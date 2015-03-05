@@ -36,8 +36,8 @@ define(function (require) {
             this.rescrollCb = this.enableOtherScroll();
             this.headerHeight = this.domCache.theadTr.height();
             this.fixHeaderCellWidth();
-            this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
-                this.setFloatTheadMode('relative');
+            this.$grid.on('click.float-thead', 'thead:first .dropdown', _.bind(function () {
+                this.setFloatTheadMode(this.scrollVisible ? 'relative' : 'default');
             }, this));
             this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
 
@@ -55,6 +55,7 @@ define(function (require) {
 
             this.setFloatTheadMode('default');
             this.disableOtherScroll();
+            this.$grid.off('click.float-thead');
             this.domCache.gridContainer.parents().add(document).off('scroll', this.checkLayout);
             // remove css
             this.domCache.headerCells.attr('style', '');
