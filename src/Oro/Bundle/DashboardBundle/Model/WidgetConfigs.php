@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Oro\Bundle\DashboardBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
 
@@ -10,6 +11,7 @@ use Oro\Component\Config\Resolver\ResolverInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WidgetConfigs
 {
@@ -31,6 +33,9 @@ class WidgetConfigs
     /** @var Request|null */
     protected $request;
 
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
     /**
      * @param ConfigProvider    $configProvider
      * @param SecurityFacade    $securityFacade
@@ -43,13 +48,15 @@ class WidgetConfigs
         SecurityFacade $securityFacade,
         ResolverInterface $resolver,
         Manager $dashboardManager,
-        StateManager $stateManager
+        StateManager $stateManager,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->configProvider   = $configProvider;
         $this->securityFacade   = $securityFacade;
         $this->resolver         = $resolver;
         $this->dashboardManager = $dashboardManager;
         $this->stateManager     = $stateManager;
+        $this->dispatcher       = $dispatcher;
     }
 
     /**
@@ -129,7 +136,14 @@ class WidgetConfigs
         $widget = $this->dashboardManager->findWidgetModel($widgetId);
         $widgetState = $this->stateManager->getWidgetState($widget);
 
-        return $widgetState->getOptions();
+        $options = $widgetState->getOptions();
+        if ($this->dispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
+            $event = new WidgetOptionsLoadEvent($options);
+            $this->dispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
+            $options = $event->getOptions();
+        }
+
+        return $options;
     }
 
     /**
