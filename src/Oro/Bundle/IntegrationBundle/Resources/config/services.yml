@@ -15,6 +15,8 @@ parameters:
 
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
     oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
+    oro_integration.importexport.processor.import.class:                  Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareImportProcessor
+    oro_integration.importexport.processor.export.class:                  Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareExportProcessor
 
     # Import/export utils
     oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
@@ -162,6 +164,20 @@ services:
           - @event_dispatcher
           - @oro_integration.logger.strategy
         lazy: true
+
+    oro_integration.importexport.processor.import:
+        class: %oro_integration.importexport.processor.import.class%
+        parent: oro_importexport.processor.import_abstract
+        abstract: true
+        calls:
+            - [setContextRegistry, [@oro_importexport.context_registry]]
+
+    oro_integration.importexport.processor.export:
+        class: %oro_integration.importexport.processor.export.class%
+        parent: oro_importexport.processor.export_abstract
+        abstract: true
+        calls:
+            - [setContextRegistry, [@oro_importexport.context_registry]]
 
     oro_integration.provider.connector_context_mediator:
         class: %oro_integration.provider.connector_context_mediator.class%

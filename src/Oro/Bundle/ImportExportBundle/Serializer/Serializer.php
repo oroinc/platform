@@ -19,15 +19,15 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = null, array $context = array())
+    public function normalize($data, $format = null, array $context = [])
     {
         if (null === $data || is_scalar($data)) {
             return $data;
-        } elseif (is_object($data) && $this->supportsNormalization($data, $format)) {
+        } elseif (is_object($data) && $this->supportsNormalization($data, $format, $context)) {
             $this->cleanCacheIfDataIsCollection($data, $format, $context);
             return $this->normalizeObject($data, $format, $context);
         } elseif ($data instanceof \Traversable) {
-            $normalized = array();
+            $normalized = [];
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
             }
@@ -58,7 +58,10 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         $cacheKey = $this->getCacheKey($type, $format, $context);
 
         if (isset($this->denormalizerCache[$cacheKey])) {
-            return $this->denormalizerCache[$cacheKey]->denormalize($data, $type, $format, $context);
+            /** @var DenormalizerInterface $normalizer */
+            $normalizer = $this->denormalizerCache[$cacheKey];
+
+            return $normalizer->denormalize($data, $type, $format, $context);
         }
 
         foreach ($this->normalizers as $normalizer) {
@@ -78,7 +81,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = array())
+    public function supportsNormalization($data, $format = null, array $context = [])
     {
         try {
             $this->getNormalizer($data, $format, $context);
@@ -92,7 +95,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = array())
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
         try {
             $this->getDenormalizer($data, $type, $format, $context);
@@ -145,7 +148,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    private function normalizeObject($object, $format = null, array $context = array())
+    private function normalizeObject($object, $format = null, array $context = [])
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
@@ -156,12 +159,15 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         $cacheKey = $this->getCacheKey($class, $format, $context);
 
         if (isset($this->normalizerCache[$cacheKey])) {
-            return $this->normalizerCache[$cacheKey]->normalize($object, $format, $context);
+            /** @var NormalizerInterface $normalizer */
+            $normalizer = $this->normalizerCache[$cacheKey];
+
+            return $normalizer->normalize($object, $format, $context);
         }
 
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof NormalizerInterface
-                && $normalizer->supportsNormalization($object, $format)) {
+                && $normalizer->supportsNormalization($object, $format, $context)) {
                 $this->normalizerCache[$cacheKey] = $normalizer;
 
                 return $normalizer->normalize($object, $format, $context);
@@ -176,7 +182,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    private function getNormalizer($data, $format = null, array $context = array())
+    private function getNormalizer($data, $format = null, array $context = [])
     {
         foreach ($this->normalizers as $normalizer) {
             if (!$normalizer instanceof NormalizerInterface) {
@@ -197,7 +203,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    private function getDenormalizer($data, $type, $format = null, array $context = array())
+    private function getDenormalizer($data, $type, $format = null, array $context = [])
     {
         foreach ($this->normalizers as $normalizer) {
             if (!$normalizer instanceof DenormalizerInterface) {
