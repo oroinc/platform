@@ -114,10 +114,15 @@ When contact ``Assigned To`` field is updated then process "contact_definition" 
 value  of ``Assigned To`` field could be changed. But option "exclude_definitions" is specified, thus this process won't
 provoke self-triggering.
 
-**Note:** If you want to test this process configuration in real application, you can put this configuration in file
+**Notes:** 
+
+ - If you want to test this process configuration in real application, you can put this configuration in file
 ``Oro/Bundle/WorkflowBundle/Resources/config/process.yml`` and reload definitions using console command
 ``app/console oro:process:configuration:load`` - after that you can create ``Contact`` of changed assigned user
 and ensure that process works.
+ - Expression `$.` allows you to access main data container, for processes it is instance of `Oro\Bundle\WorkflowBundle\Model\ProcessData`.
+ - Expression `$` (shortcut) or `$.data` allows you to access current entity, above in example it's `OroCRM\Bundle\ContactBundle\Entity\Contact`.
+
 
 Console commands
 ----------------
@@ -131,6 +136,8 @@ during application installation and update. Command has two optional options:
 
 - **--directories** - specifies directories used to find configuration files (multiple values allowed);
 - **--definitions** - specifies names of the process definitions that should be loaded (multiple values allowed).
+
+**Note:** You should run this command if process configuration was changed to upload your changes to DB.
 
 #### oro:process:execute:job
 

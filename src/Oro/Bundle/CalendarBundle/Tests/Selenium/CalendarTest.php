@@ -44,6 +44,8 @@ class CalendarTest extends Selenium2TestCase
         $login->openCalendar('Oro\Bundle\CalendarBundle')
             ->editEvent($eventName)
             ->setTitle($newEventTitle)
+            ->setStartDate('Apr 9, 2014 12:51 PM')
+            ->setEndDate('Apr 9, 2015 12:51 PM')
             ->saveEvent()
             ->assertTitle('My Calendar - John Doe')
             ->checkEventPresent($newEventTitle);

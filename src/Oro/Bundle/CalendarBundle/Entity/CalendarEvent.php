@@ -726,8 +726,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = clone $this->createdAt;
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $this->createdAt = $this->createdAt ? : $now;
+        $this->updatedAt = $now;
     }
 
     /**

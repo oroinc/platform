@@ -535,7 +535,12 @@ abstract class AbstractQueryConverter
                         $entityClassName,
                         $joinAlias,
                         Join::WITH,
-                        $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
+                        $this->getUnidirectionalJoinCondition(
+                            $joinTableAlias,
+                            $joinFieldName,
+                            $joinAlias,
+                            $entityClassName
+                        )
                     );
                 } elseif ($this->joinIdHelper->isUnidirectionalJoinWithCondition($joinId)) {
                     // such as "Entity:Name|left|WITH|t2.field = t1"
@@ -1526,10 +1531,11 @@ abstract class AbstractQueryConverter
      * @param string $joinTableAlias
      * @param string $joinFieldName
      * @param string $joinAlias
+     * @param string $entityClassName
      *
      * @return string
      */
-    protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
+    protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias, $entityClassName)
     {
         return sprintf('%s.%s = %s', $joinAlias, $joinFieldName, $joinTableAlias);
     }
