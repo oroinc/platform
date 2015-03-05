@@ -12,7 +12,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataProviderRegistryInterface;
+use Oro\Component\Layout\DataAccessorInterface;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass;
 
@@ -99,13 +99,13 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     }
 
     /**
-     * @param array                         $values
-     * @param BlockView                     $view
-     * @param ContextInterface              $context
-     * @param DataProviderRegistryInterface $data
-     * @param bool                          $evaluate
-     * @param string                        $encoding
-     * @param int                           $scope
+     * @param array                 $values
+     * @param BlockView             $view
+     * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
+     * @param bool                  $evaluate
+     * @param string                $encoding
+     * @param int                   $scope
      *
      * @return array
      *
@@ -116,7 +116,7 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
         array &$values,
         BlockView $view,
         ContextInterface $context,
-        DataProviderRegistryInterface $data,
+        DataAccessorInterface $data,
         $evaluate,
         $encoding,
         $scope
@@ -182,18 +182,18 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     }
 
     /**
-     * @param BlockView                     $view
-     * @param ContextInterface              $context
-     * @param DataProviderRegistryInterface $data
-     * @param string                        $excludeKey
-     * @param int                           $nestingLevel
+     * @param BlockView             $view
+     * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
+     * @param string                $excludeKey
+     * @param int                   $nestingLevel
      *
      * @return array
      */
     protected function getEvaluateExpressionContext(
         BlockView $view,
         ContextInterface $context,
-        DataProviderRegistryInterface $data,
+        DataAccessorInterface $data,
         $excludeKey = null,
         $nestingLevel = 0
     ) {

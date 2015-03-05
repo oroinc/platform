@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UIBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Component\Layout\Block\Type\AbstractType;
@@ -13,32 +12,15 @@ class RequireJsType extends AbstractType
 {
     const NAME = 'require_js';
 
-    /** @var bool */
-    protected $isDebug;
-
-    /**
-     * @param bool $isDebug
-     */
-    public function __construct($isDebug = false)
-    {
-        $this->isDebug = $isDebug;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(['compressed']);
-        $resolver->setNormalizers(
+        $resolver->setDefaults(
             [
-                'compressed' => function (Options $options, $compressed) {
-                    if ($compressed === null) {
-                        $compressed = !$this->isDebug;
-                    }
-
-                    return $compressed;
-                }
+                'compressed' => true,
+                'modules'    => []
             ]
         );
     }
@@ -49,6 +31,7 @@ class RequireJsType extends AbstractType
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         $view->vars['compressed'] = $options['compressed'];
+        $view->vars['modules']    = $options['modules'];
     }
 
     /**

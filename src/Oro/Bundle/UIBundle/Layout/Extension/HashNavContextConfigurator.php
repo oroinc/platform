@@ -3,12 +3,12 @@
 namespace Oro\Bundle\UIBundle\Layout\Extension;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
-use Symfony\Component\OptionsResolver\Options;
 
 class HashNavContextConfigurator implements ContextConfiguratorInterface
 {

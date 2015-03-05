@@ -69,17 +69,15 @@ class Iif extends AbstractFunction
         }
 
         $this->expression = reset($options);
-        next($options);
         if ($count === 2) {
             // short syntax
             $this->isShort    = true;
-            $this->falseValue = current($options);
+            $this->falseValue = next($options);
         } else {
             // full syntax
-            $this->isShort   = false;
-            $this->trueValue = current($options);
-            next($options);
-            $this->falseValue = current($options);
+            $this->isShort    = false;
+            $this->trueValue  = next($options);
+            $this->falseValue = next($options);
         }
 
         return $this;

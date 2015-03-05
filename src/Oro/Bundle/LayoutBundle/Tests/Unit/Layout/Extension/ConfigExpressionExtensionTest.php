@@ -74,7 +74,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewEvaluatesAllExpressions()
     {
         $context = new LayoutContext();
-        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
@@ -157,7 +157,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewEvaluatesExpressionCycledToItself()
     {
         $context = new LayoutContext();
-        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
@@ -191,7 +191,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewEvaluatesCycledExpressions()
     {
         $context = new LayoutContext();
-        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
@@ -266,7 +266,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewEncodesAllExpressions()
     {
         $context = new LayoutContext();
-        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
@@ -338,7 +338,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewThrowsExceptionIfEncoderDoesNotExist()
     {
         $context = new LayoutContext();
-        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')

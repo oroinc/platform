@@ -1,0 +1,43 @@
+oro_layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroUIBundle:layouts:base/index.html.twig'
+        - @add:
+            id:        index_before_content_addition
+            parentId:  before_content_addition
+            blockType: placeholder
+            options:
+                placeholder_name: content_after
+        - @addTree:
+            items:
+                page_header:
+                    blockType: container
+                page_title:
+                    blockType: text
+                page_buttons:
+                    blockType: container
+                name_buttons:
+                    blockType: container
+                index_navButtons_before_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: index_navButtons_before
+                        placeholder_parameters:
+                            entity_class: { @value: $context.entity_class }
+                index_navButtons_after_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: index_navButtons_after
+                        placeholder_parameters:
+                            entity_class: { @value: $context.entity_class }
+            tree:
+                content:
+                    page_header:
+                        page_title: ~
+                        page_buttons:
+                            index_navButtons_before_placeholder: ~
+                            name_buttons: ~
+                            index_navButtons_after_placeholder: ~
+
+    conditions:
+        @eq: [$context.action, 'index']

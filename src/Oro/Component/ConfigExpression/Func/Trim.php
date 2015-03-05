@@ -58,8 +58,7 @@ class Trim extends AbstractFunction
         if ($count >= 1 && $count <= 2) {
             $this->value = reset($options);
             if ($count > 1) {
-                next($options);
-                $this->charlist = current($options);
+                $this->charlist = next($options);
             }
         } else {
             throw new Exception\InvalidArgumentException(

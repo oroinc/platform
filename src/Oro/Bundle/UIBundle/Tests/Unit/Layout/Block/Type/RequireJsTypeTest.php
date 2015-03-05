@@ -11,24 +11,22 @@ class RequireJsTypeTest extends BlockTypeTestCase
     {
         $view = $this->getBlockView(
             new RequireJsType(),
-            ['compressed' => true]
+            [
+                'compressed' => false,
+                'modules'    => ['module1', 'module2']
+            ]
         );
 
-        $this->assertTrue($view->vars['compressed']);
-    }
-
-    public function testBuildViewShouldBeCompressedInProdMode()
-    {
-        $view = $this->getBlockView(new RequireJsType(false));
-
-        $this->assertTrue($view->vars['compressed']);
-    }
-
-    public function testBuildViewShouldNotBeCompressedInDevMode()
-    {
-        $view = $this->getBlockView(new RequireJsType(true));
-
         $this->assertFalse($view->vars['compressed']);
+        $this->assertEquals(['module1', 'module2'], $view->vars['modules']);
+    }
+
+    public function testBuildViewWithDefaultOptions()
+    {
+        $view = $this->getBlockView(new RequireJsType());
+
+        $this->assertTrue($view->vars['compressed']);
+        $this->assertEquals([], $view->vars['modules']);
     }
 
     public function testGetName()

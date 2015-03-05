@@ -95,8 +95,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
                 throw new InvalidArgumentException('ACL attributes must not be empty.');
             }
             if ($count > 1) {
-                next($options);
-                $this->object = current($options);
+                $this->object = next($options);
                 if (!$this->object) {
                     throw new InvalidArgumentException('ACL object must not be empty.');
                 }

@@ -14,6 +14,9 @@ class Theme
     protected $label;
 
     /** @var string */
+    protected $icon;
+
+    /** @var string */
     protected $logo;
 
     /** @var string */
@@ -73,6 +76,22 @@ class Theme
     public function setLabel($label)
     {
         $this->label = $label;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string $icon
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
     }
 
     /**

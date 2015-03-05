@@ -1,13 +1,16 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Block\Extension;
+
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\UIBundle\Layout\Extension\HeadBlockTypeExtension;
+use Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType;
+use Oro\Bundle\UIBundle\Layout\Block\Extension\HeadExtension;
 
-class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
+class HeadExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $titleProvider;
@@ -15,7 +18,7 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $titleTranslator;
 
-    /** @var HeadBlockTypeExtension */
+    /** @var HeadExtension */
     protected $extension;
 
     protected function setUp()
@@ -27,7 +30,7 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new HeadBlockTypeExtension(
+        $this->extension = new HeadExtension(
             $this->titleProvider,
             $this->titleTranslator
         );
@@ -35,7 +38,32 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExtendedType()
     {
-        $this->assertEquals('head', $this->extension->getExtendedType());
+        $this->assertEquals(HeadType::NAME, $this->extension->getExtendedType());
+    }
+
+    /**
+     * @dataProvider defaultOptionsDataProvider
+     */
+    public function testSetDefaultOptions($options, $expectedOptions)
+    {
+        $resolver = new OptionsResolver();
+        $this->extension->setDefaultOptions($resolver);
+        $resolvedOptions = $resolver->resolve($options);
+        $this->assertEquals($expectedOptions, $resolvedOptions);
+    }
+
+    public function defaultOptionsDataProvider()
+    {
+        return [
+            [
+                [],
+                ['cache' => null]
+            ],
+            [
+                ['cache' => false],
+                ['cache' => false]
+            ]
+        ];
     }
 
     public function testBuildView()
@@ -64,9 +92,10 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($titleTemplate)
             ->will($this->returnValue($translatedTitleTemplate));
 
-        $this->extension->buildView($view, $block, ['title' => '']);
+        $this->extension->buildView($view, $block, ['title' => '', 'cache' => true]);
 
         $this->assertSame($translatedTitleTemplate, $view->vars['title']);
+        $this->assertTrue($view->vars['cache']);
     }
 
     public function testBuildViewNoTitleTemplate()
@@ -91,9 +120,10 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->titleTranslator->expects($this->never())
             ->method('trans');
 
-        $this->extension->buildView($view, $block, ['title' => '']);
+        $this->extension->buildView($view, $block, ['title' => '', 'cache' => true]);
 
         $this->assertSame('', $view->vars['title']);
+        $this->assertTrue($view->vars['cache']);
     }
 
     public function testBuildViewNoRoute()
@@ -112,9 +142,10 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->titleTranslator->expects($this->never())
             ->method('trans');
 
-        $this->extension->buildView($view, $block, ['title' => '']);
+        $this->extension->buildView($view, $block, ['title' => '', 'cache' => true]);
 
         $this->assertSame('', $view->vars['title']);
+        $this->assertTrue($view->vars['cache']);
     }
 
     public function testBuildViewWithAlreadySetTitle()
@@ -131,8 +162,9 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->titleTranslator->expects($this->never())
             ->method('trans');
 
-        $this->extension->buildView($view, $block, ['title' => 'foo']);
+        $this->extension->buildView($view, $block, ['title' => 'foo', 'cache' => true]);
 
         $this->assertSame('foo', $view->vars['title']);
+        $this->assertTrue($view->vars['cache']);
     }
 }
