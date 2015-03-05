@@ -355,10 +355,13 @@ class TrackingEvent extends ExtendTrackingEvent
 
     /**
      * @param boolean $parsed
+     * @return $this
      */
     public function setParsed($parsed)
     {
         $this->parsed = $parsed;
+
+        return $this;
     }
 
     /**
@@ -371,10 +374,13 @@ class TrackingEvent extends ExtendTrackingEvent
 
     /**
      * @param TrackingData $eventData
+     * @return $this
      */
     public function setEventData($eventData)
     {
         $this->eventData = $eventData;
+
+        return $this;
     }
 
 }

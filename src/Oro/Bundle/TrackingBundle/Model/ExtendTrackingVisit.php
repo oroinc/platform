@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TrackingBundle\Model;
 
-
 class ExtendTrackingVisit
 {
     /**

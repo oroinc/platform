@@ -61,10 +61,13 @@ class TrackingEventDictionary
 
     /**
      * @param string $name
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -77,9 +80,12 @@ class TrackingEventDictionary
 
     /**
      * @param TrackingVisitEvent[] $visitEvents
+     * @return $this
      */
     public function setVisitEvents($visitEvents)
     {
         $this->visitEvents = $visitEvents;
+
+        return $this;
     }
 }

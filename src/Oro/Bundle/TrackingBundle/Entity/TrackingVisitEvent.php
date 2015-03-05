@@ -80,10 +80,13 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
 
     /**
      * @param TrackingVisit $visit
+     * @return $this
      */
     public function setVisit($visit)
     {
         $this->visit = $visit;
+
+        return $this;
     }
 
     /**
@@ -96,14 +99,18 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
 
     /**
      * @param TrackingEvent $webEvent
+     * @return $this
      */
     public function setWebEvent($webEvent)
     {
         $this->webEvent = $webEvent;
+
+        return $this;
     }
 
     /**
      * @return TrackingEventLibrary
+     * @return $this
      */
     public function getEvent()
     {
@@ -112,9 +119,12 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
 
     /**
      * @param TrackingEventLibrary $event
+     * @return $this
      */
     public function setEvent($event)
     {
         $this->event = $event;
+
+        return $this;
     }
 }

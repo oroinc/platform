@@ -101,10 +101,13 @@ class TrackingVisit extends ExtendTrackingVisit
 
     /**
      * @param string $visitorUid
+     * @return $this
      */
     public function setVisitorUid($visitorUid)
     {
         $this->visitorUid = $visitorUid;
+
+        return $this;
     }
 
     /**
@@ -117,10 +120,13 @@ class TrackingVisit extends ExtendTrackingVisit
 
     /**
      * @param string $ip
+     * @return $this
      */
     public function setIp($ip)
     {
         $this->ip = $ip;
+
+        return $this;
     }
 
     /**
@@ -133,10 +139,13 @@ class TrackingVisit extends ExtendTrackingVisit
 
     /**
      * @param string $userIdentifier
+     * @return $this
      */
     public function setUserIdentifier($userIdentifier)
     {
         $this->userIdentifier = $userIdentifier;
+
+        return $this;
     }
 
     /**
@@ -149,10 +158,13 @@ class TrackingVisit extends ExtendTrackingVisit
 
     /**
      * @param \DateTime $firstActionTime
+     * @return $this
      */
-    public function setFirstActionTime($firstActionTime)
+    public function setFirstActionTime(\DateTime $firstActionTime)
     {
         $this->firstActionTime = $firstActionTime;
+
+        return $this;
     }
 
     /**
@@ -165,26 +177,13 @@ class TrackingVisit extends ExtendTrackingVisit
 
     /**
      * @param \DateTime $lastActionTime
+     * @return $this
      */
-    public function setLastActionTime($lastActionTime)
+    public function setLastActionTime(\DateTime $lastActionTime)
     {
         $this->lastActionTime = $lastActionTime;
-    }
 
-    /**
-     * @return Customer
-     */
-    public function getCustomer()
-    {
-        return $this->customer;
-    }
-
-    /**
-     * @param Customer $customer
-     */
-    public function setCustomer($customer)
-    {
-        $this->customer = $customer;
+        return $this;
     }
 
     /**
@@ -197,10 +196,13 @@ class TrackingVisit extends ExtendTrackingVisit
 
     /**
      * @param int $parsingCount
+     * @return $this
      */
     public function setParsingCount($parsingCount)
     {
         $this->parsingCount = $parsingCount;
+
+        return $this;
     }
 
     /**
@@ -213,9 +215,12 @@ class TrackingVisit extends ExtendTrackingVisit
 
     /**
      * @param string $parsedUID
+     * @return $this
      */
     public function setParsedUID($parsedUID)
     {
         $this->parsedUID = $parsedUID;
+
+        return $this;
     }
 }
