@@ -6,8 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 use Oro\Component\Layout\LayoutContext;
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
+use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
@@ -18,8 +18,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ThemeExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ThemeManager */
-    protected $themeManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceMatcher */
+    protected $matcher;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
     protected $phpLoader;
@@ -50,7 +50,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->themeManager = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Theme\ThemeManager')
+        $this->matcher = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher')
             ->disableOriginalConstructor()->getMock();
 
         $this->yamlLoader = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
@@ -64,10 +64,10 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension = new ThemeExtension(
             $this->resources,
-            $this->themeManager,
             new ResourceFactory(),
             new ChainLoader([$this->yamlLoader, $this->phpLoader]),
-            $this->dependencyInitializer
+            $this->dependencyInitializer,
+            $this->matcher
         );
         $this->extension->setLogger($this->logger);
     }
@@ -76,7 +76,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->extension,
-            $this->themeManager,
+            $this->matcher,
             $this->yamlLoader,
             $this->phpLoader,
             $this->logger,
@@ -262,20 +262,21 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUpActiveTheme($themeName, $dir = null)
     {
-        $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $this->matcher->expects($this->any())->method('match')
+            ->willReturn(
+                function ($path) use ($themeName) {
 
-        $this->themeManager->expects($this->once())->method('getTheme')->with($themeName)->willReturn($themeMock);
-        $themeMock->expects($this->any())->method('getDirectory')->willReturn($dir ?: $themeName);
+                }
+            );
     }
 
     /**
      * @param string      $id
      * @param null|string $theme
-     * @param null|string $route
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getLayoutItem($id, $theme = null, $route = null)
+    protected function getLayoutItem($id, $theme = null)
     {
         $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
         $context    = $this->getMock('Oro\Component\Layout\ContextInterface');
@@ -283,18 +284,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $layoutItem->expects($this->any())->method('getId')->willReturn($id);
         $layoutItem->expects($this->any())->method('getContext')->willReturn($context);
 
-        $context->expects($this->any())->method('getOr')->willReturnMap(
-            [
-                ['theme', null, $theme],
-                ['route_name', null, $route],
-            ]
-        );
-        $context->expects($this->any())->method('has')->willReturnMap(
-            [
-                ['theme', null !== $theme],
-                ['route_name', null !== $route],
-            ]
-        );
+        $context->expects($this->any())->method('getOr')
+            ->with($theme)->willReturn($theme);
 
         return $layoutItem;
     }
