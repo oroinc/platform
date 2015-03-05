@@ -39,6 +39,39 @@ oro:
             event.label:      Event
             id.label:         Id
 
+        trackingvisit:
+            entity_label:        Tracking Visit
+            entity_plural_label: Tracking Visits
+            entity_description:  Tracked visits
+
+            id.label:                Id
+            first_action_time.label: First action time
+            last_action_time.label:  Last action time
+            parsed_u_i_d.label:      Parsed UID
+            parsing_count.label:     Parsing count
+            ip.label:                IP
+            user_identifier.label:   User identifier
+            visitor_uid.label:       Unique visitor ID
+
+        trackingvisitevent:
+            entity_label:        Tracking Visit Event
+            entity_plural_label: Tracking Visit Events
+            entity_description:  Tracked visit events
+
+            id.label:                Id
+            event.label:             Event
+            visit.label:             Visit
+            web_event.label:         Web event
+
+        trackingeventdictionary:
+            entity_label:        Tracking Visit Library
+            entity_plural_label: Tracking Visits Library
+            entity_description:  Tracked visit types
+
+            id.label:                Id
+            name.label:              Name
+            visit_events.label:      Visit events
+
         block:
             general:    General
             additional: Additional

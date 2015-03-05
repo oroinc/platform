@@ -86,6 +86,20 @@ class TrackingEvent extends ExtendTrackingEvent
     protected $code;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="parsed", type="boolean", options={"default" = false}, nullable=true)
+     */
+    protected $parsed;
+
+    /**
+     * @var TrackingData
+     *
+     * @ORM\OneToOne(targetEntity="TrackingData", mappedBy="event")
+     **/
+    protected $eventData;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -330,4 +344,43 @@ class TrackingEvent extends ExtendTrackingEvent
     {
         return $this->website;
     }
+
+    /**
+     * @return boolean
+     */
+    public function isParsed()
+    {
+        return $this->parsed;
+    }
+
+    /**
+     * @param boolean $parsed
+     * @return $this
+     */
+    public function setParsed($parsed)
+    {
+        $this->parsed = $parsed;
+
+        return $this;
+    }
+
+    /**
+     * @return TrackingData
+     */
+    public function getEventData()
+    {
+        return $this->eventData;
+    }
+
+    /**
+     * @param TrackingData $eventData
+     * @return $this
+     */
+    public function setEventData($eventData)
+    {
+        $this->eventData = $eventData;
+
+        return $this;
+    }
+
 }
