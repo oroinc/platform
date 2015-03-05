@@ -1,3 +1,7 @@
+CHANGELOG for 1.7.0
+===================
+ * Integration import processors may be tagged with `oro_integration.sync_processor` DIC tag with `integration` name. During integration import appropriate processor will be used if registered.
+
 CHANGELOG for 1.6.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.6.0 versions.
