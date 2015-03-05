@@ -27,16 +27,19 @@ define(function (require) {
      * @see http://stackoverflow.com/questions/14492613/ios-ipad-fixed-position-breaks-when-keyboard-is-opened
      */
     function fixStickyHeader() {
-        var $body, forceHeaderLayoutUpdate;
+        var $body, forceHeaderLayoutUpdate,
+            elementsWithKeyboardSelector = 'input[type=text], input[type=number], textarea, [content-editable]';
         $body = $('body');
         forceHeaderLayoutUpdate = _.debounce(function () {
             $(document).scrollTop($(document).scrollTop());
+            mediator.trigger('layout:headerStateChange');
         }, 1);
         $(document)
-            .on('focus', ':input', function () {
+            .on('focus', elementsWithKeyboardSelector, function () {
                 $body.addClass('input-focused');
+                mediator.trigger('layout:headerStateChange');
             })
-            .on('blur', ':input', function () {
+            .on('blur', elementsWithKeyboardSelector, function () {
                 $body.removeClass('input-focused');
                 forceHeaderLayoutUpdate();
             });
@@ -52,8 +55,10 @@ define(function (require) {
             var $mainEl = $('#container').find('>:first-child');
             if (_.some(dialogs)) {
                 mediator.execute('layout:disablePageScroll', $mainEl);
+                $('#page').css('display', 'none');
             } else {
                 mediator.execute('layout:enablePageScroll', $mainEl);
+                $('#page').css('display', '');
             }
         }
 
