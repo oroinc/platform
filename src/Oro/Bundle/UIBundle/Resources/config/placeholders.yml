@@ -5,6 +5,8 @@ placeholders:
                 order: 100
     user_menu:
         items:
+            user_dots_menu:
+                order: 150
             help:
                 order: 200
     form_buttons:
@@ -39,6 +41,8 @@ items:
         template: OroUIBundle:Default:logo.html.twig
     help:
         template: OroUIBundle:Default:help.html.twig
+    user_dots_menu:
+        template: OroUIBundle:Default:user_dots_menu.html.twig
     add_update_delete:
         template: OroUIBundle:Form:buttons.html.twig
     init_pinned_dropdown_button:
