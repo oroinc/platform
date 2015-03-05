@@ -32,6 +32,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             'click .default-actions-container .remove-action': function(event) {
                 event.preventDefault();
                 this.onRemoveFromDashboard();
+            },
+            'click .default-actions-container .configure-action': function(event) {
+                event.preventDefault();
+                this.onConfigure();
             }
         },
 
@@ -75,6 +79,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
                                     '<i class="icon-move hide-text"></i>' +
                                 '</a>' +
                             '</span>' +
+                            '<% if (showConfig) { %>' +
+                                '<span class="action-wrapper">' +
+                                    '<a class="configure-action" href="#" title="<%- _.__(\'oro.dashboard.widget.configure\') %>">' +
+                                        '<i class="icon-cog hide-text"></i>' +
+                                    '</a>' +
+                                '</span>' +
+                            '<% } %>' +
                             '<span class="action-wrapper">' +
                                 '<a class="remove-action" href="#" title="<%- _.__(\'oro.dashboard.widget.remove\') %>">' +
                                     '<i class="icon-trash hide-text"></i>' +
@@ -97,6 +108,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             this.options = _.defaults(options || {}, this.options);
             this.options.templateParams.allowEdit = this.options.allowEdit;
             this.options.templateParams.collapsed = options.state.expanded;
+            this.options.templateParams.showConfig = this.options.showConfig;
             BlockWidget.prototype.initialize.apply(this, arguments);
         },
 
@@ -244,6 +256,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
         onRemoveFromDashboard: function() {
             this.trigger('removeFromDashboard', this.$el, this);
             mediator.trigger('widget:dashboard:removeFromDashboard:' + this.getWid(), this.$el, this);
+        },
+
+        /**
+         * Trigger configure action
+         */
+        onConfigure: function() {
+            this.trigger('configure', this.$el, this);
+            mediator.trigger('widget:dashboard:configure:' + this.getWid(), this.$el, this);
         }
     });
 });

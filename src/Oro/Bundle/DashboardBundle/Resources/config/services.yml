@@ -10,7 +10,7 @@ parameters:
     oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
     oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
-    oro_dashboard.provider.form_provider.class:  Oro\Bundle\DashboardBundle\Provider\Form\DashboardConfigurationFormProvider
+    oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
 
 services:
     oro_dashboard.config_resolver:
@@ -74,8 +74,8 @@ services:
         tags:
             - { name: form.type, alias: "oro_dashboard_select" }
 
-    oro_dashboard.provider.dashboard_configuration.form_provider:
-        class: %oro_dashboard.provider.form_provider.class%
+    oro_dashboard.provider.widget_configuration_form_provider:
+        class: %oro_dashboard.provider.widget_configuration_form_provider.class%
         arguments:
             - @oro_dashboard.config_provider
             - @form.factory

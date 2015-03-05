@@ -7,7 +7,7 @@ use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class DashboardConfigurationFormProvider
+class WidgetConfigurationFormProvider
 {
     /** @var array */
     protected $config;

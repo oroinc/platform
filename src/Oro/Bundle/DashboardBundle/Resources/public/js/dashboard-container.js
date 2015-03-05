@@ -1,7 +1,7 @@
 /*global define*/
 define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/js/mediator',
-    'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item', 'orodashboard/js/dashboard-util', 'jquery-ui'],
-    function ($, _, Backbone, routing, __, mediator, widgetManager, DashboardItemWidget, dashboardUtil) {
+    'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item', 'orodashboard/js/dashboard-util', 'orodashboard/js/widget/configuration-widget', 'jquery-ui'],
+    function ($, _, Backbone, routing, __, mediator, widgetManager, DashboardItemWidget, dashboardUtil, ConfigurationWidget) {
     'use strict';
 
     /**
@@ -154,6 +154,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             widget.off('removeFromDashboard', this._onRemove, this);
             widget.on('removeFromDashboard', this._onRemove, this);
 
+            widget.off('configure', this._onConfigure, this);
+            widget.on('configure', this._onConfigure, this);
+
             widget.off('collapse expand', this._onCollapseOrExpand, this);
             widget.on('collapse expand', this._onCollapseOrExpand, this);
         },
@@ -174,6 +177,19 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                 url: this._getRemoveWidgetUrl(widget),
                 type: 'DELETE'
             });
+        },
+
+        /**
+         * @param {HTMLElement} el
+         * @param {DashboardItemWidget} widget
+         * @private
+         */
+        _onConfigure: function(el, widget) {
+            var configurationWidget = new ConfigurationWidget({
+                widget: widget
+            });
+            mediator.on('widget_success:' + configurationWidget.getWid(), widget.render);
+            configurationWidget.render();
         },
 
         /**
