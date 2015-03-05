@@ -17,7 +17,7 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
     /** @var TrackingEventMappingProvider */
     protected $mappingProvider;
 
-    /** @var [] */
+    /** @var array */
     protected $targetEntities;
 
     /** @var ConfigManager */

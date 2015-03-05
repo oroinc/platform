@@ -87,7 +87,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
 
-
     oro_tracking.migration.extension.tracking_identifier:
         class: Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension
         tags:
