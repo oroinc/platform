@@ -1,5 +1,6 @@
 parameters:
     oro_sso.oauth_provider.class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
+    oro_sso.event_listener.user_email_change_listener.class: Oro\Bundle\SSOBundle\EventListener\UserEmailChangeListener
     hwi_oauth.authentication.provider.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthProvider
     hwi_oauth.resource_owner.google.class: Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner
 
@@ -7,3 +8,8 @@ services:
     oro_sso.oauth_provider:
         class:     %oro_sso.oauth_provider.class%
         arguments: [@oro_user.manager, @oro_config.global]
+
+    oro_sso.event_listener.user_email_change_listener.class:
+        class:  %oro_sso.event_listener.user_email_change_listener.class%
+        tags:
+            - { name: doctrine.event_listener, event: preUpdate }
