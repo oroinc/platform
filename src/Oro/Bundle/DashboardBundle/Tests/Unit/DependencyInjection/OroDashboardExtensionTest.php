@@ -98,7 +98,8 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                     'enabled' => true
                                 ),
                             ),
-                            'enabled' => true
+                            'enabled' => true,
+                            'fields' => [],
                         ),
                         'second_quick_launchpad' => array(
                             'route' => 'second_quick_launchpad_test_route',
@@ -107,7 +108,8 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                 'name'   => 'secondQuickLaunchpad',
                                 'widget' => 'second_quick_launchpad'
                             ),
-                            'enabled' => true
+                            'enabled' => true,
+                            'fields' => [],
                         )
                     ),
                     'dashboards' => array(
