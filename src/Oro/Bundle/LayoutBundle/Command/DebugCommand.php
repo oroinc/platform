@@ -53,9 +53,15 @@ class DebugCommand extends ContainerAwareCommand
             $context = new DebugLayoutContext();
             $registry->configureContext($context);
             $output->writeln('Context configurators:');
-            $contextConfigurators = $registry->getContextConfigurators();
+            $contextConfigurators = array_map(
+                function ($configurator) {
+                    return get_class($configurator);
+                },
+                $registry->getContextConfigurators()
+            );
+            sort($contextConfigurators);
             foreach ($contextConfigurators as $configurator) {
-                $output->writeln(' ' . get_class($configurator));
+                $output->writeln(' ' . $configurator);
             }
             $this->dumpOptionResolver($context->getDataResolver(), $output);
 
@@ -75,9 +81,15 @@ class DebugCommand extends ContainerAwareCommand
             }
             $output->writeln(sprintf('Type inheritance: %s', implode(' <- ', $hierarchy)));
             $output->writeln('Type extensions:');
-            $blockTypeExtensions = $registry->getTypeExtensions($blockTypeName);
+            $blockTypeExtensions = array_map(
+                function ($extension) {
+                    return get_class($extension);
+                },
+                $registry->getTypeExtensions($blockTypeName)
+            );
+            sort($blockTypeExtensions);
             foreach ($blockTypeExtensions as $extension) {
-                $output->writeln(' ' . get_class($extension));
+                $output->writeln(' ' . $extension);
             }
             $optionsResolver = $this->getBlockTypeOptionsResolver($blockTypeName, $registry);
             $this->dumpOptionResolver($optionsResolver, $output);
@@ -93,17 +105,21 @@ class DebugCommand extends ContainerAwareCommand
         /** @var TableHelper $table */
         $table = $this->getHelper('table');
 
-        $output->writeln('Default Options:');
+        $output->writeln('Default options:');
         $table->setHeaders(['Name', 'Value']);
-        foreach ($resolver->getDefaultOptions() as $key => $value) {
-            $table->addRow([$key, $this->formatValue($value)]);
+        $options = $resolver->getDefaultOptions();
+        ksort($options);
+        foreach ($options as $name => $value) {
+            $table->addRow([$name, $this->formatValue($value)]);
         }
         $table->render($output);
 
-        $output->writeln('Known Options:');
+        $output->writeln('Known options:');
         $table->setHeaders(['Name', 'Type(s)']);
         $table->setRows([]);
-        foreach ($resolver->getKnownOptions() as $name => $types) {
+        $options = $resolver->getKnownOptions();
+        ksort($options);
+        foreach ($options as $name => $types) {
             $table->addRow([$name, implode(', ', $types)]);
         }
         $table->render($output);
