@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
@@ -20,20 +23,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $entity = new Email();
         ReflectionUtil::setId($entity, 1);
         $this->assertEquals(1, $entity->getId());
-    }
-
-    public function testSubjectGetterAndSetter()
-    {
-        $entity = new Email();
-        $entity->setSubject('test');
-        $this->assertEquals('test', $entity->getSubject());
-    }
-
-    public function testFromNameGetterAndSetter()
-    {
-        $entity = new Email();
-        $entity->setFromName('test');
-        $this->assertEquals('test', $entity->getFromName());
     }
 
     public function testFromEmailAddressGetterAndSetter()
@@ -93,58 +82,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bccRecipient === $recipients->first());
     }
 
-    public function testReceivedAtGetterAndSetter()
-    {
-        $entity = new Email();
-        $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $entity->setReceivedAt($date);
-        $this->assertEquals($date, $entity->getReceivedAt());
-    }
-
-    public function testSentAtGetterAndSetter()
-    {
-        $entity = new Email();
-        $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $entity->setSentAt($date);
-        $this->assertEquals($date, $entity->getSentAt());
-    }
-
-    public function testImportanceGetterAndSetter()
-    {
-        $entity = new Email();
-        $entity->setImportance(1);
-        $this->assertEquals(1, $entity->getImportance());
-    }
-
-    public function testInternalDateGetterAndSetter()
-    {
-        $entity = new Email();
-        $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $entity->setInternalDate($date);
-        $this->assertEquals($date, $entity->getInternalDate());
-    }
-
-    public function testMessageIdGetterAndSetter()
-    {
-        $entity = new Email();
-        $entity->setMessageId('test');
-        $this->assertEquals('test', $entity->getMessageId());
-    }
-
-    public function testXMessageIdGetterAndSetter()
-    {
-        $entity = new Email();
-        $entity->setXMessageId('test');
-        $this->assertEquals('test', $entity->getXMessageId());
-    }
-
-    public function testXThreadIdGetterAndSetter()
-    {
-        $entity = new Email();
-        $entity->setXThreadId('test');
-        $this->assertEquals('test', $entity->getXThreadId());
-    }
-
     public function testFolderGetterAndSetter()
     {
         $folder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
@@ -174,5 +111,49 @@ class EmailTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(Email::NORMAL_IMPORTANCE, $entity->getImportance());
         $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
+    }
+
+    public function testIsHeadGetterAndSetter()
+    {
+        $entity = new Email();
+        $this->assertTrue($entity->isHead());
+
+        $entity->setHead(false);
+        $this->assertFalse($entity->isHead());
+    }
+
+    /**
+     * @dataProvider propertiesDataProvider
+     * @param string $property
+     * @param mixed  $value
+     */
+    public function testSettersAndGetters($property, $value)
+    {
+        $obj = new Email();
+
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $accessor->setValue($obj, $property, $value);
+        $this->assertEquals($value, $accessor->getValue($obj, $property));
+    }
+
+    public function propertiesDataProvider()
+    {
+        return [
+            ['subject', 'testSubject'],
+            ['fromName', 'testFromName'],
+            ['receivedAt', new \DateTime('now', new \DateTimeZone('UTC'))],
+            ['sentAt', new \DateTime('now', new \DateTimeZone('UTC'))],
+            ['importance', Email::HIGH_IMPORTANCE],
+            ['internalDate', new \DateTime('now', new \DateTimeZone('UTC'))],
+            ['messageId', 'testMessageId'],
+            ['xMessageId', 'testXMessageId'],
+            ['thread', new EmailThread()],
+            ['xThreadId', 'testxXThreadId'],
+            ['refs', 'testRefs'],
+            ['seen', true],
+            ['seen', ''],
+            ['seen', 0],
+            ['seen', 1],
+        ];
     }
 }

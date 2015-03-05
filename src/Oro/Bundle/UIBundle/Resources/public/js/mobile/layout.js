@@ -5,6 +5,7 @@ define(function (require) {
     'use strict';
     var $ = require('jquery'),
         _ = require('underscore'),
+        mediator = require('oroui/js/mediator'),
         pageHeader = require('oroui/js/mobile/page-header');
     require('oroui/js/mobile/side-menu');
 
@@ -42,12 +43,42 @@ define(function (require) {
     }
 
     /**
+     * Binds to dialog state change events and locks/unlocks page scroll
+     */
+    function initDialogStateTracker() {
+        var  dialogs = {};
+
+        function scrollUpdate() {
+            var $mainEl = $('#container').find('>:first-child');
+            if (_.some(dialogs)) {
+                mediator.execute('layout:disablePageScroll', $mainEl);
+            } else {
+                mediator.execute('layout:enablePageScroll', $mainEl);
+            }
+        }
+
+        mediator.on('widget_dialog:open', function (dialog) {
+            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
+            scrollUpdate();
+        });
+        mediator.on('widget_dialog:close', function (dialog) {
+            delete dialogs[dialog.cid];
+            scrollUpdate();
+        });
+        mediator.on('widget_dialog:stateChange', function (dialog) {
+            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
+            scrollUpdate();
+        });
+    }
+
+    /**
      * Initiate mobile layout
      */
     function initLayout() {
         fixStickyHeader();
         initMainMenu();
         pageHeader.init();
+        initDialogStateTracker();
     }
 
     /**

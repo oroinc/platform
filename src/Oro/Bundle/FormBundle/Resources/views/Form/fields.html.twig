@@ -302,6 +302,12 @@
 {% endblock %}
 
 {% block oro_date_widget %}
+    {% set dateValidation = {'Date' : {}} %}
+
+    {% if required %}
+        {% set dateValidation = dateValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+    {% endif %}
+
     {% set options = {
         view: 'oroui/js/app/views/datepicker/datepicker-view',
         nativeMode: isMobileVersion(),
@@ -309,7 +315,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            'data-validation': '{"Date":{}}',
+            'data-validation': dateValidation|json_encode,
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -329,6 +335,14 @@
 {% endblock oro_date_widget %}
 
 {% block oro_datetime_widget %}
+    {% set dateValidation = {'Date' : {}} %}
+    {% set timeValidation = {'Time' : {}} %}
+
+    {% if required %}
+        {% set dateValidation = dateValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+        {% set timeValidation = timeValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+    {% endif %}
+
     {% set options = {
         view: 'oroui/js/app/views/datepicker/datetimepicker-view',
         nativeMode: isMobileVersion(),
@@ -337,7 +351,7 @@
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
             class: 'input-small',
-            'data-validation': '{"Date":{}}',
+            'data-validation': dateValidation|json_encode
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -351,7 +365,7 @@
             id: 'time_selector_' ~ id,
             name: 'time_selector_' ~ id,
             class: 'input-small',
-            'data-validation': '{"Time":{}}',
+            'data-validation': timeValidation|json_encode
         },
         timePickerOptions: {
         }

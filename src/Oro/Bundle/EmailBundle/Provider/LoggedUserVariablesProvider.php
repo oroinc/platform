@@ -11,7 +11,15 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
+/**
+ * Class LoggedUserVariablesProvider
+ *
+ * @package Oro\Bundle\EmailBundle\Provider
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
 {
     /** @var TranslatorInterface */
@@ -23,6 +31,9 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /** @var NameFormatter */
     protected $nameFormatter;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param TranslatorInterface $translator
      * @param SecurityFacade      $securityFacade
@@ -31,11 +42,13 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     public function __construct(
         TranslatorInterface $translator,
         SecurityFacade $securityFacade,
-        NameFormatter $nameFormatter
+        NameFormatter $nameFormatter,
+        ConfigManager $configManager
     ) {
         $this->translator     = $translator;
         $this->securityFacade = $securityFacade;
         $this->nameFormatter  = $nameFormatter;
+        $this->configManager  = $configManager;
     }
 
     /**
@@ -71,6 +84,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
         $this->addUserFirstName($result, $user, $addValue);
         $this->addUserLastName($result, $user, $addValue);
         $this->addUserFullName($result, $user, $addValue);
+        $this->addUserSignature($result, $user, $addValue);
 
         return $result;
     }
@@ -182,6 +196,28 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
             $result['userFullName'] = $val;
         } elseif ($addValue) {
             $result['userFullName'] = '';
+        }
+    }
+
+    /**
+     * @param array  $result
+     * @param object $user
+     * @param bool   $addValue
+     */
+    protected function addUserSignature(array &$result, $user, $addValue)
+    {
+        if (is_object($user)) {
+            if ($addValue) {
+                $val = $this->configManager->get('oro_email.signature');
+            } else {
+                $val = [
+                    'type'  => 'string',
+                    'label' => $this->translator->trans('oro.email.system_configuration.signature_configuration.label'),
+                ];
+            }
+            $result['userSignature'] = $val;
+        } elseif ($addValue) {
+            $result['userSignature'] = '';
         }
     }
 }

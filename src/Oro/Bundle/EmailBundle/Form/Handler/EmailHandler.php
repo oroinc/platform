@@ -11,26 +11,25 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class EmailHandler
  *
  * @package Oro\Bundle\EmailBundle\Form\Handler
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailHandler
 {
@@ -45,14 +44,9 @@ class EmailHandler
     protected $request;
 
     /**
-     * @var EntityManager
+     * @var Processor
      */
-    protected $em;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    protected $emailProcessor;
 
     /**
      * @var LoggerInterface
@@ -60,74 +54,21 @@ class EmailHandler
     protected $logger;
 
     /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
-
-    /**
-     * @var Processor
-     */
-    protected $emailProcessor;
-
-    /**
-     * @var EmailAddressManager
-     */
-    protected $emailAddressManager;
-
-    /**
-     * @var EmailAddressHelper
-     */
-    protected $emailAddressHelper;
-
-    /**
-     * @var NameFormatter
-     */
-    protected $nameFormatter;
-
-    /**
-     * @var EntityRoutingHelper
-     */
-    protected $entityRoutingHelper;
-
-    /**
-     * @param FormInterface            $form
-     * @param Request                  $request
-     * @param EntityManager            $em
-     * @param Translator               $translator
-     * @param SecurityContextInterface $securityContext
-     * @param EmailAddressManager      $emailAddressManager
-     * @param EmailAddressHelper       $emailAddressHelper
-     * @param LoggerInterface          $logger
-     * @param Processor                $emailProcessor
-     * @param NameFormatter            $nameFormatter
-     * @param EntityRoutingHelper      $entityRoutingHelper
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @param FormInterface   $form
+     * @param Request         $request
+     * @param Processor       $emailProcessor
+     * @param LoggerInterface $logger
      */
     public function __construct(
         FormInterface $form,
         Request $request,
-        EntityManager $em,
-        Translator $translator,
-        SecurityContextInterface $securityContext,
-        EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper,
         Processor $emailProcessor,
-        LoggerInterface $logger,
-        NameFormatter $nameFormatter,
-        EntityRoutingHelper $entityRoutingHelper
+        LoggerInterface $logger
     ) {
         $this->form                = $form;
         $this->request             = $request;
-        $this->em                  = $em;
-        $this->translator          = $translator;
-        $this->securityContext     = $securityContext;
-        $this->emailAddressManager = $emailAddressManager;
-        $this->emailAddressHelper  = $emailAddressHelper;
         $this->emailProcessor      = $emailProcessor;
         $this->logger              = $logger;
-        $this->nameFormatter       = $nameFormatter;
-        $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
     /**
@@ -138,9 +79,6 @@ class EmailHandler
      */
     public function process(Email $model)
     {
-        if ($this->request->getMethod() === 'GET') {
-            $this->initModel($model);
-        }
         $this->form->setData($model);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
@@ -158,157 +96,5 @@ class EmailHandler
         }
 
         return false;
-    }
-
-    /**
-     * Populate a model with initial data.
-     * This method is used to load an initial data from a query string
-     *
-     * @param Email $model
-     */
-    protected function initModel(Email $model)
-    {
-        if ($this->request->query->has('gridName')) {
-            $model->setGridName($this->request->query->get('gridName'));
-        }
-        if ($this->request->query->has('entityClass')) {
-            $model->setEntityClass(
-                $this->entityRoutingHelper->decodeClassName($this->request->query->get('entityClass'))
-            );
-        }
-        if ($this->request->query->has('entityId')) {
-            $model->setEntityId($this->request->query->get('entityId'));
-        }
-        $this->initFrom($model);
-        $this->initRecipients($model);
-        $this->initSubject($model);
-    }
-
-    /**
-     * @param Email $model
-     */
-    protected function initRecipients(Email $model)
-    {
-        $model->setTo($this->getRecipients($model, EmailRecipient::TO));
-        $model->setCc($this->getRecipients($model, EmailRecipient::CC));
-        $model->setBcc($this->getRecipients($model, EmailRecipient::BCC));
-    }
-
-    /**
-     * @param Email $model
-     * @param string $type
-     *
-     * @return array
-     */
-    protected function getRecipients(Email $model, $type)
-    {
-        $addresses = [];
-        if ($this->request->query->has($type)) {
-            $address = trim($this->request->query->get($type));
-            if (!empty($address)) {
-                $this->preciseFullEmailAddress($address, $model->getEntityClass(), $model->getEntityId());
-            }
-            $addresses = [$address];
-        }
-        return $addresses;
-    }
-
-    /**
-     * @param Email $model
-     */
-    protected function initSubject(Email $model)
-    {
-        if ($this->request->query->has('subject')) {
-            $subject = trim($this->request->query->get('subject'));
-            $model->setSubject($subject);
-        }
-    }
-
-    /**
-     * @param Email $model
-     */
-    protected function initFrom(Email $model)
-    {
-        if ($this->request->query->has('from')) {
-            $from = $this->request->query->get('from');
-            if (!empty($from)) {
-                $this->preciseFullEmailAddress($from);
-            }
-            $model->setFrom($from);
-        } else {
-            $user = $this->getUser();
-            if ($user) {
-                $model->setFrom(
-                    $this->emailAddressHelper->buildFullEmailAddress(
-                        $user->getEmail(),
-                        $this->nameFormatter->format($user)
-                    )
-                );
-            }
-        }
-    }
-
-    /**
-     * @param string      $emailAddress
-     * @param string|null $ownerClass
-     * @param mixed|null  $ownerId
-     */
-    protected function preciseFullEmailAddress(&$emailAddress, $ownerClass = null, $ownerId = null)
-    {
-        if (!$this->emailAddressHelper->isFullEmailAddress($emailAddress)) {
-            if (!empty($ownerClass) && !empty($ownerId)) {
-                $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
-                if ($owner && $this->isFullQualifiedUser($owner)) {
-                    $ownerName = $this->nameFormatter->format($owner);
-                    if (!empty($ownerName)) {
-                        $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
-
-                        return;
-                    }
-                }
-            }
-            $repo            = $this->emailAddressManager->getEmailAddressRepository($this->em);
-            $emailAddressObj = $repo->findOneBy(array('email' => $emailAddress));
-            if ($emailAddressObj) {
-                $owner = $emailAddressObj->getOwner();
-                if ($owner) {
-                    $ownerName = $this->nameFormatter->format($owner);
-                    if (!empty($ownerName)) {
-                        $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Get the current authenticated user
-     *
-     * @return UserInterface|EmailHolderInterface|EmailOwnerInterface|null
-     */
-    protected function getUser()
-    {
-        $token = $this->securityContext->getToken();
-        if ($token) {
-            $user = $token->getUser();
-            if (
-                $this->isFullQualifiedUser($user)
-            ) {
-                return $user;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param $entity
-     * @return bool
-     */
-    protected function isFullQualifiedUser($entity)
-    {
-        return $entity instanceof UserInterface
-        && $entity instanceof EmailHolderInterface
-        && $entity instanceof EmailOwnerInterface;
     }
 }

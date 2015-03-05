@@ -30,11 +30,14 @@ define([
             updatedAt: '',
 
             is_loaded: false,
+            is_head: false,
             contentHTML: '',
 
             editable: true,
             removable: true,
-            commentable: false
+            commentable: false,
+
+            targetEntityData: ''
         },
 
         initialize: function () {

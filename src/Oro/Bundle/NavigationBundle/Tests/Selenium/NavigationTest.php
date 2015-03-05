@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Selenium;
 
+use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Groups;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 /**
  * Class NavigationTest
@@ -17,6 +20,7 @@ class NavigationTest extends Selenium2TestCase
     public function testUserTab()
     {
         $login = $this->login();
+        /** @var $login Navigation */
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('User Management')
@@ -90,6 +94,7 @@ class NavigationTest extends Selenium2TestCase
     public function testPinbarFavorites()
     {
         $login = $this->login();
+        /** @var $login Groups */
         $login->openGroups('Oro\Bundle\UserBundle');
         //Add Groups page to favorites
         $login->getTest()->byXPath("//button[@class='btn favorite-button']")->click();
@@ -121,14 +126,13 @@ class NavigationTest extends Selenium2TestCase
     public function testTabs()
     {
         $login = $this->login();
-        $login->openUsers('Oro\Bundle\UserBundle');
-        //Minimize page to pinbar tabs
-        $login->getTest()->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button']")->click();
-        $login->waitForAjax();
-        $login->assertElementPresent(
-            "//div[@class='list-bar']//a[@title = 'Users - User Management - System' and text() = 'Users']",
-            'Element does not minimised to pinbar tab'
-        );
+        /** @var $login Users */
+        $login->openUsers('Oro\Bundle\UserBundle')
+            ->pin()
+            ->assertElementPresent(
+                "//div[@class='list-bar']//a[@title = 'Users - User Management - System' and text() = 'Users']",
+                'Element does not minimised to pinbar tab'
+            );
     }
 
     public function testSimpleSearch()

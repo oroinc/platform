@@ -3,6 +3,7 @@ parameters:
     oro_form.twig.form.class:                    Oro\Bundle\FormBundle\Twig\FormExtension
     oro_form.twig.js_validation_extension.class: Oro\Bundle\FormBundle\Twig\JsValidationExtension
     oro_form.model.update_handler.class:         Oro\Bundle\FormBundle\Model\UpdateHandler
+    oro_form.provider.html_tag_provider.class:   Oro\Bundle\FormBundle\Provider\HtmlTagProvider
 
 services:
     oro_form.validator.constraint_factory:
@@ -26,3 +27,6 @@ services:
             - @session
             - @oro_ui.router
             - @oro_entity.doctrine_helper
+
+    oro_form.provider.html_tag_provider:
+        class: %oro_form.provider.html_tag_provider.class%

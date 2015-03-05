@@ -94,13 +94,30 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             // update synchronization date for the current folder
             $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
+
             $this->em->flush($folder);
+
+            $this->cleanUp(true, $imapFolder->getFolder());
         }
 
         // run removing of empty outdated folders every N synchronizations
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDoNotCleanableEntityClasses()
+    {
+        return array_merge(
+            parent::getDoNotCleanableEntityClasses(),
+            [
+                'Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin',
+                'Oro\Bundle\ImapBundle\Entity\ImapEmailFolder'
+            ]
+        );
     }
 
     /**
@@ -338,7 +355,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if ($count === self::DB_BATCH_SIZE) {
                 $this->saveEmails($batch, $imapFolder);
                 $count = 0;
-                $batch = array();
+                $batch = [];
             }
         }
         if ($count > 0) {
@@ -409,7 +426,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 try {
                     $imapEmail       = $this->createImapEmail(
                         $email->getId()->getUid(),
-                        $this->addEmail($email, $folder),
+                        $this->addEmail($email, $folder, $email->hasFlag("\\Seen")),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;
@@ -449,6 +466,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
 
         $this->em->flush();
+
+        $this->cleanUp();
     }
 
     /**

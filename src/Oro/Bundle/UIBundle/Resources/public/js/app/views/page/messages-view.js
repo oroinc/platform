@@ -19,7 +19,7 @@ define([
          */
         render: function () {
             if (!this.actionArgs || !this.data) {
-                return;
+                return this;
             }
 
             this.$el.empty();
@@ -28,6 +28,8 @@ define([
             if (this.actionArgs.options.fromCache !== true) {
                 this._addMessages(this.data.flashMessages);
             }
+
+            return this;
         },
 
         /**
