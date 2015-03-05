@@ -79,3 +79,4 @@ services:
         arguments:
             - @oro_dashboard.config_provider
             - @form.factory
+            - @oro_form.validator.constraint_factory

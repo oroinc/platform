@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -93,6 +94,7 @@ class DashboardController extends Controller
 
     /**
      * @Route("/configure/{id}", name="oro_dashboard_configure", requirements={"id"="\d+"})
+     * @Method({"GET", "POST"})
      * @Template("OroDashboardBundle:Dashboard:dialog/configure.html.twig")
      */
     public function configureAction(Request $request, Widget $widget)
