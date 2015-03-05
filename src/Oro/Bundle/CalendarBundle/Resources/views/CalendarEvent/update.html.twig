@@ -74,4 +74,11 @@
         'dataBlocks': dataBlocks
     } %}
     {{ parent() }}
+    {% set options = {
+        'view':'orocalendar/js/app/views/change-duration-view',
+        'startSelector': '#' ~ form.start.vars.id,
+        'endSelector': '#' ~ form.end.vars.id
+    } %}
+    <div data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ options|json_encode }}"></div>
 {% endblock content_data %}
