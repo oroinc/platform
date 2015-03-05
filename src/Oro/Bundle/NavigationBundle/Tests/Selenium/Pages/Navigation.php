@@ -32,7 +32,7 @@ class Navigation extends AbstractPage
 
         $this->tabs = $this->test->byId("main-menu");
 
-        $this->pinbar = $this->test->byXpath("//div[contains(@class, 'pin-bar')]");
+        $this->pinbar = $this->test->byXpath("//li[contains(@class, 'dot-menu')]");
     }
 
     public function tab($tab)
