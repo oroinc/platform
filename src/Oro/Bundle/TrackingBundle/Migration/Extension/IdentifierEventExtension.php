@@ -6,9 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-
 
 class IdentifierEventExtension implements ExtendExtensionAwareInterface
 {
@@ -27,7 +25,7 @@ class IdentifierEventExtension implements ExtendExtensionAwareInterface
     }
 
     /**
-     * Adds the association between the target table and the note table
+     * Adds the association between the target table and the visit table
      *
      * @param Schema $schema
      * @param string $targetTableName  Target entity table name
@@ -45,10 +43,6 @@ class IdentifierEventExtension implements ExtendExtensionAwareInterface
             $primaryKeyColumns = $targetTable->getPrimaryKeyColumns();
             $targetColumnName  = array_shift($primaryKeyColumns);
         }
-
-//        $options = new OroOptions();
-//        $options->set(self::ASSOCIATION_KIND, 'enabled', true);
-//        $targetTable->addOption(OroOptions::KEY, $options);
 
         $associationName = ExtendHelper::buildAssociationName(
             $this->extendExtension->getEntityClassByTableName($targetTableName),

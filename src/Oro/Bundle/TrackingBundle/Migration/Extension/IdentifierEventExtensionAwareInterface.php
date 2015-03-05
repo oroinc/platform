@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\TrackingBundle\Migration\Extension;
 
-
 interface IdentifierEventExtensionAwareInterface
 {
     /**
-     * Sets the
+     * Sets the identifier tracking visit association
      *
      * @param IdentifierEventExtension $extension
      */
