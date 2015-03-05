@@ -63,14 +63,6 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     }
 
     /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return TrackingVisit
      */
     public function getVisit()
