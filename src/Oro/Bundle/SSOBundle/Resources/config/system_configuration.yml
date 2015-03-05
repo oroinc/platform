@@ -1,6 +1,7 @@
 oro_system_configuration:
     groups:
         google_settings:
+            icon: fa-google
             title: oro.sso.system_configuration.groups.google_settings.title
         google_integration_settings:
             title: oro.sso.system_configuration.groups.google_integration_settings.title
