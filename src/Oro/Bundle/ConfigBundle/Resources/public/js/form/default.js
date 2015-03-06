@@ -12,12 +12,15 @@ define(['jquery', 'underscore'], function ($, _) {
                             var tinymceInstance = $(el).tinymce();
                             if (tinymceInstance) {
                                 if ($(el).prop('disabled')) {
-                                    tinymceInstance.editorManager.activeEditor.hide()
-                                    tinymceInstance.editorManager.activeEditor.setContent('')
-                                    $(el).prop('value', '');
-                                    $(el).empty();
+                                    var settings = tinymceInstance.editorManager.activeEditor.settings;
+                                    settings.readonly = true;
+                                    tinymceInstance.editorManager.activeEditor.remove();
+                                    $(el).tinymce(settings);
                                 } else {
-                                    tinymceInstance.editorManager.activeEditor.show();
+                                    var settings = tinymceInstance.editorManager.activeEditor.settings;
+                                    settings.readonly = false;
+                                    tinymceInstance.editorManager.activeEditor.remove();
+                                    $(el).tinymce(settings);
                                 }
                             }
                         }
