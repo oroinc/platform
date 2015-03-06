@@ -2,23 +2,17 @@
 
 namespace Oro\Bundle\TrackingBundle\Command;
 
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
-
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
+use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 
@@ -36,6 +30,16 @@ class TrackCommand extends ContainerAwareCommand
         $this
             ->setName('oro:tracking:parse')
             ->setDescription('Import tracking logs');
+    }
+
+    /**
+     * {@internaldoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $processor = $this->getContainer()->get('oro_tracking.processor.tracking_processor');
+        $processor->setLogger(new OutputLogger($output));
+        $processor->process();
     }
 
     protected function getMapping()
@@ -138,7 +142,7 @@ class TrackCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function __execute(InputInterface $input, OutputInterface $output)
     {
         $start = time();
 

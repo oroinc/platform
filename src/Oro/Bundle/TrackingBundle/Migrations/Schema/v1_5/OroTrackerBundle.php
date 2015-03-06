@@ -22,6 +22,8 @@ class OroTrackerBundle implements Migration
         $this->createOroTrackingVisitEventTable($schema);
         $this->createOroTrackingEventDictionaryTable($schema);
 
+        $this->updateOroTrackingEventTable($schema);
+
         /** Foreign keys generation **/
         $this->addOroTrackingVisitEventForeignKeys($schema);
     }
@@ -61,6 +63,17 @@ class OroTrackerBundle implements Migration
         $table->addIndex(['visit_id'], 'idx_b39eee8f75fa0ff2', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['web_event_id'], 'uniq_b39eee8f66a8f966');
+    }
+
+    /**
+     * Add parsed column to the oro_tracking_event table
+     *
+     * @param Schema $schema
+     */
+    protected function updateOroTrackingEventTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tracking_event');
+        $table->addColumn('parsed', 'boolean', ['default' => false, 'notnull' => false]);
     }
 
     /**
