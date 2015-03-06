@@ -11,7 +11,7 @@ use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 abstract class AbstractPathVoter implements VoterInterface, ContextAwareInterface
 {
     /** @var array */
-    protected $filterPaths;
+    protected $filterPaths = [];
 
     /** @var ThemeManager */
     protected $manager;
@@ -68,6 +68,7 @@ abstract class AbstractPathVoter implements VoterInterface, ContextAwareInterfac
             $theme = $this->manager->getTheme($themeName);
 
             $hierarchy[] = $theme;
+            $themeName = $theme->getParentTheme();
         }
 
         return array_reverse($hierarchy);

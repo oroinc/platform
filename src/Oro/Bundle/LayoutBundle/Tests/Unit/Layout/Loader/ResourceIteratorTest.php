@@ -57,7 +57,6 @@ class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'default.yml',
                 'default2.yml',
                 'update.php',
             ],
@@ -82,7 +81,20 @@ class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
             );
 
         $iterator = new ResourceIterator($factory, $this->resources);
-        $iterator->setFilterPath($path);
+        if (null !== $path) {
+            $pathArray = explode('/', $path);
+
+            $matcher = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher')
+                ->disableOriginalConstructor()->getMock();
+            $matcher->expects($this->any())->method('match')
+                ->willReturnCallback(
+                    function (array $currentPath) use ($pathArray) {
+                        return $currentPath === $pathArray;
+                    }
+                );
+
+            $iterator->setMatcher($matcher);
+        }
         iterator_to_array($iterator);
 
         return $created;
