@@ -83,6 +83,19 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "test" has invalid type. Expected "Oro\Component\Layout\ContextItemInterface", but "stdClass" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded()
+    {
+        $this->context->getResolver()->setOptional(['test']);
+        $this->context->set('test', new \stdClass());
+        $this->context->resolve();
+    }
+
     public function testHasForUnknownItem()
     {
         $this->assertFalse($this->context->has('test'));

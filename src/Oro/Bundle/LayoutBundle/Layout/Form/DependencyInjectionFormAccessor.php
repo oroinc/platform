@@ -37,4 +37,12 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor
 
         return $this->form;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString()
+    {
+        return $this->formServiceId;
+    }
 }

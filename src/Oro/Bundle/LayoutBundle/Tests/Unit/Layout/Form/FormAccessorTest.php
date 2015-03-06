@@ -24,6 +24,16 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->form, $this->formAccessor->getForm());
     }
 
+    public function testToString()
+    {
+        $formName = 'test_form';
+        $this->form->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($formName));
+
+        $this->assertEquals($formName, $this->formAccessor->toString());
+    }
+
     public function testGetView()
     {
         // form

@@ -2,9 +2,10 @@
 
 namespace Oro\Component\Layout;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsResolverException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsResolverException;
 
 class LayoutContext implements ContextInterface
 {
@@ -50,7 +51,22 @@ class LayoutContext implements ContextInterface
         }
 
         try {
-            $this->items    = $this->getResolver()->resolve($this->items);
+            $this->items = $this->getResolver()->resolve($this->items);
+
+            // validate that all added objects implement ContextItemInterface
+            foreach ($this->items as $name => $value) {
+                if (is_object($value) && !$value instanceof ContextItemInterface) {
+                    throw new InvalidOptionsException(
+                        sprintf(
+                            'The option "%s" has invalid type. Expected "%s", but "%s" given.',
+                            $name,
+                            'Oro\Component\Layout\ContextItemInterface',
+                            get_class($value)
+                        )
+                    );
+                }
+            }
+
             $this->resolved = true;
         } catch (OptionsResolverException $e) {
             throw new Exception\LogicException(

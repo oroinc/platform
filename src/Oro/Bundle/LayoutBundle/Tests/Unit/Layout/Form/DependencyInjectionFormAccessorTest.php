@@ -34,6 +34,11 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($form, $this->formAccessor->getForm());
     }
 
+    public function testToString()
+    {
+        $this->assertEquals($this->formServiceId, $this->formAccessor->toString());
+    }
+
     public function testGetView()
     {
         // form
