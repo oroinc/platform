@@ -86,7 +86,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $expectedDataId       = 'foo_id';
         $this->context[$name] = 'other';
         $this->context->getResolver()->setOptional([$name]);
-        $this->context->getData()->set($name, $expectedDataId, $expectedData);
+        $this->context->data()->set($name, $expectedDataId, $expectedData);
         $this->context->resolve();
 
         $this->registry->expects($this->once())
@@ -108,7 +108,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $expectedDataId       = 'foo_id';
         $this->context[$name] = 'other';
         $this->context->getResolver()->setOptional([$name]);
-        $this->context->getData()->set($name, $expectedDataId, $expectedData);
+        $this->context->data()->set($name, $expectedDataId, $expectedData);
         $this->context->resolve();
 
         $this->registry->expects($this->once())
@@ -211,7 +211,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
     public function testArrayAccessExistsForContextData()
     {
         $name = 'foo';
-        $this->context->getData()->set($name, 'foo_id', 'val');
+        $this->context->data()->set($name, 'foo_id', 'val');
         $this->context->resolve();
 
         $this->registry->expects($this->once())

@@ -13,7 +13,7 @@ class LayoutContext implements ContextInterface
     protected $items = [];
 
     /** @var ContextDataCollection */
-    protected $data;
+    protected $dataCollection;
 
     /** @var OptionsResolverInterface */
     protected $resolver;
@@ -26,7 +26,7 @@ class LayoutContext implements ContextInterface
      */
     public function __construct()
     {
-        $this->data = new ContextDataCollection($this);
+        $this->dataCollection = new ContextDataCollection($this);
     }
 
     /**
@@ -146,9 +146,9 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getData()
+    public function data()
     {
-        return $this->data;
+        return $this->dataCollection;
     }
 
     /**

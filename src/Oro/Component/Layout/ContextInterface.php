@@ -82,5 +82,5 @@ interface ContextInterface extends \ArrayAccess
      *
      * @return ContextDataCollection
      */
-    public function getData();
+    public function data();
 }

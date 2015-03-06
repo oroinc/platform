@@ -67,7 +67,7 @@ class DataAccessor implements DataAccessorInterface
         } elseif ($dataProvider instanceof DataProviderInterface) {
             return $dataProvider->getData();
         } else {
-            return $this->context->getData()->get($name);
+            return $this->context->data()->get($name);
         }
     }
 
@@ -118,8 +118,8 @@ class DataAccessor implements DataAccessorInterface
             if ($dataProvider instanceof ContextAwareInterface) {
                 $dataProvider->setContext($this->context);
             }
-        } elseif ($this->context->getData()->has($name)) {
-            $dataProvider = $this->context->getData()->getIdentifier($name);
+        } elseif ($this->context->data()->has($name)) {
+            $dataProvider = $this->context->data()->getIdentifier($name);
         } else {
             $dataProvider = false;
         }

@@ -71,7 +71,7 @@ class DebugCommand extends ContainerAwareCommand
             $table = $this->getHelper('table');
             $table->setHeaders(['Name']);
             $table->setRows([]);
-            $dataValues = $context->getData()->getKnownValues();
+            $dataValues = $context->data()->getKnownValues();
             sort($dataValues);
             foreach ($dataValues as $name) {
                 $table->addRow([$name]);

@@ -208,7 +208,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf(
             'Oro\Component\Layout\ContextDataCollection',
-            $this->context->getData()
+            $this->context->data()
         );
     }
 }

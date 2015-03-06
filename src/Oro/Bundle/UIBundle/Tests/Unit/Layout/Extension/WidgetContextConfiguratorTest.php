@@ -31,8 +31,8 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertEquals('dialog', $context['widget_container']);
-        $this->assertEquals('$request._wid', $context->getData()->getIdentifier('widget_id'));
-        $this->assertEquals('test_widget_id', $context->getData()->get('widget_id'));
+        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
+        $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
     }
 
     public function testConfigureContextByPostData()
@@ -48,8 +48,8 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertEquals('dialog', $context['widget_container']);
-        $this->assertEquals('$request._wid', $context->getData()->getIdentifier('widget_id'));
-        $this->assertEquals('test_widget_id', $context->getData()->get('widget_id'));
+        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
+        $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
     }
 
     public function testConfigureContextNoWidget()
@@ -63,8 +63,8 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertNull($context['widget_container']);
-        $this->assertEquals('$request._wid', $context->getData()->getIdentifier('widget_id'));
-        $this->assertNull($context->getData()->get('widget_id'));
+        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
+        $this->assertNull($context->data()->get('widget_id'));
     }
 
     public function testConfigureContextOverride()
@@ -75,15 +75,15 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $context                     = new LayoutContext();
         $context['widget_container'] = 'updated_widget';
-        $context->getData()->set('widget_id', 'updated_id', 'updated_widget_id');
+        $context->data()->set('widget_id', 'updated_id', 'updated_widget_id');
 
         $this->contextConfigurator->configureContext($context);
         $this->contextConfigurator->setRequest($request);
         $context->resolve();
 
         $this->assertEquals('updated_widget', $context['widget_container']);
-        $this->assertEquals('updated_id', $context->getData()->getIdentifier('widget_id'));
-        $this->assertEquals('updated_widget_id', $context->getData()->get('widget_id'));
+        $this->assertEquals('updated_id', $context->data()->getIdentifier('widget_id'));
+        $this->assertEquals('updated_widget_id', $context->data()->get('widget_id'));
     }
 
     public function testConfigureContextWithoutRequest()
@@ -94,7 +94,7 @@ class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context->resolve();
 
         $this->assertNull($context['widget_container']);
-        $this->assertFalse($context->getData()->has('widget_id'));
+        $this->assertFalse($context->data()->has('widget_id'));
     }
 
     public function testRequestSetterSynchronized()
