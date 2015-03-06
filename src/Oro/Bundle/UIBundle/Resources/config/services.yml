@@ -103,6 +103,13 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_ui.layout_context_configurator.widget:
+        class: Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+
     oro_ui.layout_context_configurator.user_agent:
         class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
         calls:
@@ -160,3 +167,11 @@ services:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
         tags:
             - { name: layout.block_type_extension, alias: link }
+
+    oro_ui.layout_loader.widget_action_voter:
+        class:  Oro\Bundle\UIBundle\Layout\Loader\WidgetAndActionVoter
+        public: false
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: layout.resource_matcher.voter }
