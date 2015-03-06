@@ -77,6 +77,10 @@ define(function (require) {
                      */
                     this.$el.attr('id', id + '-' + this.cid);
                 }
+                var options = this.options;
+                if ($(this.$el).prop('disabled')) {
+                    options.readonly = true;
+                }
                 this.$el.tinymce(_.extend({
                     init_instance_callback: function (editor) {
                         /**
@@ -98,10 +102,9 @@ define(function (require) {
                              * (promise should be resolved in a separate process)
                              */
                             self.renderDeferred.resolve();
-                            delete self.renderDeferred;
                         });
                     }
-                }, this.options));
+                }, options));
                 this.tinymceConnected = true;
                 this.$el.attr('data-focusable', true);
             } else {
