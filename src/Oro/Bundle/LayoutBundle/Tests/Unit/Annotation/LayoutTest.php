@@ -23,9 +23,8 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
      * @dataProvider propertiesDataProvider
      * @param string $property
      * @param string $value
-     * @param string $optionKey
      */
-    public function testSettersAndGetters($property, $value, $optionKey)
+    public function testSettersAndGetters($property, $value)
     {
         $obj = new Layout([]);
 
@@ -37,10 +36,9 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
     public function propertiesDataProvider()
     {
         return [
-            ['templates', ['template'], 'templates'],
-            ['vars', ['var1', 'var2'], 'vars'],
-            ['action', 'action', 'action'],
-            ['theme', 'theme', 'theme'],
+            ['blockThemes', ['blockTheme']],
+            ['vars', ['var1', 'var2']],
+            ['theme', 'theme'],
         ];
     }
 }

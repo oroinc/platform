@@ -16,20 +16,6 @@ class Layout extends ConfigurationAnnotation
     const ALIAS = 'oro_layout';
 
     /**
-     * The array of templates.
-     *
-     * @var array
-     */
-    protected $templates = array();
-
-    /**
-     * The action name.
-     *
-     * @var string
-     */
-    protected $action;
-
-    /**
      * The theme name.
      *
      * @var string
@@ -37,31 +23,18 @@ class Layout extends ConfigurationAnnotation
     protected $theme;
 
     /**
+     * The array of templates.
+     *
+     * @var array
+     */
+    protected $blockThemes = array();
+
+    /**
      * The associative array of template variables.
      *
      * @var array
      */
     protected $vars = array();
-
-    /**
-     * Returns the array of templates.
-     *
-     * @return array
-     */
-    public function getTemplates()
-    {
-        return $this->templates;
-    }
-
-    /**
-     * Sets the array of templates.
-     *
-     * @param array $templates
-     */
-    public function setTemplates($templates)
-    {
-        $this->templates = $templates;
-    }
 
     /**
      * Returns the theme name.
@@ -84,27 +57,27 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Returns the action name.
+     * Returns the array of block themes.
      *
-     * @return string
+     * @return array
      */
-    public function getAction()
+    public function getBlockThemes()
     {
-        return $this->action;
+        return $this->blockThemes;
     }
 
     /**
-     * Sets the action name
+     * Sets the array of block themes.
      *
-     * @param string $action The action name
+     * @param array $blockThemes
      */
-    public function setAction($action)
+    public function setBlockThemes($blockThemes)
     {
-        $this->action = $action;
+        $this->blockThemes = $blockThemes;
     }
 
     /**
-     * Returns the array of templates variables.
+     * Returns the array of template variables.
      *
      * @return array
      */

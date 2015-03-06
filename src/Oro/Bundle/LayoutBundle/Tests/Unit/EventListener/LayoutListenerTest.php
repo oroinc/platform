@@ -63,10 +63,9 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->once())
             ->method('getLayout')
             ->willReturnCallback(function(ContextInterface $context) {
-                $context->getDataResolver()->setOptional(['theme', 'action', 'templates', 'var1', 'var2']);
+                $context->getDataResolver()->setOptional(['theme', 'blockThemes', 'var1', 'var2']);
                 $context->resolve();
                 $this->assertEquals('theme', $context->get('theme'));
-                $this->assertEquals('action', $context->get('action'));
                 $this->assertEquals('value1', $context->get('var1'));
                 $this->assertEquals('value2', $context->get('var2'));
 
@@ -78,8 +77,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $layoutAnnotation = new LayoutAnnotation(
             [
                 'theme'     => 'theme',
-                'action'    => 'action',
-                'templates' => ['test.html.twig'],
+                'blockThemes' => ['test.html.twig'],
                 'vars'      => ['var1', 'var2']
             ]
         );
@@ -92,10 +90,12 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage Failed to resolve the context data. Reason: The option "unknown" does not exist. Known options are: "known"
      */
+    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionForMissingVarsInAnnotation()
     {
         $this->setupLayoutExpectations();
@@ -136,10 +136,12 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage @Layout annotation configured improperly. Should use empty @Layout() configuration when returning an instance of Oro\Component\Layout\Layout in the response.
      */
+    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionTryingToRedefineThemeWhenContextReturned()
     {
         $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['theme' => 'theme'])];
@@ -150,10 +152,12 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage Layout annotation configured improperly. Cannot redefine context option theme that is already set in the response.
      */
+    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionIfLayoutAnnotationIsNotEmptyWhenLayoutReturned()
     {
         $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['theme' => 'theme_new'])];
@@ -188,7 +192,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @return GetResponseForControllerResultEvent
      */
-    protected function createResponseForControllerResultEvent(array $attributes = [], $controllerResult)
+    protected function createResponseForControllerResultEvent(array $attributes = [], $controllerResult = [])
     {
         return new GetResponseForControllerResultEvent(
             $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),

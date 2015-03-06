@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
@@ -16,10 +13,8 @@ use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 
-use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
-use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
-
+use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
 /**
  * The LayoutListener class handles the @Layout annotation.
@@ -39,39 +34,6 @@ class LayoutListener implements EventSubscriberInterface
     public function __construct(LayoutManager $layoutManager)
     {
         $this->layoutManager = $layoutManager;
-    }
-
-    /**
-     *
-     * @param FilterControllerEvent $event A FilterControllerEvent instance
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function onKernelController(FilterControllerEvent $event)
-    {
-        if (!is_array($controller = $event->getController())) {
-            return;
-        }
-
-        $request = $event->getRequest();
-
-        if (!$request->attributes->has('_' . LayoutAnnotation::ALIAS)) {
-            return;
-        }
-
-        $configuration = $request->attributes->get('_' . LayoutAnnotation::ALIAS);
-        // If the action is not explicitly defined we'll try to get it from controller action method
-        if (!$configuration->getAction()) {
-            if (!preg_match('/^(.+)Action$/', $controller[1], $matchAction)) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'The "%s" method does not look like an action method (it does not end with Action)',
-                        $controller[1]
-                    )
-                );
-            }
-            $configuration->setAction($matchAction[1]);
-        }
     }
 
     /**
@@ -101,12 +63,13 @@ class LayoutListener implements EventSubscriberInterface
             $layout        = $this->getLayout($layoutContext, $layoutAnnotation);
         } elseif ($result instanceof Layout) {
             if ($layoutAnnotation->getTheme()
-                || $layoutAnnotation->getAction()
                 || $layoutAnnotation->getVars()
-                || $layoutAnnotation->getTemplates()
+                || $layoutAnnotation->getBlockThemes()
             ) {
-                throw new LogicException('@Layout annotation configured improperly. Should use empty @Layout()'
-                    . ' configuration when returning an instance of Oro\\Component\\Layout\\Layout in the response.');
+                throw new LogicException(
+                    '@Layout annotation configured improperly. Should use empty @Layout()'
+                    . ' configuration when returning an instance of Oro\\Component\\Layout\\Layout in the response.'
+                );
             }
             $layout        = $result;
         } else {
@@ -129,8 +92,8 @@ class LayoutListener implements EventSubscriberInterface
         $layoutBuilder = $this->layoutManager->getLayoutBuilder();
         $layoutBuilder->add('root', null, 'root');
 
-        if ($templates = $layoutAnnotation->getTemplates()) {
-            $layoutBuilder->setBlockTheme($templates);
+        if ($blockThemes = $layoutAnnotation->getBlockThemes()) {
+            $layoutBuilder->setBlockTheme($blockThemes);
         }
 
         return $layoutBuilder->getLayout($layoutContext);
@@ -156,13 +119,6 @@ class LayoutListener implements EventSubscriberInterface
                 $this->throwCannotRedefineOptionException(ThemeExtension::PARAM_THEME);
             }
             $layoutContext[ThemeExtension::PARAM_THEME] = $theme;
-        }
-        $action = $layoutAnnotation->getAction();
-        if (!empty($action)) {
-            if (isset($layoutContext['action'])) {
-                $this->throwCannotRedefineOptionException('action');
-            }
-            $layoutContext['action'] = $action;
         }
         $vars = $layoutAnnotation->getVars();
         if (!empty($vars)) {
