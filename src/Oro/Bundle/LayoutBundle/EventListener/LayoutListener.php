@@ -153,8 +153,7 @@ class LayoutListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::CONTROLLER => ['onKernelController', -120],
-            KernelEvents::VIEW       => 'onKernelView',
+            KernelEvents::VIEW => 'onKernelView'
         ];
     }
 }
