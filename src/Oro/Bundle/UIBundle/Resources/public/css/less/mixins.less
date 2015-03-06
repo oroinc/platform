@@ -53,6 +53,11 @@
     border-top-width: @value;
   }
 }
+.forScreen (@size; display; @value: block) {
+  @media only screen and (max-width: @size) {
+    display: @value;
+  }
+}
 .forScreen (@size; @_; @value) {}
 
 .cursor (grab) {

@@ -52,6 +52,12 @@ class JobExecutor
      */
     protected $batchJobRepository;
 
+    /**
+     * @param ConnectorRegistry $jobRegistry
+     * @param BatchJobRepository $batchJobRepository
+     * @param ContextRegistry $contextRegistry
+     * @param ManagerRegistry $managerRegistry
+     */
     public function __construct(
         ConnectorRegistry $jobRegistry,
         BatchJobRepository $batchJobRepository,
@@ -70,7 +76,7 @@ class JobExecutor
      * @param array $configuration
      * @return JobResult
      */
-    public function executeJob($jobType, $jobName, array $configuration = array())
+    public function executeJob($jobType, $jobName, array $configuration = [])
     {
         $this->initialize();
 
@@ -131,7 +137,7 @@ class JobExecutor
 
             $failureExceptions = $this->collectFailureExceptions($jobExecution);
 
-            if ($jobExecution->getStatus()->getValue() == BatchStatus::COMPLETED && !$failureExceptions) {
+            if ($jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions) {
                 if (!$isTransactionRunning) {
                     $this->entityManager->commit();
                 }
@@ -212,7 +218,7 @@ class JobExecutor
     protected function getJobExecutionByJobInstanceCode($jobCode)
     {
         /** @var JobInstance $jobInstance */
-        $jobInstance = $this->getJobInstanceRepository()->findOneBy(array('code' => $jobCode));
+        $jobInstance = $this->getJobInstanceRepository()->findOneBy(['code' => $jobCode]);
         if (!$jobInstance) {
             throw new LogicException(sprintf('No job instance found with code %s', $jobCode));
         }
@@ -240,7 +246,7 @@ class JobExecutor
      */
     protected function collectFailureExceptions(JobExecution $jobExecution)
     {
-        $failureExceptions = array();
+        $failureExceptions = [];
         foreach ($jobExecution->getAllFailureExceptions() as $exceptionData) {
             if (!empty($exceptionData['message'])) {
                 $failureExceptions[] = $exceptionData['message'];
@@ -256,7 +262,7 @@ class JobExecutor
      */
     protected function collectErrors(JobExecution $jobExecution)
     {
-        $errors = array();
+        $errors = [];
         foreach ($jobExecution->getStepExecutions() as $stepExecution) {
             $errors = array_merge(
                 $errors,
