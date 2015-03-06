@@ -7,8 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisit;
 
-use OroCRM\Bundle\MagentoBundle\Entity\Customer;
-
 /**
  * @ORM\Table(name="oro_tracking_visit")
  * @ORM\Entity()
@@ -33,6 +31,14 @@ class TrackingVisit extends ExtendTrackingVisit
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var TrackingWebsite
+     *
+     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
+     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $trackingWebsite;
 
     /**
      * @var string
@@ -89,6 +95,25 @@ class TrackingVisit extends ExtendTrackingVisit
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return TrackingWebsite
+     */
+    public function getTrackingWebsite()
+    {
+        return $this->trackingWebsite;
+    }
+
+    /**
+     * @param TrackingWebsite $trackingWebsite
+     * @return $this
+     */
+    public function setTrackingWebsite($trackingWebsite)
+    {
+        $this->trackingWebsite = $trackingWebsite;
+
+        return $this;
     }
 
     /**

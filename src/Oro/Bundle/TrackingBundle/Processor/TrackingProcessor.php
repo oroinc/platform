@@ -4,6 +4,7 @@ namespace Oro\Bundle\TrackingBundle\Processor;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -26,10 +27,15 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var array */
     protected $collectedVisits = [];
 
+    /** @var array */
     protected $eventDictionary = [];
 
+    /**
+     * @param ManagerRegistry $doctrine
+     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -77,7 +83,6 @@ class TrackingProcessor implements LoggerAwareInterface
 
         /** @var  TrackingEvent $event */
         foreach ($entities as $event) {
-
             $this->logger->notice($event->getId());
 
             $trackingVisitEvent = new TrackingVisitEvent();
@@ -96,7 +101,6 @@ class TrackingProcessor implements LoggerAwareInterface
             $em->persist($event);
             $em->persist($trackingVisitEvent);
             $em->persist($trackingVisit);
-
         }
 
         $em->flush();
@@ -133,13 +137,13 @@ class TrackingProcessor implements LoggerAwareInterface
         if (!$visit) {
             $visit = new TrackingVisit();
             $visit->setParsedUID(0);
+            $visit->setTrackingWebsite($trackingEvent->getWebsite());
             $visit->setUserIdentifier($trackingEvent->getUserIdentifier());
             $visit->setVisitorUid($visitorUid);
             $visit->setFirstActionTime($trackingEvent->getCreatedAt());
             $visit->setLastActionTime($trackingEvent->getCreatedAt());
 
-            // todo: add identifier relation
-            //$this->identifyCustomer($visit, $trackingEvent, $decodedData);
+            $this->identifyTrackingVisit($visit, $trackingEvent, $decodedData);
 
         } else {
             if ($visit->getFirstActionTime() > $trackingEvent->getCreatedAt()) {
@@ -189,6 +193,62 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         return $eventType;
+    }
+
+    /**
+     * @param TrackingVisit $visit
+     * @param TrackingEvent $event
+     * @param               $unserializedData
+     */
+    protected function identifyTrackingVisit(TrackingVisit $visit, TrackingEvent $event, $unserializedData)
+    {
+        //todo: refactor this method
+        $idArray = explode('; ', $event->getUserIdentifier());
+        $idData = [];
+        array_walk(
+            $idArray,
+            function($string) use (&$idData){
+                $data = explode('=', $string);
+                $idData[$data[0]] = $data[1];
+            }
+        );
+
+        if (array_key_exists('id', $idData) && $idData['id'] !== 'guest') {
+            $customerId = $idData['id'];
+            $visit->setParsedUID($customerId);
+
+            $customer = $this->getEntityManager()->getRepository('OroCRMMagentoBundle:Customer')
+                ->findOneBy(['originId' => $customerId]);
+            if ($customer) {
+                $visit->setIdentifierTarget($customer);
+                $this->identifyPrevVisits($visit, $customer);
+            }
+        }
+    }
+
+    protected function identifyPrevVisits(TrackingVisit $visit, $identifier)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('entity');
+        $visitors = $qb->from('OroTrackingBundle:TrackingVisit', 'entity')
+            ->where('entity.visitor = :visitor')
+            ->andWhere('entity.firstActionTime < :maxDate')
+            ->andWhere('entity.customer is null')
+            ->andWhere('entity.trackingWebsite  = :website')
+            ->setParameter('visitor', $visit->getVisitorUid())
+            ->setParameter('maxDate', $visit->getFirstActionTime())
+            ->setParameter('website', $visit->getTrackingWebsite())
+            ->getQuery()
+            ->getResult();
+
+        if (!empty($visitors)) {
+            /** @var TrackingVisit $visitorObject */
+            foreach ($visitors as $visitorObject) {
+                $visitorObject->setIdentifierTarget($identifier);
+                $this->getEntityManager()->persist($visitorObject);
+            }
+        }
     }
 
     /**
