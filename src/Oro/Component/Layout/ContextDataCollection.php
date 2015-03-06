@@ -95,18 +95,20 @@ class ContextDataCollection
     /**
      * Sets callbacks to be used to get default unique identifier and value of the context data variable.
      *
-     * @param string   $name               The data item name
-     * @param \Closure $identifierCallback The callback method to be used to get the unique identifier of tied data
-     *                                     function (array|\ArrayAccess $options) : string
-     *                                     where $options argument represents the context variables
-     * @param \Closure $valueCallback      The callback method to be used to get data
-     *                                     function (array|\ArrayAccess $options) : mixed
-     *                                     where $options argument represents the context variables
-     *                                     must throw an \BadMethodCallException if data cannot be loaded
+     * @param string $name      The data item name
+     * @param mixed $identifier The the unique identifier of tied data or the callback method
+     *                          to be used to get the unique identifier
+     *                          function (array|\ArrayAccess $options) : string
+     *                          where $options argument represents the context variables
+     * @param mixed $value      The default data item value ot the callback method
+     *                          to be used to get the default value
+     *                          function (array|\ArrayAccess $options) : mixed
+     *                          where $options argument represents the context variables
+     *                          must throw an \BadMethodCallException if data cannot be loaded
      */
-    public function setDefault($name, \Closure $identifierCallback, \Closure $valueCallback)
+    public function setDefault($name, $identifier, $value)
     {
-        $this->defaults[$name] = [$identifierCallback, $valueCallback];
+        $this->defaults[$name] = [$identifier, $value];
     }
 
     /**
@@ -140,13 +142,21 @@ class ContextDataCollection
             return false;
         }
 
-        try {
-            $this->items[$name] = call_user_func($this->defaults[$name][1], $this->context);
-        } catch (\BadMethodCallException $e) {
-            return false;
+        $value = $this->defaults[$name][1];
+        if (is_callable($value)) {
+            try {
+                $this->items[$name] = call_user_func($value, $this->context);
+            } catch (\BadMethodCallException $e) {
+                return false;
+            }
+        } else {
+            $this->items[$name] = $value;
         }
 
-        $this->ids[$name] = call_user_func($this->defaults[$name][0], $this->context);
+        $id               = $this->defaults[$name][0];
+        $this->ids[$name] = is_callable($id)
+            ? call_user_func($id, $this->context)
+            : $id;
 
         return true;
     }

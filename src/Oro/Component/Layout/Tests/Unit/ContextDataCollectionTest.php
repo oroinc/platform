@@ -146,4 +146,52 @@ class ContextDataCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->collection->has('test'));
     }
+
+    public function testSetDefaultScalar()
+    {
+        $this->collection->setDefault('test', 'dataId', 'data');
+        $this->assertSame(
+            'data',
+            $this->collection->get('test'),
+            'Failed asserting that added data equal to the expected value'
+        );
+        $this->assertSame(
+            'dataId',
+            $this->collection->getIdentifier('test'),
+            'Failed asserting that data identifier equals to the expected value'
+        );
+    }
+
+    public function testSetDefaultCallable()
+    {
+        $this->context['data_id'] = 'dataId';
+        $this->context['data']    = 'data';
+
+        $this->collection->setDefault(
+            'test',
+            [$this, 'getTestDataIdentifier'],
+            [$this, 'getTestDataValue']
+        );
+
+        $this->assertSame(
+            'data',
+            $this->collection->get('test'),
+            'Failed asserting that added data equal to the expected value'
+        );
+        $this->assertSame(
+            'dataId',
+            $this->collection->getIdentifier('test'),
+            'Failed asserting that data identifier equals to the expected value'
+        );
+    }
+
+    public function getTestDataIdentifier($options)
+    {
+        return $options['data_id'];
+    }
+
+    public function getTestDataValue($options)
+    {
+        return $options['data'];
+    }
 }

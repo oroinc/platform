@@ -28,17 +28,6 @@ class ScriptTypeTest extends BlockTypeTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "crossorigin" has the value "test", but is expected to be one of "anonymous", "use-credentials"
-     */
-    // @codingStandardsIgnoreEnd
-    public function testSetDefaultOptionsWithInvalidCrossorigin()
-    {
-        $this->resolveOptions(ScriptType::NAME, ['src' => 'test.js', 'crossorigin' => 'test']);
-    }
-
     public function testBuildViewWithoutAsyncAndDefer()
     {
         $view = $this->getBlockView(

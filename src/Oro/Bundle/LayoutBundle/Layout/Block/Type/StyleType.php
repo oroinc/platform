@@ -19,8 +19,7 @@ class StyleType extends AbstractType
     {
         $resolver
             ->setDefaults(['type' => 'text/css'])
-            ->setOptional(['content', 'src', 'media', 'scoped', 'crossorigin'])
-            ->setAllowedValues(['crossorigin' => ['anonymous', 'use-credentials']]);
+            ->setOptional(['content', 'src', 'media', 'scoped', 'crossorigin']);
     }
 
     /**

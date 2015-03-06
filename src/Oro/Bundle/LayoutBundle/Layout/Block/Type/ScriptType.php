@@ -19,8 +19,7 @@ class ScriptType extends AbstractType
     {
         $resolver
             ->setDefaults(['type' => 'text/javascript'])
-            ->setOptional(['content', 'src', 'async', 'defer', 'crossorigin'])
-            ->setAllowedValues(['crossorigin' => ['anonymous', 'use-credentials']]);
+            ->setOptional(['content', 'src', 'async', 'defer', 'crossorigin']);
     }
 
     /**

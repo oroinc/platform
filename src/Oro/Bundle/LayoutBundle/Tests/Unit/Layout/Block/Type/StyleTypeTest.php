@@ -28,17 +28,6 @@ class StyleTypeTest extends BlockTypeTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "crossorigin" has the value "test", but is expected to be one of "anonymous", "use-credentials"
-     */
-    // @codingStandardsIgnoreEnd
-    public function testSetDefaultOptionsWithInvalidCrossorigin()
-    {
-        $this->resolveOptions(StyleType::NAME, ['src' => 'test.css', 'crossorigin' => 'test']);
-    }
-
     public function testBuildViewWithoutScoped()
     {
         $view = $this->getBlockView(
