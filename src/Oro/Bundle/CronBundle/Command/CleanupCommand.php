@@ -18,7 +18,7 @@ use Oro\Component\Log\OutputLogger;
 class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const COMMAND_NAME = 'oro:cron:cleanup';
-    const BATCH_SIZE   = 200;
+    const BATCH_SIZE   = 40;
     const DAYS         = 1; // cleanup entries older than ...
 
     const EXITCODE_SUCCESS = 0;
@@ -29,7 +29,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     public function getDefaultDefinition()
     {
-        return '*/5 * * * *'; // every 5 minutes
+        return '0 1 * * *'; // every day
     }
 
     /**
