@@ -33,32 +33,18 @@ class GlobalConfigManager
      */
     public function saveUserConfigSignature(User $user, $signature)
     {
-        if (!$signature) {
-            return false;
-        }
-
-        if ($this->setContext($user)) {
-            $newSettings = [
-                implode(ConfigManager::SECTION_VIEW_SEPARATOR, ['oro_email', 'signature']) => $signature,
-            ];
+        $this->setContext($user);
+        $newSettings = [implode(ConfigManager::SECTION_VIEW_SEPARATOR, ['oro_email', 'signature']) => $signature];
             $this->configManager->save($newSettings);
-        }
         $this->restoreContext();
     }
 
     /**
-     * @param User $user
-     * @return string
+     * @return string|null
      */
-    public function getUserConfigSignature(User $user)
+    public function getUserConfigSignature()
     {
-        $value = '';
-        if ($this->setContext($user)) {
-            $value = $this->configManager->get('oro_email.signature');
-        }
-        $this->restoreContext();
-
-        return $value;
+        return $this->userScopeManager->getSettingValue('oro_email.signature');
     }
 
     /**
