@@ -167,3 +167,8 @@ services:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
         tags:
             - { name: layout.block_type_extension, alias: link }
+
+    oro_ui.block_type.datagrid:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType
+        tags:
+             - { name: layout.block_type, alias: datagrid }
