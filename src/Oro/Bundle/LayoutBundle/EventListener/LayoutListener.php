@@ -122,7 +122,7 @@ class LayoutListener implements EventSubscriberInterface
         }
         $vars = $layoutAnnotation->getVars();
         if (!empty($vars)) {
-            $layoutContext->getDataResolver()->setRequired($vars);
+            $layoutContext->getResolver()->setRequired($vars);
         }
 
         foreach ($parameters as $key => $value) {

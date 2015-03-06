@@ -32,13 +32,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSubscribedEvents()
     {
-        $this->assertEquals(
-            [
-                KernelEvents::CONTROLLER => ['onKernelController', -120],
-                KernelEvents::VIEW       => 'onKernelView',
-            ],
-            LayoutListener::getSubscribedEvents()
-        );
+        $this->assertEquals([KernelEvents::VIEW => 'onKernelView'], LayoutListener::getSubscribedEvents());
     }
 
     public function testShouldNotModifyResponseWithoutLayoutAnnotation()
@@ -63,7 +57,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->once())
             ->method('getLayout')
             ->willReturnCallback(function(ContextInterface $context) {
-                $context->getDataResolver()->setOptional(['theme', 'blockThemes', 'var1', 'var2']);
+                $context->getResolver()->setOptional(['theme', 'blockThemes', 'var1', 'var2']);
                 $context->resolve();
                 $this->assertEquals('theme', $context->get('theme'));
                 $this->assertEquals('value1', $context->get('var1'));
@@ -93,7 +87,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context data. Reason: The option "unknown" does not exist. Known options are: "known"
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "unknown" does not exist. Known options are: "known"
      */
     // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionForMissingVarsInAnnotation()
@@ -108,7 +102,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context data. Reason: The required option "required2" is missing.
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required2" is missing.
      */
     public function testShouldThrowExceptionForNotHavingRequiredVarsWhenArrayReturned()
     {
@@ -122,7 +116,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context data. Reason: The required option "required1" is missing.
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required1" is missing.
      */
     public function testShouldThrowExceptionForNotHavingRequiredVarsWhenContextReturned()
     {
@@ -130,7 +124,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
         $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
         $context = new LayoutContext();
-        $context->getDataResolver()->setRequired(['required2']);
+        $context->getResolver()->setRequired(['required2']);
         $context['required2'] = 'value1';
         $responseEvent = $this->createResponseForControllerResultEvent($attributes, $context);
         $this->listener->onKernelView($responseEvent);
@@ -162,7 +156,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     {
         $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['theme' => 'theme_new'])];
         $context = new LayoutContext();
-        $context->getDataResolver()->setRequired(['theme']);
+        $context->getResolver()->setRequired(['theme']);
         $context['theme'] = 'theme_old';
         $responseEvent = $this->createResponseForControllerResultEvent($attributes, $context);
         $this->listener->onKernelView($responseEvent);
