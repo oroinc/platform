@@ -12,7 +12,7 @@ class ActionContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()
+        $context->getResolver()
             ->setDefaults(['action' => ''])
             ->setAllowedTypes(['action' => 'string']);
     }

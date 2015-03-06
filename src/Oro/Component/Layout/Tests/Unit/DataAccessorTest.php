@@ -32,6 +32,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $name         = 'foo';
         $expectedId   = 'foo_id';
         $expectedData = new \stdClass();
+
         $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
         $dataProvider->expects($this->any())
             ->method('getIdentifier')
@@ -57,6 +58,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $name         = 'foo';
         $expectedId   = 'foo_id';
         $expectedData = new \stdClass();
+
         $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
         $dataProvider->expects($this->any())
             ->method('getIdentifier')
@@ -77,11 +79,15 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
 
-    public function testGetFromContext()
+    public function testGetFromContextData()
     {
         $name                 = 'foo';
         $expectedData         = new \stdClass();
-        $this->context[$name] = $expectedData;
+        $expectedDataId       = 'foo_id';
+        $this->context[$name] = 'other';
+        $this->context->getResolver()->setOptional([$name]);
+        $this->context->data()->set($name, $expectedDataId, $expectedData);
+        $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
@@ -90,16 +96,20 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expectedData, $this->dataAccessor->get($name));
         // test data provider identifier
-        $this->assertEquals('context.' . $name, $this->dataAccessor->getIdentifier($name));
+        $this->assertEquals($expectedDataId, $this->dataAccessor->getIdentifier($name));
         // test that context data provider is cached
         $this->assertSame($expectedData, $this->dataAccessor->get($name));
     }
 
-    public function testArrayAccessGetFromContext()
+    public function testArrayAccessGetFromContextData()
     {
         $name                 = 'foo';
         $expectedData         = new \stdClass();
-        $this->context[$name] = $expectedData;
+        $expectedDataId       = 'foo_id';
+        $this->context[$name] = 'other';
+        $this->context->getResolver()->setOptional([$name]);
+        $this->context->data()->set($name, $expectedDataId, $expectedData);
+        $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
@@ -108,7 +118,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expectedData, $this->dataAccessor[$name]);
         // test data provider identifier
-        $this->assertEquals('context.' . $name, $this->dataAccessor->getIdentifier($name));
+        $this->assertEquals($expectedDataId, $this->dataAccessor->getIdentifier($name));
         // test that context data provider is cached
         $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
@@ -117,9 +127,10 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Could not load the data provider "foo".
      */
-    public function testGetFromContextThrowsExceptionIfContextVariableDoesNotExist()
+    public function testGetFromContextThrowsExceptionIfContextDataDoesNotExist()
     {
         $name = 'foo';
+        $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
@@ -133,9 +144,10 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Could not load the data provider "foo".
      */
-    public function testGetIdentifierFromContextThrowsExceptionIfContextVariableDoesNotExist()
+    public function testGetIdentifierFromContextThrowsExceptionIfContextDataDoesNotExist()
     {
         $name = 'foo';
+        $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
@@ -149,9 +161,10 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Could not load the data provider "foo".
      */
-    public function testArrayAccessGetFromContextThrowsExceptionIfContextVariableDoesNotExist()
+    public function testArrayAccessGetFromContextThrowsExceptionIfContextDataDoesNotExist()
     {
         $name = 'foo';
+        $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
@@ -164,6 +177,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
     public function testArrayAccessExistsForUnknownDataProvider()
     {
         $name = 'foo';
+        $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
@@ -177,6 +191,8 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $name         = 'foo';
         $expectedData = new \stdClass();
+        $this->context->resolve();
+
         $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
         $dataProvider->expects($this->any())
             ->method('getData')
@@ -190,6 +206,20 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($this->dataAccessor[$name]));
         // test that data provider is cached
         $this->assertSame($expectedData, $this->dataAccessor[$name]);
+    }
+
+    public function testArrayAccessExistsForContextData()
+    {
+        $name = 'foo';
+        $this->context->data()->set($name, 'foo_id', 'val');
+        $this->context->resolve();
+
+        $this->registry->expects($this->once())
+            ->method('findDataProvider')
+            ->with($name)
+            ->will($this->returnValue(null));
+
+        $this->assertTrue(isset($this->dataAccessor[$name]));
     }
 
     /**

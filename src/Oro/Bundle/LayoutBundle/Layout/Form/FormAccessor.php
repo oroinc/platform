@@ -24,4 +24,12 @@ class FormAccessor extends AbstractFormAccessor
     {
         return $this->form;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString()
+    {
+        return $this->form->getName();
+    }
 }

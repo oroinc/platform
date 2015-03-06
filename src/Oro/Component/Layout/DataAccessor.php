@@ -5,9 +5,8 @@ namespace Oro\Component\Layout;
 /**
  * The data accessor that falls back to the layout context if a data provider
  * is not registered in the layout registry.
- * This means that at first a data provider is searched in the layout registry and
- * if it is not registered there a context variable with appropriate name is used
- * as data.
+ * This means that at first the data provider is searched in the layout registry and
+ * if it is not registered there, data are searched in the context.
  */
 class DataAccessor implements DataAccessorInterface
 {
@@ -68,7 +67,7 @@ class DataAccessor implements DataAccessorInterface
         } elseif ($dataProvider instanceof DataProviderInterface) {
             return $dataProvider->getData();
         } else {
-            return $this->context[$name];
+            return $this->context->data()->get($name);
         }
     }
 
@@ -119,8 +118,8 @@ class DataAccessor implements DataAccessorInterface
             if ($dataProvider instanceof ContextAwareInterface) {
                 $dataProvider->setContext($this->context);
             }
-        } elseif (isset($this->context[$name])) {
-            $dataProvider = 'context.' . $name;
+        } elseif ($this->context->data()->has($name)) {
+            $dataProvider = $this->context->data()->getIdentifier($name);
         } else {
             $dataProvider = false;
         }

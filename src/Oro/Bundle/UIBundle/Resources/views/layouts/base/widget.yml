@@ -1,0 +1,20 @@
+oro_layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroUIBundle:layouts:base/widget.html.twig'
+        - @addAlias:
+            alias: content
+            id:    root
+        - @add:
+            id:        update_saved_id_script
+            parentId:  content
+            blockType: script
+            options:
+                visible: { @not_empty: $data.saved_id }
+                vars:
+                    widget_id: { @value: $data.widget_id }
+                    saved_id:  { @value: $data.saved_id }
+            prepend:   true
+
+    conditions:
+        @not_empty: $context.widget_container

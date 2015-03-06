@@ -25,7 +25,7 @@ oro_layout:
                 form_css:
                     blockType:   style
                     options:
-                        content: { @value: $context.embedded_form_entity.css }
+                        content: { @value: $data.embedded_form_entity.css }
                 content:
                     blockType: body
             tree:

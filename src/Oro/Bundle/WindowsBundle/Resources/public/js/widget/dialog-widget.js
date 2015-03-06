@@ -5,7 +5,7 @@ define(function (require) {
     var DialogWidget,
         $ = require('jquery'),
         _ = require('underscore'),
-        __= require('orotranslation/js/translator'),
+        __ = require('orotranslation/js/translator'),
         tools = require('oroui/js/tools'),
         error = require('oroui/js/error'),
         messenger = require('oroui/js/messenger'),
@@ -334,13 +334,15 @@ define(function (require) {
 
         _fixScrollableHeight: function() {
             var widget = this.widget;
-            widget.find('.scrollable-container').each(_.bind(function(i, el){
-                var $el = $(el);
-                var height = widget.height() - $el.position().top;
-                if (height) {
-                    $el.outerHeight(height);
-                }
-            },this));
+            if (!tools.isMobile()) {
+                widget.find('.scrollable-container').each(_.bind(function(i, el){
+                    var $el = $(el);
+                    var height = widget.height() - $el.position().top;
+                    if (height) {
+                        $el.outerHeight(height);
+                    }
+                },this));
+            }
             layout.updateResponsiveLayout();
         },
 

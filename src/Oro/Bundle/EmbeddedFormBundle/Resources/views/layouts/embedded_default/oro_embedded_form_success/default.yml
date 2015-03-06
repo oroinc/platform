@@ -5,5 +5,5 @@ oro_layout:
             parentId:  content
             blockType: embed_form_success
             options:
-                message: { @value: $context.embedded_form_entity.successMessage }
-                form_id: { @value: $context.embedded_form_entity.id }
+                message: { @value: $data.embedded_form_entity.successMessage }
+                form_id: { @value: $data.embedded_form_entity.id }

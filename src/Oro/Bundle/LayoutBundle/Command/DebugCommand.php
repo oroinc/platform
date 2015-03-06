@@ -63,7 +63,20 @@ class DebugCommand extends ContainerAwareCommand
             foreach ($contextConfigurators as $configurator) {
                 $output->writeln(' ' . $configurator);
             }
-            $this->dumpOptionResolver($context->getDataResolver(), $output);
+
+            $this->dumpOptionResolver($context->getResolver(), $output);
+
+            $output->writeln('Known data values:');
+            /** @var TableHelper $table */
+            $table = $this->getHelper('table');
+            $table->setHeaders(['Name']);
+            $table->setRows([]);
+            $dataValues = $context->data()->getKnownValues();
+            sort($dataValues);
+            foreach ($dataValues as $name) {
+                $table->addRow([$name]);
+            }
+            $table->render($output);
 
             return;
         }
@@ -107,6 +120,7 @@ class DebugCommand extends ContainerAwareCommand
 
         $output->writeln('Default options:');
         $table->setHeaders(['Name', 'Value']);
+        $table->setRows([]);
         $options = $resolver->getDefaultOptions();
         ksort($options);
         foreach ($options as $name => $value) {
