@@ -80,12 +80,12 @@ define([
             }
             var $el = this.element,
                 load = $.proxy(this.loadFields, this),
-                revert = function () {
+                revert = $.proxy(function () {
                     $el.val(oldVal).change();
                     if ($.isFunction(this.options.afterRevertCallback)) {
                         this.options.afterRevertCallback.call(this, $el);
                     }
-                }.bind(this);
+                }, this);
             confirm.on('ok', load);
             confirm.on('cancel', revert);
             confirm.once('hidden', function () {

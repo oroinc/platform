@@ -54,7 +54,7 @@ define([
          *
          * @property {string|jQuery|HTMLElement}
          */
-        limitCriteriaTo: '#container',
+        limitCriteriaTo: '#container:visible, body',
 
         /**
          * Selectors for filter criteria elements
