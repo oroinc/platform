@@ -27,7 +27,7 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
     public function testMobileAgent()
     {
         $userAgent = 'Mozilla/5.0 (Linux; U; Android 2.3; en-us) AppleWebKit/999+ (KHTML, like Gecko) Safari/999.9';
-        $agent = new UserAgent($userAgent);
+        $agent     = new UserAgent($userAgent);
 
         $this->assertTrue(isset($agent[UserAgent::USER_AGENT]));
         $this->assertTrue(isset($agent[UserAgent::MOBILE]));
@@ -44,7 +44,7 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
     public function testDesktopAgent()
     {
         $userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; DigExt)';
-        $agent = new UserAgent($userAgent);
+        $agent     = new UserAgent($userAgent);
 
         $this->assertTrue(isset($agent[UserAgent::USER_AGENT]));
         $this->assertTrue(isset($agent[UserAgent::MOBILE]));
@@ -58,13 +58,21 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($agent[UserAgent::DESKTOP]);
     }
 
+    public function testToString()
+    {
+        $userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; DigExt)';
+        $agent     = new UserAgent($userAgent);
+
+        $this->assertEquals($userAgent, $agent->toString());
+    }
+
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Not supported
      */
     public function testArrayAccessSetThrowsException()
     {
-        $agent = new UserAgent('');
+        $agent                        = new UserAgent('');
         $agent[UserAgent::USER_AGENT] = 'val';
     }
 

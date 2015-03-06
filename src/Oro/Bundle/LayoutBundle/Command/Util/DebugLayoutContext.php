@@ -9,12 +9,8 @@ class DebugLayoutContext extends LayoutContext
     /**
      * {@inheritdoc}
      */
-    public function getDataResolver()
+    protected function createResolver()
     {
-        if ($this->resolver === null) {
-            $this->resolver = new DebugOptionsResolver();
-        }
-
-        return $this->resolver;
+        return new DebugOptionsResolver();
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Provider;
 
+use Oro\Component\Layout\ContextItemInterface;
+
 /**
  * \ArrayAccess is implemented to increase performance when this class is used with PropertyAccess component.
  */
-class UserAgent implements UserAgentInterface, \ArrayAccess
+class UserAgent implements UserAgentInterface, \ArrayAccess, ContextItemInterface
 {
     /** The User-Agent string */
     const USER_AGENT = 'user_agent';
@@ -49,6 +51,14 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
     public function isDesktop()
     {
         return $this[self::DESKTOP];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString()
+    {
+        return $this->data[self::USER_AGENT];
     }
 
     /**

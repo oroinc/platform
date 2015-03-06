@@ -70,17 +70,15 @@
 {%- endblock %}
 
 {% block _debug_init_script_widget %}
-    {%- set content -%}
+    <script{{ block('block_attributes') }}>
         require(['oroui/js/tools'], function (tools) {tools.debug = true;});
-    {%- endset -%}
-    {{ block_widget(block, {'content': content}) }}
+    </script>
 {% endblock %}
 
 {% block _mobile_init_script_widget %}
-    {%- set content -%}
+    <script{{ block('block_attributes') }}>
         require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
-    {%- endset -%}
-    {{ block_widget(block, {'content': content}) }}
+    </script>
 {% endblock %}
 
 {% block _header_widget %}

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
@@ -31,22 +32,21 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()
-            ->setOptional([self::PARAM_ROUTE_NAME])
-            ->setAllowedTypes([self::PARAM_ROUTE_NAME => ['string', 'null']])
-            ->setNormalizers(
+        $context->getResolver()
+            ->setDefaults(
                 [
-                    self::PARAM_ROUTE_NAME => function ($options, $route) {
-                        if (null === $route && $this->request) {
-                            $route = $this->request->attributes->get('_route');
-                            if (null === $route) {
-                                $route = $this->request->attributes->get('_master_request_route');
+                    self::PARAM_ROUTE_NAME => function (Options $options, $value) {
+                        if (null === $value && $this->request) {
+                            $value = $this->request->attributes->get('_route');
+                            if (null === $value) {
+                                $value = $this->request->attributes->get('_master_request_route');
                             }
                         }
 
-                        return $route;
+                        return $value;
                     }
                 ]
-            );
+            )
+            ->setAllowedTypes([self::PARAM_ROUTE_NAME => ['string', 'null']]);
     }
 }

@@ -83,6 +83,19 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "test" has invalid type. Expected "Oro\Component\Layout\ContextItemInterface", but "stdClass" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded()
+    {
+        $this->context->getResolver()->setOptional(['test']);
+        $this->context->set('test', new \stdClass());
+        $this->context->resolve();
+    }
+
     public function testHasForUnknownItem()
     {
         $this->assertFalse($this->context->has('test'));
@@ -109,7 +122,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->context->set('test', 'val');
 
-        $this->context->getDataResolver()
+        $this->context->getResolver()
             ->setOptional(['test'])
             ->setNormalizers(
                 [
@@ -125,7 +138,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context data.
+     * @expectedExceptionMessage Failed to resolve the context variables.
      */
     public function testResolveThrowsExceptionWhenInvalidData()
     {
@@ -135,7 +148,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The context data are already resolved.
+     * @expectedExceptionMessage The context variables are already resolved.
      */
     public function testResolveThrowsExceptionWhenDataAlreadyResolved()
     {
@@ -152,7 +165,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
 
     public function testChangeValueAllowedForResolvedData()
     {
-        $this->context->getDataResolver()->setDefaults(['test' => 'default']);
+        $this->context->getResolver()->setDefaults(['test' => 'default']);
         $this->context->resolve();
         $this->assertEquals('default', $this->context['test']);
 
@@ -162,7 +175,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The item "test" cannot be added because the context data are already resolved.
+     * @expectedExceptionMessage The item "test" cannot be added because the context variables are already resolved.
      */
     public function testAddNewValueThrowsExceptionWhenDataAlreadyResolved()
     {
@@ -172,7 +185,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveNotExistingValueNotThrowsExceptionForResolvedData()
     {
-        $this->context->getDataResolver()->setDefaults(['test' => 'default']);
+        $this->context->getResolver()->setDefaults(['test' => 'default']);
         $this->context->resolve();
 
         $this->context->remove('unknown');
@@ -180,14 +193,22 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The item "test" cannot be removed because the context data are already resolved.
+     * @expectedExceptionMessage The item "test" cannot be removed because the context variables are already resolved.
      */
     public function testRemoveExistingValueThrowsExceptionWhenDataAlreadyResolved()
     {
-        $this->context->getDataResolver()->setOptional(['test']);
+        $this->context->getResolver()->setOptional(['test']);
         $this->context->set('test', 'val');
         $this->context->resolve();
 
         $this->context->remove('test');
+    }
+
+    public function testGetData()
+    {
+        $this->assertInstanceOf(
+            'Oro\Component\Layout\ContextDataCollection',
+            $this->context->data()
+        );
     }
 }

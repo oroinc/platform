@@ -1,13 +1,15 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroUIBundle:layouts:base/index.html.twig'
+            themes: 'OroUIBundle:layouts:base/update.html.twig'
         - @add:
-            id:        index_before_content_addition
+            id:        update_before_content_addition
             parentId:  before_content_addition
             blockType: placeholder
             options:
                 placeholder_name: content_after
+                placeholder_parameters:
+                    entity: { @value: $data.entity }
         - @addTree:
             items:
                 page_header:
@@ -18,28 +20,28 @@ oro_layout:
                     blockType: container
                 name_buttons:
                     blockType: container
-                index_navButtons_before_placeholder:
+                update_navButtons_before_placeholder:
                     blockType: placeholder
                     options:
-                        placeholder_name: index_navButtons_before
+                        placeholder_name: update_navButtons_before
                         placeholder_parameters:
-                            entity_class: { @value: $context.entity_class }
-                index_navButtons_after_placeholder:
+                            entity: { @value: $data.entity }
+                update_navButtons_after_placeholder:
                     blockType: placeholder
                     options:
-                        placeholder_name: index_navButtons_after
+                        placeholder_name: update_navButtons_after
                         placeholder_parameters:
-                            entity_class: { @value: $context.entity_class }
+                            entity: { @value: $data.entity }
             tree:
                 content:
                     page_header:
                         page_title: ~
                         page_buttons:
-                            index_navButtons_before_placeholder: ~
+                            update_navButtons_before_placeholder: ~
                             name_buttons: ~
-                            index_navButtons_after_placeholder: ~
+                            update_navButtons_after_placeholder: ~
 
     conditions:
         @and:
             - @empty: $context.widget_container
-            - @eq: [$context.action, 'index']
+            - @eq: [$context.action, 'update']

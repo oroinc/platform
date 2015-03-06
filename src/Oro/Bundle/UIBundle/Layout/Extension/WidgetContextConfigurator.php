@@ -8,12 +8,8 @@ use Symfony\Component\OptionsResolver\Options;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 
-use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
-
-class HashNavContextConfigurator implements ContextConfiguratorInterface
+class WidgetContextConfigurator implements ContextConfiguratorInterface
 {
-    const HASH_NAVIGATION_HEADER = ResponseHashnavListener::HASH_NAVIGATION_HEADER;
-
     /** @var Request|null */
     protected $request;
 
@@ -35,20 +31,28 @@ class HashNavContextConfigurator implements ContextConfiguratorInterface
         $context->getResolver()
             ->setDefaults(
                 [
-                    'hash_navigation' => function (Options $options, $value) {
-                        if (null === $value) {
-                            $value =
-                                $this->request
-                                && (
-                                    $this->request->headers->get(self::HASH_NAVIGATION_HEADER) == true
-                                    || $this->request->get(self::HASH_NAVIGATION_HEADER) == true
-                                );
+                    'widget_container' => function (Options $options, $value) {
+                        if (null === $value && $this->request) {
+                            $value = $this->request->query->get('_widgetContainer')
+                                ?: $this->request->request->get('_widgetContainer');
                         }
 
                         return $value;
                     }
                 ]
             )
-            ->setAllowedTypes(['hash_navigation' => 'bool']);
+            ->setAllowedTypes(['widget_container' => ['string', 'null']]);
+
+        $context->data()->setDefault(
+            'widget_id',
+            '$request._wid',
+            function () {
+                if (!$this->request) {
+                    throw new \BadMethodCallException('The request expected.');
+                }
+
+                return $this->request->query->get('_wid') ?: $this->request->request->get('_wid');
+            }
+        );
     }
 }

@@ -16,9 +16,10 @@ class BaseType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(['attr', 'label', 'label_attr', 'translation_domain']);
+        $resolver->setOptional(['vars', 'attr', 'label', 'label_attr', 'translation_domain']);
         $resolver->setAllowedTypes(
             [
+                'vars'       => 'array',
                 'attr'       => 'array',
                 'label_attr' => 'array'
             ]
@@ -30,6 +31,11 @@ class BaseType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
+        // merge the passed variables with the existing ones
+        if (!empty($options['vars'])) {
+            $view->vars = array_replace($view->vars, $options['vars']);
+        }
+
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
         $view->vars['block'] = $view;
 

@@ -7,6 +7,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
@@ -79,23 +80,22 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()
-            ->setOptional([self::PARAM_THEME])
-            ->setAllowedTypes([self::PARAM_THEME => ['string', 'null']])
-            ->setNormalizers(
+        $context->getResolver()
+            ->setDefaults(
                 [
-                    self::PARAM_THEME => function ($options, $theme) {
-                        if (null === $theme && $this->request) {
-                            $theme = $this->request->query->get('_theme');
-                            if (null === $theme) {
-                                $theme = $this->request->attributes->get('_theme');
+                    self::PARAM_THEME => function (Options $options, $value) {
+                        if (null === $value && $this->request) {
+                            $value = $this->request->query->get('_theme');
+                            if (null === $value) {
+                                $value = $this->request->attributes->get('_theme');
                             }
                         }
 
-                        return $theme;
+                        return $value;
                     }
                 ]
-            );
+            )
+            ->setAllowedTypes([self::PARAM_THEME => ['string', 'null']]);
     }
 
     /**

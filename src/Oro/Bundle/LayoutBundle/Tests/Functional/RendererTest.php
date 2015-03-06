@@ -28,7 +28,7 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getDataResolver()->setOptional(['form']);
+        $context->getResolver()->setOptional(['form']);
         $form = $this->getTestForm();
         $context->set('form', new FormAccessor($form));
 
@@ -53,7 +53,7 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getDataResolver()->setOptional(['form']);
+        $context->getResolver()->setOptional(['form']);
         $form = $this->getTestForm();
         $context->set('form', new FormAccessor($form));
 
@@ -79,8 +79,18 @@ class RendererTest extends LayoutTestCase
             ->add('root', null, 'root')
             ->add('head', 'root', 'head', ['title' => 'Test'])
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
-            ->add('style', 'head', 'style', ['content' => 'body { color: red; }'])
-            ->add('script', 'head', 'script', ['content' => 'alert(\'test\');'])
+            ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
+            ->add('external_style', 'head', 'style', ['src' => 'test.css', 'scoped' => new Condition\False()])
+            ->add(
+                'script',
+                'head',
+                'script',
+                [
+                    'content' => 'alert(\'test\');',
+                    'async' => true,
+                    'defer' => new Condition\False()
+                ]
+            )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
             ->add('content', 'root', 'body')
             ->add('list', 'content', 'list')
@@ -175,10 +185,11 @@ class RendererTest extends LayoutTestCase
     <head>
         <title>Test</title>
         <meta charset="UTF-8"/>
-        <style type="text/css">
+        <style type="text/css" scoped="scoped">
             body { color: red; }
         </style>
-        <script type="text/javascript">
+        <link rel="stylesheet" type="text/css" href="test.css"/>
+        <script type="text/javascript" async="async">
             alert('test');
         </script>
         <link rel="stylesheet" href="test.css"/>

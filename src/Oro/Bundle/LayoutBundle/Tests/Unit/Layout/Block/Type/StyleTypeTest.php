@@ -12,7 +12,7 @@ class StyleTypeTest extends BlockTypeTestCase
     public function testSetDefaultOptions()
     {
         $this->assertEquals(
-            [],
+            ['type' => 'text/css'],
             $this->resolveOptions(StyleType::NAME, [])
         );
         $this->assertEquals(
@@ -23,29 +23,9 @@ class StyleTypeTest extends BlockTypeTestCase
             )
         );
         $this->assertEquals(
-            ['content' => 'test content'],
+            ['type' => 'text/css', 'content' => 'test content'],
             $this->resolveOptions(StyleType::NAME, ['content' => 'test content'])
         );
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "scoped" with value "scoped" is expected to be of type "bool"
-     */
-    public function testSetDefaultOptionsWithInvalidScoped()
-    {
-        $this->resolveOptions(StyleType::NAME, ['src' => 'test.css', 'scoped' => 'scoped']);
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "crossorigin" has the value "test", but is expected to be one of "anonymous", "use-credentials"
-     */
-    // @codingStandardsIgnoreEnd
-    public function testSetDefaultOptionsWithInvalidCrossorigin()
-    {
-        $this->resolveOptions(StyleType::NAME, ['src' => 'test.css', 'crossorigin' => 'test']);
     }
 
     public function testBuildViewWithoutScoped()
@@ -56,7 +36,7 @@ class StyleTypeTest extends BlockTypeTestCase
         );
 
         $this->assertEquals('text/css', $view->vars['attr']['type']);
-        $this->assertEquals('test.css', $view->vars['attr']['src']);
+        $this->assertEquals('test.css', $view->vars['attr']['href']);
         $this->assertSame('', $view->vars['content']);
     }
 
@@ -67,7 +47,7 @@ class StyleTypeTest extends BlockTypeTestCase
             ['src' => 'test.css', 'scoped' => false]
         );
 
-        $this->assertEquals('test.css', $view->vars['attr']['src']);
+        $this->assertEquals('test.css', $view->vars['attr']['href']);
         $this->assertFalse(isset($view->vars['attr']['scoped']), 'Unexpected \'scoped\' attribute');
     }
 
@@ -78,7 +58,7 @@ class StyleTypeTest extends BlockTypeTestCase
             ['src' => 'test.css', 'scoped' => true]
         );
 
-        $this->assertEquals('test.css', $view->vars['attr']['src']);
+        $this->assertEquals('test.css', $view->vars['attr']['href']);
         $this->assertEquals('scoped', $view->vars['attr']['scoped']);
     }
 

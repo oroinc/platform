@@ -51,15 +51,15 @@ class EmbedFormLayoutManager
 
         $layoutContext = new LayoutContext();
 
-        $layoutContext->getDataResolver()
-            ->setRequired(['embedded_form_entity', 'embedded_form_type'])
+        $layoutContext->getResolver()
+            ->setRequired(['embedded_form_type'])
             ->setOptional(['embedded_form', 'embedded_form_custom_layout']);
 
         $layoutContext->set('theme', 'embedded_default');
         $layoutContext->set('embedded_form', null === $form ? null : new FormAccessor($form));
-        $layoutContext->set('embedded_form_entity', $formEntity);
         $layoutContext->set('embedded_form_type', $formTypeName);
         $layoutContext->set('embedded_form_custom_layout', $customLayout);
+        $layoutContext->data()->set('embedded_form_entity', '', $formEntity);
 
         $layoutBuilder = $this->layoutManager->getLayoutBuilder();
         // TODO discuss adding root automatically

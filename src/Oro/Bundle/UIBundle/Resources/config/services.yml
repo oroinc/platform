@@ -103,6 +103,13 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_ui.layout_context_configurator.widget:
+        class: Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+
     oro_ui.layout_context_configurator.user_agent:
         class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
         calls:

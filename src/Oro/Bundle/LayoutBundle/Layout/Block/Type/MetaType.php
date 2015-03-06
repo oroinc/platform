@@ -12,20 +12,12 @@ class MetaType extends AbstractType
 {
     const NAME = 'meta';
 
-    /** @var array */
-    protected static $attributes = [
-        'charset'    => 'charset',
-        'content'    => 'content',
-        'http-equiv' => 'http_equiv',
-        'name'       => 'name'
-    ];
-
     /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array_values(self::$attributes));
+        $resolver->setOptional(['charset', 'content', 'http_equiv', 'name']);
     }
 
     /**
@@ -33,10 +25,17 @@ class MetaType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        foreach (self::$attributes as $attr => $opt) {
-            if (!empty($options[$opt])) {
-                $view->vars['attr'][$attr] = $options[$opt];
-            }
+        if (!empty($options['charset'])) {
+            $view->vars['attr']['charset'] = $options['charset'];
+        }
+        if (!empty($options['content'])) {
+            $view->vars['attr']['content'] = $options['content'];
+        }
+        if (!empty($options['http_equiv'])) {
+            $view->vars['attr']['http-equiv'] = $options['http_equiv'];
+        }
+        if (!empty($options['name'])) {
+            $view->vars['attr']['name'] = $options['name'];
         }
     }
 

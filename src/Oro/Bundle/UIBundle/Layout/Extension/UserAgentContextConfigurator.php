@@ -30,21 +30,20 @@ class UserAgentContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()
-            ->setDefaults(['user_agent' => null])
-            ->setAllowedTypes(['user_agent' => 'Oro\Bundle\UIBundle\Provider\UserAgentInterface'])
-            ->setNormalizers(
+        $context->getResolver()
+            ->setDefaults(
                 [
-                    'user_agent' => function (Options $options, $userAgent) {
-                        if (!$userAgent) {
-                            $userAgent = new UserAgent(
+                    'user_agent' => function (Options $options, $value) {
+                        if (null === $value) {
+                            $value = new UserAgent(
                                 $this->request ? $this->request->headers->get('User-Agent') : null
                             );
                         }
 
-                        return $userAgent;
+                        return $value;
                     }
                 ]
-            );
+            )
+            ->setAllowedTypes(['user_agent' => 'Oro\Bundle\UIBundle\Provider\UserAgentInterface']);
     }
 }
