@@ -290,14 +290,14 @@ define(function (require) {
         },
 
         onConnectionAdded: function () {
-            this.smartRefetch();
+            this.updateEvents();
             this.updateLayout();
         },
 
         onConnectionChanged: function (connectionModel) {
             if (connectionModel.reloadEventsRequest !== null) {
                 if (connectionModel.reloadEventsRequest === true) {
-                    this.smartRefetch();
+                    this.updateEvents();
                 }
                 connectionModel.reloadEventsRequest = null;
                 return;
@@ -306,25 +306,15 @@ define(function (require) {
             var changes = connectionModel.changedAttributes(),
                 calendarUid = connectionModel.get('calendarUid');
             if (changes.visible && !this.eventsLoaded[calendarUid]) {
-                this.smartRefetch();
+                this.updateEvents();
             } else {
                 this.updateEventsWithoutReload();
             }
         },
 
         onConnectionDeleted: function () {
-            this.smartRefetch();
+            this.updateEvents();
             this.updateLayout();
-        },
-
-        onFcSelect: function (start, end) {
-            var attrs = {
-                allDay: start.time().as('ms') === 0 && end.time().as('ms') === 0,
-                start: start.clone(),
-                end: end.clone()
-            };
-            this.applyTzCorrection(-1, attrs);
-            this.showAddEventDialog(attrs);
         },
 
         /**
@@ -364,6 +354,17 @@ define(function (require) {
             }
         },
 
+
+        onFcSelect: function (start, end) {
+            var attrs = {
+                allDay: start.time().as('ms') === 0 && end.time().as('ms') === 0,
+                start: start.clone(),
+                end: end.clone()
+            };
+            this.applyTzCorrection(-1, attrs);
+            this.showAddEventDialog(attrs);
+        },
+
         onFcEventClick: function (fcEvent) {
             if (!this.eventView) {
                 try {
@@ -393,8 +394,8 @@ define(function (require) {
                 currentView = this.getCalendarElement().fullCalendar('getView'),
                 oldState = fcEvent._beforeDragState,
                 isDroppedOnDayGrid =
-                    fcEvent.start.time().as('ms') === 0
-                        && (fcEvent.end === null || fcEvent.end.time().as('ms') === 0);
+                    fcEvent.start.time().as('ms') === 0 &&
+                        (fcEvent.end === null || fcEvent.end.time().as('ms') === 0);
 
             // when on week view all-day event is dropped at 12AM to hour view
             // previous condition gives false positive result
@@ -425,46 +426,58 @@ define(function (require) {
                 }
             }
             fcEvent.end = fcEvent.start.clone().add(realDuration);
-            this.saveFcEvent(fcEvent, undo);
+            this.saveFcEvent(fcEvent);
         },
 
-        saveFcEvent: function (fcEvent, undo) {
+        saveFcEvent: function (fcEvent) {
+            var promises = [], oldAttrs, eventModel, attrs;
+            attrs = {
+                allDay: fcEvent.allDay,
+                start: fcEvent.start.clone(),
+                end: (fcEvent.end !== null) ? fcEvent.end.clone() : null
+            };
+            this.applyTzCorrection(-1, attrs);
+
+            attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
+            if (attrs.end) {
+                attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
+            }
+
+            eventModel = this.collection.get(fcEvent.id);
+            oldAttrs = _.clone(eventModel.attributes);
+            eventModel.set(attrs);
+
+            this.trigger('event:beforeSave', eventModel, promises);
+
+            // wait for promises execution before save
+            $.when.apply($, promises)
+                .done(_.bind(this._saveFcEvent, this, eventModel, oldAttrs))
+                .fail(function () {
+                    eventModel.set(oldAttrs);
+                });
+        },
+
+        _saveFcEvent: function (eventModel, oldAttrs) {
             this.showSavingMask();
             try {
-                var attrs = {
-                        allDay: fcEvent.allDay,
-                        start: fcEvent.start.clone(),
-                        end: (fcEvent.end !== null) ? fcEvent.end.clone() : null
-                    },
-                    model = this.collection.get(fcEvent.id);
-                this.applyTzCorrection(-1, attrs);
-
-                attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
-                if (attrs.end) {
-                    attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
-                }
-
-                model.save(
-                    attrs,
+                eventModel.save(
+                    null,
                     {
                         success: _.bind(this._hideMask, this),
                         error: _.bind(function (model, response) {
-                            if (undo) {
-                                undo();
-                            }
+                            eventModel.set(oldAttrs);
                             this.showSaveEventError(response.responseJSON || {});
+                            this._hideMask();
                         }, this)
                     }
                 );
             } catch (err) {
-                if (undo) {
-                    undo();
-                }
+                eventModel.set(oldAttrs);
                 this.showSaveEventError(err);
             }
         },
 
-        smartRefetch: function () {
+        updateEvents: function () {
             try {
                 this.showLoadingMask();
                 // load events from a server

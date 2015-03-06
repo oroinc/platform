@@ -4,13 +4,15 @@ define(function (require) {
         _ = require('underscore'),
         BasePlugin = require('oroui/js/app/plugins/base/plugin'),
         mediator = require('oroui/js/mediator'),
-        tools = require('oroui/js/tools');
+        tools = require('oroui/js/tools'),
+        GuestNotifierView = require('orocalendar/js/app/views/guest-notifier-view');
 
     GuestsPlugin = BasePlugin.extend({
         enable: function () {
             this.listenTo(this.main, 'event:added', this.onEventAdded);
             this.listenTo(this.main, 'event:changed', this.onEventChanged);
             this.listenTo(this.main, 'event:deleted', this.onEventDeleted);
+            this.listenTo(this.main, 'event:beforeSave', this.onEventBeforeSave);
             GuestsPlugin.__super__.enable.call(this);
         },
 
@@ -77,9 +79,9 @@ define(function (require) {
             if (this.hasGuestEvent(eventModel)) {
                 // refetch if there are visible guest events
                 if (!eventModel.changing) {
-                    this.main.smartRefetch();
+                    this.main.updateEvents();
                 } else {
-                    eventModel.once('sync', this.main.smartRefetch, this.main);
+                    eventModel.once('sync', this.main.updateEvents, this.main);
                 }
             }
         },
@@ -95,9 +97,9 @@ define(function (require) {
             if (this.hasGuestEvent(eventModel)) {
                 if (eventModel.changed.invitedUsers) {
                     if (!eventModel.changing) {
-                        this.main.smartRefetch();
+                        this.main.updateEvents();
                     } else {
-                        eventModel.once('sync', this.main.smartRefetch, this.main);
+                        eventModel.once('sync', this.main.updateEvents, this.main);
                     }
                     return;
                 }
@@ -125,6 +127,49 @@ define(function (require) {
                     this.main.getCalendarElement().fullCalendar('removeEvents', guestEvents[i].id);
                     this.main.collection.remove(guestEvents[i]);
                     guestEvents[i].dispose();
+                }
+            }
+        },
+
+        /**
+         * "event:beforeSave" callback.
+         *
+         * @param eventModel
+         * @param {array} promises script will wait execution of all promises before save
+         */
+        onEventBeforeSave: function (eventModel, promises) {
+            if (this.hasGuestEvent(eventModel)) {
+                var deferredConfirmation = $.Deferred(), cleanUp;
+                promises.push(deferredConfirmation);
+
+                if (!this.modal) {
+                    cleanUp = _.bind(function () {
+                        this.modal.dispose();
+                        delete this.modal;
+                    }, this);
+
+                    this.modal = GuestNotifierView.createConfirmNotificationDialog();
+
+                    this.modal.on('ok', _.bind(function () {
+                        eventModel.set({notifyInvitedUsers: true}, {silent: true});
+                        eventModel.once('sync', function () {
+                            this.unset('notifyInvitedUsers');
+                        });
+                        deferredConfirmation.resolve();
+                        _.defer(cleanUp);
+                    }, this));
+
+                    this.modal.on('cancel', _.bind(function () {
+                        deferredConfirmation.resolve();
+                        _.defer(cleanUp);
+                    }, this));
+
+                    this.modal.on('close', _.bind(function () {
+                        deferredConfirmation.reject();
+                        _.defer(cleanUp);
+                    }, this));
+
+                    this.modal.open();
                 }
             }
         }
