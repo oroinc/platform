@@ -191,9 +191,9 @@ As you can see this configuration file declares new entity config scope named `n
  - **enabled** - this attribute indicates whether the note can be added to a target entity.
  - **immutable** - this attribute can be used to prohibit changing the association state. This attribute can be used to prohibit disable already enabled association and vise versa.
 
-You can use both of these attributes for your own associations and they will automatically have the same behaviour. The implementation of **enabled** attribute you can find in [AssociationChoiceType](../../Form/Type/AssociationChoiceType.php) (please note that this form type have been configured to be used with this attribute). The implementation of the **immutable** attribute you can find in [AbstractConfigType](../../../EntityConfigBundle/Form/Type/AbstractConfigType.php).
+You can use both of these attributes for your own associations and they will automatically have the same behaviour. The implementation of **enabled** attribute can be found in [AssociationChoiceType](../../Form/Type/AssociationChoiceType.php) (please note that this form type has been configured to be used with this attribute). You can find the implementation of the **immutable** attribute in [AbstractConfigType](../../../EntityConfigBundle/Form/Type/AbstractConfigType.php).
 
-For example if you want to prohibit to create notes for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
+For example, if you want to prohibit to create notes for some entity, you just need to set the **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
 
 ``` php
 namespace Acme\Bundle\AcmeBundle\Entity;
@@ -468,9 +468,9 @@ As you can see this configuration file declares new entity config scope named `a
  - **activities** - this attribute indicates which activity entities can be associated with a target entity.
  - **immutable** - this attribute can be used to prohibit changing the association state. This attribute can be used to prohibit disable already enabled association and vise versa.
 
-The implementation of both attributes you can find in [MultipleAssociationChoiceType](../../Form/Type/MultipleAssociationChoiceType.php) (please note that this form type have been configured to be used with this attribute).
+You can find the implementation of both attributes in [MultipleAssociationChoiceType](../../Form/Type/MultipleAssociationChoiceType.php) (please note that this form type has been configured to be used with this attribute).
 
-For example if you want to prohibit to associate any activity for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
+For example, if you want to prohibit to associate any activity with some entity, you just need to set the **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
 
 ``` php
 namespace Acme\Bundle\AcmeBundle\Entity;
