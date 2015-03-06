@@ -44,6 +44,7 @@ class OroTrackingBundleInstaller implements Installation
         OroTrackerBundle::addOrganization($schema);
 
         $this->addOroTrackingVisitEventForeignKeys($schema);
+        $this->addOroTrackingEventDictionaryForeignKeys($schema);
     }
 
     /**
@@ -202,8 +203,10 @@ class OroTrackingBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_tracking_event_dictionary');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['website_id'], 'idx_5c3b076318f45c82', []);
     }
 
     /**
@@ -231,6 +234,22 @@ class OroTrackingBundleInstaller implements Installation
             ['web_event_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => null]
+        );
+    }
+
+    /**
+     * Add oro_tracking_event_dictionary foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroTrackingEventDictionaryForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tracking_event_dictionary');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_tracking_website'),
+            ['website_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 }

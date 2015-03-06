@@ -101,7 +101,7 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     }
 
     /**
-     * @return TrackingEventLibrary
+     * @return TrackingEventDictionary
      * @return $this
      */
     public function getEvent()
@@ -110,7 +110,7 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     }
 
     /**
-     * @param TrackingEventLibrary $event
+     * @param TrackingEventDictionary $event
      * @return $this
      */
     public function setEvent($event)

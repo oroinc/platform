@@ -9,9 +9,10 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
+use Oro\Bundle\TrackingBundle\Entity\TrackingEventDictionary;
+use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
-use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 
 class TrackingProcessor implements LoggerAwareInterface
 {
@@ -26,6 +27,8 @@ class TrackingProcessor implements LoggerAwareInterface
     protected $doctrine;
 
     protected $collectedVisits = [];
+
+    protected $eventDictionary = [];
 
     public function __construct(ManagerRegistry $doctrine)
     {
@@ -79,8 +82,7 @@ class TrackingProcessor implements LoggerAwareInterface
 
             $trackingVisitEvent = new TrackingVisitEvent();
 
-           //todo: set event
-            $trackingVisitEvent->setEvent($this->getMapping()[$event->getName()]);
+            $trackingVisitEvent->setEvent($this->getEventType($event));
 
             $eventData = $event->getEventData();
             $decodedData = json_decode($eventData->getData());
@@ -99,6 +101,7 @@ class TrackingProcessor implements LoggerAwareInterface
 
         $em->flush();
         $this->collectedVisits = [];
+        $this->eventDictionary = [];
         $em->clear();
     }
 
@@ -152,6 +155,40 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         return $visit;
+    }
+
+    /**
+     * Get Event dictionary for given tracking event
+     *
+     * @param TrackingEvent $event
+     * @return TrackingEventDictionary
+     */
+    protected function getEventType(TrackingEvent $event)
+    {
+        if (isset($this->eventDictionary[$event->getWebsite()->getId()])
+            && isset($this->eventDictionary[$event->getWebsite()->getId()][$event->getName()])
+        ) {
+            $eventType = $this->eventDictionary[$event->getWebsite()->getId()][$event->getName()];
+        } else {
+            $eventType = $this->getEntityManager()->getRepository('OroTrackingBundle:TrackingEventDictionary')
+                ->findOneBy(
+                    [
+                        'name' => $event->getName(),
+                        'website' => $event->getWebsite()
+                    ]
+                );
+        }
+
+        if (!$eventType) {
+            $eventType = new TrackingEventDictionary();
+            $eventType->setName($event->getName());
+            $eventType->setWebsite($event->getWebsite());
+
+            $this->getEntityManager()->persist($eventType);
+            $this->eventDictionary[$event->getWebsite()->getId()][$event->getName()] = $eventType;
+        }
+
+        return $eventType;
     }
 
     /**

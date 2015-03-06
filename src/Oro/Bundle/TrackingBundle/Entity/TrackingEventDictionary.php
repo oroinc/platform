@@ -37,6 +37,14 @@ class TrackingEventDictionary
     protected $name;
 
     /**
+     * @var TrackingWebsite
+     *
+     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
+     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $website;
+
+    /**
      * @var TrackingVisitEvent[]
      *
      * @ORM\OneToMany(targetEntity="TrackingVisitEvent", mappedBy="event")
@@ -87,5 +95,28 @@ class TrackingEventDictionary
         $this->visitEvents = $visitEvents;
 
         return $this;
+    }
+
+    /**
+     * Set website
+     *
+     * @param TrackingWebsite $website
+     * @return TrackingEvent
+     */
+    public function setWebsite(TrackingWebsite $website = null)
+    {
+        $this->website = $website;
+
+        return $this;
+    }
+
+    /**
+     * Get website
+     *
+     * @return TrackingWebsite
+     */
+    public function getWebsite()
+    {
+        return $this->website;
     }
 }
