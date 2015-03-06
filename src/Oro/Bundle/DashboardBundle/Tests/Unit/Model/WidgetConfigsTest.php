@@ -6,6 +6,7 @@ use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 use Oro\Bundle\DashboardBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -80,7 +81,7 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->with($widget)
             ->will($this->returnValue($widgetState));
 
-        $this->assertEquals($options, $this->widgetConfigs->getCurrentWidgetOptions());
+        $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getCurrentWidgetOptions());
     }
 
     public function testGetCurrentWidgetOptionsShouldReturnOptionsOfWidgetFromEvent()
@@ -122,6 +123,6 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
                 return $event;
             }));
 
-        $this->assertEquals($eventOptions, $this->widgetConfigs->getCurrentWidgetOptions());
+        $this->assertEquals(new WidgetOptionBag($eventOptions), $this->widgetConfigs->getCurrentWidgetOptions());
     }
 }

@@ -120,7 +120,7 @@ class WidgetConfigs
     /**
      * Returns a list of options for current widget
      *
-     * @return array
+     * @return WidgetOptionBag
      */
     public function getCurrentWidgetOptions()
     {
@@ -143,7 +143,7 @@ class WidgetConfigs
             $options = $event->getOptions();
         }
 
-        return $options;
+        return new WidgetOptionBag($options);
     }
 
     /**
