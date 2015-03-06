@@ -6,9 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -16,7 +14,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
 class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtureInterface
 {
-    const BATCH_SIZE = 1000;
+    const BATCH_SIZE = 100;
 
     /**
      * {@inheritdoc}
@@ -67,26 +65,24 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
                     } else {
                         $email->setHead(false);
                     }
-                    $itemsCount++;
+                    $email->setThread($newThread);
                     $entities[] = [
-                        'thread' => $newThread,
                         'email'  => $email,
                     ];
-                    if (0 == $itemsCount % self::BATCH_SIZE) {
-                        $this->saveEntities($manager, $entities);
-                        $newThread = $manager->getRepository('OroEmailBundle:EmailThread')->find($newThread->getId());
-                        $entities = [];
-                    }
                 }
             } elseif (count($emails) == 1) {
                 $email = $emails[0];
                 $email->setHead(true);
                 $itemsCount++;
                 $entities[] = [
-                    'thread' => null,
                     'email'  => $email,
                 ];
             }
+            if (0 == $itemsCount % self::BATCH_SIZE) {
+                $this->saveEntities($manager, $entities);
+                $entities = [];
+            }
+
         }
 
         if ($itemsCount % self::BATCH_SIZE > 0) {
@@ -101,16 +97,6 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
     protected function saveEntities(ObjectManager $manager, array $entities)
     {
         foreach ($entities as $pair) {
-            $uow = $manager->getUnitOfWork();
-            if ($uow->getEntityState($pair['email'], UnitOfWork::STATE_DETACHED) === UnitOfWork::STATE_DETACHED) {
-                $isHead = $pair['email']->isHead();
-                $pair['email'] = $manager->find(ClassUtils::getClass($pair['email']), $pair['email']->getId());
-                $pair['email']->setHead($isHead);
-            }
-            if ($pair['thread']) {
-                $pair['email']->setThread($pair['thread']);
-            }
-
             $manager->persist($pair['email']);
         }
         $manager->flush();
