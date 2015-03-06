@@ -20,7 +20,9 @@ define(function (require) {
         ColorManager    = require('orocalendar/js/calendar/color-manager'),
         colorUtil       = require('oroui/js/tools/color-util'),
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
-        localeSettings  = require('orolocale/js/locale-settings');
+        localeSettings  = require('orolocale/js/locale-settings'),
+        PluginManager = require('oroui/js/app/plugins/plugin-manager'),
+        GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
 
         require('jquery.fullcalendar');
 
@@ -140,6 +142,9 @@ define(function (require) {
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
+
+            this.pluginManager = new PluginManager(this);
+            this.pluginManager.enable(GuestsPlugin);
         },
 
         onWindowResize: function () {
@@ -155,6 +160,7 @@ define(function (require) {
                 // fullscreen layout has side effects, need to clean up
                 this.setLayout('default');
             }
+            this.pluginManager.dispose();
             clearInterval(this.timelineUpdateIntervalId);
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
@@ -242,17 +248,17 @@ define(function (require) {
         onEventAdded: function (eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
 
-            eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
+            eventModel.set('editable', connectionModel.get('canEditEvent'), {silent: true});
             eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
+
+            // trigger before view update
+            this.trigger('event:added', eventModel);
 
             this.addEventToCalendar(eventModel);
 
             // make sure that a calendar is visible when a new event is added to it
             if (!connectionModel.get('visible')) {
                 this.connectionsView.showCalendar(connectionModel);
-            }
-            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                this.smartRefetch();
             }
         },
 
@@ -261,32 +267,26 @@ define(function (require) {
                 calendarElement = this.getCalendarElement(),
                 fcEvent;
 
-            eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
+            eventModel.set('editable', connectionModel.get('canEditEvent'));
             eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
 
             // find and update fullCalendar event model
             fcEvent = calendarElement.fullCalendar('clientEvents', eventModel.id)[0];
             _.extend(fcEvent, this.createViewModel(eventModel));
 
+            // trigger before view update
+            this.trigger('event:changed', eventModel);
+
             // notify fullCalendar about update
             // NOTE: cannot update single event due to fullcalendar bug
             //       please check that after updating fullcalendar
             //       calendarElement.fullCalendar('updateEvent', fcEvent);
             calendarElement.fullCalendar('rerenderEvents');
-
-            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                // view is updated to closest possible
-                // start refetching 'cause event had linked events
-                eventModel.once('sync', this.smartRefetch, this);
-            }
         },
 
         onEventDeleted: function (eventModel) {
-            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                this.smartRefetch();
-            } else {
-                this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
-            }
+            this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            this.trigger('event:deleted', eventModel);
         },
 
         onConnectionAdded: function () {
@@ -861,33 +861,6 @@ define(function (require) {
                     });
                 }
             }
-        },
-
-        hasParentEvent: function (eventModel) {
-            var result = false,
-                parentEventId = eventModel.get('parentEventId'),
-                alias = eventModel.get('calendarAlias');
-            if (parentEventId) {
-                result = Boolean(this.getConnectionCollection().find(function (c) {
-                    return c.get('calendarAlias') === alias && this.collection.get(c.get('calendarUid') + '_' + parentEventId);
-                }, this));
-            }
-            return result;
-        },
-
-        hasGuestEvent: function (eventModel) {
-            var result = false,
-                guests = eventModel.get('invitedUsers');
-            guests = _.isNull(guests) ? [] : guests;
-            if (eventModel.hasChanged('invitedUsers') && !_.isEmpty(eventModel.previous('invitedUsers'))) {
-                guests = _.union(guests, eventModel.previous('invitedUsers'));
-            }
-            if (!_.isEmpty(guests)) {
-                result = Boolean(this.getConnectionCollection().find(function (connection) {
-                    return -1 !== guests.indexOf(connection.get('userId'));
-                }, this));
-            }
-            return result;
         },
 
         getAvailableHeight: function () {
