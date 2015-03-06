@@ -82,7 +82,6 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
                 $this->saveEntities($manager, $entities);
                 $entities = [];
             }
-
         }
 
         if ($itemsCount % self::BATCH_SIZE > 0) {
