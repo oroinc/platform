@@ -116,7 +116,11 @@ class JobExecutor
         $jobResult = new JobResult();
         $jobResult->setSuccessful(false);
 
-        $this->entityManager->beginTransaction();
+        $isTransactionRunning = $this->isTransactionRunning();
+        if (!$isTransactionRunning) {
+            $this->entityManager->beginTransaction();
+        }
+
         try {
             $job = $this->batchJobRegistry->getJob($jobInstance);
             if (!$job) {
@@ -128,10 +132,14 @@ class JobExecutor
             $failureExceptions = $this->collectFailureExceptions($jobExecution);
 
             if ($jobExecution->getStatus()->getValue() == BatchStatus::COMPLETED && !$failureExceptions) {
-                $this->entityManager->commit();
+                if (!$isTransactionRunning) {
+                    $this->entityManager->commit();
+                }
                 $jobResult->setSuccessful(true);
             } else {
-                $this->entityManager->rollback();
+                if (!$isTransactionRunning) {
+                    $this->entityManager->rollback();
+                }
                 foreach ($failureExceptions as $failureException) {
                     $jobResult->addFailureException($failureException);
                 }
@@ -141,7 +149,9 @@ class JobExecutor
             $this->batchJobRepository->getJobManager()->flush();
             $this->batchJobRepository->getJobManager()->clear();
         } catch (\Exception $exception) {
-            $this->entityManager->rollback();
+            if (!$isTransactionRunning) {
+                $this->entityManager->rollback();
+            }
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
 
@@ -149,6 +159,14 @@ class JobExecutor
         }
 
         return $jobResult;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isTransactionRunning()
+    {
+       return $this->entityManager->getConnection()->getTransactionNestingLevel() !== 0;
     }
 
     /**
