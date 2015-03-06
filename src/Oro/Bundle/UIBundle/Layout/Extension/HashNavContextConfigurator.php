@@ -32,14 +32,12 @@ class HashNavContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()
-            ->setOptional(['hash_navigation'])
-            ->setAllowedTypes(['hash_navigation' => 'bool'])
-            ->setNormalizers(
+        $context->getResolver()
+            ->setDefaults(
                 [
-                    'hash_navigation' => function (Options $options, $hashNavigation) {
-                        if ($hashNavigation === null) {
-                            $hashNavigation =
+                    'hash_navigation' => function (Options $options, $value) {
+                        if (null === $value) {
+                            $value =
                                 $this->request
                                 && (
                                     $this->request->headers->get(self::HASH_NAVIGATION_HEADER) == true
@@ -47,9 +45,10 @@ class HashNavContextConfigurator implements ContextConfiguratorInterface
                                 );
                         }
 
-                        return $hashNavigation;
+                        return $value;
                     }
                 ]
-            );
+            )
+            ->setAllowedTypes(['hash_navigation' => 'bool']);
     }
 }

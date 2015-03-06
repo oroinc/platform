@@ -40,4 +40,6 @@ oro_layout:
                             index_navButtons_after_placeholder: ~
 
     conditions:
-        @eq: [$context.action, 'index']
+        @and:
+            - @empty: $context.widget_container
+            - @eq: [$context.action, 'index']

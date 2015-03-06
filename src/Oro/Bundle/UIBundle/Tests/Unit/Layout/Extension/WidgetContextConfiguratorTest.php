@@ -11,74 +11,95 @@ use Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator;
 class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var WidgetContextConfigurator */
-    protected $configurator;
+    protected $contextConfigurator;
 
     protected function setUp()
     {
-        $this->configurator = new WidgetContextConfigurator();
+        $this->contextConfigurator = new WidgetContextConfigurator();
     }
 
-    protected function tearDown()
+    public function testConfigureContextByQueryString()
     {
-        unset($this->configurator);
+        $request = new Request();
+        $request->query->set('_wid', 'test_widget_id');
+        $request->query->set('_widgetContainer', 'dialog');
+
+        $context = new LayoutContext();
+
+        $this->contextConfigurator->configureContext($context);
+        $this->contextConfigurator->setRequest($request);
+        $context->resolve();
+
+        $this->assertEquals('dialog', $context['widget_container']);
+        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
+        $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
+    }
+
+    public function testConfigureContextByPostData()
+    {
+        $request = new Request();
+        $request->request->set('_wid', 'test_widget_id');
+        $request->request->set('_widgetContainer', 'dialog');
+
+        $context = new LayoutContext();
+
+        $this->contextConfigurator->configureContext($context);
+        $this->contextConfigurator->setRequest($request);
+        $context->resolve();
+
+        $this->assertEquals('dialog', $context['widget_container']);
+        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
+        $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
+    }
+
+    public function testConfigureContextNoWidget()
+    {
+        $request = new Request();
+
+        $context = new LayoutContext();
+
+        $this->contextConfigurator->configureContext($context);
+        $this->contextConfigurator->setRequest($request);
+        $context->resolve();
+
+        $this->assertNull($context['widget_container']);
+        $this->assertEquals('$request._wid', $context->data()->getIdentifier('widget_id'));
+        $this->assertNull($context->data()->get('widget_id'));
+    }
+
+    public function testConfigureContextOverride()
+    {
+        $request = new Request();
+        $request->query->set('_wid', 'test_widget_id');
+        $request->query->set('_widgetContainer', 'dialog');
+
+        $context                     = new LayoutContext();
+        $context['widget_container'] = 'updated_widget';
+        $context->data()->set('widget_id', 'updated_id', 'updated_widget_id');
+
+        $this->contextConfigurator->configureContext($context);
+        $this->contextConfigurator->setRequest($request);
+        $context->resolve();
+
+        $this->assertEquals('updated_widget', $context['widget_container']);
+        $this->assertEquals('updated_id', $context->data()->getIdentifier('widget_id'));
+        $this->assertEquals('updated_widget_id', $context->data()->get('widget_id'));
+    }
+
+    public function testConfigureContextWithoutRequest()
+    {
+        $context = new LayoutContext();
+
+        $this->contextConfigurator->configureContext($context);
+        $context->resolve();
+
+        $this->assertNull($context['widget_container']);
+        $this->assertFalse($context->data()->has('widget_id'));
     }
 
     public function testRequestSetterSynchronized()
     {
-        $this->configurator->setRequest(new Request());
-        $this->configurator->setRequest(null);
-    }
-
-    public function testConfigureContextWithOutRequest()
-    {
-        $context = new LayoutContext();
-
-        $this->configurator->configureContext($context);
-
-        $context->resolve();
-        $this->assertNull($context->get(WidgetContextConfigurator::PARAM_WIDGET));
-    }
-
-    public function testConfigureContextWithRequest()
-    {
-        $context = new LayoutContext();
-
-        $request = Request::create('');
-        $request->request->set('_widgetContainer', 'testWidget');
-
-        $this->configurator->setRequest($request);
-        $this->configurator->configureContext($context);
-
-        $context->resolve();
-        $this->assertSame('testWidget', $context->get(WidgetContextConfigurator::PARAM_WIDGET));
-    }
-
-    public function testConfigureContextWitWidgetInQueryString()
-    {
-        $context = new LayoutContext();
-
-        $request = Request::create('');
-        $request->query->set('_widgetContainer', 'testWidget');
-
-        $this->configurator->setRequest($request);
-        $this->configurator->configureContext($context);
-
-        $context->resolve();
-        $this->assertSame('testWidget', $context->get(WidgetContextConfigurator::PARAM_WIDGET));
-    }
-
-    public function testConfigureContextWithRequestAndDataSetInContext()
-    {
-        $context = new LayoutContext();
-        $context->set(WidgetContextConfigurator::PARAM_WIDGET, 'widgetShouldNotBeOverridden');
-
-        $request = Request::create('');
-        $request->attributes->set('_widgetContainer', 'testWidget');
-
-        $this->configurator->setRequest($request);
-        $this->configurator->configureContext($context);
-
-        $context->resolve();
-        $this->assertSame('widgetShouldNotBeOverridden', $context->get(WidgetContextConfigurator::PARAM_WIDGET));
+        $this->contextConfigurator->setRequest(new Request());
+        $this->contextConfigurator->setRequest(null);
     }
 }

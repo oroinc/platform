@@ -7,11 +7,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 interface ContextInterface extends \ArrayAccess
 {
     /**
-     * Returns the context data resolver.
+     * Returns the context variables resolver.
+     * This resolver should be used to configure variables which can be added to the context.
      *
      * @return OptionsResolverInterface
      */
-    public function getDataResolver();
+    public function getResolver();
 
     /**
      * Resolves the context data according the data resolver.
@@ -42,7 +43,7 @@ interface ContextInterface extends \ArrayAccess
      *
      * @return mixed
      *
-     * @throws \OutOfBoundsException if a item does not exist
+     * @throws \OutOfBoundsException if the item does not exist
      */
     public function get($name);
 
@@ -75,4 +76,11 @@ interface ContextInterface extends \ArrayAccess
      * @throws Exception\LogicException if existing value is removed from already resolved context
      */
     public function remove($name);
+
+    /**
+     * Gets a collection that is used to store data in the context.
+     *
+     * @return ContextDataCollection
+     */
+    public function data();
 }

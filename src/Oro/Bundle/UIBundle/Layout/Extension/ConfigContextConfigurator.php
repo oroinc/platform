@@ -32,10 +32,10 @@ class ConfigContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        $normalizers = [];
+        $defaults = [];
         foreach ($this->map as $alias => $configKey) {
-            $normalizers[$alias] = function (Options $options, $value) use ($configKey) {
-                if ($value === null) {
+            $defaults[$alias] = function (Options $options, $value) use ($configKey) {
+                if (null === $value) {
                     $value = $this->configManager->get($configKey);
                 }
 
@@ -43,9 +43,7 @@ class ConfigContextConfigurator implements ContextConfiguratorInterface
             };
         }
 
-        $context->getDataResolver()
-            ->setOptional(array_keys($this->map))
-            ->setNormalizers($normalizers);
+        $context->getResolver()->setDefaults($defaults);
     }
 
     /**

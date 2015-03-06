@@ -5,7 +5,9 @@ namespace Oro\Bundle\LayoutBundle\Layout\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-interface FormAccessorInterface
+use Oro\Component\Layout\ContextItemInterface;
+
+interface FormAccessorInterface extends ContextItemInterface
 {
     /**
      * Returns the form.

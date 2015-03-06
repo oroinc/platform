@@ -178,7 +178,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         });
 
         mediator.on('page:beforeChange', function () {
-            $('.pin-menus.dropdown.open, .nav .dropdown.open').removeClass('open');
+            $('.dot-menu.dropdown.open, .nav .dropdown.open').removeClass('open');
             $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
         });
         mediator.on('page:afterChange', function() {

@@ -1,0 +1,19 @@
+{% block root_widget %}
+    <div class="widget-content">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _update_saved_id_script_widget %}
+    <script{{ block('block_attributes') }}>
+        require(['oroui/js/widget-manager'],
+        function(widgetManager) {
+            widgetManager.getWidgetInstance(
+                {{ widget_id|json_encode|raw }},
+                function (widget) {
+                    widget.trigger('formSave', {{ saved_id|json_encode|raw }});
+                }
+            );
+        });
+    </script>
+{% endblock %}

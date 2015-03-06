@@ -5,8 +5,6 @@ namespace Oro\Bundle\UIBundle\Layout\Loader;
 use Oro\Component\Layout\ContextInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Loader\ThemeAndRouteVoter;
-use Oro\Bundle\UIBundle\Layout\Extension\ActionContextConfigurator;
-use Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator;
 
 class WidgetAndActionVoter extends ThemeAndRouteVoter
 {
@@ -17,8 +15,8 @@ class WidgetAndActionVoter extends ThemeAndRouteVoter
     {
         $filterPaths = [];
 
-        $widgetName = $context->getOr(WidgetContextConfigurator::PARAM_WIDGET);
-        $actionName = $context->getOr(ActionContextConfigurator::PARAM_ACTION);
+        $widgetName = $context->getOr('widget_container');
+        $actionName = $context->getOr('action');
 
         if ($widgetName || $actionName) {
             $basePaths = parent::getFilterPath($context);
