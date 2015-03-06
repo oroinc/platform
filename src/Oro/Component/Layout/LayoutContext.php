@@ -9,7 +9,10 @@ use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsRes
 class LayoutContext implements ContextInterface
 {
     /** @var array */
-    protected $data = [];
+    protected $items = [];
+
+    /** @var ContextDataCollection */
+    protected $data;
 
     /** @var OptionsResolverInterface */
     protected $resolver;
@@ -18,12 +21,20 @@ class LayoutContext implements ContextInterface
     protected $resolved = false;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->data = new ContextDataCollection($this);
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getDataResolver()
+    public function getResolver()
     {
         if ($this->resolver === null) {
-            $this->resolver = new OptionsResolver();
+            $this->resolver = $this->createResolver();
         }
 
         return $this->resolver;
@@ -35,15 +46,15 @@ class LayoutContext implements ContextInterface
     public function resolve()
     {
         if ($this->resolved) {
-            throw new Exception\LogicException('The context data are already resolved.');
+            throw new Exception\LogicException('The context variables are already resolved.');
         }
 
         try {
-            $this->data     = $this->getDataResolver()->resolve($this->data);
+            $this->items    = $this->getResolver()->resolve($this->items);
             $this->resolved = true;
         } catch (OptionsResolverException $e) {
             throw new Exception\LogicException(
-                sprintf('Failed to resolve the context data. Reason: %s', $e->getMessage()),
+                sprintf('Failed to resolve the context variables. Reason: %s', $e->getMessage()),
                 0,
                 $e
             );
@@ -63,7 +74,7 @@ class LayoutContext implements ContextInterface
      */
     public function has($name)
     {
-        return isset($this->data[$name]) || array_key_exists($name, $this->data);
+        return isset($this->items[$name]) || array_key_exists($name, $this->items);
     }
 
     /**
@@ -71,11 +82,11 @@ class LayoutContext implements ContextInterface
      */
     public function get($name)
     {
-        if (!isset($this->data[$name]) && !array_key_exists($name, $this->data)) {
+        if (!isset($this->items[$name]) && !array_key_exists($name, $this->items)) {
             throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $name));
         };
 
-        return $this->data[$name];
+        return $this->items[$name];
     }
 
     /**
@@ -83,8 +94,8 @@ class LayoutContext implements ContextInterface
      */
     public function getOr($name, $default = null)
     {
-        return isset($this->data[$name]) || array_key_exists($name, $this->data)
-            ? $this->data[$name]
+        return isset($this->items[$name]) || array_key_exists($name, $this->items)
+            ? $this->items[$name]
             : $default;
     }
 
@@ -95,11 +106,11 @@ class LayoutContext implements ContextInterface
     {
         if ($this->resolved && !$this->has($name)) {
             throw new Exception\LogicException(
-                sprintf('The item "%s" cannot be added because the context data are already resolved.', $name)
+                sprintf('The item "%s" cannot be added because the context variables are already resolved.', $name)
             );
         }
 
-        $this->data[$name] = $value;
+        $this->items[$name] = $value;
     }
 
     /**
@@ -109,11 +120,19 @@ class LayoutContext implements ContextInterface
     {
         if ($this->resolved && $this->has($name)) {
             throw new Exception\LogicException(
-                sprintf('The item "%s" cannot be removed because the context data are already resolved.', $name)
+                sprintf('The item "%s" cannot be removed because the context variables are already resolved.', $name)
             );
         }
 
-        unset($this->data[$name]);
+        unset($this->items[$name]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 
     /**
@@ -121,7 +140,7 @@ class LayoutContext implements ContextInterface
      */
     public function offsetExists($name)
     {
-        return isset($this->data[$name]) || array_key_exists($name, $this->data);
+        return isset($this->items[$name]) || array_key_exists($name, $this->items);
     }
 
     /**
@@ -129,11 +148,11 @@ class LayoutContext implements ContextInterface
      */
     public function offsetGet($name)
     {
-        if (!isset($this->data[$name]) && !array_key_exists($name, $this->data)) {
+        if (!isset($this->items[$name]) && !array_key_exists($name, $this->items)) {
             throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $name));
         };
 
-        return $this->data[$name];
+        return $this->items[$name];
     }
 
     /**
@@ -150,5 +169,13 @@ class LayoutContext implements ContextInterface
     public function offsetUnset($name)
     {
         $this->remove($name);
+    }
+
+    /**
+     * @return OptionsResolverInterface
+     */
+    protected function createResolver()
+    {
+        return new OptionsResolver();
     }
 }

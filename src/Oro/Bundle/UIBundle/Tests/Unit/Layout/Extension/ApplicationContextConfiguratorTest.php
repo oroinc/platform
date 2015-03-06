@@ -3,13 +3,12 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Component\Layout\LayoutContext;
-use Oro\Bundle\UIBundle\Layout\Extension\ApplicationContextConfigurator;
 
-use Symfony\Component\HttpKernel\KernelInterface;
+use Oro\Bundle\UIBundle\Layout\Extension\ApplicationContextConfigurator;
 
 class ApplicationContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var KernelInterface */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $kernel;
 
     /** @var ApplicationContextConfigurator */
@@ -37,7 +36,6 @@ class ApplicationContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertTrue($context->getDataResolver()->isKnown('debug'));
         $this->assertTrue($context['debug']);
     }
 

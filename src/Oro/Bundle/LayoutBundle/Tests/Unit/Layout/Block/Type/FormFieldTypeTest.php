@@ -39,7 +39,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
@@ -72,7 +72,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, 123);
         $this->getBlockView(
             FormFieldType::NAME,
@@ -92,7 +92,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
@@ -115,7 +115,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
@@ -138,7 +138,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,

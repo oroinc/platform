@@ -12,7 +12,7 @@ class ScriptTypeTest extends BlockTypeTestCase
     public function testSetDefaultOptions()
     {
         $this->assertEquals(
-            [],
+            ['type' => 'text/javascript'],
             $this->resolveOptions(ScriptType::NAME, [])
         );
         $this->assertEquals(
@@ -23,27 +23,9 @@ class ScriptTypeTest extends BlockTypeTestCase
             )
         );
         $this->assertEquals(
-            ['content' => 'test content'],
+            ['type' => 'text/javascript', 'content' => 'test content'],
             $this->resolveOptions(ScriptType::NAME, ['content' => 'test content'])
         );
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "async" with value "async" is expected to be of type "bool"
-     */
-    public function testSetDefaultOptionsWithInvalidAsync()
-    {
-        $this->resolveOptions(ScriptType::NAME, ['src' => 'test.js', 'async' => 'async']);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "defer" with value "defer" is expected to be of type "bool"
-     */
-    public function testSetDefaultOptionsWithInvalidDefer()
-    {
-        $this->resolveOptions(ScriptType::NAME, ['src' => 'test.js', 'defer' => 'defer']);
     }
 
     // @codingStandardsIgnoreStart

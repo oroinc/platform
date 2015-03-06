@@ -26,19 +26,18 @@ class ApplicationContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()
-            ->setDefaults(['debug' => null])
-            ->setAllowedTypes(['debug' => 'bool'])
-            ->setNormalizers(
+        $context->getResolver()
+            ->setDefaults(
                 [
-                    'debug' => function (Options $options, $debug) {
-                        if (is_null($debug)) {
-                            $debug = $this->kernel->isDebug();
+                    'debug' => function (Options $options, $value) {
+                        if (null === $value) {
+                            $value = $this->kernel->isDebug();
                         }
 
-                        return $debug;
+                        return $value;
                     }
                 ]
-            );
+            )
+            ->setAllowedTypes(['debug' => 'bool']);
     }
 }

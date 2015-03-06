@@ -51,7 +51,7 @@ class EmbedFormLayoutManager
 
         $layoutContext = new LayoutContext();
 
-        $layoutContext->getDataResolver()
+        $layoutContext->getResolver()
             ->setRequired(['embedded_form_entity', 'embedded_form_type'])
             ->setOptional(['embedded_form', 'embedded_form_custom_layout']);
 

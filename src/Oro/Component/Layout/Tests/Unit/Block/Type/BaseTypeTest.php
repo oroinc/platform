@@ -19,6 +19,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
     {
         $this->assertEquals(
             [
+                'vars'               => ['test_var' => 'test_var_val'],
                 'attr'               => ['test_attr' => 'test_attr_val'],
                 'label'              => 'Test Label',
                 'label_attr'         => ['test_label_attr' => 'test_label_attr_val'],
@@ -27,6 +28,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
             $this->resolveOptions(
                 BaseType::NAME,
                 [
+                    'vars'               => ['test_var' => 'test_var_val'],
                     'attr'               => ['test_attr' => 'test_attr_val'],
                     'label'              => 'Test Label',
                     'label_attr'         => ['test_label_attr' => 'test_label_attr_val'],
@@ -82,6 +84,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
     public function testBuildView()
     {
         $options = [
+            'vars'               => ['test_var' => 'test_var_val'],
             'attr'               => ['test_attr' => 'test_attr_val'],
             'label'              => 'Test Label',
             'label_attr'         => ['test_label_attr' => 'test_label_attr_val'],
@@ -108,7 +111,8 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                     'translation_domain'  => 'test_translation_domain',
                     'attr'                => ['test_attr' => 'test_attr_val'],
                     'label'               => 'Test Label',
-                    'label_attr'          => ['test_label_attr' => 'test_label_attr_val']
+                    'label_attr'          => ['test_label_attr' => 'test_label_attr_val'],
+                    'test_var'            => 'test_var_val'
                 ]
             ],
             $view,
