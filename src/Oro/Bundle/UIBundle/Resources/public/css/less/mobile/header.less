@@ -4,7 +4,6 @@
 
 #oroplatform-header {
   .logo, #main-menu-toggle {
-    margin: 0 10px;
     float: left;
     font-weight: bold;
     font-size: 17px;
@@ -42,6 +41,8 @@
     position: absolute;
     z-index: 1;
     left: 0;
+    margin: 0;
+    padding: 0 10px 10px 10px;
     &.open > [class^=icon-] {
       .header-button-active;
     }
@@ -161,6 +162,7 @@
     width: 275px;
   }
   .navbar-inner{
+    border-bottom: none;
     .dark{
       padding-left: 10px;
       padding-right: 10px;

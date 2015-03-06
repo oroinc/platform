@@ -40,7 +40,7 @@ define(['../side-menu', '../mediator'], function ($, mediator) {
          */
         _show: function () {
             this.$toggle.addClass('open');
-            this.element.add(this.element.next()).switchClass('', 'menu-opened', 200);
+            $('#main-menu').show();
             $(document).on('click', this._onOutsideClick);
         },
 
@@ -50,8 +50,8 @@ define(['../side-menu', '../mediator'], function ($, mediator) {
          * @private
          */
         _hide: function () {
+            $('#main-menu').hide();
             this.$toggle.removeClass('open');
-            this.element.add(this.element.next()).switchClass('menu-opened', '', 200);
             $(document).off('click', this._onOutsideClick);
         },
 
