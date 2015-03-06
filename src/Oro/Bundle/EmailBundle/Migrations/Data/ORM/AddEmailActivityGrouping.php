@@ -74,6 +74,7 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
                     ];
                     if (0 == $itemsCount % self::BATCH_SIZE) {
                         $this->saveEntities($manager, $entities);
+                        $newThread = $manager->getRepository('OroEmailBundle:EmailThread')->find($newThread->getId());
                         $entities = [];
                     }
                 }
@@ -107,7 +108,6 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
                 $pair['email']->setHead($isHead);
             }
             if ($pair['thread']) {
-                $manager->persist($pair['thread']);
                 $pair['email']->setThread($pair['thread']);
             }
 
