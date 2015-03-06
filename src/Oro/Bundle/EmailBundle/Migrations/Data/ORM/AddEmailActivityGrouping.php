@@ -66,17 +66,13 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
                         $email->setHead(false);
                     }
                     $email->setThread($newThread);
-                    $entities[] = [
-                        'email'  => $email,
-                    ];
+                    $entities[] = $email;
                 }
             } elseif (count($emails) == 1) {
                 $email = $emails[0];
                 $email->setHead(true);
                 $itemsCount++;
-                $entities[] = [
-                    'email'  => $email,
-                ];
+                $entities[] = $email;
             }
             if (0 == $itemsCount % self::BATCH_SIZE) {
                 $this->saveEntities($manager, $entities);
@@ -95,8 +91,8 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
      */
     protected function saveEntities(ObjectManager $manager, array $entities)
     {
-        foreach ($entities as $pair) {
-            $manager->persist($pair['email']);
+        foreach ($entities as $email) {
+            $manager->persist($email);
         }
         $manager->flush();
         $manager->clear();
