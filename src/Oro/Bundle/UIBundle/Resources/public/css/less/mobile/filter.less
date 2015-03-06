@@ -60,18 +60,16 @@
     .filter-item {
       margin: 0 0 10px 0;
       width: 100%;
-      .filter-criteria {
-        font-size: smaller;
-        left: 0px;
-        width: 100%;
-        input {
-          width: 93px;
-        }
-        .btn {
-          padding-left: 10px;
-          padding-right: 10px;
-        }
+      white-space: normal;
+      .btn-group {
+        margin-bottom: 0;
       }
+    }
+    .filter-criteria {
+      font-size: smaller;
+      left: 0;
+      width: 100%;
+      padding: 8px;
     }
   }
   .oro-open {
@@ -79,10 +77,25 @@
   }
   .filter-criteria-selector {
     text-align: left;
-    width: 93%;
+    width: 100%;
   }
   .filter-list {
     margin: 0 0 5px -5px;
+  }
+  .filter-criteria {
+    &.empty-type{
+      width: auto;
+    }
+    input[type=date] {
+      width: 93px;
+    }
+    input[type=time] {
+      width: 75px;
+    }
+    .btn {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
   }
 }
 

@@ -140,6 +140,36 @@ define([
             ChoiceFilter.__super__._showCriteria.apply(this, arguments);
         },
 
+        _onClickCriteriaSelector: function () {
+            ChoiceFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
+            this._updateValueField();
+        },
+
+        _onClickChoiceValue: function () {
+            ChoiceFilter.__super__._onClickChoiceValue.apply(this, arguments);
+            this._updateValueField();
+        },
+
+        _updateValueField: function () {
+            var leftWidth, rightWidth, type, isEmptyType,
+                valueFrame = this.$('.value-field-frame');
+            if (!valueFrame.length) {
+                return;
+            }
+            // update left and right margins of value field frame
+            leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
+            rightWidth = this.$('.filter-update').outerWidth();
+            valueFrame.css('margin-left', leftWidth);
+            valueFrame.css('margin-right', rightWidth);
+            // update class of criteria dropdown
+            type = this.$(this.criteriaValueSelectors.type).val();
+            isEmptyType = this.isEmptyType(type);
+            this.$('.filter-criteria').toggleClass('empty-type', isEmptyType);
+            if (!isEmptyType) {
+                this.$(this.criteriaValueSelectors.value).focus();
+            }
+        },
+
         /**
          * @inheritDoc
          */
