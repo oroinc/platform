@@ -19,6 +19,11 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $connection;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $managerRegistry;
 
     /**
@@ -51,6 +56,12 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityManager->expects($this->any())
+            ->method('getConnection')
+            ->will($this->returnValue($this->connection));
         $this->managerRegistry = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
@@ -92,6 +103,9 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteJobUnknownJob()
     {
+        $this->connection->expects($this->once())
+            ->method('getTransactionNestingLevel')
+            ->will($this->returnValue(0));
         $this->entityManager->expects($this->once())
             ->method('beginTransaction');
         $this->entityManager->expects($this->once())
@@ -111,7 +125,9 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
     public function testExecuteJobSuccess()
     {
         $configuration = array('test' => true);
-
+        $this->connection->expects($this->once())
+            ->method('getTransactionNestingLevel')
+            ->will($this->returnValue(0));
         $this->entityManager->expects($this->once())
             ->method('beginTransaction');
         $this->entityManager->expects($this->never())
@@ -169,10 +185,75 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($context, $result->getContext());
     }
 
+    public function testExecuteJobSuccessWithTransactionStarted()
+    {
+        $configuration = array('test' => true);
+        $this->connection->expects($this->once())
+            ->method('getTransactionNestingLevel')
+            ->will($this->returnValue(1));
+        $this->entityManager->expects($this->never())
+            ->method('beginTransaction');
+        $this->entityManager->expects($this->never())
+            ->method('rollback');
+        $this->entityManager->expects($this->never())
+            ->method('commit');
+
+        $this->batchJobManager->expects($this->once())->method('persist')
+            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
+        $this->batchJobManager->expects($this->once())->method('flush')
+            ->with();
+
+        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
+            ->getMockForAbstractClass();
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stepExecution->expects($this->any())
+            ->method('getFailureExceptions')
+            ->will($this->returnValue(array()));
+        $this->contextRegistry->expects($this->once())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->will($this->returnValue($context));
+
+        $job = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Job\JobInterface')
+            ->getMock();
+        $job->expects($this->once())
+            ->method('execute')
+            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobExecution'))
+            ->will(
+                $this->returnCallback(
+                    function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
+                        \PHPUnit_Framework_Assert::assertEquals(
+                            'import.test',
+                            $jobExecution->getJobInstance()->getLabel()
+                        );
+                        \PHPUnit_Framework_Assert::assertEquals(
+                            $configuration,
+                            $jobExecution->getJobInstance()->getRawConfiguration()
+                        );
+                        $jobExecution->setStatus(new BatchStatus(BatchStatus::COMPLETED));
+                        $jobExecution->addStepExecution($stepExecution);
+                    }
+                )
+            );
+
+        $this->batchJobRegistry->expects($this->once())
+            ->method('getJob')
+            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'))
+            ->will($this->returnValue($job));
+        $result = $this->executor->executeJob('import', 'test', $configuration);
+        $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
+        $this->assertTrue($result->isSuccessful());
+        $this->assertEquals($context, $result->getContext());
+    }
+
     public function testExecuteJobStopped()
     {
         $configuration = array('test' => true);
-
+        $this->connection->expects($this->once())
+            ->method('getTransactionNestingLevel')
+            ->will($this->returnValue(0));
         $this->entityManager->expects($this->once())
             ->method('beginTransaction');
         $this->entityManager->expects($this->once())
@@ -210,7 +291,9 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
     public function testExecuteJobFailure()
     {
         $configuration = array('test' => true);
-
+        $this->connection->expects($this->once())
+            ->method('getTransactionNestingLevel')
+            ->will($this->returnValue(0));
         $this->entityManager->expects($this->once())
             ->method('beginTransaction');
         $this->entityManager->expects($this->once())
