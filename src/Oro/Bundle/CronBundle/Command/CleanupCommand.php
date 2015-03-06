@@ -29,7 +29,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     public function getDefaultDefinition()
     {
-        return '*/1 * * * *'; // every 1 minute
+        return '0 1 * * *'; // every day
     }
 
     /**
