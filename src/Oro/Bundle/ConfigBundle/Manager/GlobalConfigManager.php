@@ -19,10 +19,10 @@ class GlobalConfigManager
      * @param UserScopeManager $userScopeManager
      */
     public function __construct(
-        ConfigManager    $configManager    = null,
+        ConfigManager $configManager = null,
         UserScopeManager $userScopeManager = null
     ) {
-        $this->configManager    = $configManager;
+        $this->configManager = $configManager;
         $this->userScopeManager = $userScopeManager;
     }
 
@@ -34,7 +34,7 @@ class GlobalConfigManager
     public function saveUserConfigSignature(User $user, $signature)
     {
         if (!$signature) {
-            return;
+            return false;
         }
 
         if ($this->setContext($user)) {
