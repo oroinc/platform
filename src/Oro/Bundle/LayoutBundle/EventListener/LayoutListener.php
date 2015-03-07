@@ -13,7 +13,6 @@ use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
 /**
@@ -110,9 +109,19 @@ class LayoutListener implements EventSubscriberInterface
      */
     protected function configureContext(ContextInterface $context, LayoutAnnotation $layoutAnnotation)
     {
+        $action = $layoutAnnotation->getAction();
+        if (!empty($action)) {
+            $currentAction = $context->getOr('action');
+            if (empty($currentAction)) {
+                $context->set('action', $action);
+            }
+        }
         $theme = $layoutAnnotation->getTheme();
-        if (!empty($theme) && !$context->has(ThemeExtension::PARAM_THEME)) {
-            $context->set(ThemeExtension::PARAM_THEME, $theme);
+        if (!empty($theme)) {
+            $currentTheme = $context->getOr('theme');
+            if (empty($currentTheme)) {
+                $context->set('theme', $theme);
+            }
         }
 
         $vars = $layoutAnnotation->getVars();

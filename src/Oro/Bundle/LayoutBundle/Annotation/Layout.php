@@ -13,30 +13,67 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationAnnotation;
 class Layout extends ConfigurationAnnotation
 {
     /**
-     * The theme name.
+     * The controller action type.
+     *
+     * @var string
+     */
+    private $action;
+
+    /**
+     * The layout theme name.
      *
      * @var string
      */
     private $theme;
 
     /**
-     * The array of the block theme(s).
+     * The block theme(s).
      *
      * @var array|string
      */
     private $blockThemes;
 
     /**
-     * The associative array of template variables.
+     * The layout context variables.
      *
      * @var string|null
      */
     private $vars;
 
     /**
-     * Returns the theme name.
+     * Sets the controller action type.
      *
-     * @return string
+     * @param string $action
+     */
+    public function setValue($action)
+    {
+        $this->action = $action;
+    }
+
+    /**
+     * Returns the controller action type.
+     *
+     * @return string|null
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * Sets the controller action type.
+     *
+     * @param string $action
+     */
+    public function setAction($action)
+    {
+        $this->action = $action;
+    }
+
+    /**
+     * Returns the layout theme name.
+     *
+     * @return string|null
      */
     public function getTheme()
     {
@@ -44,9 +81,9 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Sets the theme name
+     * Sets the layout theme name.
      *
-     * @param string $theme The theme name
+     * @param string $theme
      */
     public function setTheme($theme)
     {
@@ -54,7 +91,7 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Returns block theme(s).
+     * Returns the block theme(s).
      *
      * @return array|string|null
      */
@@ -64,7 +101,7 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Sets block theme(s).
+     * Sets the block theme(s).
      *
      * @param array|string $blockThemes
      */
@@ -84,7 +121,7 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Returns the array of template variables.
+     * Returns the layout context variables.
      *
      * @return string[]|null
      */
@@ -94,9 +131,9 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Sets the template variables
+     * Sets the layout context variables.
      *
-     * @param array $vars The template variables
+     * @param string[] $vars
      */
     public function setVars(array $vars)
     {
@@ -104,14 +141,15 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Indicates whether all properties of the annotation are empty
+     * Indicates whether all properties of the annotation are empty.
      *
      * @return bool
      */
     public function isEmpty()
     {
         return
-            empty($this->theme)
+            empty($this->action)
+            && empty($this->theme)
             && empty($this->blockThemes)
             && empty($this->vars);
     }

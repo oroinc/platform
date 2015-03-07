@@ -55,6 +55,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->setupLayoutExpectations(
             $builder,
             function (ContextInterface $context) {
+                $this->assertEquals('action', $context->get('action'));
                 $this->assertEquals('theme', $context->get('theme'));
                 $this->assertEquals('value1', $context->get('var1'));
                 $this->assertEquals('value2', $context->get('var2'));
@@ -63,6 +64,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
         $layoutAnnotation = new LayoutAnnotation(
             [
+                'action'      => 'action',
                 'theme'       => 'theme',
                 'blockThemes' => ['blockTheme1.html.twig', 'blockTheme2.html.twig'],
                 'vars'        => ['var1', 'var2']
@@ -125,12 +127,10 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "unknown" does not exist. Known options are: "known"
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "unknown" does not exist.
      */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionForMissingVarsInAnnotation()
     {
         $this->setupLayoutExpectations();
@@ -178,18 +178,55 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
+     * @dataProvider             getNotEmptyAnnotationDataProvider
+     *
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage The empty @Layout() annotation must be used when the controller returns an instance of "Oro\Component\Layout\Layout".
      */
     // @codingStandardsIgnoreEnd
-    public function testShouldThrowExceptionTryingToRedefineThemeWhenContextReturned()
+    public function testShouldThrowExceptionWhenAlreadyBuiltLayoutReturnedAndLayoutAnnotationIsNotEmpty($options)
     {
-        $attributes    = ['_layout' => new LayoutAnnotation(['theme' => 'theme'])];
+        $attributes    = ['_layout' => new LayoutAnnotation($options)];
         $layout        = $this->getMockBuilder('Oro\Component\Layout\Layout')
             ->disableOriginalConstructor()
             ->getMock();
         $responseEvent = $this->createResponseForControllerResultEvent($attributes, $layout);
         $this->listener->onKernelView($responseEvent);
+    }
+
+    public function getNotEmptyAnnotationDataProvider()
+    {
+        return [
+            [['action' => 'action']],
+            [['theme' => 'theme']],
+            [['blockThemes' => ['blockTheme.html.twig']]],
+            [['blockTheme' => 'blockTheme.html.twig']],
+            [['vars' => ['var1']]]
+        ];
+    }
+
+    public function testShouldNotOverrideActionFromLayoutAnnotation()
+    {
+        $this->setupLayoutExpectations(
+            null,
+            function (ContextInterface $context) {
+                $this->assertEquals('updated_action', $context->get('action'));
+            }
+        );
+
+        $layoutAnnotation = new LayoutAnnotation(
+            [
+                'action' => 'default_action'
+            ]
+        );
+        $responseEvent    = $this->createResponseForControllerResultEvent(
+            ['_layout' => $layoutAnnotation],
+            [
+                'action' => 'updated_action'
+            ]
+        );
+        $this->listener->onKernelView($responseEvent);
+        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
     public function testShouldNotOverrideThemeFromLayoutAnnotation()
@@ -229,7 +266,9 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayout')
             ->willReturnCallback(
                 function (ContextInterface $context) use ($assertContextCallback) {
-                    $context->getResolver()->setOptional(['theme']);
+                    $context->getResolver()
+                        ->setOptional(['theme'])
+                        ->setDefaults(['action' => '']);
                     $context->resolve();
 
                     if (null !== $assertContextCallback) {

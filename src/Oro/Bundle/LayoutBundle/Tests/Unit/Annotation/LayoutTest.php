@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Annotation;
 
-use Oro\Bundle\LayoutBundle\Annotation\Layout;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Oro\Bundle\LayoutBundle\Annotation\Layout;
 
 class LayoutTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,7 +55,8 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
             ['blockThemes', ['blockTheme1', 'blockTheme2']],
             ['blockThemes', 'blockTheme'],
             ['vars', ['var1', 'var2']],
-            ['theme', 'theme']
+            ['theme', 'theme'],
+            ['action', 'action']
         ];
     }
 
@@ -62,5 +64,12 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
     {
         $obj = new Layout(['blockTheme' => 'blockTheme']);
         $this->assertEquals('blockTheme', $obj->getBlockThemes());
+    }
+
+    public function testSetValueShouldSetAction()
+    {
+        $obj = new Layout([]);
+        $obj->setValue('action');
+        $this->assertEquals('action', $obj->getAction());
     }
 }
