@@ -27,8 +27,6 @@ class LayoutListener implements EventSubscriberInterface
     protected $layoutManager;
 
     /**
-     * Constructor.
-     *
      * @param LayoutManager $layoutManager
      */
     public function __construct(LayoutManager $layoutManager)
@@ -47,104 +45,80 @@ class LayoutListener implements EventSubscriberInterface
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        $result  = $event->getControllerResult();
 
-        /** @var LayoutAnnotation $layoutAnnotation */
-        if (!$layoutAnnotation = $request->attributes->get('_' . LayoutAnnotation::ALIAS)) {
+        /** @var LayoutAnnotation|null $layoutAnnotation */
+        $layoutAnnotation = $request->attributes->get('_layout');
+        if (!$layoutAnnotation) {
             return;
         }
 
-        $response = new Response();
-        if (is_array($result)) {
-            $layoutContext = $this->prepareContext($result, $layoutAnnotation);
-            $layout        = $this->getLayout($layoutContext, $layoutAnnotation);
-        } elseif ($result instanceof ContextInterface) {
-            $layoutContext = $this->prepareContext([], $layoutAnnotation, $result);
-            $layout        = $this->getLayout($layoutContext, $layoutAnnotation);
-        } elseif ($result instanceof Layout) {
-            if ($layoutAnnotation->getTheme()
-                || $layoutAnnotation->getVars()
-                || $layoutAnnotation->getBlockThemes()
-            ) {
+        $parameters = $event->getControllerResult();
+        if (is_array($parameters)) {
+            $context = new LayoutContext();
+            foreach ($parameters as $key => $value) {
+                $context->set($key, $value);
+            }
+            $this->configureContext($context, $layoutAnnotation);
+            $layout = $this->getLayout($context, $layoutAnnotation);
+        } elseif ($parameters instanceof ContextInterface) {
+            $this->configureContext($parameters, $layoutAnnotation);
+            $layout = $this->getLayout($parameters, $layoutAnnotation);
+        } elseif ($parameters instanceof Layout) {
+            if (!$layoutAnnotation->isEmpty()) {
                 throw new LogicException(
-                    '@Layout annotation configured improperly. Should use empty @Layout()'
-                    . ' configuration when returning an instance of Oro\\Component\\Layout\\Layout in the response.'
+                    'The empty @Layout() annotation must be used when '
+                    . 'the controller returns an instance of "Oro\Component\Layout\Layout".'
                 );
             }
-            $layout        = $result;
+            $layout = $parameters;
         } else {
             return;
         }
 
+        $response = new Response();
         $response->setContent($layout->render());
         $event->setResponse($response);
     }
 
     /**
-     * Get the layout and add parameters to the layout context
+     * Get the layout and add parameters to the layout context.
      *
-     * @param ContextInterface $layoutContext
+     * @param ContextInterface $context
      * @param LayoutAnnotation $layoutAnnotation
+     *
      * @return Layout
      */
-    protected function getLayout($layoutContext, $layoutAnnotation)
+    protected function getLayout(ContextInterface $context, LayoutAnnotation $layoutAnnotation)
     {
         $layoutBuilder = $this->layoutManager->getLayoutBuilder();
+        // TODO discuss adding root automatically
         $layoutBuilder->add('root', null, 'root');
 
-        if ($blockThemes = $layoutAnnotation->getBlockThemes()) {
+        $blockThemes = $layoutAnnotation->getBlockThemes();
+        if (!empty($blockThemes)) {
             $layoutBuilder->setBlockTheme($blockThemes);
         }
 
-        return $layoutBuilder->getLayout($layoutContext);
+        return $layoutBuilder->getLayout($context);
     }
 
     /**
-     * Add parameters to the layout context
+     * Configures the layout context.
      *
-     * @param array            $parameters
+     * @param ContextInterface $context
      * @param LayoutAnnotation $layoutAnnotation
-     * @param ContextInterface $layoutContext
-     * @return ContextInterface
      */
-    protected function prepareContext($parameters, $layoutAnnotation, $layoutContext = null)
+    protected function configureContext(ContextInterface $context, LayoutAnnotation $layoutAnnotation)
     {
-        if (is_null($layoutContext)) {
-            $layoutContext = new LayoutContext();
+        $theme = $layoutAnnotation->getTheme();
+        if (!empty($theme) && !$context->has(ThemeExtension::PARAM_THEME)) {
+            $context->set(ThemeExtension::PARAM_THEME, $theme);
         }
 
-        $theme = $layoutAnnotation->getTheme();
-        if (!empty($theme)) {
-            if (isset($layoutContext[ThemeExtension::PARAM_THEME])) {
-                $this->throwCannotRedefineOptionException(ThemeExtension::PARAM_THEME);
-            }
-            $layoutContext[ThemeExtension::PARAM_THEME] = $theme;
-        }
         $vars = $layoutAnnotation->getVars();
         if (!empty($vars)) {
-            $layoutContext->getResolver()->setRequired($vars);
+            $context->getResolver()->setRequired($vars);
         }
-
-        foreach ($parameters as $key => $value) {
-            $layoutContext[$key] = $value;
-        }
-
-        return $layoutContext;
-    }
-
-    /**
-     * @param string $option
-     * @throws LogicException
-     */
-    protected function throwCannotRedefineOptionException($option)
-    {
-        throw new LogicException(
-            sprintf(
-                'Layout annotation configured improperly.'
-                . ' Cannot redefine context option %s that is already set in the response.',
-                $option
-            )
-        );
     }
 
     /**

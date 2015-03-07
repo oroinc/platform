@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LayoutBundle\Annotation;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationAnnotation;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface;
 
 /**
  * The Layout class handles the @Layout annotation parts.
@@ -13,28 +12,26 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface;
  */
 class Layout extends ConfigurationAnnotation
 {
-    const ALIAS = 'oro_layout';
-
     /**
      * The theme name.
      *
      * @var string
      */
-    protected $theme;
+    private $theme;
 
     /**
-     * The array of templates.
+     * The array of the block theme(s).
      *
-     * @var array
+     * @var array|string
      */
-    protected $blockThemes = array();
+    private $blockThemes;
 
     /**
      * The associative array of template variables.
      *
-     * @var array
+     * @var string|null
      */
-    protected $vars = array();
+    private $vars;
 
     /**
      * Returns the theme name.
@@ -57,9 +54,9 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Returns the array of block themes.
+     * Returns block theme(s).
      *
-     * @return array
+     * @return array|string|null
      */
     public function getBlockThemes()
     {
@@ -67,9 +64,9 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
-     * Sets the array of block themes.
+     * Sets block theme(s).
      *
-     * @param array $blockThemes
+     * @param array|string $blockThemes
      */
     public function setBlockThemes($blockThemes)
     {
@@ -77,9 +74,19 @@ class Layout extends ConfigurationAnnotation
     }
 
     /**
+     * Sets the block theme.
+     *
+     * @param string $blockTheme
+     */
+    public function setBlockTheme($blockTheme)
+    {
+        $this->blockThemes = $blockTheme;
+    }
+
+    /**
      * Returns the array of template variables.
      *
-     * @return array
+     * @return string[]|null
      */
     public function getVars()
     {
@@ -91,27 +98,34 @@ class Layout extends ConfigurationAnnotation
      *
      * @param array $vars The template variables
      */
-    public function setVars($vars)
+    public function setVars(array $vars)
     {
         $this->vars = $vars;
     }
 
     /**
-     * Returns the annotation alias name.
+     * Indicates whether all properties of the annotation are empty
      *
-     * @return string
-     * @see ConfigurationInterface
+     * @return bool
      */
-    public function getAliasName()
+    public function isEmpty()
     {
-        return self::ALIAS;
+        return
+            empty($this->theme)
+            && empty($this->blockThemes)
+            && empty($this->vars);
     }
 
     /**
-     * Only one layout directive is allowed
-     *
-     * @return Boolean
-     * @see ConfigurationInterface
+     * {@inheritdoc}
+     */
+    public function getAliasName()
+    {
+        return 'layout';
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function allowArray()
     {

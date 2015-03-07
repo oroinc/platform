@@ -41,47 +41,88 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayoutBuilder');
         $responseEvent = $this->createResponseForControllerResultEvent([], []);
         $this->listener->onKernelView($responseEvent);
+        $this->assertFalse($responseEvent->hasResponse());
     }
 
     public function testShouldAddOptionsFromLayoutAnnotationToContext()
     {
         $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
-        $this->layoutManager->expects($this->once())
-            ->method('getLayoutBuilder')
-            ->willReturn($builder);
 
         $builder->expects($this->once())
             ->method('setBlockTheme')
-            ->with(['test.html.twig']);
+            ->with(['blockTheme1.html.twig', 'blockTheme2.html.twig']);
 
-        $builder->expects($this->once())
-            ->method('getLayout')
-            ->willReturnCallback(function(ContextInterface $context) {
-                $context->getResolver()->setOptional(['theme', 'blockThemes', 'var1', 'var2']);
-                $context->resolve();
+        $this->setupLayoutExpectations(
+            $builder,
+            function (ContextInterface $context) {
                 $this->assertEquals('theme', $context->get('theme'));
                 $this->assertEquals('value1', $context->get('var1'));
                 $this->assertEquals('value2', $context->get('var2'));
-
-                return $this->getMockBuilder('Oro\Component\Layout\Layout')
-                    ->disableOriginalConstructor()
-                    ->getMock();
-            });
+            }
+        );
 
         $layoutAnnotation = new LayoutAnnotation(
             [
-                'theme'     => 'theme',
-                'blockThemes' => ['test.html.twig'],
-                'vars'      => ['var1', 'var2']
+                'theme'       => 'theme',
+                'blockThemes' => ['blockTheme1.html.twig', 'blockTheme2.html.twig'],
+                'vars'        => ['var1', 'var2']
             ]
         );
-        $controllerResult = [
-            'var1' => 'value1',
-            'var2' => 'value2'
-        ];
-        $attributes = ['_' . LayoutAnnotation::ALIAS => $layoutAnnotation];
-        $responseEvent = $this->createResponseForControllerResultEvent($attributes, $controllerResult);
+        $responseEvent    = $this->createResponseForControllerResultEvent(
+            ['_layout' => $layoutAnnotation],
+            [
+                'var1' => 'value1',
+                'var2' => 'value2'
+            ]
+        );
         $this->listener->onKernelView($responseEvent);
+        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+    }
+
+    public function testShouldAddBlockThemeFromLayoutAnnotation()
+    {
+        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+
+        $builder->expects($this->once())
+            ->method('setBlockTheme')
+            ->with('blockTheme.html.twig');
+
+        $this->setupLayoutExpectations($builder);
+
+        $layoutAnnotation = new LayoutAnnotation(
+            [
+                'blockTheme' => 'blockTheme.html.twig'
+            ]
+        );
+        $responseEvent    = $this->createResponseForControllerResultEvent(
+            ['_layout' => $layoutAnnotation],
+            []
+        );
+        $this->listener->onKernelView($responseEvent);
+        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+    }
+
+    public function testShouldAddOneBlockThemeFromLayoutAnnotationBlockThemesAttr()
+    {
+        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+
+        $builder->expects($this->once())
+            ->method('setBlockTheme')
+            ->with('blockTheme.html.twig');
+
+        $this->setupLayoutExpectations($builder);
+
+        $layoutAnnotation = new LayoutAnnotation(
+            [
+                'blockThemes' => 'blockTheme.html.twig'
+            ]
+        );
+        $responseEvent    = $this->createResponseForControllerResultEvent(
+            ['_layout' => $layoutAnnotation],
+            []
+        );
+        $this->listener->onKernelView($responseEvent);
+        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
     // @codingStandardsIgnoreStart
@@ -94,90 +135,117 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setupLayoutExpectations();
 
-        $result = ['unknown' => 'data'];
-        $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['vars' => ['known']])];
-        $responseEvent = $this->createResponseForControllerResultEvent($attributes, $result);
-        $this->listener->onKernelView($responseEvent);
-    }
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required2" is missing.
-     */
-    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenArrayReturned()
-    {
-        $this->setupLayoutExpectations();
-
-        $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
-        $result = ['required1' => 'value1'];
-        $responseEvent = $this->createResponseForControllerResultEvent($attributes, $result);
-        $this->listener->onKernelView($responseEvent);
-    }
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required1" is missing.
-     */
-    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenContextReturned()
-    {
-        $this->setupLayoutExpectations();
-
-        $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
-        $context = new LayoutContext();
-        $context->getResolver()->setRequired(['required2']);
-        $context['required2'] = 'value1';
-        $responseEvent = $this->createResponseForControllerResultEvent($attributes, $context);
+        $responseEvent = $this->createResponseForControllerResultEvent(
+            ['_layout' => new LayoutAnnotation(['vars' => ['known']])],
+            ['unknown' => 'data']
+        );
         $this->listener->onKernelView($responseEvent);
     }
 
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage @Layout annotation configured improperly. Should use empty @Layout() configuration when returning an instance of Oro\Component\Layout\Layout in the response.
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required2" is missing.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenArrayReturned()
+    {
+        $this->setupLayoutExpectations();
+
+        $attributes    = ['_layout' => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
+        $result        = ['required1' => 'value1'];
+        $responseEvent = $this->createResponseForControllerResultEvent($attributes, $result);
+        $this->listener->onKernelView($responseEvent);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required1" is missing.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenContextReturned()
+    {
+        $this->setupLayoutExpectations();
+
+        $attributes = ['_layout' => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
+        $context    = new LayoutContext();
+        $context->getResolver()->setRequired(['required2']);
+        $context['required2'] = 'value1';
+        $responseEvent        = $this->createResponseForControllerResultEvent($attributes, $context);
+        $this->listener->onKernelView($responseEvent);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The empty @Layout() annotation must be used when the controller returns an instance of "Oro\Component\Layout\Layout".
      */
     // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionTryingToRedefineThemeWhenContextReturned()
     {
-        $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['theme' => 'theme'])];
-        $layout = $this->getMockBuilder('Oro\Component\Layout\Layout')
+        $attributes    = ['_layout' => new LayoutAnnotation(['theme' => 'theme'])];
+        $layout        = $this->getMockBuilder('Oro\Component\Layout\Layout')
             ->disableOriginalConstructor()
             ->getMock();
         $responseEvent = $this->createResponseForControllerResultEvent($attributes, $layout);
         $this->listener->onKernelView($responseEvent);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Layout annotation configured improperly. Cannot redefine context option theme that is already set in the response.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testShouldThrowExceptionIfLayoutAnnotationIsNotEmptyWhenLayoutReturned()
+    public function testShouldNotOverrideThemeFromLayoutAnnotation()
     {
-        $attributes = ['_' . LayoutAnnotation::ALIAS => new LayoutAnnotation(['theme' => 'theme_new'])];
-        $context = new LayoutContext();
-        $context->getResolver()->setRequired(['theme']);
-        $context['theme'] = 'theme_old';
-        $responseEvent = $this->createResponseForControllerResultEvent($attributes, $context);
+        $this->setupLayoutExpectations(
+            null,
+            function (ContextInterface $context) {
+                $this->assertEquals('updated_theme', $context->get('theme'));
+            }
+        );
+
+        $layoutAnnotation = new LayoutAnnotation(
+            [
+                'theme' => 'default_theme'
+            ]
+        );
+        $responseEvent    = $this->createResponseForControllerResultEvent(
+            ['_layout' => $layoutAnnotation],
+            [
+                'theme' => 'updated_theme'
+            ]
+        );
         $this->listener->onKernelView($responseEvent);
+        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    protected function setupLayoutExpectations()
+    protected function setupLayoutExpectations($builder = null, $assertContextCallback = null)
     {
-        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+        if (null === $builder) {
+            $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+        }
         $this->layoutManager->expects($this->once())
             ->method('getLayoutBuilder')
             ->willReturn($builder);
 
         $builder->expects($this->once())
             ->method('getLayout')
-            ->willReturnCallback(function(ContextInterface $context) {
-                $context->resolve();
+            ->willReturnCallback(
+                function (ContextInterface $context) use ($assertContextCallback) {
+                    $context->getResolver()->setOptional(['theme']);
+                    $context->resolve();
 
-                return $this->getMockBuilder('Oro\Component\Layout\Layout')
-                    ->disableOriginalConstructor()
-                    ->getMock();
-            });
+                    if (null !== $assertContextCallback) {
+                        call_user_func($assertContextCallback, $context);
+                    }
+
+                    $layout = $this->getMockBuilder('Oro\Component\Layout\Layout')
+                        ->disableOriginalConstructor()
+                        ->getMock();
+                    $layout->expects($this->once())
+                        ->method('render')
+                        ->willReturn('Test Layout');
+
+                    return $layout;
+                }
+            );
     }
 
     /**
@@ -186,12 +254,12 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @return GetResponseForControllerResultEvent
      */
-    protected function createResponseForControllerResultEvent(array $attributes = [], $controllerResult = [])
+    protected function createResponseForControllerResultEvent(array $attributes, $controllerResult)
     {
         return new GetResponseForControllerResultEvent(
             $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
             new Request([], [], $attributes),
-            HttpKernelInterface::SUB_REQUEST,
+            HttpKernelInterface::MASTER_REQUEST,
             $controllerResult
         );
     }

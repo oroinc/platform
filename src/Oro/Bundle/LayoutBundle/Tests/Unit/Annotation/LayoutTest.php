@@ -10,7 +10,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
     public function testGetAlias()
     {
         $annotation = new Layout([]);
-        $this->assertEquals(Layout::ALIAS, $annotation->getAliasName());
+        $this->assertEquals('layout', $annotation->getAliasName());
     }
 
     public function testAllowArray()
@@ -21,6 +21,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider propertiesDataProvider
+     *
      * @param string $property
      * @param string $value
      */
@@ -33,12 +34,33 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
+    /**
+     * @dataProvider propertiesDataProvider
+     *
+     * @param string $property
+     * @param string $value
+     */
+    public function testConstructor($property, $value)
+    {
+        $obj = new Layout([$property => $value]);
+
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $this->assertEquals($value, $accessor->getValue($obj, $property));
+    }
+
     public function propertiesDataProvider()
     {
         return [
-            ['blockThemes', ['blockTheme']],
+            ['blockThemes', ['blockTheme1', 'blockTheme2']],
+            ['blockThemes', 'blockTheme'],
             ['vars', ['var1', 'var2']],
-            ['theme', 'theme'],
+            ['theme', 'theme']
         ];
+    }
+
+    public function testSingleBlockThemeSetter()
+    {
+        $obj = new Layout(['blockTheme' => 'blockTheme']);
+        $this->assertEquals('blockTheme', $obj->getBlockThemes());
     }
 }
