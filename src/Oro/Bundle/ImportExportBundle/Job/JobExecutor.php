@@ -52,6 +52,12 @@ class JobExecutor
      */
     protected $batchJobRepository;
 
+    /**
+     * @param ConnectorRegistry $jobRegistry
+     * @param BatchJobRepository $batchJobRepository
+     * @param ContextRegistry $contextRegistry
+     * @param ManagerRegistry $managerRegistry
+     */
     public function __construct(
         ConnectorRegistry $jobRegistry,
         BatchJobRepository $batchJobRepository,
@@ -70,7 +76,7 @@ class JobExecutor
      * @param array $configuration
      * @return JobResult
      */
-    public function executeJob($jobType, $jobName, array $configuration = array())
+    public function executeJob($jobType, $jobName, array $configuration = [])
     {
         $this->initialize();
 
@@ -116,7 +122,11 @@ class JobExecutor
         $jobResult = new JobResult();
         $jobResult->setSuccessful(false);
 
-        $this->entityManager->beginTransaction();
+        $isTransactionRunning = $this->isTransactionRunning();
+        if (!$isTransactionRunning) {
+            $this->entityManager->beginTransaction();
+        }
+
         try {
             $job = $this->batchJobRegistry->getJob($jobInstance);
             if (!$job) {
@@ -127,11 +137,15 @@ class JobExecutor
 
             $failureExceptions = $this->collectFailureExceptions($jobExecution);
 
-            if ($jobExecution->getStatus()->getValue() == BatchStatus::COMPLETED && !$failureExceptions) {
-                $this->entityManager->commit();
+            if ($jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions) {
+                if (!$isTransactionRunning) {
+                    $this->entityManager->commit();
+                }
                 $jobResult->setSuccessful(true);
             } else {
-                $this->entityManager->rollback();
+                if (!$isTransactionRunning) {
+                    $this->entityManager->rollback();
+                }
                 foreach ($failureExceptions as $failureException) {
                     $jobResult->addFailureException($failureException);
                 }
@@ -141,7 +155,9 @@ class JobExecutor
             $this->batchJobRepository->getJobManager()->flush();
             $this->batchJobRepository->getJobManager()->clear();
         } catch (\Exception $exception) {
-            $this->entityManager->rollback();
+            if (!$isTransactionRunning) {
+                $this->entityManager->rollback();
+            }
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
 
@@ -149,6 +165,14 @@ class JobExecutor
         }
 
         return $jobResult;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isTransactionRunning()
+    {
+        return $this->entityManager->getConnection()->getTransactionNestingLevel() !== 0;
     }
 
     /**
@@ -194,7 +218,7 @@ class JobExecutor
     protected function getJobExecutionByJobInstanceCode($jobCode)
     {
         /** @var JobInstance $jobInstance */
-        $jobInstance = $this->getJobInstanceRepository()->findOneBy(array('code' => $jobCode));
+        $jobInstance = $this->getJobInstanceRepository()->findOneBy(['code' => $jobCode]);
         if (!$jobInstance) {
             throw new LogicException(sprintf('No job instance found with code %s', $jobCode));
         }
@@ -222,7 +246,7 @@ class JobExecutor
      */
     protected function collectFailureExceptions(JobExecution $jobExecution)
     {
-        $failureExceptions = array();
+        $failureExceptions = [];
         foreach ($jobExecution->getAllFailureExceptions() as $exceptionData) {
             if (!empty($exceptionData['message'])) {
                 $failureExceptions[] = $exceptionData['message'];
@@ -238,7 +262,7 @@ class JobExecutor
      */
     protected function collectErrors(JobExecution $jobExecution)
     {
-        $errors = array();
+        $errors = [];
         foreach ($jobExecution->getStepExecutions() as $stepExecution) {
             $errors = array_merge(
                 $errors,
