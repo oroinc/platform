@@ -56,14 +56,26 @@ services:
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
+    oro_layout.loader.resource_matcher:
+        class: Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher
+        public: false
+
+    oro_layout.loader.theme_route_voter:
+        class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemeAndRouteVoter
+        public: false
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: layout.resource_matcher.voter }
+
     oro_layout.theme_extension:
         class:  %oro_layout.theme_extension.class%
         arguments:
             - %oro_layout.theme_updates_resources%
-            - @oro_layout.theme_manager
             - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader.chain_loader
             - @oro_layout.dependency_initializer
+            - @oro_layout.loader.resource_matcher
         calls:
             - [setRequest, [@?request=]]
         tags:

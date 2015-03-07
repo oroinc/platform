@@ -2,17 +2,17 @@
 
 {% block root %}
     {% if isDesktopVersion() and item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
-    <div class="pin-bar">
-        <div class="pin-menus dropdown dropdown-close-prevent">
-            <i class="icon-ellipsis-horizontal oro-dropdown-toggle"></i>
-            <div class="dropdown-menu pull-right" tabindex="0">
-                <div class="tabbable tabs-left">
-                    {{ block('navbar_tabs') }}
-                    {{ block('navbar_tabs_content') }}
-                </div>
+    <li class="dot-menu dropdown">
+        <a href="#" class="oro-dropdown-toggle">
+            <i class="icon-bars"></i>
+        </a>
+        <div class="dropdown-menu pull-right" tabindex="0">
+            <div class="tabbable tabs-left">
+                {{ block('navbar_tabs') }}
+                {{ block('navbar_tabs_content') }}
             </div>
         </div>
-    </div>
+    </li>
     <script type="text/javascript">
         require(['jquery', 'bootstrap'], function ($) {
             $('.show-if-empty a').tab('show');

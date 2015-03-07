@@ -52,7 +52,7 @@ class NavigationTest extends Selenium2TestCase
     {
         $login = $this->login();
         //Open History pinbar dropdown
-        $login->getTest()->byXPath("//div[@class='pin-menus dropdown dropdown-close-prevent']/i")->click();
+        $login->getTest()->byXPath("//li[contains(@class, 'dot-menu')]/a")->click();
         $login->waitForAjax();
         $login->assertElementPresent("//div[@class='tabbable tabs-left']");
         $login->getTest()->byXPath("//div[@class='tabbable tabs-left']//a[contains(., 'History')]")->click();
@@ -74,7 +74,7 @@ class NavigationTest extends Selenium2TestCase
     {
         $login = $this->login();
         //Open Most viewed pinbar dropdown
-        $login->getTest()->byXPath("//div[@class='pin-menus dropdown dropdown-close-prevent']/i")->click();
+        $login->getTest()->byXPath("//li[contains(@class, 'dot-menu')]/a")->click();
         $login->waitForAjax();
         $login->assertElementPresent("//div[@class='tabbable tabs-left']");
         $login->getTest()->byXPath("//div[@class='tabbable tabs-left']//a[contains(., 'Most Viewed')]")->click();
@@ -99,7 +99,7 @@ class NavigationTest extends Selenium2TestCase
         //Add Groups page to favorites
         $login->getTest()->byXPath("//button[@class='btn favorite-button']")->click();
         //Open pinbar dropdown Favorites
-        $login->getTest()->byXPath("//div[@class='pin-menus dropdown dropdown-close-prevent']/i")->click();
+        $login->getTest()->byXPath("//li[contains(@class, 'dot-menu')]/a")->click();
         $login->waitForAjax();
         $login->assertElementPresent("//div[@class='tabbable tabs-left']");
         $login->getTest()->byXPath("//div[@class='tabbable tabs-left']//a[contains(., 'Favorites')]")->click();

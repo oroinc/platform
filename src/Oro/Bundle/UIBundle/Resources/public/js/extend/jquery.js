@@ -1,6 +1,7 @@
 /*global define*/
 define(['jquery'], function ($) {
     'use strict';
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-Header': 1
@@ -67,66 +68,36 @@ define(['jquery'], function ($) {
             };
         })($.fn.focus),
 
-        /*
-         * getStyleObject Plugin for jQuery JavaScript Library
-         * From: http://upshots.org/?p=112
-         *
-         * Copyright: Unknown, see source link
-         * Plugin version by Dakota Schneider (http://hackthetruth.org)
+        /**
+         * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
          */
-        getStyleObject: function(){
-            var dom = this.get(0);
-            var style;
-            var returns = {};
-            if(window.getComputedStyle){
-                var camelize = function(a,b){
-                    return b.toUpperCase();
+        getBorders: function (el) {
+            var computed = window.getComputedStyle(el || this[0], null);
+            function convertBorderToPx(cssValue) {
+                switch (cssValue) {
+                    case 'thin':
+                        return 1;
+                    case 'medium':
+                        return 2;
+                    case 'thick':
+                        return 5;
+                    default:
+                        return Math.round(parseFloat(cssValue));
                 }
-                style = window.getComputedStyle(dom, null);
-                for(var i=0;i<style.length;i++){
-                    var prop = style[i];
-                    var camel = prop.replace(/\-([a-z])/g, camelize);
-                    var val = style.getPropertyValue(prop);
-                    returns[camel] = val;
-                }
-                return returns;
             }
-            if(dom.currentStyle){
-                style = dom.currentStyle;
-                for(var prop in style){
-                    returns[prop] = style[prop];
-                }
-                return returns;
-            }
-            return this.css();
-        },
 
-        cloneWithStyles: function () {
-            // @TODO: optimize
-            var result = $('<div>');
-            this.each(function () {
-                var el = $(this),
-                    clone = el.clone().html('');
-                for (var i = 0; i < this.childNodes.length; i++) {
-                    var node = this.childNodes[i];
-                    if (node.nodeType === 1) { // ELEMENT_NODE
-                        clone[0].appendChild($(node).cloneWithStyles()[0]);
-                    } else {
-                        // all other nodes don't need any attention
-                        clone[0].appendChild(node.cloneNode());
-                    }
-                }
-                clone.css(el.getStyleObject());
-                // IE fix
-                if (clone.is("[class*='icon-']")) {
-                    clone.css({
-                        'font-family' : ''
-                    });
-                }
-                result.append(clone);
-            });
-            return result.find('>*');
+            return {
+                top: convertBorderToPx(computed.getPropertyValue('borderTopWidth') ||
+                    computed.borderTopWidth),
+                bottom: convertBorderToPx(computed.getPropertyValue('borderBottomWidth') ||
+                    computed.borderBottomWidth),
+                left: convertBorderToPx(computed.getPropertyValue('borderLeftWidth') ||
+                    computed.borderLeftWidth),
+                right: convertBorderToPx(computed.getPropertyValue('borderRightWidth') ||
+                    computed.borderRightWidth)
+            };
         }
+
     });
 
     return $;

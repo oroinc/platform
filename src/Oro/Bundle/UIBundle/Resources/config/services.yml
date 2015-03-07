@@ -172,3 +172,11 @@ services:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\FormStartExtension
         tags:
             - { name: layout.block_type_extension, alias: form_start }
+
+    oro_ui.layout_loader.widget_action_voter:
+        class:  Oro\Bundle\UIBundle\Layout\Loader\WidgetAndActionVoter
+        public: false
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: layout.resource_matcher.voter }
