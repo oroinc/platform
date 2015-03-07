@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Layout\Encoder;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 

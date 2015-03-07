@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

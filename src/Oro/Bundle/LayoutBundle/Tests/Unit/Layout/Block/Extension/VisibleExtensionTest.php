@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\Type\BaseType;
-
-use Oro\Bundle\LayoutBundle\Layout\Extension\VisibleExtension;
 use Oro\Component\Layout\BlockView;
+
+use Oro\Bundle\LayoutBundle\Layout\Block\Extension\VisibleExtension;
 
 class VisibleExtensionTest extends \PHPUnit_Framework_TestCase
 {

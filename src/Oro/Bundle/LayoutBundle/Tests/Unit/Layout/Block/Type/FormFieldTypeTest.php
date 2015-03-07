@@ -9,7 +9,7 @@ use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
-use Oro\Bundle\LayoutBundle\Layout\Extension\VisibleExtension;
+use Oro\Bundle\LayoutBundle\Layout\Block\Extension\VisibleExtension;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class FormFieldTypeTest extends BlockTypeTestCase

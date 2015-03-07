@@ -30,7 +30,7 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->configurator->configureContext($context);
 
         $context->resolve();
-        $this->assertSame(null, $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
+        $this->assertSame(null, $context->get('route_name'));
     }
 
     public function testConfigureContextWithRequest()
@@ -44,7 +44,7 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->configurator->configureContext($context);
 
         $context->resolve();
-        $this->assertSame('testRoteName', $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
+        $this->assertSame('testRoteName', $context->get('route_name'));
     }
 
     public function testConfigureContextWithSubRequest()
@@ -58,13 +58,13 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->configurator->configureContext($context);
 
         $context->resolve();
-        $this->assertSame('testRoteName', $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
+        $this->assertSame('testRoteName', $context->get('route_name'));
     }
 
     public function testConfigureContextWithRequestAndDataSetInContext()
     {
         $context = new LayoutContext();
-        $context->set(RouteContextConfigurator::PARAM_ROUTE_NAME, 'routeShouldNotBeOverridden');
+        $context->set('route_name', 'routeShouldNotBeOverridden');
 
         $request = Request::create('');
         $request->attributes->set('_route', 'testRoteName');
@@ -73,7 +73,7 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->configurator->configureContext($context);
 
         $context->resolve();
-        $this->assertSame('routeShouldNotBeOverridden', $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
+        $this->assertSame('routeShouldNotBeOverridden', $context->get('route_name'));
     }
 
     public function testRequestSetterSynchronized()
