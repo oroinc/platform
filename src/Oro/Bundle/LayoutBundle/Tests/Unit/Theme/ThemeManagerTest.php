@@ -71,6 +71,7 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
     public function testActiveThemePassedThroughConstructor()
     {
         $manager = $this->createManager(['base' => []], 'base');
+        $this->assertSame('base', $manager->getActiveTheme());
 
         $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
 
@@ -84,6 +85,7 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = $this->createManager(['base' => []]);
         $manager->setActiveTheme('base');
+        $this->assertSame('base', $manager->getActiveTheme());
 
         $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
 
