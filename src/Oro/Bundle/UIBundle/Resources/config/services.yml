@@ -98,11 +98,6 @@ services:
         tags:
             - { name: oro_layout.expression, alias: asset }
 
-    oro_ui.layout_context_configurator.action:
-        class: Oro\Bundle\UIBundle\Layout\Extension\ActionContextConfigurator
-        tags:
-            - { name: layout.context_configurator }
-
     oro_ui.layout_context_configurator.widget:
         class: Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator
         calls:
@@ -130,13 +125,6 @@ services:
             - @oro_config.user
             - # alias: config key
                 navbar_position: oro_ui.navbar_position
-        tags:
-            - { name: layout.context_configurator }
-
-    oro_ui.layout_context_configurator.application:
-        class: Oro\Bundle\UIBundle\Layout\Extension\ApplicationContextConfigurator
-        arguments:
-            - @kernel
         tags:
             - { name: layout.context_configurator }
 
