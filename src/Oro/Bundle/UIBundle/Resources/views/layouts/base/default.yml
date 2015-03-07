@@ -181,6 +181,3 @@ oro_layout:
                             right_side_bar: ~
                         footer:
                             footer_script: ~
-
-    conditions:
-        @empty: $context.widget_container
