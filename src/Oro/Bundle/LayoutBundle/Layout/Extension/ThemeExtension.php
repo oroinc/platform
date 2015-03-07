@@ -19,14 +19,9 @@ use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
 
-class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ContextConfiguratorInterface
+class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
-
-    const PARAM_THEME = 'theme';
-
-    /** @var Request|null */
-    protected $request;
 
     /** @var array */
     protected $resources;
@@ -66,46 +61,13 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
     }
 
     /**
-     * Synchronized DI method call, sets current request for further usage
-     *
-     * @param Request $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureContext(ContextInterface $context)
-    {
-        $context->getResolver()
-            ->setDefaults(
-                [
-                    self::PARAM_THEME => function (Options $options, $value) {
-                        if (null === $value && $this->request) {
-                            $value = $this->request->query->get('_theme');
-                            if (null === $value) {
-                                $value = $this->request->attributes->get('_theme');
-                            }
-                        }
-
-                        return $value;
-                    }
-                ]
-            )
-            ->setAllowedTypes([self::PARAM_THEME => ['string', 'null']]);
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
         $updates = [];
 
-        if ($context->getOr(self::PARAM_THEME)) {
+        if ($context->getOr('theme')) {
             $this->matcher->setContext($context);
 
             $iterator = new ResourceIterator($this->factory, $this->resources);

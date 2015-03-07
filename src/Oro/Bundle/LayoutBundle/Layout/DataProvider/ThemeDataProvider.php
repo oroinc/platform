@@ -6,7 +6,6 @@ use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataProviderInterface;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 
 class ThemeDataProvider implements DataProviderInterface, ContextAwareInterface
@@ -48,6 +47,6 @@ class ThemeDataProvider implements DataProviderInterface, ContextAwareInterface
      */
     public function getData()
     {
-        return $this->themeManager->getTheme($this->context->get(ThemeExtension::PARAM_THEME));
+        return $this->themeManager->getTheme($this->context->get('theme'));
     }
 }
