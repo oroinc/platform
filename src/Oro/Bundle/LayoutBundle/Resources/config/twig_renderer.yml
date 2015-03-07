@@ -5,12 +5,6 @@ parameters:
     oro_layout.twig.layout_renderer.class:    Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer
 
 services:
-    oro_layout.twig.extension.array:
-        public: false
-        class: Oro\Bundle\LayoutBundle\Twig\ArrayExtension
-        tags:
-            - { name: twig.extension }
-
     oro_layout.twig.extension.layout:
         public: false
         class: %oro_layout.twig.extension.layout.class%

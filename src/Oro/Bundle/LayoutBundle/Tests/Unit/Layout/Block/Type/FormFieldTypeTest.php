@@ -27,6 +27,21 @@ class FormFieldTypeTest extends BlockTypeTestCase
         ];
     }
 
+    public function testResolveOptionsWithoutFormName()
+    {
+        $options = $this->resolveOptions(FormFieldType::NAME, ['field_path' => 'firstName']);
+        $this->assertEquals('form', $options['form_name']);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @expectedExceptionMessage The required option "field_path" is missing.
+     */
+    public function testResolveOptionsWithoutFieldName()
+    {
+        $this->resolveOptions(FormFieldType::NAME, []);
+    }
+
     public function testBuildView()
     {
         $formName = 'test_form';

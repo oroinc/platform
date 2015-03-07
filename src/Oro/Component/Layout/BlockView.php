@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormView;
 
 /**
  * @method BlockView getParent()
+ * @property BlockView[] children
  */
 class BlockView extends FormView
 {

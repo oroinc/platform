@@ -167,3 +167,8 @@ services:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
         tags:
             - { name: layout.block_type_extension, alias: link }
+
+    oro_ui.block_type_extension.form_start:
+        class: Oro\Bundle\UIBundle\Layout\Block\Extension\FormStartExtension
+        tags:
+            - { name: layout.block_type_extension, alias: form_start }
