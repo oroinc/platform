@@ -6,12 +6,8 @@ use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\OptionsResolver\Options;
-
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
-use Oro\Component\Layout\ContextConfiguratorInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher;
