@@ -62,6 +62,18 @@ services:
         calls:
             - [addConfigurationPass, [@oro_layout.expression.pass.property_path]]
 
+    oro_ui.layout_context_configurator.application:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator
+        arguments:
+            - @kernel
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_ui.layout_context_configurator.action:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.layout_context_configurator.route:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator
         calls:
@@ -88,3 +100,10 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\JsonConfigExpressionEncoder
         tags:
             - { name: oro_layout.expression.encoder, format: json }
+
+    oro_layout.layout_listener:
+        class: Oro\Bundle\LayoutBundle\EventListener\LayoutListener
+        arguments:
+            - @oro_layout.layout_manager
+        tags:
+            - { name: kernel.event_subscriber }
