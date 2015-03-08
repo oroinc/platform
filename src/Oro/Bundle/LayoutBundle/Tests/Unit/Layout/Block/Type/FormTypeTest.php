@@ -11,6 +11,7 @@ use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormEndType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class FormTypeTest extends BlockTypeTestCase
@@ -70,32 +71,22 @@ class FormTypeTest extends BlockTypeTestCase
             ],
             'all options'                    => [
                 'options'  => [
-                    'form_name'                    => 'test',
-                    'preferred_fields'             => ['field1'],
-                    'groups'                       => ['group1' => ['title' => 'TestGroup']],
-                    'with_form_blocks'             => true,
-                    'form_prefix'                  => 'form',
-                    'form_field_prefix'            => 'form_field_prefix_',
-                    'form_group_prefix'            => 'form_group_prefix_',
-                    'form_action_path'             => 'form_action_path',
-                    'form_action_route_name'       => 'form_action_route_name',
-                    'form_action_route_parameters' => ['foo' => 'bar'],
-                    'form_method'                  => 'get',
-                    'form_enctype'                 => 'form_enctype'
+                    'form_name'         => 'test',
+                    'preferred_fields'  => ['field1'],
+                    'groups'            => ['group1' => ['title' => 'TestGroup']],
+                    'with_form_blocks'  => true,
+                    'form_prefix'       => 'form',
+                    'form_field_prefix' => 'form_field_prefix_',
+                    'form_group_prefix' => 'form_group_prefix_'
                 ],
                 'expected' => [
-                    'form_name'                    => 'test',
-                    'preferred_fields'             => ['field1'],
-                    'groups'                       => ['group1' => ['title' => 'TestGroup']],
-                    'with_form_blocks'             => true,
-                    'form_prefix'                  => 'form',
-                    'form_field_prefix'            => 'form_field_prefix_',
-                    'form_group_prefix'            => 'form_group_prefix_',
-                    'form_action_path'             => 'form_action_path',
-                    'form_action_route_name'       => 'form_action_route_name',
-                    'form_action_route_parameters' => ['foo' => 'bar'],
-                    'form_method'                  => 'get',
-                    'form_enctype'                 => 'form_enctype'
+                    'form_name'         => 'test',
+                    'preferred_fields'  => ['field1'],
+                    'groups'            => ['group1' => ['title' => 'TestGroup']],
+                    'with_form_blocks'  => true,
+                    'form_prefix'       => 'form',
+                    'form_field_prefix' => 'form_field_prefix_',
+                    'form_group_prefix' => 'form_group_prefix_'
                 ]
             ]
         ];
@@ -103,13 +94,8 @@ class FormTypeTest extends BlockTypeTestCase
 
     public function testBuildBlockWithFormBlocks()
     {
-        $formBlockId           = 'test_block';
-        $formName              = 'test_form';
-        $formActionPath        = 'test_action_path';
-        $formActionRoute       = 'test_action_route';
-        $formActionRouteParams = ['foo' => 'bar'];
-        $formMethod            = 'post';
-        $formEnctype           = 'test_enctype';
+        $formBlockId = 'test_block';
+        $formName    = 'test_form';
 
         $formAccessor      = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
         $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
@@ -133,15 +119,10 @@ class FormTypeTest extends BlockTypeTestCase
         $options = $this->resolveOptions(
             $type,
             [
-                'with_form_blocks'             => true,
-                'form_name'                    => $formName,
-                'form_prefix'                  => 'test',
-                'form_action_path'             => $formActionPath,
-                'form_action_route_name'       => $formActionRoute,
-                'form_action_route_parameters' => $formActionRouteParams,
-                'form_method'                  => $formMethod,
-                'form_enctype'                 => $formEnctype,
-                'attr'                         => ['id' => 'test_id']
+                'with_form_blocks' => true,
+                'form_name'        => $formName,
+                'form_prefix'      => 'test',
+                'attr'             => ['id' => 'test_id']
             ]
         );
 
@@ -152,13 +133,8 @@ class FormTypeTest extends BlockTypeTestCase
                 $formBlockId,
                 FormStartType::NAME,
                 [
-                    'form_name'                    => $formName,
-                    'form_action_path'             => $formActionPath,
-                    'form_action_route_name'       => $formActionRoute,
-                    'form_action_route_parameters' => $formActionRouteParams,
-                    'form_method'                  => $formMethod,
-                    'form_enctype'                 => $formEnctype,
-                    'attr'                         => ['id' => 'test_id']
+                    'form_name' => $formName,
+                    'attr'      => ['id' => 'test_id']
                 ]
             );
         $layoutManipulator->expects($this->at(1))
@@ -320,18 +296,22 @@ class FormTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->any())
             ->method('getView')
             ->will($this->returnValue($formView));
+        $formAccessor->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue(FormAction::createByPath('form_action_path')));
+        $formAccessor->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue('get'));
+        $formAccessor->expects($this->once())
+            ->method('getEnctype')
+            ->will($this->returnValue('form_enctype'));
 
         $type->buildView(
             $view,
             $block,
             [
-                'form_name'                    => 'form',
-                'with_form_blocks'             => false,
-                'form_action_path'             => 'form_action_path',
-                'form_action_route_name'       => 'form_action_route',
-                'form_action_route_parameters' => ['foo' => 'bar'],
-                'form_method'                  => 'get',
-                'form_enctype'                 => 'form_enctype'
+                'form_name'        => 'form',
+                'with_form_blocks' => false
             ]
         );
         $this->assertSame($formView, $view->vars['form']);
@@ -361,17 +341,22 @@ class FormTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->any())
             ->method('getView')
             ->will($this->returnValue($formView));
+        $formAccessor->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue(FormAction::createByRoute('form_action_route', ['foo' => 'bar'])));
+        $formAccessor->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue('get'));
+        $formAccessor->expects($this->once())
+            ->method('getEnctype')
+            ->will($this->returnValue('form_enctype'));
 
         $type->buildView(
             $view,
             $block,
             [
-                'form_name'                    => 'form',
-                'with_form_blocks'             => false,
-                'form_action_route_name'       => 'form_action_route',
-                'form_action_route_parameters' => ['foo' => 'bar'],
-                'form_method'                  => 'get',
-                'form_enctype'                 => 'form_enctype'
+                'form_name'        => 'form',
+                'with_form_blocks' => false
             ]
         );
         $this->assertSame($formView, $view->vars['form']);
@@ -506,7 +491,7 @@ class FormTypeTest extends BlockTypeTestCase
         $view->vars['action_path']             = 'form_action_path';
         $view->vars['action_route_name']       = 'form_action_route';
         $view->vars['action_route_parameters'] = ['foo' => 'bar'];
-        $view->vars['method']                  = 'get';
+        $view->vars['method']                  = 'GET';
         $view->vars['enctype']                 = 'form_enctype';
 
         $context->set('form', $formAccessor);

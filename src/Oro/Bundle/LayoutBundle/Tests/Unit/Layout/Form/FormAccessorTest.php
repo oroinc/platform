@@ -2,36 +2,113 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Form;
 
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Symfony\Component\Form\FormView;
+
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 
 class FormAccessorTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_NAME = 'test_form';
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $form;
 
-    /** @var FormAccessor */
-    protected $formAccessor;
-
     protected function setUp()
     {
-        $this->form         = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $this->formAccessor = new FormAccessor($this->form);
+        $this->form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $this->form->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue(self::FORM_NAME));
     }
 
     public function testGetForm()
     {
-        $this->assertSame($this->form, $this->formAccessor->getForm());
+        $formAccessor = new FormAccessor($this->form);
+        $this->assertSame($this->form, $formAccessor->getForm());
     }
 
     public function testToString()
     {
-        $formName = 'test_form';
-        $this->form->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($formName));
+        $formAccessor = new FormAccessor($this->form);
+        $this->assertEquals(self::FORM_NAME, $formAccessor->toString());
+    }
 
-        $this->assertEquals($formName, $this->formAccessor->toString());
+    public function testToStringWithAllParams()
+    {
+        $formAccessor = new FormAccessor(
+            $this->form,
+            FormAction::createByRoute('test_route', ['foo' => 'bar']),
+            'post',
+            'multipart/form-data'
+        );
+        $this->assertEquals(
+            self::FORM_NAME . ';action_route:test_route;method:post;enctype:multipart/form-data',
+            $formAccessor->toString()
+        );
+    }
+
+    public function testParamsInitializer()
+    {
+        $formAccessor = new FormAccessor($this->form);
+
+        $formAction = 'test_action';
+        $formMethod = 'test_method';
+
+        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formView   = new FormView();
+
+        $formView->vars['multipart'] = false;
+
+        $this->form->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($formView));
+        $this->form->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($formConfig));
+        $formConfig->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue($formAction));
+        $formConfig->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue($formMethod));
+
+        $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
+        $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
+        $this->assertNull($formAccessor->getEnctype());
+        $this->assertEquals(self::FORM_NAME, $formAccessor->toString());
+    }
+
+    public function testParamsInitializerForMultipartForm()
+    {
+        $formAccessor = new FormAccessor($this->form);
+
+        $formAction = 'test_action';
+        $formMethod = 'test_method';
+
+        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formView   = new FormView();
+
+        $formView->vars['multipart'] = true;
+
+        $this->form->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($formView));
+        $this->form->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($formConfig));
+        $formConfig->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue($formAction));
+        $formConfig->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue($formMethod));
+
+        $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
+        $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
+        $this->assertEquals('multipart/form-data', $formAccessor->getEnctype());
+        $this->assertEquals(self::FORM_NAME, $formAccessor->toString());
     }
 
     public function testGetView()
@@ -49,17 +126,20 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
             ->method('createView')
             ->will($this->returnValue($formView));
 
-        $this->assertSame($formView, $this->formAccessor->getView());
-        $this->assertSame($field1View, $this->formAccessor->getView('field1'));
-        $this->assertSame($field2View, $this->formAccessor->getView('field1.field2'));
+        $formAccessor = new FormAccessor($this->form);
+        $this->assertSame($formView, $formAccessor->getView());
+        $this->assertSame($field1View, $formAccessor->getView('field1'));
+        $this->assertSame($field2View, $formAccessor->getView('field1.field2'));
     }
 
     public function testProcessedFields()
     {
-        $this->assertNull($this->formAccessor->getProcessedFields());
+        $formAccessor = new FormAccessor($this->form);
+
+        $this->assertNull($formAccessor->getProcessedFields());
 
         $processedFields = ['field' => 'block_id'];
-        $this->formAccessor->setProcessedFields($processedFields);
-        $this->assertSame($processedFields, $this->formAccessor->getProcessedFields());
+        $formAccessor->setProcessedFields($processedFields);
+        $this->assertSame($processedFields, $formAccessor->getProcessedFields());
     }
 }

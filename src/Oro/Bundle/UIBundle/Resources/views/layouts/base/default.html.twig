@@ -201,3 +201,37 @@
         {{ block_widget(block) }}
     </div>
 {% endblock %}
+
+{% block _page_header_widget %}
+    <div class="container-fluid page-title">
+        <div class="navigation clearfix navbar-extra navbar-extra-right">
+            <div class="row">
+                {{ block_widget(block) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_header_left_panel_widget %}
+    <div class="pull-left pull-left-extra">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_right_panel_widget %}
+    <div class="pull-right">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_title_widget %}
+    <div class="pull-left">
+        <h1 class="oro-subtitle">{{ block_widget(block) }}</h1>
+    </div>
+{% endblock %}
+
+{% block _page_buttons_panel_widget %}
+    <div class="pull-right title-buttons-container">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}

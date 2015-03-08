@@ -1,0 +1,8 @@
+{% block _page_buttons_panel_widget %}
+    <div class="pull-right title-buttons-container">
+        {{ block_widget(block) }}
+        {% if form_method is not same as('GET') %}
+            <input type="hidden" name="input_action" value="" data-form-id="{{ form_name }}"/>
+        {% endif %}
+    </div>
+{% endblock %}

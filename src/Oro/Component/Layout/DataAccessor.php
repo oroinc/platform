@@ -82,7 +82,7 @@ class DataAccessor implements DataAccessorInterface
     /**
      * Implements \ArrayAccess
      *
-     * @throws \BadMethodCallException always as changing a data providers is not allowed
+     * @throws \BadMethodCallException always as changing data providers is not allowed
      */
     public function offsetSet($name, $value)
     {
@@ -92,7 +92,7 @@ class DataAccessor implements DataAccessorInterface
     /**
      * Implements \ArrayAccess
      *
-     * @throws \BadMethodCallException always as removing a data providers is not allowed
+     * @throws \BadMethodCallException always as removing data providers is not allowed
      */
     public function offsetUnset($name)
     {

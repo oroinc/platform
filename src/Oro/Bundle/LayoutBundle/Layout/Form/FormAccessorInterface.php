@@ -17,6 +17,34 @@ interface FormAccessorInterface extends ContextItemInterface
     public function getForm();
 
     /**
+     * Returns the name of the form.
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Returns the submit action of the form.
+     *
+     * @return FormAction
+     */
+    public function getAction();
+
+    /**
+     * Returns the submit method of the form.
+     *
+     * @return string|null
+     */
+    public function getMethod();
+
+    /**
+     * Returns the encryption type of the form.
+     *
+     * @return string|null
+     */
+    public function getEnctype();
+
+    /**
      * Returns the form view.
      *
      * @param string|null $fieldPath The path to the form field

@@ -55,7 +55,10 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 ['class' => 'Test\ContextConfigurator1']
             ],
             'contextConfigurator2' => [
-                ['class' => 'Test\ContextConfigurator2']
+                ['class' => 'Test\ContextConfigurator2', 'priority' => -10]
+            ],
+            'contextConfigurator3' => [
+                ['class' => 'Test\ContextConfigurator3']
             ]
         ];
         $dataProviderServiceIds        = [
@@ -149,8 +152,9 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->with(
                 4,
                 [
+                    'contextConfigurator2',
                     'contextConfigurator1',
-                    'contextConfigurator2'
+                    'contextConfigurator3'
                 ]
             );
         $extensionDef->expects($this->at(4))

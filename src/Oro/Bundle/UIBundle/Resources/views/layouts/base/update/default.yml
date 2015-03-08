@@ -12,13 +12,29 @@ oro_layout:
                     entity: { @value: $data.entity }
         - @addTree:
             items:
+                'form:start':
+                    blockType: form_start
+                form:
+                    blockType: form_end
+                    options:
+                        form_prefix: form
+                'form:end':
+                    blockType: form_end
                 page_header:
+                    blockType: container
+                page_header_left_panel:
+                    blockType: container
+                page_header_right_panel:
                     blockType: container
                 page_title:
                     blockType: text
-                page_buttons:
+                page_buttons_panel:
                     blockType: container
-                name_buttons:
+                    options:
+                        vars:
+                            form_name: { @value: $context.form.name }
+                            form_method: { @value: $context.form.method }
+                nav_buttons:
                     blockType: container
                 update_navButtons_before_placeholder:
                     blockType: placeholder
@@ -34,9 +50,13 @@ oro_layout:
                             entity: { @value: $data.entity }
             tree:
                 content:
+                    'form:start': ~
                     page_header:
-                        page_title: ~
-                        page_buttons:
-                            update_navButtons_before_placeholder: ~
-                            name_buttons: ~
-                            update_navButtons_after_placeholder: ~
+                        page_header_left_panel:
+                            page_title: ~
+                        page_header_right_panel:
+                            page_buttons_panel:
+                                update_navButtons_before_placeholder: ~
+                                nav_buttons: ~
+                                update_navButtons_after_placeholder: ~
+                    'form:end': ~

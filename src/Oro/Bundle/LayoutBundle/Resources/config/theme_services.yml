@@ -73,7 +73,7 @@ services:
         calls:
             - [setRequest, [@?request=]]
         tags:
-            - { name: layout.context_configurator }
+            - { name: layout.context_configurator, priority: -100 }
 
     oro_layout.theme_extension:
         class: %oro_layout.theme_extension.class%

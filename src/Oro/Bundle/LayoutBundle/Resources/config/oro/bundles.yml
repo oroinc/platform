@@ -1,2 +1,2 @@
 bundles:
-    - { name: Oro\Bundle\LayoutBundle\OroLayoutBundle }
+    - { name: Oro\Bundle\LayoutBundle\OroLayoutBundle, priority: -125 }

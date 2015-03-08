@@ -14,21 +14,12 @@ class FormStartType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        parent::setDefaultOptions($resolver);
-        $resolver->setOptional(FormStartHelper::getOptions());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         $view->vars['form'] = $formAccessor->getView();
-        FormStartHelper::buildView($view, $options, $formAccessor);
+        FormStartHelper::buildView($view, $formAccessor);
     }
 
     /**

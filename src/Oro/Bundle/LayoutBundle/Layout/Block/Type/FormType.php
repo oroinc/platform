@@ -68,7 +68,6 @@ class FormType extends AbstractFormType
                 'form_group_prefix' => null
             ]
         );
-        $resolver->setOptional(FormStartHelper::getOptions());
         $resolver->setAllowedTypes(
             [
                 'preferred_fields'  => 'array',
@@ -110,7 +109,7 @@ class FormType extends AbstractFormType
         if ($options['with_form_blocks']) {
             $formStartOptions = array_intersect_key(
                 $options,
-                array_flip(array_merge(FormStartHelper::getOptions(), ['form_name', 'attr']))
+                ['form_name' => null, 'attr' => null]
             );
             $builder->getLayoutManipulator()->add(
                 $options['form_prefix'] . ':start',
@@ -139,7 +138,7 @@ class FormType extends AbstractFormType
 
         $view->vars['form'] = $formAccessor->getView();
         if (!$options['with_form_blocks']) {
-            FormStartHelper::buildView($view, $options, $formAccessor);
+            FormStartHelper::buildView($view, $formAccessor);
         }
     }
 

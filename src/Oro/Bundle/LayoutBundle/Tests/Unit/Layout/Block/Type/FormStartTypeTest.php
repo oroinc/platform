@@ -8,6 +8,7 @@ use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Block\Type\BaseType;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType;
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class FormStartTypeTest extends BlockTypeTestCase
@@ -22,8 +23,8 @@ class FormStartTypeTest extends BlockTypeTestCase
     {
         $formName       = 'test_form';
         $formActionPath = 'test_form_action_path';
-        $formMethod     = 'get';
-        $formEnctype    = 'test_form';
+        $formMethod     = 'GET';
+        $formEnctype    = 'test_enctype';
         $formView       = new FormView();
 
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
@@ -33,26 +34,25 @@ class FormStartTypeTest extends BlockTypeTestCase
             ->method('getView')
             ->with(null)
             ->will($this->returnValue($formView));
+        $formAccessor->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue(FormAction::createByPath($formActionPath)));
+        $formAccessor->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue($formMethod));
+        $formAccessor->expects($this->once())
+            ->method('getEnctype')
+            ->will($this->returnValue($formEnctype));
 
         $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
-            FormStartType::NAME,
-            [
-                'form_name'                    => $formName,
-                'form_action_path'             => $formActionPath,
-                'form_action_route_name'       => 'route',
-                'form_action_route_parameters' => ['foo' => 'bar'],
-                'form_method'                  => $formMethod,
-                'form_enctype'                 => $formEnctype
-            ]
-        );
+        $view = $this->getBlockView(FormStartType::NAME, ['form_name' => $formName]);
 
         $this->assertSame($formView, $view->vars['form']);
         $this->assertSame($formActionPath, $view->vars['action_path']);
         $this->assertFalse(array_key_exists('action_route_name', $view->vars));
         $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
-        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
+        $this->assertSame($formMethod, $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
@@ -61,8 +61,8 @@ class FormStartTypeTest extends BlockTypeTestCase
         $formName              = 'test_form';
         $formActionRoute       = 'test_form_action_route';
         $formActionRouteParams = ['foo' => 'bar'];
-        $formMethod            = 'get';
-        $formEnctype           = 'test_form';
+        $formMethod            = 'POST';
+        $formEnctype           = 'test_enctype';
         $formView              = new FormView();
 
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
@@ -72,25 +72,25 @@ class FormStartTypeTest extends BlockTypeTestCase
             ->method('getView')
             ->with(null)
             ->will($this->returnValue($formView));
+        $formAccessor->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue(FormAction::createByRoute($formActionRoute, $formActionRouteParams)));
+        $formAccessor->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue($formMethod));
+        $formAccessor->expects($this->once())
+            ->method('getEnctype')
+            ->will($this->returnValue($formEnctype));
 
         $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
-            FormStartType::NAME,
-            [
-                'form_name'                    => $formName,
-                'form_action_route_name'       => $formActionRoute,
-                'form_action_route_parameters' => $formActionRouteParams,
-                'form_method'                  => $formMethod,
-                'form_enctype'                 => $formEnctype
-            ]
-        );
+        $view = $this->getBlockView(FormStartType::NAME, ['form_name' => $formName]);
 
         $this->assertSame($formView, $view->vars['form']);
         $this->assertFalse(array_key_exists('action_path', $view->vars));
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
         $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']);
-        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
+        $this->assertSame($formMethod, $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
@@ -98,8 +98,8 @@ class FormStartTypeTest extends BlockTypeTestCase
     {
         $formName        = 'test_form';
         $formActionRoute = 'test_form_action_route';
-        $formMethod      = 'get';
-        $formEnctype     = 'test_form';
+        $formMethod      = 'POST';
+        $formEnctype     = 'test_enctype';
         $formView        = new FormView();
 
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
@@ -109,24 +109,25 @@ class FormStartTypeTest extends BlockTypeTestCase
             ->method('getView')
             ->with(null)
             ->will($this->returnValue($formView));
+        $formAccessor->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue(FormAction::createByRoute($formActionRoute)));
+        $formAccessor->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue($formMethod));
+        $formAccessor->expects($this->once())
+            ->method('getEnctype')
+            ->will($this->returnValue($formEnctype));
 
         $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
-            FormStartType::NAME,
-            [
-                'form_name'              => $formName,
-                'form_action_route_name' => $formActionRoute,
-                'form_method'            => $formMethod,
-                'form_enctype'           => $formEnctype
-            ]
-        );
+        $view = $this->getBlockView(FormStartType::NAME, ['form_name' => $formName]);
 
         $this->assertSame($formView, $view->vars['form']);
         $this->assertFalse(array_key_exists('action_path', $view->vars));
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
         $this->assertSame([], $view->vars['action_route_parameters']);
-        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
+        $this->assertSame($formMethod, $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
@@ -142,20 +143,19 @@ class FormStartTypeTest extends BlockTypeTestCase
             ->method('getView')
             ->with(null)
             ->will($this->returnValue($formView));
+        $formAccessor->expects($this->once())
+            ->method('getAction')
+            ->will($this->returnValue(FormAction::createEmpty()));
+        $formAccessor->expects($this->once())
+            ->method('getMethod')
+            ->will($this->returnValue(null));
+        $formAccessor->expects($this->once())
+            ->method('getEnctype')
+            ->will($this->returnValue(null));
 
         $this->context->getResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
-            FormStartType::NAME,
-            [
-                'form_name'                    => $formName,
-                'form_action_path'             => null,
-                'form_action_route_name'       => null,
-                'form_action_route_parameters' => null,
-                'form_method'                  => null,
-                'form_enctype'                 => null
-            ]
-        );
+        $view = $this->getBlockView(FormStartType::NAME, ['form_name' => $formName]);
 
         $this->assertSame($formView, $view->vars['form']);
         $this->assertFalse(array_key_exists('action_path', $view->vars));
@@ -163,92 +163,6 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
         $this->assertFalse(array_key_exists('method', $view->vars));
         $this->assertFalse(array_key_exists('enctype', $view->vars));
-    }
-
-    public function testBuildViewWithDefaultSymfonyForm()
-    {
-        $formName       = 'test_form';
-        $formActionPath = 'test_form_action_path';
-        $formMethod     = 'get';
-        $formView       = new FormView();
-        $form           = $this->getMock('Symfony\Component\Form\FormInterface');
-        $formConfig     = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-
-        $formView->vars['multipart'] = false;
-
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $formAccessor->expects($this->any())
-            ->method('getForm')
-            ->will($this->returnValue($form));
-        $formAccessor->expects($this->any())
-            ->method('getView')
-            ->with(null)
-            ->will($this->returnValue($formView));
-        $form->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($formConfig));
-        $formConfig->expects($this->once())
-            ->method('getAction')
-            ->will($this->returnValue($formActionPath));
-        $formConfig->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue($formMethod));
-
-        $this->context->getResolver()->setOptional([$formName]);
-        $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
-            FormStartType::NAME,
-            ['form_name' => $formName]
-        );
-
-        $this->assertSame($formView, $view->vars['form']);
-        $this->assertSame($formActionPath, $view->vars['action_path']);
-        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
-        $this->assertFalse(array_key_exists('enctype', $view->vars));
-    }
-
-    public function testBuildViewWithDefaultSymfonyMultipartForm()
-    {
-        $formName       = 'test_form';
-        $formActionPath = 'test_form_action_path';
-        $formMethod     = 'get';
-        $formView       = new FormView();
-        $form           = $this->getMock('Symfony\Component\Form\FormInterface');
-        $formConfig     = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-
-        $formView->vars['multipart'] = true;
-
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $formAccessor->expects($this->any())
-            ->method('getForm')
-            ->will($this->returnValue($form));
-        $formAccessor->expects($this->any())
-            ->method('getView')
-            ->with(null)
-            ->will($this->returnValue($formView));
-        $form->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($formConfig));
-        $formConfig->expects($this->once())
-            ->method('getAction')
-            ->will($this->returnValue($formActionPath));
-        $formConfig->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue($formMethod));
-
-        $this->context->getResolver()->setOptional([$formName]);
-        $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
-            FormStartType::NAME,
-            ['form_name' => $formName]
-        );
-
-        $this->assertSame($formView, $view->vars['form']);
-        $this->assertSame($formActionPath, $view->vars['action_path']);
-        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
-        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
-        $this->assertSame('multipart/form-data', $view->vars['enctype']);
     }
 
     /**

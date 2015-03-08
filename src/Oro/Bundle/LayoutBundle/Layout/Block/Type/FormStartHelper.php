@@ -9,45 +9,29 @@ use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface;
 class FormStartHelper
 {
     /**
-     * @return string[]
-     */
-    public static function getOptions()
-    {
-        return [
-            'form_action_path',
-            'form_action_route_name',
-            'form_action_route_parameters',
-            'form_method',
-            'form_enctype'
-        ];
-    }
-
-    /**
      * @param BlockView             $view
-     * @param array                 $options
      * @param FormAccessorInterface $formAccessor
      */
-    public static function buildView(BlockView $view, array $options, FormAccessorInterface $formAccessor)
+    public static function buildView(BlockView $view, FormAccessorInterface $formAccessor)
     {
-        if (isset($options['form_action_path']) || array_key_exists('form_action_path', $options)) {
-            $view->vars['action_path'] = $options['form_action_path'];
-        } elseif (isset($options['form_action_route_name']) || array_key_exists('form_action_route_name', $options)) {
-            $view->vars['action_route_name']       = $options['form_action_route_name'];
-            $view->vars['action_route_parameters'] = isset($options['form_action_route_parameters'])
-                ? $options['form_action_route_parameters']
-                : [];
+        $action = $formAccessor->getAction();
+        $path   = $action->getPath();
+        if ($path) {
+            $view->vars['action_path'] = $path;
         } else {
-            $view->vars['action_path'] = $formAccessor->getForm()->getConfig()->getAction();
+            $routeName = $action->getRouteName();
+            if ($routeName) {
+                $view->vars['action_route_name']       = $routeName;
+                $view->vars['action_route_parameters'] = $action->getRouteParameters();
+            }
         }
-        if (isset($options['form_method']) || array_key_exists('form_method', $options)) {
-            $view->vars['method'] = $options['form_method'];
-        } else {
-            $view->vars['method'] = $formAccessor->getForm()->getConfig()->getMethod();
+        $method = $formAccessor->getMethod();
+        if ($method) {
+            $view->vars['method'] = $method;
         }
-        if (isset($options['form_enctype']) || array_key_exists('form_enctype', $options)) {
-            $view->vars['enctype'] = $options['form_enctype'];
-        } elseif ($formAccessor->getView()->vars['multipart']) {
-            $view->vars['enctype'] = 'multipart/form-data';
+        $enctype = $formAccessor->getEnctype();
+        if ($enctype) {
+            $view->vars['enctype'] = $enctype;
         }
     }
 
@@ -67,8 +51,6 @@ class FormStartHelper
         }
         if (empty($view->vars['method'])) {
             unset($view->vars['method']);
-        } else {
-            $view->vars['method'] = strtoupper($view->vars['method']);
         }
         if (empty($view->vars['enctype'])) {
             unset($view->vars['enctype']);

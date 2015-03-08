@@ -59,7 +59,6 @@ class DebugCommand extends ContainerAwareCommand
                 },
                 $registry->getContextConfigurators()
             );
-            sort($contextConfigurators);
             foreach ($contextConfigurators as $configurator) {
                 $output->writeln(' ' . $configurator);
             }
@@ -100,7 +99,6 @@ class DebugCommand extends ContainerAwareCommand
                 },
                 $registry->getTypeExtensions($blockTypeName)
             );
-            sort($blockTypeExtensions);
             foreach ($blockTypeExtensions as $extension) {
                 $output->writeln(' ' . $extension);
             }

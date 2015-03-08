@@ -1,7 +1,5 @@
 oro_layout:
     actions:
-        - @setBlockTheme:
-            themes: 'OroUIBundle:layouts:base/index/default.html.twig'
         - @add:
             id:        index_before_content_addition
             parentId:  before_content_addition
@@ -12,11 +10,15 @@ oro_layout:
             items:
                 page_header:
                     blockType: container
+                page_header_left_panel:
+                    blockType: container
+                page_header_right_panel:
+                    blockType: container
                 page_title:
                     blockType: text
-                page_buttons:
+                page_buttons_panel:
                     blockType: container
-                name_buttons:
+                nav_buttons:
                     blockType: container
                 index_navButtons_before_placeholder:
                     blockType: placeholder
@@ -33,8 +35,9 @@ oro_layout:
             tree:
                 content:
                     page_header:
-                        page_title: ~
-                        page_buttons:
+                        page_header_left_panel:
+                            page_title: ~
+                        page_buttons_panel:
                             index_navButtons_before_placeholder: ~
-                            name_buttons: ~
+                            nav_buttons: ~
                             index_navButtons_after_placeholder: ~

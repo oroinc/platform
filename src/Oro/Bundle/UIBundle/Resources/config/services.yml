@@ -103,7 +103,7 @@ services:
         calls:
             - [setRequest, [@?request=]]
         tags:
-            - { name: layout.context_configurator }
+            - { name: layout.context_configurator, priority: -100 }
 
     oro_ui.layout_context_configurator.user_agent:
         class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
@@ -125,6 +125,11 @@ services:
             - @oro_config.user
             - # alias: config key
                 navbar_position: oro_ui.navbar_position
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_ui.layout_context_configurator.entity_class:
+        class: Oro\Bundle\UIBundle\Layout\Extension\EntityClassContextConfigurator
         tags:
             - { name: layout.context_configurator }
 
