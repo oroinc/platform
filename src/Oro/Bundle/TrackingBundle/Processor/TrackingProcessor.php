@@ -56,6 +56,11 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     public function process()
     {
+        /**
+         *  to avoid memory leaks, we turn off doctrine logger
+         */
+        $this->getEntityManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
         if ($this->logger === null) {
             $this->logger = new NullLogger();
         }
@@ -150,8 +155,6 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->execute();
             }
         }
-
-        $this->getEntityManager()->clear();
     }
 
     /**
@@ -215,7 +218,12 @@ class TrackingProcessor implements LoggerAwareInterface
         $em->clear();
 
         $this->logger->notice('Process batch END - ' . date('Y-m-d H:i:s'));
-        $this->logger->notice('Memory used - ' . memory_get_peak_usage());
+        $this->logger->notice(
+            sprintf(
+                'Memory usage (currently) %dMB/ (max) %dMB',
+                round(memory_get_usage(true) / 1024 / 1024),
+                memory_get_peak_usage(true) / 1024 / 1024)
+        );
     }
 
     /**
