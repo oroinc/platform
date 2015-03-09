@@ -14,10 +14,12 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
      * @var ContextAccessor
      */
     protected $contextAccessor;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|JobExecutor
      */
     protected $jobExecutor;
+
     /**
      * @var ExecuteJobAction
      */

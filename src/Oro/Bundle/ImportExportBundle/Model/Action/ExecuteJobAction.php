@@ -24,14 +24,20 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 class ExecuteJobAction extends AbstractAction
 {
     const NAME = 'execute_job';
+
     /** @var string */
+
     protected $jobType;
+
     /** @var string */
     protected $jobName;
+
     /** @var array */
     protected $configuration;
+
     /** @var string */
     protected $attribute;
+
     /** @var JobExecutor */
     protected $jobExecutor;
 

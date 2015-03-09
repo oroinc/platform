@@ -85,7 +85,9 @@
     }
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
     border-left: 1px solid @baseGradientColorBorder;
-    a.help:hover, .dropdown > .dropdown-toggle:hover {
+    a.help:hover,
+    .dropdown > .dropdown-toggle:hover,
+    .dropdown > .oro-dropdown-toggle:hover{
       #gradient > .vertical(lighten(@baseGradientColorStart, 3%), lighten(@baseGradientColorEnd, 3%));
     }
     .dropdown {
