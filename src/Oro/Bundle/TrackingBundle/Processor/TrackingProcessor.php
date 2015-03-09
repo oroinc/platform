@@ -60,7 +60,10 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger = new NullLogger();
         }
 
-        $this->processVisits();
+        while ($this->processVisits()) {
+            $this->logger->notice('Try to process Next batch');
+        }
+
         //$this->identifyVisits();
         //$this->identifyPrevVisits();
     }
@@ -135,8 +138,8 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->set('entity.identifierDetected', ':detected')
                     ->where('entity.visitorUid = :visitorUid')
                     ->andWhere('entity.firstActionTime < :maxDate')
-                    ->andWhere('entity.identifierDetected = false')
-                    ->andWhere('entity.parsedUID = false OR entity.parsedUID IS NULL')
+                    ->andWhere('entity.identifierDetected = false OR entity.identifierDetected IS NULL')
+                    ->andWhere('entity.parsedUID IS NULL')
                     ->andWhere('entity.trackingWebsite  = :website')
                     ->setParameter('visitorUid', $visit->getVisitorUid())
                     ->setParameter('maxDate', $visit->getFirstActionTime())
@@ -167,8 +170,10 @@ class TrackingProcessor implements LoggerAwareInterface
 
         if ($entities) {
             $this->processTrackingVisits($entities);
-            $this->processVisits();
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -250,6 +255,8 @@ class TrackingProcessor implements LoggerAwareInterface
             $visit->setIdentifierDetected(false);
 
             $this->identifyTrackingVisit($visit);
+
+            $this->collectedVisits[$hash] = $visit;
         } else {
             if ($visit->getFirstActionTime() > $trackingEvent->getCreatedAt()) {
                 $visit->setFirstActionTime($trackingEvent->getCreatedAt());
@@ -257,10 +264,6 @@ class TrackingProcessor implements LoggerAwareInterface
             if ($visit->getLastActionTime() < $trackingEvent->getCreatedAt()) {
                 $visit->setLastActionTime($trackingEvent->getCreatedAt());
             }
-        }
-
-        if (!array_key_exists($hash, $this->collectedVisits)) {
-            $this->collectedVisits[$hash] = $visit;
         }
 
         return $visit;
