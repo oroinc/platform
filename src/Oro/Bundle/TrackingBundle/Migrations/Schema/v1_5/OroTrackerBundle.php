@@ -47,7 +47,7 @@ class OroTrackerBundle implements Migration
         $table->addColumn('last_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('parsing_count', 'integer', ['notnull' => false]);
         $table->addColumn('parsed_uid', 'integer', []);
-        $table->addColumn('identifier_detected', 'boolean', ['default' => false, 'notnull' => false]);
+        $table->addColumn('identifier_detected', 'boolean', ['default' => false, 'notnull' => true]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['website_id'], 'idx_d204b98018f45c82', []);
     }
