@@ -18,11 +18,13 @@ use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
 
+use Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider;
+
 class TrackingProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const TACKING_EVENT_ENTITY = 'OroTrackingBundle:TrackingEvent';
+    const TACKING_EVENT_ENTITY  = 'OroTrackingBundle:TrackingEvent';
     const TRACKING_VISIT_ENTITY = 'OroTrackingBundle:TrackingVisit';
 
     const BATCH_SIZE = 100;
@@ -36,12 +38,17 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var array */
     protected $eventDictionary = [];
 
+    /** @var  TrackingEventIdentificationProvider */
+    protected $trackingIdentification;
+
     /**
-     * @param ManagerRegistry $doctrine
+     * @param ManagerRegistry                     $doctrine
+     * @param TrackingEventIdentificationProvider $trackingIdentification
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, TrackingEventIdentificationProvider $trackingIdentification)
     {
-        $this->doctrine = $doctrine;
+        $this->doctrine               = $doctrine;
+        $this->trackingIdentification = $trackingIdentification;
     }
 
     /**
@@ -139,7 +146,6 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->getQuery()
                     ->execute();
             }
-
         }
 
         $this->getEntityManager()->clear();
@@ -153,7 +159,7 @@ class TrackingProcessor implements LoggerAwareInterface
         $queryBuilder = $this->getEntityManager()
             ->getRepository(self::TACKING_EVENT_ENTITY)
             ->createQueryBuilder('entity')
-            ->where('entity.parsed = false')
+            ->where('entity.parsed = false OR entity.parsed IS NULL')
             ->orderBy('entity.createdAt', 'ASC')
             ->setMaxResults(self::BATCH_SIZE);
 
@@ -223,8 +229,9 @@ class TrackingProcessor implements LoggerAwareInterface
         } else {
             $visit = $this->doctrine->getRepository(self::TRACKING_VISIT_ENTITY)->findOneBy(
                 [
-                    'visitorUid'     => $visitorUid,
-                    'userIdentifier' => $trackingEvent->getUserIdentifier()
+                    'visitorUid'      => $visitorUid,
+                    'userIdentifier'  => $trackingEvent->getUserIdentifier(),
+                    'trackingWebsite' => $trackingEvent->getWebsite()
                 ]
             );
         }
@@ -232,14 +239,14 @@ class TrackingProcessor implements LoggerAwareInterface
         if (!$visit) {
             $visit = new TrackingVisit();
             $visit->setParsedUID(0);
-            $visit->setTrackingWebsite($trackingEvent->getWebsite());
             $visit->setUserIdentifier($trackingEvent->getUserIdentifier());
             $visit->setVisitorUid($visitorUid);
             $visit->setFirstActionTime($trackingEvent->getCreatedAt());
             $visit->setLastActionTime($trackingEvent->getCreatedAt());
+            $visit->setTrackingWebsite($trackingEvent->getWebsite());
+            $visit->setIdentifierDetected(false);
 
-            $this->identifyTrackingVisit($visit, $trackingEvent, $decodedData);
-
+            $this->identifyTrackingVisit($visit);
         } else {
             if ($visit->getFirstActionTime() > $trackingEvent->getCreatedAt()) {
                 $visit->setFirstActionTime($trackingEvent->getCreatedAt());
@@ -269,7 +276,8 @@ class TrackingProcessor implements LoggerAwareInterface
         ) {
             $eventType = $this->eventDictionary[$event->getWebsite()->getId()][$event->getName()];
         } else {
-            $eventType = $this->getEntityManager()->getRepository('OroTrackingBundle:TrackingEventDictionary')
+            $eventType = $this->getEntityManager()
+                ->getRepository('OroTrackingBundle:TrackingEventDictionary')
                 ->findOneBy(
                     [
                         'name'    => $event->getName(),
@@ -292,31 +300,30 @@ class TrackingProcessor implements LoggerAwareInterface
 
     /**
      * @param TrackingVisit $visit
-     * @param TrackingEvent $event
-     * @param               $unserializedData
      */
-    protected function identifyTrackingVisit(TrackingVisit $visit, TrackingEvent $event, $unserializedData)
+    protected function identifyTrackingVisit(TrackingVisit $visit)
     {
-        //todo: refactor this method
-        $idArray = explode('; ', $event->getUserIdentifier());
-        $idData  = [];
-        array_walk(
-            $idArray,
-            function ($string) use (&$idData) {
-                $data             = explode('=', $string);
-                $idData[$data[0]] = $data[1];
-            }
-        );
+        /**
+         * try to identify visit
+         */
+        $idObj = $this->trackingIdentification->identify($visit);
+        if ($idObj) {
+            /**
+             * if identification was successful we should:
+             *  - assign visit to target
+             *  - assign all previous visits to same identified object(s).
+             */
+            //$visit->setIdentifierTarget($idObj['targetObject']);
 
-        if (array_key_exists('id', $idData) && $idData['id'] !== 'guest') {
-            $customerId = $idData['id'];
-            $visit->setParsedUID($customerId);
+            $this->logger->notice('-- ' . $idObj['parsedUID']);
+            $this->logger->notice('-- ' . $idObj['targetObject']->getFirstName() . ' ' . $idObj['targetObject']->getLastName());
 
-            $customer = $this->getEntityManager()->getRepository('OroCRMMagentoBundle:Customer')
-                ->findOneBy(['originId' => $customerId]);
-            if ($customer) {
-                $visit->setIdentifierTarget($customer);
-                $visit->setIdentifierDetected(true);
+            if ($idObj['parsedUID'] !== null) {
+                $visit->setParsedUID($idObj['parsedUID']);
+                if ($idObj['targetObject']) {
+                    $visit->setIdentifierTarget($idObj['targetObject']);
+                    $visit->setIdentifierDetected(true);
+                }
             }
         }
     }

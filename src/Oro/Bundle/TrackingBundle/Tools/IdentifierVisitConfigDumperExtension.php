@@ -10,12 +10,12 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDum
 
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
-use Oro\Bundle\TrackingBundle\Provider\TrackingEventMappingProvider;
+use Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider;
 
 class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
-    /** @var TrackingEventMappingProvider */
-    protected $mappingProvider;
+    /** @var  TrackingEventIdentificationProvider */
+    protected $identifyProvider;
 
     /** @var array */
     protected $targetEntities;
@@ -27,16 +27,16 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
     protected $associationBuilder;
 
     /**
-     * @param TrackingEventMappingProvider $mappingProvider
-     * @param ConfigManager             $configManager
-     * @param AssociationBuilder        $associationBuilder
+     * @param TrackingEventIdentificationProvider $identifyProvider
+     * @param ConfigManager                       $configManager
+     * @param AssociationBuilder                  $associationBuilder
      */
     public function __construct(
-        TrackingEventMappingProvider $mappingProvider,
+        TrackingEventIdentificationProvider $identifyProvider,
         ConfigManager $configManager,
         AssociationBuilder $associationBuilder
     ) {
-        $this->mappingProvider = $mappingProvider;
+        $this->identifyProvider   = $identifyProvider;
         $this->configManager      = $configManager;
         $this->associationBuilder = $associationBuilder;
     }
@@ -79,7 +79,7 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
     protected function getTargetEntities()
     {
         if (null === $this->targetEntities) {
-            $targetEntityClasses       = $this->mappingProvider->getIdentifierEntities();
+            $targetEntityClasses       = $this->identifyProvider->getTargetEntities();
             $this->targetEntityConfigs = [];
 
             $configs = $this->configManager->getProvider('extend')->getConfigs();

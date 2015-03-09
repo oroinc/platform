@@ -12,8 +12,9 @@ parameters:
     oro_tracking.config.listener:                        Oro\Bundle\TrackingBundle\EventListener\ConfigListener
     oro_tracking.entity_config_dumper.visit_identifier.extension.class: Oro\Bundle\TrackingBundle\Tools\IdentifierVisitConfigDumperExtension
     oro_tracking.entity_generator.visit_identifie.extension.class:     Oro\Bundle\TrackingBundle\Tools\IdentifierVisitGeneratorExtension
-    oro_tracking.provider.mapping_provider.class:        Oro\Bundle\TrackingBundle\Provider\TrackingEventMappingProvider
     oro_tracking.processor.tracking_processor.class:     Oro\Bundle\TrackingBundle\Processor\TrackingProcessor
+
+    oro_tracking.provider.identifier_provider.class: Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider
 
 services:
     oro_tracking.form.type.tracking_website:
@@ -96,7 +97,7 @@ services:
     oro_tracking.entity_config_dumper.visit_identifier.extension:
         class: %oro_tracking.entity_config_dumper.visit_identifier.extension.class%
         arguments:
-            - @oro_tracking.provider.mapping_provider
+            - @oro_tracking.provider.identifier_provider
             - @oro_entity_config.config_manager
             - @oro_entity_extend.association_builder
         tags:
@@ -107,10 +108,14 @@ services:
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
-    oro_tracking.provider.mapping_provider:
-        class: %oro_tracking.provider.mapping_provider.class%
-
     oro_tracking.processor.tracking_processor:
         class: %oro_tracking.processor.tracking_processor.class%
         arguments:
             - @doctrine
+            - @oro_tracking.provider.identifier_provider
+
+    #
+    # Chain provider for identicating tracking visit
+    #
+    oro_tracking.provider.identifier_provider:
+        class: %oro_tracking.provider.identifier_provider.class%
