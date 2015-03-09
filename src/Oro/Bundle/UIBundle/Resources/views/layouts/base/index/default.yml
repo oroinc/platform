@@ -20,13 +20,13 @@ oro_layout:
                     blockType: container
                 nav_buttons:
                     blockType: container
-                index_navButtons_before_placeholder:
+                nav_buttons_before:
                     blockType: placeholder
                     options:
                         placeholder_name: index_navButtons_before
                         placeholder_parameters:
                             entity_class: { @value: $context.entity_class }
-                index_navButtons_after_placeholder:
+                nav_buttons_after:
                     blockType: placeholder
                     options:
                         placeholder_name: index_navButtons_after
@@ -38,6 +38,6 @@ oro_layout:
                         page_header_left_panel:
                             page_title: ~
                         page_buttons_panel:
-                            index_navButtons_before_placeholder: ~
+                            nav_buttons_before: ~
                             nav_buttons: ~
-                            index_navButtons_after_placeholder: ~
+                            nav_buttons_after: ~

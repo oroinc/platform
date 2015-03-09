@@ -6,3 +6,14 @@
         {% endif %}
     </div>
 {% endblock %}
+
+{% block _page_content_widget %}
+    <div class="layout-content">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _navigation_content_tags_widget %}
+    {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
+    {{ navigationMacro.navigationContentTags(entity) }}
+{% endblock %}

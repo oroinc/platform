@@ -27,14 +27,14 @@ class EntityClassContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test\Class', $context['entity_class']);
     }
 
-    public function testEntityClassIsOptional()
+    public function testEntityClassDefaultValue()
     {
         $context = new LayoutContext();
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertFalse(isset($context['entity_class']));
+        $this->assertNull($context['entity_class']);
     }
 
     public function testEntityClassIsSetBasedOnEntityData()

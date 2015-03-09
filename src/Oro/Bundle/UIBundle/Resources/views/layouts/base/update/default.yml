@@ -14,6 +14,10 @@ oro_layout:
             items:
                 'form:start':
                     blockType: form_start
+                    options:
+                        attr:
+                            id: { @value: $context.form.name }
+                            data-collect: 'true'
                 form:
                     blockType: form_end
                     options:
@@ -36,17 +40,43 @@ oro_layout:
                             form_method: { @value: $context.form.method }
                 nav_buttons:
                     blockType: container
-                update_navButtons_before_placeholder:
+                nav_buttons_before:
                     blockType: placeholder
                     options:
                         placeholder_name: update_navButtons_before
                         placeholder_parameters:
                             entity: { @value: $data.entity }
-                update_navButtons_after_placeholder:
+                nav_buttons_after:
                     blockType: placeholder
                     options:
                         placeholder_name: update_navButtons_after
                         placeholder_parameters:
+                            entity: { @value: $data.entity }
+                page_actions_panel:
+                    blockType: container
+                    options:
+                        attr:
+                            class: inline-decorate
+                page_actions:
+                    blockType: container
+                page_actions_before:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: update_pageActions_before
+                        placeholder_parameters:
+                            entity: { @value: $data.entity }
+                page_actions_after:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: update_pageActions_after
+                        placeholder_parameters:
+                            entity: { @value: $data.entity }
+                page_content:
+                    blockType: container
+                navigation_content_tags:
+                    blockType: block
+                    options:
+                        vars:
                             entity: { @value: $data.entity }
             tree:
                 content:
@@ -56,7 +86,13 @@ oro_layout:
                             page_title: ~
                         page_header_right_panel:
                             page_buttons_panel:
-                                update_navButtons_before_placeholder: ~
+                                nav_buttons_before: ~
                                 nav_buttons: ~
-                                update_navButtons_after_placeholder: ~
+                                nav_buttons_after: ~
+                            page_actions_panel:
+                                page_actions_before: ~
+                                page_actions: ~
+                                page_actions_after: ~
+                    page_content: ~
+                    navigation_content_tags: ~
                     'form:end': ~

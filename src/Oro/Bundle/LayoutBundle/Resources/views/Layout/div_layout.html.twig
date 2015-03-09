@@ -97,7 +97,7 @@
 {%- endblock %}
 
 {% block link_widget -%}
-    <a{{ block('block_attributes') }} href="{{ path ?: path(route_name, route_parameters) }}">
+    <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
         {{- translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) -}}
     </a>
 {%- endblock %}

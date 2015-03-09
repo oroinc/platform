@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Layout\Extension;
 
+use Symfony\Component\OptionsResolver\Options;
+
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Component\Layout\ContextConfiguratorInterface;
@@ -19,19 +21,20 @@ class EntityClassContextConfigurator implements ContextConfiguratorInterface
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()
-            ->setOptional(['entity_class'])
+            ->setDefaults(
+                [
+                    'entity_class' => function (Options $options, $value) use ($context) {
+                        if (null === $value && $context->data()->has('entity')) {
+                            $entity = $context->data()->get('entity');
+                            if (is_object($entity)) {
+                                $value = ClassUtils::getClass($entity);
+                            }
+                        }
+
+                        return $value;
+                    }
+                ]
+            )
             ->setAllowedTypes(['entity_class' => ['string', 'null']]);
-
-        if ($context->has('entity_class')) {
-            return;
-        }
-        if (!$context->data()->has('entity')) {
-            return;
-        }
-
-        $entity = $context->data()->get('entity');
-        if (is_object($entity)) {
-            $context->set('entity_class', ClassUtils::getClass($entity));
-        }
     }
 }

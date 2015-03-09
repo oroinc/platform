@@ -10,7 +10,6 @@ use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 
