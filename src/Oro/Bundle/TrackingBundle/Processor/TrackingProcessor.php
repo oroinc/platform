@@ -136,7 +136,7 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->where('entity.visitorUid = :visitorUid')
                     ->andWhere('entity.firstActionTime < :maxDate')
                     ->andWhere('entity.identifierDetected = false')
-                    ->andWhere('entity.parsedUID  = 0')
+                    ->andWhere('entity.parsedUID = false OR entity.parsedUID IS NULL')
                     ->andWhere('entity.trackingWebsite  = :website')
                     ->setParameter('visitorUid', $visit->getVisitorUid())
                     ->setParameter('maxDate', $visit->getFirstActionTime())

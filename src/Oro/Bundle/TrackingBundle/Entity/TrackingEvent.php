@@ -88,7 +88,7 @@ class TrackingEvent extends ExtendTrackingEvent
     /**
      * @var bool
      *
-     * @ORM\Column(name="parsed", type="boolean", options={"default" = false}, nullable=true)
+     * @ORM\Column(name="parsed", type="boolean", nullable=true)
      */
     protected $parsed;
 

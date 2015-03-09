@@ -78,7 +78,7 @@ class TrackingVisit extends ExtendTrackingVisit
     /**
      * @var boolean
      *
-     * @ORM\Column(name="identifier_detected", type="boolean", options={"default" = false})
+     * @ORM\Column(name="identifier_detected", type="boolean", nullable=true)
      */
     protected $identifierDetected;
 
