@@ -176,7 +176,7 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function processTrackingVisits($entities)
     {
-        $this->logger->notice('Process batch');
+        $this->logger->notice('Process batch START - '. date('Y-m-d H:i:s'));
         $em = $this->getEntityManager();
 
         /** @var  TrackingEvent $event */
@@ -208,6 +208,9 @@ class TrackingProcessor implements LoggerAwareInterface
         $this->collectedVisits = [];
         $this->eventDictionary = [];
         $em->clear();
+
+        $this->logger->notice('Process batch END - ' . date('Y-m-d H:i:s'));
+        $this->logger->notice('Memory used - ' . memory_get_peak_usage());
     }
 
     /**
