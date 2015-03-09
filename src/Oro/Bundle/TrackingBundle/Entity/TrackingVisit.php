@@ -76,6 +76,13 @@ class TrackingVisit extends ExtendTrackingVisit
     protected $parsedUID;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="identifier_detected", type="boolean")
+     */
+    protected $identifierDetected;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="parsing_count", type="integer", nullable=true)
@@ -247,5 +254,21 @@ class TrackingVisit extends ExtendTrackingVisit
         $this->parsedUID = $parsedUID;
 
         return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIdentifierDetected()
+    {
+        return $this->identifierDetected;
+    }
+
+    /**
+     * @param boolean $identifierDetected
+     */
+    public function setIdentifierDetected($identifierDetected)
+    {
+        $this->identifierDetected = $identifierDetected;
     }
 }

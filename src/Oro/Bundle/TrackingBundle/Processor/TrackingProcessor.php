@@ -4,16 +4,19 @@ namespace Oro\Bundle\TrackingBundle\Processor;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\Common\Util\ClassUtils;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TrackingBundle\Entity\TrackingEventDictionary;
 use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
+use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
 
 class TrackingProcessor implements LoggerAwareInterface
 {
@@ -50,13 +53,102 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger = new NullLogger();
         }
 
-        $this->processEntities();
+        $this->processVisits();
+        //$this->identifyVisits();
+        //$this->identifyPrevVisits();
+    }
+
+    protected function identifyVisits()
+    {
+
+    }
+
+    /**
+     *  Identify previous visits
+     */
+//    protected function identifyPrevVisits()
+//    {
+//        $this->logger->notice('Identify previous visits');
+//
+//        $queryBuilder = $this->getEntityManager()
+//            ->getRepository(self::TRACKING_VISIT_ENTITY)
+//            ->createQueryBuilder('entity')
+//            ->select('entity')
+//            ->where('entity.identifierDetected = true')
+//            ->orderBy('entity.firstActionTime', 'ASC');
+//
+//        $iterator = new BufferedQueryResultIterator($queryBuilder);
+//        $iterator->setBufferSize(self::BATCH_SIZE);
+//        $itemsCount = 0;
+//        $entities   = [];
+//
+//        foreach ($iterator as $entity) {
+//            $entities[] = $entity;
+//            $itemsCount++;
+//
+//            if (0 == $itemsCount % self::BATCH_SIZE) {
+//                $this->updateVisits($entities);
+//                $entities = [];
+//            }
+//        }
+//
+//        if ($itemsCount % static::BATCH_SIZE > 0) {
+//            $this->updateVisits($entities);
+//        }
+//    }
+
+    /**
+     * Identify previous visits
+     *
+     * @param array $entities
+     */
+    protected function updateVisits($entities)
+    {
+        /** @var TrackingVisit $visit */
+        foreach ($entities as $visit) {
+            $this->logger->notice(
+                sprintf(
+                    'Process visit id: %s, visitorUid: %s',
+                    $visit->getId(),
+                    $visit->getVisitorUid()
+                )
+            );
+
+            $identifier = $visit->getIdentifierTarget();
+            if ($identifier) {
+                $associationName = ExtendHelper::buildAssociationName(
+                    ClassUtils::getClass($identifier),
+                    IdentifierEventExtension::ASSOCIATION_KIND
+                );
+
+                $this->getEntityManager()
+                    ->createQueryBuilder()
+                    ->update(self::TRACKING_VISIT_ENTITY, 'entity')
+                    ->set('entity.' . $associationName, ':identifier')
+                    ->set('entity.identifierDetected', ':detected')
+                    ->where('entity.visitorUid = :visitorUid')
+                    ->andWhere('entity.firstActionTime < :maxDate')
+                    ->andWhere('entity.identifierDetected = false')
+                    ->andWhere('entity.parsedUID  = 0')
+                    ->andWhere('entity.trackingWebsite  = :website')
+                    ->setParameter('visitorUid', $visit->getVisitorUid())
+                    ->setParameter('maxDate', $visit->getFirstActionTime())
+                    ->setParameter('website', $visit->getTrackingWebsite())
+                    ->setParameter('identifier', $identifier)
+                    ->setParameter('detected', true)
+                    ->getQuery()
+                    ->execute();
+            }
+
+        }
+
+        $this->getEntityManager()->clear();
     }
 
     /**
      * Collect new tracking visits with tracking visit events
      */
-    protected function processEntities()
+    protected function processVisits()
     {
         $queryBuilder = $this->getEntityManager()
             ->getRepository(self::TACKING_EVENT_ENTITY)
@@ -69,7 +161,7 @@ class TrackingProcessor implements LoggerAwareInterface
 
         if ($entities) {
             $this->processTrackingVisits($entities);
-            $this->processEntities();
+            $this->processVisits();
         }
     }
 
@@ -89,7 +181,7 @@ class TrackingProcessor implements LoggerAwareInterface
 
             $trackingVisitEvent->setEvent($this->getEventType($event));
 
-            $eventData = $event->getEventData();
+            $eventData   = $event->getEventData();
             $decodedData = json_decode($eventData->getData());
 
             $trackingVisit = $this->getTrackingVisit($event, $decodedData);
@@ -104,6 +196,9 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         $em->flush();
+
+        $this->updateVisits($this->collectedVisits);
+
         $this->collectedVisits = [];
         $this->eventDictionary = [];
         $em->clear();
@@ -117,7 +212,7 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function getTrackingVisit(TrackingEvent $trackingEvent, $decodedData)
     {
-        $visitorUid = $decodedData->_id;
+        $visitorUid     = $decodedData->_id;
         $userIdentifier = $trackingEvent->getUserIdentifier();
 
         $hash = md5($visitorUid . $userIdentifier);
@@ -128,7 +223,7 @@ class TrackingProcessor implements LoggerAwareInterface
         } else {
             $visit = $this->doctrine->getRepository(self::TRACKING_VISIT_ENTITY)->findOneBy(
                 [
-                    'visitorUid' => $visitorUid,
+                    'visitorUid'     => $visitorUid,
                     'userIdentifier' => $trackingEvent->getUserIdentifier()
                 ]
             );
@@ -177,7 +272,7 @@ class TrackingProcessor implements LoggerAwareInterface
             $eventType = $this->getEntityManager()->getRepository('OroTrackingBundle:TrackingEventDictionary')
                 ->findOneBy(
                     [
-                        'name' => $event->getName(),
+                        'name'    => $event->getName(),
                         'website' => $event->getWebsite()
                     ]
                 );
@@ -204,11 +299,11 @@ class TrackingProcessor implements LoggerAwareInterface
     {
         //todo: refactor this method
         $idArray = explode('; ', $event->getUserIdentifier());
-        $idData = [];
+        $idData  = [];
         array_walk(
             $idArray,
-            function($string) use (&$idData){
-                $data = explode('=', $string);
+            function ($string) use (&$idData) {
+                $data             = explode('=', $string);
                 $idData[$data[0]] = $data[1];
             }
         );
@@ -221,32 +316,7 @@ class TrackingProcessor implements LoggerAwareInterface
                 ->findOneBy(['originId' => $customerId]);
             if ($customer) {
                 $visit->setIdentifierTarget($customer);
-                $this->identifyPrevVisits($visit, $customer);
-            }
-        }
-    }
-
-    protected function identifyPrevVisits(TrackingVisit $visit, $identifier)
-    {
-        /** @var QueryBuilder $qb */
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('entity');
-        $visitors = $qb->from('OroTrackingBundle:TrackingVisit', 'entity')
-            ->where('entity.visitor = :visitor')
-            ->andWhere('entity.firstActionTime < :maxDate')
-            ->andWhere('entity.customer is null')
-            ->andWhere('entity.trackingWebsite  = :website')
-            ->setParameter('visitor', $visit->getVisitorUid())
-            ->setParameter('maxDate', $visit->getFirstActionTime())
-            ->setParameter('website', $visit->getTrackingWebsite())
-            ->getQuery()
-            ->getResult();
-
-        if (!empty($visitors)) {
-            /** @var TrackingVisit $visitorObject */
-            foreach ($visitors as $visitorObject) {
-                $visitorObject->setIdentifierTarget($identifier);
-                $this->getEntityManager()->persist($visitorObject);
+                $visit->setIdentifierDetected(true);
             }
         }
     }
