@@ -48,8 +48,24 @@
     {% endif %}
 {% endblock %}
 
+{% block form_start_widget %}
+    {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
+    {% if method is defined and method not in ['GET', 'POST'] -%}
+        {% set form_method = 'POST' %}
+    {%- endif -%}
+    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ with_page_parameters ? oro_url_add_query(action) : action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+    {%- if form_method is defined -%}
+        <input type="hidden" name="_method" value="{{ method }}" />
+    {%- endif -%}
+{% endblock %}
+
+{% block form_end_widget %}
+    {{ form_end(form) }}
+    {{ oro_form_js_validation(form) }}
+{% endblock %}
+
 {% block link_widget -%}
-    {% set href = path ?: path(route_name, route_parameters) -%}
+    {% set href = path is defined ? path : path(route_name, route_parameters) -%}
     <a{{ block('block_attributes') }} href="{{ with_page_parameters ? oro_url_add_query(href) : href }}">
         {{- translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) -}}
     </a>
@@ -71,10 +87,16 @@
 
 {% block datagrid_widget %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-    {% if grid_scope is defined %}
-        {% set grid_name = oro_datagrid_build_fullname(grid_name, grid_scope) %}
-    {% endif %}
-    {{ dataGrid.renderGrid(grid_name, params) }}
+    {{ dataGrid.renderGrid(grid_full_name, grid_parameters) }}
+{% endblock %}
+
+{% block taggable_datagrid_widget %}
+    {{ block_widget(block) }}
+    <script type="text/javascript">
+        require(['oronavigation/js/content/grid-builder'], function (GridTagBuilder) {
+            GridTagBuilder.allowTracking({{ grid_full_name|json_encode|raw }});
+        });
+    </script>
 {% endblock %}
 
 {% block _debug_init_script_widget %}
@@ -200,4 +222,52 @@
     <div id="container" class="scrollable-container">
         {{ block_widget(block) }}
     </div>
+{% endblock %}
+
+{% block _page_header_panel_widget %}
+    <div class="container-fluid page-title">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_widget %}
+    <div class="navigation clearfix navbar-extra navbar-extra-right">
+        <div class="row">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_header_left_panel_widget %}
+    <div class="pull-left pull-left-extra">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_right_panel_widget %}
+    <div class="pull-right">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_buttons_panel_widget %}
+    <div class="pull-right title-buttons-container">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_actions_panel_widget %}
+    <div class="pull-right user-info-state">
+        <div class="inline-decorate-container">
+            <ul{{ block('block_attributes') }}>
+                {{ block_widget(block) }}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_actions_widget %}
+    {% for child in block if child.vars.visible -%}
+        <li>{{ block_widget(child) }}</li>
+    {%- endfor %}
 {% endblock %}

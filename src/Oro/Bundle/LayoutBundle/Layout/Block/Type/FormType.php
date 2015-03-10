@@ -2,19 +2,15 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
-use Oro\Component\Layout\Block\Type\AbstractContainerType;
-use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
 
 /**
@@ -25,7 +21,7 @@ use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
  *  group id = $options['form_group_prefix'] + group name
  *      for example: form:group_myGroup where 'form:group_' is the prefix
  */
-class FormType extends AbstractContainerType
+class FormType extends AbstractFormType
 {
     const NAME = 'form';
 
@@ -45,9 +41,9 @@ class FormType extends AbstractContainerType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        parent::setDefaultOptions($resolver);
         $resolver->setDefaults(
             [
-                'form_name'         => 'form',
                 // example: ['jobTitle', 'user.lastName']
                 'preferred_fields'  => [],
                 // example:
@@ -62,30 +58,36 @@ class FormType extends AbstractContainerType
                 //   ]
                 // ]
                 'groups'            => [],
+                'form_prefix'       => null,
                 'form_field_prefix' => null,
                 'form_group_prefix' => null
             ]
         );
         $resolver->setAllowedTypes(
             [
-                'form_name'         => 'string',
                 'preferred_fields'  => 'array',
                 'groups'            => 'array',
+                'form_prefix'       => 'string',
                 'form_field_prefix' => 'string',
                 'form_group_prefix' => 'string'
             ]
         );
         $resolver->setNormalizers(
             [
-                'form_field_prefix' => function (Options $options, $fieldPrefix) {
-                    return $fieldPrefix === null
-                        ? $options['form_name'] . '_'
-                        : $fieldPrefix;
+                'form_prefix'       => function (Options $options, $value) {
+                    return $value === null
+                        ? $options['form_name']
+                        : $value;
                 },
-                'form_group_prefix' => function (Options $options, $fieldPrefix) {
-                    return $fieldPrefix === null
-                        ? $options['form_name'] . ':group_'
-                        : $fieldPrefix;
+                'form_field_prefix' => function (Options $options, $value) {
+                    return $value === null
+                        ? $options['form_prefix'] . '_'
+                        : $value;
+                },
+                'form_group_prefix' => function (Options $options, $value) {
+                    return $value === null
+                        ? $options['form_prefix'] . ':group_'
+                        : $value;
                 }
             ]
         );
@@ -96,18 +98,7 @@ class FormType extends AbstractContainerType
      */
     public function buildBlock(BlockBuilderInterface $builder, array $options)
     {
-        $formAccessor = $builder->getContext()->get($options['form_name']);
-        if ($formAccessor instanceof FormInterface) {
-            // replace the form with the form accessor
-            $formAccessor = new FormAccessor($formAccessor);
-            $builder->getContext()->set($options['form_name'], $formAccessor);
-        } elseif (!$formAccessor instanceof FormAccessorInterface) {
-            throw new UnexpectedTypeException(
-                $formAccessor,
-                'Symfony\Component\Form\FormInterface or Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface',
-                sprintf('context[%s]', $options['form_name'])
-            );
-        }
+        $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
 
         $this->formLayoutBuilder->build($formAccessor, $builder, $options);
     }
@@ -117,8 +108,8 @@ class FormType extends AbstractContainerType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        /** @var FormAccessorInterface $formAccessor */
-        $formAccessor       = $block->getContext()->get($options['form_name']);
+        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+
         $view->vars['form'] = $formAccessor->getView();
     }
 
@@ -127,11 +118,11 @@ class FormType extends AbstractContainerType
      */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
+        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+
         // prevent form fields rendering by form_rest() method,
         // if the corresponding layout block has been removed
-        /** @var FormAccessorInterface $formAccessor */
-        $formAccessor = $block->getContext()->get($options['form_name']);
-        $rootView     = null;
+        $rootView = null;
         foreach ($formAccessor->getProcessedFields() as $formFieldPath => $blockId) {
             if (isset($view[$blockId])) {
                 $this->checkExistingFieldView($view, $view[$blockId], $formFieldPath);
@@ -157,6 +148,14 @@ class FormType extends AbstractContainerType
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return ContainerType::NAME;
     }
 
     /**

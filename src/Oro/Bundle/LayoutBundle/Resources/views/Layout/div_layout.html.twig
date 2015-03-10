@@ -69,6 +69,21 @@
     </body>
 {% endblock %}
 
+{% block form_start_widget %}
+    {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
+    {% if method is defined and method not in ['GET', 'POST'] -%}
+        {% set form_method = 'POST' %}
+    {%- endif -%}
+    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+    {%- if form_method is defined -%}
+        <input type="hidden" name="_method" value="{{ method }}" />
+    {%- endif -%}
+{% endblock %}
+
+{% block form_end_widget %}
+    {{ form_end(form) }}
+{% endblock %}
+
 {% block form_field_widget %}
     {{ form_row(form) }}
 {% endblock %}
@@ -85,7 +100,7 @@
 {%- endblock %}
 
 {% block link_widget -%}
-    <a{{ block('block_attributes') }} href="{{ path ?: path(route_name, route_parameters) }}">
+    <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
         {{- translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) -}}
     </a>
 {%- endblock %}

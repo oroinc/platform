@@ -46,6 +46,16 @@ services:
         tags:
              - { name: layout.block_type, alias: form }
 
+    oro_layout.block_type.form_start:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType
+        tags:
+             - { name: layout.block_type, alias: form_start }
+
+    oro_layout.block_type.form_end:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormEndType
+        tags:
+             - { name: layout.block_type, alias: form_end }
+
     oro_layout.block_type.form_field:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType
         tags:

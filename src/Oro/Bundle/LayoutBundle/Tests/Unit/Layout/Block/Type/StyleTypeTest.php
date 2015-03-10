@@ -23,8 +23,16 @@ class StyleTypeTest extends BlockTypeTestCase
             )
         );
         $this->assertEquals(
-            ['type' => 'text/css', 'content' => 'test content'],
-            $this->resolveOptions(StyleType::NAME, ['content' => 'test content'])
+            [
+                'type'        => 'text/css',
+                'content'     => 'test content',
+                'media'       => '(max-width: 800px)',
+                'crossorigin' => 'anonymous'
+            ],
+            $this->resolveOptions(
+                StyleType::NAME,
+                ['content' => 'test content', 'media' => '(max-width: 800px)', 'crossorigin' => 'anonymous']
+            )
         );
     }
 
@@ -38,6 +46,8 @@ class StyleTypeTest extends BlockTypeTestCase
         $this->assertEquals('text/css', $view->vars['attr']['type']);
         $this->assertEquals('test.css', $view->vars['attr']['href']);
         $this->assertSame('', $view->vars['content']);
+        $this->assertFalse(isset($view->vars['attr']['media']));
+        $this->assertFalse(isset($view->vars['attr']['crossorigin']));
     }
 
     public function testBuildViewWithFalseValueForScoped()
@@ -66,10 +76,14 @@ class StyleTypeTest extends BlockTypeTestCase
     {
         $view = $this->getBlockView(
             StyleType::NAME,
-            ['content' => 'test content']
+            ['content' => 'test content', 'media' => '(max-width: 800px)', 'crossorigin' => 'anonymous']
         );
 
         $this->assertEquals('test content', $view->vars['content']);
+        $this->assertEquals('(max-width: 800px)', $view->vars['attr']['media']);
+        $this->assertEquals('anonymous', $view->vars['attr']['crossorigin']);
+        $this->assertFalse(isset($view->vars['attr']['href']));
+        $this->assertFalse(isset($view->vars['attr']['scoped']));
     }
 
     public function testGetName()

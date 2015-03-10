@@ -29,12 +29,34 @@ class MetaTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testBuildView()
+    public function testBuildViewCharset()
+    {
+        $view = $this->getBlockView(MetaType::NAME, ['charset' => 'UTF-8']);
+
+        $this->assertEquals('UTF-8', $view->vars['attr']['charset']);
+        $this->assertFalse(isset($view->vars['attr']['http-equiv']));
+        $this->assertFalse(isset($view->vars['attr']['content']));
+        $this->assertFalse(isset($view->vars['attr']['name']));
+    }
+
+    public function testBuildViewDescription()
+    {
+        $view = $this->getBlockView(MetaType::NAME, ['name' => 'description', 'content' => 'Test']);
+
+        $this->assertEquals('description', $view->vars['attr']['name']);
+        $this->assertEquals('Test', $view->vars['attr']['content']);
+        $this->assertFalse(isset($view->vars['attr']['charset']));
+        $this->assertFalse(isset($view->vars['attr']['http-equiv']));
+    }
+
+    public function testBuildViewHttpEquiv()
     {
         $view = $this->getBlockView(MetaType::NAME, ['http_equiv' => 'refresh', 'content' => '30']);
 
         $this->assertEquals('refresh', $view->vars['attr']['http-equiv']);
         $this->assertEquals('30', $view->vars['attr']['content']);
+        $this->assertFalse(isset($view->vars['attr']['charset']));
+        $this->assertFalse(isset($view->vars['attr']['name']));
     }
 
     public function testGetName()

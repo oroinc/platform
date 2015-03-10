@@ -25,17 +25,18 @@ class FormTypeTest extends BlockTypeTestCase
     public function optionsDataProvider()
     {
         return [
-            'no options'     => [
+            'no options'                     => [
                 'options'  => [],
                 'expected' => [
                     'form_name'         => 'form',
                     'preferred_fields'  => [],
                     'groups'            => [],
+                    'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_',
                     'form_group_prefix' => 'form:group_'
                 ]
             ],
-            'with form_name' => [
+            'with form_name'                 => [
                 'options'  => [
                     'form_name' => 'test'
                 ],
@@ -43,15 +44,31 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name'         => 'test',
                     'preferred_fields'  => [],
                     'groups'            => [],
+                    'form_prefix'       => 'test',
                     'form_field_prefix' => 'test_',
                     'form_group_prefix' => 'test:group_'
                 ]
             ],
-            'all options'    => [
+            'with form_name and form_prefix' => [
+                'options'  => [
+                    'form_name'   => 'test_form',
+                    'form_prefix' => 'test_prefix'
+                ],
+                'expected' => [
+                    'form_name'         => 'test_form',
+                    'preferred_fields'  => [],
+                    'groups'            => [],
+                    'form_prefix'       => 'test_prefix',
+                    'form_field_prefix' => 'test_prefix_',
+                    'form_group_prefix' => 'test_prefix:group_'
+                ]
+            ],
+            'all options'                    => [
                 'options'  => [
                     'form_name'         => 'test',
                     'preferred_fields'  => ['field1'],
                     'groups'            => ['group1' => ['title' => 'TestGroup']],
+                    'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_field_prefix_',
                     'form_group_prefix' => 'form_group_prefix_'
                 ],
@@ -59,6 +76,7 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name'         => 'test',
                     'preferred_fields'  => ['field1'],
                     'groups'            => ['group1' => ['title' => 'TestGroup']],
+                    'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_field_prefix_',
                     'form_group_prefix' => 'form_group_prefix_'
                 ]
@@ -66,44 +84,7 @@ class FormTypeTest extends BlockTypeTestCase
         ];
     }
 
-    public function testBuildBlockWithForm()
-    {
-        $formName = 'test_form';
-
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-
-        $this->context->set($formName, $form);
-
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
-        $builder->expects($this->any())
-            ->method('getContext')
-            ->will($this->returnValue($this->context));
-
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
-
-        $type    = new FormType($formLayoutBuilder);
-        $options = $this->resolveOptions(
-            $type,
-            ['form_name' => $formName]
-        );
-
-        $formLayoutBuilder->expects($this->once())
-            ->method('build')
-            ->with(
-                $this->isInstanceOf('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor'),
-                $this->identicalTo($builder),
-                $options
-            );
-
-        $type->buildBlock($builder, $options);
-
-        $this->assertInstanceOf(
-            'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor',
-            $this->context->get($formName)
-        );
-    }
-
-    public function testBuildBlockWithFormAccessor()
+    public function testBuildBlock()
     {
         $formName = 'test_form';
 
@@ -158,7 +139,7 @@ class FormTypeTest extends BlockTypeTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Symfony\Component\Form\FormInterface or Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface", "integer" given.
+     * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface", "integer" given.
      */
     // @codingStandardsIgnoreEnd
     public function testBuildBlockWithInvalidForm()
@@ -185,7 +166,6 @@ class FormTypeTest extends BlockTypeTestCase
         $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
         $type              = new FormType($formLayoutBuilder);
 
-        $formName     = 'form';
         $view         = new BlockView();
         $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
@@ -197,11 +177,15 @@ class FormTypeTest extends BlockTypeTestCase
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
-        $formAccessor->expects($this->once())
+        $formAccessor->expects($this->any())
             ->method('getView')
             ->will($this->returnValue($formView));
 
-        $type->buildView($view, $block, ['form_name' => $formName]);
+        $type->buildView(
+            $view,
+            $block,
+            ['form_name' => 'form']
+        );
         $this->assertSame($formView, $view->vars['form']);
     }
 

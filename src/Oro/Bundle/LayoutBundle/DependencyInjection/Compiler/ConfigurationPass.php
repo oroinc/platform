@@ -138,7 +138,13 @@ class ConfigurationPass implements CompilerPassInterface
     {
         $configurators = [];
         foreach ($container->findTaggedServiceIds(self::CONTEXT_CONFIGURATOR_TAG_NAME) as $serviceId => $tag) {
-            $configurators[] = $serviceId;
+            $priority = isset($tag[0]['priority']) ? $tag[0]['priority'] : 0;
+
+            $configurators[$priority][] = $serviceId;
+        }
+        if (!empty($configurators)) {
+            ksort($configurators);
+            $configurators = call_user_func_array('array_merge', $configurators);
         }
 
         return $configurators;

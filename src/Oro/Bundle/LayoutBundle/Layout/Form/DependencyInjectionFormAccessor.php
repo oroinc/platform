@@ -16,14 +16,30 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor
     /** @var FormInterface */
     protected $form;
 
+    /** @var string */
+    protected $hash;
+
     /**
-     * @param ContainerInterface $container
-     * @param string             $formServiceId
+     * @param ContainerInterface $container     The DI container
+     * @param string             $formServiceId The id of the form service in DI container
+     * @param FormAction|null    $action        The submit action of the form
+     * @param string|null        $method        The submit method of the form
+     * @param string|null        $enctype       The encryption type of the form
      */
-    public function __construct(ContainerInterface $container, $formServiceId)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        $formServiceId,
+        FormAction $action = null,
+        $method = null,
+        $enctype = null
+    ) {
         $this->container     = $container;
         $this->formServiceId = $formServiceId;
+        $this->action        = $action;
+        $this->method        = $method;
+        $this->enctype       = $enctype;
+
+        $this->hash = $this->buildHash($formServiceId, $action, $method, $enctype);
     }
 
     /**
@@ -43,6 +59,6 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor
      */
     public function toString()
     {
-        return $this->formServiceId;
+        return $this->hash;
     }
 }

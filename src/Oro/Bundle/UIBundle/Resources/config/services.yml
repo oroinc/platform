@@ -98,12 +98,19 @@ services:
         tags:
             - { name: oro_layout.expression, alias: asset }
 
+    oro_ui.layout_expression.encode_class:
+        class: Oro\Bundle\UIBundle\ConfigExpression\EncodeClass
+        arguments:
+            - @oro_entity.routing_helper
+        tags:
+            - { name: oro_layout.expression, alias: encode_class }
+
     oro_ui.layout_context_configurator.widget:
         class: Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator
         calls:
             - [setRequest, [@?request=]]
         tags:
-            - { name: layout.context_configurator }
+            - { name: layout.context_configurator, priority: -100 }
 
     oro_ui.layout_context_configurator.user_agent:
         class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
@@ -125,6 +132,20 @@ services:
             - @oro_config.user
             - # alias: config key
                 navbar_position: oro_ui.navbar_position
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_ui.layout_context_configurator.entity_config:
+        class: Oro\Bundle\UIBundle\Layout\Extension\EntityConfigContextConfigurator
+        arguments:
+            - @oro_entity_config.config_manager
+            - # alias: [scope, code]
+                entity_auditable: [dataaudit, auditable]
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_ui.layout_context_configurator.entity_class:
+        class: Oro\Bundle\UIBundle\Layout\Extension\EntityClassContextConfigurator
         tags:
             - { name: layout.context_configurator }
 
@@ -153,6 +174,8 @@ services:
 
     oro_ui.block_type.datagrid:
         class: Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType
+        arguments:
+            - @oro_datagrid.datagrid.name_strategy
         tags:
              - { name: layout.block_type, alias: datagrid }
 
@@ -160,6 +183,16 @@ services:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
         tags:
             - { name: layout.block_type_extension, alias: link }
+
+    oro_ui.block_type_extension.taggable_datagrid:
+        class: Oro\Bundle\UIBundle\Layout\Block\Extension\TaggableDatagridExtension
+        tags:
+            - { name: layout.block_type_extension, alias: datagrid }
+
+    oro_ui.block_type_extension.form_start:
+        class: Oro\Bundle\UIBundle\Layout\Block\Extension\FormStartExtension
+        tags:
+            - { name: layout.block_type_extension, alias: form_start }
 
     oro_ui.layout_loader.widget_action_voter:
         class:  Oro\Bundle\UIBundle\Layout\Loader\WidgetAndActionVoter
