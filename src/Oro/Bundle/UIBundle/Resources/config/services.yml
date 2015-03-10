@@ -174,6 +174,8 @@ services:
 
     oro_ui.block_type.datagrid:
         class: Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType
+        arguments:
+            - @oro_datagrid.datagrid.name_strategy
         tags:
              - { name: layout.block_type, alias: datagrid }
 
@@ -181,6 +183,11 @@ services:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
         tags:
             - { name: layout.block_type_extension, alias: link }
+
+    oro_ui.block_type_extension.taggable_datagrid:
+        class: Oro\Bundle\UIBundle\Layout\Block\Extension\TaggableDatagridExtension
+        tags:
+            - { name: layout.block_type_extension, alias: datagrid }
 
     oro_ui.block_type_extension.form_start:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\FormStartExtension

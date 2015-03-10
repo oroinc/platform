@@ -84,10 +84,16 @@
 
 {% block datagrid_widget %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-    {% if grid_scope is defined %}
-        {% set grid_name = oro_datagrid_build_fullname(grid_name, grid_scope) %}
-    {% endif %}
-    {{ dataGrid.renderGrid(grid_name, grid_parameters) }}
+    {{ dataGrid.renderGrid(grid_full_name, grid_parameters) }}
+{% endblock %}
+
+{% block taggable_datagrid_widget %}
+    {{ block_widget(block) }}
+    <script type="text/javascript">
+        require(['oronavigation/js/content/grid-builder'], function (GridTagBuilder) {
+            GridTagBuilder.allowTracking({{ grid_full_name|json_encode|raw }});
+        });
+    </script>
 {% endblock %}
 
 {% block _debug_init_script_widget %}
