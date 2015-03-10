@@ -92,14 +92,6 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $processedOrigins = array();
         $failedOriginIds = array();
         while (true) {
-            if ($maxExecTimeout !== false) {
-                $date = $this->getCurrentUtcDateTime();
-                if ($date->sub($maxExecTimeout) >= $startTime) {
-                    $this->logger->notice('Exit because allocated time frame elapsed.');
-                    break;
-                }
-            }
-
             $origin = $this->findOriginToSync($maxConcurrentTasks, $minExecIntervalInMin);
             if ($origin === null) {
                 $this->logger->notice('Exit because nothing to synchronise.');
@@ -109,6 +101,14 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             if (isset($processedOrigins[$origin->getId()])) {
                 $this->logger->notice('Exit because all origins have been synchronised.');
                 break;
+            }
+
+            if ($maxExecTimeout !== false) {
+                $date = $this->getCurrentUtcDateTime();
+                if ($date->sub($maxExecTimeout) >= $startTime) {
+                    $this->logger->notice('Exit because allocated time frame elapsed.');
+                    break;
+                }
             }
 
             $processedOrigins[$origin->getId()] = true;
