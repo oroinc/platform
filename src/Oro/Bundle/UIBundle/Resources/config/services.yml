@@ -172,6 +172,11 @@ services:
         tags:
              - { name: layout.block_type, alias: breadcrumbs }
 
+    oro_ui.block_type.datagrid:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType
+        tags:
+             - { name: layout.block_type, alias: datagrid }
+
     oro_ui.block_type_extension.link:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
         tags:
