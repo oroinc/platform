@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\DataConverter;
 
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 
@@ -36,7 +37,7 @@ abstract class AbstractTreeDataConverter extends IntegrationAwareDataConverter
         parent::setImportExportContext($context);
 
         foreach ($this->nodeDataConverters as $dataConverter) {
-            if ($dataConverter instanceof IntegrationAwareDataConverter) {
+            if ($dataConverter instanceof ContextAwareInterface) {
                 $dataConverter->setImportExportContext($context);
             }
         }
@@ -73,17 +74,24 @@ abstract class AbstractTreeDataConverter extends IntegrationAwareDataConverter
         $rules = $this->getHeaderConversionRules();
         $nodeData = [];
         foreach ($this->nodeDataConverters as $nodeKey => $dataConverter) {
-            if (!empty($exportedRecord[$nodeKey]) && is_array($exportedRecord[$nodeKey])) {
-                foreach ($exportedRecord[$nodeKey] as $key => $record) {
-                    $dataKey = array_search($nodeKey, $rules, true);
-                    if (false === $dataKey) {
-                        $dataKey = $nodeKey;
+            if (array_key_exists($nodeKey, $rules)) {
+                $dataKey = $rules[$nodeKey];
+            } else {
+                $dataKey = $nodeKey;
+            }
+            if (!empty($exportedRecord[$dataKey]) && is_array($exportedRecord[$dataKey])) {
+                if (empty($this->toManyDataConverters[$nodeKey])) {
+                    $nodeData[$nodeKey] = $dataConverter->convertToExportFormat(
+                        $exportedRecord[$dataKey],
+                        $skipNullValues
+                    );
+                } else {
+                    foreach ($exportedRecord[$dataKey] as $key => $record) {
+                        $nodeData[$nodeKey][$key] = $dataConverter->convertToExportFormat($record, $skipNullValues);
                     }
-                    $nodeData[$dataKey][$key] = $dataConverter->convertToExportFormat($record, $skipNullValues);
                 }
             }
-
-            unset($exportedRecord[$nodeKey]);
+            unset($exportedRecord[$dataKey]);
         }
 
         return array_merge(parent::convertToExportFormat($exportedRecord, $skipNullValues), $nodeData);

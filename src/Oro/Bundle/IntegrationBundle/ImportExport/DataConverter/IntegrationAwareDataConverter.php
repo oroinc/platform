@@ -26,7 +26,7 @@ abstract class IntegrationAwareDataConverter extends AbstractTableDataConverter 
      */
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
-        if ($this->context && empty($importedRecord['channel_id'])) {
+        if ($this->context && $this->context->hasOption('channel')) {
             $importedRecord['channel:id'] = $this->context->getOption('channel');
         }
 
