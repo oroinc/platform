@@ -172,7 +172,7 @@ class JobExecutor
      */
     protected function isTransactionRunning()
     {
-       return $this->entityManager->getConnection()->getTransactionNestingLevel() !== 0;
+        return $this->entityManager->getConnection()->getTransactionNestingLevel() !== 0;
     }
 
     /**
