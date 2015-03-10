@@ -23,8 +23,15 @@ class ScriptTypeTest extends BlockTypeTestCase
             )
         );
         $this->assertEquals(
-            ['type' => 'text/javascript', 'content' => 'test content'],
-            $this->resolveOptions(ScriptType::NAME, ['content' => 'test content'])
+            [
+                'type'        => 'text/javascript',
+                'content'     => 'test content',
+                'crossorigin' => 'anonymous'
+            ],
+            $this->resolveOptions(
+                ScriptType::NAME,
+                ['content' => 'test content', 'crossorigin' => 'anonymous']
+            )
         );
     }
 
@@ -68,10 +75,14 @@ class ScriptTypeTest extends BlockTypeTestCase
     {
         $view = $this->getBlockView(
             ScriptType::NAME,
-            ['content' => 'test content']
+            ['content' => 'test content', 'crossorigin' => 'anonymous']
         );
 
         $this->assertEquals('test content', $view->vars['content']);
+        $this->assertEquals('anonymous', $view->vars['attr']['crossorigin']);
+        $this->assertFalse(isset($view->vars['attr']['src']));
+        $this->assertFalse(isset($view->vars['attr']['async']));
+        $this->assertFalse(isset($view->vars['attr']['defer']));
     }
 
     public function testGetName()
