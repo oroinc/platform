@@ -35,16 +35,24 @@ class GlobalConfigManager
     {
         $this->setContext($user);
         $newSettings = [implode(ConfigManager::SECTION_VIEW_SEPARATOR, ['oro_email', 'signature']) => $signature];
-            $this->configManager->save($newSettings);
+        $this->configManager->save($newSettings);
         $this->restoreContext();
     }
 
     /**
-     * @return string|null
+     * @param User $user
+     * @return null|string
      */
-    public function getUserConfigSignature()
+    public function getUserConfigSignature(User $user)
     {
-        return $this->userScopeManager->getSettingValue('oro_email.signature');
+        if ($user->getId()) {
+            $this->setContext($user);
+            $value = $this->userScopeManager->getSettingValue('oro_email.signature');
+            $this->restoreContext();
+        } else {
+            $value = null;
+        }
+        return $value;
     }
 
     /**
