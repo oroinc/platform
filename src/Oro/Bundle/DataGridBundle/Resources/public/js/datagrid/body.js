@@ -3,8 +3,9 @@
 define([
     'underscore',
     'backgrid',
-    './row'
-], function (_, Backgrid, Row) {
+    './row',
+    '../pageable-collection'
+], function (_, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -145,6 +146,65 @@ define([
             if (this.rowClassName) {
                 this.$('> *').addClass(this.rowClassName);
             }
+            return this;
+        },
+
+        /**
+         * @param {string} column
+         * @param {null|"ascending"|"descending"} direction
+         */
+        sort: function (column, direction) {
+            if (!_.contains(["ascending", "descending", null], direction)) {
+                throw new RangeError('direction must be one of "ascending", "descending" or `null`');
+            }
+            if (_.isString(column)) {
+                column = this.columns.findWhere({name: column});
+            }
+
+            var collection = this.collection;
+
+            var order;
+
+            if (direction === "ascending") {
+                order = -1;
+            } else if (direction === "descending") {
+                order = 1;
+            } else {
+                order = null;
+            }
+
+            var extractorDelegate;
+            if (order) {
+                extractorDelegate = column.sortValue();
+            } else {
+                extractorDelegate = function (model) {
+                    return model.cid.replace('c', '') * 1;
+                };
+            }
+            var comparator = this.makeComparator(column.get("name"), order, extractorDelegate);
+
+            if (collection instanceof PageableCollection) {
+                collection.setSorting(order && column.get("name"), order, {sortValue: column.sortValue()});
+
+                if (collection.fullCollection) {
+                    if (collection.fullCollection.comparator == null) {
+                        collection.fullCollection.comparator = comparator;
+                    }
+                    collection.fullCollection.sort();
+                    collection.trigger("backgrid:sorted", column, direction, collection);
+                } else {
+                    collection.fetch({reset: true, success: function () {
+                        collection.trigger("backgrid:sorted", column, direction, collection);
+                    }});
+                }
+            } else {
+                collection.comparator = comparator;
+                collection.sort();
+                collection.trigger("backgrid:sorted", column, direction, collection);
+            }
+
+            column.set("direction", direction);
+
             return this;
         }
     });

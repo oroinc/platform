@@ -14,7 +14,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
 class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtureInterface
 {
-    const BATCH_SIZE = 1000;
+    const BATCH_SIZE = 100;
 
     /**
      * {@inheritdoc}
@@ -54,24 +54,29 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
             $queryBuilder->addCriteria($criteria);
             $queryBuilder->setFirstResult(0);
             $emails = $queryBuilder->getQuery()->execute();
-            if (count($emails)) {
+            if (count($emails) > 1) {
+                $itemsCount++;
                 $newThread = new EmailThread();
                 $manager->persist($newThread);
                 foreach ($emails as $key => $email) {
                     /** @var Email $email */
-                    $email->setThread($newThread);
                     if ($key == 0) {
                         $email->setHead(true);
                     } else {
                         $email->setHead(false);
                     }
-                    $itemsCount++;
+                    $email->setThread($newThread);
                     $entities[] = $email;
-                    if (0 == $itemsCount % self::BATCH_SIZE) {
-                        $this->saveEntities($manager, $entities);
-                        $entities = [];
-                    }
                 }
+            } elseif (count($emails) == 1) {
+                $email = $emails[0];
+                $email->setHead(true);
+                $itemsCount++;
+                $entities[] = $email;
+            }
+            if (0 == $itemsCount % self::BATCH_SIZE) {
+                $this->saveEntities($manager, $entities);
+                $entities = [];
             }
         }
 
@@ -82,12 +87,12 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
 
     /**
      * @param ObjectManager $manager
-     * @param array $entities
+     * @param array         $entities
      */
     protected function saveEntities(ObjectManager $manager, array $entities)
     {
-        foreach ($entities as $entity) {
-            $manager->persist($entity);
+        foreach ($entities as $email) {
+            $manager->persist($email);
         }
         $manager->flush();
         $manager->clear();

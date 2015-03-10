@@ -50,7 +50,7 @@ Oro\Bundle\UserBundle\Entity\Role:
 
 Oro\Bundle\UserBundle\Entity\Group:
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: name
+        - Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntity: name
     properties:
         name:
             - NotBlank:     ~
