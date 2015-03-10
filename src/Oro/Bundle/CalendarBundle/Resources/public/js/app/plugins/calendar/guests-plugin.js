@@ -41,7 +41,7 @@ define(function (require) {
          * @param eventModel
          * @returns {boolean}
          */
-        hasGuestEvents: function (eventModel) {
+        hasLoadedGuestEvents: function (eventModel) {
             var result = false,
                 guests = eventModel.get('invitedUsers');
             guests = _.isNull(guests) ? [] : guests;
@@ -60,7 +60,7 @@ define(function (require) {
          * Returns linked guest events
          *
          * @param eventModel
-         * @returns {boolean}
+         * @returns {array}
          */
         findGuestEvents: function (eventModel) {
             return this.main.collection.where({
@@ -75,7 +75,7 @@ define(function (require) {
          */
         onEventAdded: function (eventModel) {
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
-            if (this.hasGuestEvents(eventModel)) {
+            if (this.hasLoadedGuestEvents(eventModel)) {
                 this.main.updateEvents();
             }
         },
@@ -88,7 +88,7 @@ define(function (require) {
         onEventChanged: function (eventModel) {
             var guestEvents, i, updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
-            if (this.hasGuestEvents(eventModel)) {
+            if (this.hasLoadedGuestEvents(eventModel)) {
                 if (eventModel.hasChanged('invitedUsers')) {
                     eventModel.once('sync', this.main.updateEvents, this.main);
                     return;
@@ -110,7 +110,7 @@ define(function (require) {
          */
         onEventDeleted: function (eventModel) {
             var guestEvents, i;
-            if (this.hasGuestEvents(eventModel)) {
+            if (this.hasLoadedGuestEvents(eventModel)) {
                 // remove guests
                 guestEvents = this.findGuestEvents(eventModel);
                 for (i = 0; i < guestEvents.length; i++) {
@@ -129,7 +129,7 @@ define(function (require) {
          * @param {object} attrs to be set on event model
          */
         onEventBeforeSave: function (eventModel, promises, attrs) {
-            if (this.hasGuestEvents(eventModel)) {
+            if (this.hasLoadedGuestEvents(eventModel)) {
                 var deferredConfirmation = $.Deferred(), cleanUp;
                 promises.push(deferredConfirmation);
 
