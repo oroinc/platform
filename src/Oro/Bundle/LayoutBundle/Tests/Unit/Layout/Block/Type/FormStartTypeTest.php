@@ -19,7 +19,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertEquals('form', $options['form_name']);
     }
 
-    public function testBuildViewWithAllOptions()
+    public function testBuildView()
     {
         $formName       = 'test_form';
         $formActionPath = 'test_form_action_path';
@@ -131,7 +131,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testBuildViewWithEmptyOptions()
+    public function testBuildViewWithEmptyFormParams()
     {
         $formName = 'test_form';
         $formView = new FormView();
@@ -163,6 +163,134 @@ class FormStartTypeTest extends BlockTypeTestCase
         $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
         $this->assertFalse(array_key_exists('method', $view->vars));
         $this->assertFalse(array_key_exists('enctype', $view->vars));
+    }
+
+    public function testBuildViewWithOverrideOptions()
+    {
+        $formName       = 'test_form';
+        $formActionPath = 'test_form_action_path';
+        $formMethod     = 'get';
+        $formEnctype    = 'test_enctype';
+        $formView       = new FormView();
+
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor->expects($this->never())
+            ->method('getForm');
+        $formAccessor->expects($this->once())
+            ->method('getView')
+            ->with(null)
+            ->will($this->returnValue($formView));
+        $formAccessor->expects($this->never())
+            ->method('getAction');
+        $formAccessor->expects($this->never())
+            ->method('getMethod');
+        $formAccessor->expects($this->never())
+            ->method('getEnctype');
+
+        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->set($formName, $formAccessor);
+        $view = $this->getBlockView(
+            FormStartType::NAME,
+            [
+                'form_name'    => $formName,
+                'form_action'  => $formActionPath,
+                'form_method'  => $formMethod,
+                'form_enctype' => $formEnctype
+            ]
+        );
+
+        $this->assertSame($formView, $view->vars['form']);
+        $this->assertSame($formActionPath, $view->vars['action_path']);
+        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
+        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
+        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
+        $this->assertSame($formEnctype, $view->vars['enctype']);
+    }
+
+    public function testBuildViewWithOverrideOptionsRoute()
+    {
+        $formName              = 'test_form';
+        $formActionRoute       = 'test_form_action_route';
+        $formActionRouteParams = ['foo' => 'bar'];
+        $formMethod            = 'get';
+        $formEnctype           = 'test_enctype';
+        $formView              = new FormView();
+
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor->expects($this->never())
+            ->method('getForm');
+        $formAccessor->expects($this->once())
+            ->method('getView')
+            ->with(null)
+            ->will($this->returnValue($formView));
+        $formAccessor->expects($this->never())
+            ->method('getAction');
+        $formAccessor->expects($this->never())
+            ->method('getMethod');
+        $formAccessor->expects($this->never())
+            ->method('getEnctype');
+
+        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->set($formName, $formAccessor);
+        $view = $this->getBlockView(
+            FormStartType::NAME,
+            [
+                'form_name'             => $formName,
+                'form_route_name'       => $formActionRoute,
+                'form_route_parameters' => $formActionRouteParams,
+                'form_method'           => $formMethod,
+                'form_enctype'          => $formEnctype
+            ]
+        );
+
+        $this->assertSame($formView, $view->vars['form']);
+        $this->assertFalse(array_key_exists('action_path', $view->vars));
+        $this->assertSame($formActionRoute, $view->vars['action_route_name']);
+        $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']);
+        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
+        $this->assertSame($formEnctype, $view->vars['enctype']);
+    }
+
+    public function testBuildViewWithOverrideOptionsRouteWithoutParams()
+    {
+        $formName        = 'test_form';
+        $formActionRoute = 'test_form_action_route';
+        $formMethod      = 'get';
+        $formEnctype     = 'test_enctype';
+        $formView        = new FormView();
+
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor->expects($this->never())
+            ->method('getForm');
+        $formAccessor->expects($this->once())
+            ->method('getView')
+            ->with(null)
+            ->will($this->returnValue($formView));
+        $formAccessor->expects($this->never())
+            ->method('getAction');
+        $formAccessor->expects($this->never())
+            ->method('getMethod');
+        $formAccessor->expects($this->never())
+            ->method('getEnctype');
+
+        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->set($formName, $formAccessor);
+        $view = $this->getBlockView(
+            FormStartType::NAME,
+            [
+                'form_name'       => $formName,
+                'form_route_name' => $formActionRoute,
+                'form_method'     => $formMethod,
+                'form_enctype'    => $formEnctype
+            ]
+        );
+
+        $this->assertSame($formView, $view->vars['form']);
+        $this->assertFalse(array_key_exists('action_path', $view->vars));
+        $this->assertSame($formActionRoute, $view->vars['action_route_name']);
+        $this->assertSame([], $view->vars['action_route_parameters']);
+        $this->assertSame(strtoupper($formMethod), $view->vars['method']);
+        $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
     /**

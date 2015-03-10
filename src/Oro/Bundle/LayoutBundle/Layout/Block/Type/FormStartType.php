@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -12,28 +14,71 @@ class FormStartType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        parent::setDefaultOptions($resolver);
+        $resolver->setOptional(
+            [
+                'form_action',
+                'form_route_name',
+                'form_route_parameters',
+                'form_method',
+                'form_enctype'
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         $view->vars['form'] = $formAccessor->getView();
 
-        $action = $formAccessor->getAction();
-        $path   = $action->getPath();
-        if ($path) {
-            $view->vars['action_path'] = $path;
-        } else {
-            $routeName = $action->getRouteName();
+        // form action
+        if (isset($options['form_action'])) {
+            $path = $options['form_action'];
+            if ($path) {
+                $view->vars['action_path'] = $path;
+            }
+        } elseif (isset($options['form_route_name'])) {
+            $routeName = $options['form_route_name'];
             if ($routeName) {
                 $view->vars['action_route_name']       = $routeName;
-                $view->vars['action_route_parameters'] = $action->getRouteParameters();
+                $view->vars['action_route_parameters'] = isset($options['form_route_parameters'])
+                    ? $options['form_route_parameters']
+                    : [];
+            }
+        } else {
+            $action = $formAccessor->getAction();
+            $path   = $action->getPath();
+            if ($path) {
+                $view->vars['action_path'] = $path;
+            } else {
+                $routeName = $action->getRouteName();
+                if ($routeName) {
+                    $view->vars['action_route_name']       = $routeName;
+                    $view->vars['action_route_parameters'] = $action->getRouteParameters();
+                }
             }
         }
-        $method = $formAccessor->getMethod();
+
+        // form method
+        $method = isset($options['form_method'])
+            ? strtoupper($options['form_method'])
+            : $formAccessor->getMethod();
         if ($method) {
             $view->vars['method'] = $method;
         }
-        $enctype = $formAccessor->getEnctype();
+
+        // form enctype
+        $enctype = isset($options['form_enctype'])
+            ? $options['form_enctype']
+            : $formAccessor->getEnctype();
         if ($enctype) {
             $view->vars['enctype'] = $enctype;
         }
