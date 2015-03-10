@@ -64,12 +64,24 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($this->context);
     }
 
-    public function testValidateExceptionWhenInvalidArgumentType()
+    public function testValidateWhenNotSetArgumentType()
     {
         $this->context->expects($this->never())
             ->method('addViolation');
 
         $this->validator->validate(false, $this->constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "DateTime", "string" given
+     */
+    public function testValidateExceptionWhenInvalidArgumentType()
+    {
+        $this->formField->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue('string'));
+        $this->validator->validate('string', $this->constraint);
     }
 
     /**
