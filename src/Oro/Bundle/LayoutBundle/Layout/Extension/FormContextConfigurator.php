@@ -38,12 +38,8 @@ class FormContextConfigurator implements ContextConfiguratorInterface
             ->setOptional(['form'])
             ->setAllowedTypes(['form' => ['null', 'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface']]);
 
-        if (!$context->has('form')) {
-            return;
-        }
-
-        $form = $context->get('form');
-        if ($form instanceof FormAccessorInterface) {
+        $form = $context->getOr('form');
+        if (null === $form || $form instanceof FormAccessorInterface) {
             return;
         }
 
