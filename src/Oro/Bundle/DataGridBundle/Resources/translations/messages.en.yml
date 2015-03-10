@@ -29,6 +29,8 @@ oro:
             update: Edit
             delete: Delete
             clone: Clone
+            gridview_create_public: Create public named filter
+            gridview_edit_public: Edit public named filter
 
         system_configuration:
             groups:

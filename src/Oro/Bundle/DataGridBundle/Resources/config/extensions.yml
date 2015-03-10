@@ -65,6 +65,8 @@ services:
 
     oro_datagrid.extension.views:
         class: %oro_datagrid.extension.views.class%
+        arguments:
+            - @event_dispatcher
         tags:
             - { name: oro_datagrid.extension }
 

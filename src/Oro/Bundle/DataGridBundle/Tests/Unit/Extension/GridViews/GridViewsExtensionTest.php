@@ -2,11 +2,57 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\GridViews;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 
 class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    private $eventDispatcher;
+    private $gridViewsExtension;
+
+    public function setUp()
+    {
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->gridViewsExtension = new GridViewsExtension($this->eventDispatcher);
+    }
+
+    public function testVisitMetadataShouldAddGridViewsFromEvent()
+    {
+        $this->gridViewsExtension->setParameters(new ParameterBag());
+        $data = MetadataObject::create([]);
+        $config = DatagridConfiguration::create([
+            DatagridConfiguration::NAME_KEY => 'grid',
+        ]);
+
+        $this->eventDispatcher
+            ->expects($this->once())
+            ->method('hasListeners')
+            ->with(GridViewsLoadEvent::EVENT_NAME)
+            ->will($this->returnValue(true));
+
+        $expectedViews = [
+            new View('name', ['k' => 'v'], ['k2' => 'v2'])
+        ];
+        $this->eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(GridViewsLoadEvent::EVENT_NAME)
+            ->will($this->returnCallback(function($eventName, GridViewsLoadEvent $event) use ($expectedViews) {
+                $event->setGridViews($expectedViews);
+
+                return $event;
+            }));
+
+        $this->assertFalse($data->offsetExists('gridViews'));
+        $this->gridViewsExtension->visitMetadata($config, $data);
+        $this->assertTrue($data->offsetExists('gridViews'));
+        $this->assertEquals($expectedViews, $data->offsetGet('gridViews'));
+    }
+
     /**
      * @param array $input
      * @param array $expected
@@ -14,9 +60,8 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetParameters(array $input, array $expected)
     {
-        $extension = new GridViewsExtension();
-        $extension->setParameters(new ParameterBag($input));
-        $this->assertEquals($expected, $extension->getParameters()->all());
+        $this->gridViewsExtension->setParameters(new ParameterBag($input));
+        $this->assertEquals($expected, $this->gridViewsExtension->getParameters()->all());
     }
 
     /**

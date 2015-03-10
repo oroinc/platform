@@ -1,0 +1,11 @@
+oro_datagrid_gridview_create_public:
+    label: oro.grid.action.gridview_create_public
+    type: action
+    group_name: ""
+    bindings: ~
+
+oro_datagrid_gridview_edit_public:
+    label: oro.grid.action.gridview_edit_public
+    type: action
+    group_name: ""
+    bindings: ~

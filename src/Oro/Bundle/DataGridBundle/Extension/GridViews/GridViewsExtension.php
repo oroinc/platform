@@ -3,7 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -14,6 +16,19 @@ class GridViewsExtension extends AbstractExtension
     const VIEWS_LIST_KEY           = 'views_list';
     const VIEWS_PARAM_KEY          = 'view';
     const MINIFIED_VIEWS_PARAM_KEY = 'v';
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
 
     /**
      * {@inheritDoc}
@@ -48,8 +63,19 @@ class GridViewsExtension extends AbstractExtension
 
         /** @var AbstractViewsList $list */
         $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+        $gridViews = [];
         if ($list !== false) {
-            $data->offsetSet('gridViews', $list->getMetadata());
+            $gridViews = $list->getMetadata();
+        }
+
+        if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
+            $event = new GridViewsLoadEvent($config->getName(), $gridViews);
+            $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
+            $gridViews = $event->getGridViews();
+        }
+
+        if ($gridViews) {
+            $data->offsetSet('gridViews', $gridViews);
         }
     }
 
