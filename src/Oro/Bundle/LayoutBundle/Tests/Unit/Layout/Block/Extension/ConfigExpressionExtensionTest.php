@@ -69,13 +69,14 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $view->vars['attr']['data-scalar']   = 'foo';
         $view->vars['attr']['data-expr']     = ['@true' => null];
         $view->vars['label_attr']['enabled'] = ['@true' => null];
+        $view->vars['array_with_expr']       = ['item1' => 'val1', 'item2' => ['@true' => null]];
 
         $expr->expects($this->once())
             ->method('evaluate')
-            ->with(['context' => $context, 'data' => $data, 'scalar' => 'foo', 'expr' => true])
+            ->with(['context' => $context, 'data' => $data])
             ->will($this->returnValue(true));
 
-        $this->expressionAssembler->expects($this->exactly(4))
+        $this->expressionAssembler->expects($this->exactly(5))
             ->method('assemble')
             ->with(['@true' => null])
             ->will($this->returnValue(new Condition\True()));
@@ -123,84 +124,11 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             $view->vars['label_attr']['enabled'],
             'Failed asserting that an expression in "label_attr" is assembled and evaluated'
         );
-    }
-
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage The key "$expr" does exist in an array.
-     */
-    public function testFinishViewEvaluatesExpressionCycledToItself()
-    {
-        $context = new LayoutContext();
-        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
-        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $block->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($data));
-        $view = new BlockView();
-
-        $view->vars['attr']['data-expr'] = ['@trim' => '$expr'];
-
-        $expr = new Func\Trim();
-        $expr->initialize([new PropertyPath('$expr')]);
-        $expr->setContextAccessor(new ContextAccessor());
-
-        $this->expressionAssembler->expects($this->once())
-            ->method('assemble')
-            ->with(['@trim' => '$expr'])
-            ->will($this->returnValue($expr));
-
-        $context['expressions_evaluate'] = true;
-        $this->extension->finishView($view, $block, []);
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Circular reference in an expression for variable "data-expr2" of block "test_block". Max nesting level is 5.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testFinishViewEvaluatesCycledExpressions()
-    {
-        $context = new LayoutContext();
-        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
-        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $block->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($data));
-        $view             = new BlockView();
-        $view->vars['id'] = 'test_block';
-
-        $view->vars['attr']['data-expr1'] = ['@trim' => '$expr2'];
-        $view->vars['attr']['data-expr2'] = ['@trim' => '$expr1'];
-
-        $expr1 = new Func\Trim();
-        $expr1->initialize([new PropertyPath('$expr2')]);
-        $expr1->setContextAccessor(new ContextAccessor());
-
-        $expr2 = new Func\Trim();
-        $expr2->initialize([new PropertyPath('$expr1')]);
-        $expr2->setContextAccessor(new ContextAccessor());
-
-        $this->expressionAssembler->expects($this->exactly(2))
-            ->method('assemble')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [['@trim' => '$expr2'], $expr1],
-                        [['@trim' => '$expr1'], $expr2]
-                    ]
-                )
-            );
-
-        $context['expressions_evaluate'] = true;
-        $this->extension->finishView($view, $block, []);
+        $this->assertSame(
+            ['item1' => 'val1', 'item2' => true],
+            $view->vars['array_with_expr'],
+            'Failed asserting that an expression is assembled and evaluated in nested array'
+        );
     }
 
     public function testFinishViewDoNothingIfEvaluationIfExpressionsDisabledAndEncodingIsNotSet()

@@ -9,9 +9,8 @@ oro_layout:
                 text: oro.dataaudit.change_history
                 route_name: oro_dataaudit_history
                 route_parameters:
-                    @array:
-                        entity: { @encode_class: $context.entity_class }
-                        id: { @value: $data.entity.id }
+                    entity: { @encode_class: $context.entity_class }
+                    id: { @value: $data.entity.id }
                 attr:
                     id: view-activity-btn
                     class: no-hash

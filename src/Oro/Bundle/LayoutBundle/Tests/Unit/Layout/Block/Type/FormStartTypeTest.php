@@ -50,8 +50,8 @@ class FormStartTypeTest extends BlockTypeTestCase
 
         $this->assertSame($formView, $view->vars['form']);
         $this->assertSame($formActionPath, $view->vars['action_path']);
-        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
+        $this->assertArrayNotHasKey('action_route_name', $view->vars);
+        $this->assertArrayNotHasKey('action_route_parameters', $view->vars);
         $this->assertSame($formMethod, $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
@@ -87,7 +87,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $view = $this->getBlockView(FormStartType::NAME, ['form_name' => $formName]);
 
         $this->assertSame($formView, $view->vars['form']);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
+        $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
         $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']);
         $this->assertSame($formMethod, $view->vars['method']);
@@ -124,7 +124,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         $view = $this->getBlockView(FormStartType::NAME, ['form_name' => $formName]);
 
         $this->assertSame($formView, $view->vars['form']);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
+        $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
         $this->assertSame([], $view->vars['action_route_parameters']);
         $this->assertSame($formMethod, $view->vars['method']);
@@ -158,11 +158,11 @@ class FormStartTypeTest extends BlockTypeTestCase
         $view = $this->getBlockView(FormStartType::NAME, ['form_name' => $formName]);
 
         $this->assertSame($formView, $view->vars['form']);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
-        $this->assertFalse(array_key_exists('method', $view->vars));
-        $this->assertFalse(array_key_exists('enctype', $view->vars));
+        $this->assertArrayNotHasKey('action_path', $view->vars);
+        $this->assertArrayNotHasKey('action_route_name', $view->vars);
+        $this->assertArrayNotHasKey('action_route_parameters', $view->vars);
+        $this->assertArrayNotHasKey('method', $view->vars);
+        $this->assertArrayNotHasKey('enctype', $view->vars);
     }
 
     public function testBuildViewWithOverrideOptions()
@@ -201,8 +201,8 @@ class FormStartTypeTest extends BlockTypeTestCase
 
         $this->assertSame($formView, $view->vars['form']);
         $this->assertSame($formActionPath, $view->vars['action_path']);
-        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
+        $this->assertArrayNotHasKey('action_route_name', $view->vars);
+        $this->assertArrayNotHasKey('action_route_parameters', $view->vars);
         $this->assertSame(strtoupper($formMethod), $view->vars['method']);
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
@@ -244,7 +244,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         );
 
         $this->assertSame($formView, $view->vars['form']);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
+        $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
         $this->assertSame($formActionRouteParams, $view->vars['action_route_parameters']);
         $this->assertSame(strtoupper($formMethod), $view->vars['method']);
@@ -286,7 +286,7 @@ class FormStartTypeTest extends BlockTypeTestCase
         );
 
         $this->assertSame($formView, $view->vars['form']);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
+        $this->assertArrayNotHasKey('action_path', $view->vars);
         $this->assertSame($formActionRoute, $view->vars['action_route_name']);
         $this->assertSame([], $view->vars['action_route_parameters']);
         $this->assertSame(strtoupper($formMethod), $view->vars['method']);

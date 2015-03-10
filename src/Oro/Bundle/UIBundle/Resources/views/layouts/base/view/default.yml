@@ -9,8 +9,7 @@ oro_layout:
             options:
                 placeholder_name: view_before_content_addition
                 placeholder_parameters:
-                    @array:
-                        entity: { @value: $data.entity }
+                    entity: { @value: $data.entity }
         - @addTree:
             items:
                 page_header_panel:
@@ -40,15 +39,13 @@ oro_layout:
                     options:
                         placeholder_name: view_navButtons_before
                         placeholder_parameters:
-                            @array:
-                                entity: { @value: $data.entity }
+                            entity: { @value: $data.entity }
                 nav_buttons_after:
                     blockType: placeholder
                     options:
                         placeholder_name: view_navButtons_after
                         placeholder_parameters:
-                            @array:
-                                entity: { @value: $data.entity }
+                            entity: { @value: $data.entity }
                 page_actions_panel:
                     blockType: container
                     options:
@@ -61,15 +58,13 @@ oro_layout:
                     options:
                         placeholder_name: view_pageActions_before
                         placeholder_parameters:
-                            @array:
-                                entity: { @value: $data.entity }
+                            entity: { @value: $data.entity }
                 page_actions_after:
                     blockType: placeholder
                     options:
                         placeholder_name: view_pageActions_after
                         placeholder_parameters:
-                            @array:
-                                entity: { @value: $data.entity }
+                            entity: { @value: $data.entity }
                 page_content:
                     blockType: container
                 navigation_content_tags:
