@@ -14,6 +14,8 @@ oro_layout:
                     blockType: container
                 page_header_right_panel:
                     blockType: container
+                page_title_panel:
+                    blockType: breadcrumbs
                 page_title:
                     blockType: text
                 page_buttons_panel:
@@ -36,7 +38,7 @@ oro_layout:
                 content:
                     page_header:
                         page_header_left_panel:
-                            page_title: ~
+                            page_title_panel: ~
                         page_buttons_panel:
                             nav_buttons_before: ~
                             nav_buttons: ~

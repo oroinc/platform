@@ -30,6 +30,14 @@ oro_layout:
                     blockType: container
                 page_header_right_panel:
                     blockType: container
+                page_title_rows:
+                    blockType: container
+                page_title_first_row:
+                    blockType: container
+                page_title_second_row:
+                    blockType: container
+                page_title_panel:
+                    blockType: breadcrumbs
                 page_title:
                     blockType: text
                 page_buttons_panel:
@@ -83,7 +91,10 @@ oro_layout:
                     'form:start': ~
                     page_header:
                         page_header_left_panel:
-                            page_title: ~
+                            page_title_rows:
+                                page_title_first_row:
+                                    page_title_panel: ~
+                                page_title_second_row: ~
                         page_header_right_panel:
                             page_buttons_panel:
                                 nav_buttons_before: ~
