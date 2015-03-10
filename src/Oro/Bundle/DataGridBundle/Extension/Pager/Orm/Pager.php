@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager\Orm;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
@@ -139,24 +138,28 @@ class Pager extends AbstractPager implements PagerInterface
 
         /** @var QueryBuilder $query */
         $query = $this->getQueryBuilder();
+        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
 
         $query->setFirstResult(null);
         $query->setMaxResults(null);
+
 
         if (count($this->getParameters()) > 0) {
             $query->setParameters($this->getParameters());
         }
 
-        if (0 == $this->getPage() || 0 == $this->getMaxPerPage() || 0 == $this->getNbResults()) {
-            $this->setLastPage(0);
-        } else {
-            $offset = ($this->getPage() - 1) * $this->getMaxPerPage();
+        if (!$countQb->getDQLPart('groupBy')) {
+            $this->setPaginiationData($countQb);
+            foreach ($countQb->getQuery()->getResult() as $data) {
+                $inArray[] = current($data);
+            }
+            if (isset($inArray)) {
+                $query->andWhere($query->expr()->in($this->countQueryBuilderOptimizer->getIdFieldFQN(), $inArray));
 
-            $this->setLastPage(ceil($this->getNbResults() / $this->getMaxPerPage()));
-
-            $query->setFirstResult($offset);
-            $query->setMaxResults($this->getMaxPerPage());
+                return;
+            }
         }
+        $this->setPaginiationData($query);
     }
 
     /**
@@ -242,5 +245,22 @@ class Pager extends AbstractPager implements PagerInterface
         $results = $queryForRetrieve->getQuery()->execute();
 
         return $results[0];
+    }
+
+    /**
+     * @param QueryBuilder $query
+     */
+    private function setPaginiationData(QueryBuilder $query)
+    {
+        if (0 == $this->getPage() || 0 == $this->getMaxPerPage() || 0 == $this->getNbResults()) {
+            $this->setLastPage(0);
+        } else {
+            $offset = ($this->getPage() - 1) * $this->getMaxPerPage();
+
+            $this->setLastPage(ceil($this->getNbResults() / $this->getMaxPerPage()));
+
+            $query->setFirstResult($offset);
+            $query->setMaxResults($this->getMaxPerPage());
+        }
     }
 }

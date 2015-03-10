@@ -42,7 +42,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
                     ->select(array('u.id', 'u.username')),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u'
+                'expectedDQL' => 'SELECT DISTINCT u.id FROM OroUserBundle:User u'
             ),
             'group_test' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -98,7 +98,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->from('OroUserBundle:User', 'u')
                     ->leftJoin('OroUserBundle:UserApi', 'api')
                     ->select(array('u.id', 'u.username', 'api.apiKey')),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u',
+                'expectedDQL' => 'SELECT DISTINCT u.id FROM OroUserBundle:User u',
             ),
             'used_left_join' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -107,7 +107,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
                     ->where('aKey = :test')
                     ->setParameter('test', 'test_api_key'),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                'expectedDQL' => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
                     . 'LEFT JOIN OroUserBundle:UserApi api '
                     . 'WHERE api.apiKey = :test',
             ),
@@ -117,7 +117,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu', Join::WITH, 'u.owner = bu.id')
                     ->leftJoin('OroUserBundle:UserApi', 'api')
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey')),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                'expectedDQL' => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
                     . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu WITH u.owner = bu.id'
             ),
             'inner_with_2_left_group' => array(
@@ -164,7 +164,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->leftJoin('u.apiKeys', 'api')
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
                     ->where('gr.id > 10'),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                'expectedDQL' => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
                     . 'LEFT JOIN g.roles gr WITH api.apiKey = :test '
@@ -226,7 +226,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->from('OroUserBundle:User', 'u')
                         ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
                         ->having('login LIKE :test'),
-                'expectedDQL'  => 'SELECT u.id FROM OroUserBundle:User u WHERE u.username LIKE :test'
+                'expectedDQL'  => 'SELECT DISTINCT u.id FROM OroUserBundle:User u WHERE u.username LIKE :test'
             ),
             'join_on_table_that_has_with_join_condition' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -236,7 +236,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                         ->leftJoin('e.user', 'eu')
                         ->leftJoin('eu.owner', 'euo')
                         ->where('euo.name = :name'),
-                'expectedDQL'  => 'SELECT u.id FROM OroUserBundle:User u '
+                'expectedDQL'  => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
                     . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
                     . 'LEFT JOIN e.user eu '
                     . 'LEFT JOIN eu.owner euo WHERE euo.name = :name'
@@ -249,7 +249,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                         ->leftJoin('e.user', 'eu')
                         ->leftJoin('OroUserBundle:Status', 's', Join::WITH, 's.user = eu')
                         ->where('s.status = :statusName'),
-                'expectedDQL'  => 'SELECT u.id FROM OroUserBundle:User u '
+                'expectedDQL'  => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
                     . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
                     . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '
                     . 'WHERE s.status = :statusName'

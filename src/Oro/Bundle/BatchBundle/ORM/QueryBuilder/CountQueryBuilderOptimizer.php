@@ -95,7 +95,7 @@ class CountQueryBuilderOptimizer
             $this->addJoins($qb, $parts);
         }
         if (!$parts['groupBy']) {
-            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
+            $fieldsToSelect[] = sprintf('DISTINCT %s', $this->getIdFieldFQN());
         }
 
         if ($parts['where']) {
@@ -106,6 +106,16 @@ class CountQueryBuilderOptimizer
         $this->qbTools->fixUnusedParameters($qb);
 
         return $qb;
+    }
+
+    /**
+     * Get Identifier field's fully qualified namespace
+     *
+     * @return string
+     */
+    public function getIdFieldFQN()
+    {
+        return $this->getFieldFQN($this->idFieldName);
     }
 
     /**
