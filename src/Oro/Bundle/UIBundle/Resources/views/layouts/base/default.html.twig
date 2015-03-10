@@ -50,8 +50,11 @@
 
 {% block form_start_widget %}
     {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
-    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ with_page_parameters ? oro_url_add_query(action) : action }}"{% endif %}{% if method is defined %} method="{{ method|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
-    {%- if method is defined and method not in ['GET', 'POST'] -%}
+    {% if method is defined and method not in ['GET', 'POST'] -%}
+        {% set form_method = 'POST' %}
+    {%- endif -%}
+    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ with_page_parameters ? oro_url_add_query(action) : action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+    {%- if form_method is defined -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
 {% endblock %}

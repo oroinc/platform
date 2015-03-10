@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -61,6 +62,64 @@ class RendererTest extends LayoutTestCase
         $expected = $this->getCoreBlocksTestLayoutResult(
             $this->getPhpFormLayoutResult()
         );
+
+        $this->assertHtmlEquals($expected, $result);
+    }
+
+    public function testHtmlRenderingForFormStartByTwigRenderer()
+    {
+        if (!$this->getContainer()->hasParameter('oro_layout.twig.resources')) {
+            $this->markTestSkipped('TWIG renderer is not enabled.');
+        }
+
+        $context = new LayoutContext();
+        $context->getResolver()->setOptional(['form']);
+        $form = $this->getTestForm();
+        $context->set('form', new FormAccessor($form, FormAction::createByPath('test.php'), 'patch'));
+
+        // revert TWIG form renderer to Symfony's default theme
+        $this->getContainer()->get('twig.form.renderer')->setTheme(
+            $context->get('form')->getView(),
+            'form_div_layout.html.twig'
+        );
+
+        $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
+        $result = $layoutManager->getLayoutBuilder()
+            ->add('form:start', null, 'form_start')
+            ->getLayout($context)
+            ->setRenderer('twig')
+            ->render();
+
+        $expected = $this->getFormStartTestLayoutResult();
+
+        $this->assertHtmlEquals($expected, $result);
+    }
+
+    public function testHtmlRenderingForFormStartByPhpRenderer()
+    {
+        if (!$this->getContainer()->hasParameter('oro_layout.twig.resources')) {
+            $this->markTestSkipped('TWIG renderer is not enabled.');
+        }
+
+        $context = new LayoutContext();
+        $context->getResolver()->setOptional(['form']);
+        $form = $this->getTestForm();
+        $context->set('form', new FormAccessor($form, FormAction::createByPath('test.php'), 'patch'));
+
+        // revert TWIG form renderer to Symfony's default theme
+        $this->getContainer()->get('twig.form.renderer')->setTheme(
+            $context->get('form')->getView(),
+            'form_div_layout.html.twig'
+        );
+
+        $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
+        $result = $layoutManager->getLayoutBuilder()
+            ->add('form:start', null, 'form_start')
+            ->getLayout($context)
+            ->setRenderer('php')
+            ->render();
+
+        $expected = $this->getFormStartTestLayoutResult();
 
         $this->assertHtmlEquals($expected, $result);
     }
@@ -317,6 +376,19 @@ HTML;
             required="required"/>
     </div>
 </fieldset>
+HTML;
+
+        return $expected;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getFormStartTestLayoutResult()
+    {
+        $expected = <<<HTML
+<form action="test.php" method="post">
+<input type="hidden" name="_method" value="PATCH"/>
 HTML;
 
         return $expected;
