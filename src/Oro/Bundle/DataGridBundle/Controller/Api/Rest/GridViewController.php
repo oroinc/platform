@@ -98,22 +98,6 @@ class GridViewController extends RestController
     }
 
     /**
-     * @return GridViewRepository
-     */
-    protected function getGridViewRepository()
-    {
-        return $this->getDoctrine()->getRepository('OroDataGridBundle:GridView');
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->get('doctrine.orm.entity_manager');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getForm()
