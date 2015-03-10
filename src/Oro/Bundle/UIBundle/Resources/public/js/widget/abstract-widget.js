@@ -96,6 +96,9 @@ define(function (require) {
             // (to prevent recursion from remove method)
             this.disposing = true;
 
+            // call before dom will be removed
+            this.disposePageComponents();
+
             // trigger all events before handlers got undelegated
             this.trigger('widgetRemove', this.$el);
             mediator.trigger('widget_remove', this.getWid());
