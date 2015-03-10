@@ -1,11 +1,11 @@
 oro_layout:
     actions:
         - @add:
-            id:        index_before_content_addition
+            id:        before_content_addition_placeholder
             parentId:  before_content_addition
             blockType: placeholder
             options:
-                placeholder_name: content_after
+                placeholder_name: index_before_content_addition
         - @addTree:
             items:
                 page_header:
