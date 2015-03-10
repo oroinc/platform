@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
  *
  * @package Oro\Bundle\EmailBundle\Builder
  *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class EmailModelBuilder
 {
@@ -81,8 +82,10 @@ class EmailModelBuilder
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
         if ($fromAddress->getOwner() == $this->helper->getUser()) {
             $emailModel->setTo([$parentEmailEntity->getTo()->first()->getEmailAddress()->getEmail()]);
+            $emailModel->setFrom($fromAddress->getEmail());
         } else {
             $emailModel->setTo([$fromAddress->getEmail()]);
+            $this->initReplyFrom($emailModel, $parentEmailEntity);
         }
 
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
@@ -92,6 +95,29 @@ class EmailModelBuilder
         $emailModel->setBodyFooter($body);
 
         return $this->createEmailModel($emailModel);
+    }
+
+    /**
+     * @param EmailModel  $emailModel
+     * @param EmailEntity $parentEmailEntity
+     */
+    protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
+    {
+        $userEmails = $this->helper->getUser()->getEmails();
+        $toEmails = [];
+        $emailRecipients = $parentEmailEntity->getTo();
+        /** @var EmailRecipient $emailRecipient */
+        foreach ($emailRecipients as $emailRecipient) {
+            $toEmails[] = $emailRecipient->getEmailAddress()->getEmail();
+        }
+
+        foreach ($userEmails as $userEmail) {
+            if (in_array($userEmail->getEmail(), $toEmails)) {
+                $emailModel->setFrom($userEmail->getEmail());
+
+                break;
+            }
+        }
     }
 
     /**
@@ -152,16 +178,18 @@ class EmailModelBuilder
      */
     protected function applyFrom(EmailModel $emailModel)
     {
-        if ($this->request->query->has('from')) {
-            $from = $this->request->query->get('from');
-            if (!empty($from)) {
-                $this->helper->preciseFullEmailAddress($from);
-            }
-            $emailModel->setFrom($from);
-        } else {
-            $user = $this->helper->getUser();
-            if ($user) {
-                $emailModel->setFrom($this->helper->buildFullEmailAddress($user));
+        if (!$emailModel->getFrom()) {
+            if ($this->request->query->has('from')) {
+                $from = $this->request->query->get('from');
+                if (!empty($from)) {
+                    $this->helper->preciseFullEmailAddress($from);
+                }
+                $emailModel->setFrom($from);
+            } else {
+                $user = $this->helper->getUser();
+                if ($user) {
+                    $emailModel->setFrom($this->helper->buildFullEmailAddress($user));
+                }
             }
         }
     }
