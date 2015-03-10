@@ -111,7 +111,9 @@ define([
             FiltersManager.__super__.initialize.apply(this, arguments);
 
             if (tools.isMobile()) {
-                this.listenTo(this.collection, 'beforeFetch', this.closeDropdown);
+                this.listenTo(this.collection, 'beforeFetch',
+                    // update the filters drop in a separate process
+                    _.debounce(_.bind(this.updateFiltersDropdown, this), 0));
             }
         },
 
@@ -397,10 +399,13 @@ define([
         },
 
         /**
-         * Close dropdown
+         * Closes filters dropdown if there's no open filtes
          */
-        closeDropdown: function () {
-            this.$el.find('.dropdown').removeClass('oro-open');
+        updateFiltersDropdown: function () {
+            var openFilters = this.$('.dropdown .filter-item.open-filter');
+            if (!openFilters.length) {
+                this.$('.dropdown').removeClass('oro-open');
+            }
         }
     });
 

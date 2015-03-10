@@ -130,6 +130,7 @@ define([
                 value: value.value
             }));
             this._appendFilter($filter);
+            this._updateDOMValue();
             this._criteriaRenderd = true;
         },
 
