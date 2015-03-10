@@ -11,21 +11,28 @@ class DatagridTypeTest extends BlockTypeTestCase
     {
         $view = $this->getBlockView(
             new DatagridType(),
-            ['grid_name' => 'test-grid', 'params' => ['foo' => 'bar'], 'grid_scope' => 'test-scope']
+            [
+                'grid_name'       => 'test-grid',
+                'grid_scope'      => 'test-scope',
+                'grid_parameters' => ['foo' => 'bar']
+            ]
         );
 
         $this->assertEquals('test-grid', $view->vars['grid_name']);
         $this->assertEquals('test-scope', $view->vars['grid_scope']);
-        $this->assertEquals(['foo' => 'bar', 'enableFullScreenLayout' => true], $view->vars['params']);
+        $this->assertEquals(['foo' => 'bar', 'enableFullScreenLayout' => true], $view->vars['grid_parameters']);
     }
 
     public function testBuildViewWithParamsOverwrite()
     {
         $view = $this->getBlockView(
             new DatagridType(),
-            ['grid_name' => 'test-grid', 'params' => ['enableFullScreenLayout' => false]]
+            [
+                'grid_name'       => 'test-grid',
+                'grid_parameters' => ['enableFullScreenLayout' => false]
+            ]
         );
-        $this->assertEquals(['enableFullScreenLayout' => false], $view->vars['params']);
+        $this->assertEquals(['enableFullScreenLayout' => false], $view->vars['grid_parameters']);
     }
 
     /**

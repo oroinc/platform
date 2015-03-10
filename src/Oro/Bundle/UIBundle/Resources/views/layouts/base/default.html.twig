@@ -75,7 +75,7 @@
         {% set grid_name = oro_datagrid_build_fullname(grid_name, grid_scope) %}
     {% endif %}
     {{ dataGrid.renderGrid(grid_name, params) }}
-{% endblock datagrid_widget %}
+{% endblock %}
 
 {% block _debug_init_script_widget %}
     <script{{ block('block_attributes') }}>

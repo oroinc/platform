@@ -21,22 +21,21 @@ class DatagridType extends AbstractType
         $resolver
             ->setRequired(['grid_name'])
             ->setOptional(['grid_scope'])
-            ->setDefaults(['params' => []]);
-
-        $resolver->setAllowedTypes(
-            [
-                'grid_name'  => 'string',
-                'grid_scope' => 'string',
-                'params'     => 'array',
-            ]
-        );
-        $resolver->setNormalizers(
-            [
-                'params' => function (Options $options, $params) {
-                    return array_merge(['enableFullScreenLayout' => true], $params);
-                }
-            ]
-        );
+            ->setDefaults(['grid_parameters' => []])
+            ->setAllowedTypes(
+                [
+                    'grid_name'       => 'string',
+                    'grid_scope'      => 'string',
+                    'grid_parameters' => 'array'
+                ]
+            )
+            ->setNormalizers(
+                [
+                    'grid_parameters' => function (Options $options, $value) {
+                        return array_merge(['enableFullScreenLayout' => true], $value);
+                    }
+                ]
+            );
     }
 
     /**
@@ -44,8 +43,8 @@ class DatagridType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $view->vars['grid_name'] = $options['grid_name'];
-        $view->vars['params']    = $options['params'];
+        $view->vars['grid_name']       = $options['grid_name'];
+        $view->vars['grid_parameters'] = $options['grid_parameters'];
         if (!empty($options['grid_scope'])) {
             $view->vars['grid_scope'] = $options['grid_scope'];
         }
