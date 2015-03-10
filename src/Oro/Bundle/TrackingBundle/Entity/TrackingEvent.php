@@ -126,6 +126,7 @@ class TrackingEvent extends ExtendTrackingEvent
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->parsed = false;
     }
 
     /**
