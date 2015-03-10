@@ -8,6 +8,8 @@ oro_layout:
                 placeholder_name: index_before_content_addition
         - @addTree:
             items:
+                page_header_panel:
+                    blockType: container
                 page_header:
                     blockType: container
                 page_header_left_panel:
@@ -36,10 +38,11 @@ oro_layout:
                             entity_class: { @value: $context.entity_class }
             tree:
                 content:
-                    page_header:
-                        page_header_left_panel:
-                            page_title_panel: ~
-                        page_buttons_panel:
-                            nav_buttons_before: ~
-                            nav_buttons: ~
-                            nav_buttons_after: ~
+                    page_header_panel:
+                        page_header:
+                            page_header_left_panel:
+                                page_title_panel: ~
+                            page_buttons_panel:
+                                nav_buttons_before: ~
+                                nav_buttons: ~
+                                nav_buttons_after: ~

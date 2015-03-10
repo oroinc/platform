@@ -1,30 +1,18 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroUIBundle:layouts:base/update/default.html.twig'
+            themes: 'OroUIBundle:layouts:base/view/default.html.twig'
         - @add:
             id:        before_content_addition_placeholder
             parentId:  before_content_addition
             blockType: placeholder
             options:
-                placeholder_name: update_before_content_addition
+                placeholder_name: view_before_content_addition
                 placeholder_parameters:
                     @array:
                         entity: { @value: $data.entity }
         - @addTree:
             items:
-                'form:start':
-                    blockType: form_start
-                    options:
-                        attr:
-                            id: { @value: $context.form.name }
-                            data-collect: 'true'
-                form:
-                    blockType: form_end
-                    options:
-                        form_prefix: form
-                'form:end':
-                    blockType: form_end
                 page_header_panel:
                     blockType: container
                 page_header:
@@ -45,23 +33,19 @@ oro_layout:
                     blockType: text
                 page_buttons_panel:
                     blockType: container
-                    options:
-                        vars:
-                            form_name: { @value: $context.form.name }
-                            form_method: { @value: $context.form.method }
                 nav_buttons:
                     blockType: container
                 nav_buttons_before:
                     blockType: placeholder
                     options:
-                        placeholder_name: update_navButtons_before
+                        placeholder_name: view_navButtons_before
                         placeholder_parameters:
                             @array:
                                 entity: { @value: $data.entity }
                 nav_buttons_after:
                     blockType: placeholder
                     options:
-                        placeholder_name: update_navButtons_after
+                        placeholder_name: view_navButtons_after
                         placeholder_parameters:
                             @array:
                                 entity: { @value: $data.entity }
@@ -75,14 +59,14 @@ oro_layout:
                 page_actions_before:
                     blockType: placeholder
                     options:
-                        placeholder_name: update_pageActions_before
+                        placeholder_name: view_pageActions_before
                         placeholder_parameters:
                             @array:
                                 entity: { @value: $data.entity }
                 page_actions_after:
                     blockType: placeholder
                     options:
-                        placeholder_name: update_pageActions_after
+                        placeholder_name: view_pageActions_after
                         placeholder_parameters:
                             @array:
                                 entity: { @value: $data.entity }
@@ -95,7 +79,6 @@ oro_layout:
                             entity: { @value: $data.entity }
             tree:
                 content:
-                    'form:start': ~
                     page_header_panel:
                         page_header:
                             page_header_left_panel:
@@ -114,4 +97,3 @@ oro_layout:
                                     page_actions_after: ~
                     page_content: ~
                     navigation_content_tags: ~
-                    'form:end': ~

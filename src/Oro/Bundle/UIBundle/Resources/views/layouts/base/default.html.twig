@@ -207,12 +207,16 @@
     </div>
 {% endblock %}
 
-{% block _page_header_widget %}
+{% block _page_header_panel_widget %}
     <div class="container-fluid page-title">
-        <div class="navigation clearfix navbar-extra navbar-extra-right">
-            <div class="row">
-                {{ block_widget(block) }}
-            </div>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_widget %}
+    <div class="navigation clearfix navbar-extra navbar-extra-right">
+        <div class="row">
+            {{ block_widget(block) }}
         </div>
     </div>
 {% endblock %}
