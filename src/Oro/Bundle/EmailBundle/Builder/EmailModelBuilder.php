@@ -82,10 +82,11 @@ class EmailModelBuilder
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
         if ($fromAddress->getOwner() == $this->helper->getUser()) {
             $emailModel->setTo([$parentEmailEntity->getTo()->first()->getEmailAddress()->getEmail()]);
+            $emailModel->setFrom($fromAddress->getEmail());
         } else {
             $emailModel->setTo([$fromAddress->getEmail()]);
+            $this->initReplyFrom($emailModel, $parentEmailEntity);
         }
-        $this->initReplyFrom($emailModel, $parentEmailEntity);
 
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
 
