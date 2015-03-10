@@ -86,8 +86,6 @@ require([
                 mediator.setHandler('hideLoading', this.view.hide, this.view);
                 mediator.on('page:beforeChange', this.view.show, this.view);
                 mediator.on('page:afterChange', this.view.hide, this.view);
-                mediator.on('page:beforeChange', _.bind($.isActive, $, true));
-                mediator.on('page:afterChange', _.bind($.isActive, $, false));
                 this.view.show();
             }
         });
