@@ -388,7 +388,7 @@ define(function (require) {
                 return resultRect;
             }
             current = current.parentNode;
-            while (current !== document.documentElement) {
+            while (current && current.getBoundingClientRect) {
                 midRect = current.getBoundingClientRect();
                 borders = $.fn.getBorders(current);
 
