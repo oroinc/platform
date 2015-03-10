@@ -82,11 +82,14 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('url', 'text', []);
         $table->addColumn('title', 'text', ['notnull' => false]);
         $table->addColumn('code', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('parsed', 'boolean', ['notnull' => false]);
+        $table->addColumn('parsed', 'boolean', ['default' => '0', 'notnull' => true]);
         $table->addIndex(['logged_at'], 'event_loggedat_idx', []);
         $table->addIndex(['code'], 'code_idx', []);
         $table->addIndex(['name'], 'event_name_idx', []);
         $table->addIndex(['website_id'], 'idx_aad45a1e18f45c82', []);
+        $table->addIndex(['created_at'], 'event_createdAt_idx', []);
+        $table->addIndex(['parsed'], 'event_parsed_idx', []);
+
         $table->setPrimaryKey(['id']);
     }
 
