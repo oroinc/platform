@@ -9,8 +9,8 @@ class ResourceIterator extends \FilterIterator
     /** @var ResourceFactoryInterface */
     protected $factory;
 
-    /** @var array */
-    protected $filterPath;
+    /** @var ResourceMatcher|null */
+    protected $matcher;
 
     /**
      * @param ResourceFactoryInterface $factory
@@ -28,13 +28,13 @@ class ResourceIterator extends \FilterIterator
     }
 
     /**
-     * @param null|string $filterPath
+     * @param ResourceMatcher $matcher
      */
-    public function setFilterPath($filterPath = null)
+    public function setMatcher(ResourceMatcher $matcher = null)
     {
-        $this->filterPath = null === $filterPath
-            ? []
-            : (is_array($filterPath) ? $filterPath : explode(self::PATH_DELIMITER, $filterPath));
+        $this->matcher = $matcher;
+
+        // result may be different so just seek to the begging
         $this->rewind();
     }
 
@@ -51,25 +51,7 @@ class ResourceIterator extends \FilterIterator
      */
     public function accept()
     {
-        if (empty($this->filterPath)) {
-            return true;
-        }
-
-        $currentPath = $this->getPath();
-        if (count($currentPath) <= count($this->filterPath)) {
-            $equals = true;
-            foreach ($currentPath as $k => $v) {
-                if ($v !== $this->filterPath[$k]) {
-                    $equals = false;
-
-                    break;
-                }
-            }
-
-            return $equals;
-        }
-
-        return false;
+        return $this->matcher ? $this->matcher->match($this->getPath(), $this->getInnerIterator()->current()) : true;
     }
 
     /**

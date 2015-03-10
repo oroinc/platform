@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -15,15 +15,13 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass;
+use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderInterface;
 
 /**
  * Allows to use expressions (see ConfigExpression component) in block type options and attributes.
  */
-class ConfigExpressionExtension extends AbstractBlockTypeExtension implements ContextConfiguratorInterface
+class ConfigExpressionExtension extends AbstractBlockTypeExtension
 {
-    const PARAM_EVALUATE = 'expressions_evaluate';
-    const PARAM_ENCODING = 'expressions_encoding';
-
     const SCOPE_VARS = 1;
     const SCOPE_ATTR = 2;
     const SCOPE_OTHER = 3;
@@ -56,27 +54,11 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ContextInterface $context)
-    {
-        $context->getResolver()
-            ->setDefaults([self::PARAM_EVALUATE => true])
-            ->setOptional([self::PARAM_ENCODING])
-            ->setAllowedTypes(
-                [
-                    self::PARAM_EVALUATE => 'bool',
-                    self::PARAM_ENCODING => ['string', 'null']
-                ]
-            );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
         $context  = $block->getContext();
-        $evaluate = $context->get(self::PARAM_EVALUATE);
-        $encoding = $context->getOr(self::PARAM_ENCODING);
+        $evaluate = $context->getOr('expressions_evaluate');
+        $encoding = $context->getOr('expressions_encoding');
         if ($evaluate || $encoding !== null) {
             $view->vars = $this->processExpressions(
                 $view->vars,

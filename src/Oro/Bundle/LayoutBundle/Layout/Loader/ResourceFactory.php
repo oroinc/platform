@@ -7,7 +7,7 @@ class ResourceFactory implements ResourceFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($path, $filename)
+    public function create(array $path, $filename)
     {
         return new FileResource($filename);
     }

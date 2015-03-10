@@ -62,6 +62,18 @@ services:
         calls:
             - [addConfigurationPass, [@oro_layout.expression.pass.property_path]]
 
+    oro_ui.layout_context_configurator.application:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator
+        arguments:
+            - @kernel
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_ui.layout_context_configurator.action:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.layout_context_configurator.route:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator
         calls:
@@ -70,21 +82,32 @@ services:
             - { name: layout.context_configurator }
 
     oro_layout.block_type_extension.visible:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\VisibleExtension
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\VisibleExtension
         tags:
             - { name: layout.block_type_extension, alias: block }
 
+    oro_layout.layout_context_configurator.config_expression:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionContextConfigurator
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.block_type_extension.config_expression:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionExtension
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension
         arguments:
             - @oro_layout.expression.assembler
             - @service_container
             - {}
         tags:
             - { name: layout.block_type_extension, alias: block, priority: 255 }
-            - { name: layout.context_configurator }
 
     oro_layout.expression.json_encoder:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\JsonConfigExpressionEncoder
+        class: Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder
         tags:
             - { name: oro_layout.expression.encoder, format: json }
+
+    oro_layout.layout_listener:
+        class: Oro\Bundle\LayoutBundle\EventListener\LayoutListener
+        arguments:
+            - @oro_layout.layout_manager
+        tags:
+            - { name: kernel.event_subscriber }

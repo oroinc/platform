@@ -98,11 +98,6 @@ services:
         tags:
             - { name: oro_layout.expression, alias: asset }
 
-    oro_ui.layout_context_configurator.action:
-        class: Oro\Bundle\UIBundle\Layout\Extension\ActionContextConfigurator
-        tags:
-            - { name: layout.context_configurator }
-
     oro_ui.layout_context_configurator.widget:
         class: Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator
         calls:
@@ -133,13 +128,6 @@ services:
         tags:
             - { name: layout.context_configurator }
 
-    oro_ui.layout_context_configurator.application:
-        class: Oro\Bundle\UIBundle\Layout\Extension\ApplicationContextConfigurator
-        arguments:
-            - @kernel
-        tags:
-            - { name: layout.context_configurator }
-
     oro_ui.block_type_extension.head:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\HeadExtension
         arguments:
@@ -163,12 +151,20 @@ services:
         tags:
              - { name: layout.block_type, alias: breadcrumbs }
 
+    oro_ui.block_type.datagrid:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType
+        tags:
+             - { name: layout.block_type, alias: datagrid }
+
     oro_ui.block_type_extension.link:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
         tags:
             - { name: layout.block_type_extension, alias: link }
 
-    oro_ui.block_type.datagrid:
-        class: Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType
+    oro_ui.layout_loader.widget_action_voter:
+        class:  Oro\Bundle\UIBundle\Layout\Loader\WidgetAndActionVoter
+        public: false
+        arguments:
+            - @oro_layout.theme_manager
         tags:
-             - { name: layout.block_type, alias: datagrid }
+            - { name: layout.resource_matcher.voter }

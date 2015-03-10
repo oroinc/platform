@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\UIBundle\Layout\Extension\ApplicationContextConfigurator;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator;
 
 class ApplicationContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

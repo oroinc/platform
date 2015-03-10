@@ -56,19 +56,35 @@ services:
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
-    oro_layout.theme_extension:
-        class:  %oro_layout.theme_extension.class%
+    oro_layout.loader.resource_matcher:
+        class: Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher
+        public: false
+
+    oro_layout.loader.theme_route_voter:
+        class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemeAndRouteVoter
+        public: false
         arguments:
-            - %oro_layout.theme_updates_resources%
             - @oro_layout.theme_manager
-            - @oro_layout.loader.default_resource_factory
-            - @oro_layout.loader.chain_loader
-            - @oro_layout.dependency_initializer
+        tags:
+            - { name: layout.resource_matcher.voter }
+
+    oro_layout.layout_context_configurator.theme:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeContextConfigurator
         calls:
             - [setRequest, [@?request=]]
         tags:
-            - { name: monolog.logger, channel: main }
             - { name: layout.context_configurator }
+
+    oro_layout.theme_extension:
+        class: %oro_layout.theme_extension.class%
+        arguments:
+            - %oro_layout.theme_updates_resources%
+            - @oro_layout.loader.default_resource_factory
+            - @oro_layout.loader.chain_loader
+            - @oro_layout.dependency_initializer
+            - @oro_layout.loader.resource_matcher
+        tags:
+            - { name: monolog.logger, channel: main }
 
     oro_layout.data_provider.theme:
         class: Oro\Bundle\LayoutBundle\Layout\DataProvider\ThemeDataProvider

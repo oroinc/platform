@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Encoder;
 
 use Oro\Component\ConfigExpression\Condition;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\JsonConfigExpressionEncoder;
+use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder;
 
 class JsonConfigExpressionEncoderTest extends \PHPUnit_Framework_TestCase
 {

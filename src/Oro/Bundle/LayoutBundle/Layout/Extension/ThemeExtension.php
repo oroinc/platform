@@ -6,33 +6,21 @@ use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\OptionsResolver\Options;
-
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
-use Oro\Component\Layout\ContextConfiguratorInterface;
 
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
+use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
 
-class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ContextConfiguratorInterface
+class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const PARAM_THEME = 'theme';
-
-    /** @var Request|null */
-    protected $request;
-
     /** @var array */
     protected $resources;
-
-    /** @var ThemeManager */
-    protected $manager;
 
     /** @var ResourceFactoryInterface */
     protected $factory;
@@ -43,59 +31,29 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
     /** @var DependencyInitializer */
     protected $dependencyInitializer;
 
+    /** @var ResourceMatcher */
+    protected $matcher;
+
     /**
      * @param array                    $resources
-     * @param ThemeManager             $manager
      * @param ResourceFactoryInterface $factory
      * @param LoaderInterface          $loader
      * @param DependencyInitializer    $dependencyInitializer
+     * @param ResourceMatcher          $matcher
      */
     public function __construct(
         array $resources,
-        ThemeManager $manager,
         ResourceFactoryInterface $factory,
         LoaderInterface $loader,
-        DependencyInitializer $dependencyInitializer
+        DependencyInitializer $dependencyInitializer,
+        ResourceMatcher $matcher
     ) {
         $this->resources             = $resources;
-        $this->manager               = $manager;
         $this->loader                = $loader;
         $this->factory               = $factory;
         $this->dependencyInitializer = $dependencyInitializer;
+        $this->matcher               = $matcher;
         $this->setLogger(new NullLogger());
-    }
-
-    /**
-     * Synchronized DI method call, sets current request for further usage
-     *
-     * @param Request $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureContext(ContextInterface $context)
-    {
-        $context->getResolver()
-            ->setDefaults(
-                [
-                    self::PARAM_THEME => function (Options $options, $value) {
-                        if (null === $value && $this->request) {
-                            $value = $this->request->query->get('_theme');
-                            if (null === $value) {
-                                $value = $this->request->attributes->get('_theme');
-                            }
-                        }
-
-                        return $value;
-                    }
-                ]
-            )
-            ->setAllowedTypes([self::PARAM_THEME => ['string', 'null']]);
     }
 
     /**
@@ -103,20 +61,13 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
-        $result    = [];
-        $themeName = $context->getOr(self::PARAM_THEME);
-        if ($themeName) {
-            $updates = [];
-            $theme   = $this->manager->getTheme($themeName);
+        $updates = [];
 
-            $path      = [$theme->getDirectory()];
-            $routeName = $context->getOr(RouteContextConfigurator::PARAM_ROUTE_NAME);
-            if ($routeName) {
-                $path[] = $routeName;
-            }
+        if ($context->getOr('theme')) {
+            $this->matcher->setContext($context);
 
             $iterator = new ResourceIterator($this->factory, $this->resources);
-            $iterator->setFilterPath($path);
+            $iterator->setMatcher($this->matcher);
             foreach ($iterator as $resource) {
                 if ($this->loader->supports($resource)) {
                     $update = $this->loader->load($resource);
@@ -126,11 +77,9 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
                     $this->logUnknownResource($resource);
                 }
             }
-
-            $result = ['root' => $updates];
         }
 
-        return $result;
+        return ['root' => $updates];
     }
 
     /**

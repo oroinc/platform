@@ -5,10 +5,10 @@ namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\Options;
 
-use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 
-class RouteContextConfigurator implements ContextConfiguratorInterface
+class ThemeContextConfigurator implements ContextConfiguratorInterface
 {
     /** @var Request|null */
     protected $request;
@@ -24,8 +24,6 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
     }
 
     /**
-     * Sets current request route name into layout context
-     *
      * {@inheritdoc}
      */
     public function configureContext(ContextInterface $context)
@@ -33,11 +31,11 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
         $context->getResolver()
             ->setDefaults(
                 [
-                    'route_name' => function (Options $options, $value) {
+                    'theme' => function (Options $options, $value) {
                         if (null === $value && $this->request) {
-                            $value = $this->request->attributes->get('_route');
+                            $value = $this->request->query->get('_theme');
                             if (null === $value) {
-                                $value = $this->request->attributes->get('_master_request_route');
+                                $value = $this->request->attributes->get('_theme');
                             }
                         }
 
@@ -45,6 +43,6 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
                     }
                 ]
             )
-            ->setAllowedTypes(['route_name' => ['string', 'null']]);
+            ->setAllowedTypes(['theme' => ['string', 'null']]);
     }
 }

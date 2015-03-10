@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\Options;
