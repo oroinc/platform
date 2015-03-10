@@ -241,7 +241,8 @@ class TrackingProcessor implements LoggerAwareInterface
             sprintf(
                 'Memory usage (currently) %dMB/ (max) %dMB',
                 round(memory_get_usage(true) / 1024 / 1024),
-                memory_get_peak_usage(true) / 1024 / 1024)
+                memory_get_peak_usage(true) / 1024 / 1024
+            )
         );
     }
 
