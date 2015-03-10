@@ -43,16 +43,31 @@ define(function (require) {
          */
         initialize: function (options) {
             this.options = options;
-            this.bindEvents();
+            this.init();
         },
 
-        bindEvents: function () {
+        init: function () {
             var self = this,
                 $subject = this.options._sourceElement.find('[name$="[subject]"]'),
                 $body = this.options._sourceElement.find('[name$="[body]"]'),
                 $type = this.options._sourceElement.find('[name$="[type]"]'),
                 $template = this.options._sourceElement.find('[name$="[template]"]'),
-                $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]');
+                $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]'),
+                $parentEmailId = this.options._sourceElement.find('[name$="[parentEmailId]"]'),
+                $signature = this.options._sourceElement.find('[name$="[signature]"]');
+
+            var initBody = function(body) {
+                var signature = $signature.val();
+                if (signature && body.indexOf(signature) < 0) {
+                    body += '<br/><br/>' + $signature.val();
+                }
+                if ($bodyFooter.val()) {
+                    body += $bodyFooter.val();
+                }
+
+                return body;
+            };
+            $body.val(initBody($body.val()));
 
             $template.on('change.' + this.cid, function (e) {
                 if (!$(this).val()) {
@@ -72,13 +87,11 @@ define(function (require) {
 
                     $.ajax(url, {
                         success: function (res) {
-                            if (!$bodyFooter.val()) {
+                            if (!$parentEmailId.val() || !$subject.val()) {
                                 $subject.val(res.subject);
                             }
-                            var body = res.body;
-                            if ($bodyFooter.val()) {
-                                body += $bodyFooter.val();
-                            }
+
+                            var body = initBody(res.body);
                             $body.val(body);
                             $type.find('input[value=' + res.type + ']')
                                 .prop('checked', true)

@@ -43,6 +43,9 @@ class Email
     protected $body;
 
     /** @var string */
+    protected $signature;
+
+    /** @var string */
     protected $bodyFooter = '';
 
     /**
@@ -360,15 +363,18 @@ class Email
     }
 
     /**
-     * @param $bodyFooter
-     *
-     * @return $this
+     * @return string
      */
-    public function prependToBodyFooter($bodyFooter)
+    public function getSignature()
     {
-        // body tag is used for tinymce plugin
-        $this->bodyFooter = '<body>' . $bodyFooter . $this->bodyFooter . '</body>';
+        return $this->signature;
+    }
 
-        return $this;
+    /**
+     * @param string $signature
+     */
+    public function setSignature($signature)
+    {
+        $this->signature = $signature;
     }
 }

@@ -100,7 +100,6 @@ class EmailModelBuilder
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
 
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
-        $emailModel->setBody($body);
         $emailModel->setBodyFooter($body);
 
         return $this->createEmailModel($emailModel);
@@ -119,7 +118,6 @@ class EmailModelBuilder
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
-        $emailModel->setBody($body);
         $emailModel->setBodyFooter($body);
 
         return $this->createEmailModel($emailModel);
@@ -245,7 +243,8 @@ class EmailModelBuilder
     protected function applySignature(EmailModel $emailModel)
     {
         $signature = $this->configManager->get('oro_email.signature');
-        $emailModel->prependToBodyFooter($signature);
-        $emailModel->setBody($emailModel->getBodyFooter());
+        if ($signature) {
+            $emailModel->setSignature($signature);
+        }
     }
 }
