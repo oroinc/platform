@@ -17,6 +17,7 @@ class FormStartType extends AbstractFormType
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         $view->vars['form'] = $formAccessor->getView();
+
         $action = $formAccessor->getAction();
         $path   = $action->getPath();
         if ($path) {
