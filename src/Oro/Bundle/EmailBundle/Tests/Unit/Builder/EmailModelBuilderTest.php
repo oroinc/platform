@@ -236,8 +236,8 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
         return [
             [$entityOne, $entityTwo, 1],
             [$entityTwo, $entityOne, 1],
-            [$entityOne, $entityOne, 2],
-            [$entityTwo, $entityTwo, 2],
+            [$entityOne, $entityOne, 1],
+            [$entityTwo, $entityTwo, 1],
         ];
     }
 
