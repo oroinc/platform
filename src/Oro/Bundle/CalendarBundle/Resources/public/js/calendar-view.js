@@ -430,7 +430,7 @@ define(function (require) {
         },
 
         saveFcEvent: function (fcEvent) {
-            var promises = [], oldAttrs, eventModel, attrs;
+            var promises = [], eventModel, attrs;
             attrs = {
                 allDay: fcEvent.allDay,
                 start: fcEvent.start.clone(),
@@ -444,35 +444,29 @@ define(function (require) {
             }
 
             eventModel = this.collection.get(fcEvent.id);
-            oldAttrs = _.clone(eventModel.attributes);
-            eventModel.set(attrs);
 
-            this.trigger('event:beforeSave', eventModel, promises);
+            this.trigger('event:beforeSave', eventModel, promises, attrs);
 
             // wait for promises execution before save
             $.when.apply($, promises)
-                .done(_.bind(this._saveFcEvent, this, eventModel, oldAttrs))
-                .fail(function () {
-                    eventModel.set(oldAttrs);
-                });
+                .done(_.bind(this._saveFcEvent, this, eventModel, attrs));
         },
 
-        _saveFcEvent: function (eventModel, oldAttrs) {
+        _saveFcEvent: function (eventModel, attrs) {
             this.showSavingMask();
             try {
                 eventModel.save(
-                    null,
+                    attrs,
                     {
                         success: _.bind(this._hideMask, this),
                         error: _.bind(function (model, response) {
-                            eventModel.set(oldAttrs);
                             this.showSaveEventError(response.responseJSON || {});
                             this._hideMask();
-                        }, this)
+                        }, this),
+                        wait: true
                     }
                 );
             } catch (err) {
-                eventModel.set(oldAttrs);
                 this.showSaveEventError(err);
             }
         },

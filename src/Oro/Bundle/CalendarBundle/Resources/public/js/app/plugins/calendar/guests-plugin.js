@@ -3,8 +3,6 @@ define(function (require) {
     var GuestsPlugin,
         _ = require('underscore'),
         BasePlugin = require('oroui/js/app/plugins/base/plugin'),
-        mediator = require('oroui/js/mediator'),
-        tools = require('oroui/js/tools'),
         GuestNotifierView = require('orocalendar/js/app/views/guest-notifier-view');
 
     GuestsPlugin = BasePlugin.extend({
@@ -30,7 +28,8 @@ define(function (require) {
                 alias = eventModel.get('calendarAlias');
             if (parentEventId) {
                 result = Boolean(this.main.getConnectionCollection().find(function (c) {
-                    return c.get('calendarAlias') === alias && this.collection.get(c.get('calendarUid') + '_' + parentEventId);
+                    return c.get('calendarAlias') === alias &&
+                        this.collection.get(c.get('calendarUid') + '_' + parentEventId);
                 }, this));
             }
             return result;
@@ -42,7 +41,7 @@ define(function (require) {
          * @param eventModel
          * @returns {boolean}
          */
-        hasGuestEvent: function (eventModel) {
+        hasGuestEvents: function (eventModel) {
             var result = false,
                 guests = eventModel.get('invitedUsers');
             guests = _.isNull(guests) ? [] : guests;
@@ -63,7 +62,7 @@ define(function (require) {
          * @param eventModel
          * @returns {boolean}
          */
-        findGuestEvent: function (eventModel) {
+        findGuestEvents: function (eventModel) {
             return this.main.collection.where({
                 parentEventId: '' + eventModel.originalId
             });
@@ -76,13 +75,8 @@ define(function (require) {
          */
         onEventAdded: function (eventModel) {
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
-            if (this.hasGuestEvent(eventModel)) {
-                // refetch if there are visible guest events
-                if (!eventModel.changing) {
-                    this.main.updateEvents();
-                } else {
-                    eventModel.once('sync', this.main.updateEvents, this.main);
-                }
+            if (this.hasGuestEvents(eventModel)) {
+                this.main.updateEvents();
             }
         },
 
@@ -94,17 +88,13 @@ define(function (require) {
         onEventChanged: function (eventModel) {
             var guestEvents, i, updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
-            if (this.hasGuestEvent(eventModel)) {
-                if (eventModel.changed.invitedUsers) {
-                    if (!eventModel.changing) {
-                        this.main.updateEvents();
-                    } else {
-                        eventModel.once('sync', this.main.updateEvents, this.main);
-                    }
+            if (this.hasGuestEvents(eventModel)) {
+                if (eventModel.hasChanged('invitedUsers')) {
+                    eventModel.once('sync', this.main.updateEvents, this.main);
                     return;
                 }
                 // update linked events
-                guestEvents = this.findGuestEvent(eventModel);
+                guestEvents = this.findGuestEvents(eventModel);
                 updatedAttrs = _.pick(eventModel.changed, ['start', 'end', 'allDay', 'title', 'description']);
                 for (i = 0; i < guestEvents.length; i++) {
                     // fill with updated attributes in parent
@@ -120,9 +110,9 @@ define(function (require) {
          */
         onEventDeleted: function (eventModel) {
             var guestEvents, i;
-            if (this.hasGuestEvent(eventModel)) {
+            if (this.hasGuestEvents(eventModel)) {
                 // remove guests
-                guestEvents = this.findGuestEvent(eventModel);
+                guestEvents = this.findGuestEvents(eventModel);
                 for (i = 0; i < guestEvents.length; i++) {
                     this.main.getCalendarElement().fullCalendar('removeEvents', guestEvents[i].id);
                     this.main.collection.remove(guestEvents[i]);
@@ -136,9 +126,10 @@ define(function (require) {
          *
          * @param eventModel
          * @param {array} promises script will wait execution of all promises before save
+         * @param {object} attrs to be set on event model
          */
-        onEventBeforeSave: function (eventModel, promises) {
-            if (this.hasGuestEvent(eventModel)) {
+        onEventBeforeSave: function (eventModel, promises, attrs) {
+            if (this.hasGuestEvents(eventModel)) {
                 var deferredConfirmation = $.Deferred(), cleanUp;
                 promises.push(deferredConfirmation);
 
@@ -151,15 +142,13 @@ define(function (require) {
                     this.modal = GuestNotifierView.createConfirmNotificationDialog();
 
                     this.modal.on('ok', _.bind(function () {
-                        eventModel.set({notifyInvitedUsers: true}, {silent: true});
-                        eventModel.once('sync', function () {
-                            this.unset('notifyInvitedUsers');
-                        });
+                        attrs.notifyInvitedUsers = true;
                         deferredConfirmation.resolve();
                         _.defer(cleanUp);
                     }, this));
 
                     this.modal.on('cancel', _.bind(function () {
+                        attrs.notifyInvitedUsers = false;
                         deferredConfirmation.resolve();
                         _.defer(cleanUp);
                     }, this));
