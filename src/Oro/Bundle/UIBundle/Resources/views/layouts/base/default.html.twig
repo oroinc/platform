@@ -87,7 +87,7 @@
     {% if grid_scope is defined %}
         {% set grid_name = oro_datagrid_build_fullname(grid_name, grid_scope) %}
     {% endif %}
-    {{ dataGrid.renderGrid(grid_name, params) }}
+    {{ dataGrid.renderGrid(grid_name, grid_parameters) }}
 {% endblock %}
 
 {% block _debug_init_script_widget %}

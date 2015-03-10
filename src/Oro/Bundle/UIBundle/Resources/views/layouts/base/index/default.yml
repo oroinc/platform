@@ -36,6 +36,8 @@ oro_layout:
                         placeholder_name: index_navButtons_after
                         placeholder_parameters:
                             entity_class: { @value: $context.entity_class }
+                page_content:
+                    blockType: container
             tree:
                 content:
                     page_header_panel:
@@ -46,3 +48,4 @@ oro_layout:
                                 nav_buttons_before: ~
                                 nav_buttons: ~
                                 nav_buttons_after: ~
+                    page_content: ~
