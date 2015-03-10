@@ -37,8 +37,11 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var array */
     protected $eventDictionary = [];
 
-    /** @var  TrackingEventIdentificationProvider */
+    /** @var TrackingEventIdentificationProvider */
     protected $trackingIdentification;
+
+    /** @var int */
+    protected $processedBatches = 0;
 
     /**
      * @param ManagerRegistry                     $doctrine
@@ -64,15 +67,49 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger = new NullLogger();
         }
 
-        $this->logger->notice('Process new visits');
+        $totalEvents  = $this->getEventsCount();
+        $totalBatches = number_format(ceil($totalEvents / self::BATCH_SIZE));
+        $this->logger->notice(
+            sprintf(
+                '<info>Total events to be processed - %s (%s batches).</info>',
+                number_format($totalEvents),
+                $totalBatches
+            )
+        );
+
+        $this->logger->notice('Processing new visits...');
         while ($this->processVisits()) {
-            $this->logger->notice('Try to process Next batch');
+            $this->logger->notice(
+                sprintf(
+                    'Batch #%d of %s processed at <info>%s</info>.',
+                    ++$this->processedBatches,
+                    $totalBatches,
+                    date('Y-m-d H:i:s')
+                )
+            );
         }
 
-        $this->logger->notice('Identify previous visits identifiers');
+        $this->logger->notice('Identify previous visit identifiers');
         while ($this->identifyPrevVisits()) {
             $this->logger->notice('Try to process Next batch');
         }
+    }
+
+    /**
+     * Returns count of web events to be processed.
+     *
+     * @return mixed
+     */
+    protected function getEventsCount()
+    {
+        $em           = $this->getEntityManager();
+        $queryBuilder = $em
+            ->getRepository(self::TACKING_EVENT_ENTITY)
+            ->createQueryBuilder('entity')
+            ->select('COUNT (entity.id)')
+            ->where('entity.parsed = false');
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -94,13 +131,13 @@ class TrackingProcessor implements LoggerAwareInterface
         if ($entities) {
             /** @var TrackingVisit $visit */
             foreach ($entities as $visit) {
-                $this->logger->notice($visit->getId());
+                $this->logger->info('Parsing visit - ' . $visit->getId());
                 $idObj = $this->trackingIdentification->identify($visit);
                 if ($idObj && $idObj['targetObject']) {
                     $visit->setIdentifierTarget($idObj['targetObject']);
                     $visit->setIdentifierDetected(true);
 
-                    $this->logger->notice('-- parsed UID "' . $idObj['parsedUID'] . '"');
+                    $this->logger->info('-- <comment>parsed UID "' . $idObj['parsedUID'] . '"</comment>');
                 } else {
                     $visit->setParsingCount($visit->getParsingCount() + 1);
                 }
@@ -131,7 +168,7 @@ class TrackingProcessor implements LoggerAwareInterface
     {
         /** @var TrackingVisit $visit */
         foreach ($entities as $visit) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf(
                     'Process visit id: %s, visitorUid: %s',
                     $visit->getId(),
@@ -195,12 +232,11 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function processTrackingVisits($entities)
     {
-        $this->logger->notice('Process batch START - ' . date('Y-m-d H:i:s'));
         $em = $this->getEntityManager();
 
         /** @var  TrackingEvent $event */
         foreach ($entities as $event) {
-            $this->logger->notice($event->getId());
+            $this->logger->info('Processing event - ' . $event->getId());
 
             $trackingVisitEvent = new TrackingVisitEvent();
 
@@ -228,10 +264,9 @@ class TrackingProcessor implements LoggerAwareInterface
         $this->eventDictionary = [];
         $em->clear();
 
-        $this->logger->notice('Process batch END - ' . date('Y-m-d H:i:s'));
-        $this->logger->notice(
+        $this->logger->info(
             sprintf(
-                'Memory usage (currently) %dMB/ (max) %dMB',
+                '<comment>Memory usage (currently) %dMB/ (max) %dMB</comment>',
                 round(memory_get_usage(true) / 1024 / 1024),
                 memory_get_peak_usage(true) / 1024 / 1024
             )
@@ -341,7 +376,7 @@ class TrackingProcessor implements LoggerAwareInterface
              *  - assign visit to target
              *  - assign all previous visits to same identified object(s).
              */
-            $this->logger->notice('-- parsed UID "' . $idObj['parsedUID'] . '"');
+            $this->logger->info('-- <comment>parsed UID "' . $idObj['parsedUID'] . '"</comment>');
             if ($idObj['parsedUID'] !== null) {
                 $visit->setParsedUID($idObj['parsedUID']);
                 if ($idObj['targetObject']) {
