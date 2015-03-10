@@ -16,10 +16,6 @@ use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
 /**
  * This block type is responsible to build the layout for a Symfony's form object.
  * Naming convention:
- *  form start id = $options['form_prefix'] + ':start'
- *      for example: form:start where 'form' is the prefix
- *  form start id = $options['form_prefix'] + ':end'
- *      for example: form:end where 'form' is the prefix
  *  field id = $options['form_field_prefix'] + field path (path separator is replaced with colon (:))
  *      for example: form_firstName or form_address:city  where 'form_' is the prefix
  *  group id = $options['form_group_prefix'] + group name
@@ -62,7 +58,6 @@ class FormType extends AbstractFormType
                 //   ]
                 // ]
                 'groups'            => [],
-                'with_form_blocks'  => false,
                 'form_prefix'       => null,
                 'form_field_prefix' => null,
                 'form_group_prefix' => null
@@ -72,7 +67,6 @@ class FormType extends AbstractFormType
             [
                 'preferred_fields'  => 'array',
                 'groups'            => 'array',
-                'with_form_blocks'  => 'bool',
                 'form_prefix'       => 'string',
                 'form_field_prefix' => 'string',
                 'form_group_prefix' => 'string'
@@ -106,27 +100,7 @@ class FormType extends AbstractFormType
     {
         $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
 
-        if ($options['with_form_blocks']) {
-            $formStartOptions = array_intersect_key(
-                $options,
-                ['form_name' => null, 'attr' => null]
-            );
-            $builder->getLayoutManipulator()->add(
-                $options['form_prefix'] . ':start',
-                $builder->getId(),
-                FormStartType::NAME,
-                $formStartOptions
-            );
-        }
         $this->formLayoutBuilder->build($formAccessor, $builder, $options);
-        if ($options['with_form_blocks']) {
-            $builder->getLayoutManipulator()->add(
-                $options['form_prefix'] . ':end',
-                $builder->getId(),
-                FormEndType::NAME,
-                ['form_name' => $options['form_name']]
-            );
-        }
     }
 
     /**
@@ -137,9 +111,6 @@ class FormType extends AbstractFormType
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         $view->vars['form'] = $formAccessor->getView();
-        if (!$options['with_form_blocks']) {
-            FormStartHelper::buildView($view, $formAccessor);
-        }
     }
 
     /**
@@ -148,9 +119,6 @@ class FormType extends AbstractFormType
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
-        if (!$options['with_form_blocks']) {
-            FormStartHelper::finishView($view);
-        }
 
         // prevent form fields rendering by form_rest() method,
         // if the corresponding layout block has been removed

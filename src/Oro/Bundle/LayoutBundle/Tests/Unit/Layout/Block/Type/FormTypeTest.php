@@ -8,10 +8,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Block\Type\ContainerType;
 
-use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormEndType;
-use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class FormTypeTest extends BlockTypeTestCase
@@ -34,7 +31,6 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name'         => 'form',
                     'preferred_fields'  => [],
                     'groups'            => [],
-                    'with_form_blocks'  => false,
                     'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_',
                     'form_group_prefix' => 'form:group_'
@@ -48,7 +44,6 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name'         => 'test',
                     'preferred_fields'  => [],
                     'groups'            => [],
-                    'with_form_blocks'  => false,
                     'form_prefix'       => 'test',
                     'form_field_prefix' => 'test_',
                     'form_group_prefix' => 'test:group_'
@@ -63,7 +58,6 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name'         => 'test_form',
                     'preferred_fields'  => [],
                     'groups'            => [],
-                    'with_form_blocks'  => false,
                     'form_prefix'       => 'test_prefix',
                     'form_field_prefix' => 'test_prefix_',
                     'form_group_prefix' => 'test_prefix:group_'
@@ -74,7 +68,6 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name'         => 'test',
                     'preferred_fields'  => ['field1'],
                     'groups'            => ['group1' => ['title' => 'TestGroup']],
-                    'with_form_blocks'  => true,
                     'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_field_prefix_',
                     'form_group_prefix' => 'form_group_prefix_'
@@ -83,7 +76,6 @@ class FormTypeTest extends BlockTypeTestCase
                     'form_name'         => 'test',
                     'preferred_fields'  => ['field1'],
                     'groups'            => ['group1' => ['title' => 'TestGroup']],
-                    'with_form_blocks'  => true,
                     'form_prefix'       => 'form',
                     'form_field_prefix' => 'form_field_prefix_',
                     'form_group_prefix' => 'form_group_prefix_'
@@ -92,73 +84,7 @@ class FormTypeTest extends BlockTypeTestCase
         ];
     }
 
-    public function testBuildBlockWithFormBlocks()
-    {
-        $formBlockId = 'test_block';
-        $formName    = 'test_form';
-
-        $formAccessor      = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
-
-        $this->context->set($formName, $formAccessor);
-
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
-        $builder->expects($this->any())
-            ->method('getContext')
-            ->will($this->returnValue($this->context));
-        $builder->expects($this->any())
-            ->method('getLayoutManipulator')
-            ->will($this->returnValue($layoutManipulator));
-        $builder->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($formBlockId));
-
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
-
-        $type    = new FormType($formLayoutBuilder);
-        $options = $this->resolveOptions(
-            $type,
-            [
-                'with_form_blocks' => true,
-                'form_name'        => $formName,
-                'form_prefix'      => 'test',
-                'attr'             => ['id' => 'test_id']
-            ]
-        );
-
-        $layoutManipulator->expects($this->at(0))
-            ->method('add')
-            ->with(
-                'test:start',
-                $formBlockId,
-                FormStartType::NAME,
-                [
-                    'form_name' => $formName,
-                    'attr'      => ['id' => 'test_id']
-                ]
-            );
-        $layoutManipulator->expects($this->at(1))
-            ->method('add')
-            ->with(
-                'test:end',
-                $formBlockId,
-                FormEndType::NAME,
-                ['form_name' => $formName]
-            );
-
-        $formLayoutBuilder->expects($this->once())
-            ->method('build')
-            ->with($this->identicalTo($formAccessor), $this->identicalTo($builder), $options);
-
-        $type->buildBlock($builder, $options);
-
-        $this->assertSame(
-            $formAccessor,
-            $this->context->get($formName)
-        );
-    }
-
-    public function testBuildBlockWithoutFormBlocks()
+    public function testBuildBlock()
     {
         $formName = 'test_form';
 
@@ -176,7 +102,7 @@ class FormTypeTest extends BlockTypeTestCase
         $type    = new FormType($formLayoutBuilder);
         $options = $this->resolveOptions(
             $type,
-            ['form_name' => $formName, 'with_form_blocks' => false]
+            ['form_name' => $formName]
         );
 
         $formLayoutBuilder->expects($this->once())
@@ -235,49 +161,7 @@ class FormTypeTest extends BlockTypeTestCase
         $type->buildBlock($builder, $options);
     }
 
-    public function testBuildViewWithFormBlocks()
-    {
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
-        $type              = new FormType($formLayoutBuilder);
-
-        $formName     = 'form';
-        $view         = new BlockView();
-        $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $context      = new LayoutContext();
-        $formView     = new FormView();
-
-        $context->set('form', $formAccessor);
-
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $formAccessor->expects($this->once())
-            ->method('getView')
-            ->will($this->returnValue($formView));
-
-        $type->buildView(
-            $view,
-            $block,
-            [
-                'form_name'                    => $formName,
-                'with_form_blocks'             => true,
-                'form_action_path'             => 'form_action_path',
-                'form_action_route_name'       => 'form_action_route',
-                'form_action_route_parameters' => ['foo' => 'bar'],
-                'form_method'                  => 'get',
-                'form_enctype'                 => 'form_enctype'
-            ]
-        );
-        $this->assertSame($formView, $view->vars['form']);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
-        $this->assertFalse(array_key_exists('method', $view->vars));
-        $this->assertFalse(array_key_exists('enctype', $view->vars));
-    }
-
-    public function testBuildViewWithoutFormBlocks()
+    public function testBuildView()
     {
         $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
         $type              = new FormType($formLayoutBuilder);
@@ -296,75 +180,13 @@ class FormTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->any())
             ->method('getView')
             ->will($this->returnValue($formView));
-        $formAccessor->expects($this->once())
-            ->method('getAction')
-            ->will($this->returnValue(FormAction::createByPath('form_action_path')));
-        $formAccessor->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('get'));
-        $formAccessor->expects($this->once())
-            ->method('getEnctype')
-            ->will($this->returnValue('form_enctype'));
 
         $type->buildView(
             $view,
             $block,
-            [
-                'form_name'        => 'form',
-                'with_form_blocks' => false
-            ]
+            ['form_name' => 'form']
         );
         $this->assertSame($formView, $view->vars['form']);
-        $this->assertEquals('form_action_path', $view->vars['action_path']);
-        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
-        $this->assertEquals('get', $view->vars['method']);
-        $this->assertEquals('form_enctype', $view->vars['enctype']);
-    }
-
-    public function testBuildViewWithoutFormBlocksAndActionRoute()
-    {
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
-        $type              = new FormType($formLayoutBuilder);
-
-        $view         = new BlockView();
-        $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $context      = new LayoutContext();
-        $formView     = new FormView();
-
-        $context->set('form', $formAccessor);
-
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $formAccessor->expects($this->any())
-            ->method('getView')
-            ->will($this->returnValue($formView));
-        $formAccessor->expects($this->once())
-            ->method('getAction')
-            ->will($this->returnValue(FormAction::createByRoute('form_action_route', ['foo' => 'bar'])));
-        $formAccessor->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('get'));
-        $formAccessor->expects($this->once())
-            ->method('getEnctype')
-            ->will($this->returnValue('form_enctype'));
-
-        $type->buildView(
-            $view,
-            $block,
-            [
-                'form_name'        => 'form',
-                'with_form_blocks' => false
-            ]
-        );
-        $this->assertSame($formView, $view->vars['form']);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
-        $this->assertEquals('form_action_route', $view->vars['action_route_name']);
-        $this->assertEquals(['foo' => 'bar'], $view->vars['action_route_parameters']);
-        $this->assertEquals('get', $view->vars['method']);
-        $this->assertEquals('form_enctype', $view->vars['enctype']);
     }
 
     public function testFinishView()
@@ -415,7 +237,7 @@ class FormTypeTest extends BlockTypeTestCase
                 )
             );
 
-        $type->finishView($view, $block, ['form_name' => $formName, 'with_form_blocks' => true]);
+        $type->finishView($view, $block, ['form_name' => $formName]);
 
         $this->assertFalse($formView->isRendered());
         $this->assertFalse($formView['field1']->isRendered());
@@ -467,83 +289,13 @@ class FormTypeTest extends BlockTypeTestCase
                 )
             );
 
-        $type->finishView($view, $block, ['form_name' => $formName, 'with_form_blocks' => true]);
+        $type->finishView($view, $block, ['form_name' => $formName]);
 
         $this->assertFalse($formView->isRendered());
         $this->assertFalse($formView['field1']->isRendered());
         $this->assertTrue($formView['field2']->isRendered());
         $this->assertFalse($formView['field3']['field31']->isRendered());
         $this->assertTrue($formView['field3']['field32']->isRendered());
-    }
-
-    public function testFinishViewWithoutFormBlocks()
-    {
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
-        $type              = new FormType($formLayoutBuilder);
-
-        $view         = new BlockView();
-        $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $context      = new LayoutContext();
-        $formView     = new FormView();
-
-        $view->vars['form']                    = $formView;
-        $view->vars['action_path']             = 'form_action_path';
-        $view->vars['action_route_name']       = 'form_action_route';
-        $view->vars['action_route_parameters'] = ['foo' => 'bar'];
-        $view->vars['method']                  = 'GET';
-        $view->vars['enctype']                 = 'form_enctype';
-
-        $context->set('form', $formAccessor);
-
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $formAccessor->expects($this->once())
-            ->method('getProcessedFields')
-            ->will($this->returnValue([]));
-
-        $type->finishView($view, $block, ['form_name' => 'form', 'with_form_blocks' => false]);
-        $this->assertEquals('form_action_path', $view->vars['action_path']);
-        $this->assertEquals('form_action_route', $view->vars['action_route_name']);
-        $this->assertEquals(['foo' => 'bar'], $view->vars['action_route_parameters']);
-        $this->assertEquals('GET', $view->vars['method']);
-        $this->assertEquals('form_enctype', $view->vars['enctype']);
-    }
-
-    public function testFinishViewWithoutFormBlocksAndEmptyFormOptions()
-    {
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface');
-        $type              = new FormType($formLayoutBuilder);
-
-        $view         = new BlockView();
-        $block        = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $context      = new LayoutContext();
-        $formView     = new FormView();
-
-        $view->vars['form']                    = $formView;
-        $view->vars['action_path']             = '';
-        $view->vars['action_route_name']       = '';
-        $view->vars['action_route_parameters'] = ['foo' => 'bar'];
-        $view->vars['method']                  = '';
-        $view->vars['enctype']                 = '';
-
-        $context->set('form', $formAccessor);
-
-        $block->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($context));
-        $formAccessor->expects($this->once())
-            ->method('getProcessedFields')
-            ->will($this->returnValue([]));
-
-        $type->finishView($view, $block, ['form_name' => 'form', 'with_form_blocks' => false]);
-        $this->assertFalse(array_key_exists('action_path', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_name', $view->vars));
-        $this->assertFalse(array_key_exists('action_route_parameters', $view->vars));
-        $this->assertFalse(array_key_exists('method', $view->vars));
-        $this->assertFalse(array_key_exists('enctype', $view->vars));
     }
 
     public function testGetName()
