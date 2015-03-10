@@ -67,10 +67,6 @@ oro_layout:
                     blockType: placeholder
                     options:
                         placeholder_name: user_menu
-                dots_menu:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: dots_menu
                 navbar_menu:
                     blockType: placeholder
                     options:
@@ -160,7 +156,6 @@ oro_layout:
                             navigation_bar:
                                 header_logo: ~
                                 user_menu: ~
-                                dots_menu: ~
                                 navbar_menu: ~
                                 pin_tabs: ~
                             main_menu:
