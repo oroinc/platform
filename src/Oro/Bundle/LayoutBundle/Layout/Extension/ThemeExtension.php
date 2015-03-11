@@ -7,12 +7,12 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
+use Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
@@ -31,28 +31,28 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
     /** @var DependencyInitializer */
     protected $dependencyInitializer;
 
-    /** @var ResourceMatcher */
-    protected $matcher;
+    /** @var PathProviderInterface */
+    protected $pathProvider;
 
     /**
      * @param array                    $resources
      * @param ResourceFactoryInterface $factory
      * @param LoaderInterface          $loader
      * @param DependencyInitializer    $dependencyInitializer
-     * @param ResourceMatcher          $matcher
+     * @param PathProviderInterface    $provider
      */
     public function __construct(
         array $resources,
         ResourceFactoryInterface $factory,
         LoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
-        ResourceMatcher $matcher
+        PathProviderInterface $provider
     ) {
         $this->resources             = $resources;
         $this->loader                = $loader;
         $this->factory               = $factory;
         $this->dependencyInitializer = $dependencyInitializer;
-        $this->matcher               = $matcher;
+        $this->pathProvider          = $provider;
         $this->setLogger(new NullLogger());
     }
 
@@ -64,17 +64,14 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
         $updates = [];
 
         if ($context->getOr('theme')) {
-            $this->matcher->setContext($context);
-
-            $iterator = new ResourceIterator($this->factory, $this->resources);
-            $iterator->setMatcher($this->matcher);
+            $iterator = new ResourceIterator($this->factory, $this->findApplicableResources($context));
             foreach ($iterator as $resource) {
                 if ($this->loader->supports($resource)) {
                     $update = $this->loader->load($resource);
                     $this->dependencyInitializer->initialize($update);
                     $updates[] = $update;
                 } else {
-                    $this->logUnknownResource($resource);
+                    $this->logger->notice(sprintf('Skipping resource "%s" because loader for it not found', $resource));
                 }
             }
         }
@@ -83,10 +80,52 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
     }
 
     /**
-     * @param FileResource $resource
+     * Filters resources by paths that comes from provider and returns array of resource files
+     *
+     * @param ContextInterface $context
+     *
+     * @return array
      */
-    protected function logUnknownResource(FileResource $resource)
+    protected function findApplicableResources(ContextInterface $context)
     {
-        $this->logger->notice(sprintf('Skipping resource "%s" because loader for it not found', $resource));
+        if ($this->pathProvider instanceof ContextAwareInterface) {
+            $this->pathProvider->setContext($context);
+        }
+
+        $result = [];
+        $paths  = $this->pathProvider->getPaths();
+        foreach ($paths as $path) {
+            $pathArray = explode(PathProviderInterface::DELIMITER, $path);
+
+            $value = $this->resources;
+            for ($i = 0, $length = count($pathArray); $i < $length; ++$i) {
+                $value = $this->readValue($value, $pathArray[$i]);
+
+                if (null === $value) {
+                    break;
+                }
+            }
+
+            if ($value && is_array($value)) {
+                $result = array_merge($result, array_filter($value, 'is_string'));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array  $array
+     * @param string $property
+     *
+     * @return mixed
+     */
+    protected function readValue(&$array, $property)
+    {
+        if (is_array($array) && isset($array[$property])) {
+            return $array[$property];
+        }
+
+        return null;
     }
 }

@@ -23,7 +23,7 @@ class ResourceFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $filename = uniqid('testFilename', true);
 
-        $result = $this->factory->create(['somePath'], $filename);
+        $result = $this->factory->create($filename);
 
         $this->assertInstanceOf('Oro\Bundle\LayoutBundle\Layout\Loader\FileResource', $result);
         $this->assertSame($filename, $result->getFilename());

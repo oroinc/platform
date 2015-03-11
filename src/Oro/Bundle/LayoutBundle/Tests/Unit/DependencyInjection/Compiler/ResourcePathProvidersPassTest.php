@@ -6,16 +6,16 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ResourceMatcherVotersPass;
+use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ResourcePathProvidersPass;
 
-class ResourceMatcherVotersPassTest extends \PHPUnit_Framework_TestCase
+class ResourcePathProvidersPassTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ResourceMatcherVotersPass */
+    /** @var ResourcePathProvidersPass */
     protected $pass;
 
     protected function setUp()
     {
-        $this->pass = new ResourceMatcherVotersPass();
+        $this->pass = new ResourcePathProvidersPass();
     }
 
     protected function tearDown()
@@ -34,32 +34,32 @@ class ResourceMatcherVotersPassTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition();
 
         $container = new ContainerBuilder();
-        $container->setDefinition('oro_layout.loader.resource_matcher', $definition);
+        $container->setDefinition('oro_layout.loader.chain_path_provider', $definition);
 
         $this->pass->process($container);
 
         $this->assertEmpty($definition->getMethodCalls());
     }
 
-    public function testFoundVoters()
+    public function testFoundProviders()
     {
         $definition = new Definition();
 
         $container = new ContainerBuilder();
-        $container->setDefinition('oro_layout.loader.resource_matcher', $definition);
+        $container->setDefinition('oro_layout.loader.chain_path_provider', $definition);
 
-        $voter1Def = new Definition();
-        $voter1Def->addTag('layout.resource_matcher.voter', ['priority' => 100]);
-        $container->setDefinition('voter1', $voter1Def);
-        $voter2Def = new Definition();
-        $voter2Def->addTag('layout.resource_matcher.voter');
-        $container->setDefinition('voter2', $voter2Def);
+        $provider1Def = new Definition();
+        $provider1Def->addTag('layout.resource.path_provider', ['priority' => 100]);
+        $container->setDefinition('provider1', $provider1Def);
+        $provider2Def = new Definition();
+        $provider2Def->addTag('layout.resource.path_provider');
+        $container->setDefinition('provider2', $provider2Def);
 
         $this->pass->process($container);
 
         $methods = $definition->getMethodCalls();
         $this->assertCount(2, $methods);
-        $this->assertEquals(['addVoter', [new Reference('voter1'), 100]], current($methods));
-        $this->assertEquals(['addVoter', [new Reference('voter2'), 0]], next($methods));
+        $this->assertEquals(['addProvider', [new Reference('provider1'), 100]], current($methods));
+        $this->assertEquals(['addProvider', [new Reference('provider2'), 0]], next($methods));
     }
 }
