@@ -14,8 +14,9 @@ use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 
 /**
  * This extension is intended to:
- * 1) load the title configured in navigation.yml
- * 2) add the "cache" option to the HeadType.
+ * 1) load the title configured in navigation.yml.
+ * 2) add the "title_parameters" option to the HeadType.
+ * 3) add the "cache" option to the HeadType.
  *  Allowed values are (currently only null and false are implemented by HTML renderer - see layout.html.twig):
  *  * null     - no any cache configuration is applied (default behaviour).
  *  * false    - the document caching is prohibited.
@@ -46,7 +47,7 @@ class HeadExtension extends AbstractBlockTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(['cache' => null]);
+        $resolver->setDefaults(['cache' => null, 'title_parameters' => []]);
     }
 
     /**
@@ -66,6 +67,7 @@ class HeadExtension extends AbstractBlockTypeExtension
                 }
             }
         }
+        $view->vars['title_parameters'] = $options['title_parameters'];
     }
 
     /**

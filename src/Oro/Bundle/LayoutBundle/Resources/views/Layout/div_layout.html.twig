@@ -6,7 +6,7 @@
         {%- if label is empty -%}
             {% set label = id|humanize %}
         {%- endif -%}
-        <label{% if label_attr is defined %}{% for attrname, attrvalue in label_attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}{% endif %}>{{ label|trans({}, translation_domain) }}</label>
+        <label{% if label_attr is defined %}{% for attrname, attrvalue in label_attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}{% endif %}>{{ label|block_text(translation_domain) }}</label>
     {%- endif %}
 {%- endblock %}
 
@@ -16,7 +16,7 @@
 {%- endblock %}
 
 {% block block_attributes -%}
-    {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
+    {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
 {%- endblock %}
 
 {% block container_widget -%}
@@ -34,7 +34,7 @@
 
 {% block head_widget %}
     <head{{ block('block_attributes') }}>
-        <title>{{ translatable ? title|trans(title_parameters, translation_domain) : title|replace(title_parameters) }}</title>
+        <title>{{ title|block_text(translation_domain) }}</title>
         {{ block_widget(block) }}
     </head>
 {% endblock %}
@@ -90,18 +90,18 @@
 
 {% block fieldset_widget %}
     <fieldset{{ block('block_attributes') }}>
-        <legend>{{ translatable ? title|trans(title_parameters, translation_domain) : title|replace(title_parameters) }}</legend>
+        <legend>{{ title|block_text(translation_domain) }}</legend>
         {{ block_widget(block) }}
     </fieldset>
 {% endblock %}
 
 {% block text_widget -%}
-    {{ translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) }}
+    {{ text|block_text(translation_domain) }}
 {%- endblock %}
 
 {% block link_widget -%}
     <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
-        {{- translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) -}}
+        {{- text|block_text(translation_domain) -}}
     </a>
 {%- endblock %}
 

@@ -13,24 +13,18 @@ class HeadTypeTest extends BlockTypeTestCase
     {
         $this->assertEquals(
             [
-                'title'            => '',
-                'title_parameters' => [],
-                'translatable'     => true
+                'title' => ''
             ],
             $this->resolveOptions(HeadType::NAME, [])
         );
         $this->assertEquals(
             [
-                'title'            => 'test',
-                'title_parameters' => ['{{ foo }}' => 'bar'],
-                'translatable'     => false
+                'title' => 'test'
             ],
             $this->resolveOptions(
                 HeadType::NAME,
                 [
-                    'title'            => 'test',
-                    'title_parameters' => ['{{ foo }}' => 'bar'],
-                    'translatable'     => false
+                    'title' => 'test'
                 ]
             )
         );
@@ -40,12 +34,10 @@ class HeadTypeTest extends BlockTypeTestCase
     {
         $view = $this->getBlockView(
             HeadType::NAME,
-            ['title' => 'test', 'title_parameters' => ['{{ foo }}' => 'bar']]
+            ['title' => 'test']
         );
 
         $this->assertEquals('test', $view->vars['title']);
-        $this->assertEquals(['{{ foo }}' => 'bar'], $view->vars['title_parameters']);
-        $this->assertTrue($view->vars['translatable']);
     }
 
     public function testGetName()

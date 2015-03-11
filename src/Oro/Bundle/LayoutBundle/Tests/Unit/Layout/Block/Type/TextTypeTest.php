@@ -26,20 +26,16 @@ class TextTypeTest extends BlockTypeTestCase
         );
 
         $this->assertEquals('', $view->vars['text']);
-        $this->assertEquals([], $view->vars['text_parameters']);
-        $this->assertTrue($view->vars['translatable']);
     }
 
     public function testBuildView()
     {
         $view = $this->getBlockView(
             TextType::NAME,
-            ['text' => 'test', 'text_parameters' => ['{{ foo }}' => 'bar'], 'translatable' => false]
+            ['text' => 'test']
         );
 
         $this->assertEquals('test', $view->vars['text']);
-        $this->assertEquals(['{{ foo }}' => 'bar'], $view->vars['text_parameters']);
-        $this->assertFalse($view->vars['translatable']);
     }
 
     public function testGetName()

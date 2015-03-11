@@ -17,14 +17,7 @@ class TextType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver
-            ->setRequired(['text'])
-            ->setDefaults(
-                [
-                    'text_parameters' => [],
-                    'translatable'    => true
-                ]
-            );
+        $resolver->setRequired(['text']);
     }
 
     /**
@@ -32,9 +25,7 @@ class TextType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $view->vars['text']            = $options['text'];
-        $view->vars['text_parameters'] = $options['text_parameters'];
-        $view->vars['translatable']    = $options['translatable'];
+        $view->vars['text'] = $options['text'];
     }
 
     /**

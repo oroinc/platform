@@ -10,6 +10,7 @@ services:
         class: %oro_layout.twig.extension.layout.class%
         arguments:
             - @oro_layout.twig.renderer
+            - @oro_layout.text.helper
         tags:
             - { name: twig.extension }
 

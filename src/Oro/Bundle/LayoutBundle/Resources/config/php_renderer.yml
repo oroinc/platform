@@ -28,5 +28,6 @@ services:
         class: %oro_layout.php.templating.helper.class%
         arguments:
             - @oro_layout.php.renderer
+            - @oro_layout.text.helper
         tags:
              - { name: templating.helper, alias: layout }

@@ -1,1 +1,1 @@
-<a <?php echo $view['layout']->block($block, 'block_attributes') ?> href="<?php echo $path ?: $view['router']->generate($route_name, $route_parameters) ?>"><?php echo $view->escape($translatable ? $view['translator']->trans($text, $text_parameters, $translation_domain) : strtr($text, $text_parameters)) ?></a>
+<a <?php echo $view['layout']->block($block, 'block_attributes') ?> href="<?php echo $path ?: $view['router']->generate($route_name, $route_parameters) ?>"><?php echo $view->escape($view['layout']->text($text, $translation_domain)) ?></a>
