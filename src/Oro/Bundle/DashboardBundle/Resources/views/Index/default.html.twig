@@ -221,7 +221,7 @@
                             'layoutPosition': widget.layoutPosition,
                         },
                         'allowEdit': options.allowEdit,
-                        'showConfig': widget.config.fields|length > 0,
+                        'showConfig': options.allowEdit and widget.config.fields|length > 0,
                     })
                 }}
             {% endif %}

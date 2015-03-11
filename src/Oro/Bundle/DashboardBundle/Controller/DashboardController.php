@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -99,6 +100,10 @@ class DashboardController extends Controller
      */
     public function configureAction(Request $request, Widget $widget)
     {
+        if (!$this->getSecurityFacade()->isGranted('EDIT', $widget->getDashboard())) {
+            throw new AccessDeniedException();
+        }
+
         $form = $this->getFormProvider()->getForm($widget->getName());
         $saved = false;
 

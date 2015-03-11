@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 {
-    private $dashboardManager;
+    private $widgetRepository;
+
+    private $em;
     private $stateManager;
     private $eventDispatcher;
 
@@ -30,9 +32,7 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
         $resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
 
-        $this->dashboardManager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\Manager')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
 
         $this->stateManager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\StateManager')
                 ->disableOriginalConstructor()
@@ -40,14 +40,24 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->widgetConfigs = new WidgetConfigs($configProvider, $securityFacade, $resolver, $this->dashboardManager, $this->stateManager, $this->eventDispatcher);
+        $this->widgetConfigs = new WidgetConfigs($configProvider, $securityFacade, $resolver, $this->em, $this->stateManager, $this->eventDispatcher);
+
+        $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $this->em
+            ->expects($this->any())
+            ->method('getRepository')
+            ->with('OroDashboardBundle:Widget')
+            ->will($this->returnValue($this->widgetRepository));
     }
 
     public function testGetCurrentWidgetOptionsShouldReturnEmptyArrayIfRequestIsNull()
     {
         $this->widgetConfigs->setRequest(null);
 
-        $this->assertEmpty($this->widgetConfigs->getCurrentWidgetOptions());
+        $this->assertEmpty($this->widgetConfigs->getCurrentWidgetOptions()->all());
     }
 
     public function testGetCurrentWidgetOptionsShouldReturnEmptyArrayIfThereIsNoWidgetIdInRequestQuery()
@@ -55,7 +65,7 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->widgetConfigs->setRequest($request);
 
-        $this->assertEmpty($this->widgetConfigs->getCurrentWidgetOptions());
+        $this->assertEmpty($this->widgetConfigs->getCurrentWidgetOptions()->all());
     }
 
     public function testGetCurrentWidgetOptionsShouldReturnOptionsOfWidget()
@@ -66,9 +76,9 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
         $this->widgetConfigs->setRequest($request);
 
         $widget = new Widget();
-        $this->dashboardManager
+        $this->widgetRepository
             ->expects($this->once())
-            ->method('findWidgetModel')
+            ->method('find')
             ->with(1)
             ->will($this->returnValue($widget));
 
@@ -92,9 +102,9 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
         $this->widgetConfigs->setRequest($request);
 
         $widget = new Widget();
-        $this->dashboardManager
+        $this->widgetRepository
             ->expects($this->once())
-            ->method('findWidgetModel')
+            ->method('find')
             ->with(1)
             ->will($this->returnValue($widget));
 

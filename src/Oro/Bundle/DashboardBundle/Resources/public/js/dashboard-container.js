@@ -105,7 +105,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                 'loadingMaskEnabled': false,
                 'container': '#' + containerId,
                 'allowEdit': this.options.allowEdit,
-                'showConfig': !_.isEmpty(data.config.fields)
+                'showConfig': this.options.allowEdit && !_.isEmpty(data.config.fields)
             };
             var widget = new DashboardItemWidget(widgetParams);
             widget.render();
