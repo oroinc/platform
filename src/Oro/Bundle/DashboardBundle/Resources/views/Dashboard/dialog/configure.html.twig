@@ -16,13 +16,15 @@
     {% else %}
         <div class="form-container">
             {{ form_start(form, {action: formAction}) }}
-                <div>
-                    {{ form_rest(form) }}
-                </div>
-                <div class="widget-actions form-actions" style="display: none;">
-                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                    <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
-                </div>
+                <fieldset class="form form-horizontal">
+                    <div class="span6">
+                        {{ form_rest(form) }}
+                    </div>
+                    <div class="widget-actions form-actions" style="display: none;">
+                        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                        <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                    </div>
+                </fieldset>
             {{ form_end(form) }}
         </div>
     {% endif %}

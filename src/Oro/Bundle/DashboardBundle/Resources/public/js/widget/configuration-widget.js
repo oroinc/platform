@@ -16,7 +16,8 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
             });
 
             options.dialogOptions = {
-                modal: true
+                modal: true,
+                width: 575
             };
 
             ConfigurationWidget.__super__.initialize.apply(this, arguments);
