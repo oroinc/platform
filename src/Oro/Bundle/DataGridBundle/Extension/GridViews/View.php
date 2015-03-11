@@ -13,11 +13,15 @@ class View
     /** @var array */
     protected $sortersData;
 
-    public function __construct($name, array $filtersData = [], array $sortersData = [])
+    /** @var string */
+    protected $type = 'system';
+
+    public function __construct($name, array $filtersData = [], array $sortersData = [], $type = 'system')
     {
         $this->name        = $name;
         $this->filtersData = $filtersData;
         $this->sortersData = $sortersData;
+        $this->type        = $type;
     }
 
     /**
@@ -28,6 +32,14 @@ class View
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
@@ -87,6 +99,7 @@ class View
     {
         return [
             'name'    => $this->getName(),
+            'type'    => $this->getType(),
             'filters' => $this->getFiltersData(),
             'sorters' => $this->getSortersData()
         ];

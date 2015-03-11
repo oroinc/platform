@@ -48,12 +48,21 @@ class GridViewsLoadListener
             return;
         }
 
+        $choices = [];
         $views = [];
         foreach ($gridViews as $gridView) {
-            $views[] = $gridView->createView();
+            $views[] = $gridView->createView()->getMetadata();
+            $choices[] = [
+                'label' => $gridView->getName(),
+                'value' => $gridView->getId(),
+            ];
         }
 
-        $event->setGridViews(array_merge($event->getGridViews(), $views));
+        $newGridViews = $event->getGridViews();
+        $newGridViews['choices'] = array_merge($newGridViews['choices'], $choices);
+        $newGridViews['views'] = array_merge($newGridViews['views'], $views);
+
+        $event->setGridViews($newGridViews);
     }
 
     /**

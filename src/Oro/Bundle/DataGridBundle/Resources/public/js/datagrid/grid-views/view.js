@@ -4,8 +4,10 @@ define([
     'backbone',
     'underscore',
     'orotranslation/js/translator',
-    './collection'
-], function (Backbone, _, __, GridViewsCollection) {
+    './collection',
+    './model',
+    'oroui/js/modal'
+], function (Backbone, _, __, GridViewsCollection, GridViewModel, Modal) {
     'use strict';
     var $, GridViewsView;
     $ = Backbone.$;
@@ -18,23 +20,34 @@ define([
      * @extends Backbone.View
      */
     GridViewsView = Backbone.View.extend({
-        className: 'btn-group grid-views',
+        className: 'btn-toolbar grid-views',
 
         /** @property */
         events: {
-            "click a": "onChange"
+            "click .dropdown-menu a": "onChange",
+            "click a.save": "onSave",
+            "click a.save_as": "onSaveAs",
+            "click a.share": "onShare",
+            "click a.delete": "onDelete"
         },
 
         /** @property */
         template: _.template(
-            '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                '<%=  current %>' + '<span class="caret"></span>' +
-            '</button>' +
-            '<ul class="dropdown-menu pull-right">' +
-                '<% _.each(choices, function (choice) { %>' +
-                    '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
+            '<div class="btn-group">' +
+                '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
+                    '<%=  current %>' + '<span class="caret"></span>' +
+                '</button>' +
+                '<ul class="dropdown-menu pull-right">' +
+                    '<% _.each(choices, function (choice) { %>' +
+                        '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
+                    '<% }); %>' +
+                '</ul>' +
+            '</div>' +
+            '<div class="btn-group">' +
+                '<% _.each(actions, function(action) { %>' +
+                    '<a href="#" class="btn <%= action.name %>"><%= action.label %></a>' +
                 '<% }); %>' +
-            '</ul>'
+            '</div>'
         ),
 
         /** @property */
@@ -73,7 +86,14 @@ define([
             this.listenTo(this.collection, "beforeFetch", this.render);
 
             options.views = options.views || [];
+            _.each(options.views, function(view) {
+                view.grid_name = options.collection.inputName;
+            });
+
             this.viewsCollection = new this.viewsCollection(options.views);
+
+            this.listenTo(this.viewsCollection, 'add', this._onModelAdd);
+            this.listenTo(this.viewsCollection, 'remove', this._onModelRemove);
 
             GridViewsView.__super__.initialize.call(this, options);
         },
@@ -128,6 +148,99 @@ define([
         },
 
         /**
+         * @param {Event} e
+         */
+        onSave: function(e) {
+            var model = this._getCurrentViewModel();
+
+            model.save({
+                label: this._getCurrentViewLabel(),
+                filters: this.collection.state.filters,
+                sorters: this.collection.state.sorters
+            }, {
+                wait: true
+            });
+        },
+
+        /**
+         * @param {Event} e
+         */
+        onSaveAs: function(e) {
+            var modal = new Modal({
+                title: 'Filter configuration',
+                content: '<label>name: <input name="name" type="text"></label>'
+            });
+
+            var self = this;
+            modal.on('ok', function(e) {
+                var model = new GridViewModel({
+                    label: this.$('input[name=name]').val(),
+                    type: 'private',
+                    grid_name: self.collection.inputName,
+                    filters: self.collection.state.filters,
+                    sorters: self.collection.state.sorters
+                });
+                model.save(null, {
+                    wait: true
+                });
+                model.once('sync', function(model) {
+                    this.viewsCollection.add(model);
+                }, self);
+            });
+
+            modal.open();
+        },
+
+        /**
+         * @param {Event} e
+         */
+        onShare: function(e) {
+            var model = this._getCurrentViewModel();
+
+            model.save({
+                type: 'public'
+            }, {
+                wait: true
+            });
+        },
+
+        /**
+         * @param {Event} e
+         */
+        onDelete: function(e) {
+            var model = this._getCurrentViewModel();
+
+            model.destroy({wait: true});
+        },
+
+        /**
+         * @param {GridViewModel} model
+         */
+        _onModelAdd: function(model) {
+            model.set('name', model.get('id'));
+            model.unset('id');
+
+            this.choices.push({
+                label: model.get('label'),
+                value: model.get('name')
+            });
+            this.collection.state.gridView = model.get('name');
+            this.render();
+        },
+
+        /**
+         * @param {GridViewModel} model
+         */
+        _onModelRemove: function(model) {
+            this.choices = _.reject(this.choices, function (item) {
+                return item.value == this.collection.state.gridView;
+            }, this);
+            this.collection.state.gridView = null;
+
+            this.render();
+        },
+
+        /**
          * Updates collection
          *
          * @param gridView
@@ -147,25 +260,73 @@ define([
         },
 
         render: function () {
-            var currentView, currentViewLabel, html;
+            var html;
             this.$el.empty();
 
             if (this.choices.length > 0) {
-                currentView = _.filter(this.choices, function (item) {
-                    return item.value == this.collection.state.gridView;
-                }, this);
-
-                currentViewLabel = currentView.length ? _.first(currentView).label : __('Please select view');
                 html = this.template({
                     disabled: !this.enabled,
                     choices: this.choices,
-                    current: currentViewLabel
+                    current: this._getCurrentViewLabel(),
+                    actions: [
+                        {
+                            label: __('oro.datagrid.action.save_grid_view'),
+                            name: 'save'
+                        },
+                        {
+                            label: __('oro.datagrid.action.save_grid_view_as'),
+                            name: 'save_as'
+                        },
+                        {
+                            label: __('oro.datagrid.action.share_grid_view'),
+                            name: 'share'
+                        },
+                        {
+                            label: __('oro.datagrid.action.delete_grid_view'),
+                            name: 'delete'
+                        }
+                    ]
                 });
 
                 this.$el.append(html);
             }
 
             return this;
+        },
+
+        /**
+         * @private
+         *
+         * @returns {GridViewModel}
+         */
+        _getCurrentViewModel: function() {
+            return this.viewsCollection.findWhere({
+                name: this._getCurrentView().value
+            });
+        },
+
+        /**
+         * @private
+         *
+         * @returns {string}
+         */
+        _getCurrentViewLabel: function() {
+            var currentView = this._getCurrentView();
+
+            return typeof currentView === 'undefined' ? __('Please select view') : currentView.label;
+        },
+
+        /**
+         * @private
+         *
+         * @returns {undefined|Object}
+         */
+        _getCurrentView: function() {
+            var currentViews =  _.filter(this.choices, function (item) {
+                return item.value == this.collection.state.gridView;
+            }, this);
+
+            return _.first(currentViews);
         }
     });
 

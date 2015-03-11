@@ -45,3 +45,7 @@ oro.datagrid.extension.export.tooltip: "With this button you will export the con
 oro_datagrid.label_add_filter: "Manage filters"
 oro_datagrid.action.reset: "Reset"
 oro_datagrid.action.refresh: "Refresh"
+"oro.datagrid.action.save_grid_view": Save
+"oro.datagrid.action.save_grid_view_as": Save As
+"oro.datagrid.action.share_grid_view": Share
+"oro.datagrid.action.delete_grid_view": Delete

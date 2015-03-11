@@ -65,10 +65,7 @@ class GridViewControllerTest extends WebTestCase
                 ],
             ],
             'sorters_data' => [
-                [
-                    'field' => 'username',
-                    'direction' => 'ASC',
-                ],
+                'username' => 1,
             ],
         ]);
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
@@ -85,10 +82,7 @@ class GridViewControllerTest extends WebTestCase
             ],
         ], $updatedGridView->getFiltersData());
         $this->assertEquals([
-            [
-                'field' => 'username',
-                'direction' => 'ASC',
-            ],
+            'username' => 1,
         ], $updatedGridView->getSortersData());
     }
 

@@ -2,13 +2,17 @@
 /*global define*/
 define([
     'backbone',
-    'underscore'
-], function (Backbone, _) {
+    'underscore',
+    'routing'
+], function (Backbone, _, routing) {
     'use strict';
 
     var GridViewsModel;
 
     GridViewsModel = Backbone.Model.extend({
+        route: 'oro_datagrid_api_rest_gridview_post',
+        urlRoot: null,
+
         /** @property */
         idAttribute: 'name',
 
@@ -28,15 +32,14 @@ define([
          * Initializer.
          *
          * @param {Object} data
-         * @param {String} data.name required
+         * @param {String} data.name
+         * @param {String} data.label
+         * @param {String} data.type
          * @param {Array}  data.sorters
          * @param {Array}  data.filters
          */
         initialize: function (data) {
-            if (!data.name) {
-                throw new TypeError("'name' is required");
-            }
-
+            this.urlRoot = routing.generate(this.route);
             _.each(data.sorters, _.bind(function (direction, key) {
                 data.sorters[key] = this.directions[direction];
             }, this));

@@ -1,0 +1,3 @@
+oro_datagrid_gridview_api:
+    resource: @OroDataGridBundle/Controller/Api/Rest/GridViewController
+    type: rest

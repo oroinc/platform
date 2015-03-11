@@ -154,6 +154,18 @@ class GridView
     }
 
     /**
+     * @param int $id
+     *
+     * @return this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      *
      * @return this
@@ -230,7 +242,7 @@ class GridView
      */
     public function createView()
     {
-        return new View($this->name, $this->filtersData, $this->sortersData);
+        return new View($this->id, $this->filtersData, $this->sortersData, $this->type);
     }
 
     /**

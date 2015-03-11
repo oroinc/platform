@@ -41,6 +41,6 @@ class GridViewTest extends \PHPUnit_Framework_TestCase
         $gridView->setFiltersData(['f' => 'fv']);
         $gridView->setSortersData(['s' => 'sv']);
 
-        $this->assertEquals(new View('name', ['f' => 'fv'], ['s' => 'sv']), $gridView->createView());
+        $this->assertEquals(new View(null, ['f' => 'fv'], ['s' => 'sv'], GridView::TYPE_PRIVATE), $gridView->createView());
     }
 }

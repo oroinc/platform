@@ -37,8 +37,23 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testListenerShouldAddViewsIntoEvent()
     {
-        $originalView = new View('view');
-        $event = new GridViewsLoadEvent('grid', [$originalView]);
+        $originalViews = [
+            'choices' => [
+                [
+                    'label' => 'first',
+                    'value' => 'first',
+                ],
+            ],
+            'views' => [
+                [
+                    'name' => 'first',
+                    'filters' => [],
+                    'sorters' => [],
+                    'type' => 'system',
+                ],
+            ]
+        ];
+        $event = new GridViewsLoadEvent('grid', $originalViews);
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
@@ -53,8 +68,10 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($token));
 
         $view1 = new GridView();
+        $view1->setId(1);
         $view1->setName('view1');
         $view2 = new GridView();
+        $view2->setId(2);
         $view2->setName('view2');
         $gridViews = [
             $view1,
@@ -67,9 +84,40 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($gridViews));
 
         $expectedViews = [
-            $originalView,
-            new View('view1'),
-            new View('view2'),
+            'choices' => [
+                [
+                    'label' => 'first',
+                    'value' => 'first',
+                ],
+                [
+                    'label' => 'view1',
+                    'value' => 1,
+                ],
+                [
+                    'label' => 'view2',
+                    'value' => 2,
+                ],
+            ],
+            'views' => [
+                [
+                    'name' => 'first',
+                    'filters' => [],
+                    'sorters' => [],
+                    'type' => 'system',
+                ],
+                [
+                    'name' => 1,
+                    'filters' => [],
+                    'sorters' => [],
+                    'type' => GridView::TYPE_PRIVATE,
+                ],
+                [
+                    'name' => 2,
+                    'filters' => [],
+                    'sorters' => [],
+                    'type' => GridView::TYPE_PRIVATE,
+                ],
+            ]
         ];
 
         $this->gridViewsLoadListener->onViewsLoad($event);

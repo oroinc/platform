@@ -2,13 +2,3 @@ oro_datagrid_bundle:
     resource: "@OroDataGridBundle/Controller"
     type:     annotation
     prefix:   /datagrid
-
-oro_datagrid_gridview_api:
-    resource: Oro\Bundle\DataGridBundle\Controller\Api\Rest\GridViewController
-    type: rest
-    prefix: api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format: json
-    defaults:
-        version: latest

@@ -16,14 +16,16 @@ class GridViewType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'text')
+            ->add('label', 'text', [
+                'property_path' => 'name',
+            ])
             ->add('type', 'choice', [
                 'choices' => GridView::getTypes(),
             ])
             ->add('grid_name', 'text', [
                 'property_path' => 'gridName',
             ])
-            ->add('filters_data', 'collection', [
+            ->add('filters', 'collection', [
                 'property_path' => 'filtersData',
                 'error_bubbling' => false,
                 'allow_add' => true,
@@ -33,12 +35,18 @@ class GridViewType extends AbstractType
                     'operator_type' => 'text',
                 ]
             ])
-            ->add('sorters_data', 'collection', [
+            ->add('sorters', 'collection', [
                 'property_path' => 'sorters_data',
                 'error_bubbling' => false,
                 'allow_add' => true,
                 'allow_delete' => true,
-                'type' => 'oro_datagrid_sorting',
+                'type' => 'choice',
+                'options' => [
+                    'choices' => [
+                        1 => 1,
+                        -1 => -1
+                    ],
+                ],
             ])
         ;
     }

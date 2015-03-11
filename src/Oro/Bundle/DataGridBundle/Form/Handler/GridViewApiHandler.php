@@ -36,7 +36,10 @@ class GridViewApiHandler
         $this->form->setData($entity);
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $data = $this->request->request->all();
-            $data['owner'] = $entity->getOwner();
+            unset($data['name']);
+            if ($this->form->has('owner')) {
+                $data['owner'] = $entity->getOwner();
+            }
             $this->form->submit($data);
 
             if ($this->form->isValid()) {

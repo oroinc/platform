@@ -4,6 +4,9 @@ namespace Oro\Bundle\DataGridBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -15,7 +18,6 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Rest\RouteResource("datagrid_gridview")
  * @Rest\NamePrefix("oro_api_")
  */
 class GridViewController extends RestController
@@ -24,6 +26,7 @@ class GridViewController extends RestController
      * @param int $id
      * 
      * @return Response
+     * @Post("/gridviews.{_format}", defaults={"_format"="json"})
      * @ApiDoc(
      *      description="Create grid view",
      *      resource=true,
@@ -44,6 +47,7 @@ class GridViewController extends RestController
      * @param int $id
      * 
      * @return Response
+     * @Put("/gridviews/{id}.{_format}", requirements={"id"="\d+"}, defaults={"_format"="json"})
      * @ApiDoc(
      *      description="Update grid view",
      *      resource=true,
@@ -67,6 +71,7 @@ class GridViewController extends RestController
      * @param int $id
      * 
      * @return Response
+     * @Delete("/gridviews/{id}.{_format}", requirements={"id"="\d+"}, defaults={"_format"="json"})
      * @ApiDoc(
      *      description="Delete grid view",
      *      resource=true,
