@@ -88,11 +88,11 @@ define(function (require) {
         onEventChanged: function (eventModel) {
             var guestEventModels, i, updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
-            if (eventModel.hasChanged('invitedUsers')) {
-                eventModel.once('sync', this.main.updateEvents, this.main);
-                return;
-            }
             if (this.hasLoadedGuestEvents(eventModel)) {
+                if (eventModel.hasChanged('invitedUsers')) {
+                    eventModel.once('sync', this.main.updateEvents, this.main);
+                    return;
+                }
                 // update linked events
                 guestEventModels = this.findGuestEventModels(eventModel);
                 updatedAttrs = _.pick(eventModel.changed, ['start', 'end', 'allDay', 'title', 'description']);
