@@ -23,12 +23,18 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityFacade;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $globalConfigManager;
+
     protected function setUp()
     {
-        $this->securityInterface = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
+        $this->securityInterface   = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade    = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->globalConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Manager\GlobalConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -64,7 +70,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $order   = 0;
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(array('addEventSubscriber', 'add', 'getFormFactory'))
+            ->setMethods(array('addEventSubscriber', 'add', 'getFormFactory', 'addEventListener'))
             ->getMock();
         $builder->expects($this->at($order))
             ->method('getFormFactory')
@@ -115,6 +121,10 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($builder));
         $builder->expects($this->at(++$order))
             ->method('add')
+            ->with('signature', 'oro_rich_text')
+            ->will($this->returnValue($builder));
+        $builder->expects($this->at(++$order))
+            ->method('add')
             ->with('tags', 'oro_tag_select')
             ->will($this->returnValue($builder));
         $builder->expects($this->at(++$order))
@@ -134,7 +144,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
-        $type = new UserType($this->securityInterface, $this->securityFacade, $request);
+        $type = new UserType($this->securityInterface, $this->securityFacade, $request, $this->globalConfigManager);
         $type->buildForm($builder, []);
     }
 
@@ -231,7 +241,12 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMockForAbstractClass('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults');
-        $type = new UserType($this->securityInterface, $this->securityFacade, new Request());
+        $type = new UserType(
+            $this->securityInterface,
+            $this->securityFacade,
+            new Request(),
+            $this->globalConfigManager
+        );
         $type->setDefaultOptions($resolver);
     }
 }

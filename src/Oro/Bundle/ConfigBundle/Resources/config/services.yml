@@ -16,6 +16,7 @@ parameters:
     oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
 
     oro_config.manager.class:                                                    Oro\Bundle\ConfigBundle\Config\ConfigManager
+    oro_config.global_config_manager.class:                                      Oro\Bundle\ConfigBundle\Manager\GlobalConfigManager
 
 services:
     oro_config.config_definition_bag:
@@ -100,3 +101,9 @@ services:
         arguments:
             - @oro_config.provider.system_configuration.form_provider
         lazy: true
+
+    oro_config.global_config_manager:
+        class: %oro_config.global_config_manager.class%
+        arguments:
+            - @oro_config.user
+            - @oro_config.scope.user
