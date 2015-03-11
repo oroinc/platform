@@ -4,10 +4,6 @@
     </div>
 {% endblock %}
 
-{% block _page_content_widget %}
-    {{ block_widget(block) }}
-{% endblock %}
-
 {% block _update_saved_id_script_widget %}
     <script{{ block('block_attributes') }}>
         require(['oroui/js/widget-manager'],

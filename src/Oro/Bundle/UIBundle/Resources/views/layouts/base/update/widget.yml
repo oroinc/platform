@@ -1,7 +1,11 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroUIBundle:layouts:base/widget.html.twig'
+            themes: 'OroUIBundle:layouts:base/update/widget.html.twig'
+        - @setOption:
+            id:          page_header_panel
+            optionName:  visible
+            optionValue: false
         - @add:
             id:        widget_content
             parentId:  root
@@ -14,17 +18,17 @@ oro_layout:
                 visible: { @not_empty: $data.saved_id }
                 vars:
                     widget_id: { @value: $data.widget_id }
-                    saved_id:  { @value: [$data.saved_id, false] }
+                    saved_id:  { @value: [$data.saved_id, null] }
             prepend:   true
         - @move:
-            id:        'form:start'
-            parentId:  widget_content
+            id:       'form:start'
+            parentId: widget_content
         - @move:
-            id:        page_content
-            parentId:  widget_content
+            id:       page_content
+            parentId: widget_content
         - @move:
-            id:        'form:end'
-            parentId:  widget_content
+            id:       'form:end'
+            parentId: widget_content
 
     conditions:
         @not_empty: $context.widget_container
