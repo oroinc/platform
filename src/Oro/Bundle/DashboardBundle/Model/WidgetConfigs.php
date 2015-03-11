@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Event\WidgetOptionsLoadEvent;
-use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
 
 use Oro\Component\Config\Resolver\ResolverInterface;
@@ -27,8 +29,8 @@ class WidgetConfigs
     /** @var StateManager */
     protected $stateManager;
 
-    /** @var Manager */
-    protected $dashboardManager;
+    /** @var EntityManagerInterface */
+    protected $entityManager;
 
     /** @var Request|null */
     protected $request;
@@ -37,24 +39,25 @@ class WidgetConfigs
     protected $dispatcher;
 
     /**
-     * @param ConfigProvider    $configProvider
-     * @param SecurityFacade    $securityFacade
-     * @param ResolverInterface $resolver
-     * @param Manager           $dashboardManager
-     * @param StateManager      $stateManager
+     * @param ConfigProvider          $configProvider
+     * @param SecurityFacade          $securityFacade
+     * @param ResolverInterface       $resolver
+     * @param EntityManagerInterface  $entityManager
+     * @param StateManager            $stateManager
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
         ResolverInterface $resolver,
-        Manager $dashboardManager,
+        EntityManagerInterface $entityManager,
         StateManager $stateManager,
         EventDispatcherInterface $dispatcher
     ) {
         $this->configProvider   = $configProvider;
         $this->securityFacade   = $securityFacade;
         $this->resolver         = $resolver;
-        $this->dashboardManager = $dashboardManager;
+        $this->entityManager    = $entityManager;
         $this->stateManager     = $stateManager;
         $this->dispatcher       = $dispatcher;
     }
@@ -125,15 +128,15 @@ class WidgetConfigs
     public function getCurrentWidgetOptions()
     {
         if (!$this->request) {
-            return [];
+            return new WidgetOptionBag();
         }
 
         $widgetId = $this->request->query->get('_widgetId', null);
         if (!$widgetId) {
-            return [];
+            return new WidgetOptionBag();
         }
 
-        $widget = $this->dashboardManager->findWidgetModel($widgetId);
+        $widget = $this->findWidget($widgetId);
         $widgetState = $this->stateManager->getWidgetState($widget);
 
         $options = $widgetState->getOptions();
@@ -174,6 +177,16 @@ class WidgetConfigs
                 return $enabled && $accessGranted && $applicable;
             }
         );
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Widget
+     */
+    protected function findWidget($id)
+    {
+        return $this->entityManager->getRepository('OroDashboardBundle:Widget')->find($id);
     }
 
     /**
