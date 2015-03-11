@@ -26,6 +26,7 @@ services:
             - @oro_dashboard.config_resolver
             - @oro_dashboard.manager
             - @oro_dashboard.manager.state
+            - @event_dispatcher
         calls:
             - [setRequest, ["@?request="]]
 
