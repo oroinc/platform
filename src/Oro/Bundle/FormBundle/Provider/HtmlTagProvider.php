@@ -10,19 +10,33 @@ namespace Oro\Bundle\FormBundle\Provider;
 class HtmlTagProvider
 {
     /**
-     * List of allowed element.
-     *
-     * @url http://www.tinymce.com/wiki.php/Configuration:valid_elements
      * @var array
      */
-    protected $allowedElements = [
-        '@[style|class]',
-        'table[cellspacing|cellpadding|border|align|width]',
-        'thead[align|valign]',
-        'tbody[align|valign]',
-        'tr[align|valign]',
-        'td[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
-        'a[!href|target=_blank|title]',
+    protected $elements = [
+        [
+            'name' => 'table',
+            'attrs' => ['cellspacing', 'cellpadding', 'border', 'align', 'width'],
+        ],
+        [
+            'name' => 'thead',
+            'attrs' => ['align', 'valign'],
+        ],
+        [
+            'name' => 'tbody',
+            'attrs' => ['align', 'valign'],
+        ],
+        [
+            'name' => 'tr',
+            'attrs' => ['align', 'valign'],
+        ],
+        [
+            'name' => 'td',
+            'attrs' => ['align', 'valign', 'rowspan', 'colspan', 'bgcolor', 'nowrap', 'width', 'height'],
+        ],
+        [
+            'name' => 'a',
+            'attrs' => ['!href', 'target=_blank', 'title'],
+        ],
         'dl',
         'dt',
         'div',
@@ -30,13 +44,24 @@ class HtmlTagProvider
         'ol',
         'li',
         'em',
-        'strong/b',
+        'strong',
+        'b',
         'p',
-        'font[color]',
+        [
+            'name' => 'font',
+            'attrs' => ['color'],
+        ],
         'i',
-        'br',
+        [
+            'name' => 'br',
+            'hasClosingTag' => false,
+        ],
         'span',
-        'img[src|width|height|alt]',
+        [
+            'name' => 'img',
+            'attrs' => ['src', 'width', 'height', 'alt'],
+            'hasClosingTag' => false,
+        ],
         'h1',
         'h2',
         'h3',
@@ -45,20 +70,62 @@ class HtmlTagProvider
         'h6',
     ];
 
+    /**
+     * Returns array of allowed elements to use in TinyMCE plugin
+     *
+     * @return array
+     */
     public function getAllowedElements()
     {
-        return $this->allowedElements;
+        $allowedElements = ['@[style|class]'];
+
+        foreach ($this->elements as $element) {
+            if (is_array($element)) {
+                if (!array_key_exists('name', $element)) {
+                    continue;
+                }
+
+                $allowedElement = $element['name'];
+                if (array_key_exists('attrs', $element) && is_array($element['attrs'])) {
+                    $allowedElement .= '[' . implode('|', $element['attrs']) . ']';
+                }
+            } else {
+                $allowedElement = $element;
+            }
+
+            $allowedElements[] = $allowedElement;
+        }
+
+        return $allowedElements;
     }
 
     /**
-     * todo refactor
+     * Returns string consisted from allowed tags
      *
      * @return string
      */
     public function getAllowedTags()
     {
-        return '<table></table><thead></thead><tbody></tbody><tr></tr><td></td><a></a><dl></dl><dt></dt><div></div>' .
-            '<ul></ul><ol></ol><li></li><em></em><strong></strong><b></b><p></p><i></i><br><br/><span></span>' .
-            '<img><h1></h1><h2></h2><h3></h3><h4></h4><h5></h5><h6></h6>';
+        $allowedTags = '';
+
+        foreach ($this->elements as $element) {
+            if (is_array($element)) {
+                if (!array_key_exists('name', $element)) {
+                    continue;
+                }
+
+                $allowedTag = '<' . $element['name'] . '>';
+                if (!array_key_exists('hasClosingTag', $element) || $element['hasClosingTag']) {
+                    $allowedTag .= '</' . $element['name'] . '>';
+                }
+            } else {
+                $allowedTag = '<' . $element . '>';
+                $allowedTag .= '</' . $element . '>';
+            }
+
+            $allowedTags .= $allowedTag;
+        }
+
+        return $allowedTags;
     }
 }

@@ -43,7 +43,10 @@ class Email
     protected $body;
 
     /** @var string */
-    protected $bodyFooter;
+    protected $signature;
+
+    /** @var string */
+    protected $bodyFooter = '';
 
     /**
      * Get id of emails datagrid
@@ -348,7 +351,7 @@ class Email
     /**
      * Set email body footer
      *
-     * @param string $bodyFooter
+     * @param string  $bodyFooter
      *
      * @return Email
      */
@@ -357,5 +360,21 @@ class Email
         $this->bodyFooter = $bodyFooter;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+
+    /**
+     * @param string $signature
+     */
+    public function setSignature($signature)
+    {
+        $this->signature = $signature;
     }
 }
