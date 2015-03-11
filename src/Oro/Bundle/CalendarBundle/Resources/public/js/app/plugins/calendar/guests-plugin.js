@@ -130,7 +130,8 @@ define(function (require) {
          */
         onEventBeforeSave: function (eventModel, promises, attrs) {
             if (this.hasLoadedGuestEvents(eventModel)) {
-                var deferredConfirmation = $.Deferred(), cleanUp;
+                var cleanUp,
+                    deferredConfirmation = $.Deferred();
                 promises.push(deferredConfirmation);
 
                 if (!this.modal) {
