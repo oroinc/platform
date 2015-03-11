@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsExtension extends AbstractExtension
 {
@@ -23,11 +24,18 @@ class GridViewsExtension extends AbstractExtension
     protected $eventDispatcher;
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
+     * @var SecurityFacade
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    protected $securityFacade;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param SecurityFacade $securityFacade
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher, SecurityFacade $securityFacade)
     {
         $this->eventDispatcher = $eventDispatcher;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -75,8 +83,23 @@ class GridViewsExtension extends AbstractExtension
         }
 
         if ($gridViews) {
+            $gridViews['permissions'] = $this->getPermissions();
             $data->offsetSet('gridViews', $gridViews);
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function getPermissions()
+    {
+        return [
+            'CREATE' => $this->securityFacade->isGranted('oro_datagrid_gridview_create'),
+            'EDIT' => $this->securityFacade->isGranted('oro_datagrid_gridview_update'),
+            'DELETE' => $this->securityFacade->isGranted('oro_datagrid_gridview_delete'),
+            'SHARE' => $this->securityFacade->isGranted('oro_datagrid_gridview_create_public'),
+            'EDIT_SHARED' => $this->securityFacade->isGranted('oro_datagrid_gridview_edit_public'),
+        ];
     }
 
     /**

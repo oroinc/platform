@@ -6,6 +6,11 @@ oro_datagrid:
     label_loading_mask: "Loading . . ."
 
 oro:
+    datagrid:
+        gridview:
+            entity_label: Grid view
+            entity_plural_label: Grid views
+            entity_description: Represent grid views
     grid:
         mass_action:
             label: Mass Actions

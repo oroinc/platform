@@ -6,8 +6,9 @@ define([
     'orotranslation/js/translator',
     './collection',
     './model',
-    'oroui/js/modal'
-], function (Backbone, _, __, GridViewsCollection, GridViewModel, Modal) {
+    'oroui/js/modal',
+    'oroui/js/mediator'
+], function (Backbone, _, __, GridViewsCollection, GridViewModel, Modal, mediator) {
     'use strict';
     var $, GridViewsView;
     $ = Backbone.$;
@@ -45,7 +46,9 @@ define([
             '</div>' +
             '<div class="btn-group">' +
                 '<% _.each(actions, function(action) { %>' +
-                    '<a href="#" class="btn <%= action.name %>"><%= action.label %></a>' +
+                    '<% if (action.enabled) { %>' +
+                        '<a href="#" class="btn <%= action.name %>"><%= action.label %></a>' +
+                    '<% } %>' +
                 '<% }); %>' +
             '</div>'
         ),
@@ -55,6 +58,15 @@ define([
 
         /** @property */
         choices: [],
+
+        /** @property */
+        permissions: {
+            CREATE: false,
+            EDIT: false,
+            DELETE: false,
+            SHARE: false,
+            EDIT_SHARED: false
+        },
 
         /** @property */
         viewsCollection: GridViewsCollection,
@@ -77,6 +89,10 @@ define([
 
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
+            }
+
+            if (options.permissions) {
+                this.permissions = _.extend(this.permissions, options.permissions);
             }
 
             this.collection = options.collection;
@@ -160,6 +176,10 @@ define([
             }, {
                 wait: true
             });
+
+            model.once('sync', function() {
+                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+            });
         },
 
         /**
@@ -202,6 +222,10 @@ define([
             }, {
                 wait: true
             });
+
+            model.once('sync', function() {
+                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+            });
         },
 
         /**
@@ -226,6 +250,8 @@ define([
             });
             this.collection.state.gridView = model.get('name');
             this.render();
+
+            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.created'));
         },
 
         /**
@@ -238,6 +264,8 @@ define([
             this.collection.state.gridView = null;
 
             this.render();
+
+            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
         },
 
         /**
@@ -264,6 +292,7 @@ define([
             this.$el.empty();
 
             if (this.choices.length > 0) {
+                var currentView = this._getCurrentViewModel();
                 html = this.template({
                     disabled: !this.enabled,
                     choices: this.choices,
@@ -271,19 +300,25 @@ define([
                     actions: [
                         {
                             label: __('oro.datagrid.action.save_grid_view'),
-                            name: 'save'
+                            name: 'save',
+                            enabled: typeof currentView !== 'undefined' && this.permissions.EDIT
                         },
                         {
                             label: __('oro.datagrid.action.save_grid_view_as'),
-                            name: 'save_as'
+                            name: 'save_as',
+                            enabled: this.permissions.CREATE
                         },
                         {
                             label: __('oro.datagrid.action.share_grid_view'),
-                            name: 'share'
+                            name: 'share',
+                            enabled: typeof currentView !== 'undefined' &&
+                                    ((currentView.get('type') === 'private' && this.permissions.SHARE) ||
+                                    (currentView.get('type' === 'public' && this.permissions.EDIT_SHARED)))
                         },
                         {
                             label: __('oro.datagrid.action.delete_grid_view'),
-                            name: 'delete'
+                            name: 'delete',
+                            enabled: typeof currentView !== 'undefined' && this.permissions.DELETE
                         }
                     ]
                 });
@@ -297,12 +332,25 @@ define([
         /**
          * @private
          *
-         * @returns {GridViewModel}
+         * @returns {undefined|GridViewModel}
          */
         _getCurrentViewModel: function() {
+            if (!this._hasActiveView()) {
+                return;
+            }
+
             return this.viewsCollection.findWhere({
                 name: this._getCurrentView().value
             });
+        },
+
+        /**
+         * @private
+         *
+         * @returns {boolean}
+         */
+        _hasActiveView: function() {
+            return typeof this._getCurrentView() !== 'undefined';
         },
 
         /**

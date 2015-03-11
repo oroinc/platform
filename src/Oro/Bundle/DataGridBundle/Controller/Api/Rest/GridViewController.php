@@ -18,7 +18,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Rest\NamePrefix("oro_api_")
+ * @Rest\NamePrefix("oro_datagrid_api_rest_gridview_")
  */
 class GridViewController extends RestController
 {
@@ -26,7 +26,7 @@ class GridViewController extends RestController
      * @param int $id
      * 
      * @return Response
-     * @Post("/gridviews.{_format}", defaults={"_format"="json"})
+     * @Post("/gridviews")
      * @ApiDoc(
      *      description="Create grid view",
      *      resource=true,
@@ -47,7 +47,7 @@ class GridViewController extends RestController
      * @param int $id
      * 
      * @return Response
-     * @Put("/gridviews/{id}.{_format}", requirements={"id"="\d+"}, defaults={"_format"="json"})
+     * @Put("/gridviews/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Update grid view",
      *      resource=true,
@@ -71,7 +71,7 @@ class GridViewController extends RestController
      * @param int $id
      * 
      * @return Response
-     * @Delete("/gridviews/{id}.{_format}", requirements={"id"="\d+"}, defaults={"_format"="json"})
+     * @Delete("/gridviews/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Delete grid view",
      *      resource=true,

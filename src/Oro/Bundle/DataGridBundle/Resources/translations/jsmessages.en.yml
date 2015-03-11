@@ -49,3 +49,6 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.action.save_grid_view_as": Save As
 "oro.datagrid.action.share_grid_view": Share
 "oro.datagrid.action.delete_grid_view": Delete
+"oro.datagrid.gridView.created": View have been successfully created
+"oro.datagrid.gridView.updated": View have been successfully updated
+"oro.datagrid.gridView.deleted": View have been successfully deleted

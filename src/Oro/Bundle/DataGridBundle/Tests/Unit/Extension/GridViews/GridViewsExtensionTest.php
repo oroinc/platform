@@ -17,7 +17,17 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->gridViewsExtension = new GridViewsExtension($this->eventDispatcher);
+
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacade
+            ->expects($this->any())
+            ->method('isGranted')
+            ->will($this->returnValue(true));
+
+        $this->gridViewsExtension = new GridViewsExtension($this->eventDispatcher, $securityFacade);
     }
 
     public function testVisitMetadataShouldAddGridViewsFromEvent()
@@ -35,7 +45,16 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $expectedViews = [
-            new View('name', ['k' => 'v'], ['k2' => 'v2'])
+            'views' => [
+                (new View('name', ['k' => 'v'], ['k2' => 'v2']))->getMetadata(),
+            ],
+            'permissions' => [
+                'CREATE' => true,
+                'EDIT' => true,
+                'DELETE' => true,
+                'SHARE' => true,
+                'EDIT_SHARED' => true,
+            ],
         ];
         $this->eventDispatcher
             ->expects($this->once())

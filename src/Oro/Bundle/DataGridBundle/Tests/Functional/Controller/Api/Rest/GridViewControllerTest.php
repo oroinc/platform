@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller\Api\Rest;
 
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * @dbIsolation
@@ -15,27 +17,26 @@ class GridViewControllerTest extends WebTestCase
 {
     public function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
-            'Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData',
             'Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData',
         ]);
     }
 
     public function testPostActionShouldReturn400IfSentDataAreInvalid()
     {
-        $this->client->request('POST', $this->getUrl('oro_api_post_datagrid_gridview'));
+        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [], [], $this->generateWsseAuthHeader());
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 400);
     }
 
     public function testPostActionShouldReturn201IfSentDataAreValid()
     {
-        $this->client->request('POST', $this->getUrl('oro_api_post_datagrid_gridview'), [
-            'name' => 'view',
+        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [
+            'label' => 'view',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid',
-            'filters_data' => [],
-            'sorters_data' => [],
+            'filters' => [],
+            'sorters' => [],
         ]);
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 201);
 
@@ -54,17 +55,17 @@ class GridViewControllerTest extends WebTestCase
     {
         $gridView = $this->findFirstGridView();
 
-        $this->client->request('PUT', $this->getUrl('oro_api_put_datagrid_gridview', ['id' => $gridView->getId()]), [
-            'name' => 'view2',
+        $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
+            'label' => 'view2',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid2',
-            'filters_data' => [
+            'filters' => [
                 'username' => [
                     'type' => 1,
                     'value' => 'adm',
                 ],
             ],
-            'sorters_data' => [
+            'sorters' => [
                 'username' => 1,
             ],
         ]);
@@ -90,7 +91,7 @@ class GridViewControllerTest extends WebTestCase
     {
         $id = $this->findLastGridView()->getId();
 
-        $this->client->request('DELETE', $this->getUrl('oro_api_delete_datagrid_gridview', ['id' => $id]));
+        $this->client->request('DELETE', $this->getUrl('oro_datagrid_api_rest_gridview_delete', ['id' => $id]));
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         $this->assertNull($this->findGridView($id));
@@ -134,5 +135,13 @@ class GridViewControllerTest extends WebTestCase
     private function getEntityManager()
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    private function getSeurityFacade()
+    {
+        return $this->getContainer()->get('oro_security.security_facade');
     }
 }
