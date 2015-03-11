@@ -24,7 +24,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $entity = $this->beforeProcessEntity($entity);
         $entity = $this->processEntity($entity, true, true, $this->context->getValue('itemData'));
         $entity = $this->afterProcessEntity($entity);
-        $entity = $this->validateAndUpdateContext($entity);
+        if ($entity) {
+            $entity = $this->validateAndUpdateContext($entity);
+        }
 
         return $entity;
     }
