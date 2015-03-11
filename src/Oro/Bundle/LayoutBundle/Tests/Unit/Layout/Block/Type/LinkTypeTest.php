@@ -38,8 +38,6 @@ class LinkTypeTest extends BlockTypeTestCase
         $this->assertFalse(isset($view->vars['route_name']));
         $this->assertFalse(isset($view->vars['route_parameters']));
         $this->assertEquals('test', $view->vars['text']);
-        $this->assertEquals([], $view->vars['text_parameters']);
-        $this->assertTrue($view->vars['translatable']);
     }
 
     public function testBuildView()
@@ -49,9 +47,7 @@ class LinkTypeTest extends BlockTypeTestCase
             [
                 'route_name'       => 'test_route',
                 'route_parameters' => ['foo' => 'bar'],
-                'text'             => 'test',
-                'text_parameters'  => ['{{ foo }}' => 'bar'],
-                'translatable'     => false
+                'text'             => 'test'
             ]
         );
 
@@ -59,8 +55,6 @@ class LinkTypeTest extends BlockTypeTestCase
         $this->assertEquals('test_route', $view->vars['route_name']);
         $this->assertEquals(['foo' => 'bar'], $view->vars['route_parameters']);
         $this->assertEquals('test', $view->vars['text']);
-        $this->assertEquals(['{{ foo }}' => 'bar'], $view->vars['text_parameters']);
-        $this->assertFalse($view->vars['translatable']);
     }
 
     public function testBuildViewWithoutRouteParameters()
@@ -77,8 +71,6 @@ class LinkTypeTest extends BlockTypeTestCase
         $this->assertEquals('test_route', $view->vars['route_name']);
         $this->assertEquals([], $view->vars['route_parameters']);
         $this->assertEquals('test', $view->vars['text']);
-        $this->assertEquals([], $view->vars['text_parameters']);
-        $this->assertTrue($view->vars['translatable']);
     }
 
     public function testGetName()

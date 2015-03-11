@@ -17,20 +17,16 @@ class FieldsetTypeTest extends BlockTypeTestCase
         );
 
         $this->assertSame('', $view->vars['title']);
-        $this->assertEquals([], $view->vars['title_parameters']);
-        $this->assertTrue($view->vars['translatable']);
     }
 
     public function testBuildView()
     {
         $view = $this->getBlockView(
             FieldsetType::NAME,
-            ['title' => 'test', 'title_parameters' => ['{{ foo }}' => 'bar'], 'translatable' => false]
+            ['title' => 'test']
         );
 
         $this->assertEquals('test', $view->vars['title']);
-        $this->assertEquals(['{{ foo }}' => 'bar'], $view->vars['title_parameters']);
-        $this->assertFalse($view->vars['translatable']);
     }
 
     public function testGetName()

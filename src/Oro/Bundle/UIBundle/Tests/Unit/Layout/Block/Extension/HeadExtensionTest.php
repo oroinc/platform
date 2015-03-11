@@ -57,11 +57,11 @@ class HeadExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [],
-                ['cache' => null]
+                ['cache' => null, 'title_parameters' => []]
             ],
             [
-                ['cache' => false],
-                ['cache' => false]
+                ['cache' => false, 'title_parameters' => ['foo' => 'bar']],
+                ['cache' => false, 'title_parameters' => ['foo' => 'bar']]
             ]
         ];
     }
@@ -92,9 +92,14 @@ class HeadExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($titleTemplate)
             ->will($this->returnValue($translatedTitleTemplate));
 
-        $this->extension->buildView($view, $block, ['title' => '', 'cache' => true]);
+        $this->extension->buildView(
+            $view,
+            $block,
+            ['title' => '', 'title_parameters' => [], 'cache' => true]
+        );
 
         $this->assertSame($translatedTitleTemplate, $view->vars['title']);
+        $this->assertSame([], $view->vars['title_parameters']);
         $this->assertTrue($view->vars['cache']);
     }
 
@@ -120,9 +125,14 @@ class HeadExtensionTest extends \PHPUnit_Framework_TestCase
         $this->titleTranslator->expects($this->never())
             ->method('trans');
 
-        $this->extension->buildView($view, $block, ['title' => '', 'cache' => true]);
+        $this->extension->buildView(
+            $view,
+            $block,
+            ['title' => '', 'title_parameters' => [], 'cache' => true]
+        );
 
         $this->assertSame('', $view->vars['title']);
+        $this->assertSame([], $view->vars['title_parameters']);
         $this->assertTrue($view->vars['cache']);
     }
 
@@ -142,9 +152,14 @@ class HeadExtensionTest extends \PHPUnit_Framework_TestCase
         $this->titleTranslator->expects($this->never())
             ->method('trans');
 
-        $this->extension->buildView($view, $block, ['title' => '', 'cache' => true]);
+        $this->extension->buildView(
+            $view,
+            $block,
+            ['title' => '', 'title_parameters' => [], 'cache' => true]
+        );
 
         $this->assertSame('', $view->vars['title']);
+        $this->assertSame([], $view->vars['title_parameters']);
         $this->assertTrue($view->vars['cache']);
     }
 
@@ -162,9 +177,14 @@ class HeadExtensionTest extends \PHPUnit_Framework_TestCase
         $this->titleTranslator->expects($this->never())
             ->method('trans');
 
-        $this->extension->buildView($view, $block, ['title' => 'foo', 'cache' => true]);
+        $this->extension->buildView(
+            $view,
+            $block,
+            ['title' => 'foo', 'title_parameters' => ['foo' => 'bar'], 'cache' => true]
+        );
 
         $this->assertSame('foo', $view->vars['title']);
+        $this->assertSame(['foo' => 'bar'], $view->vars['title_parameters']);
         $this->assertTrue($view->vars['cache']);
     }
 }

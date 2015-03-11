@@ -6,23 +6,27 @@ use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FormRendererInterface;
 
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Templating\TextHelper;
 
 /**
  * LayoutHelper provides helpers to help display layout blocks
  */
 class LayoutHelper extends Helper
 {
-    /**
-     * @var FormRendererInterface
-     */
+    /** @var FormRendererInterface */
     private $renderer;
+
+    /** @var TextHelper */
+    private $textHelper;
 
     /**
      * @param FormRendererInterface $renderer
+     * @param TextHelper            $textHelper
      */
-    public function __construct(FormRendererInterface $renderer)
+    public function __construct(FormRendererInterface $renderer, TextHelper $textHelper)
     {
-        $this->renderer = $renderer;
+        $this->renderer   = $renderer;
+        $this->textHelper = $textHelper;
     }
 
     /**
@@ -107,5 +111,18 @@ class LayoutHelper extends Helper
     public function block(BlockView $view, $blockName, array $variables = [])
     {
         return $this->renderer->renderBlock($view, $blockName, $variables);
+    }
+
+    /**
+     * Normalizes and translates (if needed) labels in the given value.
+     *
+     * @param mixed       $value
+     * @param string|null $domain
+     *
+     * @return mixed
+     */
+    public function text($value, $domain = null)
+    {
+        return $this->textHelper->processText($value, $domain);
     }
 }

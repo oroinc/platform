@@ -4,6 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Twig;
 
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 
+use Oro\Component\Layout\Templating\TextHelper;
+
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
 class LayoutExtension extends \Twig_Extension
@@ -18,12 +20,17 @@ class LayoutExtension extends \Twig_Extension
      */
     public $renderer;
 
+    /** @var TextHelper */
+    private $textHelper;
+
     /**
      * @param TwigRendererInterface $renderer
+     * @param TextHelper            $textHelper
      */
-    public function __construct(TwigRendererInterface $renderer)
+    public function __construct(TwigRendererInterface $renderer, TextHelper $textHelper)
     {
-        $this->renderer = $renderer;
+        $this->renderer   = $renderer;
+        $this->textHelper = $textHelper;
     }
 
     /**
@@ -65,6 +72,17 @@ class LayoutExtension extends \Twig_Extension
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return [
+            // Normalizes and translates (if needed) labels in the given value.
+            new \Twig_SimpleFilter('block_text', [$this->textHelper, 'processText'])
         ];
     }
 

@@ -10,13 +10,20 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $textHelper;
+
     /** @var LayoutHelper */
     protected $helper;
 
     protected function setUp()
     {
-        $this->renderer = $this->getMock('Symfony\Component\Form\FormRendererInterface');
-        $this->helper   = new LayoutHelper($this->renderer);
+        $this->renderer   = $this->getMock('Symfony\Component\Form\FormRendererInterface');
+        $this->textHelper = $this->getMockBuilder('Oro\Component\Layout\Templating\TextHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->helper = new LayoutHelper($this->renderer, $this->textHelper);
     }
 
     public function testGetName()
@@ -121,5 +128,15 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($view), $blockName, $variables);
 
         $this->helper->block($view, $blockName, $variables);
+    }
+
+    public function testText()
+    {
+        $this->textHelper->expects($this->once())
+            ->method('processText')
+            ->with('test', 'domain')
+            ->will($this->returnValue('processed'));
+
+        $this->assertEquals('processed', $this->helper->text('test', 'domain'));
     }
 }

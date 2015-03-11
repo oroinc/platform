@@ -84,7 +84,7 @@ class RendererTest extends LayoutTestCase
         );
 
         $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
-        $result = $layoutManager->getLayoutBuilder()
+        $result        = $layoutManager->getLayoutBuilder()
             ->add('form:start', null, 'form_start')
             ->getLayout($context)
             ->setRenderer('twig')
@@ -113,7 +113,7 @@ class RendererTest extends LayoutTestCase
         );
 
         $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
-        $result = $layoutManager->getLayoutBuilder()
+        $result        = $layoutManager->getLayoutBuilder()
             ->add('form:start', null, 'form_start')
             ->getLayout($context)
             ->setRenderer('php')
@@ -146,19 +146,35 @@ class RendererTest extends LayoutTestCase
                 'script',
                 [
                     'content' => 'alert(\'test\');',
-                    'async' => true,
-                    'defer' => new Condition\False()
+                    'async'   => true,
+                    'defer'   => new Condition\False()
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
             ->add('content', 'root', 'body')
             ->add('list', 'content', 'list')
-            ->add('list_tem_1', 'list', 'text', ['text' => 'Hi %val%!', 'text_parameters' => ['%val%' => 'World']])
+            ->add(
+                'list_tem_1',
+                'list',
+                'text',
+                [
+                    'text' => [
+                        'label'      => 'Hi %val%!',
+                        'parameters' => ['%val%' => 'World']
+                    ]
+                ]
+            )
             ->add(
                 'list_tem_2',
                 'list',
                 'link',
-                ['path' => 'http://example.com', 'text' => 'Hi %val%!', 'text_parameters' => ['%val%' => 'World']]
+                [
+                    'path' => 'http://example.com',
+                    'text' => [
+                        'label'      => 'Hi %val%!',
+                        'parameters' => ['%val%' => 'World']
+                    ]
+                ]
             )
             ->add(
                 'form',

@@ -62,24 +62,29 @@ services:
         calls:
             - [addConfigurationPass, [@oro_layout.expression.pass.property_path]]
 
-    oro_ui.layout_context_configurator.application:
+    oro_layout.text.helper:
+        class: Oro\Component\Layout\Templating\TextHelper
+        arguments:
+            - @translator
+
+    oro_layout.layout_context_configurator.application:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator
         arguments:
             - @kernel
         tags:
             - { name: layout.context_configurator }
 
-    oro_ui.layout_context_configurator.action:
+    oro_layout.layout_context_configurator.action:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
-    oro_ui.layout_context_configurator.data:
+    oro_layout.layout_context_configurator.data:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\DataContextConfigurator
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
-    oro_ui.layout_context_configurator.form:
+    oro_layout.layout_context_configurator.form:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\FormContextConfigurator
         arguments:
             - @service_container

@@ -17,13 +17,7 @@ class FieldsetType extends AbstractContainerType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'title'            => '',
-                'title_parameters' => [],
-                'translatable'     => true
-            ]
-        );
+        $resolver->setDefaults(['title' => '']);
     }
 
     /**
@@ -31,9 +25,7 @@ class FieldsetType extends AbstractContainerType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $view->vars['title']            = $options['title'];
-        $view->vars['title_parameters'] = $options['title_parameters'];
-        $view->vars['translatable']     = $options['translatable'];
+        $view->vars['title'] = $options['title'];
     }
 
     /**

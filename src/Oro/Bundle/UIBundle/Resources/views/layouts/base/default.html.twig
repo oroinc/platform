@@ -67,7 +67,7 @@
 {% block link_widget -%}
     {% set href = path is defined ? path : path(route_name, route_parameters) -%}
     <a{{ block('block_attributes') }} href="{{ with_page_parameters ? oro_url_add_query(href) : href }}">
-        {{- translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) -}}
+        {{- text|block_text(translation_domain) -}}
     </a>
 {%- endblock %}
 
