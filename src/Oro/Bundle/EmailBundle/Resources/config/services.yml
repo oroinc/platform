@@ -286,7 +286,7 @@ services:
             - @translator
             - @oro_security.security_facade
             - @oro_locale.formatter.name
-            - @oro_config.manager
+            - @oro_config.user
         lazy: true
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
