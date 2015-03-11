@@ -52,3 +52,5 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.created": View have been successfully created
 "oro.datagrid.gridView.updated": View have been successfully updated
 "oro.datagrid.gridView.deleted": View have been successfully deleted
+"oro.datagrid.gridView.name": Name
+"oro.datagrid.gridView.actions": Actions

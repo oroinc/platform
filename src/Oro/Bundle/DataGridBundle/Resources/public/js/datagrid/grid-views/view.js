@@ -21,11 +21,11 @@ define([
      * @extends Backbone.View
      */
     GridViewsView = Backbone.View.extend({
-        className: 'btn-toolbar grid-views',
+        className: 'btn-toolbar grid-views pull-left',
 
         /** @property */
         events: {
-            "click .dropdown-menu a": "onChange",
+            "click .views-group a": "onChange",
             "click a.save": "onSave",
             "click a.save_as": "onSaveAs",
             "click a.share": "onShare",
@@ -34,7 +34,7 @@ define([
 
         /** @property */
         template: _.template(
-            '<div class="btn-group">' +
+            '<div class="btn-group views-group">' +
                 '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
                     '<%=  current %>' + '<span class="caret"></span>' +
                 '</button>' +
@@ -44,13 +44,20 @@ define([
                     '<% }); %>' +
                 '</ul>' +
             '</div>' +
-            '<div class="btn-group">' +
-                '<% _.each(actions, function(action) { %>' +
-                    '<% if (action.enabled) { %>' +
-                        '<a href="#" class="btn <%= action.name %>"><%= action.label %></a>' +
-                    '<% } %>' +
-                '<% }); %>' +
-            '</div>'
+            '<% if (showActions) { %>' +
+                '<div class="btn-group actions-group">' +
+                    '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">' +
+                        '<%= actionsLabel %><span class="caret">' +
+                    '</a>' +
+                    '<ul class="dropdown-menu">' +
+                        '<% _.each(actions, function(action) { %>' +
+                            '<% if (action.enabled) { %>' +
+                                '<li><a href="#" class="<%= action.name %>"><%= action.label %></a></li>' +
+                            '<% } %>' +
+                        '<% }); %>' +
+                    '</ul>' +
+                '</div>' +
+            '<% } %>'
         ),
 
         /** @property */
@@ -188,7 +195,8 @@ define([
         onSaveAs: function(e) {
             var modal = new Modal({
                 title: 'Filter configuration',
-                content: '<label>name: <input name="name" type="text"></label>'
+                content: '<label for="gridViewName"><strong>' + __('oro.datagrid.gridView.name') + ':</strong></label>' +
+                         '<input id="gridViewName" name="name" type="text">'
             });
 
             var self = this;
@@ -292,41 +300,59 @@ define([
             this.$el.empty();
 
             if (this.choices.length > 0) {
-                var currentView = this._getCurrentViewModel();
+                var actions = this._getCurrentActions();
+
                 html = this.template({
                     disabled: !this.enabled,
                     choices: this.choices,
                     current: this._getCurrentViewLabel(),
-                    actions: [
-                        {
-                            label: __('oro.datagrid.action.save_grid_view'),
-                            name: 'save',
-                            enabled: typeof currentView !== 'undefined' && this.permissions.EDIT
-                        },
-                        {
-                            label: __('oro.datagrid.action.save_grid_view_as'),
-                            name: 'save_as',
-                            enabled: this.permissions.CREATE
-                        },
-                        {
-                            label: __('oro.datagrid.action.share_grid_view'),
-                            name: 'share',
-                            enabled: typeof currentView !== 'undefined' &&
-                                    ((currentView.get('type') === 'private' && this.permissions.SHARE) ||
-                                    (currentView.get('type' === 'public' && this.permissions.EDIT_SHARED)))
-                        },
-                        {
-                            label: __('oro.datagrid.action.delete_grid_view'),
-                            name: 'delete',
-                            enabled: typeof currentView !== 'undefined' && this.permissions.DELETE
-                        }
-                    ]
+                    actionsLabel: __('oro.datagrid.gridView.actions'),
+                    actions: actions,
+                    showActions: _.some(actions, function(action) {
+                        return action.enabled;
+                    })
                 });
 
                 this.$el.append(html);
             }
 
             return this;
+        },
+
+        /**
+         * @private
+         *
+         * @returns {Array}
+         */
+        _getCurrentActions: function() {
+            var currentView = this._getCurrentViewModel();
+
+            return [
+                {
+                    label: __('oro.datagrid.action.save_grid_view'),
+                    name: 'save',
+                    enabled: typeof currentView !== 'undefined' &&
+                             currentView.get('type') !== 'system' && this.permissions.EDIT
+                },
+                {
+                    label: __('oro.datagrid.action.save_grid_view_as'),
+                    name: 'save_as',
+                    enabled: this.permissions.CREATE
+                },
+                {
+                    label: __('oro.datagrid.action.share_grid_view'),
+                    name: 'share',
+                    enabled: typeof currentView !== 'undefined' &&
+                            ((currentView.get('type') === 'private' && this.permissions.SHARE) ||
+                            (currentView.get('type' === 'public' && this.permissions.EDIT_SHARED)))
+                },
+                {
+                    label: __('oro.datagrid.action.delete_grid_view'),
+                    name: 'delete',
+                    enabled: typeof currentView !== 'undefined' && currentView.get('type') !== 'system' &&
+                             this.permissions.DELETE
+                }
+            ];
         },
 
         /**
