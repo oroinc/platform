@@ -34,6 +34,9 @@ class GlobalConfigManager
     public function saveUserConfigSignature(User $user, $signature)
     {
         $this->setContext($user);
+        if ($signature === '') {
+            $signature = null;
+        }
         $newSettings = [implode(ConfigManager::SECTION_VIEW_SEPARATOR, ['oro_email', 'signature']) => $signature];
         $this->configManager->save($newSettings);
         $this->restoreContext();
