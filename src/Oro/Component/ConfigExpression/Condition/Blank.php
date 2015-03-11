@@ -71,7 +71,7 @@ class Blank extends AbstractCondition implements ContextAccessorAwareInterface
      */
     protected function isConditionAllowed($context)
     {
-        $value = $this->resolveValue($context, $this->value);
+        $value = $this->resolveValue($context, $this->value, false);
 
         return '' === $value || null === $value;
     }

@@ -12,6 +12,12 @@ class GetValue extends AbstractFunction
     /** @var mixed */
     protected $value;
 
+    /** @var mixed */
+    protected $default;
+
+    /** @var bool */
+    protected $hasDefault = false;
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +31,12 @@ class GetValue extends AbstractFunction
      */
     public function toArray()
     {
-        return $this->convertToArray($this->value);
+        $params = [$this->value];
+        if ($this->hasDefault) {
+            $params[] = $this->default;
+        }
+
+        return $this->convertToArray($params);
     }
 
     /**
@@ -33,7 +44,12 @@ class GetValue extends AbstractFunction
      */
     public function compile($factoryAccessor)
     {
-        return $this->convertToPhpCode($this->value, $factoryAccessor);
+        $params = [$this->value];
+        if ($this->hasDefault) {
+            $params[] = $this->default;
+        }
+
+        return $this->convertToPhpCode($params, $factoryAccessor);
     }
 
     /**
@@ -41,11 +57,16 @@ class GetValue extends AbstractFunction
      */
     public function initialize(array $options)
     {
-        if (1 === count($options)) {
+        $count = count($options);
+        if ($count >= 1 && $count <= 2) {
             $this->value = reset($options);
+            if ($count > 1) {
+                $this->default    = next($options);
+                $this->hasDefault = true;
+            }
         } else {
             throw new Exception\InvalidArgumentException(
-                sprintf('Options must have 1 element, but %d given.', count($options))
+                sprintf('Options must have 1 or 2 elements, but %d given.', count($options))
             );
         }
 
@@ -57,6 +78,14 @@ class GetValue extends AbstractFunction
      */
     protected function doEvaluate($context)
     {
+        if ($this->hasDefault) {
+            $value = $this->resolveValue($context, $this->value, false);
+
+            return null !== $value
+                ? $value
+                : $this->resolveValue($context, $this->default);
+        }
+
         return $this->resolveValue($context, $this->value);
     }
 }

@@ -42,7 +42,7 @@ class Not extends AbstractCondition
      */
     public function initialize(array $options)
     {
-        if (1 == count($options)) {
+        if (1 === count($options)) {
             $operand = reset($options);
             if ($operand instanceof ExpressionInterface) {
                 $this->operand = $operand;

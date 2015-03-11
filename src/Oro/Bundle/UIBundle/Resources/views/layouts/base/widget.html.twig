@@ -1,7 +1,11 @@
 {% block root_widget %}
     <div class="widget-content">
-        {{ block_widget(block) }}
+        {{ block_widget(block.widget_content) }}
     </div>
+{% endblock %}
+
+{% block _page_content_widget %}
+    {{ block_widget(block) }}
 {% endblock %}
 
 {% block _update_saved_id_script_widget %}
