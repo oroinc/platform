@@ -19,16 +19,18 @@ oro:
             entity_plural_label: Tracking Events
             entity_description:  Tracked events
 
-            id.label:             Id
-            title.label:          Title
-            name.label:           Name
-            value.label:          Value
-            userIdentifier.label: User
-            url.label:            Url
-            website.label:        Website
-            code.label:           Code
-            logged_at.label:      Logged At
+            id.label:              Id
+            title.label:           Title
+            name.label:            Name
+            value.label:           Value
+            userIdentifier.label:  User
+            url.label:             Url
+            website.label:         Website
+            code.label:            Code
+            logged_at.label:       Logged At
             user_identifier.label: User Id
+            parsed.label:          Is Parsed
+            event_data.label:      Tracking Data
 
         trackingdata:
             entity_label:        Tracking Data
@@ -44,14 +46,16 @@ oro:
             entity_plural_label: Tracking Visits
             entity_description:  Tracked visits
 
-            id.label:                Id
-            first_action_time.label: First action time
-            last_action_time.label:  Last action time
-            parsed_u_i_d.label:      Parsed UID
-            parsing_count.label:     Parsing count
-            ip.label:                IP
-            user_identifier.label:   User identifier
-            visitor_uid.label:       Unique visitor ID
+            id.label:                  Id
+            first_action_time.label:   First action time
+            last_action_time.label:    Last action time
+            parsed_u_i_d.label:        Parsed UID
+            parsing_count.label:       Parsing count
+            ip.label:                  IP
+            user_identifier.label:     User identifier
+            visitor_uid.label:         Unique visitor ID
+            identifier_detected.label: Is UID detected
+            tracking_website.label:    Tracking website
 
         trackingvisitevent:
             entity_label:        Tracking Visit Event

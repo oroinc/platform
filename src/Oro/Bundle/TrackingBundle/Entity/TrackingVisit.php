@@ -8,8 +8,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisit;
 
 /**
- * @ORM\Table(name="oro_tracking_visit")
  * @ORM\Entity()
+ * @ORM\Table(name="oro_tracking_visit", indexes={
+ *     @ORM\Index(name="visit_visitorUid_idx", columns={"visitor_uid"}),
+ *     @ORM\Index(name="visit_userIdentifier_idx", columns={"user_identifier"})
+ * })
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *  defaultValues={

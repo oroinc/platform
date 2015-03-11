@@ -43,6 +43,9 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var int */
     protected $processedBatches = 0;
 
+    /** @var array */
+    protected $skipList = [];
+
     /**
      * @param ManagerRegistry                     $doctrine
      * @param TrackingEventIdentificationProvider $trackingIdentification
@@ -77,22 +80,26 @@ class TrackingProcessor implements LoggerAwareInterface
             )
         );
 
-        $this->logger->notice('Processing new visits...');
-        while ($this->processVisits()) {
-            $this->logger->notice(
-                sprintf(
-                    'Batch #%d of %s processed at <info>%s</info>.',
-                    ++$this->processedBatches,
-                    $totalBatches,
-                    date('Y-m-d H:i:s')
-                )
-            );
+        if ($totalEvents > 0) {
+            $this->logger->notice('Processing new visits...');
+            while ($this->processVisits()) {
+                $this->logger->notice(
+                    sprintf(
+                        'Batch #%d of %s processed at <info>%s</info>.',
+                        ++$this->processedBatches,
+                        $totalBatches,
+                        date('Y-m-d H:i:s')
+                    )
+                );
+            }
         }
 
-        $this->logger->notice('Identify previous visit identifiers');
+        $this->logger->notice('Recheck previous visit identifiers...');
         while ($this->identifyPrevVisits()) {
             $this->logger->notice('Try to process Next batch');
         }
+
+        $this->logger->notice('<info>Done</info>');
     }
 
     /**
@@ -117,21 +124,26 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function identifyPrevVisits()
     {
-        $em           = $this->getEntityManager();
-        $queryBuilder = $em
+        $em             = $this->getEntityManager();
+        $queryBuilder   = $em
             ->getRepository(self::TRACKING_VISIT_ENTITY)
-            ->createQueryBuilder('entity')
+            ->createQueryBuilder('entity');
+        $queryBuilder
             ->select('entity')
             ->where('entity.identifierDetected = false')
             ->andWhere('entity.parsedUID > 0')
             ->andWhere('entity.parsingCount < 100')
             ->orderBy('entity.firstActionTime', 'ASC');
 
+        if (count($this->skipList)) {
+            $queryBuilder->andWhere('entity.id not in('. implode(',', $this->skipList) .')');
+        }
+
         $entities = $queryBuilder->getQuery()->getResult();
         if ($entities) {
             /** @var TrackingVisit $visit */
             foreach ($entities as $visit) {
-                $this->logger->info('Parsing visit - ' . $visit->getId());
+                //$this->logger->info('Parsing visit - ' . $visit->getId());
                 $idObj = $this->trackingIdentification->identify($visit);
                 if ($idObj && $idObj['targetObject']) {
                     $visit->setIdentifierTarget($idObj['targetObject']);
@@ -140,6 +152,7 @@ class TrackingProcessor implements LoggerAwareInterface
                     $this->logger->info('-- <comment>parsed UID "' . $idObj['parsedUID'] . '"</comment>');
                 } else {
                     $visit->setParsingCount($visit->getParsingCount() + 1);
+                    $this->skipList[] = $visit->getId();
                 }
 
                 $em->persist($visit);
