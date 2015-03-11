@@ -3,9 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\ConfigExpression\Condition;
-use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;

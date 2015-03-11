@@ -54,7 +54,7 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
         $evaluate = $context->getOr('expressions_evaluate');
         $encoding = $context->getOr('expressions_encoding');
         if ($evaluate || $encoding !== null) {
-            $this->processExpressions($view->vars, $view, $context, $block->getData(), $evaluate, $encoding);
+            $this->processExpressions($view->vars, $context, $block->getData(), $evaluate, $encoding);
         }
     }
 
@@ -68,7 +68,6 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
 
     /**
      * @param array                 $values
-     * @param BlockView             $view
      * @param ContextInterface      $context
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
@@ -76,41 +75,58 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
      */
     protected function processExpressions(
         array &$values,
-        BlockView $view,
         ContextInterface $context,
         DataAccessorInterface $data,
         $evaluate,
         $encoding
     ) {
-        $removeBackslashKeys = [];
-        foreach ($values as $key => $value) {
-            if (is_array($value) && !empty($value)) {
-                switch ($this->checkArrayValue($value)) {
-                    case 0:
-                        $this->processExpressions($values[$key], $view, $context, $data, $evaluate, $encoding);
-                        break;
-                    case 1:
-                        // assemble the expression
-                        $value        = $this->expressionAssembler->assemble($value);
-                        $values[$key] = $value;
-                        break;
-                    case -1:
-                        // the backslash (\) at the begin of the array key should be removed
-                        $removeBackslashKeys[] = $key;
-                        break;
+        foreach ($values as $key => &$value) {
+            if (is_array($value)) {
+                if (!empty($value)) {
+                    switch ($this->checkArrayValue($value)) {
+                        case 0:
+                            $this->processExpressions($value, $context, $data, $evaluate, $encoding);
+                            break;
+                        case 1:
+                            $value = $this->processExpression(
+                                $this->expressionAssembler->assemble($value),
+                                $context,
+                                $data,
+                                $evaluate,
+                                $encoding
+                            );
+                            break;
+                        case -1:
+                            // the backslash (\) at the begin of the array key should be removed
+                            $value = [substr(key($value), 1) => reset($value)];
+                            break;
+                    }
                 }
-            }
-            if ($value instanceof ExpressionInterface) {
-                $values[$key] = $evaluate
-                    ? $value->evaluate(['context' => $context, 'data' => $data])
-                    : $this->encodeExpression($value, $encoding);
+            } elseif ($value instanceof ExpressionInterface) {
+                $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
             }
         }
-        // remove the backslash (\) at the begin of the array key
-        foreach ($removeBackslashKeys as $key) {
-            $value        = $values[$key];
-            $values[$key] = [substr(key($value), 1) => reset($value)];
-        }
+    }
+
+    /**
+     * @param ExpressionInterface   $expr
+     * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
+     * @param bool                  $evaluate
+     * @param string                $encoding
+     *
+     * @return mixed|string
+     */
+    protected function processExpression(
+        ExpressionInterface $expr,
+        ContextInterface $context,
+        DataAccessorInterface $data,
+        $evaluate,
+        $encoding
+    ) {
+        return $evaluate
+            ? $expr->evaluate(['context' => $context, 'data' => $data])
+            : $this->encodeExpression($expr, $encoding);
     }
 
     /**
