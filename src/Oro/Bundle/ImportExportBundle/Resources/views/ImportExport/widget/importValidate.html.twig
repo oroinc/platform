@@ -54,6 +54,14 @@
             </thead>
             <tbody>
             <tr>
+                <td>{{ 'Total number of records'|trans }}</td>
+                <td>
+                    <div class="pull-right">
+                        {{ counts.read|default(0) }}
+                    </div>
+                </td>
+            </tr>
+            <tr>
                 <td>{{ 'Records to add'|trans }}</td>
                 <td>
                     <div class="pull-right">
@@ -99,15 +107,6 @@
                 <td>
                     <div class="pull-right">
                         {{ counts.error_entries|default(0) }}
-                    </div>
-                </td>
-            </tr>
-
-            <tr class="info">
-                <td><strong>{{ 'Total number of records'|trans }}</strong></td>
-                <td>
-                    <div class="pull-right">
-                        {{ counts.read|default(0) }}
                     </div>
                 </td>
             </tr>
