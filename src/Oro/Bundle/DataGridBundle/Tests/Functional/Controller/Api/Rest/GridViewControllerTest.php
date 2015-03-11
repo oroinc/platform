@@ -5,9 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
@@ -25,7 +24,7 @@ class GridViewControllerTest extends WebTestCase
 
     public function testPostActionShouldReturn400IfSentDataAreInvalid()
     {
-        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [], [], $this->generateWsseAuthHeader());
+        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'));
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 400);
     }
 
@@ -135,13 +134,5 @@ class GridViewControllerTest extends WebTestCase
     private function getEntityManager()
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return SecurityFacade
-     */
-    private function getSeurityFacade()
-    {
-        return $this->getContainer()->get('oro_security.security_facade');
     }
 }
