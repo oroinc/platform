@@ -2,10 +2,6 @@ oro_layout:
     actions:
         - @setBlockTheme:
             themes: 'OroUIBundle:layouts:base/update/widget.html.twig'
-        - @setOption:
-            id:          page_header_panel
-            optionName:  visible
-            optionValue: false
         - @add:
             id:        widget_content
             parentId:  root
