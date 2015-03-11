@@ -38,15 +38,15 @@ define(function (require) {
         /**
          * Verifies if event has a loaded guest events
          *
-         * @param eventModel
+         * @param parentEventModel
          * @returns {boolean}
          */
-        hasLoadedGuestEvents: function (eventModel) {
+        hasLoadedGuestEvents: function (parentEventModel) {
             var result = false,
-                guests = eventModel.get('invitedUsers');
+                guests = parentEventModel.get('invitedUsers');
             guests = _.isNull(guests) ? [] : guests;
-            if (eventModel.hasChanged('invitedUsers') && !_.isEmpty(eventModel.previous('invitedUsers'))) {
-                guests = _.union(guests, eventModel.previous('invitedUsers'));
+            if (parentEventModel.hasChanged('invitedUsers') && !_.isEmpty(parentEventModel.previous('invitedUsers'))) {
+                guests = _.union(guests, parentEventModel.previous('invitedUsers'));
             }
             if (!_.isEmpty(guests)) {
                 result = Boolean(this.main.getConnectionCollection().find(function (connection) {
@@ -59,12 +59,12 @@ define(function (require) {
         /**
          * Returns linked guest events
          *
-         * @param eventModel
-         * @returns {array}
+         * @param parentEventModel
+         * @returns {Array.<EventModel>}
          */
-        findGuestEvents: function (eventModel) {
+        findGuestEventModels: function (parentEventModel) {
             return this.main.collection.where({
-                parentEventId: '' + eventModel.originalId
+                parentEventId: '' + parentEventModel.originalId
             });
         },
 
@@ -86,19 +86,19 @@ define(function (require) {
          * @param eventModel
          */
         onEventChanged: function (eventModel) {
-            var guestEvents, i, updatedAttrs;
+            var guestEventModels, i, updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
+            if (eventModel.hasChanged('invitedUsers')) {
+                eventModel.once('sync', this.main.updateEvents, this.main);
+                return;
+            }
             if (this.hasLoadedGuestEvents(eventModel)) {
-                if (eventModel.hasChanged('invitedUsers')) {
-                    eventModel.once('sync', this.main.updateEvents, this.main);
-                    return;
-                }
                 // update linked events
-                guestEvents = this.findGuestEvents(eventModel);
+                guestEventModels = this.findGuestEventModels(eventModel);
                 updatedAttrs = _.pick(eventModel.changed, ['start', 'end', 'allDay', 'title', 'description']);
-                for (i = 0; i < guestEvents.length; i++) {
+                for (i = 0; i < guestEventModels.length; i++) {
                     // fill with updated attributes in parent
-                    guestEvents[i].set(updatedAttrs);
+                    guestEventModels[i].set(updatedAttrs);
                 }
             }
         },
@@ -109,14 +109,14 @@ define(function (require) {
          * @param eventModel
          */
         onEventDeleted: function (eventModel) {
-            var guestEvents, i;
+            var guestEventModels, i;
             if (this.hasLoadedGuestEvents(eventModel)) {
                 // remove guests
-                guestEvents = this.findGuestEvents(eventModel);
-                for (i = 0; i < guestEvents.length; i++) {
-                    this.main.getCalendarElement().fullCalendar('removeEvents', guestEvents[i].id);
-                    this.main.collection.remove(guestEvents[i]);
-                    guestEvents[i].dispose();
+                guestEventModels = this.findGuestEventModels(eventModel);
+                for (i = 0; i < guestEventModels.length; i++) {
+                    this.main.getCalendarElement().fullCalendar('removeEvents', guestEventModels[i].id);
+                    this.main.collection.remove(guestEventModels[i]);
+                    guestEventModels[i].dispose();
                 }
             }
         },
@@ -125,7 +125,7 @@ define(function (require) {
          * "event:beforeSave" callback.
          *
          * @param eventModel
-         * @param {array} promises script will wait execution of all promises before save
+         * @param {Array.<$.promise>} promises script will wait execution of all promises before save
          * @param {object} attrs to be set on event model
          */
         onEventBeforeSave: function (eventModel, promises, attrs) {
