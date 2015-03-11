@@ -9,15 +9,18 @@ class ThemeAndRoutePathProvider extends AbstractPathProvider
      */
     public function getPaths()
     {
-        $filterPaths = [];
+        $filterPaths = $themePaths = [];
 
         $themeName = $this->context->getOr('theme');
         if ($themeName) {
             $routeName = $this->context->getOr('route_name');
             foreach ($this->getThemesHierarchy($themeName) as $theme) {
-                $filterPaths[] = $theme->getDirectory();
-                if ($routeName) {
-                    $filterPaths[] = implode(self::DELIMITER, [$theme->getDirectory(), $routeName]);
+                $themePaths[] = $filterPaths[] = $theme->getDirectory();
+            }
+
+            if ($routeName) {
+                foreach ($themePaths as $path) {
+                    $filterPaths[] = implode(self::DELIMITER, [$path, $routeName]);
                 }
             }
         }

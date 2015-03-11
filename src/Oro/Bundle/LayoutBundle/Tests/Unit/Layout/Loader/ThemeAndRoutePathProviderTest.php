@@ -36,6 +36,6 @@ class ThemeAndRoutePathProviderTest extends AbstractPathProviderTestCase
         );
 
         $this->provider->setContext($context);
-        $this->assertSame(['base', 'base/oro_route', 'black', 'black/oro_route'], $this->provider->getPaths());
+        $this->assertSame(['base', 'black', 'base/oro_route', 'black/oro_route'], $this->provider->getPaths());
     }
 }
