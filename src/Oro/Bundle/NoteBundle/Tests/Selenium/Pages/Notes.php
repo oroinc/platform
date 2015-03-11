@@ -83,7 +83,7 @@ class Notes extends AbstractPageEntity
     public function addNoteButtonAvailable()
     {
         if ($this->isElementPresent("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")) {
-            $this->checkActionInGroup('Add note');
+            $this->checkActionInGroup(['Add note']);
         } else {
             $this->assertElementPresent(
                 "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
@@ -100,7 +100,7 @@ class Notes extends AbstractPageEntity
     public function addNoteButtonNotAvailable()
     {
         if ($this->isElementPresent("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")) {
-            $this->checkActionInGroup('Add note', false);
+            $this->checkActionInGroup(['Add note'], false);
         } else {
             $this->assertElementNotPresent(
                 "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
