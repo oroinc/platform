@@ -95,7 +95,7 @@ define(function (require) {
                 }
                 // update linked events
                 guestEventModels = this.findGuestEventModels(eventModel);
-                updatedAttrs = _.pick(eventModel.changed, ['start', 'end', 'allDay', 'title', 'description']);
+                updatedAttrs = _.pick(eventModel.changedAttributes(), ['start', 'end', 'allDay', 'title', 'description']);
                 for (i = 0; i < guestEventModels.length; i++) {
                     // fill with updated attributes in parent
                     guestEventModels[i].set(updatedAttrs);
