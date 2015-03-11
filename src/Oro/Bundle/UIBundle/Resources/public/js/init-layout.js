@@ -390,4 +390,23 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             return false;
         });
     });
+
+    /* ============================================================
+     * from form/collection.js'
+     * ============================================================ */
+    $(document).on('click', '.add-list-item', function (e) {
+        e.preventDefault();
+        var $listContainer, index, html;
+        $listContainer = $(this).siblings('.collection-fields-list');
+        index = $listContainer.data('last-index') || $listContainer.children().length;
+        html = $listContainer.attr('data-prototype').replace(/__name__/g, index);
+        $listContainer.append(html).data('last-index', index + 1);
+
+        $listContainer.trigger('content:changed');
+    });
+
+    $(document).on('click', '.removeRow', function (e) {
+        e.preventDefault();
+        $(this).closest('*[data-content]').remove();
+    });
 });

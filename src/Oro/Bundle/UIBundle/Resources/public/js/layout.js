@@ -62,17 +62,19 @@ define(function (require) {
         },
 
         init: function (container, parent) {
-            var promise;
-            container = $(container);
-            this.styleForm(container);
+            var promise, $container;
+            $container = $(container);
+            this.styleForm($container);
 
-            scrollspy.init(container);
+            scrollspy.init($container);
 
-            container.find('[data-toggle="tooltip"]').tooltip();
+            $container.find('[data-toggle="tooltip"]').tooltip();
 
-            this.initPopover(container.find('label'));
+            this.initPopover($container.find('label'));
 
-            promise = this.initPageComponents(container, parent);
+            promise = this.initPageComponents($container, parent);
+
+            this._bindContainerChanges($container, parent);
             return promise;
         },
 
@@ -80,20 +82,20 @@ define(function (require) {
          * Initializes components defined in HTML of the container
          * and attaches them to passed parent instance
          *
-         * @param {jQuery.Element} container
-         * @param {Backbone.View|Chaplin.View|PageController} parent
+         * @param {jQuery.Element} $container
+         * @param {Backbone.View|Chaplin.View} parent
          * @returns {jQuery.Promise}
          */
-        initPageComponents: function (container, parent) {
-            var loadPromises, initDeferred, pageComponentNodes, preloadQueue;
+        initPageComponents: function ($container, parent) {
+            var loadPromises, initDeferred, $pageComponentNodes, preloadQueue;
             // console.groupCollapsed('container', container.attr('class'), {html: container.clone().html('')[0].outerHTML});
             loadPromises = [];
             initDeferred = $.Deferred(),
-            pageComponentNodes = container.find('[data-page-component-module]');
+            $pageComponentNodes = $container.find('[data-page-component-module]');
 
-            if (pageComponentNodes.length) {
+            if ($pageComponentNodes.length) {
                 preloadQueue = [];
-                pageComponentNodes.each(function () {
+                $pageComponentNodes.each(function () {
                     var $elem, module, name, options, loadDeferred, $separateLayout;
 
                     $elem = $(this);
@@ -101,9 +103,9 @@ define(function (require) {
                     // find nearest marked container with separate layout
                     $separateLayout = $elem.closest('[data-layout="separate"]');
                     // if it placed inside container - prevent component creation from here
-                    if ($separateLayout.length
-                            && $.contains(container[0], $separateLayout[0])
-                            && this !== $separateLayout[0]) {
+                    if ($separateLayout.length &&
+                            $.contains($container[0], $separateLayout[0]) &&
+                            this !== $separateLayout[0]) {
                         // optimize load time - push components to preload queue
                         preloadQueue.push(module);
                         return;
@@ -131,7 +133,7 @@ define(function (require) {
                             loadDeferred.resolve();
                             return;
                         }
-                        if (typeof component.init === "function") {
+                        if (typeof component.init === 'function') {
                             loadDeferred.resolve(component.init(options));
                         } else {
                             loadDeferred.resolve(component(options));
@@ -141,7 +143,7 @@ define(function (require) {
                         if (tools.debug) {
                             try {
                                 // rethrow of exception will not show stack - try to show it manually
-                                console.log(e.stack)
+                                console.log(e.stack);
                             } catch (e2) {
                                 // have no access to stack information, suppress
                             }
@@ -173,6 +175,35 @@ define(function (require) {
             }
             // console.groupEnd();
             return initDeferred.promise();
+        },
+
+        /**
+         * Subscribes the container on 'content:changed' event and updates layout on it
+         *
+         * @param {jQuery.Element} $container
+         * @param {Backbone.View|Chaplin.View} parent
+         * @protected
+         */
+        _bindContainerChanges: function ($container, parent) {
+            var namespace = '.initcomponents',
+                parentDataAttribute = 'page-component-related-parent';
+
+            if (!$container.data(parentDataAttribute)) {
+                $container.data(parentDataAttribute, parent);
+
+                $container.on('content:changed' + namespace, function (e) {
+                    e.stopImmediatePropagation();
+                    layout.init($container, parent);
+                });
+
+                parent.once('dispose', function () {
+                    $container.removeData(parentDataAttribute);
+                    $container.off(namespace);
+                });
+
+            } else if ($container.data(parentDataAttribute) !== parent) {
+                throw new Error('Attempt to init container with another parent element');
+            }
         },
 
         initPopover: function (container) {
