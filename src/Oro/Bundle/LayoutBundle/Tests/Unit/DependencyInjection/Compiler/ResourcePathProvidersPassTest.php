@@ -23,7 +23,7 @@ class ResourcePathProvidersPassTest extends \PHPUnit_Framework_TestCase
         unset($this->pass);
     }
 
-    public function testMatcherDefinitionNotFound()
+    public function testChainDefinitionNotFound()
     {
         $container = new ContainerBuilder();
         $this->pass->process($container);

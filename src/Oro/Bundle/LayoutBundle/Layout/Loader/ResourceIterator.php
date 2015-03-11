@@ -7,9 +7,6 @@ class ResourceIterator extends \IteratorIterator
     /** @var ResourceFactoryInterface */
     protected $factory;
 
-    /** @var ChainPathProvider|null */
-    protected $matcher;
-
     /**
      * @param ResourceFactoryInterface $factory
      * @param array                    $resources

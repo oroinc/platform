@@ -17,12 +17,12 @@ class ResourcePathProvidersPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition(self::CHAIN_SERVICE)) {
-            $matcherDef = $container->getDefinition(self::CHAIN_SERVICE);
+            $chainDef = $container->getDefinition(self::CHAIN_SERVICE);
 
             foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tag) {
                 $priority = isset($tag[0]['priority']) ? $tag[0]['priority'] : 0;
 
-                $matcherDef->addMethodCall('addProvider', [new Reference($serviceId), $priority]);
+                $chainDef->addMethodCall('addProvider', [new Reference($serviceId), $priority]);
             }
         }
     }

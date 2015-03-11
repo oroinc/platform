@@ -72,7 +72,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->extension,
-            $this->matcher,
+            $this->provider,
             $this->yamlLoader,
             $this->phpLoader,
             $this->logger,
