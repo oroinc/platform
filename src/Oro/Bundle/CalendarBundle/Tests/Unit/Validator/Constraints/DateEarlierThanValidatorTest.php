@@ -96,16 +96,19 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($this->dateTimeStart, $this->constraint);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "FormInterface", "array" given
-     */
-    public function testValidateExceptionWhenInvalidRootType()
+    public function testValidateExceptionWhenRootTypeIsNotForm()
     {
+        $data = new \stdClass();
+        $data->start = new \DateTime();
+        $data->end = new \DateTime();
+        
         $this->context = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
         $this->context->expects($this->any())
             ->method('getRoot')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue($data));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
         $validator = new DateEarlierThanValidator();
         $validator->initialize($this->context);
