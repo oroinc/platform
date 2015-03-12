@@ -25,8 +25,49 @@ class ErrorHandler
      */
     public function registerHandlers()
     {
-        set_error_handler(array($this, 'handleWarning'), E_WARNING | E_USER_WARNING);
-        set_error_handler(array($this, 'handleError'), E_RECOVERABLE_ERROR | E_ERROR | E_USER_ERROR);
+        $error_types = E_RECOVERABLE_ERROR | E_ERROR | E_USER_ERROR | E_WARNING | E_USER_WARNING;
+        set_error_handler(array($this, 'handle'), $error_types);
+    }
+
+
+    /**
+     * @param int    $code
+     * @param string $message
+     * @param string $file
+     * @param int    $line
+     *
+     * @return bool
+     * @throws \ErrorException
+     */
+    public function handle($code, $message, $file, $line)
+    {
+        /**
+         * Check if suppress warnings used
+         */
+        if (error_reporting() === 0) {
+            return false;
+        }
+
+        /**
+         * DateTimeZone produce error of E_ERROR type but it should be E_WARNING
+         */
+        if (strpos($message, 'DateTimeZone::__construct') !== false) {
+            return $this->handle(E_WARNING, $message, $file, $line);
+        }
+
+        switch ($code) {
+            case E_WARNING:
+            case E_USER_WARNING:
+                return $this->handleWarning($code, $message);
+                break;
+            case E_ERROR:
+            case E_USER_ERROR:
+            case E_RECOVERABLE_ERROR:
+                return $this->handleError($code, $message, $file, $line);
+                break;
+        }
+
+        return false;
     }
 
     /**
@@ -55,20 +96,6 @@ class ErrorHandler
      */
     public function handleError($code, $message, $file, $line)
     {
-        /**
-         * DateTimeZone produce error of E_ERROR type but it should be E_WARNING
-         */
-        if (strpos($message, 'DateTimeZone::__construct') !== false) {
-            return false;
-        }
-
-        /**
-         * Check if suppress warnings used
-         */
-        if (error_reporting() === 0) {
-            return false;
-        }
-
         $errorType = isset($this->errorTypes[$code]) ? $this->errorTypes[$code] : "Unknown error ({$code})";
         throw new \ErrorException("{$errorType}: {$message} in {$file} on line {$line}", 0, $code, $file, $line);
     }

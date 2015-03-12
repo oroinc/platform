@@ -43,7 +43,12 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleErrorIgnoredErrorIfErrorsSuppressed()
     {
-        @$this->handler->handleError(E_ERROR, 'test', '', 0);
+        @$this->handler->handle(E_ERROR, 'test', '', 0);
+    }
+
+    public function testHandleErrorIgnoreWarnings()
+    {
+        trigger_error('Test warning', E_USER_WARNING);
     }
 
     public function testHandleErrorIgnoredTimezoneWarning()
