@@ -24,6 +24,11 @@ class GridViewApiHandler
      */
     protected $om;
 
+    /**
+     * @param FormInterface $form
+     * @param Request $request
+     * @param ObjectManager $om
+     */
     public function __construct(FormInterface $form, Request $request, ObjectManager $om)
     {
         $this->form = $form;
@@ -31,6 +36,11 @@ class GridViewApiHandler
         $this->om = $om;
     }
 
+    /**
+     * @param GridView $entity
+     *
+     * @return boolean
+     */
     public function process(GridView $entity)
     {
         $this->form->setData($entity);
@@ -51,7 +61,10 @@ class GridViewApiHandler
 
         return false;
     }
-    
+
+    /**
+     * @param GridView $entity
+     */
     protected function onSuccess(GridView $entity)
     {
         $this->om->persist($entity);
