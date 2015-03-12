@@ -44,9 +44,9 @@
                         error.handle({}, jqXHR, {enforce: true});
                     },
                     success: function(data) {
-                        var content = $tabContent.find('.content');
-                        content.html(data);
-                        mediator.execute('layout:init', content);
+                        $tabContent.find('.content')
+                            .html(data)
+                            .trigger('content:changed');
                         loadingMask.hide();
                     }
                 });
