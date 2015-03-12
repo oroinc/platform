@@ -232,14 +232,16 @@ define([
             var model = this._getCurrentViewModel();
 
             model.save({
+                label: this._getCurrentViewLabel(),
                 type: 'public'
             }, {
                 wait: true
             });
 
             model.once('sync', function() {
+                this.render();
                 mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
-            });
+            }, this);
         },
 
         /**
