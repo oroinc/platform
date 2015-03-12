@@ -41,19 +41,14 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         trigger_error('Test error', E_USER_ERROR);
     }
 
-    public function testHandleErrorIgnoredErrorIfErrorsSuppressed()
+    public function testHandleIgnoredErrorIfErrorsSuppressed()
     {
         @$this->handler->handle(E_ERROR, 'test', '', 0);
     }
 
-    public function testHandleErrorIgnoreWarnings()
+    public function testHandleIgnoreWarnings()
     {
-        trigger_error('Test warning', E_USER_WARNING);
-    }
-
-    public function testHandleErrorIgnoredTimezoneWarning()
-    {
-        timezone_open(1202229163);
+        $this->assertFalse($this->handler->handle(E_WARNING, 'Test warning', '', 0));
     }
 
     public function warningDataProvider()

@@ -48,13 +48,6 @@ class ErrorHandler
             return false;
         }
 
-        /**
-         * DateTimeZone produce error of E_ERROR type but it should be E_WARNING
-         */
-        if (strpos($message, 'DateTimeZone::__construct') !== false) {
-            return $this->handle(E_WARNING, $message, $file, $line);
-        }
-
         switch ($code) {
             case E_WARNING:
             case E_USER_WARNING:
