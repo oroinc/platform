@@ -16,8 +16,9 @@ oro:
             email_configuration: Email Configuration
 
             signature_configuration:
-              label: Signature
-              signature.label: Signature Content
+                label: Signature
+                signature.label: Signature Content
+                append_signature.label: Append signature to email body
 
             email_threads:
                 label: Email Threads
@@ -154,3 +155,4 @@ oro:
 "Content": "Content"
 "Cc/Bcc": "Cc/Bcc"
 "Thread view": "Thread view"
+"Add signature": "Add signature"

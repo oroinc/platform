@@ -19,6 +19,12 @@ oro_system_configuration:
             options:
                 label: oro.email.system_configuration.signature_configuration.signature.label
 
+        oro_email.append_signature:
+            data_type: boolean
+            type: checkbox
+            options:
+                label: oro.email.system_configuration.signature_configuration.append_signature.label
+
         oro_email.use_threads_in_emails:
             data_type: boolean
             type: choice
@@ -39,6 +45,7 @@ oro_system_configuration:
                                     signature_configuration:
                                         children:
                                             - oro_email.signature
+                                            - oro_email.append_signature
                                     email_threads:
                                         children:
                                             - oro_email.use_threads_in_emails
@@ -46,5 +53,6 @@ oro_system_configuration:
     api_tree:
         signature_configuration:
             oro_email.signature: ~
+            oro_email.append_signature: ~
         email_threads:
             oro_email.use_threads_in_emails: ~

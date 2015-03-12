@@ -54,12 +54,23 @@ define(function (require) {
                 $template = this.options._sourceElement.find('[name$="[template]"]'),
                 $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]'),
                 $parentEmailId = this.options._sourceElement.find('[name$="[parentEmailId]"]'),
-                $signature = this.options._sourceElement.find('[name$="[signature]"]');
+                $signature = this.options._sourceElement.find('[name$="[signature]"]'),
+                $addSignatureButton = this.options._sourceElement.find('#addSignatureButton');
+
+            $addSignatureButton.on('click', function() {
+                var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
+                if (bodyEditorComponent.view.tinymceConnected) {
+                    var tinyMCE= bodyEditorComponent.view.tinymceInstance;
+                    tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                }
+            });
 
             var initBody = function(body) {
                 var signature = $signature.val();
-                if (signature && body.indexOf(signature) < 0) {
-                    body += '<br/><br/>' + $signature.val();
+                if (self.options.appendSignature) {
+                    if (signature && body.indexOf(signature) < 0) {
+                        body += '<br/><br/>' + $signature.val();
+                    }
                 }
                 if ($bodyFooter.val()) {
                     body += $bodyFooter.val();

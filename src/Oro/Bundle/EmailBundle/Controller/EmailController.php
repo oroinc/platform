@@ -279,7 +279,8 @@ class EmailController extends Controller
     {
         $responseData = [
             'entity' => $emailModel,
-            'saved' => false
+            'saved' => false,
+            'appendSignature' => $this->get('oro_config.user')->get('oro_email.append_signature'),
         ];
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;
