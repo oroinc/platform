@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\ConfigBundle\Manager\GlobalConfigManager;
+use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -31,24 +31,24 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
-    /** GlobalConfigManager */
-    protected $globalConfigManager;
+    /** UserConfigManager */
+    protected $userConfigManager;
 
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade           $securityFacade
      * @param Request                  $request Request
-     * @param GlobalConfigManager      $globalConfigManager
+     * @param UserConfigManager        $userConfigManager
      */
     public function __construct(
         SecurityContextInterface $security,
         SecurityFacade           $securityFacade,
         Request                  $request,
-        GlobalConfigManager      $globalConfigManager
+        UserConfigManager        $userConfigManager
     ) {
-        $this->security            = $security;
-        $this->securityFacade      = $securityFacade;
-        $this->globalConfigManager = $globalConfigManager;
+        $this->security          = $security;
+        $this->securityFacade    = $securityFacade;
+        $this->userConfigManager = $userConfigManager;
 
         if ($request->attributes->get('_route') == 'oro_user_profile_update') {
             $this->isMyProfilePage = true;
@@ -153,15 +153,6 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 )
             )
-            ->add(
-                'signature',
-                'oro_rich_text',
-                [
-                    'label'    => 'oro.user.form.signature.label',
-                    'required' => false,
-                    'mapped'   => false,
-                ]
-            )
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
             ->add('change_password', 'oro_change_password')
@@ -255,9 +246,21 @@ class UserType extends AbstractType
         /** @var Form $form */
         $form = $event->getForm();
         $data = $form->getData();
-        $signatureEl = $form->get('signature');
         if ($data instanceof User) {
-            $signatureEl->setData($this->globalConfigManager->getUserConfigSignature($data));
+            if ($token = $this->security->getToken()) {
+                if (is_object($user = $token->getUser()) && $data->getId() == $user->getId()) {
+                    $form->add(
+                        'signature',
+                        'oro_rich_text',
+                        [
+                            'label'    => 'oro.user.form.signature.label',
+                            'required' => false,
+                            'mapped'   => false,
+                            'data'     => $this->userConfigManager->getUserConfigSignature(),
+                        ]
+                    );
+                }
+            }
         }
     }
 }

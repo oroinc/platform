@@ -79,7 +79,7 @@ services:
             - @security.context
             - @oro_security.security_facade
             - @request
-            - @oro_config.global_config_manager
+            - @oro_config.user_config_manager
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -183,7 +183,7 @@ services:
             - @oro_user.form.user
             - @request
             - @oro_user.manager
-            - @oro_config.global_config_manager
+            - @oro_config.user_config_manager
             - @oro_config.global
             - @templating
             - @oro_email.direct_mailer
