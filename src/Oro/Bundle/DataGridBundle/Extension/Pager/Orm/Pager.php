@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager\Orm;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
@@ -138,18 +139,16 @@ class Pager extends AbstractPager implements PagerInterface
 
         /** @var QueryBuilder $query */
         $query = $this->getQueryBuilder();
+        if (count($this->getParameters()) > 0) {
+            $query->setParameters($this->getParameters());
+        }
         $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
 
         $query->setFirstResult(null);
         $query->setMaxResults(null);
 
-
-        if (count($this->getParameters()) > 0) {
-            $query->setParameters($this->getParameters());
-        }
-
         if (!$countQb->getDQLPart('groupBy')) {
-            $this->setPaginiationData($countQb);
+            $this->setPaginationData($countQb);
             foreach ($countQb->getQuery()->getResult() as $data) {
                 $inArray[] = current($data);
             }
@@ -159,7 +158,7 @@ class Pager extends AbstractPager implements PagerInterface
                 return;
             }
         }
-        $this->setPaginiationData($query);
+        $this->setPaginationData($query);
     }
 
     /**
@@ -250,7 +249,7 @@ class Pager extends AbstractPager implements PagerInterface
     /**
      * @param QueryBuilder $query
      */
-    private function setPaginiationData(QueryBuilder $query)
+    private function setPaginationData(QueryBuilder $query)
     {
         if (0 == $this->getPage() || 0 == $this->getMaxPerPage() || 0 == $this->getNbResults()) {
             $this->setLastPage(0);
