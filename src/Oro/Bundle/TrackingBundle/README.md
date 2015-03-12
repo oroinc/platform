@@ -1,6 +1,7 @@
 OroTrackingBundle
 =================
 Provides:
+
     - CRUD for configuring web tracking
     - Proxying tracking data to Piwik (in case it's enabled) 
     - Web events tracking functionality
@@ -9,12 +10,10 @@ Provides:
     - Assigning tracking with identified objects
 
 # Notes
--------
 
 In case when Piwik synchronization enabled tracking website's "identifier" fields value should be the same as Piwik website id (integer value).
 
 # TrackingProcessor
--------------------
 
 The main goal of processing(parsing) tracking events is to identify object(s) for which event(s) belongs to. For example, it can be identification of users/customers form any integrated system like eCommerce, blog, project management application, etc.
 
