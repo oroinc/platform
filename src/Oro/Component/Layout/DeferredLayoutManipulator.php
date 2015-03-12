@@ -385,9 +385,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                         && (!$siblingId || $this->rawLayoutBuilder->isParentFor($parentId, $siblingId))
                     );
             case self::MOVE:
-                $id        = $args[0];
-                $parentId  = $args[1];
-                $siblingId = $args[2];
+                list($id, $parentId, $siblingId) = $args;
 
                 return
                     (!$id || $this->rawLayoutBuilder->has($id))
@@ -492,11 +490,10 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     protected function executeAction($action)
     {
-        $name = $action[1];
-        $args = $action[2];
+        list($key, $name, $args) = $action;
         call_user_func_array([$this->rawLayoutBuilder, $name], $args);
 
-        switch ($action[0]) {
+        switch ($key) {
             case self::ADD:
                 $this->addCounter++;
                 $this->item->initialize($args[0]);
