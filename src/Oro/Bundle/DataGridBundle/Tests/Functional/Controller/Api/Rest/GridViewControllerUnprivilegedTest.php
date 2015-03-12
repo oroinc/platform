@@ -21,9 +21,9 @@ class GridViewControllerUnprivilegedTest extends WebTestCase
         ]);
     }
 
-    public function testPostActionShouldReturn403IfUserIsUnprivileged()
+    public function testPostActionShouldReturn403IfUserTriesToCreatePublicView()
     {
-        $this->disableEntityPermissions(['CREATE']);
+        $this->disableActionPermissions(['action:oro_datagrid_gridview_create_public']);
 
         $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [
             'label' => 'view',
@@ -35,15 +35,75 @@ class GridViewControllerUnprivilegedTest extends WebTestCase
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 403);
     }
 
-    public function testPutActionShouldReturn403IfUserIsUprivileged()
+    public function testPostActionShouldReturn403IfUserIsUnprivileged()
     {
-        $this->disableEntityPermissions(['EDIT']);
+        $this->disableEntityPermissions(['CREATE']);
 
-        $gridView = $this->findFirstGridView();
+        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [
+            'label' => 'view',
+            'type' => GridView::TYPE_PRIVATE,
+            'grid_name' => 'testing-grid',
+            'filters' => [],
+            'sorters' => [],
+        ]);
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 403);
+    }
+
+    public function testPutActionShouldReturn403IfUserTriesToShareView()
+    {
+        $this->disableActionPermissions(['action:oro_datagrid_gridview_create_public']);
+
+        $gridView = $this->findPrivateView();
 
         $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
             'label' => 'view2',
             'type' => GridView::TYPE_PUBLIC,
+            'grid_name' => 'testing-grid2',
+            'filters' => [
+                'username' => [
+                    'type' => 1,
+                    'value' => 'adm',
+                ],
+            ],
+            'sorters' => [
+                'username' => 1,
+            ],
+        ]);
+        $this->assertResponseStatusCodeEquals($this->client->getResponse(), 403);
+    }
+
+    public function testPutActionShouldReturn403IfUserTriesToEditPublicView()
+    {
+        $this->disableActionPermissions(['action:oro_datagrid_gridview_edit_public']);
+
+        $gridView = $this->findPublicView();
+
+        $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
+            'label' => 'view2',
+            'type' => GridView::TYPE_PUBLIC,
+            'grid_name' => 'testing-grid2',
+            'filters' => [
+                'username' => [
+                    'type' => 1,
+                    'value' => 'adm',
+                ],
+            ],
+            'sorters' => [
+                'username' => 1,
+            ],
+        ]);
+        $this->assertResponseStatusCodeEquals($this->client->getResponse(), 403);
+    }
+
+    public function testPutActionShouldReturn403IfUserIsUprivileged()
+    {
+        $this->disableEntityPermissions(['EDIT']);
+
+        $gridView = $this->findPrivateView();
+
+        $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
+            'label' => 'view2',
+            'type' => GridView::TYPE_PRIVATE,
             'grid_name' => 'testing-grid2',
             'filters' => [
                 'username' => [
@@ -66,6 +126,23 @@ class GridViewControllerUnprivilegedTest extends WebTestCase
 
         $this->client->request('DELETE', $this->getUrl('oro_datagrid_api_rest_gridview_delete', ['id' => $id]));
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 403);
+    }
+
+    private function disableActionPermissions(array $permissions)
+    {
+        $role = $this->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole('ROLE_ADMINISTRATOR');
+
+        $sid = $this->getAclManager()->getSid($role);
+        $privileges = $this->getPrivilegeRepository()->getPrivileges($sid);
+        $privilege = $privileges->filter(function(AclPrivilege $privilege) use ($permissions) {
+            return in_array($privilege->getIdentity()->getId(), $permissions);
+        })->first();
+
+        foreach ($privilege->getPermissions() as $permission) {
+            $permission->setAccessLevel(AccessLevel::NONE_LEVEL);
+        }
+
+        $this->getPrivilegeRepository()->savePrivileges($sid, $privileges);
     }
 
     private function disableEntityPermissions(array $permissions)
@@ -107,9 +184,21 @@ class GridViewControllerUnprivilegedTest extends WebTestCase
     /**
      * @return GridView
      */
-    private function findFirstGridView()
+    private function findPublicView()
     {
-        return $this->getGridViewRepository()->findOneBy([], ['id' => 'ASC']);
+        return $this->getGridViewRepository()->findOneBy([
+            'type' => GridView::TYPE_PUBLIC,
+        ], ['id' => 'ASC']);
+    }
+
+    /**
+     * @return GridView
+     */
+    private function findPrivateView()
+    {
+        return $this->getGridViewRepository()->findOneBy([
+            'type' => GridView::TYPE_PRIVATE,
+        ], ['id' => 'ASC']);
     }
 
     /**

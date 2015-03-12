@@ -11,11 +11,13 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Rest\NamePrefix("oro_datagrid_api_rest_gridview_")
@@ -40,6 +42,8 @@ class GridViewController extends RestController
      */
     public function postAction()
     {
+        $this->checkCreatePublicAccess();
+
         return $this->handleCreateRequest();
     }
 
@@ -64,6 +68,13 @@ class GridViewController extends RestController
      */
     public function putAction($id)
     {
+        $gridView = $this->getManager()->find($id);
+        if ($gridView->getType() === GridView::TYPE_PUBLIC) {
+            $this->checkEditPublicAccess($gridView);
+        } else {
+            $this->checkCreatePublicAccess();
+        }
+
         return $this->handleUpdateRequest($id);
     }
 
@@ -89,6 +100,42 @@ class GridViewController extends RestController
     public function deleteAction($id)
     {
         return $this->handleDeleteRequest($id);
+    }
+
+    /**
+     * @param GridView $gridView
+     *
+     * @throws AccessDeniedException
+     */
+    protected function checkEditPublicAccess(GridView $gridView)
+    {
+        if ($gridView->getType() !== GridView::TYPE_PUBLIC) {
+            return;
+        }
+
+        if ($this->getSecurityFacade()->isGranted('oro_datagrid_gridview_edit_public')) {
+            return;
+        }
+
+        throw new AccessDeniedException();
+    }
+
+    /**
+     * @param GridView $gridView
+     *
+     * @throws AccessDeniedException
+     */
+    protected function checkCreatePublicAccess()
+    {
+        if ($this->getRequest()->request->get('type') !== GridView::TYPE_PUBLIC) {
+            return;
+        }
+
+        if ($this->getSecurityFacade()->isGranted('oro_datagrid_gridview_create_public')) {
+            return;
+        }
+
+        throw new AccessDeniedException();
     }
 
     /**
@@ -124,5 +171,13 @@ class GridViewController extends RestController
     public function getManager()
     {
         return $this->get('oro_datagrid.grid_view.manager.api');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->get('oro_security.security_facade');
     }
 }
