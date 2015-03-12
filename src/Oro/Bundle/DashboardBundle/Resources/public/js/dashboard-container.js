@@ -100,7 +100,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             var widgetParams = {
                 'widgetType': 'dashboard-item',
                 'wid': wid,
-                'url': routing.generate(data.config.route, data.config.route_parameters),
+                'url': routing.generate(data.config.route, _.extend(data.config.route_parameters, {
+                    '_widgetId': state.id
+                })),
                 'state': state,
                 'loadingMaskEnabled': false,
                 'container': '#' + containerId,
