@@ -79,7 +79,25 @@
   }
   .filter-criteria-selector {
     text-align: left;
-    width: 93%;
+    width: 100%;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: bottom;
+    padding-right: 35px;
+    position: relative;
+    .filter-criteria-hint {
+      display: inline;
+    }
+    .reset-filter {
+      position: absolute;
+      right: 20px;
+    }
+    .caret {
+      position: absolute;
+      right: 8px;
+    }
   }
   .filter-list {
     margin: 0 0 5px -5px;
