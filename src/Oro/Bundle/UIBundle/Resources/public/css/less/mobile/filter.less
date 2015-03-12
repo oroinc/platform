@@ -89,13 +89,35 @@
     .filter-criteria-hint {
       display: inline;
     }
-    .reset-filter {
-      position: absolute;
-      right: 20px;
-    }
     .caret {
       position: absolute;
       right: 8px;
+    }
+
+    &:not(.filter-default-value) {
+      .reset-filter {
+        position: absolute;
+        border-left: 1px solid rgba(0,0,0,0.1);
+        display: block;
+        width: 27px;
+        height: 27px;
+        right: 0;
+        top: 0;
+        text-align: center;
+      }
+      [class^='icon-'].hide-text:before {
+        color: #666;
+        font-size: 12px;
+      }
+      .caret {
+        right: 35px;
+      }
+    }
+    &.filter-default-value {
+      .caret {
+        position: absolute;
+        right: 8px;
+      }
     }
   }
   .filter-list {
