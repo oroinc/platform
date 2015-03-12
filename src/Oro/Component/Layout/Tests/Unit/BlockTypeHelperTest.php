@@ -222,7 +222,7 @@ class BlockTypeHelperTest extends \PHPUnit_Framework_TestCase
         $this->registry->expects($this->exactly(3))
             ->method('getType');
 
-        // get derived (here we test that the local cache of the BlockTypeHelper is used)
+        // get derived (here all types are added to the local cache of the BlockTypeHelper)
         $this->assertSame(
             [$baseBlockType, $containerBlockType, $headerBlockType],
             $this->typeHelper->getTypes($headerBlockType->getName())
@@ -235,7 +235,7 @@ class BlockTypeHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->typeHelper->isInstanceOf($headerBlockType->getName(), ContainerType::NAME));
         $this->assertTrue($this->typeHelper->isInstanceOf($headerBlockType->getName(), BaseType::NAME));
 
-        // get parent (here both 'block' and 'container' types are added to the local cache of the BlockTypeHelper)
+        // get parent (here we test that the local cache of the BlockTypeHelper is used)
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
             $this->typeHelper->getTypes(ContainerType::NAME)
