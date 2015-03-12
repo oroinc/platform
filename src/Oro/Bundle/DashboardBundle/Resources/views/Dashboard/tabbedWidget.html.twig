@@ -45,6 +45,7 @@
                     },
                     success: function(data) {
                         $tabContent.find('.content')
+                            .trigger('content:remove')
                             .html(data)
                             .trigger('content:changed');
                         loadingMask.hide();

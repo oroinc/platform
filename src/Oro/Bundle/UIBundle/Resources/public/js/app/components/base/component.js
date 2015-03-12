@@ -27,7 +27,7 @@ define([
         }
         if ($sourceElement) {
             $sourceElement.data('componentInstance', this);
-            this.once('dispose', function () {
+            this.on('dispose', function () {
                 $sourceElement.removeData('componentInstance');
             });
         }

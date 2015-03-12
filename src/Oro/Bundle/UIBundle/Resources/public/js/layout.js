@@ -204,44 +204,47 @@ define(function (require) {
         _bindContainerChanges: function ($container, parentView) {
             var namespace = '.init-components',
                 parentViewDataKey = 'pageComponentRelatedView',
-                _parentView = $container.data(parentViewDataKey);
+                storedParentView = $container.data(parentViewDataKey);
 
-            if (_parentView && _parentView !== parentView) {
+            if (storedParentView && storedParentView !== parentView) {
                 throw new Error('Attempt to init container with another parent view');
-
-            } else if (!_parentView) {
-                $container.data(parentViewDataKey, parentView);
-
-                // if the container catches content changed event -- updates its layout
-                $container.on('content:changed' + namespace, function (e) {
-                    if (e.isDefaultPrevented()) {
-                        return;
-                    }
-                    e.preventDefault();
-                    layout.init($container, parentView);
-                });
-
-                // if the container catches content remove event -- disposes related components
-                $container.on('content:remove' + namespace, function (e) {
-                    if (e.isDefaultPrevented()) {
-                        return;
-                    }
-                    e.preventDefault();
-                    $(e.target).find('[data-bound-component]').each(function () {
-                        var $elem = $(this),
-                            component = $elem.data('componentInstance');
-                        if (component) {
-                            component.dispose();
-                        }
-                    });
-                });
-
-                // once parent view gets disposed -- break the container bound
-                parentView.once('dispose', function () {
-                    $container.removeData(parentViewDataKey);
-                    $container.off(namespace);
-                });
+            } else if (!storedParentView) {
+                // handlers are already bound
+                return;
             }
+
+            $container.data(parentViewDataKey, parentView);
+
+            // if the container catches content changed event -- updates its layout
+            $container.on('content:changed' + namespace, function (e) {
+                if (e.isDefaultPrevented()) {
+                    return;
+                }
+                e.preventDefault();
+                layout.init($container, parentView);
+            });
+
+            // if the container catches content remove event -- disposes related components
+            $container.on('content:remove' + namespace, function (e) {
+                if (e.isDefaultPrevented()) {
+                    return;
+                }
+                e.preventDefault();
+                $(e.target).find('[data-bound-component]').each(function () {
+                    var $elem = $(this),
+                        component = $elem.data('componentInstance');
+                    if (component) {
+                        component.dispose();
+                    }
+                });
+            });
+
+            // once parent view gets disposed -- break the container bound
+            parentView.once('dispose', function () {
+                $container.removeData(parentViewDataKey);
+                $container.off(namespace);
+            });
+
         },
 
         initPopover: function (container) {
