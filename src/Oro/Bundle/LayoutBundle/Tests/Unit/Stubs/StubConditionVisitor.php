@@ -3,16 +3,16 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Stubs;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorInterface;
 
-class StubCondition implements ConditionInterface
+class StubConditionVisitor implements VisitorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function startVisit(VisitContext $visitContext)
     {
-        $visitContext->getWriter()
+        $visitContext->getUpdateMethodWriter()
             ->writeln('if (true) {')
             ->indent();
     }
@@ -22,7 +22,7 @@ class StubCondition implements ConditionInterface
      */
     public function endVisit(VisitContext $visitContext)
     {
-        $visitContext->getWriter()
+        $visitContext->getUpdateMethodWriter()
             ->outdent()
             ->writeln('}');
     }

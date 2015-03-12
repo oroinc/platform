@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator\Condition;
+namespace Oro\Bundle\LayoutBundle\Layout\Generator\Visitor;
 
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
-class ConditionCollection extends \ArrayIterator
+class VisitorCollection extends \ArrayIterator
 {
     /**
      * @param array $conditions
@@ -32,10 +32,10 @@ class ConditionCollection extends \ArrayIterator
     protected function validate(array $conditions)
     {
         foreach ($conditions as $condition) {
-            if (!$condition instanceof ConditionInterface) {
+            if (!$condition instanceof VisitorInterface) {
                 throw new UnexpectedTypeException(
                     $condition,
-                    'Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionInterface'
+                    'Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorInterface'
                 );
             }
         }

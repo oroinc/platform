@@ -27,7 +27,5 @@ class ResourceFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Oro\Bundle\LayoutBundle\Layout\Loader\FileResource', $result);
         $this->assertSame($filename, $result->getFilename());
-
-        $this->assertEmpty($result->getConditions());
     }
 }

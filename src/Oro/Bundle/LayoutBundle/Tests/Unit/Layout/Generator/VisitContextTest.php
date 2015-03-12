@@ -28,6 +28,14 @@ class VisitContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($writer, $visitContext->createWriter());
     }
 
+    public function testGetUpdateMethodWriter()
+    {
+        $class = $this->getClass();
+
+        $visitContext = new VisitContext($class);
+        $this->assertSame($visitContext->getUpdateMethodWriter(), $visitContext->getUpdateMethodWriter());
+    }
+
     /**
      * @return PhpClass
      */

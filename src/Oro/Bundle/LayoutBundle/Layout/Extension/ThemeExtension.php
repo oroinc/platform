@@ -14,6 +14,7 @@ use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\ElementDependentLayoutUpdateInterface;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 {
@@ -69,14 +70,15 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
                 if ($this->loader->supports($resource)) {
                     $update = $this->loader->load($resource);
                     $this->dependencyInitializer->initialize($update);
-                    $updates[] = $update;
+                    $el = $update instanceof ElementDependentLayoutUpdateInterface ? $update->getElement() : 'root';
+                    $updates[$el][] = $update;
                 } else {
                     $this->logger->notice(sprintf('Skipping resource "%s" because loader for it not found', $resource));
                 }
             }
         }
 
-        return ['root' => $updates];
+        return $updates;
     }
 
     /**
