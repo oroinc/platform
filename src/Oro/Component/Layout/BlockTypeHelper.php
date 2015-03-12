@@ -75,21 +75,51 @@ class BlockTypeHelper implements BlockTypeHelperInterface
             }
 
             $types      = [$type];
-            $names      = [$type->getName()];
-            $nameMap    = [$type->getName() => true];
+            $typeName   = $type->getName();
+            $names      = [$typeName];
+            $nameMap    = [$typeName => true];
             $parentName = $type->getParent();
             while ($parentName) {
-                $type = $this->registry->getType($parentName);
+                if (isset($this->types[$parentName])) {
+                    // use data from already loaded parent type
+                    $types   = array_merge($this->types[$parentName], array_reverse($types));
+                    $names   = array_merge($this->names[$parentName], array_reverse($names));
+                    $nameMap = array_merge($this->nameMap[$parentName], $nameMap);
+                    break;
+                } else {
+                    $type     = $this->registry->getType($parentName);
+                    $typeName = $type->getName();
 
-                array_unshift($types, $type);
-                array_unshift($names, $type->getName());
-                $nameMap[$type->getName()] = true;
+                    $types[]            = $type;
+                    $names[]            = $typeName;
+                    $nameMap[$typeName] = true;
 
-                $parentName = $type->getParent();
+                    $parentName = $type->getParent();
+                }
             }
+
+            if (null === $parentName) {
+                $types = array_reverse($types);
+                $names = array_reverse($names);
+            }
+
             $this->types[$name]   = $types;
             $this->names[$name]   = $names;
             $this->nameMap[$name] = $nameMap;
+
+            // initialise all parent types if them are not initialized yet
+            $foundNames = array_keys($nameMap);
+            $offset     = 0;
+            while (false !== ($foundName = next($foundNames))) {
+                if (isset($this->nameMap[$foundName])) {
+                    break;
+                }
+
+                $offset++;
+                $this->types[$foundName]   = array_slice($types, 0, -$offset);
+                $this->names[$foundName]   = array_slice($names, 0, -$offset);
+                $this->nameMap[$foundName] = array_slice($nameMap, $offset);
+            }
         }
 
         return $name;
