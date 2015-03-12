@@ -375,7 +375,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                             }
                         },
                         error: function () {
-                            console.log(5);
                             var message;
                             message = el.data('error-message') ||
                                 __('Unexpected error occurred. Please contact system administrator.');
@@ -400,13 +399,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         $listContainer = $(this).siblings('.collection-fields-list');
         index = $listContainer.data('last-index') || $listContainer.children().length;
         html = $listContainer.attr('data-prototype').replace(/__name__/g, index);
-        $listContainer.append(html).data('last-index', index + 1);
-
-        $listContainer.trigger('content:changed');
+        $listContainer.append(html)
+            .trigger('content:changed')
+            .data('last-index', index + 1);
     });
 
     $(document).on('click', '.removeRow', function (e) {
         e.preventDefault();
-        $(this).closest('*[data-content]').remove();
+        $(this).closest('*[data-content]')
+            .trigger('content:remove')
+            .remove();
     });
 });

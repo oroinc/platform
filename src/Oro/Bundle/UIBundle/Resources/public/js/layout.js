@@ -129,29 +129,31 @@ define(function (require) {
                     loadDeferred = $.Deferred();
 
                     require([module], function (component) {
+                        var result;
                         if (options.parent && options.parent.disposed) {
                             loadDeferred.resolve();
                             return;
                         }
                         if (typeof component.init === 'function') {
-                            loadDeferred.resolve(component.init(options));
+                            result = component.init(options);
+                            $.when(result).then(function (componentInstance) {
+                                // once component initialized save an instance in element's data
+                                $elem.data('componentInstance', componentInstance);
+                            });
+                            loadDeferred.resolve(result);
                         } else {
                             loadDeferred.resolve(component(options));
                         }
-                    }, function (e) {
-                        var e2;
+                    }, function (error) {
                         if (tools.debug) {
-                            try {
-                                // rethrow of exception will not show stack - try to show it manually
-                                console.log(e.stack);
-                            } catch (e2) {
-                                // have no access to stack information, suppress
+                            if (console && console.log) {
+                                console.log(error.stack);
                             }
-                            throw e;
+                            throw error;
                         } else {
                             // prevent interface from blocking by loader in production mode
                             mediator.execute('showMessage', 'error',
-                                __('Cannot load module ') + '"' + e.requireModules[0] + '"'
+                                __('Cannot load module ') + '"' + error.requireModules[0] + '"'
                             );
                             loadDeferred.resolve();
                         }
@@ -191,18 +193,39 @@ define(function (require) {
             if (!$container.data(parentDataAttribute)) {
                 $container.data(parentDataAttribute, parent);
 
+                // if the container catches content changed event -- updates its layout
                 $container.on('content:changed' + namespace, function (e) {
-                    e.stopImmediatePropagation();
+                    if (e.isDefaultPrevented()) {
+                        return;
+                    }
+                    e.preventDefault();
                     layout.init($container, parent);
                 });
 
+                // if the container catches content remove event -- disposes related components
+                $container.on('content:remove' + namespace, function (e) {
+                    if (e.isDefaultPrevented()) {
+                        return;
+                    }
+                    e.preventDefault();
+                    $(e.target).find('[data-bound-component]').each(function () {
+                        var $elem = $(this),
+                            component = $elem.data('componentInstance');
+                        $elem.removeData('componentInstance');
+                        if (component) {
+                            component.dispose();
+                        }
+                    });
+                });
+
+                // once parent view gets disposed -- break the container bound
                 parent.once('dispose', function () {
                     $container.removeData(parentDataAttribute);
                     $container.off(namespace);
                 });
 
             } else if ($container.data(parentDataAttribute) !== parent) {
-                throw new Error('Attempt to init container with another parent element');
+                throw new Error('Attempt to init container with another parent view');
             }
         },
 
