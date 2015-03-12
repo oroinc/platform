@@ -25,9 +25,11 @@ class SoapConnectionException extends TransportException
         $message .= str_pad('[code]', 20, ' ', STR_PAD_RIGHT) . $code . PHP_EOL;
         $message .= PHP_EOL;
 
-        $exception = new static($message, $exceptionCode, $exception);
-        $exception->setFaultCode($code);
+        $newException = new static($message, $exceptionCode, $exception);
+        if ($exception instanceof \SoapFault) {
+            $newException->setFaultCode($exception->faultcode);
+        }
 
-        return $exception;
+        return $newException;
     }
 }
