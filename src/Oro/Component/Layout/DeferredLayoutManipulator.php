@@ -10,37 +10,37 @@ namespace Oro\Component\Layout;
 class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 {
     /** The group name for add new items related actions */
-    const GROUP_ADD = 'add';
+    const GROUP_ADD = 1;
 
     /** The group name for remove items related actions */
-    const GROUP_REMOVE = 'remove';
+    const GROUP_REMOVE = 2;
 
     /** The action name for add layout item */
-    const ADD = 'add';
+    const ADD = 1;
 
     /** The action name for remove layout item */
-    const REMOVE = 'remove';
+    const REMOVE = 2;
 
     /** The action name for move layout item */
-    const MOVE = 'move';
+    const MOVE = 3;
 
     /** The action name for add the alias for the layout item */
-    const ADD_ALIAS = 'addAlias';
+    const ADD_ALIAS = 4;
 
     /** The action name for remove the alias for the layout item */
-    const REMOVE_ALIAS = 'removeAlias';
+    const REMOVE_ALIAS = 5;
 
     /** The action name for add/update an option for the layout item */
-    const SET_OPTION = 'setOption';
+    const SET_OPTION = 6;
 
     /** The action name for remove an option for the layout item */
-    const REMOVE_OPTION = 'removeOption';
+    const REMOVE_OPTION = 7;
 
     /** The action name for change the block type for the layout item */
-    const CHANGE_BLOCK_TYPE = 'changeBlockType';
+    const CHANGE_BLOCK_TYPE = 8;
 
     /** The action name for add the theme(s) to be used for rendering the layout item and its children */
-    const SET_BLOCK_THEME = 'setBlockTheme';
+    const SET_BLOCK_THEME = 9;
 
     /** @var LayoutRegistryInterface */
     protected $registry;
@@ -98,6 +98,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         $prepend = false
     ) {
         $this->actions[self::GROUP_ADD][] = [
+            self::ADD,
             __FUNCTION__,
             [$id, $parentId, $blockType, $options, $siblingId, $prepend]
         ];
@@ -110,7 +111,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function remove($id)
     {
-        $this->actions[self::GROUP_REMOVE][] = [__FUNCTION__, [$id]];
+        $this->actions[self::GROUP_REMOVE][] = [self::REMOVE, __FUNCTION__, [$id]];
 
         return $this;
     }
@@ -120,7 +121,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function move($id, $parentId = null, $siblingId = null, $prepend = false)
     {
-        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $parentId, $siblingId, $prepend]];
+        $this->actions[self::GROUP_ADD][] = [self::MOVE, __FUNCTION__, [$id, $parentId, $siblingId, $prepend]];
 
         return $this;
     }
@@ -130,7 +131,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function addAlias($alias, $id)
     {
-        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$alias, $id]];
+        $this->actions[self::GROUP_ADD][] = [self::ADD_ALIAS, __FUNCTION__, [$alias, $id]];
 
         return $this;
     }
@@ -140,7 +141,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function removeAlias($alias)
     {
-        $this->actions[self::GROUP_REMOVE][] = [__FUNCTION__, [$alias]];
+        $this->actions[self::GROUP_REMOVE][] = [self::REMOVE_ALIAS, __FUNCTION__, [$alias]];
 
         return $this;
     }
@@ -150,7 +151,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function setOption($id, $optionName, $optionValue)
     {
-        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $optionName, $optionValue]];
+        $this->actions[self::GROUP_ADD][] = [self::SET_OPTION, __FUNCTION__, [$id, $optionName, $optionValue]];
 
         return $this;
     }
@@ -160,7 +161,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function removeOption($id, $optionName)
     {
-        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $optionName]];
+        $this->actions[self::GROUP_ADD][] = [self::REMOVE_OPTION, __FUNCTION__, [$id, $optionName]];
 
         return $this;
     }
@@ -170,7 +171,11 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function changeBlockType($id, $blockType, $optionsCallback = null)
     {
-        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $blockType, $optionsCallback]];
+        $this->actions[self::GROUP_ADD][] = [
+            self::CHANGE_BLOCK_TYPE,
+            __FUNCTION__,
+            [$id, $blockType, $optionsCallback]
+        ];
 
         return $this;
     }
@@ -180,7 +185,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function setBlockTheme($themes, $id = null)
     {
-        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$themes, $id]];
+        $this->actions[self::GROUP_ADD][] = [self::SET_BLOCK_THEME, __FUNCTION__, [$themes, $id]];
 
         return $this;
     }
@@ -191,7 +196,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function clear()
     {
         $this->rawLayoutBuilder->clear();
-        $this->actions = [];
+        $this->actions    = [];
         $this->addCounter = 0;
 
         return $this;
@@ -211,7 +216,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function applyChanges(ContextInterface $context, $finalize = false)
     {
         $this->addCounter = 0;
-        $this->item = new LayoutItem($this->rawLayoutBuilder, $context);
+        $this->item       = new LayoutItem($this->rawLayoutBuilder, $context);
         try {
             $total = $this->calculateActionCount();
             if ($total !== 0) {
@@ -313,31 +318,31 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         while ($continue && !empty($this->actions[self::GROUP_ADD])) {
             $continue = false;
             foreach ($this->actions[self::GROUP_ADD] as $key => $action) {
-                if (self::ADD === $action[0] && $action[1][4]) {
+                if (self::ADD === $action[0] && $action[2][4]) {
                     // remember siblingId for the case if the removing of it does not allow to execute the action
-                    $siblingId = $this->actions[self::GROUP_ADD][$key][1][4];
+                    $siblingId = $this->actions[self::GROUP_ADD][$key][2][4];
                     // remove siblingId
-                    $this->actions[self::GROUP_ADD][$key][1][4] = null;
+                    $this->actions[self::GROUP_ADD][$key][2][4] = null;
                     // try to execute the action without siblingId
                     if (0 !== $this->executeDependedActions(self::GROUP_ADD)) {
                         $continue = true;
                         break;
                     } else {
                         // restore siblingId if the action was not executed
-                        $this->actions[self::GROUP_ADD][$key][1][4] = $siblingId;
+                        $this->actions[self::GROUP_ADD][$key][2][4] = $siblingId;
                     }
-                } elseif (self::MOVE === $action[0] && $action[1][2]) {
+                } elseif (self::MOVE === $action[0] && $action[2][2]) {
                     // remember siblingId for the case if the removing of it does not allow to execute the action
-                    $siblingId = $this->actions[self::GROUP_ADD][$key][1][2];
+                    $siblingId = $this->actions[self::GROUP_ADD][$key][2][2];
                     // remove siblingId
-                    $this->actions[self::GROUP_ADD][$key][1][2] = null;
+                    $this->actions[self::GROUP_ADD][$key][2][2] = null;
                     // try to execute the action without siblingId
                     if (0 !== $this->executeDependedActions(self::GROUP_ADD)) {
                         $continue = true;
                         break;
                     } else {
                         // restore siblingId if the action was not executed
-                        $this->actions[self::GROUP_ADD][$key][1][2] = $siblingId;
+                        $this->actions[self::GROUP_ADD][$key][2][2] = $siblingId;
                     }
                 }
             }
@@ -359,16 +364,16 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * Checks whether an action is ready to execute
      *
-     * @param string $name The action name
+     * @param string $key  The action key
      * @param array  $args The action arguments
      *
      * @return bool
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function isActionReadyToExecute($name, $args)
+    protected function isActionReadyToExecute($key, $args)
     {
-        switch ($name) {
+        switch ($key) {
             case self::ADD:
                 $parentId  = $args[1];
                 $siblingId = $args[4];
@@ -379,13 +384,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                         $this->rawLayoutBuilder->has($parentId)
                         && (!$siblingId || $this->rawLayoutBuilder->isParentFor($parentId, $siblingId))
                     );
-            case self::REMOVE:
-            case self::SET_OPTION:
-            case self::REMOVE_OPTION:
-            case self::CHANGE_BLOCK_TYPE:
-                $id = $args[0];
-
-                return !$id || $this->rawLayoutBuilder->has($id);
             case self::MOVE:
                 $id        = $args[0];
                 $parentId  = $args[1];
@@ -399,6 +397,13 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                         || ($parentId && $this->rawLayoutBuilder->isParentFor($parentId, $siblingId))
                         || (!$parentId && $this->rawLayoutBuilder->has($siblingId))
                     );
+            case self::REMOVE:
+            case self::SET_OPTION:
+            case self::REMOVE_OPTION:
+            case self::CHANGE_BLOCK_TYPE:
+                $id = $args[0];
+
+                return !$id || $this->rawLayoutBuilder->has($id);
             case self::SET_BLOCK_THEME:
                 $id = $args[1];
 
@@ -429,8 +434,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         $executeCounter = 0;
         reset($this->actions[$group]);
         while (list($key, $action) = each($this->actions[$group])) {
-            if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                $this->executeAction($action[0], $action[1]);
+            if ($this->isActionReadyToExecute($action[0], $action[2])) {
+                $this->executeAction($action);
                 unset($this->actions[$group][$key]);
                 $executeCounter++;
             }
@@ -458,8 +463,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             $hasSkipped  = false;
             reset($this->actions[$group]);
             while (list($key, $action) = each($this->actions[$group])) {
-                if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                    $this->executeAction($action[0], $action[1]);
+                if ($this->isActionReadyToExecute($action[0], $action[2])) {
+                    $this->executeAction($action);
                     unset($this->actions[$group][$key]);
                     $executeCounter++;
                     $hasExecuted = true;
@@ -483,14 +488,15 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     }
 
     /**
-     * @param string $name
-     * @param array  $args
+     * @param array $action
      */
-    protected function executeAction($name, $args)
+    protected function executeAction($action)
     {
+        $name = $action[1];
+        $args = $action[2];
         call_user_func_array([$this->rawLayoutBuilder, $name], $args);
 
-        switch ($name) {
+        switch ($action[0]) {
             case self::ADD:
                 $this->addCounter++;
                 $this->item->initialize($args[0]);
@@ -514,7 +520,10 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         $exActions = [];
         foreach ($this->actions as $actions) {
             foreach ($actions as $action) {
-                $exActions[] = ['name' => $action[0], 'args' => isset($action[1]) ? $action[1] : []];
+                $exActions[] = [
+                    'name' => $action[1],
+                    'args' => isset($action[2]) ? $action[2] : []
+                ];
             }
         }
 
@@ -536,12 +545,12 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function convertActionArgsToString(array $action)
     {
         switch ($action['name']) {
-            case self::ADD:
-            case self::ADD_ALIAS:
+            case 'add':
+            case 'addAlias':
                 // for add: "id, parentId"
                 // for addAlias: "alias, id"
                 return sprintf('%s, %s', $action['args'][0], $action['args'][1]);
-            case self::SET_BLOCK_THEME:
+            case 'setBlockTheme':
                 // "id"
                 return sprintf('%s', $action['args'][1]);
         }
