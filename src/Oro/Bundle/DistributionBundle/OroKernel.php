@@ -14,7 +14,6 @@ use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
-use Oro\Bundle\DistributionBundle\Handler\ErrorHandler as OroErrorHandler;
 
 /**
  * This class should work on PHP 5.3
@@ -242,12 +241,6 @@ abstract class OroKernel extends Kernel
         }
 
         parent::boot();
-
-        /**
-         * Register error handler. Required for catch fatal errors.
-         */
-        $errorTypes = $this->isDebug() ? E_ALL : E_RECOVERABLE_ERROR|E_USER_ERROR;
-        OroErrorHandler::register($errorTypes);
     }
 
     /**
