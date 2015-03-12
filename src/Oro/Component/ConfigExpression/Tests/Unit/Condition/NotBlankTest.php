@@ -50,6 +50,11 @@ class NotBlankTest extends \PHPUnit_Framework_TestCase
                 'options'        => [new PropertyPath('foo')],
                 'context'        => ['foo' => null],
                 'expectedResult' => false
+            ],
+            'no_value' => [
+                'options'        => [new PropertyPath('foo')],
+                'context'        => [],
+                'expectedResult' => false
             ]
         ];
     }

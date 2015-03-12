@@ -127,7 +127,9 @@ abstract class AbstractExpression implements ExpressionInterface
                 $params = [$params];
             }
             foreach ($params as $param) {
-                if ($param instanceof PropertyPathInterface) {
+                if (null === $param) {
+                    $compiledParams[] = 'null';
+                } elseif ($param instanceof PropertyPathInterface) {
                     $compiledPathElements = implode(
                         ', ',
                         array_map(

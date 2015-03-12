@@ -15,6 +15,7 @@ oro_layout:
                 'form:start':
                     blockType: form_start
                     options:
+                        with_page_parameters: true
                         attr:
                             id: { @value: $context.form.name }
                             data-collect: 'true'

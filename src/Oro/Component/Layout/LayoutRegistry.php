@@ -20,6 +20,9 @@ class LayoutRegistry implements LayoutRegistryInterface
     /** @var DataProviderInterface[] */
     private $dataProviders = [];
 
+    /** @var BlockTypeExtensionInterface[] */
+    private $typeExtensions = [];
+
     /**
      * {@inheritdoc}
      */
@@ -53,14 +56,9 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function getTypeExtensions($name)
     {
-        $extensions = [];
-        foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasTypeExtensions($name)) {
-                $extensions = array_merge($extensions, $extension->getTypeExtensions($name));
-            }
-        }
-
-        return $extensions;
+        return isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : $this->loadTypeExtensions($name);
     }
 
     /**
@@ -108,13 +106,12 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function setDefaultOptions($name, OptionsResolverInterface $resolver)
     {
-        foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasTypeExtensions($name)) {
-                $typeExtensions = $extension->getTypeExtensions($name);
-                foreach ($typeExtensions as $typeExtension) {
-                    $typeExtension->setDefaultOptions($resolver);
-                }
-            }
+        $extensions = isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : $this->loadTypeExtensions($name);
+
+        foreach ($extensions as $extension) {
+            $extension->setDefaultOptions($resolver);
         }
     }
 
@@ -123,13 +120,12 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function buildBlock($name, BlockBuilderInterface $builder, array $options)
     {
-        foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasTypeExtensions($name)) {
-                $typeExtensions = $extension->getTypeExtensions($name);
-                foreach ($typeExtensions as $typeExtension) {
-                    $typeExtension->buildBlock($builder, $options);
-                }
-            }
+        $extensions = isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : $this->loadTypeExtensions($name);
+
+        foreach ($extensions as $extension) {
+            $extension->buildBlock($builder, $options);
         }
     }
 
@@ -138,13 +134,12 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function buildView($name, BlockView $view, BlockInterface $block, array $options)
     {
-        foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasTypeExtensions($name)) {
-                $typeExtensions = $extension->getTypeExtensions($name);
-                foreach ($typeExtensions as $typeExtension) {
-                    $typeExtension->buildView($view, $block, $options);
-                }
-            }
+        $extensions = isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : $this->loadTypeExtensions($name);
+
+        foreach ($extensions as $extension) {
+            $extension->buildView($view, $block, $options);
         }
     }
 
@@ -153,13 +148,12 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function finishView($name, BlockView $view, BlockInterface $block, array $options)
     {
-        foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasTypeExtensions($name)) {
-                $typeExtensions = $extension->getTypeExtensions($name);
-                foreach ($typeExtensions as $typeExtension) {
-                    $typeExtension->finishView($view, $block, $options);
-                }
-            }
+        $extensions = isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : $this->loadTypeExtensions($name);
+
+        foreach ($extensions as $extension) {
+            $extension->finishView($view, $block, $options);
         }
     }
 
@@ -203,6 +197,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     {
         $this->extensions[$priority][] = $extension;
         $this->sorted                  = null;
+        $this->typeExtensions          = [];
     }
 
     /**
@@ -220,5 +215,23 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
 
         return $this->sorted;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return BlockTypeExtensionInterface[]
+     */
+    protected function loadTypeExtensions($name)
+    {
+        $extensions = [];
+        foreach ($this->getExtensions() as $extension) {
+            if ($extension->hasTypeExtensions($name)) {
+                $extensions = array_merge($extensions, $extension->getTypeExtensions($name));
+            }
+        }
+        $this->typeExtensions[$name] = $extensions;
+
+        return $extensions;
     }
 }
