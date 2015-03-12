@@ -25,8 +25,8 @@ class ErrorHandler
      */
     public function registerHandlers()
     {
-        $error_types = E_RECOVERABLE_ERROR | E_ERROR | E_USER_ERROR | E_WARNING | E_USER_WARNING;
-        set_error_handler(array($this, 'handle'), $error_types);
+        $errorTypes = E_RECOVERABLE_ERROR | E_ERROR | E_USER_ERROR | E_WARNING | E_USER_WARNING;
+        set_error_handler(array($this, 'handle'), $errorTypes);
     }
 
 
