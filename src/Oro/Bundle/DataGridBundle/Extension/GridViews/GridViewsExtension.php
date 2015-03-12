@@ -43,20 +43,7 @@ class GridViewsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-
-        if ($list !== false && !$list instanceof AbstractViewsList) {
-            throw new InvalidTypeException(
-                sprintf(
-                    'Invalid type for path "%s.%s". Expected AbstractViewsList, but got %s.',
-                    $config->getName(),
-                    self::VIEWS_LIST_KEY,
-                    gettype($list)
-                )
-            );
-        }
-
-        return $list !== false;
+        return true;
     }
 
     /**
@@ -71,7 +58,10 @@ class GridViewsExtension extends AbstractExtension
 
         /** @var AbstractViewsList $list */
         $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-        $gridViews = [];
+        $gridViews = [
+            'choices' => [],
+            'views' => [],
+        ];
         if ($list !== false) {
             $gridViews = $list->getMetadata();
         }
@@ -82,10 +72,8 @@ class GridViewsExtension extends AbstractExtension
             $gridViews = $event->getGridViews();
         }
 
-        if ($gridViews) {
-            $gridViews['permissions'] = $this->getPermissions();
-            $data->offsetSet('gridViews', $gridViews);
-        }
+        $gridViews['permissions'] = $this->getPermissions();
+        $data->offsetSet('gridViews', $gridViews);
     }
 
     /**

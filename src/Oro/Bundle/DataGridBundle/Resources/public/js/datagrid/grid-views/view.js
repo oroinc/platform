@@ -34,16 +34,18 @@ define([
 
         /** @property */
         template: _.template(
-            '<div class="btn-group views-group">' +
-                '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                    '<%=  current %>' + '<span class="caret"></span>' +
-                '</button>' +
-                '<ul class="dropdown-menu pull-right">' +
-                    '<% _.each(choices, function (choice) { %>' +
-                        '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
-                    '<% }); %>' +
-                '</ul>' +
-            '</div>' +
+            '<% if (choices.length) { %>' +
+                '<div class="btn-group views-group">' +
+                    '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
+                        '<%=  current %>' + '<span class="caret"></span>' +
+                    '</button>' +
+                    '<ul class="dropdown-menu pull-right">' +
+                        '<% _.each(choices, function (choice) { %>' +
+                            '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
+                        '<% }); %>' +
+                    '</ul>' +
+                '</div>' +
+            '<% } %>' +
             '<% if (showActions) { %>' +
                 '<div class="btn-group actions-group">' +
                     '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">' +
@@ -307,22 +309,20 @@ define([
             var html;
             this.$el.empty();
 
-            if (this.choices.length > 0) {
-                var actions = this._getCurrentActions();
+            var actions = this._getCurrentActions();
 
-                html = this.template({
-                    disabled: !this.enabled,
-                    choices: this.choices,
-                    current: this._getCurrentViewLabel(),
-                    actionsLabel: __('oro.datagrid.gridView.actions'),
-                    actions: actions,
-                    showActions: _.some(actions, function(action) {
-                        return action.enabled;
-                    })
-                });
+            html = this.template({
+                disabled: !this.enabled,
+                choices: this.choices,
+                current: this._getCurrentViewLabel(),
+                actionsLabel: __('oro.datagrid.gridView.actions'),
+                actions: actions,
+                showActions: _.some(actions, function(action) {
+                    return action.enabled;
+                })
+            });
 
-                this.$el.append(html);
-            }
+            this.$el.append(html);
 
             return this;
         },
