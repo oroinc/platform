@@ -73,10 +73,9 @@ require([
      * Init PageLoadingMaskView
      */
     BaseController.loadBeforeAction([
-        'jquery',
         'oroui/js/mediator',
         'oroui/js/app/views/loading-mask-view'
-    ], function ($, mediator, LoadingMaskView) {
+    ], function (mediator, LoadingMaskView) {
         BaseController.addToReuse('loadingMask', {
             compose: function () {
                 this.view = new LoadingMaskView({
