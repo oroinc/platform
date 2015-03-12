@@ -1,7 +1,7 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroUIBundle:layouts:base/update/widget.html.twig'
+            themes: 'OroUIBundle:layouts:base/update/widget_default.html.twig'
         - @add:
             id:        widget_content
             parentId:  root
