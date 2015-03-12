@@ -84,7 +84,7 @@ class BlockTypeHelper implements BlockTypeHelperInterface
                     // use data from already loaded parent type
                     $types   = array_merge($this->types[$parentName], array_reverse($types));
                     $names   = array_merge($this->names[$parentName], array_reverse($names));
-                    $nameMap = array_merge($this->nameMap[$parentName], $nameMap);
+                    $nameMap = array_merge($nameMap, $this->nameMap[$parentName]);
                     break;
                 } else {
                     $type     = $this->registry->getType($parentName);
@@ -108,17 +108,17 @@ class BlockTypeHelper implements BlockTypeHelperInterface
             $this->nameMap[$name] = $nameMap;
 
             // initialise all parent types if them are not initialized yet
-            $foundNames = array_keys($nameMap);
-            $offset     = 0;
-            while (false !== ($foundName = next($foundNames))) {
-                if (isset($this->nameMap[$foundName])) {
+            $typeNames = array_keys($nameMap);
+            $offset    = 0;
+            while (false !== ($typeName = next($typeNames))) {
+                if (isset($this->nameMap[$typeName])) {
                     break;
                 }
 
                 $offset++;
-                $this->types[$foundName]   = array_slice($types, 0, -$offset);
-                $this->names[$foundName]   = array_slice($names, 0, -$offset);
-                $this->nameMap[$foundName] = array_slice($nameMap, $offset);
+                $this->types[$typeName]   = array_slice($types, 0, -$offset);
+                $this->names[$typeName]   = array_slice($names, 0, -$offset);
+                $this->nameMap[$typeName] = array_slice($nameMap, $offset);
             }
         }
 
