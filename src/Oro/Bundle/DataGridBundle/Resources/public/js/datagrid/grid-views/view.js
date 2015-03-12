@@ -195,8 +195,14 @@ define([
         onSaveAs: function(e) {
             var modal = new Modal({
                 title: 'Filter configuration',
-                content: '<label for="gridViewName"><strong>' + __('oro.datagrid.gridView.name') + ':</strong></label>' +
-                         '<input id="gridViewName" name="name" type="text">'
+                content: '<div class="form-horizontal">' +
+                            '<div class="control-group">' +
+                                '<label class="control-label" for="gridViewName">' + __('oro.datagrid.gridView.name') + ':</label>' +
+                                '<div class="controls">' +
+                                    '<input id="gridViewName" name="name" type="text">' +
+                                '</div>' +
+                            '</div>' +
+                         '</div>'
             });
 
             var self = this;
