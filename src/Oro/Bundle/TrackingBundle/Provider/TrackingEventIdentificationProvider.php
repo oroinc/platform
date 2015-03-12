@@ -20,6 +20,8 @@ class TrackingEventIdentificationProvider
     }
 
     /**
+     * Returns identifying object for given tracking visit.
+     *
      * @param TrackingVisit $trackingVisit
      *
      * @return object|bool
@@ -36,6 +38,8 @@ class TrackingEventIdentificationProvider
     }
 
     /**
+     * Returns array of possible identifying object classes.
+     *
      * @return array
      */
     public function getTargetEntities()
