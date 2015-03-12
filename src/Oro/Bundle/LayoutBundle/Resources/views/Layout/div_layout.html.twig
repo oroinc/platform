@@ -105,6 +105,21 @@
     </a>
 {%- endblock %}
 
+{% block button_widget -%}
+    {% if element is same as('input') -%}
+    <input{{ block('block_attributes') }}
+        {%- if name is defined %} name="{{ name }}"{% endif %}
+        {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}/>
+    {%- else -%}
+    <button{{ block('block_attributes') }}
+        {%- if name is defined %} name="{{ name }}"{% endif %}
+        {%- if value is defined %} value="{{ value }}"{% endif %}>
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+        {{- block_widget(block) -}}
+    </button>
+    {%- endif %}
+{%- endblock %}
+
 {% block external_resource_widget %}
     <link {{ block('block_attributes') }} />
 {% endblock %}
