@@ -49,9 +49,7 @@ class UserCalendarHandler extends UserAclHandler
      */
     protected function searchById($query)
     {
-        list ($id, $entityClass) = explode(';', $query);
-
-        return $this->em->getRepository($entityClass)->find((int)$id);
+        return $this->em->getRepository('OroCalendarBundle:Calendar')->findBy(['id' => explode(',', $query)]);
     }
 
     /**
