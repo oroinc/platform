@@ -67,7 +67,37 @@
 {% block link_widget -%}
     {% set href = path is defined ? path : path(route_name, route_parameters) -%}
     <a{{ block('block_attributes') }} href="{{ with_page_parameters ? oro_url_add_query(href) : href }}">
-        {{- text|block_text(translation_domain) -}}
+        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+    </a>
+{%- endblock %}
+
+{% block button_widget -%}
+    {% set attr = attr|merge({
+        'class': 'btn'
+            ~ (
+                action is same as('submit') ? ' btn-primary'
+                : (action is same as('create') ? ' btn-primary main-group pull-right'
+                : (action is same as('cancel') ? ' back'
+                : (action is same as('save') ? ' btn-success main-group'
+                : (action is same as('save_and_close') ? ' btn-success' : ''))
+            )
+            ~ (attr.class is defined ? ' ' ~ attr.class : '') }
+    ) %}
+    {% if type is same as('link') %}
+        {{- block('button_widget_link') -}}
+    {% elseif type is same as('input') %}
+        {{- block('button_widget_input') -}}
+    {% else %}
+        {{- block('button_widget_button') -}}
+    {% endif %}
+{%- endblock %}
+
+{% block button_widget_link -%}
+    {% set href = path is defined ? path : (route_name is defined ? path(route_name, route_parameters) : null) -%}
+    <a{{ block('block_attributes') }} href="{{ with_page_parameters and href is not empty ? oro_url_add_query(href) : href|default('javascript: void(0);') }}">
+        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
     </a>
 {%- endblock %}
 

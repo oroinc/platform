@@ -184,6 +184,11 @@ services:
         tags:
             - { name: layout.block_type_extension, alias: link }
 
+    oro_ui.block_type_extension.button:
+        class: Oro\Bundle\UIBundle\Layout\Block\Extension\ButtonExtension
+        tags:
+            - { name: layout.block_type_extension, alias: button }
+
     oro_ui.block_type_extension.taggable_datagrid:
         class: Oro\Bundle\UIBundle\Layout\Block\Extension\TaggableDatagridExtension
         tags:

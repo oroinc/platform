@@ -35,19 +35,17 @@ oro_layout:
             parentId:  widget_actions
             blockType: button
             options:
-                type: reset_button
+                action: reset
                 text: Cancel
-                attr:
-                    class: btn
         - @add:
             id:        save_button
             parentId:  widget_actions
             blockType: button
             options:
-                type: submit_button
+                action: submit
                 text: Save
                 attr:
-                    class: btn btn-success
+                    class: btn-success
 
     conditions:
         @not_empty: $context.widget_container
