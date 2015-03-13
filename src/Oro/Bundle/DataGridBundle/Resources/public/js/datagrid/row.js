@@ -101,7 +101,7 @@ define([
                 model: this.model
             });
             if (column.has('align')) {
-                cell.$el.css('text-align', column.get('align'));
+                cell.$el.addClass('align-right');
             }
             this._listenToCellEvents(cell);
             return cell;
