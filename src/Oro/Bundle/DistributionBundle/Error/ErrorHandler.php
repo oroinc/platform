@@ -24,12 +24,17 @@ class ErrorHandler
     );
 
     /**
+     * @var Callable|null
+     */
+    private $previousHandler;
+
+    /**
      * Register all custom application error handlers
      */
     public function registerHandlers()
     {
         $errorTypes = E_RECOVERABLE_ERROR | E_ERROR | E_USER_ERROR | E_WARNING | E_USER_WARNING;
-        set_error_handler(array($this, 'handle'), $errorTypes);
+        $this->previousHandler = set_error_handler(array($this, 'handle'), $errorTypes);
     }
 
 
@@ -63,7 +68,7 @@ class ErrorHandler
                 break;
         }
 
-        return false;
+        return $this->previousHandler ? call_user_func($this->previousHandler, $code, $message, $file, $line) : false;
     }
 
     /**

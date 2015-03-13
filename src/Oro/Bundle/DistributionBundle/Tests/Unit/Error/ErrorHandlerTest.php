@@ -20,6 +20,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->handler);
+        restore_error_handler();
     }
 
     /**
@@ -49,6 +50,16 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleIgnoreWarnings()
     {
         $this->assertFalse($this->handler->handle(E_WARNING, 'Test warning', '', 0));
+    }
+
+    public function testPreviousErrorHandlerUsed()
+    {
+        /** test getSubBlock Exception */
+        $this->setExpectedException(
+            '\PHPUnit_Framework_Error_Notice',
+            'test'
+        );
+        trigger_error('test');
     }
 
     public function warningDataProvider()
