@@ -46,7 +46,9 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                 }
             )
         );
-        $container->expects($this->once())->method('getDefinition')->will($this->returnValue($definition));
+        $container->expects($this->once())
+            ->method('getDefinition')
+            ->will($this->returnValue($definition));
         $this->target->load($configs, $container);
     }
 
@@ -72,26 +74,31 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                 'test1' => array(
                                     'label' => 'Test1',
                                     'route' => 'test1',
-                                    'route_parameters' => array()
+                                    'route_parameters' => array(),
+                                    'enabled' => true
                                 ),
                                 'index'  => array(
                                     'label' => 'List',
                                     'route' => 'orocrm_sales_opportunity_index',
                                     'acl' => 'orocrm_sales_opportunity_view',
-                                    'route_parameters' => array()
+                                    'route_parameters' => array(),
+                                    'enabled' => true
                                 ),
                                 'create' => array(
                                     'label' => 'Create opportunity',
                                     'route' => 'orocrm_sales_opportunity_create',
                                     'acl' => 'orocrm_sales_opportunity_create',
-                                    'route_parameters' => array()
+                                    'route_parameters' => array(),
+                                    'enabled' => true
                                 ),
                                 'test2' => array(
                                     'label' => 'Test2',
                                     'route' => 'test2',
-                                    'route_parameters' => array()
+                                    'route_parameters' => array(),
+                                    'enabled' => true
                                 ),
-                            )
+                            ),
+                            'enabled' => true
                         ),
                         'second_quick_launchpad' => array(
                             'route' => 'second_quick_launchpad_test_route',
@@ -99,7 +106,8 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                 'bundle' => 'SecondTestBundle',
                                 'name'   => 'secondQuickLaunchpad',
                                 'widget' => 'second_quick_launchpad'
-                            )
+                            ),
+                            'enabled' => true
                         )
                     ),
                     'dashboards' => array(

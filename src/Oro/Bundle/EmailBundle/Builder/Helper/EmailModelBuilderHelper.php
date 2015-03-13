@@ -134,7 +134,7 @@ class EmailModelBuilderHelper
     /**
      * Get the current authenticated user
      *
-     * @return UserInterface|EmailHolderInterface|EmailOwnerInterface|null
+     * @return User|UserInterface|EmailHolderInterface|EmailOwnerInterface|null
      */
     public function getUser()
     {

@@ -32,6 +32,11 @@ define(function (require) {
         MOBILE_HEADER_HEIGHT: 54,
 
         /**
+         * Height of header on mobile devices
+         */
+        MOBILE_POPUP_HEADER_HEIGHT: 44,
+
+        /**
          * Minimal height for fullscreen layout
          */
         minimalHeightForFullScreenLayout: 300,

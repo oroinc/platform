@@ -13,14 +13,11 @@ class DateEarlierThanValidator extends ConstraintValidator
     /**
      * @param \DateTime $value
      * @param Constraint|DateEarlierThan $constraint
+     *
      * @throws UnexpectedTypeException
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$value instanceof \DateTime) {
-            throw new UnexpectedTypeException($value, 'DateTime');
-        }
-
         $root = $this->context->getRoot();
 
         if (!$root instanceof FormInterface) {
@@ -29,8 +26,17 @@ class DateEarlierThanValidator extends ConstraintValidator
 
         $valueCompare = $root->get($constraint->field)->getData();
 
-        if (!$valueCompare instanceof \DateTime) {
+        // values presence should be validated by NotNullValidator
+        if (!$value || !$valueCompare) {
+            return;
+        }
+
+        if (!$value instanceof \DateTime) {
             throw new UnexpectedTypeException($value, 'DateTime');
+        }
+
+        if (!$valueCompare instanceof \DateTime) {
+            throw new UnexpectedTypeException($valueCompare, 'DateTime');
         }
 
         if ($value->getTimestamp() > $valueCompare->getTimestamp()) {
