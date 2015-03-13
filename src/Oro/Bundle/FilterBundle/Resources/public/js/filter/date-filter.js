@@ -275,6 +275,10 @@ define(function (require) {
             }
         },
 
+        _updateValueField: function () {
+            // nothing to do
+        },
+
         /**
          * Prepares configuration options for picker view
          *

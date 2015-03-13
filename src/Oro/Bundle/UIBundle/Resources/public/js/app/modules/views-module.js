@@ -80,7 +80,8 @@ require([
         BaseController.addToReuse('loadingMask', {
             compose: function () {
                 this.view = new LoadingMaskView({
-                    container: 'body'
+                    container: 'body',
+                    hideDelay: 25
                 });
                 mediator.setHandler('showLoading', this.view.show, this.view);
                 mediator.setHandler('hideLoading', this.view.hide, this.view);
