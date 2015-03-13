@@ -85,7 +85,7 @@ class OroRichTextType extends AbstractType
      * @param ConfigManager $configManager
      * @param string $cacheDir
      */
-    public function __construct(ConfigManager $configManager, $cacheDir)
+    public function __construct(ConfigManager $configManager, $cacheDir = null)
     {
         $this->configManager = $configManager;
         $this->cacheDir = $cacheDir;

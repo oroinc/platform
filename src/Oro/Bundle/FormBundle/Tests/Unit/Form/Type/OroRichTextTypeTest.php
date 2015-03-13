@@ -31,7 +31,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->assetsHelper = $this->getMock('Symfony\Component\Templating\Asset\PackageInterface');
-        $this->formType = new OroRichTextType($this->configManager, '');
+        $this->formType = new OroRichTextType($this->configManager);
         $this->formType->setAssetHelper($this->assetsHelper);
     }
 
