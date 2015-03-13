@@ -4,12 +4,14 @@ define(['underscore', 'backbone', 'routing', 'moment'
     ], function (_, Backbone, routing, moment) {
     'use strict';
 
+    var EventModel;
+
     /**
      * @export  orocalendar/js/calendar/event/model
      * @class   orocalendar.calendar.event.Model
      * @extends Backbone.Model
      */
-    return Backbone.Model.extend({
+    EventModel = Backbone.Model.extend({
         route: 'oro_api_get_calendarevents',
         urlRoot: null,
         originalId: null, // original id received from a server
@@ -110,4 +112,6 @@ define(['underscore', 'backbone', 'routing', 'moment'
             return invitationStatus;
         }
     });
+
+    return EventModel;
 });

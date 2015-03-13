@@ -107,7 +107,6 @@ config:
         'oroui/js/app/views/page/content-view': 'bundles/oroui/js/app/views/page/content-view.js'
         'oroui/js/app/views/page/main-menu-view': 'bundles/oroui/js/app/views/page/main-menu-view.js'
         'oroui/js/app/views/page/user-menu-view': 'bundles/oroui/js/app/views/page/user-menu-view.js'
-        'oroui/js/app/views/page/loading-mask-view': 'bundles/oroui/js/app/views/page/loading-mask-view.js'
         'oroui/js/app/views/page/messages-view': 'bundles/oroui/js/app/views/page/messages-view.js'
         'oroui/js/app/views/page/debug-toolbar-view': 'bundles/oroui/js/app/views/page/debug-toolbar-view.js'
         'oroui/js/app/views/datepicker/datetimepicker-view': 'bundles/oroui/js/app/views/datepicker/datetimepicker-view.js'

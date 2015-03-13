@@ -22,7 +22,13 @@ oro_system_configuration:
                     100:    100
                 constraints:
                     - NotBlank: ~
-
+        oro_data_grid.full_screen_layout_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 150
+            options:
+                label: oro.grid.system_configuration.fields.full_screen_layout_enabled.label
+                tooltip: oro.grid.system_configuration.fields.full_screen_layout_enabled.tooltip
     tree:
         system_configuration:
             platform:
@@ -35,6 +41,7 @@ oro_system_configuration:
                                     grid_settings:
                                         children:
                                             - oro_data_grid.default_per_page
+                                            - oro_data_grid.full_screen_layout_enabled
 
     api_tree:
         look-and-feel:

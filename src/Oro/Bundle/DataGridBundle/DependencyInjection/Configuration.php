@@ -20,7 +20,8 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'default_per_page' => ['value' => 25]
+                'default_per_page' => ['value' => 25],
+                'full_screen_layout_enabled' => ['type' => 'boolean', 'value' => true],
             ]
         );
 

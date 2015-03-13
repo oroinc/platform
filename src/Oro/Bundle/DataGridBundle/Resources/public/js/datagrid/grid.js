@@ -407,7 +407,7 @@ define(function (require) {
                         label: __('oro.datagrid.extension.export.label'),
                         title: __('oro.datagrid.extension.export.tooltip'),
                         className: 'btn',
-                        iconClassName: 'icon-download-alt',
+                        iconClassName: 'icon-upload-alt',
                         links: links
                     }
                 });

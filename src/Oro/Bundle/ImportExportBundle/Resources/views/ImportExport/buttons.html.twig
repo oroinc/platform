@@ -12,7 +12,7 @@
             <a type="button"
                class="btn export-btn icons-holder-text no-hash"
                href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
-                <i class="icon-download-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
+                <i class="icon-upload-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
     {% endif %}
@@ -23,7 +23,7 @@
                 <a type="button"
                    class="btn import-btn icons-holder-text no-hash"
                    href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
-                    <i class="icon-upload-alt  hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+                    <i class="icon-download-alt hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
                 </a>
                 {% if hasExportTemplateProcessor %}
                     <a type="button"
