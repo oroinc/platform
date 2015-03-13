@@ -325,6 +325,7 @@ define([
                 return item.value == this.collection.state.gridView;
             }, this);
             this.collection.state.gridView = null;
+            this.viewDirty = false;
 
             this.render();
 
