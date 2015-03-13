@@ -104,7 +104,7 @@
 }
 .other-scroll-container {
   overflow: hidden;
-  margin: 20px 20px 50px 20px;
+  margin: 10px 20px 20px 20px;
   border: 1px solid #ddd;
   border-radius: 4px;
   .other-scroll{
@@ -129,10 +129,10 @@
 }
 .grid-container {
   .table-bordered {
-    border-width: 0;
     margin: 0;
-    td,
-    th { border-left:0; }
+    td:not(:first-child), th:not(:first-child) {
+      border-left: 0;
+    }
     .boolean-cell {
       input[type='checkbox'],
       input[type='radio'] { margin-top:0; }
