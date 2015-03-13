@@ -19,6 +19,7 @@ define([
             return;
         }
         this.disposePageComponents();
+        this.trigger('dispose', this);
         original.viewDispose.call(this, arguments);
     };
 
