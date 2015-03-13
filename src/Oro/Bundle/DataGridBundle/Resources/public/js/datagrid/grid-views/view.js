@@ -21,7 +21,7 @@ define([
      * @extends Backbone.View
      */
     GridViewsView = Backbone.View.extend({
-        className: 'grid-views pull-left',
+        className: 'grid-views',
 
         /** @property */
         events: {
@@ -124,19 +124,32 @@ define([
             options.views = options.views || [];
             _.each(options.views, function(view) {
                 view.grid_name = options.collection.inputName;
-            });
+                view.label = _.first(_.filter(this.choices, function (item) {
+                    return view.name == item.value;
+                }, this)).label;
+            }, this);
 
             this.viewsCollection = new this.viewsCollection(options.views);
 
-            var currentState = this._getCurrentState();
-            var modelState = this._getCurrentViewModelState();
-            if (modelState && !_.isEqual(currentState, modelState)) {
-                this.viewDirty = true;
-            }
-            this.prevState = currentState;
+            this.viewDirty = !this._isCurrentStateSynchronized();
+            this.prevState = this._getCurrentState();
 
             this.listenTo(this.viewsCollection, 'add', this._onModelAdd);
             this.listenTo(this.viewsCollection, 'remove', this._onModelRemove);
+            this.listenTo(this.viewsCollection, 'change', this._onModelChange, this);
+
+            var gridName = options.collection.inputName;
+            this.listenTo(mediator, 'datagrid:' + gridName + ':views:add', function(model) {
+                this.viewsCollection.add(model);
+            }, this);
+            this.listenTo(mediator, 'datagrid:' + gridName + ':views:remove', function(model) {
+                this.viewsCollection.remove(model);
+            }, this);
+            this.listenTo(mediator, 'datagrid' + gridName + ':views:change', function(model) {
+                this.viewsCollection.get(model).attributes = model.attributes;
+                this.viewDirty = !this._isCurrentStateSynchronized();
+                this.render();
+            }, this);
 
             GridViewsView.__super__.initialize.call(this, options);
         },
@@ -190,7 +203,7 @@ define([
             }
 
             this.prevState = this._getCurrentState();
-            this.viewDirty = false;
+            this.viewDirty = !this._isCurrentStateSynchronized();
         },
 
         /**
@@ -209,7 +222,7 @@ define([
 
             model.once('sync', function() {
                 mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
-            });
+            }, this);
         },
 
         /**
@@ -241,8 +254,14 @@ define([
                     wait: true
                 });
                 model.once('sync', function(model) {
+                    model.set('name', model.get('id'));
+                    model.unset('id');
                     this.viewsCollection.add(model);
                     this.changeView(model.get('name'));
+                    this.collection.state.gridView = model.get('name');
+                    this.viewDirty = !this._isCurrentStateSynchronized();
+                    mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.created'));
+                    mediator.trigger('datagrid:' + this.collection.inputName + ':views:add', model);
                 }, self);
             });
 
@@ -263,7 +282,6 @@ define([
             });
 
             model.once('sync', function() {
-                this.render();
                 mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
             }, this);
         },
@@ -282,7 +300,6 @@ define([
             });
 
             model.once('sync', function() {
-                this.render();
                 mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
             }, this);
         },
@@ -291,9 +308,14 @@ define([
          * @param {Event} e
          */
         onDelete: function(e) {
-            var model = this._getCurrentViewModel();
+            var id = this._getCurrentView().value;
+            var model = this.viewsCollection.get(id);
 
             model.destroy({wait: true});
+            model.once('sync', function() {
+                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
+                mediator.trigger('datagrid:' + this.collection.inputName + ':views:remove', model);
+            }, this);
         },
 
         /**
@@ -302,17 +324,11 @@ define([
          * @param {GridViewModel} model
          */
         _onModelAdd: function(model) {
-            model.set('name', model.get('id'));
-            model.unset('id');
-
             this.choices.push({
                 label: model.get('label'),
                 value: model.get('name')
             });
-            this.collection.state.gridView = model.get('name');
             this.render();
-
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.created'));
         },
 
         /**
@@ -324,12 +340,22 @@ define([
             this.choices = _.reject(this.choices, function (item) {
                 return item.value == this.collection.state.gridView;
             }, this);
-            this.collection.state.gridView = null;
-            this.viewDirty = false;
+
+            if (model.id === this.collection.state.gridView) {
+                this.collection.state.gridView = null;
+                this.viewDirty = !this._isCurrentStateSynchronized();
+            }
 
             this.render();
+        },
 
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
+        /**
+         * @private
+         *
+         * @param {GridViewModel} model
+         */
+        _onModelChange: function(model) {
+            mediator.trigger('datagrid' + this.collection.inputName + ':views:change', model);
         },
 
         /**
@@ -341,7 +367,7 @@ define([
                 return;
             }
 
-            this.viewDirty = true;
+            this.viewDirty = !this._isCurrentStateSynchronized();
             this.prevState = newState;
         },
 
@@ -476,6 +502,22 @@ define([
             }, this);
 
             return _.first(currentViews);
+        },
+
+        /**
+         * @private
+         *
+         * @returns {Boolean}
+         */
+        _isCurrentStateSynchronized: function() {
+            console.log(this._getCurrentState());
+            console.log(this._getCurrentViewModelState());
+            var modelState = this._getCurrentViewModelState();
+            if (!modelState) {
+                return true;
+            }
+
+            return _.isEqual(this._getCurrentState(), modelState);
         },
 
         /**

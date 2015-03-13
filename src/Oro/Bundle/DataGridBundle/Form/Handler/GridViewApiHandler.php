@@ -43,6 +43,9 @@ class GridViewApiHandler
      */
     public function process(GridView $entity)
     {
+        $entity->setFiltersData();
+        $entity->setSortersData();
+
         $this->form->setData($entity);
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $data = $this->request->request->all();
@@ -67,7 +70,25 @@ class GridViewApiHandler
      */
     protected function onSuccess(GridView $entity)
     {
+        $this->fixFilters($entity);
         $this->om->persist($entity);
         $this->om->flush();
+    }
+
+    /**
+     * @todo Remove once https://github.com/symfony/symfony/issues/5906 is fixed
+     *
+     * @param GridView $gridView
+     */
+    protected function fixFilters(GridView $gridView)
+    {
+        $filters = $gridView->getFiltersData();
+        foreach ($filters as $name => $filter) {
+            if (array_key_exists('type', $filter) && $filter['type'] == null) {
+                $filters[$name]['type'] = '';
+            }
+        }
+
+        $gridView->setFiltersData($filters);
     }
 }

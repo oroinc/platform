@@ -22,6 +22,7 @@ parameters:
     oro_datagrid.twig.datagrid.class:                             Oro\Bundle\DataGridBundle\Twig\DataGridExtension
     oro_datagrid.event_listener.grid_views_load.class:            Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener
     oro_datagrid.form.type.grid_view_type.class:                  Oro\Bundle\DataGridBundle\Form\Type\GridViewType
+    oro_datagrid.form.type.filter_type.class:                     Oro\Bundle\DataGridBundle\Form\Type\FilterType
     oro_datagrid.form.type.sorting_type.class:                    Oro\Bundle\DataGridBundle\Form\Type\SortingType
     oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
@@ -128,6 +129,11 @@ services:
         class: %oro_datagrid.form.type.grid_view_type.class%
         tags:
             - { name: form.type, alias: oro_datagrid_grid_view }
+
+    oro_datagrid.form.type.filter_type:
+        class: %oro_datagrid.form.type.filter_type.class%
+        tags:
+            - { name: form.type, alias: oro_datagrid_filter }
 
     oro_datagrid.form.type.sorting_type:
         class: %oro_datagrid.form.type.sorting_type.class%

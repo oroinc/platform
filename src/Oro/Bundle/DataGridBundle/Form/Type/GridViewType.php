@@ -30,10 +30,10 @@ class GridViewType extends AbstractType
                 'error_bubbling' => false,
                 'allow_add' => true,
                 'allow_delete' => true,
-                'type' => 'oro_type_filter',
+                'type' => 'oro_datagrid_filter',
                 'options' => [
                     'operator_type' => 'text',
-                ]
+                ],
             ])
             ->add('sorters', 'collection', [
                 'property_path' => 'sorters_data',

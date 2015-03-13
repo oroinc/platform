@@ -25,7 +25,9 @@
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
             builders: metaData.requireJSModules,
             metadata: metaData,
-            data: data
+            data: data,
+            enableViews: renderParams.enableViews is defined ? renderParams.enableViews : false,
+            showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
         } %}
 
         <div id="{{ gridId }}"

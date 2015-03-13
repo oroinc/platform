@@ -6,6 +6,7 @@ define(function (require) {
     var gridViewsBuilder, gridGridViewsSelector,
         $ = require('jquery'),
         _ = require('underscore'),
+        mediator = require('oroui/js/mediator'),
         GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
 
     gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra';
@@ -27,12 +28,35 @@ define(function (require) {
             var self = {
                 metadata: _.defaults(options.metadata, {
                     gridViews: {}
-                })
+                }),
+                enableViews: options.enableViews,
+                $gridEl: options.$el,
+                showInNavbar: options.showViewsInNavbar,
+                buildViews: function(grid) {
+                    var gridViews = gridViewsBuilder.build.call(this, grid.collection);
+                    deferred.resolve(gridViews);
+                }
             };
 
             options.gridPromise.done(function (grid) {
-                var gridViews = gridViewsBuilder.build.call(self, grid.collection);
-                deferred.resolve(gridViews);
+                if (_.contains(options.builders, 'orofilter/js/datafilter-builder')) {
+                    if (self.$gridEl.find('.filter-box').length) {
+                        self.buildViews.call(self, grid);
+                    } else {
+                        var _buildViews = function(collection, $gridEl) {
+                            if (!$gridEl.is('#' + this.$gridEl.attr('id'))) {
+                                return;
+                            }
+
+                            this.buildViews(grid);
+                            mediator.off('datagrid_filters:rendered', _buildViews);
+                        };
+
+                        mediator.on('datagrid_filters:rendered', _buildViews, self);
+                    }
+                } else {
+                    self.buildViews.call(self, grid);
+                }
             }).fail(function () {
                 deferred.reject();
             });
@@ -47,9 +71,13 @@ define(function (require) {
         build: function (collection) {
             var options, gridViews;
             options = gridViewsBuilder.combineGridViewsOptions.call(this);
-            if (!$.isEmptyObject(options)) {
+            if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews) {
                 gridViews = new GridViewsView(_.extend({collection: collection}, options));
-                $(gridGridViewsSelector).append(gridViews.render().$el);
+                if (this.showInNavbar) {
+                    $(gridGridViewsSelector).append(gridViews.render().$el);
+                } else {
+                    this.$gridEl.prepend(gridViews.render().$el);
+                }
             }
             return gridViews;
         },

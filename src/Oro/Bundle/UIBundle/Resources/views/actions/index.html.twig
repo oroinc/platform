@@ -38,7 +38,10 @@
             {% else %}
                 {% set params = {'enableFullScreenLayout': true } %}
             {% endif %}
-            {{ dataGrid.renderGrid(gridName, params) }}
+            {{ dataGrid.renderGrid(gridName, params, {
+                enableViews: true,
+                showViewsInNavbar: true,
+            }) }}
 
             {# Only grids on index pages will be tagged #}
             <script type="text/javascript">
