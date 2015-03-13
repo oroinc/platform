@@ -38,7 +38,7 @@ define([
             Modal.__super__.initialize.call(this, options);
         },
 
-        onClose: function(event) {
+        onClose: function (event) {
             event.preventDefault();
 
             this.trigger('close');

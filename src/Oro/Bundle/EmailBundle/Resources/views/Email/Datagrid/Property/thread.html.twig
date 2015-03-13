@@ -1,0 +1,12 @@
+{% set thread = record.getValue('thread') %}
+
+<span class="thread-icon">
+    <span class="icon head">
+        <i class="icon-envelope"></i>
+    </span>
+    {%- if thread is not null -%}
+        <span class="icon head-alt">
+            <i class="icon-envelope-alt"></i>
+        </span>
+    {% endif %}
+</span>

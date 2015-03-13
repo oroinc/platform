@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Selenium;
 
-use Oro\Bundle\CalendarBundle\Tests\Selenium\Pages\Calendar;
+use Oro\Bundle\CalendarBundle\Tests\Selenium\Pages\Calendars;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
@@ -19,11 +19,13 @@ class CalendarTest extends Selenium2TestCase
     {
         $eventName = 'Event_'.mt_rand();
         $login = $this->login();
-        /* @var Calendar $login */
-        $login->openCalendar('Oro\Bundle\CalendarBundle')
+        /* @var Calendars $login */
+        $login->openCalendars('Oro\Bundle\CalendarBundle')
             ->assertTitle('My Calendar - John Doe')
             ->addEvent()
             ->setTitle($eventName)
+            ->setStartDate('Apr 9, 2014 11:00 PM')
+            ->setEndDate('Apr 9, 2015 12:00 PM')
             ->saveEvent()
             ->checkEventPresent($eventName);
 
@@ -40,12 +42,12 @@ class CalendarTest extends Selenium2TestCase
     {
         $newEventTitle = 'Update_' . $eventName;
         $login = $this->login();
-        /* @var Calendar $login */
-        $login->openCalendar('Oro\Bundle\CalendarBundle')
+        /* @var Calendars $login */
+        $login->openCalendars('Oro\Bundle\CalendarBundle')
             ->editEvent($eventName)
             ->setTitle($newEventTitle)
-            ->setStartDate('Apr 9, 2014 12:51 PM')
-            ->setEndDate('Apr 9, 2015 12:51 PM')
+            ->setStartDate('Apr 9, 2014 11:30 PM')
+            ->setEndDate('Apr 9, 2015 12:30 PM')
             ->saveEvent()
             ->assertTitle('My Calendar - John Doe')
             ->checkEventPresent($newEventTitle);
@@ -61,8 +63,8 @@ class CalendarTest extends Selenium2TestCase
     public function testDeleteEvent($eventName)
     {
         $login = $this->login();
-        /* @var Calendar $login */
-        $login->openCalendar('Oro\Bundle\CalendarBundle')
+        /* @var Calendars $login */
+        $login->openCalendars('Oro\Bundle\CalendarBundle')
             ->editEvent($eventName)
             ->deleteEvent()
             ->assertTitle('My Calendar - John Doe')

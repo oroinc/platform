@@ -86,7 +86,7 @@ define([
             var type = $(e.currentTarget).attr('data-value');
             var choiceName = $(e.currentTarget).html();
 
-            parentDiv.find(this.criteriaValueSelectors.type).val(type).trigger('change');
+            this.$(this.criteriaValueSelectors.type).val(type).trigger('change');
             choiceName += '<span class="caret"></span>';
             parentDiv.find('.dropdown-toggle').html(choiceName);
 

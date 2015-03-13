@@ -42,11 +42,14 @@ class OroTrackerBundle implements Migration
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('first_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('last_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addColumn('parsing_count', 'integer', ['notnull' => false]);
-        $table->addColumn('parsed_uid', 'integer', []);
-        $table->addColumn('identifier_detected', 'boolean', ['notnull' => true]);
+        $table->addColumn('parsing_count', 'integer', ['default' => '0']);
+        $table->addColumn('parsed_uid', 'integer', ['default' => '0']);
+        $table->addColumn('identifier_detected', 'boolean', ['default' => '0']);
+
         $table->setPrimaryKey(['id']);
         $table->addIndex(['website_id'], 'idx_d204b98018f45c82', []);
+        $table->addIndex(['visitor_uid'], 'visit_visitorUid_idx', []);
+        $table->addIndex(['user_identifier'], 'visit_userIdentifier_idx', []);
     }
 
     /**
@@ -75,7 +78,9 @@ class OroTrackerBundle implements Migration
     protected function updateOroTrackingEventTable(Schema $schema)
     {
         $table = $schema->getTable('oro_tracking_event');
-        $table->addColumn('parsed', 'boolean', ['notnull' => false]);
+        $table->addColumn('parsed', 'boolean', ['default' => '0']);
+        $table->addIndex(['created_at'], 'event_createdAt_idx', []);
+        $table->addIndex(['parsed'], 'event_parsed_idx', []);
     }
 
     /**

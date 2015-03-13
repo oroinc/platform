@@ -8,8 +8,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisit;
 
 /**
- * @ORM\Table(name="oro_tracking_visit")
  * @ORM\Entity()
+ * @ORM\Table(name="oro_tracking_visit", indexes={
+ *     @ORM\Index(name="visit_visitorUid_idx", columns={"visitor_uid"}),
+ *     @ORM\Index(name="visit_userIdentifier_idx", columns={"user_identifier"})
+ * })
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *  defaultValues={
@@ -71,23 +74,23 @@ class TrackingVisit extends ExtendTrackingVisit
     /**
      * @var string
      *
-     * @ORM\Column(name="parsed_uid", type="integer", length=255)
+     * @ORM\Column(name="parsed_uid", type="integer", length=255, nullable=false, options={"default"=0})
      */
-    protected $parsedUID;
+    protected $parsedUID = 0;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(name="identifier_detected", type="boolean", nullable=true)
+     * @ORM\Column(name="identifier_detected", type="boolean", nullable=false, options={"default"=false})
      */
-    protected $identifierDetected;
+    protected $identifierDetected = false;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="parsing_count", type="integer", nullable=true)
+     * @ORM\Column(name="parsing_count", type="integer", nullable=false, options={"default"=0})
      */
-    protected $parsingCount;
+    protected $parsingCount = 0;
 
     /**
      * @var string

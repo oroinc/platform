@@ -8,10 +8,14 @@
   left: -9999px;
 }
 &, #page, #top-page {
-  min-height: 100vh;
-}
-&, #page, #top-page {
   height: auto;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+#main {
+  float: none;
+  height: 100%;
 }
 
 #top-page {
@@ -31,9 +35,6 @@
  */
 &.input-focused #oroplatform-header {
   position: absolute;
-}
-#main {
-  float: none;
 }
 
 .row {
@@ -188,4 +189,9 @@
       }
     }
   }
+}
+
+&.loading > .loader-mask {
+  position: fixed;
+  bottom: 0;
 }

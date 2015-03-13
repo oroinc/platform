@@ -33,9 +33,11 @@ class TrackingVisitTest extends \PHPUnit_Framework_TestCase
     public function testProperties($property, $value, $expected)
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $this->assertNull(
-            $propertyAccessor->getValue($this->trackingVisit, $property)
-        );
+        if (!in_array($property, ['parsedUid', 'parsingCount'], true)) {
+            $this->assertNull(
+                $propertyAccessor->getValue($this->trackingVisit, $property)
+            );
+        }
 
         $propertyAccessor->setValue($this->trackingVisit, $property, $value);
 
@@ -57,9 +59,9 @@ class TrackingVisitTest extends \PHPUnit_Framework_TestCase
             ['userIdentifier', '215', '215'],
             ['firstActionTime', $date, $date],
             ['lastActionTime', $date, $date],
-            ['parsedUID', 458, 458],
+            ['parsedUid', 458, 458],
             ['parsingCount', 1, 1],
-            ['ip', '127.0.0.1', '127.0.0.1'],
+            ['ip', '127.0.0.1', '127.0.0.1']
         ];
     }
 }
