@@ -27,11 +27,11 @@ define(function (require) {
 
         /**
          * Delay of loading mask hide. Allows avoid blinking.
-         * Set to false to disable
+         * Set to negative number to disable
          *
          * @property {number}
          */
-        hideDelay: false,
+        hideDelay: -1,
 
         /**
          * Timeout id of current hide request
@@ -68,11 +68,13 @@ define(function (require) {
             if (hint && _.isString(hint)) {
                 this.setLoadingHint(hint);
             }
+
             if (this.hideTimeoutId) {
+                // clear deferred hide timeout
                 clearTimeout(this.hideTimeoutId);
                 delete this.hideTimeoutId;
-                return;
             }
+
             if (!this.isShown()) {
                 this.$parent = this.$el.parent();
                 this.$parent.addClass('loading');
@@ -84,17 +86,15 @@ define(function (require) {
          * Hides loading mask with delay
          * @see this.hideDelay
          *
-         * @param {bool=} instant if true loading mask will disappear instantly
+         * @param {boolean=} instant if true loading mask will disappear instantly
          */
         hide: function (instant) {
-            if (this.isShown()) {
-                if (instant || this.hideDelay === false) {
-                    clearTimeout(this.hideTimeoutId);
-                    delete this.hideTimeoutId;
-                    this._hide();
-                    return;
-                }
-                if (!this.hideTimeoutId) {
+            if (instant || this.hideDelay < 0) {
+                // instant hide
+                this._hide();
+            } else {
+                // defer hiding if mask is visible and it is not deferred already
+                if (this.isShown() && !this.hideTimeoutId) {
                     this.hideTimeoutId = setTimeout(_.bind(this._hide, this), this.hideDelay);
                 }
             }
@@ -106,6 +106,11 @@ define(function (require) {
         _hide: function () {
             clearTimeout(this.hideTimeoutId);
             delete this.hideTimeoutId;
+
+            if (!this.isShown()) {
+                // nothing to do
+                return;
+            }
 
             this.$el.removeClass('shown');
             if (this.$parent && !this.$parent.find('>.loader-mask.shown').length) {
