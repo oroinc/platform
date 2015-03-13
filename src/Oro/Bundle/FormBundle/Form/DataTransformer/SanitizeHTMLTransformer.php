@@ -8,17 +8,26 @@ use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 
 class SanitizeHTMLTransformer implements DataTransformerInterface
 {
+    const SUB_DIR = 'ezyang';
+
     /**
      * @var string|null
      */
     protected $allowedElements;
 
     /**
-     * @param string|null $allowedElements
+     * @var string|null
      */
-    public function __construct($allowedElements = null)
+    protected $cacheDir;
+
+    /**
+     * @param string|null $allowedElements
+     * @param string|null $cacheDir
+     */
+    public function __construct($allowedElements = null, $cacheDir = null)
     {
         $this->allowedElements = $allowedElements;
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -46,12 +55,19 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     {
         $config = \HTMLPurifier_Config::createDefault();
         $converter = new TagDefinitionConverter();
-
         if ($this->allowedElements) {
             $config->set('HTML.AllowedElements', $converter->getElements($this->allowedElements));
             $config->set('HTML.AllowedAttributes', $converter->getAttributes($this->allowedElements));
         }
-
+        if ($this->cacheDir) {
+            $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . self::SUB_DIR;
+            if (!file_exists($cacheDir) && !is_dir($cacheDir)) {
+                mkdir($cacheDir, 777);
+            }
+            $config->set('Cache.SerializerPath', $cacheDir);
+        } else {
+            $config->set('Cache.DefinitionImpl', null);
+        }
         $purifier = new \HTMLPurifier($config);
 
         return $purifier->purify($value);
