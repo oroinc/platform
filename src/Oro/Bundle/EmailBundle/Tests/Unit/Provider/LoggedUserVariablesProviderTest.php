@@ -80,7 +80,8 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'userSignature' => [
                     'type' => 'string',
-                    'label' => 'oro.email.system_configuration.signature_configuration.label'
+                    'label' => 'oro.email.emailtemplate.siganture',
+                    'filter' => 'oro_tag_filter'
                 ],
             ],
             $result
@@ -109,7 +110,8 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'organizationName' => ['type' => 'string', 'label' => 'oro.email.emailtemplate.organization_name'],
                 'userSignature'    => [
                     'type' => 'string',
-                    'label' => 'oro.email.system_configuration.signature_configuration.label'
+                    'label' => 'oro.email.emailtemplate.siganture',
+                    'filter' => 'oro_tag_filter'
                 ],
             ],
             $result

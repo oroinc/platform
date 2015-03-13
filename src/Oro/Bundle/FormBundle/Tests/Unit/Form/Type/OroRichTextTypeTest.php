@@ -108,6 +108,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         foreach ($viewData as $key => $value) {
             $this->assertArrayHasKey($key, $view->vars);
             $this->assertEquals($value['data-page-component-module'], $view->vars[$key]['data-page-component-module']);
+            $this->
             $this->assertEquals(
                 ksort(json_decode($value['data-page-component-options'], true)),
                 ksort(json_decode($view->vars[$key]['data-page-component-options'], true))
