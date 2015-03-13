@@ -4,7 +4,7 @@
            class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
             <% if (showLabel) { %><%= label %>: <% } %>
             <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+            <span class="reset-filter btn" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
                 ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
             <span class="caret"></span>
         </a>
@@ -108,7 +108,7 @@
                 </option>
                 <% }); %>
             </select>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+            <span class="reset-filter btn" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
                 ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
         </div>
     </div>
@@ -126,7 +126,7 @@
                     <%- option.label %>
                 </option><% }); %>
             </select>
-            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+            <span class="reset-filter btn" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
                 ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
         </div>
     </div>
