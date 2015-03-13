@@ -73,7 +73,7 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $cacheDir
+     * @param string $cacheDir
      */
     protected function touchCacheDir($cacheDir)
     {
