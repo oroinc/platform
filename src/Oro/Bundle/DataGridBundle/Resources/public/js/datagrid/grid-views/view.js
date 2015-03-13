@@ -21,7 +21,7 @@ define([
      * @extends Backbone.View
      */
     GridViewsView = Backbone.View.extend({
-        className: 'btn-toolbar grid-views pull-left',
+        className: 'grid-views pull-left',
 
         /** @property */
         events: {
@@ -35,32 +35,37 @@ define([
 
         /** @property */
         template: _.template(
-            '<% if (choices.length) { %>' +
-                '<div class="btn-group views-group">' +
-                    '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                        '<%=  current %>' + '<span class="caret"></span>' +
-                    '</button>' +
-                    '<ul class="dropdown-menu pull-right">' +
-                        '<% _.each(choices, function (choice) { %>' +
-                            '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
-                        '<% }); %>' +
-                    '</ul>' +
-                '</div>' +
+            '<% if (showEditedLabel) { %>' +
+                '<div class="edited-label"><%= editedLabel %></div>' +
             '<% } %>' +
-            '<% if (showActions) { %>' +
-                '<div class="btn-group actions-group">' +
-                    '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">' +
-                        '<%= actionsLabel %><span class="caret">' +
-                    '</a>' +
-                    '<ul class="dropdown-menu">' +
-                        '<% _.each(actions, function(action) { %>' +
-                            '<% if (action.enabled) { %>' +
-                                '<li><a href="#" class="<%= action.name %>"><%= action.label %></a></li>' +
-                            '<% } %>' +
-                        '<% }); %>' +
-                    '</ul>' +
-                '</div>' +
-            '<% } %>'
+            '<div class="btn-toolbar">' +
+                '<% if (choices.length) { %>' +
+                    '<div class="btn-group views-group">' +
+                        '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
+                            '<%=  current %>' + '<span class="caret"></span>' +
+                        '</button>' +
+                        '<ul class="dropdown-menu pull-right">' +
+                            '<% _.each(choices, function (choice) { %>' +
+                                '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
+                            '<% }); %>' +
+                        '</ul>' +
+                    '</div>' +
+                '<% } %>' +
+                '<% if (showActions) { %>' +
+                    '<div class="btn-group actions-group">' +
+                        '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">' +
+                            '<%= actionsLabel %><span class="caret">' +
+                        '</a>' +
+                        '<ul class="dropdown-menu">' +
+                            '<% _.each(actions, function(action) { %>' +
+                                '<% if (action.enabled) { %>' +
+                                    '<li><a href="#" class="<%= action.name %>"><%= action.label %></a></li>' +
+                                '<% } %>' +
+                            '<% }); %>' +
+                        '</ul>' +
+                    '</div>' +
+                '<% } %>' +
+            '</div>'
         ),
 
         /** @property */
@@ -77,6 +82,9 @@ define([
             SHARE: false,
             EDIT_SHARED: false
         },
+
+        /** @property */
+        prevState: {},
 
         /** @property */
         viewsCollection: GridViewsCollection,
@@ -110,6 +118,10 @@ define([
 
             this.listenTo(this.collection, "updateState", this.render);
             this.listenTo(this.collection, "beforeFetch", this.render);
+            this.listenTo(this.collection, "reset", this._onCollectionReset);
+            this.listenTo(this.collection, "reset", this.render);
+
+            this.prevState = this._getCurrentState();
 
             options.views = options.views || [];
             _.each(options.views, function(view) {
@@ -171,6 +183,9 @@ define([
             if (value !== this.collection.state.gridView) {
                 this.changeView(value);
             }
+
+            this.prevState = this._getCurrentState();
+            this.viewDirty = false;
         },
 
         /**
@@ -276,6 +291,8 @@ define([
         },
 
         /**
+         * @private
+         *
          * @param {GridViewModel} model
          */
         _onModelAdd: function(model) {
@@ -293,6 +310,8 @@ define([
         },
 
         /**
+         * @private
+         *
          * @param {GridViewModel} model
          */
         _onModelRemove: function(model) {
@@ -304,6 +323,19 @@ define([
             this.render();
 
             mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
+        },
+
+        /**
+         * @private
+         */
+        _onCollectionReset: function() {
+            var newState = this._getCurrentState();
+            if (_.isEqual(newState, this.prevState)) {
+                return;
+            }
+
+            this.viewDirty = true;
+            this.prevState = newState;
         },
 
         /**
@@ -325,7 +357,7 @@ define([
             return this;
         },
 
-        render: function () {
+        render: function (o) {
             var html;
             this.$el.empty();
 
@@ -336,6 +368,8 @@ define([
                 choices: this.choices,
                 current: this._getCurrentViewLabel(),
                 actionsLabel: __('oro.datagrid.gridView.actions'),
+                editedLabel: __('oro.datagrid.gridView.data_edited'),
+                showEditedLabel: this.viewDirty,
                 actions: actions,
                 showActions: _.some(actions, function(action) {
                     return action.enabled;
@@ -435,6 +469,18 @@ define([
             }, this);
 
             return _.first(currentViews);
+        },
+
+        /**
+         * @private
+         *
+         * @returns {Object}
+         */
+        _getCurrentState: function() {
+            return {
+                filters: this.collection.state.filters,
+                sorters: this.collection.state.sorters
+            };
         }
     });
 
