@@ -75,3 +75,13 @@ Here we can see that *visible* option depends on context value, let's review how
        // {"@value":{"parameters":["$context.debug"]}}
     }
 ```
+
+Developer reference
+-------------------
+
+Here is a list of key classes that work with layout expressions :
+
+ - `\Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionContextConfigurator` - the **layout context configurator** 
+    responsible for configuring `expressions_encoding` and `expressions_evaluate` options as known for context.
+ - `\Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension` - the block type extension of `block` type.
+    It finds, evaluates or encode *view variables* of all blocks.
