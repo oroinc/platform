@@ -35,6 +35,11 @@ class OroRichTextType extends AbstractType
     protected $htmlTagProvider;
 
     /**
+     * @var string
+     */
+    protected $cacheDir;
+
+    /**
      * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
      * @var array
      */
@@ -47,13 +52,16 @@ class OroRichTextType extends AbstractType
     ];
 
     /**
-     * @param ConfigManager   $configManager
+     * @param ConfigManager $configManager
      * @param HtmlTagProvider $htmlTagProvider
+     * @param string $cacheDir
      */
-    public function __construct(ConfigManager $configManager, HtmlTagProvider $htmlTagProvider)
+    public function __construct(ConfigManager $configManager, HtmlTagProvider $htmlTagProvider, $cacheDir = null)
     {
         $this->configManager   = $configManager;
         $this->htmlTagProvider = $htmlTagProvider;
+        $this->configManager = $configManager;
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -74,7 +82,7 @@ class OroRichTextType extends AbstractType
             $allowableTags = $options['wysiwyg_options']['valid_elements'];
         }
 
-        $transformer = new SanitizeHTMLTransformer($allowableTags);
+        $transformer = new SanitizeHTMLTransformer($allowableTags, $this->cacheDir);
         $builder->addModelTransformer($transformer);
     }
 

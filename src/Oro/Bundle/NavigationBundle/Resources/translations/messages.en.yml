@@ -16,6 +16,7 @@ oro:
             example: "Example: Create user, Users list"
             see_all: See full list
             most_used: Most Used Actions
+            placeholder: Enter shortcut action
         favorites:
             button: Favorites
             button.title: Mark/unmark the page as favorite
