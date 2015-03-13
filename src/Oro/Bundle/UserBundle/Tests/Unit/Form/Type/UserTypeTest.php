@@ -24,7 +24,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     private $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $globalConfigManager;
+    private $userConfigManager;
 
     protected function setUp()
     {
@@ -34,7 +34,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->globalConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Manager\GlobalConfigManager')
+        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Manager\UserConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -144,7 +144,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
-        $type = new UserType($this->securityInterface, $this->securityFacade, $request, $this->globalConfigManager);
+        $type = new UserType($this->securityInterface, $this->securityFacade, $request, $this->userConfigManager);
         $type->buildForm($builder, []);
     }
 
@@ -245,7 +245,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             $this->securityInterface,
             $this->securityFacade,
             new Request(),
-            $this->globalConfigManager
+            $this->userConfigManager
         );
         $type->setDefaultOptions($resolver);
     }

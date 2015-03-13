@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Manager\GlobalConfigManager;
+use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\TagBundle\Entity\TagManager;
@@ -45,41 +45,41 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var GlobalConfigManager */
-    protected $globalConfigManager;
+    /** @var UserConfigManager */
+    protected $userConfigManager;
 
     /**
-     * @param FormInterface       $form
-     * @param Request             $request
-     * @param UserManager         $manager
-     * @param GlobalConfigManager $globalConfigManager
-     * @param ConfigManager       $cm
-     * @param DelegatingEngine    $templating
-     * @param \Swift_Mailer       $mailer
-     * @param FlashBagInterface   $flashBag
-     * @param Translator          $translator
-     * @param LoggerInterface     $logger
+     * @param FormInterface     $form
+     * @param Request           $request
+     * @param UserManager       $manager
+     * @param UserConfigManager $userConfigManager
+     * @param ConfigManager     $cm
+     * @param DelegatingEngine  $templating
+     * @param \Swift_Mailer     $mailer
+     * @param FlashBagInterface $flashBag
+     * @param Translator        $translator
+     * @param LoggerInterface   $logger
      */
     public function __construct(
-        FormInterface       $form,
-        Request             $request,
-        UserManager         $manager,
-        GlobalConfigManager $globalConfigManager,
-        ConfigManager       $cm = null,
-        DelegatingEngine    $templating = null,
-        \Swift_Mailer       $mailer = null,
-        FlashBagInterface   $flashBag = null,
-        Translator          $translator = null,
-        LoggerInterface     $logger = null
+        FormInterface     $form,
+        Request           $request,
+        UserManager       $manager,
+        UserConfigManager $userConfigManager,
+        ConfigManager     $cm = null,
+        DelegatingEngine  $templating = null,
+        \Swift_Mailer     $mailer = null,
+        FlashBagInterface $flashBag = null,
+        Translator        $translator = null,
+        LoggerInterface   $logger = null
     ) {
         parent::__construct($form, $request, $manager);
-        $this->globalConfigManager = $globalConfigManager;
-        $this->templating          = $templating;
-        $this->cm                  = $cm;
-        $this->mailer              = $mailer;
-        $this->flashBag            = $flashBag;
-        $this->translator          = $translator;
-        $this->logger              = $logger;
+        $this->userConfigManager = $userConfigManager;
+        $this->templating        = $templating;
+        $this->cm                = $cm;
+        $this->mailer            = $mailer;
+        $this->flashBag          = $flashBag;
+        $this->translator        = $translator;
+        $this->logger            = $logger;
     }
 
     /**
@@ -146,7 +146,9 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         // username or password have been changed to avoid issues with the
         // security layer.
         $this->manager->reloadUser($user);
-        $this->globalConfigManager->saveUserConfigSignature($user, $this->form->get('signature')->getData());
+        if ($this->form->has('signature')) {
+            $this->userConfigManager->saveUserConfigSignature($this->form->get('signature')->getData());
+        }
     }
 
     /**

@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\ConfigBundle\Manager\GlobalConfigManager;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
 
-class GlobalConfigManagerTest extends \PHPUnit_Framework_TestCase
+class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveUserConfigSignatureNoSignature()
     {
-        $manager = new GlobalConfigManager();
-        $this->assertFalse($manager->saveUserConfigSignature(new User(), ''));
+        $manager = new UserConfigManager();
+        $this->assertFalse($manager->saveUserConfigSignature(''));
     }
 
     /**
@@ -18,8 +17,8 @@ class GlobalConfigManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSaveUserConfigSignatureWithException()
     {
-        $manager = new GlobalConfigManager();
-        $manager->saveUserConfigSignature(new User(), 'testSignature');
+        $manager = new UserConfigManager();
+        $manager->saveUserConfigSignature('testSignature');
     }
 
     public function testSaveUserConfigSignature()
@@ -42,8 +41,8 @@ class GlobalConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('setScopeId');
         $configManager->expects($this->once())
             ->method('save');
-        $manager = new GlobalConfigManager($configManager, $userScopeManager);
-        $manager->saveUserConfigSignature(new User(), 'testSignature');
+        $manager = new UserConfigManager($configManager, $userScopeManager);
+        $manager->saveUserConfigSignature('testSignature');
     }
 
     public function testGetUserConfigSignature()
@@ -70,7 +69,7 @@ class GlobalConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with('oro_email.signature')
             ->will($this->returnValue($testSignature));
 
-        $manager = new GlobalConfigManager($configManager, $userScopeManager);
-        $this->assertEquals($testSignature, $manager->getUserConfigSignature(new User()));
+        $manager = new UserConfigManager($configManager, $userScopeManager);
+        $this->assertEquals($testSignature, $manager->getUserConfigSignature());
     }
 }
