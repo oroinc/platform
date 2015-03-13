@@ -151,6 +151,11 @@ define([
             this._updateValueField();
         },
 
+        _onClickResetFilter: function () {
+            ChoiceFilter.__super__._onClickResetFilter.apply(this, arguments);
+            this._updateValueField();
+        },
+
         _updateValueField: function () {
             var leftWidth, rightWidth, type, isEmptyType,
                 valueFrame = this.$('.value-field-frame');
