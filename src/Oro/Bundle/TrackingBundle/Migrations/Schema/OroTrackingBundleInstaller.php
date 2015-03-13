@@ -82,7 +82,7 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('url', 'text', []);
         $table->addColumn('title', 'text', ['notnull' => false]);
         $table->addColumn('code', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('parsed', 'boolean', ['default' => '0', 'notnull' => true]);
+        $table->addColumn('parsed', 'boolean', ['default' => '0']);
         $table->addIndex(['logged_at'], 'event_loggedat_idx', []);
         $table->addIndex(['code'], 'code_idx', []);
         $table->addIndex(['name'], 'event_name_idx', []);
@@ -176,9 +176,9 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('first_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('last_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addColumn('parsing_count', 'integer', ['notnull' => false]);
-        $table->addColumn('parsed_uid', 'integer', []);
-        $table->addColumn('identifier_detected', 'boolean', ['notnull' => false]);
+        $table->addColumn('parsing_count', 'integer', ['default' => '0']);
+        $table->addColumn('parsed_uid', 'integer', ['default' => '0']);
+        $table->addColumn('identifier_detected', 'boolean', ['default' => '0']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['website_id'], 'idx_d204b98018f45c82', []);
         $table->addIndex(['visitor_uid'], 'visit_visitorUid_idx', []);

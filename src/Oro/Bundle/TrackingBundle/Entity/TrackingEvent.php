@@ -385,5 +385,4 @@ class TrackingEvent extends ExtendTrackingEvent
 
         return $this;
     }
-
 }
