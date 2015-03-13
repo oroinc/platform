@@ -29,6 +29,7 @@ define([
             "click a.save": "onSave",
             "click a.save_as": "onSaveAs",
             "click a.share": "onShare",
+            "click a.unshare": "onUnshare",
             "click a.delete": "onDelete"
         },
 
@@ -249,6 +250,25 @@ define([
         /**
          * @param {Event} e
          */
+        onUnshare: function(e) {
+            var model = this._getCurrentViewModel();
+
+            model.save({
+                label: this._getCurrentViewLabel(),
+                type: 'private'
+            }, {
+                wait: true
+            });
+
+            model.once('sync', function() {
+                this.render();
+                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+            }, this);
+        },
+
+        /**
+         * @param {Event} e
+         */
         onDelete: function(e) {
             var model = this._getCurrentViewModel();
 
@@ -339,8 +359,9 @@ define([
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
-                    enabled: typeof currentView !== 'undefined' &&
-                             currentView.get('type') !== 'system' && this.permissions.EDIT
+                    enabled: typeof currentView !== 'undefined' && this.permissions.EDIT &&
+                             (currentView.get('type') === 'private' ||
+                                (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
                 },
                 {
                     label: __('oro.datagrid.action.save_grid_view_as'),
@@ -351,8 +372,13 @@ define([
                     label: __('oro.datagrid.action.share_grid_view'),
                     name: 'share',
                     enabled: typeof currentView !== 'undefined' &&
-                            ((currentView.get('type') === 'private' && this.permissions.SHARE) ||
-                            (currentView.get('type' === 'public' && this.permissions.EDIT_SHARED)))
+                            currentView.get('type') === 'private' && this.permissions.SHARE
+                },
+                {
+                    label: __('oro.datagrid.action.unshare_grid_view'),
+                    name: 'unshare',
+                    enabled: typeof currentView !== 'undefined' &&
+                            currentView.get('type') === 'public' && this.permissions.EDIT_SHARED
                 },
                 {
                     label: __('oro.datagrid.action.delete_grid_view'),
