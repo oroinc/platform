@@ -15,8 +15,10 @@ define([
      * @class   oro.WorkflowTransitionExecutor
      */
     return function (element, data) {
+        mediator.execute('showLoading');
         $.getJSON(element.data('transition-url'), data ? {'data': data} : null)
             .done(function (response) {
+                mediator.execute('hideLoading');
                 function doRedirect(redirectUrl) {
                     mediator.execute('redirectTo', {url: redirectUrl});
                 }
@@ -40,6 +42,7 @@ define([
                 element.trigger('transitions_success', [response]);
             })
             .fail(function (jqxhr, textStatus, error) {
+                mediator.execute('hideLoading');
                 element.one('transitions_failure', function() {
                     messenger.notificationFlashMessage('error', __('Could not perform transition'));
                 });
