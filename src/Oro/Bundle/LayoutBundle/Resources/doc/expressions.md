@@ -9,14 +9,14 @@ some page in a single page application, where the data should be fetched using `
 to unify data access mechanism for different layout renderer **expressions** were added. Think about them as a **DSL** 
 language for data accessing.
 
-`ConfigExpressionExtension` extends base `block` type and allows to use **expressions** 
-[ConfigExpression component](../../../../Component/ConfigExpression/README.md) as an option for layout blocks.
+`ConfigExpressionExtension` extends base `block` type and allows to use 
+**[expressions](../../../../Component/ConfigExpression/README.md)**  as an option for layout blocks.
 
 Automatically the extension processes **expressions** that are found in **block view** variables during `finishView` method 
 execution. 
-There are two modes how expressions could be processed: if option `expressions_evaluate` of the context set to `true` 
+There are two modes how expressions could be processed: if context option `expressions_evaluate` set to `true` 
 then expressions will be evaluated on server side, or will be encoded to specified in 
-`expressions_encoding` option format. 
+`expressions_encoding` context option format otherwise. 
 
 **NOTE:** it's impossible to rely on complex option values in `buildBlock` and `buildView` methods of your block type, because 
 of expressions will be evaluated only on `finishView` of base block type. You are able to deny expression usage via defining
@@ -29,7 +29,7 @@ You can access following variables in your expressions:
 
 | Variable name | Description |
 |------- |-------------|
-| `$context` | Refers current [layout context](./layout_context.md) |
+| `$context` | Refers to current [layout context](./layout_context.md) |
 | `$data` | Refers to [data accessor](./data_accessor.md) |
 
 Encoders
