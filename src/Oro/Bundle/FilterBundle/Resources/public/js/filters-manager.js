@@ -101,7 +101,7 @@ define([
             };
 
             if (tools.isMobile()) {
-                filterListeners.updateCriteriaClick = this.closeDropdown;
+                filterListeners.updateCriteriaClick = this._onUpdateCriteriaClick;
             }
 
             _.each(this.filters, function (filter) {
@@ -405,7 +405,16 @@ define([
          */
         closeDropdown: function () {
             this.$el.find('.dropdown').removeClass('oro-open');
+        },
+
+        /**
+         * On mobile closes filter box if value is changed
+         */
+        _onUpdateCriteriaClick: function (filter) {
+            filter.once('update', this.closeDropdown, this);
+            _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
         }
+
     });
 
     return FiltersManager;

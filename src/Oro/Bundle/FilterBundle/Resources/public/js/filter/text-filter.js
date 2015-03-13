@@ -130,9 +130,9 @@ define([
          * @private
          */
         _onClickUpdateCriteria: function (e) {
+            this.trigger('updateCriteriaClick', this);
             this._hideCriteria();
             this.applyValue();
-            this.trigger('updateCriteriaClick');
         },
 
         /**
