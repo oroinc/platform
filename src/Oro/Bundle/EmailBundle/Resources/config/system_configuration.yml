@@ -21,9 +21,12 @@ oro_system_configuration:
 
         oro_email.append_signature:
             data_type: boolean
-            type: checkbox
+            type: choice
             options:
                 label: oro.email.system_configuration.signature_configuration.append_signature.label
+                choices:
+                    1: oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label
+                    0: oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label
 
         oro_email.use_threads_in_emails:
             data_type: boolean
