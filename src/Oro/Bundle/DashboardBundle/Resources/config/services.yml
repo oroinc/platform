@@ -26,7 +26,6 @@ services:
             - @oro_dashboard.config_resolver
             - @doctrine.orm.entity_manager
             - @oro_dashboard.manager.state
-            - @event_dispatcher
         calls:
             - [setRequest, ["@?request="]]
 

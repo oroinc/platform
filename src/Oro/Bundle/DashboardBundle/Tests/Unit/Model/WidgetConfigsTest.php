@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
-use Oro\Bundle\DashboardBundle\Event\WidgetOptionsLoadEvent;
+use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
@@ -16,7 +16,6 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
     private $em;
     private $stateManager;
-    private $eventDispatcher;
 
     private $widgetConfigs;
 
@@ -38,9 +37,8 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->widgetConfigs = new WidgetConfigs($configProvider, $securityFacade, $resolver, $this->em, $this->stateManager, $this->eventDispatcher);
+        $this->widgetConfigs = new WidgetConfigs($configProvider, $securityFacade, $resolver, $this->em, $this->stateManager);
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
                 ->disableOriginalConstructor()
@@ -92,47 +90,5 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($widgetState));
 
         $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getCurrentWidgetOptions());
-    }
-
-    public function testGetCurrentWidgetOptionsShouldReturnOptionsOfWidgetFromEvent()
-    {
-        $request = new Request([
-            '_widgetId' => 1,
-        ]);
-        $this->widgetConfigs->setRequest($request);
-
-        $widget = new Widget();
-        $this->widgetRepository
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->will($this->returnValue($widget));
-
-        $options = ['k' => 'v', 'k2' => 'v2'];
-        $widgetState = new WidgetState();
-        $widgetState->setOptions($options);
-        $this->stateManager
-            ->expects($this->once())
-            ->method('getWidgetState')
-            ->with($widget)
-            ->will($this->returnValue($widgetState));
-
-        $this->eventDispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->with(WidgetOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnValue(true));
-
-        $eventOptions = ['k12' => 'opt'];
-        $this->eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->will($this->returnCallback(function($name, $event) use ($eventOptions) {
-                $event->setOptions($eventOptions);
-
-                return $event;
-            }));
-
-        $this->assertEquals(new WidgetOptionBag($eventOptions), $this->widgetConfigs->getCurrentWidgetOptions());
     }
 }

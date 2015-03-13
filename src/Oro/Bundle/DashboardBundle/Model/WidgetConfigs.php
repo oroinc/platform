@@ -5,7 +5,6 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
-use Oro\Bundle\DashboardBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
 
 use Oro\Component\Config\Resolver\ResolverInterface;
@@ -13,7 +12,6 @@ use Oro\Component\Config\Resolver\ResolverInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WidgetConfigs
 {
@@ -35,31 +33,25 @@ class WidgetConfigs
     /** @var Request|null */
     protected $request;
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
     /**
      * @param ConfigProvider          $configProvider
      * @param SecurityFacade          $securityFacade
      * @param ResolverInterface       $resolver
      * @param EntityManagerInterface  $entityManager
      * @param StateManager            $stateManager
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
         ResolverInterface $resolver,
         EntityManagerInterface $entityManager,
-        StateManager $stateManager,
-        EventDispatcherInterface $dispatcher
+        StateManager $stateManager
     ) {
         $this->configProvider   = $configProvider;
         $this->securityFacade   = $securityFacade;
         $this->resolver         = $resolver;
         $this->entityManager    = $entityManager;
         $this->stateManager     = $stateManager;
-        $this->dispatcher       = $dispatcher;
     }
 
     /**
@@ -139,14 +131,7 @@ class WidgetConfigs
         $widget = $this->findWidget($widgetId);
         $widgetState = $this->stateManager->getWidgetState($widget);
 
-        $options = $widgetState->getOptions();
-        if ($this->dispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
-            $event = new WidgetOptionsLoadEvent($options);
-            $this->dispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
-            $options = $event->getOptions();
-        }
-
-        return new WidgetOptionBag($options);
+        return new WidgetOptionBag($widgetState->getOptions());
     }
 
     /**
