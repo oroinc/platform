@@ -121,14 +121,19 @@ define([
             this.listenTo(this.collection, "reset", this._onCollectionReset);
             this.listenTo(this.collection, "reset", this.render);
 
-            this.prevState = this._getCurrentState();
-
             options.views = options.views || [];
             _.each(options.views, function(view) {
                 view.grid_name = options.collection.inputName;
             });
 
             this.viewsCollection = new this.viewsCollection(options.views);
+
+            var currentState = this._getCurrentState();
+            var modelState = this._getCurrentViewModelState();
+            if (modelState && !_.isEqual(currentState, modelState)) {
+                this.viewDirty = true;
+            }
+            this.prevState = currentState;
 
             this.listenTo(this.viewsCollection, 'add', this._onModelAdd);
             this.listenTo(this.viewsCollection, 'remove', this._onModelRemove);
@@ -470,6 +475,23 @@ define([
             }, this);
 
             return _.first(currentViews);
+        },
+
+        /**
+         * @private
+         *
+         * @returns {Object|undefined}
+         */
+        _getCurrentViewModelState: function() {
+            var model = this._getCurrentViewModel();
+            if (!model) {
+                return;
+            }
+
+            return {
+                filters: model.get('filters'),
+                sorters: model.get('sorters')
+            };
         },
 
         /**
