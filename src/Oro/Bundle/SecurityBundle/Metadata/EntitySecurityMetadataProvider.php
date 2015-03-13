@@ -201,19 +201,12 @@ class EntitySecurityMetadataProvider
                     $permissions = explode(';', $permissions);
                 }
 
-                $additionalParams = [];
-
-                if ($securityConfig->has('additional_params')) {
-                    $additionalParams = $securityConfig->get('additional_params');
-                }
-
                 $data[$className] = new EntitySecurityMetadata(
                     $securityType,
                     $className,
                     $securityConfig->get('group_name'),
                     $label,
-                    $permissions,
-                    $additionalParams
+                    $permissions
                 );
             }
         }
