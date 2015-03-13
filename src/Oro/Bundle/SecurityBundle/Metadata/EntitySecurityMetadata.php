@@ -32,21 +32,34 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     protected $permissions;
 
     /**
+     * @var array
+     */
+    protected $additionalParams;
+
+    /**
      * Constructor
      *
      * @param string   $securityType
      * @param string   $className
      * @param string   $group
      * @param string   $label
-     * @param string[] $permissions
+     * @param array    $permissions
+     * @param array    $additionalParams
      */
-    public function __construct($securityType = '', $className = '', $group = '', $label = '', $permissions = array())
-    {
-        $this->securityType = $securityType;
-        $this->className    = $className;
-        $this->group        = $group;
-        $this->label        = $label;
-        $this->permissions  = $permissions;
+    public function __construct(
+        $securityType = '',
+        $className = '',
+        $group = '',
+        $label = '',
+        $permissions = [],
+        $additionalParams = []
+    ) {
+        $this->securityType     = $securityType;
+        $this->className        = $className;
+        $this->group            = $group;
+        $this->label            = $label;
+        $this->permissions      = $permissions;
+        $this->additionalParams = $additionalParams;
     }
 
     /**
@@ -100,6 +113,14 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * @return array
+     */
+    public function getAdditionalParams()
+    {
+        return $this->additionalParams;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -111,6 +132,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
                 $this->group,
                 $this->label,
                 $this->permissions,
+                $this->additionalParams
             )
         );
     }
@@ -125,26 +147,28 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
             $this->className,
             $this->group,
             $this->label,
-            $this->permissions
+            $this->permissions,
+            $this->additionalParams
             ) = unserialize($serialized);
     }
-
 
     /**
      * The __set_state handler
      *
      * @param array $data Initialization array
+     *
      * @return EntitySecurityMetadata A new instance of a EntitySecurityMetadata object
      */
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result               = new EntitySecurityMetadata();
-        $result->securityType = $data['securityType'];
-        $result->className    = $data['className'];
-        $result->group        = $data['group'];
-        $result->label        = $data['label'];
-        $result->permissions  = $data['permissions'];
+        $result                   = new EntitySecurityMetadata();
+        $result->securityType     = $data['securityType'];
+        $result->className        = $data['className'];
+        $result->group            = $data['group'];
+        $result->label            = $data['label'];
+        $result->permissions      = $data['permissions'];
+        $result->additionalParams = $data['additionalParams'];
 
         return $result;
     }
