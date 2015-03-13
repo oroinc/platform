@@ -1,3 +1,3 @@
 css:
   'oroworkflow':
-      - 'bundles/oroworkflow/css/workflow.css'
+      - 'bundles/oroworkflow/css/less/workflow.less'

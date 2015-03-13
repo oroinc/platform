@@ -7,6 +7,12 @@ OroEntityExtendBundle
 
 All additions can be done through UI or using [migration scripts](../MigrationBundle/README.md).
 
+You can find additional information about the bundle's features in their dedicated sections:
+
+ - [Custom form types and options](./Resources/doc/custom_form_type.md)
+ - [Associations](./Resources/doc/associations.md)
+
+
 Manage entities through UI
 --------------------------
 

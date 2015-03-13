@@ -54,12 +54,28 @@ define(function (require) {
                 $template = this.options._sourceElement.find('[name$="[template]"]'),
                 $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]'),
                 $parentEmailId = this.options._sourceElement.find('[name$="[parentEmailId]"]'),
-                $signature = this.options._sourceElement.find('[name$="[signature]"]');
+                $signature = this.options._sourceElement.find('[name$="[signature]"]'),
+                $addSignatureButton = this.options._sourceElement.find('#addSignatureButton');
+
+            $addSignatureButton.on('click', function() {
+                var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
+                if (bodyEditorComponent.view.tinymceConnected) {
+                    var tinyMCE= bodyEditorComponent.view.tinymceInstance;
+                    tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                } else {
+                    $body.focus();
+                    var caretPos = $body.getCursorPosition();
+                    var body = $body.val();
+                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos));
+                }
+            });
 
             var initBody = function(body) {
                 var signature = $signature.val();
-                if (signature && body.indexOf(signature) < 0) {
-                    body += '<br/><br/>' + $signature.val();
+                if (self.options.appendSignature) {
+                    if (signature && body.indexOf(signature) < 0) {
+                        body += '<br/><br/>' + $signature.val();
+                    }
                 }
                 if ($bodyFooter.val()) {
                     body += $bodyFooter.val();
@@ -161,6 +177,23 @@ define(function (require) {
             }
         }
     });
+
+    (function ($, undefined) {
+        $.fn.getCursorPosition = function() {
+            var el = $(this).get(0);
+            var pos = 0;
+            if('selectionStart' in el) {
+                pos = el.selectionStart;
+            } else if('selection' in document) {
+                el.focus();
+                var Sel = document.selection.createRange();
+                var SelLength = document.selection.createRange().text.length;
+                Sel.moveStart('character', -el.value.length);
+                pos = Sel.text.length - SelLength;
+            }
+            return pos;
+        }
+    })(jQuery);
 
     return EmailEditorComponent;
 });
