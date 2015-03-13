@@ -26,7 +26,11 @@ class TrackingProcessor implements LoggerAwareInterface
     const TACKING_EVENT_ENTITY  = 'OroTrackingBundle:TrackingEvent';
     const TRACKING_VISIT_ENTITY = 'OroTrackingBundle:TrackingVisit';
 
-    const BATCH_SIZE = 100;
+    /** Batch size for tracking events */
+    const BATCH_SIZE  = 100;
+
+    /** Max retries to identify tracking visit */
+    const MAX_RETRIES = 100;
 
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -132,8 +136,9 @@ class TrackingProcessor implements LoggerAwareInterface
             ->select('entity')
             ->where('entity.identifierDetected = false')
             ->andWhere('entity.parsedUID > 0')
-            ->andWhere('entity.parsingCount < 100')
-            ->orderBy('entity.firstActionTime', 'ASC');
+            ->andWhere('entity.parsingCount < :maxRetries')
+            ->orderBy('entity.firstActionTime', 'ASC')
+            ->setParameter('maxRetries', self::MAX_RETRIES);
 
         if (count($this->skipList)) {
             $queryBuilder->andWhere('entity.id not in('. implode(',', $this->skipList) .')');

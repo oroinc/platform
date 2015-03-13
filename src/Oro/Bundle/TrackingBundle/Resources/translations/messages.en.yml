@@ -74,7 +74,8 @@ oro:
 
             id.label:                Id
             name.label:              Name
-            visit_events.label:      Visit events
+            visit_events.label:      Visit event
+            website.label:           Tracking website
 
         block:
             general:    General
