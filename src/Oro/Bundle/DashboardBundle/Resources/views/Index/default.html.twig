@@ -220,7 +220,8 @@
                             'expanded': widget.expanded,
                             'layoutPosition': widget.layoutPosition,
                         },
-                        'allowEdit': options.allowEdit
+                        'allowEdit': options.allowEdit,
+                        'showConfig': options.allowEdit and widget.config.fields|length > 0,
                     })
                 }}
             {% endif %}

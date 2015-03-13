@@ -4,17 +4,23 @@ namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Oro\Bundle\DashboardBundle\Model\StateManager;
+use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
@@ -85,6 +91,37 @@ class DashboardController extends Controller
                 'widgets'    => $this->get('oro_dashboard.widget_configs')->getWidgetConfigs(),
             )
         );
+    }
+
+    /**
+     * @Route("/configure/{id}", name="oro_dashboard_configure", requirements={"id"="\d+"})
+     * @Method({"GET", "POST"})
+     * @Template("OroDashboardBundle:Dashboard:dialog/configure.html.twig")
+     */
+    public function configureAction(Request $request, Widget $widget)
+    {
+        if (!$this->getSecurityFacade()->isGranted('EDIT', $widget->getDashboard())) {
+            throw new AccessDeniedException();
+        }
+
+        $form = $this->getFormProvider()->getForm($widget->getName());
+        $saved = false;
+
+        $widgetState = $this->getStateManager()->getWidgetState($widget);
+        $form->setData($widgetState->getOptions());
+
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $widgetState->setOptions($form->getData());
+            $this->getEntityManager()->flush();
+            $saved = true;
+        }
+
+        return [
+            'form' => $form->createView(),
+            'formAction' => $request->getRequestUri(),
+            'saved' => $saved,
+        ];
     }
 
     /**
@@ -243,6 +280,22 @@ class DashboardController extends Controller
         }
 
         return $dashboard;
+    }
+
+    /**
+     * @return WidgetConfigurationFormProvider
+     */
+    protected function getFormProvider()
+    {
+        return $this->get('oro_dashboard.provider.widget_configuration_form_provider');
+    }
+
+    /**
+     * @return StateManager
+     */
+    protected function getStateManager()
+    {
+        return $this->get('oro_dashboard.manager.state');
     }
 
     /**
