@@ -4,11 +4,15 @@ namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
 use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ElementDependentVisitor;
 
 abstract class AbstractLoader implements LoaderInterface
 {
     const CLASS_PREFIX = '__Oro_Layout_Update_';
+
+    const ELEMENT_PREFIX = '_';
 
     /** @var LayoutUpdateGeneratorInterface */
     private $generator;
@@ -67,7 +71,9 @@ abstract class AbstractLoader implements LoaderInterface
         $resourceDataForGenerator->setFilename($resource->getFilename());
 
         try {
-            return $this->getGenerator()->generate($className, $resourceDataForGenerator, $resource->getConditions());
+            $visitors = $this->prepareVisitors($resource);
+
+            return $this->getGenerator()->generate($className, $resourceDataForGenerator, $visitors);
         } catch (SyntaxException $e) {
             $message = $e->getMessage() . "\n" . $this->dumpSource($e->getSource());
             $message .= str_repeat("\n", 2) . 'Filename: ' . $resource->getFilename();
@@ -84,6 +90,22 @@ abstract class AbstractLoader implements LoaderInterface
      * @return GeneratorData
      */
     abstract protected function loadResourceGeneratorData(FileResource $resource);
+
+    /**
+     * @param FileResource $resource
+     *
+     * @return null|VisitorCollection
+     */
+    protected function prepareVisitors(FileResource $resource)
+    {
+        $filename = pathinfo($resource->getFilename(), PATHINFO_FILENAME);
+
+        if (strpos($filename, self::ELEMENT_PREFIX) === 0) {
+            return new VisitorCollection([new ElementDependentVisitor(substr($filename, 1))]);
+        }
+
+        return null;
+    }
 
     /**
      * @return LayoutUpdateGeneratorInterface

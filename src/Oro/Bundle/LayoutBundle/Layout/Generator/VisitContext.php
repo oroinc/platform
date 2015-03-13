@@ -38,7 +38,7 @@ class VisitContext
     /**
      * @return Writer
      */
-    public function getWriter()
+    public function getUpdateMethodWriter()
     {
         return $this->writer;
     }

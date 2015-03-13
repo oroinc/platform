@@ -4,9 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
-
-use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubCondition;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
+use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubConditionVisitor;
 
 class PhpLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,7 +49,7 @@ class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
 }
 CLASS
             ,
-            $this->generator->generate('testClassName', $data, new ConditionCollection())
+            $this->generator->generate('testClassName', $data)
         );
     }
     // @codingStandardsIgnoreEnd
@@ -86,7 +85,7 @@ CLASS
             $this->generator->generate(
                 'testClassName',
                 new GeneratorData('echo 123;'),
-                new ConditionCollection([new StubCondition()])
+                new VisitorCollection([new StubConditionVisitor()])
             )
         );
     }

@@ -8,13 +8,16 @@ use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Bundle\LayoutBundle\Model\Theme;
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 
-abstract class AbstractPathVoter implements VoterInterface, ContextAwareInterface
+abstract class AbstractPathProvider implements PathProviderInterface, ContextAwareInterface
 {
     /** @var array */
     protected $filterPaths = [];
 
     /** @var ThemeManager */
     protected $manager;
+
+    /** @var ContextInterface */
+    protected $context;
 
     /**
      * @param ThemeManager $manager
@@ -29,29 +32,8 @@ abstract class AbstractPathVoter implements VoterInterface, ContextAwareInterfac
      */
     public function setContext(ContextInterface $context)
     {
-        $this->filterPaths = $this->getFilterPath($context);
+        $this->context = $context;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(array $path, $resource)
-    {
-        foreach ($this->filterPaths as $currentPath) {
-            if ($currentPath === $path) {
-                return true;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param ContextInterface $context
-     *
-     * @return array
-     */
-    abstract protected function getFilterPath(ContextInterface $context);
 
     /**
      * Returns theme inheritance hierarchy with root theme as first item
@@ -68,7 +50,7 @@ abstract class AbstractPathVoter implements VoterInterface, ContextAwareInterfac
             $theme = $this->manager->getTheme($themeName);
 
             $hierarchy[] = $theme;
-            $themeName = $theme->getParentTheme();
+            $themeName   = $theme->getParentTheme();
         }
 
         return array_reverse($hierarchy);

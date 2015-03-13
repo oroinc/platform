@@ -7,8 +7,8 @@ use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ArrayUtils;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ReflectionUtils;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ConfigExpressionConditionVisitor;
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
@@ -125,11 +125,11 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     }
 
     /**
-     * Appends given condition expression from "condition" node to condition collection.
+     * Appends given condition expression from "condition" node to visitor collection.
      *
      * {@inheritdoc}
      */
-    protected function prepare(GeneratorData $data, ConditionCollection $conditionCollection)
+    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
     {
         $source = $data->getSource();
         if (is_array($source)) {
@@ -186,7 +186,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 try {
                     $expr = $this->expressionAssembler->assemble($source[self::NODE_CONDITION]);
                     if ($expr) {
-                        $conditionCollection->append(new ConfigExpressionCondition($expr));
+                        $visitorCollection->append(new ConfigExpressionConditionVisitor($expr));
                     }
                 } catch (\Exception $e) {
                     throw new SyntaxException(

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator\Condition;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator\Visitor;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
@@ -10,15 +10,15 @@ use CG\Core\DefaultGeneratorStrategy;
 use Oro\Component\ConfigExpression\Condition;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ConfigExpressionConditionVisitor;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
-class ConfigExpressionConditionTest extends \PHPUnit_Framework_TestCase
+class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
 {
     // @codingStandardsIgnoreStart
     public function testVisit()
     {
-        $condition    = new ConfigExpressionCondition(new Condition\True());
+        $condition    = new ConfigExpressionConditionVisitor(new Condition\True());
         $phpClass = PhpClass::create('LayoutUpdateClass');
         $visitContext = new VisitContext($phpClass);
 
@@ -27,10 +27,10 @@ class ConfigExpressionConditionTest extends \PHPUnit_Framework_TestCase
         $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
 
         $condition->startVisit($visitContext);
-        $visitContext->getWriter()->writeln('echo 123;');
+        $visitContext->getUpdateMethodWriter()->writeln('echo 123;');
         $condition->endVisit($visitContext);
 
-        $method->setBody($visitContext->getWriter()->getContent());
+        $method->setBody($visitContext->getUpdateMethodWriter()->getContent());
         $phpClass->setMethod($method);
 
         $strategy = new DefaultGeneratorStrategy();

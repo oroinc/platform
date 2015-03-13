@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator\Condition;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator\Visitor;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
@@ -8,9 +8,9 @@ use CG\Generator\PhpParameter;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\SimpleContextValueComparisonConditionVisitor;
 
-class SimpleContextValueComparisonConditionTest extends \PHPUnit_Framework_TestCase
+class SimpleContextValueComparisonConditionVisitorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider conditionDataProvider
@@ -22,7 +22,7 @@ class SimpleContextValueComparisonConditionTest extends \PHPUnit_Framework_TestC
      */
     public function testVisit($oldMethodBody, $value, $condition, $expectedMethodBody)
     {
-        $condition = new SimpleContextValueComparisonCondition('valueToCompare', $condition, $value);
+        $conditionObject = new SimpleContextValueComparisonConditionVisitor('valueToCompare', $condition, $value);
 
         $phpClass = PhpClass::create('LayoutUpdateClass');
         $visitContext = new VisitContext($phpClass);
@@ -31,11 +31,11 @@ class SimpleContextValueComparisonConditionTest extends \PHPUnit_Framework_TestC
         $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
         $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
 
-        $condition->startVisit($visitContext);
-        $visitContext->getWriter()->writeln($oldMethodBody);
-        $condition->endVisit($visitContext);
+        $conditionObject->startVisit($visitContext);
+        $visitContext->getUpdateMethodWriter()->writeln($oldMethodBody);
+        $conditionObject->endVisit($visitContext);
 
-        $method->setBody($visitContext->getWriter()->getContent());
+        $method->setBody($visitContext->getUpdateMethodWriter()->getContent());
         $phpClass->setMethod($method);
 
         $this->assertSame($expectedMethodBody, $method->getBody());

@@ -8,7 +8,6 @@ use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader;
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -77,27 +76,6 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($dir)));
 
         $fs->remove($dir);
-    }
-
-    public function testPassesConditionCollection()
-    {
-        $generator = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator);
-
-        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update3.php';
-        $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
-        $resource = new FileResource($path);
-
-        $generator->expects($this->once())->method('generate')
-            ->willReturnCallback(
-                function ($className, $data, ConditionCollection $collection) use ($resource) {
-                    $this->assertSame($resource->getConditions(), $collection);
-
-                    return $this->buildClass($className, $data);
-                }
-            );
-
-        $loader->load($resource);
     }
 
     public function testProcessSyntaxExceptions()

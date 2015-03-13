@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator\Condition;
+namespace Oro\Bundle\LayoutBundle\Layout\Generator\Visitor;
 
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpProperty;
@@ -11,7 +11,7 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
-class ConfigExpressionCondition implements ConditionInterface
+class ConfigExpressionConditionVisitor implements VisitorInterface
 {
     /** @var ExpressionInterface */
     protected $expression;
@@ -46,7 +46,7 @@ class ConfigExpressionCondition implements ConditionInterface
         $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
         $class->setProperty($factoryProperty);
 
-        $visitContext->getWriter()
+        $visitContext->getUpdateMethodWriter()
             ->writeln('if (null === $this->expressionFactory) {')
             ->writeln('    throw new \\RuntimeException(\'Missing expression factory for layout update\');')
             ->writeln('}')
@@ -67,7 +67,7 @@ class ConfigExpressionCondition implements ConditionInterface
      */
     public function endVisit(VisitContext $visitContext)
     {
-        $visitContext->getWriter()
+        $visitContext->getUpdateMethodWriter()
             ->outdent()
             ->writeln('}');
     }

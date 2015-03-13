@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator\Condition;
+namespace Oro\Bundle\LayoutBundle\Layout\Generator\Visitor;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
-class SimpleContextValueComparisonCondition implements ConditionInterface
+class SimpleContextValueComparisonConditionVisitor implements VisitorInterface
 {
     /** @var string */
     protected $contextValueName;
@@ -33,7 +33,7 @@ class SimpleContextValueComparisonCondition implements ConditionInterface
      */
     public function startVisit(VisitContext $visitContext)
     {
-        $visitContext->getWriter()
+        $visitContext->getUpdateMethodWriter()
             ->writeln('if (')
             ->indent()
                 ->write(sprintf('$%s->getContext()', LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM))
@@ -50,7 +50,7 @@ class SimpleContextValueComparisonCondition implements ConditionInterface
      */
     public function endVisit(VisitContext $visitContext)
     {
-        $visitContext->getWriter()
+        $visitContext->getUpdateMethodWriter()
             ->outdent()
             ->writeln('}');
     }
