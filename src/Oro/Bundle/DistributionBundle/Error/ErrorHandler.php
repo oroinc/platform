@@ -24,7 +24,7 @@ class ErrorHandler
     );
 
     /**
-     * @var Callable|null
+     * @var callable|null
      */
     private $previousHandler;
 
