@@ -23,7 +23,7 @@ class TrackingProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const TACKING_EVENT_ENTITY  = 'OroTrackingBundle:TrackingEvent';
+    const TRACKING_EVENT_ENTITY  = 'OroTrackingBundle:TrackingEvent';
     const TRACKING_VISIT_ENTITY = 'OroTrackingBundle:TrackingVisit';
 
     /** Batch size for tracking events */
@@ -115,7 +115,7 @@ class TrackingProcessor implements LoggerAwareInterface
     {
         $em           = $this->getEntityManager();
         $queryBuilder = $em
-            ->getRepository(self::TACKING_EVENT_ENTITY)
+            ->getRepository(self::TRACKING_EVENT_ENTITY)
             ->createQueryBuilder('entity')
             ->select('COUNT (entity.id)')
             ->where('entity.parsed = false');
@@ -148,7 +148,6 @@ class TrackingProcessor implements LoggerAwareInterface
         if ($entities) {
             /** @var TrackingVisit $visit */
             foreach ($entities as $visit) {
-                //$this->logger->info('Parsing visit - ' . $visit->getId());
                 $idObj = $this->trackingIdentification->identify($visit);
                 if ($idObj && $idObj['targetObject']) {
                     $visit->setIdentifierTarget($idObj['targetObject']);
@@ -228,7 +227,7 @@ class TrackingProcessor implements LoggerAwareInterface
     protected function processVisits()
     {
         $queryBuilder = $this->getEntityManager()
-            ->getRepository(self::TACKING_EVENT_ENTITY)
+            ->getRepository(self::TRACKING_EVENT_ENTITY)
             ->createQueryBuilder('entity')
             ->where('entity.parsed = false')
             ->orderBy('entity.createdAt', 'ASC')
