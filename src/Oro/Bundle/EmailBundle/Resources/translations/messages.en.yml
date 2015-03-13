@@ -72,6 +72,7 @@ oro:
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time
+            siganture:           oro_html_filter should be applied to this variable to allow usage of its html view
 
         menu:
             emailtemplate_list.description: List of email templates
