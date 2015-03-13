@@ -63,9 +63,10 @@ define(function (require) {
                     var tinyMCE= bodyEditorComponent.view.tinymceInstance;
                     tinyMCE.execCommand('mceInsertContent', false, $signature.val());
                 } else {
-                    var caretPos = $body.selectionStart;
+                    $body.focus();
+                    var caretPos = $body.getCursorPosition();
                     var body = $body.val();
-                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos) );
+                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos));
                 }
             });
 
@@ -176,6 +177,23 @@ define(function (require) {
             }
         }
     });
+
+    (function ($, undefined) {
+        $.fn.getCursorPosition = function() {
+            var el = $(this).get(0);
+            var pos = 0;
+            if('selectionStart' in el) {
+                pos = el.selectionStart;
+            } else if('selection' in document) {
+                el.focus();
+                var Sel = document.selection.createRange();
+                var SelLength = document.selection.createRange().text.length;
+                Sel.moveStart('character', -el.value.length);
+                pos = Sel.text.length - SelLength;
+            }
+            return pos;
+        }
+    })(jQuery);
 
     return EmailEditorComponent;
 });
