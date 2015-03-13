@@ -348,10 +348,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function handleCreateRequest($_ = null)
     {
-        $entity      = call_user_func_array(array($this, 'createEntity'), func_get_args());
+        $isProcessed = false;
+        $entity = call_user_func_array([$this, 'createEntity'], func_get_args());
         try {
             $isProcessed = $this->processForm($entity);
-
             if ($isProcessed) {
                 $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
             } else {
