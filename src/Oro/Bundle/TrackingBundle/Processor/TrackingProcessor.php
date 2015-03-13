@@ -350,10 +350,13 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function getEventType(TrackingEvent $event)
     {
-        if (isset(
-            $this->eventDictionary[$event->getWebsite()->getId()],
-            $this->eventDictionary[$event->getWebsite()->getId()][$event->getName()]
-        )) {
+        $eventWebsite = $event->getWebsite();
+        if ($eventWebsite
+            && isset(
+                $this->eventDictionary[$eventWebsite->getId()],
+                $this->eventDictionary[$eventWebsite->getId()][$event->getName()]
+            )
+        ) {
             $eventType = $this->eventDictionary[$event->getWebsite()->getId()][$event->getName()];
         } else {
             $eventType = $this->getEntityManager()
@@ -361,7 +364,7 @@ class TrackingProcessor implements LoggerAwareInterface
                 ->findOneBy(
                     [
                         'name'    => $event->getName(),
-                        'website' => $event->getWebsite()
+                        'website' => $eventWebsite
                     ]
                 );
         }
@@ -369,10 +372,11 @@ class TrackingProcessor implements LoggerAwareInterface
         if (!$eventType) {
             $eventType = new TrackingEventDictionary();
             $eventType->setName($event->getName());
-            $eventType->setWebsite($event->getWebsite());
+            $eventType->setWebsite($eventWebsite);
 
             $this->getEntityManager()->persist($eventType);
-            $this->eventDictionary[$event->getWebsite()->getId()][$event->getName()] = $eventType;
+
+            $this->eventDictionary[$eventWebsite ? $eventWebsite->getId() : null][$event->getName()] = $eventType;
         }
 
         return $eventType;
