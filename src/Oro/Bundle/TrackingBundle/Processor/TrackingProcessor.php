@@ -23,7 +23,7 @@ class TrackingProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const TRACKING_EVENT_ENTITY  = 'OroTrackingBundle:TrackingEvent';
+    const TRACKING_EVENT_ENTITY = 'OroTrackingBundle:TrackingEvent';
     const TRACKING_VISIT_ENTITY = 'OroTrackingBundle:TrackingVisit';
 
     /** Batch size for tracking events */
