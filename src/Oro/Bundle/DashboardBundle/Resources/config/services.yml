@@ -54,6 +54,7 @@ services:
         class: %oro_dashboard.config_provider.class%
         arguments:
             - []
+            - @event_dispatcher
 
     oro_dashboard.navigation_listener:
         class: %oro_dashboard.navigation_listener.class%
