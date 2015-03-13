@@ -62,6 +62,10 @@ define(function (require) {
                 if (bodyEditorComponent.view.tinymceConnected) {
                     var tinyMCE= bodyEditorComponent.view.tinymceInstance;
                     tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                } else {
+                    var caretPos = $body.selectionStart;
+                    var body = $body.val();
+                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos) );
                 }
             });
 
