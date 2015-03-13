@@ -4,6 +4,9 @@ namespace Oro\Bundle\DistributionBundle\Error;
 
 class ErrorHandler
 {
+    /**
+     * @var array
+     */
     private $errorTypes = array(
         E_WARNING => 'Warning',
         E_NOTICE => 'Notice',
@@ -56,7 +59,7 @@ class ErrorHandler
             case E_ERROR:
             case E_USER_ERROR:
             case E_RECOVERABLE_ERROR:
-                return $this->handleError($code, $message, $file, $line);
+                $this->handleError($code, $message, $file, $line);
                 break;
         }
 
@@ -66,6 +69,8 @@ class ErrorHandler
     /**
      * @param int $number
      * @param string $string
+     * @deprecated since 1.7 it will be protected after 1.9
+     *
      * @return bool
      */
     public function handleWarning($number, $string)
@@ -84,10 +89,9 @@ class ErrorHandler
      * @param string $file
      * @param int    $line
      *
-     * @return bool
      * @throws \ErrorException
      */
-    public function handleError($code, $message, $file, $line)
+    protected function handleError($code, $message, $file, $line)
     {
         $errorType = isset($this->errorTypes[$code]) ? $this->errorTypes[$code] : "Unknown error ({$code})";
         throw new \ErrorException("{$errorType}: {$message} in {$file} on line {$line}", 0, $code, $file, $line);
