@@ -18,7 +18,11 @@ oro:
             signature_configuration:
                 label: Signature
                 signature.label: Signature Content
-                append_signature.label: Append signature to email body
+                append_signature:
+                    label: Append signature to email body
+                    choices:
+                        auto.label: Auto
+                        manual.label: Manual
 
             email_threads:
                 label: Email Threads
