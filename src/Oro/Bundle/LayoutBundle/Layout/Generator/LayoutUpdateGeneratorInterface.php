@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Generator;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
 
 interface LayoutUpdateGeneratorInterface
 {
@@ -14,12 +14,16 @@ interface LayoutUpdateGeneratorInterface
     /**
      * Generates valid PHP class that is instance of "Oro\Component\Layout\LayoutUpdateInterface" based on given data.
      *
-     * @param string              $className           Class name for newly generated PHP source
-     * @param GeneratorData       $data                Data consist actions which should be generated as PHP code
-     * @param ConditionCollection $conditionCollection Collection of conditions that are should be allowed for
-     *                                                 the actions to be performed
+     * @param string            $className Class name for newly generated PHP source
+     * @param GeneratorData     $data      Data consist actions which should be generated as PHP code
+     * @param VisitorCollection $visitorCollection
      *
      * @return string
      */
-    public function generate($className, GeneratorData $data, ConditionCollection $conditionCollection);
+    public function generate($className, GeneratorData $data, VisitorCollection $visitorCollection = null);
+
+    /**
+     * @return VisitorCollection
+     */
+    public function getVisitorCollection();
 }

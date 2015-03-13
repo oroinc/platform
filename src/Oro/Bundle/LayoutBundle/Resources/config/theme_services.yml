@@ -13,18 +13,20 @@ parameters:
 
 services:
     oro_layout.dependency_initializer:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer
+        public: false
         arguments:
             - @service_container
         calls:
             - [addKnownDependency, ['\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
     oro_layout.theme_factory:
-        class: %oro_layout.theme_factory.class%
+        class:  %oro_layout.theme_factory.class%
         public: false
 
     oro_layout.theme_manager:
-        class: %oro_layout.theme_manager.class%
+        class:  %oro_layout.theme_manager.class%
+        public: false
         arguments:
             - @oro_layout.theme_factory
             - []
@@ -56,17 +58,17 @@ services:
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
-    oro_layout.loader.resource_matcher:
-        class: Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher
+    oro_layout.loader.chain_path_provider:
+        class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainPathProvider
         public: false
 
-    oro_layout.loader.theme_route_voter:
-        class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemeAndRouteVoter
+    oro_layout.loader.theme_route_path_provider:
+        class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemeAndRoutePathProvider
         public: false
         arguments:
             - @oro_layout.theme_manager
         tags:
-            - { name: layout.resource_matcher.voter }
+            - { name: layout.resource.path_provider }
 
     oro_layout.layout_context_configurator.theme:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeContextConfigurator
@@ -82,9 +84,9 @@ services:
             - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader.chain_loader
             - @oro_layout.dependency_initializer
-            - @oro_layout.loader.resource_matcher
-        tags:
-            - { name: monolog.logger, channel: main }
+            - @oro_layout.loader.chain_path_provider
+        calls:
+            - [setLogger, [ @logger ]]
 
     oro_layout.data_provider.theme:
         class: Oro\Bundle\LayoutBundle\Layout\DataProvider\ThemeDataProvider

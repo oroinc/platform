@@ -7,20 +7,25 @@ use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 use CG\Core\DefaultGeneratorStrategy;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
 
 abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInterface
 {
+    /** @var VisitorCollection */
+    private $visitorCollection;
+
     /**
      * {@inheritdoc}
      */
-    public function generate($className, GeneratorData $data, ConditionCollection $conditionCollection)
+    public function generate($className, GeneratorData $data, VisitorCollection $visitorCollection = null)
     {
-        $this->prepare($data, $conditionCollection);
+        $this->visitorCollection = $visitorCollection ?: new VisitorCollection();
+
+        $this->prepare($data, $this->visitorCollection);
         $this->validate($data);
 
-        $class   = PhpClass::create($className);
+        $class        = PhpClass::create($className);
         $visitContext = new VisitContext($class);
 
         if ($data->getFilename()) {
@@ -45,16 +50,16 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
         $layoutItemParameter->setType('Oro\Component\Layout\LayoutItemInterface');
         $method->addParameter($layoutItemParameter);
 
-        /** @var ConditionInterface $condition */
-        foreach ($conditionCollection as $condition) {
+        /** @var VisitorInterface $condition */
+        foreach ($this->visitorCollection as $condition) {
             $condition->startVisit($visitContext);
         }
 
-        $writer = $visitContext->getWriter();
+        $writer = $visitContext->getUpdateMethodWriter();
         $writer->writeLn(trim($this->doGenerateBody($data)));
 
-        /** @var ConditionInterface $condition */
-        foreach ($conditionCollection as $condition) {
+        /** @var VisitorInterface $condition */
+        foreach ($this->visitorCollection as $condition) {
             $condition->endVisit($visitContext);
         }
 
@@ -67,6 +72,14 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
     }
 
     /**
+     * @return VisitorCollection
+     */
+    public function getVisitorCollection()
+    {
+        return $this->visitorCollection;
+    }
+
+    /**
      * Performs code generation itself based on source data given
      *
      * @param GeneratorData $data
@@ -74,13 +87,13 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
     abstract protected function doGenerateBody(GeneratorData $data);
 
     /**
-     * Do preparation of data and condition collection based on resource data.
+     * Do preparation of data and visitor collection based on resource data.
      * Empty implementation, could be overridden in descendants.
      *
-     * @param GeneratorData       $data
-     * @param ConditionCollection $conditionCollection
+     * @param GeneratorData     $data
+     * @param VisitorCollection $visitorCollection
      */
-    protected function prepare(GeneratorData $data, ConditionCollection $conditionCollection)
+    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
     {
     }
 

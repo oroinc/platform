@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\VoterInterface;
+use Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface;
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 
-abstract class AbstractPathVoterTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractPathProviderTestCase extends \PHPUnit_Framework_TestCase
 {
-    /** @var VoterInterface */
-    protected $voter;
+    /** @var PathProviderInterface */
+    protected $provider;
 
     /** @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $themeManager;
@@ -21,7 +21,7 @@ abstract class AbstractPathVoterTestCase extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->voter, $this->themeManager);
+        unset($this->provider, $this->themeManager);
     }
 
     /**

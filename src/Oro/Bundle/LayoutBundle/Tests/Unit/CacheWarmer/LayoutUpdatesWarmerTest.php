@@ -67,21 +67,9 @@ class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->exactly(3))->method('create')->willReturnMap(
             [
-                [
-                    ['oro-black'],
-                    'layout_update_unsupported.xml',
-                    $resourceUnsupported
-                ],
-                [
-                    ['oro-black'],
-                    'layout_update_supported.yml',
-                    $resourceYmlSupported
-                ],
-                [
-                    ['oro-gold', 'route_name'],
-                    'supported_update.php',
-                    $resourcePhpSupported
-                ]
+                ['layout_update_unsupported.xml', $resourceUnsupported],
+                ['layout_update_supported.yml', $resourceYmlSupported],
+                ['supported_update.php', $resourcePhpSupported]
             ]
         );
 

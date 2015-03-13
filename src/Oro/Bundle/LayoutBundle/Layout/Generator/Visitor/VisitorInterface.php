@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator\Condition;
+namespace Oro\Bundle\LayoutBundle\Layout\Generator\Visitor;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 
-interface ConditionInterface
+interface VisitorInterface
 {
     /**
      * @param VisitContext $visitContext

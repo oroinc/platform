@@ -43,58 +43,21 @@ class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testIteratorReturnResourcesForTheme()
-    {
-        $this->assertSame(
-            [
-                'default_black.yml',
-            ],
-            $this->getCreatedResources('black')
-        );
-    }
-
-    public function testIteratorReturnResourcesForRouteInTheme()
-    {
-        $this->assertSame(
-            [
-                'default2.yml',
-                'update.php',
-            ],
-            $this->getCreatedResources('base/oro_dashboard_view')
-        );
-    }
-
     /**
-     * @param null|string $path
-     *
      * @return array
      */
-    protected function getCreatedResources($path = null)
+    protected function getCreatedResources()
     {
         $created = [];
         $factory = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface');
         $factory->expects($this->any())->method('create')
             ->willReturnCallback(
-                function ($path, $resource) use (&$created) {
+                function ($resource) use (&$created) {
                     return $created[] = $resource;
                 }
             );
 
         $iterator = new ResourceIterator($factory, $this->resources);
-        if (null !== $path) {
-            $pathArray = explode('/', $path);
-
-            $matcher = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher')
-                ->disableOriginalConstructor()->getMock();
-            $matcher->expects($this->any())->method('match')
-                ->willReturnCallback(
-                    function (array $currentPath) use ($pathArray) {
-                        return $currentPath === $pathArray;
-                    }
-                );
-
-            $iterator->setMatcher($matcher);
-        }
         iterator_to_array($iterator);
 
         return $created;

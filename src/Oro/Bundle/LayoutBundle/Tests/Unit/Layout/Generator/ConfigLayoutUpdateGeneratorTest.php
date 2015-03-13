@@ -6,7 +6,6 @@ use Oro\Component\ConfigExpression\Condition;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,7 +39,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException('\Oro\Bundle\LayoutBundle\Exception\SyntaxException', $exception);
         }
 
-        $this->generator->generate('testClassName', new GeneratorData($data), new ConditionCollection());
+        $this->generator->generate('testClassName', new GeneratorData($data));
     }
 
     /**
@@ -177,8 +176,7 @@ CLASS
                         ]
                     ],
                     'testfilename.yml'
-                ),
-                new ConditionCollection()
+                )
             )
         );
     }
@@ -248,8 +246,7 @@ CLASS
                         ]
                     ],
                     'testfilename.yml'
-                ),
-                new ConditionCollection()
+                )
             )
         );
     }
@@ -262,22 +259,15 @@ CLASS
             ->with([['@true' => null]])
             ->willReturn(new Condition\True());
 
-        $collection = new ConditionCollection();
         $this->generator->generate(
             'testClassName',
-            new GeneratorData(
-                [
-                    'actions'    => [],
-                    'conditions' => [['@true' => null]]
-                ]
-            ),
-            $collection
+            new GeneratorData(['actions' => [], 'conditions' => [['@true' => null]]])
         );
 
-        $this->assertNotEmpty($collection);
+        $this->assertNotEmpty($this->generator->getVisitorCollection());
         $this->assertContainsOnlyInstancesOf(
-            'Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition',
-            $collection
+            'Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ConfigExpressionConditionVisitor',
+            $this->generator->getVisitorCollection()
         );
     }
 
@@ -288,7 +278,6 @@ CLASS
             ->with(['not supported'])
             ->willReturn(null);
 
-        $collection = new ConditionCollection();
         $this->generator->generate(
             'testClassName',
             new GeneratorData(
@@ -296,11 +285,10 @@ CLASS
                     'actions'    => [],
                     'conditions' => ['not supported']
                 ]
-            ),
-            $collection
+            )
         );
 
-        $this->assertEmpty($collection);
+        $this->assertEmpty($this->generator->getVisitorCollection());
     }
 
     /**
@@ -314,7 +302,6 @@ CLASS
             ->with(['error'])
             ->willThrowException(new \Exception('assembling failed'));
 
-        $collection = new ConditionCollection();
         $this->generator->generate(
             'testClassName',
             new GeneratorData(
@@ -322,8 +309,7 @@ CLASS
                     'actions'    => [],
                     'conditions' => ['error']
                 ]
-            ),
-            $collection
+            )
         );
     }
 }

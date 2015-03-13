@@ -8,7 +8,7 @@ use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader;
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -79,19 +79,22 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $fs->remove($dir);
     }
 
-    public function testTakesIntoAccountRoute()
+    public function testPassElementVisitor()
     {
         $generator = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
-        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update3.yml';
+        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/_header.yml';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
         $resource = new FileResource($path);
 
         $generator->expects($this->once())->method('generate')
             ->willReturnCallback(
-                function ($className, $data, ConditionCollection $collection) use ($resource) {
-                    $this->assertSame($resource->getConditions(), $collection);
+                function ($className, $data, VisitorCollection $collection) use ($resource) {
+                    $this->assertContainsOnlyInstancesOf(
+                        '\Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ElementDependentVisitor',
+                        $collection
+                    );
 
                     return $this->buildClass($className, $data);
                 }
@@ -110,7 +113,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $generator->expects($this->once())->method('generate')
             ->willReturnCallback(
-                function ($className, GeneratorData $data, ConditionCollection $collection) use ($path) {
+                function ($className, GeneratorData $data) use ($path) {
                     $this->assertNotEmpty($data);
                     $this->assertSame(
                         ['actions' => [['@add' => ['id' => 'root', 'parent' => null]]]],

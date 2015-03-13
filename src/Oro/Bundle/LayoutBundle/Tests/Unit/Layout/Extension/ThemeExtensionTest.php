@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher;
+use Oro\Bundle\LayoutBundle\Layout\Loader\ChainPathProvider;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
@@ -16,8 +16,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ThemeExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceMatcher */
-    protected $matcher;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ChainPathProvider */
+    protected $provider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
     protected $phpLoader;
@@ -39,15 +39,16 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             'resource3.php'
         ],
         'oro-gold'    => [
-            'resource-gold.yml'
-        ]
+            'resource-gold.yml',
+            'index' => [
+                'resource-update.yml'
+            ]
+        ],
     ];
 
     protected function setUp()
     {
-        $this->matcher = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceMatcher')
-            ->disableOriginalConstructor()->getMock();
-
+        $this->provider   = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubContextAwarePathProvider');
         $this->yamlLoader = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
         $this->phpLoader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
 
@@ -62,7 +63,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             new ResourceFactory(),
             new ChainLoader([$this->yamlLoader, $this->phpLoader]),
             $this->dependencyInitializer,
-            $this->matcher
+            $this->provider
         );
         $this->extension->setLogger($this->logger);
     }
@@ -71,7 +72,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->extension,
-            $this->matcher,
+            $this->provider,
             $this->yamlLoader,
             $this->phpLoader,
             $this->logger,
@@ -82,7 +83,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testThemeWithoutUpdatesTheme()
     {
         $themeName = 'my-theme';
-        $this->setUpResourceMatcher($themeName);
+        $this->setUpResourcePathProvider($themeName);
 
         $this->yamlLoader->expects($this->never())->method('supports');
         $this->phpLoader->expects($this->never())->method('supports');
@@ -93,7 +94,28 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testThemeYamlUpdateFound()
     {
         $themeName = 'oro-gold';
-        $this->setUpResourceMatcher($themeName);
+        $this->setUpResourcePathProvider($themeName);
+
+        $callbackBuilder = $this->getCallbackBuilder();
+
+        $this->yamlLoader->expects($this->any())->method('supports')
+            ->willReturnCallback($callbackBuilder('yml'));
+        $this->phpLoader->expects($this->never())->method('supports')
+            ->willReturnCallback($callbackBuilder('php'));
+
+        $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+
+        $this->yamlLoader->expects($this->once())->method('load')->with('resource-gold.yml')
+            ->willReturn($updateMock);
+
+        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
+        $this->assertContains($updateMock, $result);
+    }
+
+    public function testUpdatesFoundBasedOnMultiplePaths()
+    {
+        $themeName = 'oro-gold';
+        $this->setUpResourcePathProvider([$themeName], [$themeName.'_index']);
 
         $callbackBuilder = $this->getCallbackBuilder();
 
@@ -114,7 +136,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testThemeUpdatesFoundWithOneSkipped()
     {
         $themeName = 'oro-default';
-        $this->setUpResourceMatcher($themeName);
+        $this->setUpResourcePathProvider($themeName);
 
         $callbackBuilder = $this->getCallbackBuilder();
 
@@ -144,13 +166,23 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $themeName = 'oro-gold';
         $update    = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
-        $this->setUpResourceMatcher($themeName);
+        $this->setUpResourcePathProvider($themeName);
 
         $callbackBuilder = $this->getCallbackBuilder();
         $this->yamlLoader->expects($this->any())->method('supports')->willReturnCallback($callbackBuilder('yml'));
         $this->yamlLoader->expects($this->once())->method('load')->willReturn($update);
 
         $this->dependencyInitializer->expects($this->once())->method('initialize')->with($this->identicalTo($update));
+
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
+    }
+
+    public function testShouldPassContextInContextAwareProvider()
+    {
+        $themeName = 'my-theme';
+        $this->setUpResourcePathProvider($themeName);
+
+        $this->provider->expects($this->once())->method('setContext');
 
         $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
@@ -165,16 +197,11 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $themeName
+     * @param array $paths
      */
-    protected function setUpResourceMatcher($themeName)
+    protected function setUpResourcePathProvider($paths)
     {
-        $this->matcher->expects($this->any())->method('match')
-            ->willReturnCallback(
-                function ($path, $resourceName) use ($themeName) {
-                    return isset($this->resources[$themeName]) && in_array($resourceName, $this->resources[$themeName]);
-                }
-            );
+        $this->provider->expects($this->any())->method('getPaths')->willReturn((array)$paths);
     }
 
     /**

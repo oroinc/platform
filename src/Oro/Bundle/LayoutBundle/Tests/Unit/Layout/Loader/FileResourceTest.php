@@ -13,10 +13,5 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($filename, $resource->getFilename());
         $this->assertSame($filename, (string)$resource);
-
-        $this->assertInstanceOf(
-            'Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection',
-            $resource->getConditions()
-        );
     }
 }
