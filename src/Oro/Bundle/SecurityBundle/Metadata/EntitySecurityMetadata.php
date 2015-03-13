@@ -27,14 +27,9 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     protected $label;
 
     /**
-     * @var string[]
-     */
-    protected $permissions;
-
-    /**
      * @var array
      */
-    protected $additionalParams;
+    protected $permissions;
 
     /**
      * Constructor
@@ -44,22 +39,19 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
      * @param string   $group
      * @param string   $label
      * @param array    $permissions
-     * @param array    $additionalParams
      */
     public function __construct(
         $securityType = '',
         $className = '',
         $group = '',
         $label = '',
-        $permissions = [],
-        $additionalParams = []
+        $permissions = []
     ) {
         $this->securityType     = $securityType;
         $this->className        = $className;
         $this->group            = $group;
         $this->label            = $label;
         $this->permissions      = $permissions;
-        $this->additionalParams = $additionalParams;
     }
 
     /**
@@ -105,19 +97,11 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     /**
      * Gets permissions
      *
-     * @return string[]
+     * @return array
      */
     public function getPermissions()
     {
         return $this->permissions;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdditionalParams()
-    {
-        return $this->additionalParams;
     }
 
     /**
@@ -131,8 +115,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
                 $this->className,
                 $this->group,
                 $this->label,
-                $this->permissions,
-                $this->additionalParams
+                $this->permissions
             )
         );
     }
@@ -147,8 +130,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
             $this->className,
             $this->group,
             $this->label,
-            $this->permissions,
-            $this->additionalParams
+            $this->permissions
             ) = unserialize($serialized);
     }
 
@@ -168,7 +150,6 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
         $result->group            = $data['group'];
         $result->label            = $data['label'];
         $result->permissions      = $data['permissions'];
-        $result->additionalParams = $data['additionalParams'];
 
         return $result;
     }
