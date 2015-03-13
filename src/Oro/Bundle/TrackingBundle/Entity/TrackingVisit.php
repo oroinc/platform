@@ -7,11 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisit;
 
-use OroCRM\Bundle\MagentoBundle\Entity\Customer;
-
 /**
- * @ORM\Table(name="oro_tracking_visit")
  * @ORM\Entity()
+ * @ORM\Table(name="oro_tracking_visit", indexes={
+ *     @ORM\Index(name="visit_visitorUid_idx", columns={"visitor_uid"}),
+ *     @ORM\Index(name="visit_userIdentifier_idx", columns={"user_identifier"})
+ * })
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *  defaultValues={
@@ -33,6 +34,14 @@ class TrackingVisit extends ExtendTrackingVisit
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var TrackingWebsite
+     *
+     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
+     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $trackingWebsite;
 
     /**
      * @var string
@@ -65,16 +74,23 @@ class TrackingVisit extends ExtendTrackingVisit
     /**
      * @var string
      *
-     * @ORM\Column(name="parsed_uid", type="integer", length=255)
+     * @ORM\Column(name="parsed_uid", type="integer", length=255, nullable=false, options={"default"=0})
      */
-    protected $parsedUID;
+    protected $parsedUID = 0;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="identifier_detected", type="boolean", nullable=false, options={"default"=false})
+     */
+    protected $identifierDetected = false;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="parsing_count", type="integer", nullable=true)
+     * @ORM\Column(name="parsing_count", type="integer", nullable=false, options={"default"=0})
      */
-    protected $parsingCount;
+    protected $parsingCount = 0;
 
     /**
      * @var string
@@ -89,6 +105,25 @@ class TrackingVisit extends ExtendTrackingVisit
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return TrackingWebsite
+     */
+    public function getTrackingWebsite()
+    {
+        return $this->trackingWebsite;
+    }
+
+    /**
+     * @param TrackingWebsite $trackingWebsite
+     * @return $this
+     */
+    public function setTrackingWebsite($trackingWebsite)
+    {
+        $this->trackingWebsite = $trackingWebsite;
+
+        return $this;
     }
 
     /**
@@ -222,5 +257,21 @@ class TrackingVisit extends ExtendTrackingVisit
         $this->parsedUID = $parsedUID;
 
         return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIdentifierDetected()
+    {
+        return $this->identifierDetected;
+    }
+
+    /**
+     * @param boolean $identifierDetected
+     */
+    public function setIdentifierDetected($identifierDetected)
+    {
+        $this->identifierDetected = $identifierDetected;
     }
 }

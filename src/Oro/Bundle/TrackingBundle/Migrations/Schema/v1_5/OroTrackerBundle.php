@@ -6,9 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
-use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
-use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtensionAwareInterface;
 
 class OroTrackerBundle implements Migration
 {
@@ -22,8 +19,12 @@ class OroTrackerBundle implements Migration
         $this->createOroTrackingVisitEventTable($schema);
         $this->createOroTrackingEventDictionaryTable($schema);
 
+        $this->updateOroTrackingEventTable($schema);
+
         /** Foreign keys generation **/
         $this->addOroTrackingVisitEventForeignKeys($schema);
+        $this->addOroTrackingEventDictionaryForeignKeys($schema);
+        $this->addOroTrackingVisitForeignKeys($schema);
     }
 
     /**
@@ -35,14 +36,20 @@ class OroTrackerBundle implements Migration
     {
         $table = $schema->createTable('oro_tracking_visit');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('visitor_uid', 'string', ['length' => 255]);
         $table->addColumn('ip', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('first_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('last_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addColumn('parsing_count', 'integer', ['notnull' => false]);
-        $table->addColumn('parsed_uid', 'integer', []);
+        $table->addColumn('parsing_count', 'integer', ['default' => '0']);
+        $table->addColumn('parsed_uid', 'integer', ['default' => '0']);
+        $table->addColumn('identifier_detected', 'boolean', ['default' => '0']);
+
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['website_id'], 'idx_d204b98018f45c82', []);
+        $table->addIndex(['visitor_uid'], 'visit_visitorUid_idx', []);
+        $table->addIndex(['user_identifier'], 'visit_userIdentifier_idx', []);
     }
 
     /**
@@ -64,6 +71,19 @@ class OroTrackerBundle implements Migration
     }
 
     /**
+     * Add parsed column to the oro_tracking_event table
+     *
+     * @param Schema $schema
+     */
+    protected function updateOroTrackingEventTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tracking_event');
+        $table->addColumn('parsed', 'boolean', ['default' => '0']);
+        $table->addIndex(['created_at'], 'event_createdAt_idx', []);
+        $table->addIndex(['parsed'], 'event_parsed_idx', []);
+    }
+
+    /**
      * Create oro_tracking_event_lib table
      *
      * @param Schema $schema
@@ -72,8 +92,10 @@ class OroTrackerBundle implements Migration
     {
         $table = $schema->createTable('oro_tracking_event_dictionary');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['website_id'], 'idx_5c3b076318f45c82', []);
     }
 
     /**
@@ -101,6 +123,38 @@ class OroTrackerBundle implements Migration
             ['web_event_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => null]
+        );
+    }
+
+    /**
+     * Add oro_tracking_event_dictionary foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroTrackingEventDictionaryForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tracking_event_dictionary');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_tracking_website'),
+            ['website_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Add oro_tracking_visit foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroTrackingVisitForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tracking_visit');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_tracking_website'),
+            ['website_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 }

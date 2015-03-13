@@ -12,6 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\Table(name="oro_tracking_event", indexes={
  *     @ORM\Index(name="event_name_idx", columns={"name"}),
  *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"}),
+ *     @ORM\Index(name="event_createdAt_idx", columns={"created_at"}),
+ *     @ORM\Index(name="event_parsed_idx", columns={"parsed"}),
  *     @ORM\Index(name="code_idx", columns={"code"})
  * })
  * @ORM\Entity()
@@ -88,9 +90,9 @@ class TrackingEvent extends ExtendTrackingEvent
     /**
      * @var bool
      *
-     * @ORM\Column(name="parsed", type="boolean", options={"default" = false}, nullable=true)
+     * @ORM\Column(name="parsed", type="boolean", nullable=false, options={"default"=false})
      */
-    protected $parsed;
+    protected $parsed = false;
 
     /**
      * @var TrackingData
@@ -126,6 +128,7 @@ class TrackingEvent extends ExtendTrackingEvent
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->parsed = false;
     }
 
     /**
@@ -382,5 +385,4 @@ class TrackingEvent extends ExtendTrackingEvent
 
         return $this;
     }
-
 }
