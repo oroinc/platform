@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\DataTransformerInterface;
 
 use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
@@ -61,9 +62,7 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
         }
         if ($this->cacheDir) {
             $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . self::SUB_DIR;
-            if (!file_exists($cacheDir) && !is_dir($cacheDir)) {
-                mkdir($cacheDir, 777);
-            }
+            $this->touchCacheDir($cacheDir);
             $config->set('Cache.SerializerPath', $cacheDir);
         } else {
             $config->set('Cache.DefinitionImpl', null);
@@ -71,5 +70,16 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
         $purifier = new \HTMLPurifier($config);
 
         return $purifier->purify($value);
+    }
+
+    /**
+     * @param $cacheDir
+     */
+    protected function touchCacheDir($cacheDir)
+    {
+        $fs = new Filesystem();
+        if (!$fs->exists($cacheDir)) {
+            $fs->mkdir($cacheDir, 0777);
+        }
     }
 }
