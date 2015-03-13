@@ -128,6 +128,8 @@ class RendererTest extends LayoutTestCase
      * @param ContextInterface $context
      *
      * @return Layout
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function getCoreBlocksTestLayout(ContextInterface $context)
     {
@@ -216,6 +218,22 @@ class RendererTest extends LayoutTestCase
             // test 'visible' option when its value is already assembled expression
             ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\False()])
             ->add('invisible_by_expr_child', 'invisible_by_expr_container', 'meta', ['charset' => 'invisible_by_expr'])
+            // test buttons
+            ->add(
+                'button',
+                'content',
+                'button',
+                ['name' => 'btn1', 'text' => 'Btn1', 'icon' => 'plus'],
+                null,
+                true
+            )
+            ->add(
+                'input_button',
+                'content',
+                'button',
+                ['type' => 'input', 'action' => 'submit', 'name' => 'btn2', 'text' => 'Btn2'],
+                'button'
+            )
             ->getLayout($context);
 
         return $layout;
@@ -270,6 +288,8 @@ class RendererTest extends LayoutTestCase
         <link rel="stylesheet" href="test.css"/>
     </head>
 <body>
+    <button name="btn1"><i class="icon-plus"></i>Btn1</button>
+    <input type="submit" name="btn2" value="Btn2"/>
     <ul>
         <li>Hi World!</li>
         <li><a href="http://example.com">Hi World!</a></li>

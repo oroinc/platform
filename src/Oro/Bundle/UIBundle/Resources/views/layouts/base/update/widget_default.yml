@@ -25,6 +25,27 @@ oro_layout:
         - @move:
             id:       'form:end'
             parentId: widget_content
+        - @add:
+            id:        widget_actions
+            parentId:  widget_content
+            blockType: container
+            siblingId: 'form:start'
+        - @add:
+            id:        cancel_button
+            parentId:  widget_actions
+            blockType: button
+            options:
+                action: reset
+                text: Cancel
+        - @add:
+            id:        save_button
+            parentId:  widget_actions
+            blockType: button
+            options:
+                action: submit
+                text: Save
+                attr:
+                    class: btn-success
 
     conditions:
         @not_empty: $context.widget_container

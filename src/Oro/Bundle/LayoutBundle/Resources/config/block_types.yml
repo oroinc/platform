@@ -76,6 +76,11 @@ services:
         tags:
              - { name: layout.block_type, alias: link }
 
+    oro_layout.block_type.button:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonType
+        tags:
+             - { name: layout.block_type, alias: button }
+
     oro_layout.block_type.resource:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ExternalResourceType
         tags:

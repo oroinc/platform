@@ -19,8 +19,7 @@ class LinkType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver
-            ->setRequired(['text'])
-            ->setOptional(['path', 'route_name', 'route_parameters']);
+            ->setOptional(['path', 'route_name', 'route_parameters', 'text', 'icon']);
     }
 
     /**
@@ -39,7 +38,12 @@ class LinkType extends AbstractType
             throw new MissingOptionsException('Either "path" or "route_name" must be set.');
         }
 
-        $view->vars['text'] = $options['text'];
+        if (!empty($options['text'])) {
+            $view->vars['text'] = $options['text'];
+        }
+        if (!empty($options['icon'])) {
+            $view->vars['icon'] = $options['icon'];
+        }
     }
 
     /**

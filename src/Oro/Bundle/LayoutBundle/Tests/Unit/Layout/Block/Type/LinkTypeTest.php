@@ -11,33 +11,40 @@ class LinkTypeTest extends BlockTypeTestCase
 {
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "text" is missing.
-     */
-    public function testBuildViewWithoutText()
-    {
-        $this->getBlockView(LinkType::NAME, []);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      * @expectedExceptionMessage Either "path" or "route_name" must be set.
      */
     public function testBuildViewWithoutPathAndRouteName()
     {
-        $this->getBlockView(LinkType::NAME, ['text' => 'test']);
+        $this->getBlockView(LinkType::NAME, []);
     }
 
     public function testBuildViewWithDefaultOptions()
     {
         $view = $this->getBlockView(
             LinkType::NAME,
-            ['path' => 'http://example.com', 'text' => 'test']
+            ['path' => 'http://example.com']
         );
 
         $this->assertEquals('http://example.com', $view->vars['path']);
-        $this->assertFalse(isset($view->vars['route_name']));
-        $this->assertFalse(isset($view->vars['route_parameters']));
-        $this->assertEquals('test', $view->vars['text']);
+        $this->assertArrayNotHasKey('route_name', $view->vars);
+        $this->assertArrayNotHasKey('route_parameters', $view->vars);
+        $this->assertArrayNotHasKey('text', $view->vars);
+        $this->assertArrayNotHasKey('icon', $view->vars);
+    }
+
+    public function testBuildViewWithEmptyOptions()
+    {
+        $view = $this->getBlockView(
+            LinkType::NAME,
+            [
+                'path' => 'http://example.com',
+                'text' => '',
+                'icon' => ''
+            ]
+        );
+
+        $this->assertArrayNotHasKey('text', $view->vars);
+        $this->assertArrayNotHasKey('icon', $view->vars);
     }
 
     public function testBuildView()
@@ -51,7 +58,7 @@ class LinkTypeTest extends BlockTypeTestCase
             ]
         );
 
-        $this->assertFalse(isset($view->vars['path']));
+        $this->assertArrayNotHasKey('path', $view->vars);
         $this->assertEquals('test_route', $view->vars['route_name']);
         $this->assertEquals(['foo' => 'bar'], $view->vars['route_parameters']);
         $this->assertEquals('test', $view->vars['text']);
@@ -67,7 +74,7 @@ class LinkTypeTest extends BlockTypeTestCase
             ]
         );
 
-        $this->assertFalse(isset($view->vars['path']));
+        $this->assertArrayNotHasKey('path', $view->vars);
         $this->assertEquals('test_route', $view->vars['route_name']);
         $this->assertEquals([], $view->vars['route_parameters']);
         $this->assertEquals('test', $view->vars['text']);

@@ -19,6 +19,10 @@
     {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
 {%- endblock %}
 
+{% block icon_block -%}
+    <i class="icon-{{ icon }}"></i>
+{%- endblock %}
+
 {% block container_widget -%}
     {% for child in block if child.vars.visible -%}
         {{ block_widget(child) }}
@@ -101,8 +105,34 @@
 
 {% block link_widget -%}
     <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
-        {{- text|block_text(translation_domain) -}}
+        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
     </a>
+{%- endblock %}
+
+{% block button_widget -%}
+    {% if type is same as('input') %}
+        {{- block('button_widget_input') -}}
+    {% else %}
+        {{- block('button_widget_button') -}}
+    {% endif %}
+{%- endblock %}
+
+{% block button_widget_input -%}
+    <input{{ block('block_attributes') }}
+        type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
+        {%- if name is defined %} name="{{ name }}"{% endif %}
+        {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}/>
+{%- endblock %}
+
+{% block button_widget_button -%}
+    <button{{ block('block_attributes') }}
+        {%- if action in ['submit', 'reset'] %} type="{{ action }}"{% endif %}
+        {%- if name is defined %} name="{{ name }}"{% endif %}
+        {%- if value is defined %} value="{{ value }}"{% endif %}>
+        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+    </button>
 {%- endblock %}
 
 {% block external_resource_widget %}
