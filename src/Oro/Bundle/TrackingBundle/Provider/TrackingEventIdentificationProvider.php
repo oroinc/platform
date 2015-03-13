@@ -6,8 +6,8 @@ use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 
 class TrackingEventIdentificationProvider
 {
-    /** @var  TrackingEventIdentifierInterface[] */
-    protected $providers;
+    /** @var TrackingEventIdentifierInterface[] */
+    protected $providers = [];
 
     /**
      * Add activity list provider
