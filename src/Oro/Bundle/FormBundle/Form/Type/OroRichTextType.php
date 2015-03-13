@@ -29,6 +29,11 @@ class OroRichTextType extends AbstractType
     protected $configManager;
 
     /**
+     * @var string
+     */
+    protected $cacheDir;
+
+    /**
      * List of allowed element.
      *
      * @url http://www.tinymce.com/wiki.php/Configuration:valid_elements
@@ -78,10 +83,12 @@ class OroRichTextType extends AbstractType
 
     /**
      * @param ConfigManager $configManager
+     * @param string $cacheDir
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, $cacheDir)
     {
         $this->configManager = $configManager;
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -102,7 +109,7 @@ class OroRichTextType extends AbstractType
             $allowableTags = $options['wysiwyg_options']['valid_elements'];
         }
 
-        $transformer = new SanitizeHTMLTransformer($allowableTags);
+        $transformer = new SanitizeHTMLTransformer($allowableTags, $this->cacheDir);
         $builder->addModelTransformer($transformer);
     }
 
