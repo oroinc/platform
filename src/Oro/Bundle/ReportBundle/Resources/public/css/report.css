@@ -14,3 +14,12 @@
 .mobile-version .chart-wrapper {
     margin-top: 20px;
 }
+
+.oro_report-columns:not(:last-child) {
+    margin-bottom: 35px;
+}
+
+.query-designer-form > .pull-right {
+    margin-bottom: 10px;
+    margin-left: 20px;
+}

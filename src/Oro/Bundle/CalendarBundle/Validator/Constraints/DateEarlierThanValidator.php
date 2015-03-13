@@ -3,13 +3,13 @@
 namespace Oro\Bundle\CalendarBundle\Validator\Constraints;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class DateEarlierThanValidator extends ConstraintValidator
 {
-
     /**
      * @param \DateTime $value
      * @param Constraint|DateEarlierThan $constraint
@@ -20,11 +20,12 @@ class DateEarlierThanValidator extends ConstraintValidator
     {
         $root = $this->context->getRoot();
 
-        if (!$root instanceof FormInterface) {
-            throw new UnexpectedTypeException($root, 'FormInterface');
+        if ($root instanceof FormInterface) {
+            $valueCompare = $root->get($constraint->field)->getData();
+        } else {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            $valueCompare = $propertyAccessor->getValue($root, $constraint->field);
         }
-
-        $valueCompare = $root->get($constraint->field)->getData();
 
         // values presence should be validated by NotNullValidator
         if (!$value || !$valueCompare) {
