@@ -87,7 +87,12 @@ class WidgetExtension extends \Twig_Extension
             $options['container'] = '#' . $elementId;
         }
 
-        $options['url'] = $this->getUrlWithContainer($options['url'], $widgetType, $options['wid'], $options['state']['id']);
+        $id = null;
+        if (isset($options['state']) && isset($options['state']['id'])) {
+            $id = $options['state']['id'];
+        }
+
+        $options['url'] = $this->getUrlWithContainer($options['url'], $widgetType, $options['wid'], $id);
 
         if ($this->request) {
             $options['url'] = $this->addRequestParameters($options['url']);
@@ -104,12 +109,13 @@ class WidgetExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $url
-     * @param string $widgetType
-     * @param string $wid
+     * @param string   $url
+     * @param string   $widgetType
+     * @param string   $wid
+     * @param int|null $id
      * @return string
      */
-    protected function getUrlWithContainer($url, $widgetType, $wid, $id)
+    protected function getUrlWithContainer($url, $widgetType, $wid, $id = null)
     {
         if (strpos($url, '_widgetContainer=') === false) {
             $parts = parse_url($url);
@@ -123,12 +129,14 @@ class WidgetExtension extends \Twig_Extension
             }
         }
 
-        if (strpos($url, '?') === false) {
-            $url .= '?';
-        } else {
-            $url .= '&';
+        if ($id) {
+            if (strpos($url, '?') === false) {
+                $url .= '?';
+            } else {
+                $url .= '&';
+            }
+            $url .= '_widgetId=' . $id;
         }
-        $url .= '_widgetId=' . $id;
 
         return $url;
     }
