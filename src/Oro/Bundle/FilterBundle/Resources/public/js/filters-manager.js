@@ -87,10 +87,21 @@ define([
          * @param {String} [options.addButtonHint]
          */
         initialize: function (options) {
+            var filterListeners;
+
             this.template = _.template($(this.templateSelector).html());
 
             if (options.filters) {
                 this.filters = options.filters;
+            }
+
+            filterListeners = {
+                'update': this._onFilterUpdated,
+                'disable': this._onFilterDisabled
+            };
+
+            if (tools.isMobile()) {
+                filterListeners.updateCriteriaClick = this.closeDropdown;
             }
 
             _.each(this.filters, function (filter) {
@@ -98,10 +109,7 @@ define([
                     _.extend(filter, filterWrapper);
                 }
 
-                this.listenTo(filter, {
-                    'update': this._onFilterUpdated,
-                    'disable': this._onFilterDisabled
-                });
+                this.listenTo(filter, filterListeners);
             }, this);
 
             if (options.addButtonHint) {
@@ -109,12 +117,6 @@ define([
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
-
-            if (tools.isMobile()) {
-                this.listenTo(this.collection, 'beforeFetch',
-                    // update the filters drop in a separate process
-                    _.debounce(_.bind(this.updateFiltersDropdown, this), 0));
-            }
         },
 
         /**
@@ -399,13 +401,10 @@ define([
         },
 
         /**
-         * Closes filters dropdown if there's no open filtes
+         * Closes dropdown on mobile
          */
-        updateFiltersDropdown: function () {
-            var openFilters = this.$('.dropdown .filter-item.open-filter');
-            if (!openFilters.length) {
-                this.$('.dropdown').removeClass('oro-open');
-            }
+        closeDropdown: function () {
+            this.$el.find('.dropdown').removeClass('oro-open');
         }
     });
 

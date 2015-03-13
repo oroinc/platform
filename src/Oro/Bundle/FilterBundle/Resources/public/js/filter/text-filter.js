@@ -16,6 +16,7 @@ define([
      * Triggers events:
      *  - "disable" when filter is disabled
      *  - "update" when filter criteria is changed
+     *  - "updateCriteriaClick" when update button clicked
      *
      * @export  oro/filter/text-filter
      * @class   oro.filter.TextFilter
@@ -131,6 +132,7 @@ define([
         _onClickUpdateCriteria: function (e) {
             this._hideCriteria();
             this.applyValue();
+            this.trigger('updateCriteriaClick');
         },
 
         /**
