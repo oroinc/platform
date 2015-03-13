@@ -70,9 +70,10 @@ define(function (require) {
                 }
             });
 
-            var initBody = function(body) {
+            var initBody = function(body, appendSignature) {
+                appendSignature = typeof appendSignature !== 'undefined' ? appendSignature : true;
                 var signature = $signature.val();
-                if (self.options.appendSignature) {
+                if (self.options.appendSignature && appendSignature) {
                     if (signature && body.indexOf(signature) < 0) {
                         body += '<br/><br/>' + $signature.val();
                     }
@@ -107,7 +108,7 @@ define(function (require) {
                                 $subject.val(res.subject);
                             }
 
-                            var body = initBody(res.body);
+                            var body = initBody(res.body, false);
                             $body.val(body);
                             $type.find('input[value=' + res.type + ']')
                                 .prop('checked', true)
