@@ -8,68 +8,40 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveUserConfigSignatureNoSignature()
     {
-        $manager = new UserConfigManager();
-        $this->assertFalse($manager->saveUserConfigSignature(''));
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testSaveUserConfigSignatureWithException()
-    {
-        $manager = new UserConfigManager();
-        $manager->saveUserConfigSignature('testSignature');
+        $userScopeManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserScopeManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $userScopeManager->expects($this->once())
+            ->method('save')
+            ->with(['oro_email___signature' => null]);
+        $manager = new UserConfigManager($userScopeManager);
+        $manager->saveUserConfigSignature('');
     }
 
     public function testSaveUserConfigSignature()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $signature = 'testSignature';
         $userScopeManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserScopeManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $userScopeManager->expects($this->at(0))
-            ->method('getScopedEntityName');
-        $configManager->expects($this->once())
-            ->method('addManager');
-        $userScopeManager->expects($this->at(1))
-            ->method('getScopedEntityName');
-        $configManager->expects($this->once())
-            ->method('setScopeName');
-        $configManager->expects($this->exactly(2))
-            ->method('setScopeId');
-        $configManager->expects($this->once())
-            ->method('save');
-        $manager = new UserConfigManager($configManager, $userScopeManager);
-        $manager->saveUserConfigSignature('testSignature');
+        $userScopeManager->expects($this->once())
+            ->method('save')
+            ->with(['oro_email___signature' => $signature]);
+        $manager = new UserConfigManager($userScopeManager);
+        $manager->saveUserConfigSignature($signature);
     }
 
     public function testGetUserConfigSignature()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $signature = 'testSignature';
         $userScopeManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserScopeManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $userScopeManager->expects($this->at(0))
-            ->method('getScopedEntityName');
-        $configManager->expects($this->once())
-            ->method('addManager');
-        $userScopeManager->expects($this->at(1))
-            ->method('getScopedEntityName');
-        $configManager->expects($this->once())
-            ->method('setScopeName');
-        $configManager->expects($this->exactly(2))
-            ->method('setScopeId');
-        $testSignature = 'testSignature';
-        $configManager->expects($this->once())
-            ->method('get')
+        $userScopeManager->expects($this->once())
+            ->method('getSettingValue')
             ->with('oro_email.signature')
-            ->will($this->returnValue($testSignature));
-
-        $manager = new UserConfigManager($configManager, $userScopeManager);
-        $this->assertEquals($testSignature, $manager->getUserConfigSignature());
+            ->will($this->returnValue($signature));
+        $manager = new UserConfigManager($userScopeManager);
+        $this->assertEquals($signature, $manager->getUserConfigSignature());
     }
 }
