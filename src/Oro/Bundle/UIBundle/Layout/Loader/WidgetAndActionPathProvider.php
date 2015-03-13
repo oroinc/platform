@@ -20,7 +20,7 @@ class WidgetAndActionPathProvider extends ThemeAndRoutePathProvider
             $basePaths = parent::getPaths();
 
             foreach ($basePaths as $path) {
-                if ($actionName && count($path) === 1) {
+                if ($actionName && false === strpos($path, self::DELIMITER)) {
                     // add action name to theme related path
                     $actionPath = implode(self::DELIMITER, [$path, $actionName]);
                     $paths[]    = $actionPath;

@@ -55,8 +55,6 @@ class WidgetAndActionPathProviderTest extends AbstractPathProviderTestCase
                     'base/index',
                     'base/index/dialog',
                     'base/dialog',
-                    'base/route/index',
-                    'base/route/index/dialog',
                     'base/route/dialog',
                 ],
                 '$theme'           => 'base',
@@ -67,8 +65,8 @@ class WidgetAndActionPathProviderTest extends AbstractPathProviderTestCase
             [
                 '$expectedResults' => [
                     'base/dialog',
-                    'base/route/dialog',
                     'black/dialog',
+                    'base/route/dialog',
                     'black/route/dialog',
                 ],
                 '$theme'           => 'black',
