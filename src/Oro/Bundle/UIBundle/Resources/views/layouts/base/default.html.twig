@@ -80,7 +80,7 @@
                 : (action is same as('create') ? ' btn-primary main-group pull-right'
                 : (action is same as('cancel') ? ' back'
                 : (action is same as('save') ? ' btn-success main-group'
-                : (action is same as('save_and_close') ? ' btn-success' : ''))
+                : (action is same as('save_and_close') ? ' btn-success' : ''))))
             )
             ~ (attr.class is defined ? ' ' ~ attr.class : '') }
     ) %}
