@@ -58,9 +58,8 @@ class OroRichTextType extends AbstractType
      */
     public function __construct(ConfigManager $configManager, HtmlTagProvider $htmlTagProvider, $cacheDir = null)
     {
-        $this->configManager   = $configManager;
-        $this->htmlTagProvider = $htmlTagProvider;
         $this->configManager = $configManager;
+        $this->htmlTagProvider = $htmlTagProvider;
         $this->cacheDir = $cacheDir;
     }
 
