@@ -237,6 +237,7 @@ define([
                 });
                 model.once('sync', function(model) {
                     this.viewsCollection.add(model);
+                    this.changeView(model.get('name'));
                 }, self);
             });
 
