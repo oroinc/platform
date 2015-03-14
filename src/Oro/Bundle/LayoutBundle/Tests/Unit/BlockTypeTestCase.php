@@ -42,6 +42,7 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
             ->addType(new Type\TextType())
             ->addType(new Type\LinkType())
             ->addType(new Type\ButtonType())
+            ->addType(new Type\ButtonGroupType())
             ->addType(new Type\ListType());
     }
 }

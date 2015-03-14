@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Util;
 
 use Oro\Component\Layout\BlockView;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class BlockUtils
 {
@@ -25,6 +26,56 @@ class BlockUtils
             1,
             [$pluginName, end($view->vars['block_prefixes'])]
         );
+    }
+
+    /**
+     * Normalizes the given value to the format that can be translated by a renderer.
+     *
+     * @param string|array $text       The text to be translated
+     * @param array|null   $parameters The parameters
+     *
+     * @return array
+     */
+    public static function normalizeTransValue($text, $parameters = null)
+    {
+        if (is_string($text) && !empty($text)) {
+            $text = ['label' => $text];
+        }
+        if (!empty($parameters) && is_array($text) && !isset($text['parameters'])) {
+            $text['parameters'] = $parameters;
+        }
+
+        return $text;
+    }
+
+    /**
+     * Gets the url related options and pass them to the block view.
+     *
+     * @param BlockView   $view     The block view
+     * @param array       $options  The block options
+     * @param boolean     $required Specifies whether the url related options are mandatory
+     * @param string|null $prefix   The prefix for the url related options
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public static function processUrl(BlockView $view, array $options, $required = false, $prefix = null)
+    {
+        $pathName  = null !== $prefix ? $prefix . '_path' : 'path';
+        $routeName = null !== $prefix ? $prefix . '_route_name' : 'route_name';
+        if (!empty($options[$pathName])) {
+            $view->vars[$pathName] = $options[$pathName];
+        } elseif (!empty($options[$routeName])) {
+            $view->vars[$routeName] = $options[$routeName];
+
+            $routeParamName              = null !== $prefix ? $prefix . '_route_parameters' : 'route_parameters';
+            $view->vars[$routeParamName] = isset($options[$routeParamName])
+                ? $options[$routeParamName]
+                : [];
+        } elseif ($required) {
+            throw new MissingOptionsException(
+                sprintf('Either "%s" or "%s" must be set.', $pathName, $routeName)
+            );
+        }
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -13,6 +12,7 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Oro\Bundle\LayoutBundle\Tests\Fixtures\UserNameType;
 
 class RendererTest extends LayoutTestCase
@@ -223,7 +223,7 @@ class RendererTest extends LayoutTestCase
                 'button',
                 'content',
                 'button',
-                ['name' => 'btn1', 'text' => 'Btn1', 'icon' => 'plus'],
+                ['name' => 'btn1', 'text' => 'Btn1', 'icon' => 'plus', 'vars' => ['icon_class' => 'hide-text']],
                 null,
                 true
             )
@@ -288,7 +288,7 @@ class RendererTest extends LayoutTestCase
         <link rel="stylesheet" href="test.css"/>
     </head>
 <body>
-    <button name="btn1"><i class="icon-plus"></i>Btn1</button>
+    <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
     <input type="submit" name="btn2" value="Btn2"/>
     <ul>
         <li>Hi World!</li>

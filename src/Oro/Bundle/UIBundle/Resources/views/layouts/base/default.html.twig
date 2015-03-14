@@ -74,18 +74,15 @@
 
 {% block button_widget -%}
     {% set attr = attr|merge({
-        'class': 'btn'
-            ~ (
-                action is same as('submit') ? ' btn-primary'
-                : (action is same as('create') ? ' btn-primary main-group pull-right'
-                : (action is same as('cancel') ? ' back'
-                : (action is same as('save') ? ' btn-success main-group'
-                : (action is same as('save_and_close') ? ' btn-success'
-                : ''))))
-            )
-            ~ (attr.class is defined ? ' ' ~ attr.class : '') }
-    ) %}
+        'class': 'btn' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    }) -%}
     {% if type is same as('link') %}
+        {%- if icon is defined -%}
+            {% set icon_class = 'hide-text' -%}
+            {% set attr = attr|merge({
+                'class': attr.class ~ ' icons-holder-text'
+            }) -%}
+        {% endif %}
         {{- block('button_widget_link') -}}
     {% elseif type is same as('input') %}
         {{- block('button_widget_input') -}}
@@ -95,11 +92,105 @@
 {%- endblock %}
 
 {% block button_widget_link -%}
-    {% set href = path is defined ? path : (route_name is defined ? path(route_name, route_parameters) : null) -%}
-    <a{{ block('block_attributes') }} href="{{ with_page_parameters and href is not empty ? oro_url_add_query(href) : href|default('javascript: void(0);') }}">
-        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+    {% set url = path is defined ? path : (route_name is defined ? path(route_name, route_parameters) : null) -%}
+    {% set url = url is not same as(null) and with_page_parameters ? oro_url_add_query(url) : url -%}
+    {% if icon is defined -%}
+        {% set attr = attr|merge({'class': attr.class ~ ' icons-holder-text'}) -%}
+    {% endif -%}
+    {% set redirectUrl = redirect_path is defined ? redirect_path : (redirect_route_name is defined ? path(redirect_route_name, redirect_route_parameters) : null) -%}
+    {% if redirectUrl is not same as(null) -%}
+        {% set attr = attr|merge({'data-redirect': with_page_parameters ? oro_url_add_query(redirectUrl) : redirectUrl}) -%}
+    {% endif -%}
+    {% if entity_id is defined -%}
+        {% set attr = attr|merge({'data-id': entity_id}) -%}
+    {% endif -%}
+    {% if confirm_message is defined -%}
+        {% set attr = attr|merge({'data-message': confirm_message|block_text(translation_domain)}) -%}
+    {% endif -%}
+    {% if success_message is defined -%}
+        {% set attr = attr|merge({'data-success-message': success_message|block_text(translation_domain)}) -%}
+    {% endif -%}
+    <a{{ block('block_attributes') }}
+        {%- if use_data_url|default is same as(true) %} href="javascript: void(0);" data-url="{{ url|default('') }}"
+        {%- else %} href="{{ url|default('javascript: void(0);') }}"{% endif %}>
+        {%- if icon is defined -%}
+            {% set icon_class = 'hide-text' -%}
+            {{ block('icon_block') }}
+        {%- endif %}
         {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
     </a>
+{%- endblock %}
+
+{% block submit_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'class': 'btn-primary' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block create_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'class': 'btn-primary' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block cancel_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'class': 'back' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block save_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'data-action': 'save_and_stay',
+            'class': 'btn-success action-button' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block save_and_close_button_widget -%}
+    {{ block_widget(block, {
+        'action': 'submit',
+        'attr': {
+            'class': 'btn-success' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block delete_button_widget -%}
+    {{ block_widget(block, {
+        'icon': icon|default('trash'),
+        'use_data_url': true,
+        'attr': {
+            'class': 'no-hash remove-button' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block button_separator_widget -%}
+    <div{{ block('block_attributes') }}>
+        <div class="separator-btn"></div>
+    </div>
+{%- endblock %}
+
+{% block button_group_widget -%}
+    {% set attr = attr|merge({
+        'class': 'btn-group' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    }) -%}
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{%- endblock %}
+
+{% block pinned_button_group_widget -%}
+    {% set pinnedAttr = {
+        'groupKey': group_name,
+        'useMainButtonsClone': true
+    } -%}
+    {% if more_button_attr is defined -%}
+        {% set pinnedAttr = pinnedAttr|merge({'moreButtonAttrs': more_button_attr}) -%}
+    {% endif -%}
+    {{ block_widget(block, {'attr': {'data-pinned-dropdown-button': pinnedAttr|json_encode} }) }}
 {%- endblock %}
 
 {% block breadcrumbs_widget -%}

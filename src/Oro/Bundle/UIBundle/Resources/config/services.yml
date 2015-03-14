@@ -167,6 +167,16 @@ services:
         tags:
              - { name: layout.block_type, alias: require_js }
 
+    oro_ui.block_type.button_separator:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\ButtonSeparatorType
+        tags:
+             - { name: layout.block_type, alias: button_separator }
+
+    oro_ui.block_type.pinned_button_group:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\PinnedButtonGroupType
+        tags:
+             - { name: layout.block_type, alias: pinned_button_group }
+
     oro_ui.block_type.breadcrumb_list:
         class: Oro\Bundle\UIBundle\Layout\Block\Type\BreadcrumbListType
         tags:
