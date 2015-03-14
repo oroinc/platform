@@ -14,11 +14,13 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->handler = new ErrorHandler();
+        $this->handler->registerHandlers();
     }
 
     protected function tearDown()
     {
         unset($this->handler);
+        restore_error_handler();
     }
 
     /**
@@ -29,6 +31,25 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleWarning($message, $silenced = true)
     {
         $this->assertEquals($silenced, $this->handler->handleWarning(E_WARNING, $message));
+    }
+
+    /**
+     * @expectedException \ErrorException
+     * @expectedExceptionMessage Test error
+     */
+    public function testHandleError()
+    {
+        trigger_error('Test error', E_USER_ERROR);
+    }
+
+    public function testHandleIgnoredErrorIfErrorsSuppressed()
+    {
+        @$this->handler->handle(E_ERROR, 'test', '', 0);
+    }
+
+    public function testHandleIgnoreWarnings()
+    {
+        $this->assertFalse($this->handler->handle(E_WARNING, 'Test warning', '', 0));
     }
 
     public function warningDataProvider()

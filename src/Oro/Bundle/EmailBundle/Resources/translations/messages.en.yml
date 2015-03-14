@@ -16,8 +16,13 @@ oro:
             email_configuration: Email Configuration
 
             signature_configuration:
-              label: Signature
-              signature.label: Signature Content
+                label: Signature
+                signature.label: Signature Content
+                append_signature:
+                    label: Append signature to email body
+                    choices:
+                        auto.label: Auto
+                        manual.label: Manual
 
             email_threads:
                 label: Email Threads
@@ -67,6 +72,7 @@ oro:
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time
+            siganture:           Signature (oro_html_filter should be applied to this variable to allow usage of it's html view)
 
         menu:
             emailtemplate_list.description: List of email templates
@@ -154,3 +160,4 @@ oro:
 "Content": "Content"
 "Cc/Bcc": "Cc/Bcc"
 "Thread view": "Thread view"
+"Add signature": "Add signature"

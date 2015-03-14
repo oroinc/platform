@@ -32,6 +32,11 @@ define(function (require) {
         MOBILE_HEADER_HEIGHT: 54,
 
         /**
+         * Height of header on mobile devices
+         */
+        MOBILE_POPUP_HEADER_HEIGHT: 44,
+
+        /**
          * Minimal height for fullscreen layout
          */
         minimalHeightForFullScreenLayout: 300,
@@ -56,39 +61,58 @@ define(function (require) {
             return this.devToolbarHeight;
         },
 
-        init: function (container, parent) {
-            var promise;
-            container = $(container);
-            this.styleForm(container);
+        /**
+         * Initializes
+         *  - form widgets (uniform)
+         *  - tooltips
+         *  - popovers
+         *  - scrollspy
+         *  - page components
+         *
+         * @param {string|HTMLElement|jQuery.Element} container
+         * @param {Backbone.View|Chaplin.View} parentView
+         * @returns {jQuery.Promise}
+         */
+        init: function (container, parentView) {
+            var promise, $container;
 
-            scrollspy.init(container);
+            if (!parentView) {
+                throw new Error('Parent view is required for page components initialization');
+            }
 
-            container.find('[data-toggle="tooltip"]').tooltip();
+            $container = $(container);
+            this.styleForm($container);
 
-            this.initPopover(container.find('label'));
+            scrollspy.init($container);
 
-            promise = this.initPageComponents(container, parent);
+            $container.find('[data-toggle="tooltip"]').tooltip();
+
+            this.initPopover($container.find('label'));
+
+            promise = this.initPageComponents($container, parentView);
+            this._bindContainerChanges($container, parentView);
+
             return promise;
         },
 
         /**
          * Initializes components defined in HTML of the container
-         * and attaches them to passed parent instance
+         * and attaches them to passed parent view instance
          *
-         * @param {jQuery.Element} container
-         * @param {Backbone.View|Chaplin.View|PageController} parent
+         * @param {jQuery.Element} $container
+         * @param {Backbone.View|Chaplin.View} parentView
          * @returns {jQuery.Promise}
          */
-        initPageComponents: function (container, parent) {
-            var loadPromises, initDeferred, pageComponentNodes, preloadQueue;
-            // console.groupCollapsed('container', container.attr('class'), {html: container.clone().html('')[0].outerHTML});
+        initPageComponents: function ($container, parentView) {
+            var loadPromises, initDeferred, $pageComponentNodes, preloadQueue;
+            // console.groupCollapsed('container', $container.attr('class'), {html: $container.clone().html('')[0].outerHTML});
             loadPromises = [];
-            initDeferred = $.Deferred(),
-            pageComponentNodes = container.find('[data-page-component-module]');
+            initDeferred = $.Deferred();
+            $pageComponentNodes = $container.find('[data-page-component-module]');
 
-            if (pageComponentNodes.length) {
+            if ($pageComponentNodes.length) {
                 preloadQueue = [];
-                pageComponentNodes.each(function () {
+                $pageComponentNodes.each(function () {
                     var $elem, module, name, options, loadDeferred, $separateLayout;
 
                     $elem = $(this);
@@ -96,22 +120,22 @@ define(function (require) {
                     // find nearest marked container with separate layout
                     $separateLayout = $elem.closest('[data-layout="separate"]');
                     // if it placed inside container - prevent component creation from here
-                    if ($separateLayout.length
-                            && $.contains(container[0], $separateLayout[0])
-                            && this !== $separateLayout[0]) {
+                    if ($separateLayout.length &&
+                            $.contains($container[0], $separateLayout[0]) &&
+                            this !== $separateLayout[0]) {
                         // optimize load time - push components to preload queue
                         preloadQueue.push(module);
                         return;
                     }
 
-                    // console.log('pageComponent', container.attr('class'), {html: $elem.clone().html('')[0].outerHTML});
+                    // console.log('pageComponent', $container.attr('class'), {html: $elem.clone().html('')[0].outerHTML});
                     name = $elem.data('pageComponentName');
                     options = $elem.data('pageComponentOptions') || {};
                     options._sourceElement = $elem;
                     if (name) {
                         options.name = name;
                     }
-                    options.parent = parent;
+                    options.parent = parentView;
 
                     $elem
                         .attr('data-bound-component', module)
@@ -122,29 +146,27 @@ define(function (require) {
                     loadDeferred = $.Deferred();
 
                     require([module], function (component) {
-                        if (options.parent && options.parent.disposed) {
+                        var result;
+                        if (parentView.disposed) {
                             loadDeferred.resolve();
                             return;
                         }
-                        if (typeof component.init === "function") {
-                            loadDeferred.resolve(component.init(options));
+                        if (typeof component.init === 'function') {
+                            result = component.init(options);
                         } else {
-                            loadDeferred.resolve(component(options));
+                            result = component(options);
                         }
-                    }, function (e) {
-                        var e2;
+                        loadDeferred.resolve(result);
+                    }, function (error) {
                         if (tools.debug) {
-                            try {
-                                // rethrow of exception will not show stack - try to show it manually
-                                console.log(e.stack)
-                            } catch (e2) {
-                                // have no access to stack information, suppress
+                            if (console && console.log) {
+                                console.log(error.stack);
                             }
-                            throw e;
+                            throw error;
                         } else {
                             // prevent interface from blocking by loader in production mode
                             mediator.execute('showMessage', 'error',
-                                __('Cannot load module ') + '"' + e.requireModules[0] + '"'
+                                __('Cannot load module ') + '"' + error.requireModules[0] + '"'
                             );
                             loadDeferred.resolve();
                         }
@@ -168,6 +190,61 @@ define(function (require) {
             }
             // console.groupEnd();
             return initDeferred.promise();
+        },
+
+        /**
+         * Subscribes to the container changes events
+         *  - on 'content:changed' event -- updates layout
+         *  - on 'content:remove' event -- disposes related components (if they are left undisposed)
+         *
+         * @param {jQuery.Element} $container
+         * @param {Backbone.View|Chaplin.View} parentView
+         * @protected
+         */
+        _bindContainerChanges: function ($container, parentView) {
+            var namespace = '.init-components',
+                parentViewDataKey = 'pageComponentRelatedView',
+                storedParentView = $container.data(parentViewDataKey);
+
+            if (storedParentView && storedParentView !== parentView) {
+                throw new Error('Attempt to init container with another parent view');
+            } else if (!storedParentView) {
+                // handlers are already bound
+                return;
+            }
+
+            $container.data(parentViewDataKey, parentView);
+
+            // if the container catches content changed event -- updates its layout
+            $container.on('content:changed' + namespace, function (e) {
+                if (e.isDefaultPrevented()) {
+                    return;
+                }
+                e.preventDefault();
+                layout.init($container, parentView);
+            });
+
+            // if the container catches content remove event -- disposes related components
+            $container.on('content:remove' + namespace, function (e) {
+                if (e.isDefaultPrevented()) {
+                    return;
+                }
+                e.preventDefault();
+                $(e.target).find('[data-bound-component]').each(function () {
+                    var $elem = $(this),
+                        component = $elem.data('componentInstance');
+                    if (component) {
+                        component.dispose();
+                    }
+                });
+            });
+
+            // once parent view gets disposed -- break the container bound
+            parentView.once('dispose', function () {
+                $container.removeData(parentViewDataKey);
+                $container.off(namespace);
+            });
+
         },
 
         initPopover: function (container) {

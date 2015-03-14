@@ -49,15 +49,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
 
         getConfirmDialog: function () {
             if (!this.confirmModal) {
-                this.confirmModal = new Modal({
-                    title: __('Notify guests title'),
-                    okText: __('Notify'),
-                    cancelText: __("Don't notify"),
-                    content: __('Notify guests message'),
-                    className: 'modal modal-primary',
-                    okButtonClass: 'btn-primary btn-large',
-                    handleClose: true
-                });
+                this.confirmModal = GuestNotifierView.createConfirmNotificationDialog();
                 this.listenTo(this.confirmModal, 'ok', _.bind(function () {
                     this.$form.find('input[name*="[notifyInvitedUsers]"]').val(true);
                     this.$form.submit();
@@ -86,6 +78,18 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
             _.each(this.exclusions, function (selector) {
                 this.$form.find(selector).attr('disabled', state);
             }, this);
+        }
+    }, {
+        createConfirmNotificationDialog: function () {
+            return new Modal({
+                title: __('Notify guests title'),
+                okText: __('Notify'),
+                cancelText: __("Don't notify"),
+                content: __('Notify guests message'),
+                className: 'modal modal-primary',
+                okButtonClass: 'btn-primary btn-large',
+                handleClose: true
+            });
         }
     });
 

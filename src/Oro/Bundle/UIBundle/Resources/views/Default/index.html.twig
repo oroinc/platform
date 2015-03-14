@@ -1,6 +1,6 @@
 {% if not oro_is_hash_navigation() %}
     <!DOCTYPE html>
-    <html>
+    <html class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
     <head>
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
@@ -67,7 +67,6 @@
                             <ul class="nav pull-right user-menu">
                                 {{ block('user_menu') }}
                             </ul>
-                            {% placeholder dots_menu %}
                             <div class="nav top-search shortcuts">
                                 {{ block('navbar') }}
                             </div>
@@ -132,7 +131,7 @@
 
                     </div>
                     {% endblock before_content %}
-                    <div id="container" class="scrollable-container">
+                    <div id="container" class="{% if isDesktopVersion() %}scrollable-container{% endif %}">
                         {% block page_container %}
                             {% placeholder content_before %}
                             {% block content %}

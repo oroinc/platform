@@ -1,10 +1,12 @@
+@import "../../../oroui/css/less/mixins";
+
 .workflow-step-list {
     list-style: none outside none;
     margin: 0;
 }
 
 .workflow-step-list li:before{
-    background: url("../images/workflow-sprite.png") no-repeat 50% -8px;
+    background: url("../../images/workflow-sprite.png") no-repeat 50% -8px;
     width:100%;
     height: 4px;
     content: "";
@@ -60,12 +62,13 @@ li.current:before{
     left: 25%;
     width: 50%;
     margin: -25px auto 0;
-}
-.workflow-steps-container .box-type1{
-    background: transparent;
-}
-.workflow-steps-container .widget-content{
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
+    .forScreen (959px; display; none);// less than Nexus 7 landscape
+    .box-type1 {
+        background: transparent;
+    }
+    .widget-content{
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+    }
 }

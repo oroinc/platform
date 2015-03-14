@@ -127,7 +127,7 @@ define([
             var collection = this.collection;
             var event = "backgrid:sort";
 
-            var cycleSort = function (header, col) {
+            var cycleSort = _.bind(function (header, col) {
                 if (column.get("direction") === "ascending") {
                     collection.trigger(event, col, "descending");
                 } else if (this.allowNoSorting && column.get("direction") === "descending") {
@@ -136,7 +136,7 @@ define([
                 else {
                     collection.trigger(event, col, "ascending");
                 }
-            }.bind(this);
+            }, this);
 
             var toggleSort = function (header, col) {
                 if (column.get("direction") === "ascending") {
