@@ -95,7 +95,6 @@ sets the **theme** for which this update is suitable (see `directory` option in 
 for which it is suitable. Considering our previous examples, we may see that for the `oro-gold` theme `update1.yml` and `update2.yml` will be
 executed for every request, but `route_dependent_update.yml` will be executed only for a page that has the *route name* equals to `oro_user_edit`.
 
-
 Developer reference
 -------------------
 
