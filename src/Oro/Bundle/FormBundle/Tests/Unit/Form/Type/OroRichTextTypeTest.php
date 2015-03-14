@@ -216,7 +216,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                 'skin_url' => 'bundles/oroform/css/tinymce',
                                 'plugins' => ['textcolor', 'code', 'link'],
                                 'toolbar' => $toolbar,
-                                //'valid_elements' => implode(',', $elements),
                                 'menubar' => false,
                                 'statusbar' => false,
                                 'relative_urls' => false,
