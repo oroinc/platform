@@ -31,14 +31,14 @@ oro_layout:
             blockType: container
             siblingId: 'form:start'
         - @add:
-            id:        cancel_button
+            id:        widget_cancel_button
             parentId:  widget_actions
             blockType: button
             options:
                 action: reset
                 text: Cancel
         - @add:
-            id:        save_button
+            id:        widget_save_button
             parentId:  widget_actions
             blockType: button
             options:
