@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures;
+namespace Oro\Component\PropertyAccess\Tests\Unit\Fixtures;
 
 /**
  * This class is a hand written simplified version of PHP native `ArrayObject`

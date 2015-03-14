@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Exception;
+namespace Oro\Component\PropertyAccess\Exception;
 
 class NoSuchPropertyException extends \RuntimeException implements ExceptionInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures;
+namespace Oro\Component\PropertyAccess\Tests\Unit\Fixtures;
 
 class TestClassMagicCall
 {

@@ -2,8 +2,9 @@
 
 namespace Oro\Component\ConfigExpression;
 
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyAccessor;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPathInterface;
+use Oro\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Component\PropertyAccess\PropertyPathInterface;
 
 class ContextAccessor implements ContextAccessorInterface
 {
@@ -33,7 +34,7 @@ class ContextAccessor implements ContextAccessorInterface
     {
         try {
             $this->getPropertyAccessor()->getValue($context, $property);
-        } catch (Exception\NoSuchPropertyException $e) {
+        } catch (NoSuchPropertyException $e) {
             return false;
         }
 

@@ -2,7 +2,7 @@
 
 namespace Oro\Component\ConfigExpression;
 
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPathInterface;
+use Oro\Component\PropertyAccess\PropertyPathInterface;
 
 abstract class AbstractExpression implements ExpressionInterface
 {

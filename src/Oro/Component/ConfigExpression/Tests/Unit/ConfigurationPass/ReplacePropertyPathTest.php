@@ -3,7 +3,7 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\ConfigurationPass;
 
 use Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
+use Oro\Component\PropertyAccess\PropertyPath;
 
 class ReplacePropertyPathTest extends \PHPUnit_Framework_TestCase
 {

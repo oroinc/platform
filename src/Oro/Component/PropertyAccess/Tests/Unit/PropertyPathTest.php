@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess;
+namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
+use Oro\Component\PropertyAccess\PropertyPath;
 
 class PropertyPathTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,7 +51,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     public function testUnexpectedCharacters($path, $invalidToken, $errorPos)
     {
         $this->setExpectedException(
-            '\Oro\Component\ConfigExpression\Exception\InvalidPropertyPathException',
+            '\Oro\Component\PropertyAccess\Exception\InvalidPropertyPathException',
             sprintf(
                 'Could not parse property path "%s". Unexpected token "%s" at position %d.',
                 $path,
@@ -80,7 +80,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidPropertyPathException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @expectedExceptionMessage The property path must not be empty.
      */
     public function testPathCannotBeEmpty()
@@ -89,7 +89,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidPropertyPathException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
      */
     public function testPathCannotBeNull()
@@ -98,7 +98,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidPropertyPathException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @expectedExceptionMessage Expected argument of type "string", "integer" given.
      */
     public function testPathShouldBeString()
@@ -107,7 +107,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidPropertyPathException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @expectedExceptionMessage Expected argument of type "string", "boolean" given.
      */
     public function testPathCannotBeFalse()

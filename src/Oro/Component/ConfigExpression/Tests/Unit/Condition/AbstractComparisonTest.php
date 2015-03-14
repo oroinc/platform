@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
+use Oro\Component\PropertyAccess\PropertyPath;
 
 class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
 {

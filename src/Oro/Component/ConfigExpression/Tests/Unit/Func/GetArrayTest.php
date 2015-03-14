@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
+use Oro\Component\PropertyAccess\PropertyPath;
 
 class GetArrayTest extends \PHPUnit_Framework_TestCase
 {

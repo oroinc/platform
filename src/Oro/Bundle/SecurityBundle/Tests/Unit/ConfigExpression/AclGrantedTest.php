@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ConfigExpression;
 
 use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
 
 class AclGrantedTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess;
+namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\Car;
+use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Car;
 
 abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {
@@ -27,8 +27,8 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()
     {
-        $car        = $this->getMock('Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\CompositeCar');
-        $structure  = $this->getMock('Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\CarStructure');
+        $car        = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CompositeCar');
+        $structure  = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarStructure');
         $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
         $axesAfter  = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -54,14 +54,14 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()", "addAxis()"/"removeAxis()", "setAxes()", "__set()" or "__call()" exist and have public access in class "Mock_CarNoAdderAndRemover
      */
     // @codingStandardsIgnoreEnd
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
         $car        = $this->getMock(
-            'Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\CarNoAdderAndRemover'
+            'Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover'
         );
         $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
         $axesAfter  = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));

@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\PropertyAccess;
-
-use Oro\Component\ConfigExpression\Exception;
+namespace Oro\Component\PropertyAccess;
 
 class PropertyPath implements PropertyPathInterface
 {

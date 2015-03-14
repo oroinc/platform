@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess;
+namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyAccessor;
-use Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\TestClass;
-use Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\TestClassMagicCall;
-use Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\TestClassMagicGet;
-use Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess\Fixtures\Ticket5775Object;
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClass;
+use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicCall;
+use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicGet;
+use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Ticket5775Object;
 
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,7 +59,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidArgumentException
      */
     public function testGetValueThrowsExceptionForInvalidPropertyPathType()
     {
@@ -68,7 +68,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
@@ -77,7 +77,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($objectOrArray, $path)
     {
@@ -86,7 +86,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -108,7 +108,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueDoesNotReadMagicCallByDefault()
     {
@@ -138,7 +138,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -149,7 +149,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -160,7 +160,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -171,7 +171,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
      */
     // @codingStandardsIgnoreEnd
@@ -191,7 +191,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidArgumentException
      */
     public function testSetValueThrowsExceptionForInvalidPropertyPathType()
     {
@@ -200,7 +200,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
@@ -218,7 +218,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -226,7 +226,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidPropertyPathException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
     public function testSetValueThrowsExceptionIfThereIsInvalidItemInGraph()
     {
@@ -246,7 +246,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfThereAreMissingParameters()
     {
@@ -254,7 +254,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueDoesNotUpdateMagicCallByDefault()
     {
@@ -276,7 +276,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -289,7 +289,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -302,7 +302,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -315,7 +315,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
      */
     // @codingStandardsIgnoreEnd

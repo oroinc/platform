@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Exception;
+namespace Oro\Component\PropertyAccess\Exception;
 
 class InvalidPropertyPathException extends \RuntimeException implements ExceptionInterface
 {

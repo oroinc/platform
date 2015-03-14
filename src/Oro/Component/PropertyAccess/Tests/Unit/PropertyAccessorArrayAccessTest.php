@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\PropertyAccess;
+namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyAccessor;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,7 +66,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($collection, $path)
     {

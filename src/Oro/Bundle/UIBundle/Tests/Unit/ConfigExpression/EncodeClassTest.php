@@ -5,7 +5,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\ConfigExpression;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
+use Oro\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\UIBundle\ConfigExpression\EncodeClass;
 

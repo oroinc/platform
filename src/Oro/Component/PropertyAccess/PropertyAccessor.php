@@ -1,10 +1,8 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\PropertyAccess;
+namespace Oro\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\StringUtil;
-
-use Oro\Component\ConfigExpression\Exception;
 
 /**
  * Writes and reads values to/from an object/array graph.
@@ -38,7 +36,7 @@ class PropertyAccessor
      * Example:
      *
      * <code>
-     *     use Oro\Component\ConfigExpression\PropertyAccess;
+     *     use Oro\Component\PropertyAccess;
      *
      *     $propertyAccessor = new PropertyAccessor();
      *
@@ -70,7 +68,7 @@ class PropertyAccessor
             throw new Exception\InvalidArgumentException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\ConfigExpression\PropertyAccess\PropertyPathInterface". ' .
+                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )
@@ -119,7 +117,7 @@ class PropertyAccessor
      * Example:
      *
      * <code>
-     *     use Oro\Component\ConfigExpression\PropertyAccess;
+     *     use Oro\Component\PropertyAccess;
      *
      *     $propertyAccessor = new PropertyAccessor();
      *
@@ -152,7 +150,7 @@ class PropertyAccessor
             throw new Exception\InvalidArgumentException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\ConfigExpression\PropertyAccess\PropertyPathInterface". ' .
+                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )

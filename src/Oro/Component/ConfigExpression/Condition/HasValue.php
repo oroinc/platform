@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
-use Oro\Component\ConfigExpression\PropertyAccess\PropertyPathInterface;
+use Oro\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Checks whether the value exists in the context.

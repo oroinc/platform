@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\PropertyAccess;
+namespace Oro\Component\PropertyAccess;
 
 interface PropertyPathInterface
 {
