@@ -42,4 +42,25 @@ class ReplacePropertyPathTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    public function testLocalCache()
+    {
+        $parameterPass = new ReplacePropertyPath();
+        $actualData    = $parameterPass->passConfiguration(['a' => '$path']);
+
+        $this->assertEquals(
+            ['a' => new PropertyPath('path')],
+            $actualData
+        );
+
+        $propertyPath = $actualData['a'];
+
+        $actualData = $parameterPass->passConfiguration(['b' => '$path']);
+        $this->assertEquals(
+            ['b' => new PropertyPath('path')],
+            $actualData
+        );
+
+        $this->assertSame($propertyPath, $actualData['b']);
+    }
 }

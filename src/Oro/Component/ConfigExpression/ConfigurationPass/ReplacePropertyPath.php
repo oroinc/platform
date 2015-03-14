@@ -12,6 +12,9 @@ use Oro\Component\PropertyAccess\PropertyPath;
  */
 class ReplacePropertyPath implements ConfigurationPassInterface
 {
+    /** @var PropertyPath[] */
+    private $cache = [];
+
     /**
      * {@inheritdoc}
      */
@@ -23,7 +26,13 @@ class ReplacePropertyPath implements ConfigurationPassInterface
             } elseif (is_string($value)) {
                 $pos = strpos($value, '$');
                 if ($pos === 0) {
-                    $data[$key] = new PropertyPath(substr($value, 1));
+                    if (isset($this->cache[$value])) {
+                        $propertyPath = $this->cache[$value];
+                    } else {
+                        $propertyPath        = new PropertyPath(substr($value, 1));
+                        $this->cache[$value] = $propertyPath;
+                    }
+                    $data[$key] = $propertyPath;
                 } elseif ($pos === 1 && $value[0] === '\\') {
                     $data[$key] = substr($value, 1);
                 }
