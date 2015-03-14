@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\TypesPass;
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\SettingsPass;
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\DeleteIntegrationProvidersPass;
+use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\ProcessorsPass;
 
 class OroIntegrationBundle extends Bundle
 {
@@ -21,5 +22,6 @@ class OroIntegrationBundle extends Bundle
         $container->addCompilerPass(new TypesPass());
         $container->addCompilerPass(new DeleteIntegrationProvidersPass());
         $container->addCompilerPass(new SettingsPass());
+        $container->addCompilerPass(new ProcessorsPass());
     }
 }
