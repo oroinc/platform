@@ -22,6 +22,17 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_layout');
+
+        $rootNode
+            ->children()
+                ->arrayNode('view')
+                    ->info('Defines whether @Layout annotation can be used in controllers')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('annotations')->defaultTrue()->end()
+                    ->end()
+                ->end()
+            ->end();
         $this->appendTemplatingNodes($rootNode);
         $this->appendThemingNodes($rootNode);
 

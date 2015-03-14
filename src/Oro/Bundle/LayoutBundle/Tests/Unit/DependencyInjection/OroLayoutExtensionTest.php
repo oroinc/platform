@@ -22,6 +22,14 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroLayoutExtension();
         $extension->load($extensionConfig, $container);
 
+        // view annotations
+        $this->assertEquals(
+            [
+                'Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener'
+            ],
+            $extension->getClassesToCompile(),
+            'Failed asserting that @Layout annotation is enabled'
+        );
         // default renderer name
         $this->assertTrue(
             $container->hasParameter('oro_layout.templating.default'),

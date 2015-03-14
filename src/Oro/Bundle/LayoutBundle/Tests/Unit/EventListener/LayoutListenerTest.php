@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -27,12 +27,13 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new LayoutListener($this->layoutManager);
-    }
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->any())
+            ->method('get')
+            ->with('oro_layout.layout_manager')
+            ->will($this->returnValue($this->layoutManager));
 
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals([KernelEvents::VIEW => 'onKernelView'], LayoutListener::getSubscribedEvents());
+        $this->listener = new LayoutListener($container);
     }
 
     public function testShouldNotModifyResponseWithoutLayoutAnnotation()
@@ -125,6 +126,19 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         );
         $this->listener->onKernelView($responseEvent);
         $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The @Template() annotation cannot be used together with the @Layout() annotation.
+     */
+    public function testShouldThrowExceptionIfBothLayoutAndTemplateAreUsed()
+    {
+        $responseEvent = $this->createResponseForControllerResultEvent(
+            ['_layout' => new LayoutAnnotation([]), '_template' => new Template([])],
+            []
+        );
+        $this->listener->onKernelView($responseEvent);
     }
 
     /**

@@ -37,6 +37,11 @@ class OroLayoutExtension extends Extension
         $loader->load('block_types.yml');
         $loader->load('config_expressions.yml');
 
+        if ($config['view']['annotations']) {
+            $loader->load('view_annotations.yml');
+            $this->addClassesToCompile(['Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener']);
+        }
+
         $container->setParameter(
             'oro_layout.templating.default',
             $config['templating']['default']

@@ -121,10 +121,3 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder
         tags:
             - { name: oro_layout.expression.encoder, format: json }
-
-    oro_layout.layout_listener:
-        class: Oro\Bundle\LayoutBundle\EventListener\LayoutListener
-        arguments:
-            - @oro_layout.layout_manager
-        tags:
-            - { name: kernel.event_subscriber }

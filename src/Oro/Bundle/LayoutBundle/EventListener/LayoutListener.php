@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 use Oro\Component\Layout\Layout;
@@ -18,28 +17,26 @@ use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 /**
  * The LayoutListener class handles the @Layout annotation.
  */
-class LayoutListener implements EventSubscriberInterface
+class LayoutListener
 {
-    /**
-     * @var LayoutManager
-     */
-    protected $layoutManager;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param LayoutManager $layoutManager
+     * @param ContainerInterface $container The service container instance
      */
-    public function __construct(LayoutManager $layoutManager)
+    public function __construct(ContainerInterface $container)
     {
-        $this->layoutManager = $layoutManager;
+        $this->container = $container;
     }
 
     /**
-     * Renders the layout and initializes a new response object with the
-     * rendered layout content.
+     * Renders the layout and initializes the content of a new response object
+     * with the rendered layout.
      *
-     * @param GetResponseForControllerResultEvent $event A GetResponseForControllerResultEvent instance
+     * @param GetResponseForControllerResultEvent $event
      *
-     * @throws LogicException
+     * @throws LogicException if @Layout annotation is used in incorrect way
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -49,6 +46,11 @@ class LayoutListener implements EventSubscriberInterface
         $layoutAnnotation = $request->attributes->get('_layout');
         if (!$layoutAnnotation) {
             return;
+        }
+        if ($request->attributes->get('_template')) {
+            throw new LogicException(
+                'The @Template() annotation cannot be used together with the @Layout() annotation.'
+            );
         }
 
         $parameters = $event->getControllerResult();
@@ -89,7 +91,9 @@ class LayoutListener implements EventSubscriberInterface
      */
     protected function getLayout(ContextInterface $context, LayoutAnnotation $layoutAnnotation)
     {
-        $layoutBuilder = $this->layoutManager->getLayoutBuilder();
+        /** @var LayoutManager $layoutManager */
+        $layoutManager = $this->container->get('oro_layout.layout_manager');
+        $layoutBuilder = $layoutManager->getLayoutBuilder();
         // TODO discuss adding root automatically
         $layoutBuilder->add('root', null, 'root');
 
@@ -128,15 +132,5 @@ class LayoutListener implements EventSubscriberInterface
         if (!empty($vars)) {
             $context->getResolver()->setRequired($vars);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return [
-            KernelEvents::VIEW => 'onKernelView'
-        ];
     }
 }
