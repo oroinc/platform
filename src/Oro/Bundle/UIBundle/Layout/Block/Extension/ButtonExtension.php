@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonType;
 
@@ -24,6 +25,7 @@ class ButtonExtension extends AbstractBlockTypeExtension
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -34,12 +36,18 @@ class ButtonExtension extends AbstractBlockTypeExtension
                     'route_name',
                     'route_parameters',
                     'with_page_parameters',
-                    'entity_label'
+                    'entity_label',
+                    'entity_id',
+                    'redirect_path',
+                    'redirect_route_name',
+                    'redirect_route_parameters',
+                    'confirm_message',
+                    'success_message'
                 ]
             )
-            ->setDefaults(
+            ->setNormalizers(
                 [
-                    'type' => function (Options $options, $value) {
+                    'type'            => function (Options $options, $value) {
                         if ('button' === $value
                             && in_array($options['action'], ['create', 'edit', 'delete', 'cancel'], true)
                         ) {
@@ -48,26 +56,21 @@ class ButtonExtension extends AbstractBlockTypeExtension
 
                         return $value;
                     },
-                    'text' => function (Options $options, $value) {
+                    'text'            => function (Options $options, $value) {
                         if (null === $value) {
-                            if (!empty($options['entity_label'])) {
-                                $entityLabel = $options['entity_label'];
-                                if (is_string($entityLabel)) {
-                                    $entityLabel = ['label' => $entityLabel];
-                                }
-                            }
                             switch ($options['action']) {
                                 case 'cancel':
                                     $value = 'Cancel';
                                     break;
                                 case 'create':
-                                    $value = isset($entityLabel) ? 'oro.ui.create_entity' : 'oro.ui.create';
+                                    $entityLabel = $this->getEntityLabel($options);
+                                    $value       = $entityLabel ? 'oro.ui.create_entity' : 'oro.ui.create';
                                     break;
                                 case 'edit':
-                                    $value = isset($entityLabel) ? 'oro.ui.edit_entity' : 'oro.ui.edit';
+                                    $value = 'oro.ui.edit';
                                     break;
                                 case 'delete':
-                                    $value = isset($entityLabel) ? 'oro.ui.delete_entity' : 'oro.ui.delete';
+                                    $value = 'oro.ui.delete';
                                     break;
                                 case 'save':
                                     $value = 'Save';
@@ -77,11 +80,59 @@ class ButtonExtension extends AbstractBlockTypeExtension
                                     break;
                             }
                             if (null !== $value && isset($entityLabel)) {
-                                $value = [
-                                    'label'      => $value,
-                                    'parameters' => ['%entityName%' => $entityLabel]
-                                ];
+                                $value = BlockUtils::normalizeTransValue(
+                                    $value,
+                                    ['%entityName%' => $entityLabel]
+                                );
                             }
+                        }
+
+                        return $value;
+                    },
+                    'attr'            => function (Options $options, $value) {
+                        if (null === $value) {
+                            $value = [];
+                        }
+                        if (!isset($value['title'])) {
+                            switch ($options['action']) {
+                                case 'edit':
+                                    $entityLabel = $this->getEntityLabel($options);
+                                    $title       = $entityLabel ? 'oro.ui.edit_entity' : 'oro.ui.edit';
+                                    break;
+                                case 'delete':
+                                    $entityLabel = $this->getEntityLabel($options);
+                                    $title       = $entityLabel ? 'oro.ui.delete_entity' : 'oro.ui.delete';
+                                    break;
+                            }
+                            if (!empty($title)) {
+                                if (isset($entityLabel)) {
+                                    $title = BlockUtils::normalizeTransValue(
+                                        $title,
+                                        ['%entityName%' => $entityLabel]
+                                    );
+                                }
+                                $value['title'] = $title;
+                            }
+                        }
+
+                        return $value;
+                    },
+                    'confirm_message' => function (Options $options, $value) {
+                        if (null === $value && $options['action'] === 'delete') {
+                            $value = BlockUtils::normalizeTransValue(
+                                'oro.ui.delete_confirm',
+                                ['%entity_label%' => $this->getEntityLabel($options) ?: ['label' => 'oro.ui.item']]
+                            );
+                        }
+
+                        return $value;
+                    },
+                    'success_message' => function (Options $options, $value) {
+                        if (null === $value && $options['action'] === 'delete') {
+                            $value = BlockUtils::normalizeTransValue(
+                                'oro.ui.delete_message',
+                                ['%entity_label%' => $this->getEntityLabel($options) ?: ['label' => 'oro.ui.item']]
+                            );
                         }
 
                         return $value;
@@ -95,19 +146,39 @@ class ButtonExtension extends AbstractBlockTypeExtension
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        if ($options['type'] === 'link') {
-            if (!empty($options['path'])) {
-                $view->vars['path'] = $options['path'];
-            } elseif (!empty($options['route_name'])) {
-                $view->vars['route_name']       = $options['route_name'];
-                $view->vars['route_parameters'] = isset($options['route_parameters'])
-                    ? $options['route_parameters']
-                    : [];
-            }
+        BlockUtils::processUrl($view, $options);
+        BlockUtils::processUrl($view, $options, false, 'redirect');
+
+        if (isset($view->vars['path'])
+            || isset($view->vars['route_name'])
+            || isset($view->vars['redirect_path'])
+            || isset($view->vars['redirect_route_name'])
+        ) {
             $view->vars['with_page_parameters'] = isset($options['with_page_parameters'])
                 ? $options['with_page_parameters']
                 : false;
         }
+
+        if (!empty($options['entity_label'])) {
+            $view->vars['entity_label'] = $options['entity_label'];
+        }
+        if (!empty($options['entity_id'])) {
+            $view->vars['entity_id'] = $options['entity_id'];
+        }
+        if (!empty($options['confirm_message'])) {
+            $view->vars['confirm_message'] = $options['confirm_message'];
+        }
+        if (!empty($options['success_message'])) {
+            $view->vars['success_message'] = $options['success_message'];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        BlockUtils::registerPlugin($view, $options['action'] . '_' . $block->getTypeName());
     }
 
     /**
@@ -116,5 +187,17 @@ class ButtonExtension extends AbstractBlockTypeExtension
     public function getExtendedType()
     {
         return ButtonType::NAME;
+    }
+
+    /**
+     * @param Options $options
+     *
+     * @return array|null
+     */
+    protected function getEntityLabel(Options $options)
+    {
+        return !empty($options['entity_label'])
+            ? BlockUtils::normalizeTransValue($options['entity_label'])
+            : null;
     }
 }

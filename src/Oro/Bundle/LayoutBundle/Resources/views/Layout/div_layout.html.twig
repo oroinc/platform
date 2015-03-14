@@ -20,7 +20,7 @@
 {%- endblock %}
 
 {% block icon_block -%}
-    <i class="icon-{{ icon }}"></i>
+    <i class="icon-{{ icon }}{% if icon_class is defined %} {{ icon_class }}{% endif %}"></i>
 {%- endblock %}
 
 {% block container_widget -%}
