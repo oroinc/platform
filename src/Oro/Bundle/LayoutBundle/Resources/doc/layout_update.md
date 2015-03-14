@@ -164,4 +164,4 @@ Here is a list of key classes involved in the layout update loading mechanism an
 
 In order to implement a loader for a new format different form supported, the `\Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface`
 interface should be implemented and added as a known loader to the loaders chain (add `addLoader` *method call*
-for `oro_layout.loader.chain_loader` service definition).
+for `oro_layout.loader` service definition).

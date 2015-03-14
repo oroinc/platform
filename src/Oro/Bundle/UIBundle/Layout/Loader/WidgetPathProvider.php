@@ -2,37 +2,39 @@
 
 namespace Oro\Bundle\UIBundle\Layout\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\ThemeAndRoutePathProvider;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\ContextAwareInterface;
 
-class WidgetAndActionPathProvider extends ThemeAndRoutePathProvider
+use Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface;
+
+class WidgetPathProvider implements PathProviderInterface, ContextAwareInterface
 {
+    /** @var ContextInterface */
+    protected $context;
+
     /**
      * {@inheritdoc}
      */
-    public function getPaths()
+    public function setContext(ContextInterface $context)
     {
-        $paths = [];
+        $this->context = $context;
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaths(array $existingPaths)
+    {
         $widgetName = $this->context->getOr('widget_container');
-        $actionName = $this->context->getOr('action');
+        if (!$widgetName) {
+            return $existingPaths;
+        }
 
-        if ($widgetName || $actionName) {
-            $basePaths = parent::getPaths();
-
-            foreach ($basePaths as $path) {
-                if ($actionName && false === strpos($path, self::DELIMITER)) {
-                    // add action name to theme related path
-                    $actionPath = implode(self::DELIMITER, [$path, $actionName]);
-                    $paths[]    = $actionPath;
-
-                    if ($widgetName) {
-                        $paths[] = implode(self::DELIMITER, [$actionPath, $widgetName]);
-                    }
-                }
-
-                if ($widgetName) {
-                    $paths[] = implode(self::DELIMITER, [$path, $widgetName]);
-                }
+        $paths = [];
+        foreach ($existingPaths as $path) {
+            $paths[] = $path;
+            if (false !== strpos($path, self::DELIMITER)) {
+                $paths[] = implode(self::DELIMITER, [$path, $widgetName]);
             }
         }
 

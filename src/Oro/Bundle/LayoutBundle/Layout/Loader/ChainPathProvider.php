@@ -41,15 +41,13 @@ class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPaths()
+    public function getPaths(array $existingPaths)
     {
-        $result = [];
-
         foreach ($this->getProviders() as $provider) {
-            $result = array_merge($result, $provider->getPaths());
+            $existingPaths = $provider->getPaths($existingPaths);
         }
 
-        return array_unique($result, SORT_STRING);
+        return array_unique($existingPaths, SORT_STRING);
     }
 
     /**
@@ -59,7 +57,9 @@ class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
     {
         if (!$this->sorted) {
             krsort($this->providers);
-            $this->sorted = !empty($this->providers) ? call_user_func_array('array_merge', $this->providers) : [];
+            $this->sorted = !empty($this->providers)
+                ? call_user_func_array('array_merge', $this->providers)
+                : [];
         }
 
         return $this->sorted;

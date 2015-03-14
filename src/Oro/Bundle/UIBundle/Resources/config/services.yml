@@ -210,9 +210,7 @@ services:
             - { name: layout.block_type_extension, alias: form_start }
 
     oro_ui.layout_loader.widget_action_path_provider:
-        class:  Oro\Bundle\UIBundle\Layout\Loader\WidgetAndActionPathProvider
+        class:  Oro\Bundle\UIBundle\Layout\Loader\WidgetPathProvider
         public: false
-        arguments:
-            - @oro_layout.theme_manager
         tags:
-            - { name: layout.resource.path_provider }
+            - { name: layout.resource.path_provider, priority: -10 }

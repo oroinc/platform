@@ -31,16 +31,16 @@ services:
             - @oro_layout.theme_factory
             - []
 
-    oro_layout.loader.default_resource_factory:
-        class:  %oro_layout.loader.default_resource_factory.class%
-        public: false
-
-    oro_layout.loader.chain_loader:
+    oro_layout.loader:
         class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader
         public: false
         calls:
             - [addLoader, [@oro_layout.loader.yaml_file_loader]]
             - [addLoader, [@oro_layout.loader.php_file_loader]]
+
+    oro_layout.loader.default_resource_factory:
+        class:  %oro_layout.loader.default_resource_factory.class%
+        public: false
 
     oro_layout.loader.php_file_loader:
         class:  %oro_layout.loader.php_file_loader.class%
@@ -58,12 +58,12 @@ services:
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
-    oro_layout.loader.chain_path_provider:
+    oro_layout.loader.path_provider:
         class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainPathProvider
         public: false
 
     oro_layout.loader.theme_route_path_provider:
-        class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemeAndRoutePathProvider
+        class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemePathProvider
         public: false
         arguments:
             - @oro_layout.theme_manager
@@ -82,9 +82,9 @@ services:
         arguments:
             - %oro_layout.theme_updates_resources%
             - @oro_layout.loader.default_resource_factory
-            - @oro_layout.loader.chain_loader
+            - @oro_layout.loader
             - @oro_layout.dependency_initializer
-            - @oro_layout.loader.chain_path_provider
+            - @oro_layout.loader.path_provider
         calls:
             - [setLogger, [ @logger ]]
 
@@ -101,7 +101,7 @@ services:
         arguments:
             - %oro_layout.theme_updates_resources%
             - @oro_layout.loader.default_resource_factory
-            - @oro_layout.loader.chain_loader
+            - @oro_layout.loader
         tags:
             - { name: kernel.cache_warmer }
 

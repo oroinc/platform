@@ -34,7 +34,7 @@ class ResourcePathProvidersPassTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition();
 
         $container = new ContainerBuilder();
-        $container->setDefinition('oro_layout.loader.chain_path_provider', $definition);
+        $container->setDefinition('oro_layout.loader.path_provider', $definition);
 
         $this->pass->process($container);
 
@@ -46,7 +46,7 @@ class ResourcePathProvidersPassTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition();
 
         $container = new ContainerBuilder();
-        $container->setDefinition('oro_layout.loader.chain_path_provider', $definition);
+        $container->setDefinition('oro_layout.loader.path_provider', $definition);
 
         $provider1Def = new Definition();
         $provider1Def->addTag('layout.resource.path_provider', ['priority' => 100]);

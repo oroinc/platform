@@ -4,44 +4,34 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Loader;
 
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\UIBundle\Layout\Loader\WidgetAndActionPathProvider;
-use Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader\AbstractPathProviderTestCase;
+use Oro\Bundle\UIBundle\Layout\Loader\WidgetPathProvider;
 
 /**
- * @property WidgetAndActionPathProvider provider
+ * @property WidgetPathProvider provider
  */
-class WidgetAndActionPathProviderTest extends AbstractPathProviderTestCase
+class WidgetPathProviderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var WidgetPathProvider */
+    protected $provider;
+
     protected function setUp()
     {
-        parent::setUp();
-        $this->provider = new WidgetAndActionPathProvider($this->themeManager);
+        $this->provider = new WidgetPathProvider();
     }
 
     /**
      * @dataProvider pathsDataProvider
      *
-     * @param array       $expectedResults
-     * @param string|null $theme
-     * @param string|null $route
+     * @param string[]    $existingPaths
      * @param string|null $widget
-     * @param string|null $action
+     * @param string[]    $expectedPaths
      */
-    public function testThemeHierarchyWithRoutePassed(array $expectedResults, $theme, $route, $widget, $action)
+    public function testGetPaths($existingPaths, $widget, $expectedPaths)
     {
         $context = new LayoutContext();
-        $context->set('theme', $theme);
-        $context->set('route_name', $route);
         $context->set('widget_container', $widget);
-        $context->set('action', $action);
-        $this->setUpThemeManager(
-            [
-                'black' => $this->getThemeMock('black', 'base'),
-                'base'  => $this->getThemeMock('base')
-            ]
-        );
         $this->provider->setContext($context);
-        $this->assertSame($expectedResults, $this->provider->getPaths());
+        $this->assertSame($expectedPaths, $this->provider->getPaths($existingPaths));
     }
 
     /**
@@ -51,35 +41,52 @@ class WidgetAndActionPathProviderTest extends AbstractPathProviderTestCase
     {
         return [
             [
-                '$expectedResults' => [
-                    'base/index',
-                    'base/index/dialog',
-                    'base/dialog',
-                    'base/route/dialog',
-                ],
-                '$theme'           => 'base',
-                '$route'           => 'route',
-                '$widget'          => 'dialog',
-                '$action'          => 'index',
+                'existingPaths' => [],
+                'widget'        => null,
+                'expectedPaths' => []
             ],
             [
-                '$expectedResults' => [
-                    'base/dialog',
-                    'black/dialog',
-                    'base/route/dialog',
-                    'black/route/dialog',
-                ],
-                '$theme'           => 'black',
-                '$route'           => 'route',
-                '$widget'          => 'dialog',
-                '$action'          => null,
+                'existingPaths' => [],
+                'widget'        => 'dialog',
+                'expectedPaths' => []
             ],
             [
-                '$expectedResults' => [],
-                '$theme'           => 'black',
-                '$route'           => 'route',
-                '$widget'          => null,
-                '$action'          => null,
+                'existingPaths' => [
+                    'base',
+                    'base/action',
+                    'base/route'
+                ],
+                'widget'        => 'dialog',
+                'expectedPaths' => [
+                    'base',
+                    'base/action',
+                    'base/action/dialog',
+                    'base/route',
+                    'base/route/dialog'
+                ]
+            ],
+            [
+                'existingPaths' => [
+                    'base',
+                    'black',
+                    'base/action',
+                    'black/action',
+                    'base/route',
+                    'black/route'
+                ],
+                'widget'        => 'dialog',
+                'expectedPaths' => [
+                    'base',
+                    'black',
+                    'base/action',
+                    'base/action/dialog',
+                    'black/action',
+                    'black/action/dialog',
+                    'base/route',
+                    'base/route/dialog',
+                    'black/route',
+                    'black/route/dialog'
+                ]
             ]
         ];
     }

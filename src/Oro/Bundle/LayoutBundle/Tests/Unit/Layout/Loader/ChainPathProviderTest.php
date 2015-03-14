@@ -21,9 +21,9 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddProviderUsePriorityForSorting()
     {
-        $provider1 = $this->getMock('\Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('\Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider3 = $this->getMock('\Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider1 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider2 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider3 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
         $this->provider->addProvider($provider1, 100);
         $this->provider->addProvider($provider2, -10);
         $this->provider->addProvider($provider3);
@@ -37,11 +37,13 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetContext()
     {
-        $context = $this->getMock('\Oro\Component\Layout\ContextInterface');
+        $context = $this->getMock('Oro\Component\Layout\ContextInterface');
 
-        $provider1 = $this->getMock('\Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubContextAwarePathProvider');
-        $provider2->expects($this->once())->method('setContext')->with($this->identicalTo($context));
+        $provider1 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider2 = $this->getMock('Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubContextAwarePathProvider');
+        $provider2->expects($this->once())
+            ->method('setContext')
+            ->with($this->identicalTo($context));
 
         $this->provider->addProvider($provider1);
         $this->provider->addProvider($provider2);
@@ -50,24 +52,56 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPaths()
     {
-        $provider1 = $this->getMock('\Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('\Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider3 = $this->getMock('\Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider1 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider2 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider3 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
         $this->provider->addProvider($provider1, 100);
         $this->provider->addProvider($provider2, 0);
         $this->provider->addProvider($provider3, -100);
 
-        $provider1->expects($this->once())->method('getPaths')->willReturn(['testPath1', 'testPath2/testSubPath']);
-        $provider2->expects($this->once())->method('getPaths')->willReturn(['testPath1']);
-        $provider3->expects($this->once())->method('getPaths')->willReturn(['testPath1/testSubPath']);
+        $provider1->expects($this->once())
+            ->method('getPaths')
+            ->will(
+                $this->returnCallback(
+                    function (array $existingPaths) {
+                        $existingPaths[] = 'testPath1';
+                        $existingPaths[] = 'testPath2/testSubPath';
+
+                        return $existingPaths;
+                    }
+                )
+            );
+        $provider2->expects($this->once())
+            ->method('getPaths')
+            ->will(
+                $this->returnCallback(
+                    function (array $existingPaths) {
+                        $existingPaths[] = 'testPath1';
+
+                        return $existingPaths;
+                    }
+                )
+            );
+        $provider3->expects($this->once())
+            ->method('getPaths')
+            ->will(
+                $this->returnCallback(
+                    function (array $existingPaths) {
+                        $existingPaths[] = 'testPath1/testSubPath';
+
+                        return $existingPaths;
+                    }
+                )
+            );
 
         $this->assertSame(
             [
+                'path',
                 'testPath1',
                 'testPath2/testSubPath',
                 'testPath1/testSubPath'
             ],
-            array_values($this->provider->getPaths())
+            array_values($this->provider->getPaths(['path']))
         );
     }
 }

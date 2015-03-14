@@ -70,7 +70,8 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
                 if ($this->loader->supports($resource)) {
                     $update = $this->loader->load($resource);
                     $this->dependencyInitializer->initialize($update);
-                    $el = $update instanceof ElementDependentLayoutUpdateInterface ? $update->getElement() : 'root';
+                    $el             = $update instanceof ElementDependentLayoutUpdateInterface ? $update->getElement(
+                    ) : 'root';
                     $updates[$el][] = $update;
                 } else {
                     $this->logger->notice(sprintf('Skipping resource "%s" because loader for it not found', $resource));
@@ -95,7 +96,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
         }
 
         $result = [];
-        $paths  = $this->pathProvider->getPaths();
+        $paths  = $this->pathProvider->getPaths([]);
         foreach ($paths as $path) {
             $pathArray = explode(PathProviderInterface::DELIMITER, $path);
 

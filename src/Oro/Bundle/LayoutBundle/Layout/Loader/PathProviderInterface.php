@@ -7,9 +7,11 @@ interface PathProviderInterface
     const DELIMITER = '/';
 
     /**
-     * Provides paths where with applicable resources
+     * Provides paths where applicable resources are located.
      *
-     * @return array Array of paths imploded with delimiter
+     * @param string[] $existingPaths Array of already found paths
+     *
+     * @return string[] Array of paths imploded with delimiter
      */
-    public function getPaths();
+    public function getPaths(array $existingPaths);
 }
