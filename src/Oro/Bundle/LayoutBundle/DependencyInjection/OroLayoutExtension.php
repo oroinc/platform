@@ -62,8 +62,10 @@ class OroLayoutExtension extends Extension
         }
 
         $loader->load('theme_services.yml');
+        if (isset($config['active_theme'])) {
+            $container->setParameter('oro_layout.default_active_theme', $config['active_theme']);
+        }
         $managerDefinition = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
-        $managerDefinition->addMethodCall('setActiveTheme', array($config['active_theme']));
         $managerDefinition->replaceArgument(1, $config['themes']);
 
         $foundThemeLayoutUpdates = [];

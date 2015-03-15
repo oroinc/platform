@@ -2,12 +2,14 @@ parameters:
     oro_layout.theme_factory.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeFactory
     oro_layout.theme_manager.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeManager
     oro_layout.theme_extension.class:                  Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension
+    oro_layout.request.listener.theme.class:           Oro\Bundle\LayoutBundle\EventListener\ThemeListener
 
     oro_layout.loader.default_resource_factory.class:  Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory
 
     oro_layout.loader.php_file_loader.class:           Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader
     oro_layout.loader.yaml_file_loader.class:          Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader
 
+    oro_layout.default_active_theme:    ~
     oro_layout.theme_updates_resources: []
     oro_layout.updates_cache_dir:       %kernel.cache_dir%/layouts
 
@@ -62,7 +64,7 @@ services:
         class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainPathProvider
         public: false
 
-    oro_layout.loader.theme_route_path_provider:
+    oro_layout.loader.theme_path_provider:
         class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemePathProvider
         public: false
         arguments:
@@ -115,9 +117,9 @@ services:
         class:  Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator
         public: false
 
-    oro_layout.theme_listener:
-        class: Oro\Bundle\LayoutBundle\EventListener\ThemeListener
+    oro_layout.request.listener.theme:
+        class: %oro_layout.request.listener.theme.class%
         arguments:
-            - @oro_layout.theme_manager
+            - %oro_layout.default_active_theme%
         tags:
             - { name: kernel.event_subscriber }

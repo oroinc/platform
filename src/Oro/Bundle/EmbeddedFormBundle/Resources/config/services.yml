@@ -37,7 +37,6 @@ services:
         arguments:
             - @oro_layout.layout_manager
             - @oro_embedded_form.manager
-            - @oro_layout.theme_manager
 
     oro_embedded_form.layout.block_type.success_message:
         class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType

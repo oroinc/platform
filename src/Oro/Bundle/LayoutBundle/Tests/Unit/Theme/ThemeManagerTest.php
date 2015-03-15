@@ -59,40 +59,13 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Impossible to retrieve active theme due to miss configuration
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The theme name must not be empty.
      */
-    public function testTryingToGetActiveThemeModelWhenNotConfigured()
+    public function testGetThemeShouldThrowExceptionIfThemeNameIsEmpty()
     {
         $manager = $this->createManager();
-        $manager->getTheme();
-    }
-
-    public function testActiveThemePassedThroughConstructor()
-    {
-        $manager = $this->createManager(['base' => []], 'base');
-        $this->assertSame('base', $manager->getActiveTheme());
-
-        $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
-
-        $this->factory->expects($this->once())->method('create')
-            ->with($this->equalTo('base'))->willReturn($themeMock);
-
-        $this->assertSame($themeMock, $manager->getTheme());
-    }
-
-    public function testActiveThemePassedThroughSetter()
-    {
-        $manager = $this->createManager(['base' => []]);
-        $manager->setActiveTheme('base');
-        $this->assertSame('base', $manager->getActiveTheme());
-
-        $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
-
-        $this->factory->expects($this->once())->method('create')
-            ->with($this->equalTo('base'))->willReturn($themeMock);
-
-        $this->assertSame($themeMock, $manager->getTheme());
+        $manager->getTheme('');
     }
 
     public function testGetThemeNames()
@@ -144,13 +117,12 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array       $definitions
-     * @param string|null $activeTheme
+     * @param array $definitions
      *
      * @return ThemeManager
      */
-    protected function createManager(array $definitions = [], $activeTheme = null)
+    protected function createManager(array $definitions = [])
     {
-        return new ThemeManager($this->factory, $definitions, $activeTheme);
+        return new ThemeManager($this->factory, $definitions);
     }
 }

@@ -7,12 +7,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
-
 class ThemeListener implements EventSubscriberInterface
 {
-    /** @var ThemeManager */
-    protected $themeManager;
+    /** @var string */
+    protected $defaultActiveTheme;
 
     /** @var string */
     protected $masterRequestTheme;
@@ -21,11 +19,11 @@ class ThemeListener implements EventSubscriberInterface
     protected $masterRequestRoute;
 
     /**
-     * @param ThemeManager $themeManager
+     * @param string $defaultActiveTheme
      */
-    public function __construct(ThemeManager $themeManager)
+    public function __construct($defaultActiveTheme)
     {
-        $this->themeManager = $themeManager;
+        $this->defaultActiveTheme = $defaultActiveTheme;
     }
 
     /**
@@ -39,7 +37,7 @@ class ThemeListener implements EventSubscriberInterface
             if ($request->query->has('_theme')) {
                 $this->masterRequestTheme = $request->query->get('_theme');
             } else {
-                $this->masterRequestTheme = $this->themeManager->getActiveTheme();
+                $this->masterRequestTheme = $this->defaultActiveTheme;
                 // set the default theme to the master request
                 $request->attributes->set('_theme', $this->masterRequestTheme);
             }

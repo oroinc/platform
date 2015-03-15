@@ -11,17 +11,17 @@ use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
 {
     /** @var ThemeManager */
-    protected $manager;
+    protected $themeManager;
 
     /** @var ContextInterface */
     protected $context;
 
     /**
-     * @param ThemeManager $manager
+     * @param ThemeManager $themeManager
      */
-    public function __construct(ThemeManager $manager)
+    public function __construct(ThemeManager $themeManager)
     {
-        $this->manager = $manager;
+        $this->themeManager = $themeManager;
     }
 
     /**
@@ -74,7 +74,7 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
         $hierarchy = [];
 
         while (null !== $themeName) {
-            $theme = $this->manager->getTheme($themeName);
+            $theme = $this->themeManager->getTheme($themeName);
 
             $hierarchy[] = $theme;
             $themeName   = $theme->getParentTheme();

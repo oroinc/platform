@@ -209,7 +209,7 @@ services:
         tags:
             - { name: layout.block_type_extension, alias: form_start }
 
-    oro_ui.layout_loader.widget_action_path_provider:
+    oro_ui.layout_loader.widget_path_provider:
         class:  Oro\Bundle\UIBundle\Layout\Loader\WidgetPathProvider
         public: false
         tags:
