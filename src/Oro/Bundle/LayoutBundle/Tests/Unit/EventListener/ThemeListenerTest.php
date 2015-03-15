@@ -11,19 +11,12 @@ use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
 
 class ThemeListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $themeManager;
-
     /** @var ThemeListener */
     protected $listener;
 
     protected function setUp()
     {
-        $this->themeManager = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Theme\ThemeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->listener = new ThemeListener($this->themeManager);
+        $this->listener = new ThemeListener('defaultTheme');
     }
 
     public function testGetSubscribedEvents()
@@ -36,10 +29,6 @@ class ThemeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSetDefaultTheme()
     {
-        $this->themeManager->expects($this->once())
-            ->method('getActiveTheme')
-            ->will($this->returnValue('defaultTheme'));
-
         $masterRequestEvent = $this->createMasterRequestEvent([], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
         $this->assertEquals('defaultTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
@@ -51,9 +40,6 @@ class ThemeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSetSubRequestThemeFromMasterRequestQueryString()
     {
-        $this->themeManager->expects($this->never())
-            ->method('getActiveTheme');
-
         $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
         $this->assertNull($masterRequestEvent->getRequest()->attributes->get('_theme'));

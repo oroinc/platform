@@ -12,38 +12,17 @@ class ThemeManager
     /** @var array */
     protected $themeDefinitions;
 
-    /** @var string */
-    protected $activeTheme;
-
     /** @var Theme[] */
     protected $instances = [];
 
     /**
      * @param ThemeFactoryInterface $themeFactory
      * @param array                 $themeDefinitions
-     * @param string|null           $activeTheme
      */
-    public function __construct(ThemeFactoryInterface $themeFactory, array $themeDefinitions, $activeTheme = null)
+    public function __construct(ThemeFactoryInterface $themeFactory, array $themeDefinitions)
     {
-        $this->themeDefinitions = $themeDefinitions;
-        $this->activeTheme      = $activeTheme;
         $this->themeFactory     = $themeFactory;
-    }
-
-    /**
-     * @param string $activeTheme Theme name
-     */
-    public function setActiveTheme($activeTheme)
-    {
-        $this->activeTheme = $activeTheme;
-    }
-
-    /**
-     * @return string
-     */
-    public function getActiveTheme()
-    {
-        return $this->activeTheme;
+        $this->themeDefinitions = $themeDefinitions;
     }
 
     /**
@@ -75,14 +54,12 @@ class ThemeManager
      *
      * @return Theme
      */
-    public function getTheme($themeName = null)
+    public function getTheme($themeName)
     {
-        $themeName = null === $themeName ? $this->activeTheme : $themeName;
-
-        if (null === $themeName) {
-            throw new \LogicException('Impossible to retrieve active theme due to miss configuration');
+        if (empty($themeName)) {
+            throw new \InvalidArgumentException('The theme name must not be empty.');
         } elseif (!$this->hasTheme($themeName)) {
-            throw new \LogicException(sprintf('Unable to retrieve definition for theme "%s"', $themeName));
+            throw new \LogicException(sprintf('Unable to retrieve definition for theme "%s".', $themeName));
         }
 
         if (!isset($this->instances[$themeName])) {
@@ -95,7 +72,7 @@ class ThemeManager
     /**
      * @param null|string|array $groups
      *
-     * @return \Oro\Bundle\LayoutBundle\Model\Theme[]
+     * @return Theme[]
      */
     public function getAllThemes($groups = null)
     {

@@ -8,7 +8,6 @@ use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 
@@ -20,22 +19,16 @@ class EmbedFormLayoutManager
     /** @var EmbeddedFormManager */
     protected $formManager;
 
-    /** @var ThemeManager */
-    protected $themeManager;
-
     /**
      * @param LayoutManager       $layoutManager
      * @param EmbeddedFormManager $formManager
-     * @param ThemeManager        $themeManager
      */
     public function __construct(
         LayoutManager $layoutManager,
-        EmbeddedFormManager $formManager,
-        ThemeManager $themeManager
+        EmbeddedFormManager $formManager
     ) {
         $this->layoutManager = $layoutManager;
         $this->formManager   = $formManager;
-        $this->themeManager  = $themeManager;
     }
 
     /**

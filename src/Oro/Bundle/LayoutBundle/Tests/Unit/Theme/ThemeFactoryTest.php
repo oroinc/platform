@@ -52,7 +52,7 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
         return [
             'minimal definition given' => [
                 '$name'           => 'base',
-                '$definition'     => ['parent' => null, 'hidden' => true],
+                '$definition'     => [],
                 '$expectedResult' => $minimalDefinition,
             ],
             'full definition given'    => [

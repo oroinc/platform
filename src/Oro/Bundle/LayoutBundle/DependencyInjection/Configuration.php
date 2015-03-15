@@ -11,10 +11,6 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
     const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
 
-    const BASE_THEME_IDENTIFIER = 'base';
-
-    const MAIN_PLATFORM_GROUP = 'main';
-
     /**
      * {@inheritdoc}
      */
@@ -122,29 +118,26 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->children()
                     ->scalarNode('label')
-                        ->info('Label will be displayed in theme management UI')
-                        ->cannotBeEmpty()
+                        ->info('The label is displayed in the theme management UI. Can be empty for "hidden" themes')
                         ->isRequired()
                     ->end()
                     ->scalarNode('icon')
-                        ->info('Icon that will be displayed in the UI')
+                        ->info('The icon is displayed in the UI')
                     ->end()
                     ->scalarNode('logo')
-                        ->info('Logo that will be displayed in the UI')
+                        ->info('The logo image is displayed in the UI')
                     ->end()
                     ->scalarNode('screenshot')
-                        ->info('Screenshot for preview, will be displayed in theme management UI')
+                        ->info('The screenshot image is used in theme management UI for the theme preview')
                     ->end()
                     ->scalarNode('directory')
-                        ->info('Directory name where to look up for layout updates. By default theme identifier')
+                        ->info('The directory name where to look up for layout updates. By default theme identifier')
                     ->end()
                     ->scalarNode('parent')
-                        ->info('Parent theme identifier')
-                        ->defaultValue(self::BASE_THEME_IDENTIFIER)
+                        ->info('The identifier of the parent theme')
                     ->end()
                     ->arrayNode('groups')
-                        ->info('Layout groups for which it\'s applicable.')
-                        ->defaultValue([self::MAIN_PLATFORM_GROUP])
+                        ->info('Layout groups for which the theme is applicable')
                         ->example('[main, embedded_forms, frontend]')
                         ->prototype('scalar')->end()
                         ->cannotBeEmpty()
@@ -156,26 +149,8 @@ class Configuration implements ConfigurationInterface
             ->append($node)
             ->children()
                 ->scalarNode('active_theme')
-                    ->cannotBeEmpty()
-                    ->defaultValue(self::BASE_THEME_IDENTIFIER)
+                    ->info('The identifier of the theme that should be used by default')
                 ->end()
-            ->end()
-            ->validate()
-                ->always(
-                    function ($v) {
-                        $v['themes'] = isset($v['themes']) ? $v['themes'] : [];
-
-                        if (empty($v['themes'][self::BASE_THEME_IDENTIFIER])) {
-                            $v['themes'][self::BASE_THEME_IDENTIFIER] = [
-                                'parent'    => null,
-                                'directory' => self::BASE_THEME_IDENTIFIER,
-                                'hidden'    => true
-                            ];
-                        }
-
-                        return $v;
-                    }
-                )
             ->end();
     }
 }

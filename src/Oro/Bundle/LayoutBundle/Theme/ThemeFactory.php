@@ -11,7 +11,10 @@ class ThemeFactory implements ThemeFactoryInterface
      */
     public function create($themeName, array $themeDefinition)
     {
-        $theme = new Theme($themeName, $themeDefinition['parent']);
+        $theme = new Theme(
+            $themeName,
+            isset($themeDefinition['parent']) ? $themeDefinition['parent'] : null
+        );
 
         if (isset($themeDefinition['label'])) {
             $theme->setLabel($themeDefinition['label']);
@@ -29,7 +32,7 @@ class ThemeFactory implements ThemeFactoryInterface
             $theme->setDirectory($themeDefinition['directory']);
         }
         if (isset($themeDefinition['groups'])) {
-            $theme->setGroups((array) $themeDefinition['groups']);
+            $theme->setGroups((array)$themeDefinition['groups']);
         }
 
         return $theme;

@@ -61,7 +61,7 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
             $container->has('oro_layout.twig.extension.layout'),
             'Failed asserting that TWIG extension service is registered'
         );
-
+        // theme services
         $this->assertTrue(
             $container->has(OroLayoutExtension::THEME_MANAGER_SERVICE_ID),
             'Failed asserting that theme manager is registered'
@@ -171,8 +171,9 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'themes'       => [
                     'gold' => [
-                        'label' => 'Gold theme',
-                        'icon'  => 'gold.ico'
+                        'label'  => 'Gold theme',
+                        'icon'   => 'gold.ico',
+                        'groups' => ['main', 'another']
                     ]
                 ],
                 'active_theme' => 'gold'
@@ -185,11 +186,11 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $manager = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID);
         $result  = $manager->getTheme('gold');
 
-        $this->assertNotEmpty($result->getGroups());
-        $this->assertSame(Configuration::BASE_THEME_IDENTIFIER, $result->getParentTheme());
+        $this->assertNull($result->getParentTheme());
         $this->assertSame('Gold theme', $result->getLabel());
         $this->assertSame('gold.ico', $result->getIcon());
         $this->assertSame('gold', $result->getDirectory());
+        $this->assertEquals(['main', 'another'], $result->getGroups());
     }
 
     public function testLoadWithBundleThemesConfig()

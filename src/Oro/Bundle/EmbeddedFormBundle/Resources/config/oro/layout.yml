@@ -2,5 +2,4 @@ oro_layout:
     themes:
         embedded_default:
             label:   Default theme for embedded forms
-            parent:  ~
             groups:  [ embedded_forms ]
