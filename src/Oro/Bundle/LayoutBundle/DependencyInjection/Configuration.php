@@ -26,10 +26,12 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('view')
-                    ->info('Defines whether @Layout annotation can be used in controllers')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode('annotations')->defaultTrue()->end()
+                        ->booleanNode('annotations')
+                            ->info('Defines whether @Layout annotation can be used in controllers')
+                            ->defaultTrue()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
