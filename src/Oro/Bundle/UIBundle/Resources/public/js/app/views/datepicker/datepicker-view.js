@@ -101,6 +101,7 @@ define(function (require) {
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontDateField.attr('data-validation', this.$el.attr('data-validation'));
             this.$el.after(this.$frontDateField);
         },
 
