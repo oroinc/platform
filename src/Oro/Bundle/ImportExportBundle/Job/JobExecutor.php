@@ -90,6 +90,19 @@ class JobExecutor
         $this->batchJobRepository->getJobManager()->persist($jobInstance);
         $jobExecution = $this->batchJobRepository->createJobExecution($jobInstance);
 
+        // load configuration to context
+        if ($configuration) {
+            foreach ($configuration as $typeConfiguration) {
+                if (!is_array($typeConfiguration)) {
+                    continue;
+                }
+
+                foreach ($typeConfiguration as $name => $option) {
+                    $jobExecution->getExecutionContext()->put($name, $option);
+                }
+            }
+        }
+
         // do job
         $jobResult = $this->doJob($jobInstance, $jobExecution);
 
