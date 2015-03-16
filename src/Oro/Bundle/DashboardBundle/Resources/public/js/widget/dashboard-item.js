@@ -1,16 +1,18 @@
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oro/block-widget'],
-    function (_, Backbone, __, mediator, BlockWidget) {
+define([
+    'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oro/block-widget'
+], function (_, Backbone, __, mediator, BlockWidget) {
     'use strict';
 
-    var $ = Backbone.$;
+    var DashboardItemWidget,
+        $ = Backbone.$;
 
     /**
      * @export  orodashboard/js/widget/dashboard-item
      * @class   orodashboard.DashboardItemWidget
      * @extends oro.BlockWidget
      */
-    return BlockWidget.extend({
+    DashboardItemWidget = BlockWidget.extend({
         /**
          * Widget events
          *
@@ -97,7 +99,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             this.options = _.defaults(options || {}, this.options);
             this.options.templateParams.allowEdit = this.options.allowEdit;
             this.options.templateParams.collapsed = options.state.expanded;
-            BlockWidget.prototype.initialize.apply(this, arguments);
+            DashboardItemWidget.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -107,7 +109,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
          */
         initializeWidget: function(options) {
             this._initState(options);
-            BlockWidget.prototype.initializeWidget.apply(this, arguments);
+            DashboardItemWidget.__super__.initializeWidget.apply(this, arguments);
+        },
+
+        _afterLayoutInit: function () {
+            this.$el.removeClass('invisible');
+            DashboardItemWidget.__super__._afterLayoutInit.apply(this, arguments);
         },
 
         /**
@@ -246,4 +253,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             mediator.trigger('widget:dashboard:removeFromDashboard:' + this.getWid(), this.$el, this);
         }
     });
+
+    return DashboardItemWidget;
 });
