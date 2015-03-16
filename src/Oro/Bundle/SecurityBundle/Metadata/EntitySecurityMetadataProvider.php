@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
+
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
@@ -42,13 +43,14 @@ class EntitySecurityMetadataProvider
     /**
      * @param ConfigProvider     $securityConfigProvider
      * @param ConfigProvider     $entityConfigProvider
+     * @param ConfigProvider     $extendConfigProvider
      * @param CacheProvider|null $cache
      */
     public function __construct(
         ConfigProvider $securityConfigProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
-        CacheProvider $cache = null
+        CacheProvider  $cache = null
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
