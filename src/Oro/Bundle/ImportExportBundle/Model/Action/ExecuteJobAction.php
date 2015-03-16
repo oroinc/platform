@@ -26,7 +26,6 @@ class ExecuteJobAction extends AbstractAction
     const NAME = 'execute_job';
 
     /** @var string */
-
     protected $jobType;
 
     /** @var string */
@@ -48,6 +47,7 @@ class ExecuteJobAction extends AbstractAction
     public function __construct(ContextAccessor $contextAccessor, JobExecutor $jobExecutor)
     {
         parent::__construct($contextAccessor);
+
         $this->jobExecutor = $jobExecutor;
     }
 
@@ -59,6 +59,7 @@ class ExecuteJobAction extends AbstractAction
         $jobType = $this->getJobType($context);
         $jobName = $this->getJobName($context);
         $configuration = $this->getConfiguration($context);
+
         $jobResult = $this->jobExecutor->executeJob($jobType, $jobName, $configuration);
         $this->contextAccessor->setValue($context, $this->attribute, $jobResult);
     }
@@ -71,15 +72,19 @@ class ExecuteJobAction extends AbstractAction
         if (empty($options['jobType'])) {
             throw new InvalidParameterException('Parameter "jobType" is required.');
         }
+
         if (empty($options['jobName'])) {
             throw new InvalidParameterException('Parameter "jobName" is required.');
         }
+
         if (!array_key_exists('configuration', $options)) {
             throw new InvalidParameterException('Parameter "configuration" is required.');
         }
+
         if (empty($options['attribute'])) {
             throw new InvalidParameterException('Parameter "attribute" is required.');
         }
+
         $this->jobType = $options['jobType'];
         $this->jobName = $options['jobName'];
         $this->configuration = $options['configuration'];
@@ -147,6 +152,7 @@ class ExecuteJobAction extends AbstractAction
                 )
             );
         }
+
         $configuration = $this->parseArrayValues($context, $configuration);
 
         return $configuration;

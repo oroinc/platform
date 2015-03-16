@@ -32,6 +32,9 @@
 
 table.grid {
   overflow: hidden;
+  td.align-right, th.align-right {
+    text-align: right;
+  }
   thead {
     th {
       vertical-align: top;
@@ -120,6 +123,13 @@ table.grid {
   }
   .select-row-cell input[type=checkbox] {
       margin-top: -3px;
+  }
+}
+
+.other-scroll-container .table-bordered{
+  border-width: 0;
+  td:first-child, th:first-child {
+    border-left: 1px;
   }
 }
 

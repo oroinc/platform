@@ -4,6 +4,9 @@ define(function (require) {
     var BasePlugin = require('./base/plugin');
 
     function PluginManager(main) {
+        if (!main) {
+            throw new Error('Please specify main object');
+        }
         this.main = main;
         this._pluginList = [];
     }
@@ -17,7 +20,7 @@ define(function (require) {
         /**
          * Returns internal plugin representation
          *
-         * @param {Function} Constructor Plugin constructor
+         * @param {function(new:BasePlugin)} Constructor Plugin constructor
          * @returns {Object}
          */
         getInstance: function (Constructor) {
@@ -34,7 +37,7 @@ define(function (require) {
         /**
          * Creates plugin, also it is a way to update options
          *
-         * @param {Function} Constructor Plugin constructor
+         * @param {function(new:BasePlugin)} Constructor Plugin constructor
          * @param {Object=} options
          */
         create: function (Constructor, options) {
@@ -53,7 +56,7 @@ define(function (require) {
         /**
          * Update options for plugin
          *
-         * @param {Function} Constructor Plugin constructor
+         * @param {function(new:BasePlugin)} Constructor Plugin constructor
          * @param {Object} options
          */
         updateOptions: function (Constructor, options) {
@@ -64,7 +67,7 @@ define(function (require) {
         /**
          * Removes plugin
          *
-         * @param {Function} Constructor Plugin constructor
+         * @param {function(new:BasePlugin)} Constructor Plugin constructor
          */
         remove: function (Constructor) {
             var instance = this.getInstance(Constructor);

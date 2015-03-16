@@ -12,6 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\Table(name="oro_tracking_event", indexes={
  *     @ORM\Index(name="event_name_idx", columns={"name"}),
  *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"}),
+ *     @ORM\Index(name="event_createdAt_idx", columns={"created_at"}),
+ *     @ORM\Index(name="event_parsed_idx", columns={"parsed"}),
  *     @ORM\Index(name="code_idx", columns={"code"})
  * })
  * @ORM\Entity()
@@ -86,6 +88,20 @@ class TrackingEvent extends ExtendTrackingEvent
     protected $code;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="parsed", type="boolean", nullable=false, options={"default"=false})
+     */
+    protected $parsed = false;
+
+    /**
+     * @var TrackingData
+     *
+     * @ORM\OneToOne(targetEntity="TrackingData", mappedBy="event")
+     **/
+    protected $eventData;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -112,6 +128,7 @@ class TrackingEvent extends ExtendTrackingEvent
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->parsed = false;
     }
 
     /**
@@ -329,5 +346,43 @@ class TrackingEvent extends ExtendTrackingEvent
     public function getWebsite()
     {
         return $this->website;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isParsed()
+    {
+        return $this->parsed;
+    }
+
+    /**
+     * @param boolean $parsed
+     * @return $this
+     */
+    public function setParsed($parsed)
+    {
+        $this->parsed = $parsed;
+
+        return $this;
+    }
+
+    /**
+     * @return TrackingData
+     */
+    public function getEventData()
+    {
+        return $this->eventData;
+    }
+
+    /**
+     * @param TrackingData $eventData
+     * @return $this
+     */
+    public function setEventData($eventData)
+    {
+        $this->eventData = $eventData;
+
+        return $this;
     }
 }
