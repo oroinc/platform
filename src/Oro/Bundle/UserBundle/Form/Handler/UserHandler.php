@@ -19,6 +19,13 @@ use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
+/**
+ * Class UserHandler
+ *
+ * @package Oro\Bundle\UserBundle\Form\Handler
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ */
 class UserHandler extends AbstractUserHandler implements TagHandlerInterface
 {
     /** @var DelegatingEngine */

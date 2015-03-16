@@ -13,7 +13,8 @@ class UserConfigManager
     /**
      * @param UserScopeManager $userScopeManager
      */
-    public function __construct(UserScopeManager $userScopeManager = null) {
+    public function __construct(UserScopeManager $userScopeManager = null)
+    {
         $this->userScopeManager = $userScopeManager;
     }
 
