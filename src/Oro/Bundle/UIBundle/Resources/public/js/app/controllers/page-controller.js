@@ -33,7 +33,7 @@ define([
 
             page = new PageModel();
             this.listenTo(page, 'request', this.onPageRequest);
-            this.listenTo(page, 'change', this.onPageLoaded);
+            this.listenTo(page, 'sync', this.onPageLoaded);
             this.listenTo(page, 'invalid', this.onPageInvalid);
             this.listenTo(page, 'error', this.onPageError);
             this.model = page;
@@ -84,7 +84,7 @@ define([
 
             if (!route.previous) {
                 // page just loaded from server, does not require extra request
-                this.onPageLoaded(this.model, {actionArgs: args});
+                this.onPageLoaded(this.model, {}, {actionArgs: args});
                 return;
             }
 
@@ -160,9 +160,10 @@ define([
          *  - updates page title
          *
          * @param {Chaplin.Model} model
+         * @param {object} result
          * @param {Object} options
          */
-        onPageLoaded: function (model, options) {
+        onPageLoaded: function (model, result, options) {
             var pageData, actionArgs, jqXHR, self, updatePromises;
 
             self = this;
