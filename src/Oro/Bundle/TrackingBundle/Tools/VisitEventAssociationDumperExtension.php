@@ -72,32 +72,26 @@ class VisitEventAssociationDumperExtension extends AbstractEntityConfigDumperExt
     }
 
     /**
-     * todo: change this logic to get targets from the provider
      * Gets the list of configs for entities which can be the target of the association
      *
      * @return array
      */
     protected function getTargetEntities()
     {
-        $this->targetEntities[] = 'OroCRM\Bundle\MagentoBundle\Entity\Order';
-        $this->targetEntities[] = 'OroCRM\Bundle\MagentoBundle\Entity\Customer';
-        $this->targetEntities[] = 'OroCRM\Bundle\MagentoBundle\Entity\Product';
-        $this->targetEntities[] = 'OroCRM\Bundle\MagentoBundle\Entity\Cart';
+        if (null === $this->targetEntities) {
+            $targetEntityClasses       = $this->identifyProvider->getEventTargetEntities();
+            $this->targetEntityConfigs = [];
 
-//        if (null === $this->targetEntities) {
-//            $targetEntityClasses       = $this->identifyProvider->getTargetEntities();
-//            $this->targetEntityConfigs = [];
-//
-//            $configs = $this->configManager->getProvider('extend')->getConfigs();
-//            foreach ($configs as $config) {
-//                if ($config->is('upgradeable')
-//                    && in_array($config->getId()->getClassName(), $targetEntityClasses)
-//                ) {
-//                    $this->targetEntities[] = $config->getId()->getClassName();
-//                }
-//            }
-//        }
-//
+            $configs = $this->configManager->getProvider('extend')->getConfigs();
+            foreach ($configs as $config) {
+                if ($config->is('upgradeable')
+                    && in_array($config->getId()->getClassName(), $targetEntityClasses)
+                ) {
+                    $this->targetEntities[] = $config->getId()->getClassName();
+                }
+            }
+        }
+
         return $this->targetEntities;
     }
 }

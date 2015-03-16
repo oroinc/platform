@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -25,6 +26,7 @@ class TrackingProcessor implements LoggerAwareInterface
 
     const TRACKING_EVENT_ENTITY = 'OroTrackingBundle:TrackingEvent';
     const TRACKING_VISIT_ENTITY = 'OroTrackingBundle:TrackingVisit';
+    const TRACKING_VISIT_EVENT_ENTITY = 'OroTrackingBundle:TrackingVisitEvent';
 
     /** Batch size for tracking events */
     const BATCH_SIZE  = 100;
@@ -217,6 +219,34 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->setParameter('detected', true)
                     ->getQuery()
                     ->execute();
+
+                // update tracking event identifiers
+                $associationName = ExtendHelper::buildAssociationName(
+                    ClassUtils::getClass($identifier),
+                    VisitEventAssociationExtension::ASSOCIATION_KIND
+                );
+
+                $qb = $this->getEntityManager()
+                    ->createQueryBuilder();
+
+                $subSelect = $qb->select('entity.id')
+                    ->from(self::TRACKING_VISIT_ENTITY, 'entity')
+                    ->where('entity.visitorUid = :visitorUid')
+                    ->andWhere('entity.firstActionTime < :maxDate')
+                    ->andWhere('entity.identifierDetected = false')
+                    ->andWhere('entity.parsedUID = 0')
+                    ->andWhere('entity.trackingWebsite  = :website')
+                    ->setParameter('visitorUid', $visit->getVisitorUid())
+                    ->setParameter('maxDate', $visit->getFirstActionTime())
+                    ->setParameter('website', $visit->getTrackingWebsite())
+                    ->getDQL();
+
+                $qb->update(self::TRACKING_VISIT_EVENT_ENTITY, 'event')
+                    ->set('event.' . $associationName, ':identifier')
+                    ->where($qb->expr()->in('event.visit', $subSelect))
+                    ->setParameter('identifier', $identifier)
+                    ->getQuery()
+                    ->execute();
             }
         }
     }
@@ -265,6 +295,8 @@ class TrackingProcessor implements LoggerAwareInterface
             $trackingVisit = $this->getTrackingVisit($event, $decodedData);
             $trackingVisitEvent->setVisit($trackingVisit);
             $trackingVisitEvent->setWebEvent($event);
+
+            $this->trackingIdentification->processEvent($trackingVisitEvent);
 
             $event->setParsed(true);
 

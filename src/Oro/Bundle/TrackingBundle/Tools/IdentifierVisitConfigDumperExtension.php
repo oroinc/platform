@@ -79,7 +79,7 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
     protected function getTargetEntities()
     {
         if (null === $this->targetEntities) {
-            $targetEntityClasses       = $this->identifyProvider->getTargetEntities();
+            $targetEntityClasses       = $this->identifyProvider->getTargetIdentityEntities();
             $this->targetEntityConfigs = [];
 
             $configs = $this->configManager->getProvider('extend')->getConfigs();

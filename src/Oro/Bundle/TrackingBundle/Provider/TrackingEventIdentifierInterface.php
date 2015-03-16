@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TrackingBundle\Provider;
 
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
+use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 
 interface TrackingEventIdentifierInterface
 {
@@ -34,5 +35,16 @@ interface TrackingEventIdentifierInterface
      *
      * @return string
      */
-    public function getTarget();
+    public function getIdentityTarget();
+
+    public function isApplicableVisitEvent(TrackingVisitEvent $trackingVisitEvent);
+
+    public function processEvent(TrackingVisitEvent $trackingVisitEvent);
+
+    /**
+     * Returns array with FQCN for identifying events.
+     *
+     * @return string
+     */
+    public function getEventTargets();
 }

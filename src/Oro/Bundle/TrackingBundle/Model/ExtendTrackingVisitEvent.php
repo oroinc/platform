@@ -14,4 +14,23 @@ class ExtendTrackingVisitEvent
     public function __construct()
     {
     }
+
+    /**
+     * Gets the entities this entity is associated with
+     *
+     * @return object[]
+     */
+    public function getAssociationTargets()
+    {
+    }
+
+    /**
+     * Sets the entity this entity is associated with
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function addAssociationTarget($target)
+    {
+    }
 }
