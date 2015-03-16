@@ -13,6 +13,10 @@ define(['underscore', 'jquery', 'orotranslation/js/translator', 'orolocale/js/fo
     return [
         'Oro\\Bundle\\CalendarBundle\\Validator\\Constraints\\DateEarlierThan',
         function (value, element, options) {
+            /**
+             * For example if elementId == date_selector_orocrm_campaign_form_startDate and options.field == endDate
+             * then comparedElId will be date_selector_orocrm_campaign_form_endDate
+             */
             var elementId = $(element).attr('id');
             var strToReplace = elementId.substr(elementId.lastIndexOf('_') + 1);
             var comparedElId = elementId.replace(strToReplace, options.field);
@@ -31,7 +35,7 @@ define(['underscore', 'jquery', 'orotranslation/js/translator', 'orolocale/js/fo
             var value = String(this.elementValue(element)),
                 placeholders = {};
             param = _.extend({}, defaultParam, param);
-            placeholders.value = value;
+            placeholders.field = value;
             return __(param.message, placeholders);
         }
     ];

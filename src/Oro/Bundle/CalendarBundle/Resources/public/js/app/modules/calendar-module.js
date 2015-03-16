@@ -1,8 +1,7 @@
 /*global require*/
 require([
-    'oroui/js/mediator',
     'oroui/js/app/controllers/base/controller'
-], function (mediator, BaseController) {
+], function (BaseController) {
     'use strict';
 
     /**

@@ -302,10 +302,16 @@
 {% endblock %}
 
 {% block oro_date_widget %}
-    {% set dateValidation = {'Date' : {}} %}
+    {% if attribute(attr, 'data-validation') is defined %}
+        {% set dataValidation = attr['data-validation'] %}
+    {% else %}
+        {% set dataValidation = {'Date' : {}} %}
 
-    {% if required %}
-        {% set dateValidation = dateValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+        {% if required %}
+            {% set dataValidation = dataValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+        {% endif %}
+
+        {% set dataValidation = dataValidation|json_encode %}
     {% endif %}
 
     {% set options = {
@@ -315,7 +321,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            'data-validation': dateValidation|json_encode,
+            'data-validation': dataValidation,
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -335,11 +341,11 @@
 {% endblock oro_date_widget %}
 
 {% block oro_datetime_widget %}
-    {% set dateValidation = {'Date' : {}} %}
+    {% set dataValidation = {'Date' : {}} %}
     {% set timeValidation = {'Time' : {}} %}
 
     {% if required %}
-        {% set dateValidation = dateValidation|merge({'NotBlank' : {}}) %}
+        {% set dataValidation = dataValidation|merge({'NotBlank' : {}}) %}
         {% set timeValidation = timeValidation|merge({'NotBlank' : {}}) %}
     {% endif %}
 
@@ -351,7 +357,7 @@
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
             class: 'input-small',
-            'data-validation': dateValidation|json_encode
+            'data-validation': dataValidation|json_encode
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
