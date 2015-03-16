@@ -18,7 +18,7 @@ class SyncEvent extends Event
     /** @var string */
     protected $jobName;
 
-    /** @var string */
+    /** @var array */
     protected $configuration;
 
     /** @var JobResult */
@@ -29,7 +29,7 @@ class SyncEvent extends Event
      * @param array     $configuration
      * @param JobResult $jobResult
      */
-    public function __construct($jobName, $configuration, JobResult $jobResult = null)
+    public function __construct($jobName, array $configuration, JobResult $jobResult = null)
     {
         $this->jobName       = $jobName;
         $this->configuration = $configuration;
@@ -45,7 +45,7 @@ class SyncEvent extends Event
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getConfiguration()
     {
@@ -53,9 +53,9 @@ class SyncEvent extends Event
     }
 
     /**
-     * @param string $configuration
+     * @param array $configuration
      */
-    public function setConfiguration($configuration)
+    public function setConfiguration(array $configuration)
     {
         $this->configuration = $configuration;
     }

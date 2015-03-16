@@ -38,6 +38,7 @@ oro:
     user:
         form:
             access_settings.label: Business Units
+            signature.label: Email Signature
         menu:
             system_tab.label: System
             user_list.description: List of system users

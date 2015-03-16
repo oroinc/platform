@@ -192,14 +192,16 @@ abstract class AbstractPageEntity extends AbstractPage
         return trim($element->selectedLabel());
     }
 
-    public function checkActionInGroup($action, $false = true)
+    public function checkActionInGroup($actions = array(), $false = true)
     {
-        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
-        $this->waitForAjax();
-        if (!$false) {
-            $this->assertElementNotPresent("//div[@class='pull-right']//a[@title='{$action}']");
-        } else {
-            $this->assertElementPresent("//div[@class='pull-right']//a[@title='{$action}']");
+        foreach ($actions as $action) {
+            $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+            $this->waitForAjax();
+            if (!$false) {
+                $this->assertElementNotPresent("//div[@class='pull-right']//a[contains(., '{$action}')]");
+            } else {
+                $this->assertElementPresent("//div[@class='pull-right']//a[contains(., '{$action}')]");
+            }
         }
 
         return $this;
@@ -209,7 +211,7 @@ abstract class AbstractPageEntity extends AbstractPage
     {
         $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
         $this->waitForAjax();
-        $this->test->byXpath("//div[@class='pull-right']//a[@title='{$action}']")->click();
+        $this->test->byXpath("//div[@class='pull-right']//a[contains(., '{$action}')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -227,6 +229,23 @@ abstract class AbstractPageEntity extends AbstractPage
             "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
             "/following-sibling::div[contains(., '{$value}')]",
             "Field '{$fieldName}' data are not equals '{$value}'"
+        );
+
+        return $this;
+    }
+
+    /**
+     * Method is verifying activity in activity list by activity name and activity type
+     * @param $activityType
+     * @param $activityName
+     * @return $this
+     */
+    public function verifyActivity($activityType, $activityName)
+    {
+        $this->assertElementPresent(
+            "//div[@class='container-fluid accordion']//span[@class='message-item message']".
+            "//a[starts-with(@href,'#accordion-item')][contains(., '{$activityName}')]/parent::span".
+            "/preceding-sibling::span[contains(., '{$activityType}')]"
         );
 
         return $this;

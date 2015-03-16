@@ -19,10 +19,17 @@ define([
      * @class oroui.app.components.base.Component
      */
     BaseComponent = function (options) {
+        var $sourceElement = options._sourceElement;
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
         if (this.parent) {
             this.parent.pageComponent(this.name || this.cid, this);
+        }
+        if ($sourceElement) {
+            $sourceElement.data('componentInstance', this);
+            this.on('dispose', function () {
+                $sourceElement.removeData('componentInstance');
+            });
         }
         this.initialize(options);
         this.delegateListeners();
@@ -35,16 +42,14 @@ define([
          * if it has defer property (means it'll be initialized in async way) -- returns promise object
          *
          * @param {Object} options
-         * @returns {BaseComponent|promise}
+         * @returns {jQuery.Promise}
          */
         init: function (options) {
-            var Component, result;
+            var Component, component, deferredInit;
             Component = this;
-            result = new Component(options);
-            if (result.deferredInit) {
-                result = result.deferredInit.promise();
-            }
-            return result;
+            component = new Component(options);
+            deferredInit = component.deferredInit || $.Deferred().resolve(component);
+            return deferredInit.promise();
         },
 
         /**
@@ -101,7 +106,7 @@ define([
             this.off();
             // dispose and remove all own properties
             _.each(this, function (item, name) {
-                if (item && name !== 'parent' && typeof item.dispose === "function") {
+                if (item && name !== 'parent' && typeof item.dispose === 'function') {
                     item.dispose();
                 }
                 delete this[name];
@@ -111,7 +116,7 @@ define([
             // remove link to parent
             delete this.parent;
 
-            return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+            return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
         },
 
         /**

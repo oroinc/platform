@@ -26,6 +26,7 @@ class EmailTypeTest extends TypeTestCase
     {
         parent::setUp();
         $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
     }
 
     protected function getExtensions()
@@ -44,7 +45,11 @@ class EmailTypeTest extends TypeTestCase
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $richTextType = new OroRichTextType($configManager);
+        $htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['br', 'a']);
+        $richTextType = new OroRichTextType($configManager, $htmlTagProvider);
 
         return [
             new PreloadedExtension(

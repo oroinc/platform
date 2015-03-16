@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\TagBundle\Entity\TagManager;
@@ -18,6 +19,13 @@ use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
+/**
+ * Class UserHandler
+ *
+ * @package Oro\Bundle\UserBundle\Form\Handler
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ */
 class UserHandler extends AbstractUserHandler implements TagHandlerInterface
 {
     /** @var DelegatingEngine */
@@ -44,36 +52,41 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
+    /** @var UserConfigManager */
+    protected $userConfigManager;
+
     /**
      * @param FormInterface     $form
      * @param Request           $request
      * @param UserManager       $manager
-     * @param DelegatingEngine  $templating
+     * @param UserConfigManager $userConfigManager
      * @param ConfigManager     $cm
+     * @param DelegatingEngine  $templating
      * @param \Swift_Mailer     $mailer
      * @param FlashBagInterface $flashBag
      * @param Translator        $translator
      * @param LoggerInterface   $logger
      */
     public function __construct(
-        FormInterface $form,
-        Request $request,
-        UserManager $manager,
-        ConfigManager $cm = null,
-        DelegatingEngine $templating = null,
-        \Swift_Mailer $mailer = null,
+        FormInterface     $form,
+        Request           $request,
+        UserManager       $manager,
+        UserConfigManager $userConfigManager = null,
+        ConfigManager     $cm = null,
+        DelegatingEngine  $templating = null,
+        \Swift_Mailer     $mailer = null,
         FlashBagInterface $flashBag = null,
-        Translator $translator = null,
-        LoggerInterface $logger = null
+        Translator        $translator = null,
+        LoggerInterface   $logger = null
     ) {
         parent::__construct($form, $request, $manager);
-
-        $this->templating = $templating;
-        $this->cm         = $cm;
-        $this->mailer     = $mailer;
-        $this->flashBag   = $flashBag;
-        $this->translator = $translator;
-        $this->logger     = $logger;
+        $this->userConfigManager = $userConfigManager;
+        $this->templating        = $templating;
+        $this->cm                = $cm;
+        $this->mailer            = $mailer;
+        $this->flashBag          = $flashBag;
+        $this->translator        = $translator;
+        $this->logger            = $logger;
     }
 
     /**
@@ -140,6 +153,9 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         // username or password have been changed to avoid issues with the
         // security layer.
         $this->manager->reloadUser($user);
+        if ($this->form->has('signature')) {
+            $this->userConfigManager->saveUserConfigSignature($this->form->get('signature')->getData());
+        }
     }
 
     /**
