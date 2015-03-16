@@ -22,6 +22,9 @@ class ConnectorContextMediator
     /** @var RegistryInterface */
     protected $doctrineRegistry;
 
+    /** @var TransportInterface[] */
+    protected $transportByIntegration;
+
     /**
      * @param ServiceLink       $registryLink
      * @param RegistryInterface $doctrineRegistry
@@ -56,6 +59,26 @@ class ConnectorContextMediator
 
         return clone $this->registryLink->getService()
             ->getTransportTypeBySettingEntity($transport, $source->getType());
+    }
+
+    /**
+     * @param Integration $integration
+     * @param bool $markReadOnly
+     *
+     * @return TransportInterface
+     */
+    public function getInitializedTransport(Integration $integration, $markReadOnly = false)
+    {
+        if (!empty($this->transportByIntegration[$integration->getId()])) {
+            return $this->transportByIntegration[$integration->getId()];
+        }
+
+        $transport = $this->getTransport($integration, $markReadOnly);
+        $transport->init($integration->getTransport());
+
+        $this->transportByIntegration[$integration->getId()] = $transport;
+
+        return $transport;
     }
 
     /**
