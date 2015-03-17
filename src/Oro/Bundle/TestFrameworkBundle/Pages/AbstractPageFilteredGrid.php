@@ -72,7 +72,7 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
             . "[a[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
         );
-        $input = $criteria->element($this->test->using('xpath')->value("div/div/div/input[@name='value']"));
+        $input = $criteria->element($this->test->using('xpath')->value("div/div/input[@name='value']"));
 
         $input->clear();
         $input->value($value);
