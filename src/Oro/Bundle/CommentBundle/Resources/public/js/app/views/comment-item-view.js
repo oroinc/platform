@@ -5,7 +5,6 @@ define(function (require) {
     var CommentItemView,
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
         _ = require('underscore'),
-        moment = require('moment'),
         routing = require('routing'),
         mediator = require('oroui/js/mediator'),
         __ = require('orotranslation/js/translator'),
