@@ -86,7 +86,7 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
             $criteria->element($this->test->using('xpath')->value("div/div/div/ul/li/a[text()='{$condition}']"))
                 ->click();
         }
-        $criteria->element($this->test->using('xpath')->value("div/button[contains(@class, 'filter-update')]"))
+        $criteria->element($this->test->using('xpath')->value("div/div/button[contains(@class, 'filter-update')]"))
             ->click();
         $this->waitForAjax();
         return $this;
