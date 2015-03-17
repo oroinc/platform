@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -29,13 +30,20 @@ class GridViewsExtension extends AbstractExtension
     protected $securityFacade;
 
     /**
+     * @var WidgetConfigs
+     */
+    protected $widgetConfigs;
+
+    /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param SecurityFacade $securityFacade
+     * @param WidgetConfigs $widgetConfigs
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, SecurityFacade $securityFacade)
+    public function __construct(EventDispatcherInterface $eventDispatcher, SecurityFacade $securityFacade, WidgetConfigs $widgetConfigs)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->securityFacade = $securityFacade;
+        $this->widgetConfigs = $widgetConfigs;
     }
 
     /**
@@ -53,6 +61,7 @@ class GridViewsExtension extends AbstractExtension
     {
         $params      = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         $currentView = isset($params[self::VIEWS_PARAM_KEY]) ? $params[self::VIEWS_PARAM_KEY] : null;
+
         $data->offsetAddToArray('initialState', ['gridView' => null]);
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 

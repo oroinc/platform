@@ -510,8 +510,6 @@ define([
          * @returns {Boolean}
          */
         _isCurrentStateSynchronized: function() {
-            console.log(this._getCurrentState());
-            console.log(this._getCurrentViewModelState());
             var modelState = this._getCurrentViewModelState();
             if (!modelState) {
                 return true;

@@ -21,6 +21,7 @@ parameters:
     oro_datagrid.event_listener.row_selection.class:              Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener
     oro_datagrid.twig.datagrid.class:                             Oro\Bundle\DataGridBundle\Twig\DataGridExtension
     oro_datagrid.event_listener.grid_views_load.class:            Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener
+    oro_datagrid.event_listener.widget_configuration_load.class:  Oro\Bundle\DataGridBundle\EventListener\WidgetConfigurationLoadListener
     oro_datagrid.form.type.grid_view_type.class:                  Oro\Bundle\DataGridBundle\Form\Type\GridViewType
     oro_datagrid.form.type.filter_type.class:                     Oro\Bundle\DataGridBundle\Form\Type\FilterType
     oro_datagrid.form.type.sorting_type.class:                    Oro\Bundle\DataGridBundle\Form\Type\SortingType
@@ -124,6 +125,14 @@ services:
             - @security.context
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }
+
+    oro_datagrid.event_listener.widget_configuration_load:
+        class: %oro_datagrid.event_listener.widget_configuration_load.class%
+        arguments:
+            - @oro_datagrid.datagrid.manager
+            - @oro_datagrid.datagrid.builder
+        tags:
+            - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad }
 
     oro_datagrid.form.type.grid_view_type:
         class: %oro_datagrid.form.type.grid_view_type.class%
