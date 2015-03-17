@@ -3,12 +3,51 @@
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
+use JMS\JobQueueBundle\Entity\Job;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 class ChannelRepository extends EntityRepository
 {
+    /**
+     * @param string $commandName
+     * @param int|null $integrationId
+     * @return int
+     */
+    public function getRunningSyncJobsCount($commandName, $integrationId = null)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getEntityManager()
+            ->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j')
+            ->select('count(j.id)')
+            ->andWhere('j.command=:commandName')
+            ->andWhere('j.state=:stateName')
+            ->setParameter('commandName', $commandName)
+            ->setParameter('stateName', Job::STATE_RUNNING);
+
+        if ($integrationId) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('j.args', ':integrationIdType1'),
+                    $qb->expr()->like('j.args', ':integrationIdType2'),
+                    $qb->expr()->andX(
+                        $qb->expr()->notLike('j.args', ':noIntegrationIdType1'),
+                        $qb->expr()->notLike('j.args', ':noIntegrationIdType2')
+                    )
+                )
+            )
+                ->setParameter('integrationIdType1', '%--integration-id=' . $integrationId . '%')
+                ->setParameter('noIntegrationIdType1', '%--integration-id=%')
+                ->setParameter('integrationIdType2', '%-i=' . $integrationId . '%')
+                ->setParameter('noIntegrationIdType2', '%-i=%');
+        }
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
     /**
      * Returns latest status for integration's connector and code if it exists.
      *

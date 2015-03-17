@@ -40,7 +40,7 @@ class TrackingData
     /**
      * @var TrackingEvent
      *
-     * @ORM\OneToOne(targetEntity="TrackingEvent", cascade={"persist"})
+     * @ORM\OneToOne(targetEntity="TrackingEvent", cascade={"persist"}, inversedBy="eventData")
      * @ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")
      * @ConfigField(
      *  defaultValues={
