@@ -100,6 +100,8 @@ define([
                 options.fromCache = true;
                 this.onPageRequest(this.model, null, {actionArgs: args});
                 this.model.set(cacheItem.page, {actionArgs: args});
+                // manually call onPageLoaded() since there is no 'sync' event triggered
+                this.onPageLoaded(this.model, {}, {actionArgs: args});
             } else {
                 this.model.fetch({
                     url: url,
