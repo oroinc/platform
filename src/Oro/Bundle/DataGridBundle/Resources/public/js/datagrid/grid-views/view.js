@@ -35,14 +35,11 @@ define([
 
         /** @property */
         template: _.template(
-            '<% if (showEditedLabel) { %>' +
-                '<div class="edited-label"><%= editedLabel %></div>' +
-            '<% } %>' +
             '<div class="btn-toolbar">' +
                 '<% if (choices.length) { %>' +
                     '<div class="btn-group views-group">' +
-                        '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                            '<%=  current %>' + '<span class="caret"></span>' +
+                        '<button data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
+                            '<span class="caret"></span>' +
                         '</button>' +
                         '<ul class="dropdown-menu pull-right">' +
                             '<% _.each(choices, function (choice) { %>' +
@@ -53,8 +50,8 @@ define([
                 '<% } %>' +
                 '<% if (showActions) { %>' +
                     '<div class="btn-group actions-group">' +
-                        '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">' +
-                            '<%= actionsLabel %><span class="caret">' +
+                        '<a class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">' +
+                            '<%= actionsLabel %>' +
                         '</a>' +
                         '<ul class="dropdown-menu">' +
                             '<% _.each(actions, function(action) { %>' +
@@ -400,9 +397,7 @@ define([
                 disabled: !this.enabled,
                 choices: this.choices,
                 current: this._getCurrentViewLabel(),
-                actionsLabel: __('oro.datagrid.gridView.actions'),
-                editedLabel: __('oro.datagrid.gridView.data_edited'),
-                showEditedLabel: this.viewDirty,
+                actionsLabel: this.viewDirty ? __('oro.datagrid.gridView.data_edited') : __('oro.datagrid.gridView.actions'),
                 actions: actions,
                 showActions: _.some(actions, function(action) {
                     return action.enabled;
