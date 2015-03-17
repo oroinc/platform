@@ -302,10 +302,16 @@
 {% endblock %}
 
 {% block oro_date_widget %}
-    {% set dateValidation = {'Date' : {}} %}
+    {% if attribute(attr, 'data-validation') is defined %}
+        {% set dateValidation = attr['data-validation'] %}
+    {% else %}
+        {% set dateValidation = {'Date' : {}} %}
 
-    {% if required %}
-        {% set dateValidation = dateValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+        {% if required %}
+            {% set dateValidation = dateValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+        {% endif %}
+
+        {% set dateValidation = dateValidation|json_encode %}
     {% endif %}
 
     {% set options = {
@@ -315,7 +321,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            'data-validation': dateValidation|json_encode,
+            'data-validation': dateValidation,
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
