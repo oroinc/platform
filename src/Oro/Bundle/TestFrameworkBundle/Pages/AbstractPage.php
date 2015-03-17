@@ -125,7 +125,7 @@ abstract class AbstractPage
                                 "}" .
                                 "isAppActive = window.mediatorCachedForSelenium.execute('isInAction');" .
                             "} catch(e) {};" .
-                            "return !(jQuery && jQuery.active && jQuery(document.body).hasClass('loading')) && !isAppActive;",
+                            "return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;",
                         'args' => array()
                     )
                 );
