@@ -10,6 +10,13 @@ define(['jquery'], function ($) {
     $.expr[':'].parents = function (a, i, m) {
         return $(a).parents(m[3]).length < 1;
     };
+    // used to indicate app's activity, such as AJAX request or redirection, etc.
+    $.isActive = $.proxy(function (flag) {
+        if ($.type(flag) !== 'undefined') {
+            this.active = flag;
+        }
+        return $.active || this.active;
+    }, {active: false});
 
     $.fn.extend({
         // http://stackoverflow.com/questions/4609405/set-focus-after-last-character-in-text-box

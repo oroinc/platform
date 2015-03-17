@@ -73,9 +73,10 @@ require([
      * Init PageLoadingMaskView
      */
     BaseController.loadBeforeAction([
+        'jquery',
         'oroui/js/mediator',
         'oroui/js/app/views/loading-mask-view'
-    ], function (mediator, LoadingMaskView) {
+    ], function ($, mediator, LoadingMaskView) {
         BaseController.addToReuse('loadingMask', {
             compose: function () {
                 this.view = new LoadingMaskView({
@@ -86,6 +87,8 @@ require([
                 mediator.setHandler('hideLoading', this.view.hide, this.view);
                 mediator.on('page:beforeChange', this.view.show, this.view);
                 mediator.on('page:afterChange', this.view.hide, this.view);
+                mediator.on('page:beforeChange', $.proxy($.isActive, $, true));
+                mediator.on('page:afterChange', $.proxy($.isActive, $, false));
                 this.view.show();
             }
         });
