@@ -33,7 +33,7 @@ define([
 
             page = new PageModel();
             this.listenTo(page, 'request', this.onPageRequest);
-            this.listenTo(page, 'change', this.onPageLoaded);
+            this.listenTo(page, 'sync', this.onPageLoaded);
             this.listenTo(page, 'invalid', this.onPageInvalid);
             this.listenTo(page, 'error', this.onPageError);
             this.model = page;
@@ -84,7 +84,7 @@ define([
 
             if (!route.previous) {
                 // page just loaded from server, does not require extra request
-                this.onPageLoaded(this.model, {actionArgs: args});
+                this.onPageLoaded(this.model, {}, {actionArgs: args});
                 return;
             }
 
@@ -100,6 +100,8 @@ define([
                 options.fromCache = true;
                 this.onPageRequest(this.model, null, {actionArgs: args});
                 this.model.set(cacheItem.page, {actionArgs: args});
+                // manually call onPageLoaded() since there is no 'sync' event triggered
+                this.onPageLoaded(this.model, {}, {actionArgs: args});
             } else {
                 this.model.fetch({
                     url: url,
@@ -160,9 +162,10 @@ define([
          *  - updates page title
          *
          * @param {Chaplin.Model} model
+         * @param {Object} result
          * @param {Object} options
          */
-        onPageLoaded: function (model, options) {
+        onPageLoaded: function (model, result, options) {
             var pageData, actionArgs, jqXHR, self, updatePromises;
 
             self = this;

@@ -23,6 +23,7 @@
     margin: 10px auto 0;
     max-width: 460px;
     width: 100%;
+    z-index: 1000; // to show over grid's loading mask
     @media only screen and (min-width: 481px) {
       left: 50%;
       margin-left: -230px;
@@ -60,18 +61,16 @@
     .filter-item {
       margin: 0 0 10px 0;
       width: 100%;
-      .filter-criteria {
-        font-size: smaller;
-        left: 0px;
-        width: 100%;
-        input {
-          width: 93px;
-        }
-        .btn {
-          padding-left: 10px;
-          padding-right: 10px;
-        }
+      white-space: normal;
+      .btn-group {
+        margin-bottom: 0;
       }
+    }
+    .filter-criteria {
+      font-size: smaller;
+      left: 0;
+      width: 100%;
+      padding: 8px;
     }
   }
   .oro-open {
@@ -85,22 +84,63 @@
     white-space: nowrap;
     overflow: hidden;
     vertical-align: bottom;
-    padding-right: 35px;
+    padding-right: 43px;
     position: relative;
     .filter-criteria-hint {
       display: inline;
-    }
-    .reset-filter {
-      position: absolute;
-      right: 20px;
     }
     .caret {
       position: absolute;
       right: 8px;
     }
+
+    &:not(.filter-default-value) {
+      .reset-filter {
+        position: absolute;
+        border-left: 1px solid rgba(0,0,0,0.1);
+        display: block;
+        width: 29px;
+        height: 29px;
+        right: -1px;
+        top: -1px;
+        text-align: center;
+        padding: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        #gradient > .vertical(#fdfdfd, #efefef);
+      }
+      [class^='icon-'].hide-text:before {
+        color: #666;
+        font-size: 12px;
+      }
+      .caret {
+        right: 35px;
+      }
+    }
+    &.filter-default-value {
+      .caret {
+        position: absolute;
+        right: 8px;
+      }
+    }
   }
   .filter-list {
     margin: 0 0 5px -5px;
+  }
+  .filter-criteria {
+    &.empty-type{
+      width: auto;
+    }
+    input[type=date] {
+      width: 93px;
+    }
+    input[type=time] {
+      width: 75px;
+    }
+    .btn {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
   }
 }
 

@@ -163,6 +163,7 @@ services:
           - @oro_email.email.model.builder.helper
           - @request
           - @doctrine.orm.entity_manager
+          - @oro_config.user
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
@@ -285,6 +286,7 @@ services:
             - @translator
             - @oro_security.security_facade
             - @oro_locale.formatter.name
+            - @oro_config.user
         lazy: true
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
