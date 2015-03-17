@@ -61,7 +61,10 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
             $config->set('HTML.AllowedAttributes', $converter->getAttributes($this->allowedElements));
         }
         if ($this->cacheDir) {
-            $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . self::SUB_DIR;
+            $cacheDir = $this->cacheDir
+                . DIRECTORY_SEPARATOR . '..'
+                . DIRECTORY_SEPARATOR . 'vendor'
+                . DIRECTORY_SEPARATOR . self::SUB_DIR;
             $this->touchCacheDir($cacheDir);
             $config->set('Cache.SerializerPath', $cacheDir);
         } else {
