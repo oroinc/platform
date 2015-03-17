@@ -162,7 +162,7 @@ define([
          *  - updates page title
          *
          * @param {Chaplin.Model} model
-         * @param {object} result
+         * @param {Object} result
          * @param {Object} options
          */
         onPageLoaded: function (model, result, options) {
