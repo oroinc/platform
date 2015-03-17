@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraint;
 class DateEarlierThan extends Constraint
 {
     public $field;
-    public $message = "This date can't be earlier than {{ field }} date";
+    public $message = "This date should be earlier than {{ field }} date";
 
     /**
      * {@inheritdoc}
