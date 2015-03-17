@@ -1,6 +1,7 @@
 parameters:
     oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
     oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
+    oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
 
 services:
     oro_importexport.template_fixture.entity_registry:
@@ -10,3 +11,11 @@ services:
         class: %oro_importexport.template_fixture.manager.class%
         arguments:
             - @oro_importexport.template_fixture.entity_registry
+
+    oro_importexport.action.execute_job:
+        class: %oro_importexport.action.execute_job.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_importexport.job_executor
+        tags:
+            - { name: oro_workflow.action, alias: execute_job }

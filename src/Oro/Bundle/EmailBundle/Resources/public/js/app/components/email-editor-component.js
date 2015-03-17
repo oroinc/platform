@@ -43,16 +43,48 @@ define(function (require) {
          */
         initialize: function (options) {
             this.options = options;
-            this.bindEvents();
+            this.init();
         },
 
-        bindEvents: function () {
+        init: function () {
             var self = this,
                 $subject = this.options._sourceElement.find('[name$="[subject]"]'),
                 $body = this.options._sourceElement.find('[name$="[body]"]'),
                 $type = this.options._sourceElement.find('[name$="[type]"]'),
                 $template = this.options._sourceElement.find('[name$="[template]"]'),
-                $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]');
+                $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]'),
+                $parentEmailId = this.options._sourceElement.find('[name$="[parentEmailId]"]'),
+                $signature = this.options._sourceElement.find('[name$="[signature]"]'),
+                $addSignatureButton = this.options._sourceElement.find('#addSignatureButton');
+
+            $addSignatureButton.on('click', function() {
+                var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
+                if (bodyEditorComponent.view.tinymceConnected) {
+                    var tinyMCE= bodyEditorComponent.view.tinymceInstance;
+                    tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                } else {
+                    $body.focus();
+                    var caretPos = $body.getCursorPosition();
+                    var body = $body.val();
+                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos));
+                }
+            });
+
+            var initBody = function(body, appendSignature) {
+                appendSignature = typeof appendSignature !== 'undefined' ? appendSignature : true;
+                var signature = $signature.val();
+                if (self.options.appendSignature && appendSignature) {
+                    if (signature && body.indexOf(signature) < 0) {
+                        body += '<br/><br/>' + $signature.val();
+                    }
+                }
+                if ($bodyFooter.val()) {
+                    body += $bodyFooter.val();
+                }
+
+                return body;
+            };
+            $body.val(initBody($body.val()));
 
             $template.on('change.' + this.cid, function (e) {
                 if (!$(this).val()) {
@@ -72,13 +104,11 @@ define(function (require) {
 
                     $.ajax(url, {
                         success: function (res) {
-                            if (!$bodyFooter.val()) {
+                            if (!$parentEmailId.val() || !$subject.val()) {
                                 $subject.val(res.subject);
                             }
-                            var body = res.body;
-                            if ($bodyFooter.val()) {
-                                body += $bodyFooter.val();
-                            }
+
+                            var body = initBody(res.body, false);
                             $body.val(body);
                             $type.find('input[value=' + res.type + ']')
                                 .prop('checked', true)
@@ -148,6 +178,23 @@ define(function (require) {
             }
         }
     });
+
+    (function ($, undefined) {
+        $.fn.getCursorPosition = function() {
+            var el = $(this).get(0);
+            var pos = 0;
+            if('selectionStart' in el) {
+                pos = el.selectionStart;
+            } else if('selection' in document) {
+                el.focus();
+                var Sel = document.selection.createRange();
+                var SelLength = document.selection.createRange().text.length;
+                Sel.moveStart('character', -el.value.length);
+                pos = Sel.text.length - SelLength;
+            }
+            return pos;
+        }
+    })(jQuery);
 
     return EmailEditorComponent;
 });
