@@ -118,7 +118,14 @@ abstract class AbstractPage
             function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
                 $status = $testCase->execute(
                     array(
-                        'script' => "return typeof(jQuery.isActive) == 'undefined' || !jQuery.isActive()",
+                        'script' => "var isAppActive = false; " .
+                            "try {" .
+                                "if (!window.mediatorCachedForSelenium) {" .
+                                    "window.mediatorCachedForSelenium = require('oroui/js/mediator');" .
+                                "}" .
+                                "isAppActive = window.mediatorCachedForSelenium.execute('isInAction');" .
+                            "} catch(e) {};" .
+                            "return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;",
                         'args' => array()
                     )
                 );
