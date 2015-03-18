@@ -1,20 +1,37 @@
 .comments-list {
   color: #888;
+  display: table;
+  width: 100%;
 }
 .comments-block {
   min-width: initial;
   .comment-item {
-    border-bottom: 1px solid #f0f0f0;
-    padding: 15px 0;
-    line-height: 1.3em;
+    display: table-row !important;
   }
-  .comment-item:last-child {
-    border-bottom: none;
+  .comment-title, .comment-content, .comment-actions {
+    display: table-cell;
+    line-height: 1.3em;
+    padding: 13px 0 14px 0;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
   }
   .comment-title {
-    float: left;
-    left: 0;
-    position: relative;
+    width: 30px;
+  }
+  .comment-actions {
+    width: 23px;
+  }
+  .comment-content {
+    vertical-align: middle;
+    padding: 14px;
+  }
+  .comment-item:last-child {
+    .comment-title, .comment-content, .comment-actions {
+      border-bottom: none;
+    }
+  }
+
+  .comment-title {
     .comment-title-avatar {
       width: 30px;
       height: 30px;
@@ -38,14 +55,12 @@
       }
     }
   }
+
   .comment-body{
-    margin: 0 45px 0 45px;
+    display: block;
   }
   .comment-attachments {
-    margin: 0.5em 45px 0 45px;
-  }
-  .comment-actions {
-    float: right;
+    margin: 0.5em 0 0 0;
   }
 
   .attachment-icon.accordion-toggle {
@@ -68,6 +83,7 @@
     color: #888;
     &:hover {
       color: #08c;
+      cursor: pointer;
     }
     > span {
       display: inline-block;

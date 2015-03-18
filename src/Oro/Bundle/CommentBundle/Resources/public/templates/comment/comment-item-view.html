@@ -1,56 +1,25 @@
-<div class="clearfix">
-
-    <% if (hasActions) { %>
-    <div class="comment-actions">
-        <div class="more-bar-holder">
-            <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">...</a>
-                <ul class="dropdown-menu pull-right launchers-dropdown-menu">
-                    <li>
-                        <ul class="nav nav-pills icons-holder launchers-list">
-                            <% if (editable) { %>
-                            <li class="launcher-item">
-                                <a href="#" class="action item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
-                                    <i class="icon-edit hide-text"><%= _.__('oro.comment.action.update') %></i>
-                                </a>
-                            </li>
-                            <% } %>
-                            <% if (removable) { %>
-                            <li class="launcher-item">
-                                <a href="#" class="action item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
-                                    <i class="icon-trash hide-text"><%= _.__('oro.comment.action.delete') %></i>
-                                </a>
-                            </li>
-                            <% } %>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
+<div class="comment-title">
+    <div class="comment-title-avatar">
+        <img src="/bundles/oroui/img/info-user.png" />
     </div>
-    <% } %>
-
-    <div class="comment-title">
-        <div class="comment-title-avatar">
-            <img src="/bundles/oroui/img/info-user.png" />
-        </div>
-        <div class="comment-title-info">
-            <% if (owner_id) {  %>
-                <%= _.__('oro.comment.item.added',{
-                    user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
-                    time: '<i class="date">' + createdTime + '</i>'
-                }) %>
-            <% } %>
-            <% if (editor_id) { %>,
-                <%= _.__('oro.comment.item.update',{
-                    user: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
-                    time: '<i class="date">' + updatedTime + '</i>'
-                }) %>
-            <% } %>
-        </div>
+    <div class="comment-title-info">
+        <% if (owner_id) {  %>
+            <%= _.__('oro.comment.item.added',{
+                user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
+                time: '<i class="date">' + createdTime + '</i>'
+            }) %>
+        <% } %>
+        <% if (editor_id) { %>,
+            <%= _.__('oro.comment.item.update',{
+                user: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
+                time: '<i class="date">' + updatedTime + '</i>'
+            }) %>
+        <% } %>
     </div>
+</div>
 
+<div class="comment-content">
     <div class="comment-body"><%= message %></div>
-
     <% if (attachmentURL) { %>
     <div class="comment-attachments">
         <div class="attachment-item">
@@ -58,5 +27,33 @@
         </div>
     </div>
     <% } %>
+</div>
 
+<div class="comment-actions">
+    <% if (hasActions) { %>
+    <div class="more-bar-holder">
+        <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">...</a>
+            <ul class="dropdown-menu pull-right launchers-dropdown-menu">
+                <li>
+                    <ul class="nav nav-pills icons-holder launchers-list">
+                        <% if (editable) { %>
+                        <li class="launcher-item">
+                            <a href="#" class="action item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
+                                <i class="icon-edit hide-text"><%= _.__('oro.comment.action.update') %></i>
+                            </a>
+                        </li>
+                        <% } %>
+                        <% if (removable) { %>
+                        <li class="launcher-item">
+                            <a href="#" class="action item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
+                                <i class="icon-trash hide-text"><%= _.__('oro.comment.action.delete') %></i>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <% } %>
 </div>
