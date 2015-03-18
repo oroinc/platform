@@ -5,7 +5,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial e.{id, subject, sentAt}
+                    - partial e.{id, subject, sentAt, thread}
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
                 join:
@@ -14,6 +14,11 @@ datagrid:
                         - { join: e.recipients, alias: r_cc_bcc, conditionType: WITH, condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc' }
 
         columns:
+            thread:
+                type: twig
+                label:
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/thread.html.twig
             fromEmailExpression:
                 type: twig
                 label: oro.email.from_name.label
@@ -74,11 +79,18 @@ datagrid:
         extends: email-grid
 
         properties:
-          id: ~
-          view_thread_link:
-              type: url
-              route: oro_email_thread_view
-              params: [ id ]
+            id: ~
+            view_thread_link:
+                type: url
+                route: oro_email_thread_view
+                params: [ id ]
+
+        actions:
+            view_thread:
+                type: navigate
+                label: oro.grid.action.view
+                link: view_thread_link
+                icon: eye-open
 
     dashboard-recent-emails-grid:
         source:

@@ -72,12 +72,17 @@ class EmailController extends Controller
      */
     public function threadWidgetAction(Email $entity)
     {
-        $thread = $this->get('oro_email.email.thread.provider')->getThreadEmails(
-            $this->get('doctrine')->getManager(),
-            $entity
-        );
+        $config = $this->get('oro_config.global');
+        if ($config->get('oro_email.use_threads_in_emails')) {
+            $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
+                $this->get('doctrine')->getManager(),
+                $entity
+            );
+        } else {
+            $emails = [$entity];
+        }
 
-        foreach ($thread as $email) {
+        foreach ($emails as $email) {
             try {
                 $this->getEmailCacheManager()->ensureEmailBodyCached($email);
             } catch (LoadEmailBodyException $e) {
@@ -87,7 +92,7 @@ class EmailController extends Controller
 
         return [
             'entity' => $entity,
-            'thread' => $thread,
+            'thread' => $emails,
         ];
     }
 
@@ -146,7 +151,8 @@ class EmailController extends Controller
      */
     public function createAction()
     {
-        return $this->createEmail(new EmailModel());
+        $emailModel = $this->get('oro_email.email.model.builder')->createEmailModel();
+        return $this->process($emailModel);
     }
 
     /**
@@ -156,7 +162,19 @@ class EmailController extends Controller
      */
     public function replyAction(Email $email)
     {
-        return $this->createEmail(new EmailModel(), $email);
+        $emailModel = $this->get('oro_email.email.model.builder')->createReplyEmailModel($email);
+        return $this->process($emailModel);
+    }
+
+    /**
+     * @Route("/forward/{id}", name="oro_email_email_forward", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_create")
+     * @Template("OroEmailBundle:Email:update.html.twig")
+     */
+    public function forwardAction(Email $email)
+    {
+        $emailModel = $this->get('oro_email.email.model.builder')->createForwardEmailModel($email);
+        return $this->process($emailModel);
     }
 
     /**
@@ -254,47 +272,16 @@ class EmailController extends Controller
 
     /**
      * @param EmailModel $emailModel
-     * @param Email $parentEmail
      *
      * @return array
      */
-    protected function createEmail(EmailModel $emailModel, Email $parentEmail = null)
+    protected function process(EmailModel $emailModel)
     {
         $responseData = [
             'entity' => $emailModel,
-            'saved' => false
+            'saved' => false,
+            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature'),
         ];
-        if ($parentEmail) {
-            // setting Parent email id
-            $emailModel->setParentEmailId($parentEmail->getId());
-
-            // setting To
-            $fromAddress = $parentEmail->getFromEmailAddress();
-            if ($fromAddress->getOwner() == $this->getUser()) {
-                $emailModel->setTo([$parentEmail->getTo()->first()->getEmailAddress()->getEmail()]);
-            } else {
-                $emailModel->setTo([$fromAddress->getEmail()]);
-            }
-
-            // setting Subject
-            $subject = $parentEmail->getSubject();
-            if (preg_match('/^Re:*/', $subject)) {
-                $emailModel->setSubject($subject);
-            } else {
-                $emailModel->setSubject('Re: ' . $subject);
-            }
-
-            // setting Body
-            try {
-                $this->getEmailCacheManager()->ensureEmailBodyCached($parentEmail);
-            } catch (LoadEmailBodyException $e) {
-                $this->get('logger')->notice(sprintf('Reply To email exception: %s', $e->getMessage()));
-            }
-            $body = $this->get('templating')
-                ->render('OroEmailBundle:Email/Reply:parentBody.html.twig', ['email' => $parentEmail]);
-            $emailModel->setBody($body);
-            $emailModel->setBodyFooter($body);
-        }
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;
         }

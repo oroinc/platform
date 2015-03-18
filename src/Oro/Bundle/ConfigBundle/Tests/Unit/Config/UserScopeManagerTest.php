@@ -46,7 +46,15 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $repo = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo->expects($this->any())
+            ->method('loadSettings');
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->om->expects($this->any())
+            ->method('getRepository')
+            ->will($this->returnValue($repo));
         $this->object = new UserScopeManager($this->om);
 
         $this->security   = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
@@ -98,7 +106,6 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
         $object->setSecurity($this->security);
 
         $this->assertEquals('user', $object->getScopedEntityName());
-        $this->assertEquals(0, $object->getScopeId());
     }
 
     public function testGetScopedEntityName()
@@ -106,8 +113,18 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('user', $this->object->getScopedEntityName());
     }
 
+    public function testSetScopeId()
+    {
+        $object = clone $this->object;
+        $object->setSecurity($this->security);
+        $object->setScopeId();
+        $this->assertEquals(1, $object->getScopeId());
+    }
+
     public function testGetScopeId()
     {
-        $this->assertEquals(0, $this->object->getScopeId());
+        $object = clone $this->object;
+        $object->setSecurity($this->security);
+        $this->assertEquals(1, $object->getScopeId());
     }
 }

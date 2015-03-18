@@ -268,7 +268,6 @@ i.color {
   }
 }
 .user-fieldset{
-  background: url("../../img/horizontal-divider-lite.png") repeat-x  0 50%;
   margin-bottom: 22px;
   span{
     background-color: #fff;
@@ -1404,11 +1403,15 @@ footer {
     padding-left: 20px;
   }
   .modal-header .close {
-    margin-top:-3px;
+    margin-top: -6px;
     color: @white;
     font-size: 25px;
     text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
     opacity: 0.9;
+    height: 32px;
+    width: 32px;
+    text-align: center;
+    line-height: 32px;
     &:hover,
     &:focus {
       color: @white;
@@ -2087,11 +2090,6 @@ textarea {
   > input[type=checkbox]:only-child {
     margin-top: 6px;
   }
-}
-.dot-menu-empty-message {
-  padding: 4px 15px;
-  color:lighten(@bodyColor,30%);
-  font-style:italic;
 }
 .btn-group > .btn-small {
   font-size: @fontSizeSmall;

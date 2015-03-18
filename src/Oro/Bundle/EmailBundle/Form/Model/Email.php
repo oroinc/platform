@@ -18,9 +18,6 @@ class Email
     /** @var int */
     protected $parentEmailId;
 
-    /** @var int */
-    protected $direction;
-
     /** @var string */
     protected $from;
 
@@ -46,7 +43,10 @@ class Email
     protected $body;
 
     /** @var string */
-    protected $bodyFooter;
+    protected $signature;
+
+    /** @var string */
+    protected $bodyFooter = '';
 
     /**
      * Get id of emails datagrid
@@ -140,30 +140,6 @@ class Email
     public function setParentEmailId($parentEmailId)
     {
         $this->parentEmailId = $parentEmailId;
-
-        return $this;
-    }
-
-    /**
-     * Set email direction
-     *
-     * @return int
-     */
-    public function getDirection()
-    {
-        return $this->direction;
-    }
-
-    /**
-     * Get email direction
-     *
-     * @param $direction
-     *
-     * @return $this
-     */
-    public function setDirection($direction)
-    {
-        $this->direction = $direction;
 
         return $this;
     }
@@ -375,7 +351,7 @@ class Email
     /**
      * Set email body footer
      *
-     * @param string $bodyFooter
+     * @param string  $bodyFooter
      *
      * @return Email
      */
@@ -384,5 +360,21 @@ class Email
         $this->bodyFooter = $bodyFooter;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+
+    /**
+     * @param string $signature
+     */
+    public function setSignature($signature)
+    {
+        $this->signature = $signature;
     }
 }
