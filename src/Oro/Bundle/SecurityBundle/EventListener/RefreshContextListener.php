@@ -93,12 +93,12 @@ class RefreshContextListener
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityClass);
 
-        if ($entity instanceof Proxy && !$entity->__isInitialized()) {
+        if ($entity instanceof Proxy && !$entity->__isInitialized() && $entityId) {
             // We cannot use $entity->__load(); because of bug BAP-7851
             return $entityManager->find($entityClass, $entityId);
         }
 
-        if (!$this->doctrineHelper->getSingleEntityIdentifier($entity)) {
+        if (!$entityId) {
             return null;
         }
 
