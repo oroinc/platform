@@ -40,9 +40,9 @@ define([
          */
         initialize: function (data) {
             this.urlRoot = routing.generate(this.route);
-            _.each(data.sorters, _.bind(function (direction, key) {
-                data.sorters[key] = this.directions[direction];
-            }, this));
+            _.each(data.sorters, function(direction, key) {
+                data.sorters[key] = String(direction)
+            });
         },
 
         /**
