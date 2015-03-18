@@ -48,7 +48,7 @@
             {% endblock %}
         {% endblock %}
     </head>
-    <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version  language-{{ oro_language() }} {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
+    <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version lang-{{ oro_language()|slice(0,2) }} {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
     {% placeholder after_body_start %}
     <div id="progressbar">
         <h3>{% trans %}Loading...{% endtrans %}</h3>
