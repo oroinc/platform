@@ -16,7 +16,8 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->userProvider = $this->getMock('HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface');
+        $this->userProvider = $this
+                ->getMock('HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface');
         $this->resourceOwnerMap = $this->getMockBuilder('HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap')
                 ->disableOriginalConstructor()
                 ->getMock();

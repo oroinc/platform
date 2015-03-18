@@ -31,6 +31,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
     /**
      * Constructor
      *
+     * @param UserManager   $userManager
      * @param ConfigManager $cm
      */
     public function __construct(UserManager $userManager, ConfigManager $cm)

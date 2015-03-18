@@ -37,8 +37,11 @@ class OAuthProvider extends HWIOAuthProvider
      * @param ResourceOwnerMap $resourceOwnerMap Resource owner map
      * @param UserCheckerInterface $userChecker User checker
      */
-    public function __construct(OAuthAwareUserProviderInterface $userProvider, ResourceOwnerMap $resourceOwnerMap, UserCheckerInterface $userChecker)
-    {
+    public function __construct(
+        OAuthAwareUserProviderInterface $userProvider,
+        ResourceOwnerMap $resourceOwnerMap,
+        UserCheckerInterface $userChecker
+    ) {
         $this->userProvider = $userProvider;
         $this->resourceOwnerMap = $resourceOwnerMap;
         $this->userChecker = $userChecker;
