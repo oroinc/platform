@@ -8,8 +8,12 @@ oro:
         action:
             delete: Delete Comment
             update: Update Comment
+        dialog:
+            add_comment.title: Add Comment
         from:
             button:
+                send_comment:
+                    label: Send
                 add_comment:
                     label: Add Comment
                 edit_comment:

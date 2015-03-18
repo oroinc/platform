@@ -7,17 +7,17 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
-        routing = require('routing'),
-        tools = require('oroui/js/tools'),
-        mediator = require('oroui/js/mediator'),
         BaseComponent = require('oroui/js/app/components/base/component'),
         CommentFromView = require('orocomment/js/app/views/comment-form-view'),
         CommentListView = require('orocomment/js/app/views/comment-list-view'),
-        CommentCollection = require('orocomment/js/app/models/comment-collection');
+        CommentCollection = require('orocomment/js/app/models/comment-collection'),
+        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
+        DialogWidget = require('oro/dialog-widget');
 
     CommentComponent = BaseComponent.extend({
         listen: {
-            'toEdit collection': 'onCommentEdit'
+            'toEdit collection': 'onCommentEdit',
+            'toAdd collection': 'onCommentAdd'
         },
 
         initialize: function (options) {
@@ -31,38 +31,70 @@ define(function (require) {
             this.listView = new CommentListView({
                 el: options._sourceElement,
                 collection: this.collection,
-                template: options.listTemplate
+                template: options.listTemplate,
+                canCreate: this.options.canCreate
             });
 
             this.formTemplate = options.listTemplate + '-form';
-            if (this.options.canCreate) {
-                this.addFormView();
-            }
 
             this.collection.fetch();
         },
 
-        onCommentEdit: function (model) {
-            this.addFormView(model);
-        },
-
-        addFormView: function (model) {
-            var formView, parentView;
-
-            parentView = this.listView;
-            if (model) {
-                parentView = this.listView.getItemView(model);
-            } else {
-                model = new this.collection.model();
+        onCommentAdd: function () {
+            var dialogWidget, loadingMaskView, model;
+            if (!this.options.canCreate) {
+                return;
             }
 
+            model = new this.collection.model();
+
+            // init dialog
+            dialogWidget = new DialogWidget({
+                title: __('oro.comment.dialog.add_comment.title'),
+                el: $('<div><div class="comment-form-container"/></div>'),
+                stateEnabled: false,
+                incrementalPosition: false,
+                dialogOptions: {
+                    modal: true,
+                    width: '510px',
+                    dialogClass: 'add-comment-dialog'
+                }
+            });
+            model.once('synced', function () {
+                dialogWidget.remove();
+            });
+
+            // init form view
+            this._initFormView(dialogWidget, model);
+
+            dialogWidget.render();
+
+            // bind dialog loader
+            loadingMaskView = new LoadingMaskView({
+                container: dialogWidget.loadingElement
+            });
+            dialogWidget.subview('loading', loadingMaskView);
+            loadingMaskView.listenTo(model, 'request', loadingMaskView.show);
+            loadingMaskView.listenTo(model, 'sync error', loadingMaskView.hide);
+        },
+
+        onCommentEdit: function (model) {
+            var parentView;
+            if (!model.get('editable')) {
+                return;
+            }
+            parentView = this.listView.getItemView(model);
+            this._initFormView(parentView, model);
+        },
+
+        _initFormView: function (parentView, model) {
+            var formView;
             formView = new CommentFromView({
                 template: this.formTemplate,
-                el: parentView.$('.form-container'),
+                el: parentView.$('.comment-form-container'),
                 model: model
             });
             parentView.subview('form', formView);
-
             this.listenTo(formView, 'submit', this.onFormSubmit, this);
             this.listenTo(formView, 'reset', this.onFormReset, this);
         },
