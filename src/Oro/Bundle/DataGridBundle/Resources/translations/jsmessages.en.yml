@@ -46,6 +46,9 @@ oro_datagrid.label_add_filter: "Manage filters"
 oro_datagrid.action.reset: "Reset"
 oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.action.save_grid_view": Save
+"oro.datagrid.action.rename_grid_view": Rename
+"oro.datagrid.name_modal.title": Filter configuration
+"oro.datagrid.action.discard_grid_view_changes": Discard changes
 "oro.datagrid.action.save_grid_view_as": Save As
 "oro.datagrid.action.share_grid_view": Share With Others
 "oro.datagrid.action.unshare_grid_view": Unshare

@@ -6,9 +6,9 @@ define([
     'orotranslation/js/translator',
     './collection',
     './model',
-    'oroui/js/modal',
+    './view-name-modal',
     'oroui/js/mediator'
-], function (Backbone, _, __, GridViewsCollection, GridViewModel, Modal, mediator) {
+], function (Backbone, _, __, GridViewsCollection, GridViewModel, ViewNameModal, mediator) {
     'use strict';
     var $, GridViewsView;
     $ = Backbone.$;
@@ -30,7 +30,9 @@ define([
             "click a.save_as": "onSaveAs",
             "click a.share": "onShare",
             "click a.unshare": "onUnshare",
-            "click a.delete": "onDelete"
+            "click a.delete": "onDelete",
+            "click a.rename": "onRename",
+            "click a.discard_changes": "onDiscardChanges"
         },
 
         /** @property */
@@ -226,17 +228,7 @@ define([
          * @param {Event} e
          */
         onSaveAs: function(e) {
-            var modal = new Modal({
-                title: 'Filter configuration',
-                content: '<div class="form-horizontal">' +
-                            '<div class="control-group">' +
-                                '<label class="control-label" for="gridViewName">' + __('oro.datagrid.gridView.name') + ':</label>' +
-                                '<div class="controls">' +
-                                    '<input id="gridViewName" name="name" type="text">' +
-                                '</div>' +
-                            '</div>' +
-                         '</div>'
-            });
+            var modal = new ViewNameModal();
 
             var self = this;
             modal.on('ok', function(e) {
@@ -313,6 +305,37 @@ define([
                 mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
                 mediator.trigger('datagrid:' + this.collection.inputName + ':views:remove', model);
             }, this);
+        },
+
+        /**
+         * @param {Event} e
+         */
+        onRename: function(e) {
+            var model = this._getCurrentViewModel();
+
+            var modal = new ViewNameModal({
+                defaultValue: model.get('label')
+            });
+            modal.on('ok', function() {
+                model.save({
+                    label: this.$('input[name=name]').val(),
+                }, {
+                    wait: true
+                });
+
+                model.once('sync', function() {
+                    mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+                }, this);
+            });
+
+            modal.open();
+        },
+
+        /**
+         * @param {Event} e
+         */
+        onDiscardChanges: function(e) {
+            this.changeView(this.collection.state.gridView);
         },
 
         /**
@@ -426,6 +449,13 @@ define([
                                 (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
                 },
                 {
+                    label: __('oro.datagrid.action.rename_grid_view'),
+                    name: 'rename',
+                    enabled: typeof currentView !== 'undefined' && this.permissions.EDIT &&
+                             (currentView.get('type') === 'private' ||
+                                (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
+                },
+                {
                     label: __('oro.datagrid.action.save_grid_view_as'),
                     name: 'save_as',
                     enabled: this.permissions.CREATE
@@ -447,6 +477,11 @@ define([
                     name: 'delete',
                     enabled: typeof currentView !== 'undefined' && currentView.get('type') !== 'system' &&
                              this.permissions.DELETE
+                },
+                {
+                    label: __('oro.datagrid.action.discard_grid_view_changes'),
+                    name: 'discard_changes',
+                    enabled: this.viewDirty
                 }
             ];
         },
