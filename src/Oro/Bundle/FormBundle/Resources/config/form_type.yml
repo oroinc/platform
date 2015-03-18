@@ -127,6 +127,7 @@ services:
         class: %oro_form.type.rich_text.class%
         arguments:
             - @oro_config.global
+            - %kernel.cache_dir%
         calls:
             - [setAssetHelper, ["@?templating.helper.assets="]]
         tags:
