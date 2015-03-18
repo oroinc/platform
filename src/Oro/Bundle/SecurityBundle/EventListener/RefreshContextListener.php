@@ -87,18 +87,20 @@ class RefreshContextListener
      */
     protected function refreshEntity($entity)
     {
+        $entityClass = ClassUtils::getClass($entity);
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getManagerForClass($entityClass);
+
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {
-            $entity->__load();
+            // We cannot use $entity->__load(); because of bug BAP-7851
+            return $entityManager->find($entityClass, $entityId);
         }
 
         if (!$this->doctrineHelper->getSingleEntityIdentifier($entity)) {
             return null;
         }
-
-        $entityClass = ClassUtils::getClass($entity);
-
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityClass);
 
         return $entityManager->merge($entity);
     }
