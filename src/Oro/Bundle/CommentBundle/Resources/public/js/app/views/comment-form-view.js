@@ -39,14 +39,8 @@ define(function (require) {
             attachmentSize: null
         },
 
-        /**
-         * Stores timeoutId for delayed hideErrors handler
-         * @type {number}
-         */
-        hideErrorsTimeoutId: null,
-
         initialize: function (options) {
-            this.template = _.template($(options.template ).html());
+            this.template = _.template($(options.template).html());
             this.isAddForm = this.model.isNew();
             if (this.isAddForm) {
                 // save instance of empty model
@@ -62,7 +56,6 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
-            this._clearHideErrorsTimeout();
             CommentFormView.__super__.dispose.apply(this, arguments);
         },
 
@@ -81,9 +74,7 @@ define(function (require) {
 
             this.$('form')
                 .addClass(this.isAddForm ? 'add-form' : 'edit-form')
-                .validate({invalidHandler: function(event, validator) {
-                    self.scheduleHideErrors(_.bind(validator.resetFormErrors, validator));
-                }});
+                .validate();
             mediator.execute('layout:init', this.$('form'), this);
             if (!this.isAddForm) {
                 this.bindData();
@@ -141,27 +132,6 @@ define(function (require) {
         },
 
         /**
-         * Schedule hideErrors handler
-         *
-         * @param {function} hideErrors
-         */
-        scheduleHideErrors: function (hideErrors) {
-            this._clearHideErrorsTimeout();
-            this.hideErrorsTimeoutId = _.delay(hideErrors, HIDE_ERRORS_TIMEOUT);
-        },
-
-        /**
-         * Stops delayed hideErrors handler
-         * @protected
-         */
-        _clearHideErrorsTimeout: function () {
-            if (this.hideErrorsTimeoutId) {
-                clearTimeout(this.hideErrorsTimeoutId);
-                this.hideErrorsTimeoutId = null;
-            }
-        },
-
-        /**
          * Fetches options with form-data to send it over ajax
          *
          * @param {Object=} options initial options
@@ -187,6 +157,9 @@ define(function (require) {
          *  - clears form if necessary
          */
         onSuccess: function () {
+            if (this.disposed) {
+                return;
+            }
             this.subview('loading').hide();
             if (this.isAddForm) {
                 this._clearForm();
@@ -209,7 +182,6 @@ define(function (require) {
                 validator = this.$('form').data('validator');
                 if (validator) {
                     validator.showBackendErrors(jqxhr.responseJSON.errors);
-                    this.scheduleHideErrors(_.bind(validator.resetFormErrors, validator));
                 }
             }
         }

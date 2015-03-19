@@ -138,7 +138,7 @@ define(function (require) {
          * @returns {boolean}
          */
         isShown: function () {
-            return this.$el.hasClass('shown');
+            return !this.disposed && this.$el.hasClass('shown');
         },
 
         /**

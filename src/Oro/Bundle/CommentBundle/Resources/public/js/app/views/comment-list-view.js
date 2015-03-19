@@ -21,10 +21,20 @@ define(function (require) {
             'sync collection': 'renderAllItems'
         },
 
+        events: {
+            'click .add-comment-button': 'addModel'
+        },
+
         firstExpandedItems: 5,
 
+        /**
+         * Flag if user is permitted to add comments
+         * @type {boolean}
+         */
+        canCreate: false,
+
         initialize: function (options) {
-            _.extend(this, _.pick(options || {}, ['firstExpandedItems']));
+            _.extend(this, _.pick(options || {}, ['firstExpandedItems', 'canCreate']));
             this.template = _.template($(options.template).html());
             CommentListView.__super__.initialize.apply(this, arguments);
         },
@@ -33,6 +43,11 @@ define(function (require) {
             CommentListView.__super__.render.call(this);
             this.createPaginationView();
             return this;
+        },
+
+        addModel: function (e) {
+            e.stopPropagation();
+            this.collection.trigger('toAdd');
         },
 
         createPaginationView: function () {
@@ -54,6 +69,7 @@ define(function (require) {
             var data = CommentListView.__super__.getTemplateData.call(this);
             data.cid = this.cid;
             data.accordionId = this.getAccordionId();
+            data.canCreate = this.canCreate;
             return data;
         },
 
