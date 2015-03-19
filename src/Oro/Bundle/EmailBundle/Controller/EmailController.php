@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -24,7 +22,7 @@ use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * Class EmailController
