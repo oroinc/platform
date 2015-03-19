@@ -163,12 +163,12 @@ class TagManager
                 );
             }
 
-            $taggingCollection = $this->getTaggingCollection($entity, $tag);
+            $taggingCollection = $this->getTaggingCollection ($entity, $tag);
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
                 if ($owner = $tagging->getOwner()) {
-                    if ($this->getUser ()->getId() == $owner->getId()) {
+                    if ($this->securityContext->getToken ()->getUser ()->getId() == $owner->getId()) {
                         $entry['owner'] = true;
                     }
                 }
