@@ -32,6 +32,14 @@ oro:
                         non_threaded.label: Non-Threaded
                         threaded.label: Threaded
 
+            attachment_configuration:
+                label: Attachments
+                link_to_scope:
+                    label: Link Attachments To Context Entity
+                    choices:
+                        auto.label: Auto
+                        manual.label: Manual
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
