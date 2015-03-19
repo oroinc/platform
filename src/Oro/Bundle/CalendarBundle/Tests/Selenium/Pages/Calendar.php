@@ -123,11 +123,11 @@ class Calendar extends Calendars
     {
         $this->test->byXPath("//a[@class='btn add-list-item'][contains(., 'Add')]")->click();
         $this->waitForAjax();
-        $method = $this->test->select($this->test->byId('oro_calendar_event_form_reminders_0_method'));
+        $method = $this->test->select($this->test->byXPath("//select[@id[contains(., 'method')]]"));
         $method->selectOptionByLabel($reminderMethod);
-        $interval = $this->test->byId('oro_calendar_event_form_reminders_0_interval_number');
+        $interval = $this->test->byXPath("//input[@id[contains(., 'interval_number')]]");
         $interval->value($reminderInterval);
-        $unit = $this->test->select($this->test->byId('oro_calendar_event_form_reminders_0_interval_unit'));
+        $unit = $this->test->select($this->test->byXPath("//select[@id[contains(., 'interval_unit')]]"));
         $unit->selectOptionByLabel($intervalUnit);
 
         return $this;
