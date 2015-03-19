@@ -315,14 +315,16 @@
     Parameters:
         attachments - an array of Oro\Bundle\EmailBundle\Entity\EmailAttachment
 #}
-{% macro attachments(attachments) -%}
+{% macro attachments(attachments, canLinkAttachment) -%}
     {%- for attachment in attachments -%}
     <a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
         <span class="label label-info">{{ attachment.fileName }}</span>
     </a>
-    <a href="{{ path('oro_email_attachment_link', {id: attachment.id}) }}">
-        <i class="icon-link"></i>
-    </a>
+    {% if canLinkAttachment == true %}
+        <a href="{{ path('oro_email_attachment_link', {id: attachment.id}) }}">
+            <i class="icon-link"></i>
+        </a>
+    {% endif %}
     {%- endfor -%}
 {%- endmacro %}
 

@@ -260,7 +260,9 @@ define(function (require) {
                     type: 'get',
                     dataType: 'html',
                     data: {
-                        _widgetContainer: 'dialog'
+                        _widgetContainer: 'dialog',
+                        targetActivityClass: model.get('targetEntityData').class,
+                        targetActivityId: model.get('targetEntityData').id
                     }
                 };
 
