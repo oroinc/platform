@@ -211,6 +211,17 @@ class EmailController extends Controller
     }
 
     /**
+     * Link attachment to entity
+     *
+     * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_view")
+     */
+    public function linkAction(EmailAttachment $entity)
+    {
+        return [$entity->getId()];
+    }
+
+    /**
      * @Route("/widget", name="oro_email_widget_emails")
      * @Template
      * @AclAncestor("oro_email_view")

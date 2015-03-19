@@ -320,6 +320,9 @@
     <a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
         <span class="label label-info">{{ attachment.fileName }}</span>
     </a>
+    <a href="{{ path('oro_email_attachment_link', {id: attachment.id}) }}">
+        <i class="icon-link"></i>
+    </a>
     {%- endfor -%}
 {%- endmacro %}
 
