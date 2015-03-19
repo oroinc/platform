@@ -63,9 +63,10 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $originalConfig[] = array();
         }
 
-        $mergedConfig = [array_merge_recursive($originalConfig[0], $config)];
+        $mergedConfig = array_merge_recursive($originalConfig[0], $config);
+        $originalConfig[0] = $mergedConfig;
 
-        $container->setExtensionConfig('security', $mergedConfig);
+        $container->setExtensionConfig('security', $originalConfig);
     }
 
     /**
