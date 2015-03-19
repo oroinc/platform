@@ -158,12 +158,13 @@ class OroCronExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilder->setExtensionConfig('security', $originalConfig);
 
         $platformExtension = new OroPlatformExtension();
-        $mergeConfigurationIntoOne = new \ReflectionMethod('Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension', 'mergeConfigIntoOne');
+        $mergeConfigurationIntoOne = new \ReflectionMethod(
+            'Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension',
+            'mergeConfigIntoOne');
         $mergeConfigurationIntoOne->setAccessible(true);
 
         $mergeConfigurationIntoOne->invoke($platformExtension, $containerBuilder, 'security', $additionalConfig);
 
         $this->assertEquals($expectedConfig, $containerBuilder->getExtensionConfig('security'));
     }
-
 }
