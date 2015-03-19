@@ -197,29 +197,6 @@ class TrackingProcessor implements LoggerAwareInterface
 
             $identifier = $visit->getIdentifierTarget();
             if ($identifier) {
-                $associationName = ExtendHelper::buildAssociationName(
-                    ClassUtils::getClass($identifier),
-                    IdentifierEventExtension::ASSOCIATION_KIND
-                );
-
-                $this->getEntityManager()
-                    ->createQueryBuilder()
-                    ->update(self::TRACKING_VISIT_ENTITY, 'entity')
-                    ->set('entity.' . $associationName, ':identifier')
-                    ->set('entity.identifierDetected', ':detected')
-                    ->where('entity.visitorUid = :visitorUid')
-                    ->andWhere('entity.firstActionTime < :maxDate')
-                    ->andWhere('entity.identifierDetected = false')
-                    ->andWhere('entity.parsedUID = 0')
-                    ->andWhere('entity.trackingWebsite  = :website')
-                    ->setParameter('visitorUid', $visit->getVisitorUid())
-                    ->setParameter('maxDate', $visit->getFirstActionTime())
-                    ->setParameter('website', $visit->getTrackingWebsite())
-                    ->setParameter('identifier', $identifier)
-                    ->setParameter('detected', true)
-                    ->getQuery()
-                    ->execute();
-
                 // update tracking event identifiers
                 $associationName = ExtendHelper::buildAssociationName(
                     ClassUtils::getClass($identifier),
@@ -245,6 +222,29 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->set('event.' . $associationName, ':identifier')
                     ->where($qb->expr()->in('event.visit', $subSelect))
                     ->setParameter('identifier', $identifier)
+                    ->getQuery()
+                    ->execute();
+
+                $associationName = ExtendHelper::buildAssociationName(
+                    ClassUtils::getClass($identifier),
+                    IdentifierEventExtension::ASSOCIATION_KIND
+                );
+
+                $this->getEntityManager()
+                    ->createQueryBuilder()
+                    ->update(self::TRACKING_VISIT_ENTITY, 'entity')
+                    ->set('entity.' . $associationName, ':identifier')
+                    ->set('entity.identifierDetected', ':detected')
+                    ->where('entity.visitorUid = :visitorUid')
+                    ->andWhere('entity.firstActionTime < :maxDate')
+                    ->andWhere('entity.identifierDetected = false')
+                    ->andWhere('entity.parsedUID = 0')
+                    ->andWhere('entity.trackingWebsite  = :website')
+                    ->setParameter('visitorUid', $visit->getVisitorUid())
+                    ->setParameter('maxDate', $visit->getFirstActionTime())
+                    ->setParameter('website', $visit->getTrackingWebsite())
+                    ->setParameter('identifier', $identifier)
+                    ->setParameter('detected', true)
                     ->getQuery()
                     ->execute();
             }
@@ -296,7 +296,12 @@ class TrackingProcessor implements LoggerAwareInterface
             $trackingVisitEvent->setVisit($trackingVisit);
             $trackingVisitEvent->setWebEvent($event);
 
-            $this->trackingIdentification->processEvent($trackingVisitEvent);
+            $targets = $this->trackingIdentification->processEvent($trackingVisitEvent);
+            if (!empty($targets)) {
+                foreach ($targets as $target) {
+                    $trackingVisitEvent->addAssociationTarget($target);
+                }
+            }
 
             $event->setParsed(true);
 

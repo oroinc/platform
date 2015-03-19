@@ -37,8 +37,18 @@ interface TrackingEventIdentifierInterface
      */
     public function getIdentityTarget();
 
+    /**
+     * @param TrackingVisitEvent $trackingVisitEvent
+     * @return bool
+     */
     public function isApplicableVisitEvent(TrackingVisitEvent $trackingVisitEvent);
 
+    /**
+     * Return array with target objects we should associate current tracking visit event
+     *
+     * @param TrackingVisitEvent $trackingVisitEvent
+     * @return array
+     */
     public function processEvent(TrackingVisitEvent $trackingVisitEvent);
 
     /**

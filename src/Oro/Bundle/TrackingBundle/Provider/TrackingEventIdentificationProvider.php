@@ -45,12 +45,12 @@ class TrackingEventIdentificationProvider
      */
     public function getTargetIdentityEntities()
     {
-        $targetEntityClassses = [];
+        $targetEntityClasses = [];
         foreach ($this->providers as $provider) {
-            $targetEntityClassses[] = $provider->getIdentityTarget();
+            $targetEntityClasses[] = $provider->getIdentityTarget();
         }
 
-        return $targetEntityClassses;
+        return $targetEntityClasses;
     }
 
     /**
@@ -58,20 +58,27 @@ class TrackingEventIdentificationProvider
      */
     public function getEventTargetEntities()
     {
-        $targetEntityClassses = [];
+        $targetEntityClasses = [];
         foreach ($this->providers as $provider) {
-            $targetEntityClassses = array_merge($targetEntityClassses, $provider->getEventTargets());
+            $targetEntityClasses = array_merge($targetEntityClasses, $provider->getEventTargets());
         }
 
-        return array_unique($targetEntityClassses);
+        return array_unique($targetEntityClasses);
     }
 
+    /**
+     * @param TrackingVisitEvent $trackingVisitEvent
+     * @return array
+     */
     public function processEvent(TrackingVisitEvent $trackingVisitEvent)
     {
+        $targets = [];
         foreach ($this->providers as $provider) {
             if ($provider->isApplicableVisitEvent($trackingVisitEvent)) {
-                return $provider->processEvent($trackingVisitEvent);
+                $targets = array_merge($targets, $provider->processEvent($trackingVisitEvent));
             }
         }
+
+        return $targets;
     }
 }
