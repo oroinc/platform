@@ -160,7 +160,8 @@ class OroCronExtensionTest extends \PHPUnit_Framework_TestCase
         $platformExtension = new OroPlatformExtension();
         $mergeConfigurationIntoOne = new \ReflectionMethod(
             'Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension',
-            'mergeConfigIntoOne');
+            'mergeConfigIntoOne'
+        );
         $mergeConfigurationIntoOne->setAccessible(true);
 
         $mergeConfigurationIntoOne->invoke($platformExtension, $containerBuilder, 'security', $additionalConfig);
