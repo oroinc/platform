@@ -139,7 +139,7 @@ class Calendar extends Calendars
      */
     public function setAllDayEventOff()
     {
-        if ($this->assertElementPresent("//input[@id='oro_calendar_event_form_allDay'][@value='1']")) {
+        if ($this->isElementPresent("//input[@id='oro_calendar_event_form_allDay'][@value='1']")) {
             $this->test->byXPath("//input[@id='oro_calendar_event_form_allDay']")->click();
         }
 
