@@ -104,7 +104,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ->method('getContent')
             ->will($this->returnValue($srcAttachmentContent));
         $srcAttachmentFileName->expects($this->once())
-            ->method('getDecodedValue')
+            ->method('getValue')
             ->will($this->returnValue('fileName'));
         $srcAttachmentContent->expects($this->once())
             ->method('getContent')
