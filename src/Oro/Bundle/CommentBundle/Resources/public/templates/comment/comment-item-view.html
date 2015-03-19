@@ -5,14 +5,14 @@
     <div class="comment-title-info">
         <% if (owner_id) {  %>
             <%= _.__('oro.comment.item.added',{
-                user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
-                time: '<i class="date">' + createdTime + '</i>'
+                user: '<a class="user nowrap" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
+                time: '<i class="date nowrap">' + createdTime + '</i>'
             }) %>
         <% } %>
         <% if (editor_id) { %>,
             <%= _.__('oro.comment.item.update',{
-                user: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
-                time: '<i class="date">' + updatedTime + '</i>'
+                user: '<a class="user nowrap" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
+                time: '<i class="date nowrap">' + updatedTime + '</i>'
             }) %>
         <% } %>
     </div>

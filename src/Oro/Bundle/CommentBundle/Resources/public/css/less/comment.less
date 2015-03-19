@@ -17,9 +17,17 @@
   }
   .comment-title {
     width: 30px;
+    position: relative;
   }
   .comment-actions {
     width: 23px;
+    /** .horizontal-icon-menu; */
+    .dropdown-menu{
+      padding: 0;
+    }
+    .nav-pills {
+      padding: 0 0 0 2px;
+    }
   }
   .comment-content {
     vertical-align: middle;
@@ -46,10 +54,10 @@
         display: block;
         position: absolute;
         background: white;
-        width: 260px;
+        max-width: 260px;
         z-index: 1;
-        top: 25px;
-        left: 25px;
+        top: 44px;
+        left: 10px;
         border-radius: 3px;
         padding: 0.5em;
       }
