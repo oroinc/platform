@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class UpdateEntityConfigFieldValueQuery implements MigrationQuery, ConnectionAwareInterface
+class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
 {
     /**
      * @var string
@@ -38,11 +37,6 @@ class UpdateEntityConfigFieldValueQuery implements MigrationQuery, ConnectionAwa
     protected $value;
 
     /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * @param string $entityName
      * @param string $fieldName
      * @param string $scope
@@ -61,23 +55,37 @@ class UpdateEntityConfigFieldValueQuery implements MigrationQuery, ConnectionAwa
     /**
      * {@inheritdoc}
      */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription()
     {
-        return 'Update entity config value for specific field';
+        $logger = new ArrayLogger();
+        $logger->info(
+            sprintf(
+                'Set entity "%s" config value "%s" for field "%s" in scope "%s" to "%s"',
+                $this->entityName,
+                $this->code,
+                $this->fieldName,
+                $this->scope,
+                var_export($this->value, true)
+            )
+        );
+        $this->updateFieldConfig($logger, true);
+
+        return $logger->getMessages();
     }
 
     /**
      * {@inheritdoc}
      */
     public function execute(LoggerInterface $logger)
+    {
+        $this->updateFieldConfig($logger);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     */
+    protected function updateFieldConfig(LoggerInterface $logger, $dryRun = false)
     {
         $sql = 'SELECT f.id, f.data
             FROM oro_entity_config_field as f
@@ -87,7 +95,6 @@ class UpdateEntityConfigFieldValueQuery implements MigrationQuery, ConnectionAwa
             LIMIT 1';
         $parameters = [$this->entityName, $this->fieldName];
         $row = $this->connection->fetchAssoc($sql, $parameters);
-        $this->logQuery($logger, $sql, $parameters);
 
         if ($row) {
             $data = $row['data'];
@@ -99,20 +106,12 @@ class UpdateEntityConfigFieldValueQuery implements MigrationQuery, ConnectionAwa
             // update field itself
             $sql = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
             $parameters = [$data, $id];
-            $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
             $this->logQuery($logger, $sql, $parameters);
-        }
-    }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param string $sql
-     * @param array $parameters
-     */
-    protected function logQuery(LoggerInterface $logger, $sql, array $parameters)
-    {
-        $message = sprintf('%s with parameters [%s]', $sql, implode(', ', $parameters));
-        $logger->debug($message);
+            if (!$dryRun) {
+                $statement = $this->connection->prepare($sql);
+                $statement->execute($parameters);
+            }
+        }
     }
 }
