@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CommentBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
@@ -24,8 +25,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class CommentApiManager extends ApiEntityManager
 {
-    const ITEMS_PER_PAGE = 10;
-
     /** @var ObjectManager */
     protected $em;
 
@@ -78,10 +77,12 @@ class CommentApiManager extends ApiEntityManager
      * @param string $entityClass
      * @param int    $entityId
      * @param int    $page
+     * @param int    $limit
+     * @param array  $filters
      *
      * @return array
      */
-    public function getCommentList($entityClass, $entityId, $page = 1)
+    public function getCommentList($entityClass, $entityId, $page = 1, $limit = 10, $filters = [])
     {
         $entityName = $this->convertRelationEntityClassName($entityClass);
         $result     = [
@@ -98,11 +99,12 @@ class CommentApiManager extends ApiEntityManager
             /** @var QueryBuilder $qb */
             $qb = $repository->getBaseQueryBuilder($fieldName, $entityId);
             $qb->orderBy('c.createdAt', 'DESC');
+            $this->addFilters($qb, $filters);
 
             $pager = $this->pager;
             $pager->setQueryBuilder($qb);
             $pager->setPage($page);
-            $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
+            $pager->setMaxPerPage($limit);
             $pager->init();
 
             $result['data']  = $this->getEntityViewModels($pager->getAppliedResult(), $entityClass, $entityId);
@@ -203,6 +205,31 @@ class CommentApiManager extends ApiEntityManager
     public function isCommentable()
     {
         return $this->securityFacade->isGranted('oro_comment_view');
+    }
+
+    /**
+     * Adds filters to a query builder
+     *
+     * @param QueryBuilder   $qb
+     * @param array|Criteria $filters Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                or \Doctrine\Common\Collections\Criteria
+     */
+    protected function addFilters(QueryBuilder $qb, $filters)
+    {
+        if ($filters) {
+            if (is_array($filters)) {
+                $newCriteria = new Criteria();
+                foreach ($filters as $fieldName => $value) {
+                    $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+                }
+
+                $filters = $newCriteria;
+            }
+
+            if ($filters instanceof Criteria) {
+                $qb->addCriteria($filters);
+            }
+        }
     }
 
     /**
