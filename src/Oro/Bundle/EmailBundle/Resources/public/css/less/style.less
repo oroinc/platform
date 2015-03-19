@@ -1,0 +1,162 @@
+.emailtemplate-translatation {
+  .tab-content {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    .tab-pane {
+      input,
+      textarea {
+        width: 100%;
+      }
+    }
+  }
+}
+.emailtemplate-variables {
+  .tab-content {
+    padding-top: 12px;
+    padding-bottom: 10px;
+  }
+  .breadcrumb {
+    float: none;
+    padding-left: 15px;
+    padding-bottom: 10px;
+    &>li,
+    &>li.active {
+      text-transform: none;
+      font-size: 13px;
+    }
+  }
+  .variables {
+    .groups {
+      padding-left: 15px;
+    }
+    .group-label {
+      font-weight: bold;
+    }
+  }
+}
+.modal-body {
+  .loading-content {
+    background: #fff url('../../img/loader.gif') no-repeat center left;
+    padding-left: 30px;
+  }
+}
+.ui-dialog {
+  .email-form {
+    .mce-tinymce {
+      width: calc(~"97% + 12px");
+    }
+    .form-horizontal {
+      .control-group {
+        max-width: none;
+        .controls {
+          .validation-failed {
+            margin-left: 14px;
+          }
+        }
+      }
+    }
+    input[type=radio] {
+      width: auto;
+    }
+    input,
+    textarea,
+    .uneditable-input {
+      width: 97%;
+    }
+  }
+  pre.email-body,
+  iframe.email-body,
+  .email-form textarea {
+    height: 200px;
+  }
+}
+.select2-container.select2-container-multi.taggable-email {
+  width: calc(~"97% + 12px");
+  max-width: none;
+  position: relative;
+  ul.select2-choices {
+    padding-right: 60px;
+  }
+}
+#cc-bcc-holder {
+  position: absolute;
+  top: 5px;
+  right: 0;
+}
+#showCc, #showBcc {
+  cursor:pointer;
+  padding: 0 5px;
+}
+#showCc:hover, #showBcc:hover {
+  text-decoration: underline;
+}
+.thread-view {
+  .email-head {
+    border-bottom: 1px solid #eee;
+    overflow: hidden;
+    padding: 10px;
+    a.subject {
+      font-size: 16px;
+    }
+  }
+  .email-body {
+    margin: 10px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    .quote,
+    .gmail_quote {
+      background-color: #eee;
+      padding: 4px;
+      -webkit-border-radius: 4px;
+      border-radius: 4px;
+    }
+  }
+}
+.accordion-group {
+  .accordion-heading {
+    .title-item {
+      span.icon.head {
+        position: relative;
+        left: 2px;
+      }
+      span.icon {
+        i.icon-envelope {
+          background: white;
+        }
+        i.icon-envelope-alt {
+          position: absolute;
+          top: 6px;
+          left: -32px;
+          background: white;
+          line-height: 16px;
+          border-radius: 2px;
+        }
+      }
+      span.icon.head-alt {
+        position: absolute;
+      }
+    }
+  }
+}
+.thread-icon {
+  span.icon.head {
+    position: relative;
+    left: 2px;
+  }
+  span.icon {
+    i.icon-envelope {
+      background: white;
+    }
+    i.icon-envelope-alt {
+      position: absolute;
+      top: 6px;
+      left: -20px;
+      background: white;
+      line-height: 12px;
+      border-radius: 2px;
+    }
+  }
+  span.icon.head-alt {
+    position: absolute;
+  }
+}
