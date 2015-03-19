@@ -130,61 +130,54 @@ class TagManager
      * @param ArrayCollection|null $tags
      * @return array
      */
-    public function getPreparedArray(Taggable $entity, $tags = null)
+    public function getPreparedArray (Taggable $entity, $tags = null)
     {
         if (is_null($tags)) {
             $this->loadTagging($entity);
             $tags = $entity->getTags();
         }
-        $result = [];
+        $result = array();
 
         /** @var Tag $tag */
         foreach ($tags as $tag) {
-            $entry = [
+            $entry = array(
                 'name' => $tag->getName()
-            ];
+            );
             if (!$tag->getId()) {
                 $entry = array_merge(
                     $entry,
-                    [
+                    array(
                         'id'    => $tag->getName(),
                         'url'   => false,
                         'owner' => true
-                    ]
+                    )
                 );
             } else {
                 $entry = array_merge(
                     $entry,
-                    [
+                    array(
                         'id'    => $tag->getId(),
-                        'url'   => $this->router->generate('oro_tag_search', ['id' => $tag->getId()]),
+                        'url'   => $this->router->generate('oro_tag_search', array('id' => $tag->getId())),
                         'owner' => false
-                    ]
+                    )
                 );
             }
 
-            $taggingCollection = $tag->getTagging()->filter(
-                function (Tagging $tagging) use ($entity) {
-                    // only use tagging entities that related to current entity
-                    return $tagging->getEntityName() == ClassUtils::getClass($entity)
-                    && $tagging->getRecordId() == $entity->getTaggableId();
-                }
-            );
+            $taggingCollection = $this->getTaggingCollection($entity, $tag);
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
                 if ($owner = $tagging->getOwner()) {
-                    if ($this->getUser()->getId() == $owner->getId()) {
+                    if ($this->getUser ()->getId() == $owner->getId()) {
                         $entry['owner'] = true;
                     }
                 }
             }
 
-            $entry['moreOwners'] = $taggingCollection->count() > 1;
+            $entry['moreOwners'] = count ($taggingCollection) > 1;
 
             $result[] = $entry;
         }
-
         return $result;
     }
 
@@ -359,6 +352,29 @@ class TagManager
         $repository = $this->em->getRepository($this->tagClass);
 
         return new ArrayCollection($repository->getTagging($resource, $createdBy, $all, $this->getOrganization()));
+    }
+    
+    /**
+     * Get entity tagging
+     * 
+     * @param Taggable $entity
+     * @param Tag $tag
+     * @return array
+     */
+    public function getTaggingCollection(Taggable $entity, Tag $tag)
+    {
+        $query = $this->em->createQueryBuilder();
+
+        $query
+            ->select('o', 't')
+            ->from('OroTagBundle:Tagging', 't')
+            ->leftJoin('t.owner', 'o')
+            ->where($query->expr()->eq('t.entityName', $query->expr()->literal(ClassUtils::getClass($entity))))
+            ->andWhere($query->expr()->eq('t.recordId', $entity->getTaggableId()));
+
+        return $query
+            ->getQuery()
+            ->getResult();
     }
 
     /**
