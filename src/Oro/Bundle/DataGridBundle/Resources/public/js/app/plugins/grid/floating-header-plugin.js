@@ -111,7 +111,7 @@ define(function (require) {
             });
 
             // FF sometimes gives wrong values, need to check
-            sumWidth = _.reduce(widths, function (a,b){return a+b});
+            sumWidth = _.reduce(widths, function (a, b) {return a + b});
             if (sumWidth > totalWidth) {
                 widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001
             }
