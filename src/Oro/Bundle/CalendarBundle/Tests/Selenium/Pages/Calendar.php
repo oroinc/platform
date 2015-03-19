@@ -93,6 +93,60 @@ class Calendar extends Calendars
     }
 
     /**
+     * This method adds existing user as a guest to calendar event
+     * @param $username
+     * @return $this
+     */
+    public function setGuestUser($username)
+    {
+        $this->test->byXpath(
+            "//div[starts-with(@id,'s2id_oro_calendar_event_form_invitedUsers')]//input"
+        )->value($username);
+        $this->waitForAjax();
+        $this->assertElementPresent(
+            "//div[@id='select2-drop']//div[contains(., '{$username}')]",
+            "Guest user not found"
+        );
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$username}')]")->click();
+
+        return $this;
+    }
+
+    /**
+     * This method sets reminder and it parameters
+     * @param string $reminderMethod
+     * @param string $reminderInterval
+     * @param string $intervalUnit
+     * @return $this
+     */
+    public function setReminder($reminderMethod = 'Email', $reminderInterval = '10', $intervalUnit = 'minutes')
+    {
+        $this->test->byXPath("//a[@class='btn add-list-item'][contains(., 'Add')]")->click();
+        $this->waitForAjax();
+        $method = $this->test->select($this->test->byId('oro_calendar_event_form_reminders_0_method'));
+        $method->selectOptionByLabel($reminderMethod);
+        $interval = $this->test->byId('oro_calendar_event_form_reminders_0_interval_number');
+        $interval->value($reminderInterval);
+        $unit = $this->test->select($this->test->byId('oro_calendar_event_form_reminders_0_interval_unit'));
+        $unit->selectOptionByLabel($intervalUnit);
+
+        return $this;
+    }
+
+    /**
+     * This methods switch off all day long option in calendar event
+     * @return $this
+     */
+    public function setAllDayEventOff()
+    {
+        if ($this->assertElementPresent("//input[@id='oro_calendar_event_form_allDay'][@value='1']")) {
+            $this->test->byXPath("//input[@id='oro_calendar_event_form_allDay']")->click();
+        }
+
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function saveEvent()
