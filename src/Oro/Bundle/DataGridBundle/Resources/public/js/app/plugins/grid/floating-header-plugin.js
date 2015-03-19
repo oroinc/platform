@@ -101,9 +101,10 @@ define(function (require) {
             // compensate scroll bar
             if (this.scrollVisible) {
                 this.$grid.css({borderRight: scrollBarWidth + 'px solid transparent'});
+                totalWidth = this.$grid[0].offsetWidth - scrollBarWidth;
+            } else {
+                totalWidth = this.$grid[0].offsetWidth;
             }
-
-            totalWidth = this.$grid[0].offsetWidth;
 
             // save widths
             headerCells.each(function (i, headerCell) {
@@ -135,9 +136,8 @@ define(function (require) {
                 }
             });
 
-            if (this.scrollVisible) {
-                this.$grid.css({borderRight: 'none'});
-            }
+            this.$grid.css({borderRight: 'none'});
+
             this.$el.addClass('floatThead');
             this.$grid.css({
                 width: totalWidth
