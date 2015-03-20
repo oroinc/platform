@@ -39,7 +39,6 @@ define(function (require) {
             var options = {
                 relationId:    this.relatedEntityId,
                 relationClass: this.relatedEntityClassName,
-                canCreate:     this.canCreate,
                 page:          this.getPage()
             };
             return routing.generate(this.route, options);

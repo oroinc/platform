@@ -35,6 +35,25 @@ class RestApiTest extends WebTestCase
         $this->getJsonResponseContent($this->client->getResponse(), 200);
     }
 
+    public function testCgetFiltering()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_api_comment_get_items',
+                [
+                    'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
+                    'relationId'    => 1
+                ]
+            ) . '?createdAt<2014-03-04T20:00:00+0000'
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals(0, $result['count']);
+        $this->assertCount(0, $result['data']);
+    }
+
     public function testPost()
     {
         $request = [

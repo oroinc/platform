@@ -1,6 +1,6 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
 
-<form method="post" class="comment-form well">
+<form method="post" class="comment-form">
     <fieldset class="form-horizontal">
         <label>
             {{ form_widget(form.message) }}
@@ -15,13 +15,17 @@
             </div>
             <% } %>
         </div>
-        <div class="pull-right">
-            <button class="btn add-comment-button" type="submit">
-                <%= id ? _.__('oro.comment.from.button.edit_comment.label') : _.__('oro.comment.from.button.add_comment.label') %>
-            </button>
-            <% if (id) { %>
+        <div class="widget-actions pull-right">
             <button class="btn cancel-comment-button" type="reset">
                 <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
+            </button>
+            <% if (id) { %>
+            <button class="btn btn-primary" type="submit">
+                <%= _.__('oro.comment.from.button.edit_comment.label') %>
+            </button>
+            <% } else { %>
+            <button class="btn btn-primary" type="submit">
+                <%= _.__('oro.comment.from.button.send_comment.label') %>
             </button>
             <% } %>
         </div>
