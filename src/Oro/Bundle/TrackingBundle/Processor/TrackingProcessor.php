@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -18,6 +17,7 @@ use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
+use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider;
 
 class TrackingProcessor implements LoggerAwareInterface
@@ -52,6 +52,9 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var array */
     protected $skipList = [];
 
+    /** @var DeviceDetectorFactory  */
+    protected $deviceDetector;
+
     /**
      * @param ManagerRegistry                     $doctrine
      * @param TrackingEventIdentificationProvider $trackingIdentification
@@ -60,6 +63,7 @@ class TrackingProcessor implements LoggerAwareInterface
     {
         $this->doctrine               = $doctrine;
         $this->trackingIdentification = $trackingIdentification;
+        $this->deviceDetector = new DeviceDetectorFactory();
     }
 
     /**
@@ -290,7 +294,7 @@ class TrackingProcessor implements LoggerAwareInterface
             $trackingVisitEvent->setEvent($this->getEventType($event));
 
             $eventData   = $event->getEventData();
-            $decodedData = json_decode($eventData->getData());
+            $decodedData = json_decode($eventData->getData(), true);
 
             $trackingVisit = $this->getTrackingVisit($event, $decodedData);
             $trackingVisitEvent->setVisit($trackingVisit);
@@ -329,13 +333,13 @@ class TrackingProcessor implements LoggerAwareInterface
 
     /**
      * @param TrackingEvent $trackingEvent
-     * @param \stdClass     $decodedData
+     * @param array         $decodedData
      *
      * @return TrackingVisit
      */
     protected function getTrackingVisit(TrackingEvent $trackingEvent, $decodedData)
     {
-        $visitorUid     = $decodedData->_id;
+        $visitorUid     = $decodedData['_id'];
         $userIdentifier = $trackingEvent->getUserIdentifier();
 
         $hash = md5($visitorUid . $userIdentifier);
@@ -364,6 +368,14 @@ class TrackingProcessor implements LoggerAwareInterface
             $visit->setTrackingWebsite($trackingEvent->getWebsite());
             $visit->setIdentifierDetected(false);
 
+            if (!empty($decodedData['cip'])) {
+                $visit->setIp($decodedData['cip']);
+            }
+
+            if (!empty($decodedData['ua'])) {
+                $this->processUserAgentString($visit, $decodedData['ua']);
+            }
+
             $this->identifyTrackingVisit($visit);
 
             $this->collectedVisits[$hash] = $visit;
@@ -377,6 +389,30 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         return $visit;
+    }
+
+    /**
+     * @param TrackingVisit $visit
+     * @param string        $ua
+     */
+    protected function processUserAgentString(TrackingVisit $visit, $ua)
+    {
+        $device = $this->deviceDetector->getInstance($ua);
+        $os = $device->getOs();
+        if (is_array($os)) {
+            $visit->setOs($os['name']);
+            $visit->setOsVersion($os['version']);
+        }
+        $client = $device->getClient();
+        if (is_array($client)) {
+            $visit->setClient($client['name']);
+            $visit->setClientType($client['type']);
+            $visit->setClientVersion($client['version']);
+        }
+
+        $visit->setDesktop($device->isDesktop());
+        $visit->setMobile($device->isMobile());
+        $visit->setBot($device->isBot());
     }
 
     /**

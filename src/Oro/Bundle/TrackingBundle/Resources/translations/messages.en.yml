@@ -52,6 +52,14 @@ oro:
             parsed_u_i_d.label:        Parsed UID
             parsing_count.label:       Parsing count
             ip.label:                  IP
+            client.label:              Client
+            client_type.label:         Client type
+            client_version.label:      Client version
+            os.label:                  Operating system
+            os_version.label:          Operating system
+            desktop.label:             Is desktop
+            mobile.label:              Is mobile
+            bot.label:                 Is bot
             user_identifier.label:     User identifier
             visitor_uid.label:         Unique visitor ID
             identifier_detected.label: Is UID detected

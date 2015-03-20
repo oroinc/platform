@@ -20,7 +20,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -173,6 +173,14 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('visitor_uid', 'string', ['length' => 255]);
         $table->addColumn('ip', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('client', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('client_type', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('client_version', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('os', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('os_version', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('desktop', 'boolean', ['notnull' => false]);
+        $table->addColumn('mobile', 'boolean', ['notnull' => false]);
+        $table->addColumn('bot', 'boolean', ['notnull' => false]);
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('first_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('last_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
