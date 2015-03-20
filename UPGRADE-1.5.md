@@ -24,6 +24,7 @@ fos_rest:
     routing_loader:
         default_format: json
 ```
+- Removed abandoned package `guzzle/http` from composer dependencies. Using `guzzle/guzzle` instead.
 
 ####OroAddressBundle:
 - `PhoneProvider` class has been added to help getting phone number(s) from object.

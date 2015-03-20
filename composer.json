@@ -57,7 +57,7 @@
         "a2lix/translation-form-bundle": "1.2",
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "0.1.*",
-        "guzzle/http": "3.7.*",
+        "guzzle/guzzle": "3.7.*",
         "lexik/maintenance-bundle": "v1.0.3",
         "sylius/flow-bundle": "0.6.*",
         "composer/composer": "1.0.0-alpha8",
