@@ -73,7 +73,8 @@
         "ezyang/htmlpurifier": "4.6.0",
         "components/jquery": "2.1.*",
         "components/underscore": "1.7.*",
-        "components/backbone": "1.1.*"
+        "components/backbone": "1.1.*",
+        "piwik/device-detector": "dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
