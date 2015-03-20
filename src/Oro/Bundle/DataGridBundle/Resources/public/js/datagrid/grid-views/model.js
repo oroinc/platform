@@ -41,8 +41,12 @@ define([
         initialize: function (data) {
             this.urlRoot = routing.generate(this.route);
             _.each(data.sorters, function(direction, key) {
-                data.sorters[key] = String(direction)
-            });
+                if (typeof this.directions[direction] !== 'undefined') {
+                    data.sorters[key] = this.directions[direction];
+                } else {
+                    data.sorters[key] = String(direction);
+                }
+            }, this);
         },
 
         /**

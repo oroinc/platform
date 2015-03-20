@@ -16,6 +16,12 @@ class View
     /** @var string */
     protected $type = 'system';
 
+    /**
+     * @param string $name
+     * @param array $filtersData
+     * @param array $sortersData
+     * @param string $type
+     */
     public function __construct($name, array $filtersData = [], array $sortersData = [], $type = 'system')
     {
         $this->name        = $name;

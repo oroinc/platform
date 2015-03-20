@@ -11,6 +11,13 @@ oro:
             entity_label: Grid view
             entity_plural_label: Grid views
             entity_description: Represent grid views
+            filters_data.label: Filters
+            grid_name.label: Grid name
+            id.label: Id
+            name.label: Name
+            owner.label: Owner
+            sorters_data.label: Sorters
+            type.label: Type
     grid:
         mass_action:
             label: Mass Actions

@@ -82,14 +82,14 @@ class Manager implements ManagerInterface
      */
     public function getDatagridUniqueName($name, $id = null)
     {
-        $inputName = $name;
+        $uniqueName = $name;
         if ($id) {
-            $inputName = sprintf('%s_%s', $inputName, $id);
+            $uniqueName = sprintf('%s_%s', $uniqueName, $id);
         } elseif ($widgetId = $this->request->get('_widgetId')) {
-            $inputName = sprintf('%s_w%s', $inputName, $widgetId);
+            $uniqueName = sprintf('%s_w%s', $uniqueName, $widgetId);
         }
 
-        return $inputName;
+        return $uniqueName;
     }
 
     /**
@@ -107,8 +107,8 @@ class Manager implements ManagerInterface
             }
         }
 
-        $datagridId = $this->getDatagridUniqueName($name);
-        $parameters = $this->parametersFactory->createParameters($datagridId);
+        $uniqueName = $this->getDatagridUniqueName($name);
+        $parameters = $this->parametersFactory->createParameters($uniqueName);
         $parameters->add($additionalParameters);
 
         return $this->getDatagrid($name, $parameters);
