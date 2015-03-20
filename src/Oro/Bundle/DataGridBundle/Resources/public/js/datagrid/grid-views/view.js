@@ -63,6 +63,9 @@ define([
                             '<% }); %>' +
                         '</ul>' +
                     '</div>' +
+                    '<% if (dirty) { %>' +
+                        '<div class="edited-label">&nbsp;-&nbsp;<%= editedLabel %></div>' +
+                    '<% } %>' +
                 '<% } %>' +
             '</div>'
         ),
@@ -423,7 +426,9 @@ define([
                 disabled: !this.enabled,
                 choices: this.choices,
                 current: this._getCurrentViewLabel(),
-                actionsLabel: this.viewDirty ? __('oro.datagrid.gridView.data_edited') : __('oro.datagrid.gridView.actions'),
+                dirty: this.viewDirty,
+                editedLabel: __('oro.datagrid.gridView.data_edited'),
+                actionsLabel: __('oro.datagrid.gridView.actions'),
                 actions: actions,
                 showActions: _.some(actions, function(action) {
                     return action.enabled;
