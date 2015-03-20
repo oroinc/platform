@@ -64,6 +64,8 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     }
 
     /**
+     * Create cache dir if need
+     *
      * @param string $cacheDir
      */
     protected function touchCacheDir($cacheDir)
@@ -75,6 +77,8 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     }
 
     /**
+     * Configure cache
+     *
      * @param \HTMLPurifier_Config $config
      */
     protected function fillCacheConfig($config)
@@ -92,6 +96,8 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     }
 
     /**
+     * Configure allowed tags
+     *
      * @param \HTMLPurifier_Config $config
      */
     protected function fillAllowedElementsConfig($config)
