@@ -8,18 +8,26 @@
   left: -9999px;
 }
 &, #page, #top-page {
-  overflow: hidden;
+  height: auto;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+#main {
+  float: none;
   height: 100%;
 }
+
 #top-page {
-  position: relative;
   padding-top: @headerHeight;
 }
 #oroplatform-header {
   position: fixed;
   width: 100%;
   height: @headerHeight;
+  max-height: @headerHeight;
   top: 0;
+  left: 0;
 }
 /**
  * Fixes issue when header with position fixed loses its place after blur event on some input
@@ -27,16 +35,6 @@
  */
 &.input-focused #oroplatform-header {
   position: absolute;
-}
-#main {
-  float: none;
-  height: 100%;
-  #container {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    overflow-scrolling: touch;
-    height: 100%;
-  }
 }
 
 .row {
@@ -133,8 +131,8 @@
     }
     .container-fluid,
     .grid-toolbar{
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: 10px;
+      padding-right: 10px;
     }
   }
 }
@@ -187,7 +185,13 @@
       }
       .oro-page-body {
         width: 100%;
+        overflow: hidden;
       }
     }
   }
+}
+
+&.loading > .loader-mask {
+  position: fixed;
+  bottom: 0;
 }

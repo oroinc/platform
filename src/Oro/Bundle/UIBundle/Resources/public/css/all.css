@@ -52,9 +52,6 @@
     right: 10px;
     top: 10px;
 }
-.fr{
-    float:right;
-}
 .layout-content{
     background: #fff;
 }
@@ -138,7 +135,7 @@
 /* Start: Progress bar */
 #progressbar {
     display:block;
-    margin-top:200px;
+    padding-top: 25vh;
     margin-right:auto;
     margin-left:auto;
     text-align:center;

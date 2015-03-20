@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,6 +17,9 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var LoggedUserVariablesProvider */
     protected $provider;
+
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
 
     protected function setUp()
     {
@@ -34,10 +38,15 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->provider = new LoggedUserVariablesProvider(
             $translator,
             $this->securityFacade,
-            $this->nameFormatter
+            $this->nameFormatter,
+            $this->configManager
         );
     }
 
@@ -65,7 +74,15 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
             [
-                'userName' => ['type' => 'string', 'label' => 'oro.email.emailtemplate.user_name'],
+                'userName' => [
+                    'type' => 'string',
+                    'label' => 'oro.email.emailtemplate.user_name'
+                ],
+                'userSignature' => [
+                    'type' => 'string',
+                    'label' => 'oro.email.emailtemplate.siganture',
+                    'filter' => 'oro_tag_filter'
+                ],
             ],
             $result
         );
@@ -91,6 +108,11 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'userLastName'     => ['type' => 'string', 'label' => 'oro.email.emailtemplate.user_last_name'],
                 'userFullName'     => ['type' => 'string', 'label' => 'oro.email.emailtemplate.user_full_name'],
                 'organizationName' => ['type' => 'string', 'label' => 'oro.email.emailtemplate.organization_name'],
+                'userSignature'    => [
+                    'type' => 'string',
+                    'label' => 'oro.email.emailtemplate.siganture',
+                    'filter' => 'oro_tag_filter'
+                ],
             ],
             $result
         );
@@ -113,6 +135,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'userLastName'     => '',
                 'userFullName'     => '',
                 'organizationName' => '',
+                'userSignature'    => '',
             ],
             $result
         );
@@ -140,6 +163,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'userLastName'     => '',
                 'userFullName'     => '',
                 'organizationName' => '',
+                'userSignature'    => '',
             ],
             $result
         );
@@ -167,6 +191,11 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($user))
             ->will($this->returnValue('FullName'));
 
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with('oro_email.signature')
+            ->will($this->returnValue('Signature'));
+
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
             [
@@ -175,6 +204,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'userLastName'     => 'LastName',
                 'userFullName'     => 'FullName',
                 'organizationName' => 'TestOrg',
+                'userSignature'    => 'Signature',
             ],
             $result
         );

@@ -8,10 +8,22 @@
     a.help:before{
       background-color: @baseGradientColorBorder;
     }
+    a.help:hover,
+    .dropdown > .dropdown-toggle:hover,
+    .dropdown > .oro-dropdown-toggle:hover{
+      #gradient > .vertical(lighten(@baseGradientColorStart, 3%), lighten(@baseGradientColorEnd, 3%));
+    }
   }
   .nav.top-search {
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
     padding: 0 10px 0 5px;
+    .dropdown {
+      > .dropdown-toggle {
+        &:hover > [class^=icon-] {
+          #gradient > .vertical(lighten(@baseGradientColorStart, 3%), lighten(@baseGradientColorEnd, 3%));
+        }
+      }
+    }
   }
   .navbar-inner{
     .nav {

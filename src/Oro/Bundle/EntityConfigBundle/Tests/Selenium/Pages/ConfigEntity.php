@@ -121,6 +121,22 @@ class ConfigEntity extends CustomEntity
         return $this;
     }
 
+    /**
+     * Method set activity On if it is not
+     * @param array $activities
+     * @return $this
+     */
+    public function setActivitiesOn($activities = array())
+    {
+        foreach ($activities as $activity) {
+            $xpath = "//div[@id='oro_entity_config_type_activity_activities']//label[contains(., '{$activity}')]";
+            if (!($this->isElementPresent($xpath."/preceding-sibling::input[@checked='checked']"))) {
+                $this->test->byXPath($xpath."/preceding-sibling::input")->click();
+            }
+        }
+        return $this;
+    }
+
     public function edit()
     {
         $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[contains(., 'Edit')]")->click();

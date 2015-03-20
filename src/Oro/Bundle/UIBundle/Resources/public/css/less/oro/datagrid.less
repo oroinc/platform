@@ -7,7 +7,6 @@
   padding: 9px 20px;
   .actions-panel {
     margin-left: 5px;
-    margin-bottom: 14px;
   }
   .pagination {
     margin: 0;
@@ -102,7 +101,26 @@
   }
   .caret { margin-top:11px; }
 }
-.grid-container-parent {
+.other-scroll-container {
+  overflow: hidden;
+  clear: both;
+  margin: 10px 20px 20px 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  .other-scroll{
+    position: absolute;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    z-index: 700;
+    > div {
+      width: 1px;
+    }
+  }
+}
+.grid-scrollable-container {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
   > .loader-mask {
     left: @verticalPadding;
     right: @verticalPadding;
@@ -110,37 +128,15 @@
   }
 }
 .grid-container {
-  width: 100%;
-  margin-top: 10px;
-  overflow-x: auto;
-  overflow-y: visible;
-  border:1px solid #ddd;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  margin-bottom:50px;
   .table-bordered {
-    border-width: 0;
     margin: 0;
-    td,
-    th { border-left:0; }
+    td:not(:first-child), th:not(:first-child) {
+      border-left: 0;
+    }
     .boolean-cell {
       input[type='checkbox'],
       input[type='radio'] { margin-top:0; }
     }
-  }
-}
-.no-data-visible .grid-container {
-  border: none;
-}
-.floatThead-connected {
-  .grid-container-parent > .loader-mask {
-    top: @topPadding/2 - 32 /* header height */;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-  .grid-container {
-    margin-bottom:0;
   }
 }
 .grid-without-header {
@@ -171,7 +167,7 @@
   }
 }
 .grid {
-  margin-bottom: 50px;
+  overflow: visible;
   .select-all-header-cell {
     #header-cell-dropdown();
     [type=checkbox] {

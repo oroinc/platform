@@ -10,6 +10,7 @@ use Symfony\Component\Templating\Asset\PackageInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
 class OroRichTextType extends AbstractType
 {
@@ -29,40 +30,14 @@ class OroRichTextType extends AbstractType
     protected $configManager;
 
     /**
-     * List of allowed element.
-     *
-     * @url http://www.tinymce.com/wiki.php/Configuration:valid_elements
-     * @var array
+     * @var HtmlTagProvider
      */
-    protected $allowedElements = [
-        '@[style|class]',
-        'table[cellspacing|cellpadding|border|align|width]',
-        'thead[align|valign]',
-        'tbody[align|valign]',
-        'tr[align|valign]',
-        'td[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
-        'a[!href|target=_blank|title]',
-        'dl',
-        'dt',
-        'div',
-        'ul',
-        'ol',
-        'li',
-        'em',
-        'strong/b',
-        'p',
-        'font[color]',
-        'i',
-        'br',
-        'span',
-        'img[src|width|height|alt]',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-    ];
+    protected $htmlTagProvider;
+
+    /**
+     * @var string
+     */
+    protected $cacheDir;
 
     /**
      * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
@@ -78,10 +53,14 @@ class OroRichTextType extends AbstractType
 
     /**
      * @param ConfigManager $configManager
+     * @param HtmlTagProvider $htmlTagProvider
+     * @param string $cacheDir
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, HtmlTagProvider $htmlTagProvider, $cacheDir = null)
     {
         $this->configManager = $configManager;
+        $this->htmlTagProvider = $htmlTagProvider;
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -102,7 +81,7 @@ class OroRichTextType extends AbstractType
             $allowableTags = $options['wysiwyg_options']['valid_elements'];
         }
 
-        $transformer = new SanitizeHTMLTransformer($allowableTags);
+        $transformer = new SanitizeHTMLTransformer($allowableTags, $this->cacheDir);
         $builder->addModelTransformer($transformer);
     }
 
@@ -115,7 +94,7 @@ class OroRichTextType extends AbstractType
             'plugins' => ['textcolor', 'code', 'link'],
             'toolbar_type' => self::TOOLBAR_DEFAULT,
             'skin_url' => 'bundles/oroform/css/tinymce',
-            'valid_elements' => implode(',', $this->allowedElements),
+            'valid_elements' => implode(',', $this->htmlTagProvider->getAllowedElements()),
             'menubar' => false,
             'statusbar' => false,
             'relative_urls' => false,
