@@ -3,8 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use JMS\Serializer\Annotation as JMS;
+
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 /**
  * Email Attachment
@@ -60,6 +64,15 @@ class EmailAttachment
      * @JMS\Exclude
      */
     protected $emailBody;
+
+    /**
+     * @var Attachment
+     *
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\Attachment", inversedBy="emailAttachment")
+     * @ORM\JoinColumn(name="attachment_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @JMS\Exclude
+     */
+    protected $attachment;
 
     /**
      * Get id
@@ -161,6 +174,26 @@ class EmailAttachment
     public function setEmailBody(EmailBody $emailBody)
     {
         $this->emailBody = $emailBody;
+
+        return $this;
+    }
+
+    /**
+     * @return Attachment
+     */
+    public function getAttachment()
+    {
+        return $this->attachment;
+    }
+
+    /**
+     * @param Attachment $attachment
+     *
+     * @return $this
+     */
+    public function setAttachment(Attachment $attachment)
+    {
+        $this->attachment = $attachment;
 
         return $this;
     }
