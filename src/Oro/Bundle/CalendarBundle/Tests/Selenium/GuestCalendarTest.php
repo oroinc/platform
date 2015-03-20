@@ -1,0 +1,75 @@
+<?php
+
+namespace Oro\Bundle\CalendarBundle\Tests\Selenium;
+
+use Oro\Bundle\CalendarBundle\Tests\Selenium\Pages\Calendars;
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
+
+/**
+ * Class GuestCalendarTest
+ * @package Oro\Bundle\CalendarBundle\Tests\Selenium
+ */
+class GuestCalendarTest extends Selenium2TestCase
+{
+    /**
+     * @return string
+     */
+    public function testCreateUser()
+    {
+        $username = 'User_'.mt_rand();
+
+        $login = $this->login();
+        /** @var Users $login */
+        $login->openUsers('Oro\Bundle\UserBundle')
+            ->add()
+            ->assertTitle('Create User - Users - User Management - System')
+            ->setUsername($username)
+            ->enable()
+            ->setOwner('Main')
+            ->setFirstpassword('123123q')
+            ->setSecondpassword('123123q')
+            ->setFirstName('First_'.$username)
+            ->setLastName('Last_'.$username)
+            ->setEmail($username.'@mail.com')
+            ->setRoles(['Administrator'])
+            ->setBusinessUnit()
+            ->setOrganization('OroCRM')
+            ->uncheckInviteUser()
+            ->save()
+            ->assertMessage('User saved')
+            ->close();
+
+        return $username;
+    }
+
+    /**
+     * @depends testCreateUser
+     * @param $username
+     * @return string
+     */
+    public function testAddEventToGuestUser($username)
+    {
+        $eventName = 'Event_'.mt_rand();
+        $login = $this->login();
+        /* @var Calendars $login */
+        $login->openCalendars('Oro\Bundle\CalendarBundle')
+            ->assertTitle('My Calendar - John Doe')
+            ->addEvent()
+            ->setTitle($eventName)
+            ->setStartDate('Apr 9, 2014 11:00 PM')
+            ->setEndDate('Apr 9, 2015 12:00 PM')
+            ->setAllDayEventOff()
+            ->setGuestUser($username)
+            ->setReminder('Flash message', '1', 'days')
+            ->saveEvent()
+            ->checkEventPresent($eventName)
+            ->checkReminderIcon($eventName)
+            ->logout()
+            ->setUsername($username)
+            ->setPassword('123123q')
+            ->submit()
+            ->openCalendars('Oro\Bundle\CalendarBundle')
+            ->checkEventPresent($eventName);
+    }
+}
