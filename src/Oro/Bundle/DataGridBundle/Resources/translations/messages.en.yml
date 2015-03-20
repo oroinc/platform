@@ -43,3 +43,4 @@ oro:
                 grid_settings.title: 'Data Grid settings'
             fields:
                 default_per_page.label: 'Items per Page by Default'
+                full_screen_layout_enabled.label: 'Lock headers in grids'

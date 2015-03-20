@@ -38,7 +38,13 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
 
 
-        $this->widgetConfigs = new WidgetConfigs($configProvider, $securityFacade, $resolver, $this->em, $this->stateManager);
+        $this->widgetConfigs = new WidgetConfigs(
+            $configProvider,
+            $securityFacade,
+            $resolver,
+            $this->em,
+            $this->stateManager
+        );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
                 ->disableOriginalConstructor()

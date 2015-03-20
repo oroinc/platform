@@ -268,7 +268,6 @@ i.color {
   }
 }
 .user-fieldset{
-  background: url("../../img/horizontal-divider-lite.png") repeat-x  0 50%;
   margin-bottom: 22px;
   span{
     background-color: #fff;
@@ -2969,13 +2968,15 @@ span.validation-failed {
     }
   }
 }
-// capitalize buttons, labels, titles, breadcrumb
-.btn, .btn-group a,
-#main label,
-.oro-subtitle, .title, .ui-dialog-title,
-.btn-group .dropdown-menu button,
-.breadcrumb li {
-  text-transform: capitalize;
+// capitalize buttons, labels, titles, breadcrumb for English language
+.lang-en {
+  .btn, .btn-group a,
+  #main label,
+  .oro-subtitle, .title, .ui-dialog-title,
+  .btn-group .dropdown-menu button,
+  .breadcrumb li {
+    text-transform: capitalize;
+  }
 }
 .pull-left-extra{
   margin-left: 20px;

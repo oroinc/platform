@@ -84,7 +84,7 @@ define(function (require) {
                 .validate({invalidHandler: function(event, validator) {
                     self.scheduleHideErrors(_.bind(validator.resetFormErrors, validator));
                 }});
-            mediator.execute('layout:init', this.$('form'));
+            mediator.execute('layout:init', this.$('form'), this);
             if (!this.isAddForm) {
                 this.bindData();
             }

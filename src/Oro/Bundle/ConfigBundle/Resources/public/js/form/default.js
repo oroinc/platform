@@ -5,9 +5,31 @@ define(['jquery', 'underscore'], function ($, _) {
 
     return function () {
         $(function () {
-            var value, valueEls,
+            function prepareTinymce(textareas) {
+                if (textareas.length > 0) {
+                    $(textareas).each(function (i, el){
+                        if ($(el).tinymce) {
+                            var tinymceInstance = $(el).tinymce();
+                            if (tinymceInstance) {
+                                if ($(el).prop('disabled')) {
+                                    var settings = tinymceInstance.editorManager.activeEditor.settings;
+                                    settings.readonly = true;
+                                    tinymceInstance.editorManager.activeEditor.remove();
+                                    $(el).tinymce(settings);
+                                } else {
+                                    var settings = tinymceInstance.editorManager.activeEditor.settings;
+                                    settings.readonly = false;
+                                    tinymceInstance.editorManager.activeEditor.remove();
+                                    $(el).tinymce(settings);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            prepareTinymce($.find('textarea'));
+            var value, valueEls, textareas,
                 checkboxEls = $('.parent-scope-checkbox input');
-
             checkboxEls.on('change', function () {
                 value = $(this).is(':checked');
                 valueEls = $(this).parents('.controls').find(':input').not(checkboxEls);
@@ -21,6 +43,8 @@ define(['jquery', 'underscore'], function ($, _) {
                         $(el).uniform('update');
                     }
                 });
+
+                prepareTinymce($(this).parents('.controls').find('textarea'));
             });
         });
     };

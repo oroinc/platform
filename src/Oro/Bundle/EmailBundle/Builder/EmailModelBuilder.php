@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
@@ -17,6 +18,8 @@ use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
  *
  * @package Oro\Bundle\EmailBundle\Builder
  *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class EmailModelBuilder
 {
@@ -35,18 +38,26 @@ class EmailModelBuilder
     protected $entityManager;
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * @param EmailModelBuilderHelper $emailModelBuilderHelper
      * @param Request                 $request
      * @param EntityManager           $entityManager
+     * @param ConfigManager           $configManager
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         Request $request,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        ConfigManager $configManager
     ) {
         $this->helper              = $emailModelBuilderHelper;
         $this->request             = $request;
         $this->entityManager       = $entityManager;
+        $this->configManager       = $configManager;
     }
 
     /**
@@ -63,6 +74,7 @@ class EmailModelBuilder
         if ($this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
         }
+        $this->applySignature($emailModel);
 
         return $emailModel;
     }
@@ -81,17 +93,41 @@ class EmailModelBuilder
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
         if ($fromAddress->getOwner() == $this->helper->getUser()) {
             $emailModel->setTo([$parentEmailEntity->getTo()->first()->getEmailAddress()->getEmail()]);
+            $emailModel->setFrom($fromAddress->getEmail());
         } else {
             $emailModel->setTo([$fromAddress->getEmail()]);
+            $this->initReplyFrom($emailModel, $parentEmailEntity);
         }
 
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
 
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
-        $emailModel->setBody($body);
         $emailModel->setBodyFooter($body);
 
         return $this->createEmailModel($emailModel);
+    }
+
+    /**
+     * @param EmailModel  $emailModel
+     * @param EmailEntity $parentEmailEntity
+     */
+    protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
+    {
+        $userEmails = $this->helper->getUser()->getEmails();
+        $toEmails = [];
+        $emailRecipients = $parentEmailEntity->getTo();
+        /** @var EmailRecipient $emailRecipient */
+        foreach ($emailRecipients as $emailRecipient) {
+            $toEmails[] = $emailRecipient->getEmailAddress()->getEmail();
+        }
+
+        foreach ($userEmails as $userEmail) {
+            if (in_array($userEmail->getEmail(), $toEmails)) {
+                $emailModel->setFrom($userEmail->getEmail());
+
+                break;
+            }
+        }
     }
 
     /**
@@ -107,7 +143,6 @@ class EmailModelBuilder
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
-        $emailModel->setBody($body);
         $emailModel->setBodyFooter($body);
 
         return $this->createEmailModel($emailModel);
@@ -152,16 +187,18 @@ class EmailModelBuilder
      */
     protected function applyFrom(EmailModel $emailModel)
     {
-        if ($this->request->query->has('from')) {
-            $from = $this->request->query->get('from');
-            if (!empty($from)) {
-                $this->helper->preciseFullEmailAddress($from);
-            }
-            $emailModel->setFrom($from);
-        } else {
-            $user = $this->helper->getUser();
-            if ($user) {
-                $emailModel->setFrom($this->helper->buildFullEmailAddress($user));
+        if (!$emailModel->getFrom()) {
+            if ($this->request->query->has('from')) {
+                $from = $this->request->query->get('from');
+                if (!empty($from)) {
+                    $this->helper->preciseFullEmailAddress($from);
+                }
+                $emailModel->setFrom($from);
+            } else {
+                $user = $this->helper->getUser();
+                if ($user) {
+                    $emailModel->setFrom($this->helper->buildFullEmailAddress($user));
+                }
             }
         }
     }
@@ -224,6 +261,17 @@ class EmailModelBuilder
 
                 return;
             }
+        }
+    }
+
+    /**
+     * @param EmailModel $emailModel
+     */
+    protected function applySignature(EmailModel $emailModel)
+    {
+        $signature = $this->configManager->get('oro_email.signature');
+        if ($signature) {
+            $emailModel->setSignature($signature);
         }
     }
 }

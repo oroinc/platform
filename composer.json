@@ -71,6 +71,7 @@
         "oro/doctrine-extensions": "1.0.*",
         "tinymce/tinymce": "4.1.*",
         "ezyang/htmlpurifier": "4.6.0",
+        "hwi/oauth-bundle": "~0.3",
         "components/jquery": "2.1.*",
         "components/underscore": "1.7.*",
         "components/backbone": "1.1.*"
