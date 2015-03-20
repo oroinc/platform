@@ -5,9 +5,9 @@ namespace Oro\Bundle\EmailBundle\Controller;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -48,7 +48,8 @@ class EmailController extends Controller
         $templateVars = [
             'entity' => $entity,
             'noBodyFound' => false,
-            'canLinkAttachment' => $this->canLinkAttachment($entity)
+            'canLinkAttachment' => $this->canLinkAttachment(),
+            'targetEntityData' => $this->getTargetEntity()
         ];
         try {
             $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
@@ -223,7 +224,15 @@ class EmailController extends Controller
      */
     public function linkAction(EmailAttachment $entity)
     {
-        return [$entity->getId()];
+        // TODO: Add link to entity after done - CRM-2906
+        try {
+            $result = [];
+        } catch (\Exception $e) {
+            $result = [
+                'error' => $e->getMessage()
+            ];
+        }
+        return new JsonResponse($result);
     }
 
     /**
@@ -309,35 +318,39 @@ class EmailController extends Controller
     /**
      * Check possibility link attachment to target entity
      *
-     * @param Email $entity
-     *
      * @return bool
      */
-    protected function canLinkAttachment(Email $entity)
+    protected function canLinkAttachment()
     {
-        $enabledAttachment = false;
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $entityId = $this->getRequest()->get('targetActivityId');
-        $entityClass = $this->getRequest()->get('targetActivityClass');
-        if (is_null($entityClass) || is_null($entityId)) {
-            return $enabledAttachment;
-        }
-
-        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
-        try {
-            $targetEntity = $entityRoutingHelper->getEntity($entityClass, $entityId);
-        } catch (NotFoundHttpException $e) {
-            return $enabledAttachment;
-        } catch (\ReflectionException $e) {
-            return $enabledAttachment;
+        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
+        if (is_null($entityClassName)) {
+            return false;
         }
 
         /** @var ConfigProvider $targetConfigProvider */
         $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
-        if ($entity->hasActivityTarget($targetEntity)) {
-            $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
-        }
+        $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
 
         return $enabledAttachment;
+    }
+
+    /**
+     * Get target entity parameters
+     *
+     * @return array
+     */
+    protected function getTargetEntity()
+    {
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
+        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
+        if (is_null($targetEntityClass) || is_null($targetEntityId)) {
+            return [];
+        }
+        return [
+            'targetEntityClass' => $entityRoutingHelper->encodeClassName($targetEntityClass),
+            'targetEntityId' => $targetEntityId
+        ];
     }
 }

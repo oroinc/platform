@@ -314,15 +314,38 @@
     Render the given email attachments
     Parameters:
         attachments - an array of Oro\Bundle\EmailBundle\Entity\EmailAttachment
+        canLinkAttachment - bool
+        targetEntityData - target entity class and id
 #}
-{% macro attachments(attachments, canLinkAttachment) -%}
+{% macro attachments(attachments, canLinkAttachment, targetEntityData) -%}
     {%- for attachment in attachments -%}
     <a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
         <span class="label label-info">{{ attachment.fileName }}</span>
     </a>
-    {% if canLinkAttachment == true %}
-        <a href="{{ path('oro_email_attachment_link', {id: attachment.id}) }}">
-            <i class="icon-link"></i>
+    {% if canLinkAttachment and targetEntityData is defined %}
+        {% set options = {
+            'view': 'oroemail/js/app/views/email-attachment-link-view',
+            'url': path(
+                    'oro_email_attachment_link',
+                    {
+                        id: attachment.id,
+                        targetEntityClass: targetEntityData.targetEntityClass,
+                        targetEntityId: targetEntityData.targetEntityId
+                    }
+                )
+        } %}
+        <a data-page-component-module="oroui/js/app/components/view-component"
+           data-page-component-options="{{ options|json_encode }}" class="attachment" href="{{
+                path(
+                    'oro_email_attachment_link',
+                    {
+                        id: attachment.id,
+                        targetEntityClass: targetEntityData.targetEntityClass,
+                        targetEntityId: targetEntityData.targetEntityId
+                    }
+                )
+            }}">
+            <span class="icon"><i class="icon-link"></i></span>
         </a>
     {% endif %}
     {%- endfor -%}

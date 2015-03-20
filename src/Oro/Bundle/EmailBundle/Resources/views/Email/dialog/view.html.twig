@@ -24,7 +24,10 @@
             {{ UI.attibuteRow('', notFoundMessage) }}
         {% else %}
             {% if entity.emailBody.hasAttachments %}
-                {{ UI.attibuteRow('Attachments'|trans, EA.attachments(entity.emailBody.attachments, canLinkAttachment)) }}
+                {{ UI.attibuteRow(
+                    'Attachments'|trans,
+                    EA.attachments(entity.emailBody.attachments, canLinkAttachment, targetEntityData)
+                ) }}
             {% endif %}
             {% if entity.emailBody.bodyContent is empty %}
                 {{ UI.attibuteRow('', 'oro.email.empty_body'|trans) }}

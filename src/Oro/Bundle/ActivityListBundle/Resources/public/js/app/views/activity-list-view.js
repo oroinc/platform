@@ -261,8 +261,8 @@ define(function (require) {
                     dataType: 'html',
                     data: {
                         _widgetContainer: 'dialog',
-                        targetActivityClass: model.get('targetEntityData').class,
-                        targetActivityId: model.get('targetEntityData').id
+                        targetEntityClass: model.get('targetEntityData').class,
+                        targetEntityId: model.get('targetEntityData').id
                     }
                 };
 
@@ -272,6 +272,7 @@ define(function (require) {
                     .done(function (data) {
                         var response = $('<html />').html(data);
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
+                        mediator.execute('layout:init', that.$el, that);
                         that._hideLoading();
                     })
                     .fail(
