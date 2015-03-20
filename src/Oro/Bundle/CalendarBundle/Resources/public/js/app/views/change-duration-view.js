@@ -83,13 +83,20 @@ function ($, _, __, moment, tools, datetimeFormatter, localeSettings, BaseView) 
         bindEvents: function() {
             var self = this;
             $(this.startSelector).on('change', function() {
-                self.applyEndTimestamp(self.getTimestamp($(self.startSelector).val()) + self.diff);
+                var value = $(self.startSelector).val();
+                if (self.isValid(value)) {
+                    self.applyEndTimestamp(self.getTimestamp(value) + self.diff);
+                }
             });
 
             $(this.endSelector).on('change', function() {
-                var start = self.getTimestamp($(self.startSelector).val());
-                if (self.getTimestamp($(self.endSelector).val()) < start) {
-                    self.applyEndTimestamp(start);
+                var startValue = $(self.startSelector).val();
+                var endValue = $(self.endSelector).val();
+                if (self.isValid(startValue) && self.isValid(endValue)) {
+                    var start = self.getTimestamp(startValue);
+                    if (self.getTimestamp(endValue) < start) {
+                        self.applyEndTimestamp(start);
+                    }
                 }
             });
         },
@@ -103,13 +110,26 @@ function ($, _, __, moment, tools, datetimeFormatter, localeSettings, BaseView) 
             var momentInstance = moment.utc(endTimestamp, 'X');
 
             $(this.endSelector).val(momentInstance.format(this.getBackendFormat()));
+            $(this.endSelector).trigger('change');
 
             momentInstance.add(localeSettings.getTimeZoneShift(), 'm');
             var endDateHolder = $(this.endSelector).parents(this.formRowSelector).find(this.dateHolderSelector)[0];
             $(endDateHolder).val(momentInstance.format(this.getDateFormat()));
+            $(endDateHolder).trigger('change');
 
             var endTimeHolder = $(this.endSelector).parents(this.formRowSelector).find(this.timeHolderSelector)[0];
             $(endTimeHolder).val(momentInstance.format(this.getTimeFormat()));
+            $(endTimeHolder).trigger('change');
+        },
+
+        /**
+         * Returns whether the value is valid date string
+         *
+         * @param value
+         * @returns {*|Boolean}
+         */
+        isValid: function(value) {
+            return moment.utc(value, this.getBackendFormat(), true).isValid();
         },
 
         /**
