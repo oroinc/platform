@@ -43,7 +43,7 @@ define([
                         '<button data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
                             '<span class="caret"></span>' +
                         '</button>' +
-                        '<ul class="dropdown-menu pull-right">' +
+                        '<ul class="dropdown-menu">' +
                             '<% _.each(choices, function (choice) { %>' +
                                 '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
                             '<% }); %>' +
