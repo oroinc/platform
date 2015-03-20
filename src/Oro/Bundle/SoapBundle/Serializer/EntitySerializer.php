@@ -7,6 +7,82 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
 /**
+ * @todo: This is draft implementation of the entity serializer.
+ *       It is expected that the full implementation will be done when new API component is implemented.
+ * What need to do:
+ *  * by default the value of identifier field should be used
+ *    for related entities (now it should be configured manually in serialization rules)
+ *
+ * Example of serialization rules used in the $config parameter of
+ * {@see serialize}, {@see serializeEntities} and {@see prepareQuery} methods:
+ *
+ *  [
+ *      // exclude the 'email' field
+ *      'excluded_fields' => ['email'],
+ *      'fields' => [
+ *          // serialize the 'status' many-to-one relation using the value of the 'name' field
+ *          'status'       => ['fields' => 'name'],
+ *          // order the 'phones' many-to-many relation by the 'primary' field and
+ *          // serialize each phone as a pair of 'phone' and 'primary' field
+ *          'phones'       => [
+ *              'exclusion_policy' => 'all',
+ *              'fields'           => [
+ *                  'phone'   => null,
+ *                  'primary' => null
+ *              ],
+ *              'orderBy'          => [
+ *                  'primary' => 'DESC'
+ *              ]
+ *          ],
+ *          'addresses'    => [
+ *              'excluded_fields' => ['owner'],
+ *              'fields'          => [
+ *                  'country' => ['fields' => 'name'],
+ *                  'types'   => [
+ *                      'fields' => 'name',
+ *                      'orderBy' => [
+ *                          'name' => 'ASC'
+ *                      ]
+ *                  ]
+ *              ]
+ *          ]
+ *      ]
+ *  ]
+ *
+ * Example of the serialization result by this config (it is supposed that the serializing entity has
+ * the following fields:
+ *  id
+ *  name
+ *  email
+ *  status -> many-to-one
+ *      name
+ *      label
+ *  phones -> many-to-many
+ *      id
+ *      phone
+ *      primary
+ *  addresses -> many-to-many
+ *      id
+ *      owner -> many-to-one
+ *      country -> many-to-one
+ *          code,
+ *          name
+ *      types -> many-to-many
+ *          name
+ *          label
+ *  [
+ *      'id'        => 123,
+ *      'name'      => 'John Smith',
+ *      'status'    => 'active',
+ *      'phones'    => [
+ *          ['phone' => '123-123', 'primary' => true],
+ *          ['phone' => '456-456', 'primary' => false]
+ *      ],
+ *      'addresses' => [
+ *          ['country' => 'USA', 'types' => ['billing', 'shipping']]
+ *      ]
+ *  ]
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntitySerializer
@@ -50,40 +126,43 @@ class EntitySerializer
     }
 
     /**
-     * @param object[] $entities
-     * @param string   $entityClass
-     * @param array    $config
-     * @param boolean  $useIdAsKey
+     * @param object[] $entities    The list of entities to be serialized
+     * @param string   $entityClass The entity class name
+     * @param array    $config      Serialization rules
+     * @param boolean  $useIdAsKey  Defines whether the entity id should be used as a key of the result array
      *
      * @return array
      */
     public function serializeEntities(array $entities, $entityClass, $config, $useIdAsKey = false)
     {
-        $result = [];
-        if (!empty($entities)) {
-            $getIdMethodName = $useIdAsKey
-                ? $this->getEntityIdGetter($entityClass)
-                : null;
-            foreach ($entities as $entity) {
-                $item = $this->serializeItem($entity, $entityClass, $config);
-                if ($getIdMethodName) {
-                    $result[$entity->$getIdMethodName()] = $item;
-                } else {
-                    $result[] = $item;
-                }
-            }
-            $relatedData = $this->loadRelatedData(
-                $entityClass,
-                $this->getEntityIds($entities, $entityClass),
-                $config
-            );
-            $this->applyRelatedData($result, $entityClass, $relatedData, $config);
+        if (empty($entities)) {
+            return [];
+        }
 
-            if (isset($config['post_serialize'])) {
-                $postSerialize = $config['post_serialize'];
-                foreach ($result as &$resultItem) {
-                    $postSerialize($resultItem);
-                }
+        $result = [];
+        if ($useIdAsKey) {
+            $getIdMethodName = $this->getEntityIdGetter($entityClass);
+            foreach ($entities as $entity) {
+                $id          = $entity->$getIdMethodName();
+                $result[$id] = $this->serializeItem($entity, $entityClass, $config);
+            }
+        } else {
+            foreach ($entities as $entity) {
+                $result[] = $this->serializeItem($entity, $entityClass, $config);
+            }
+        }
+
+        $relatedData = $this->loadRelatedData(
+            $entityClass,
+            $this->getEntityIds($entities, $entityClass),
+            $config
+        );
+        $this->applyRelatedData($result, $entityClass, $relatedData, $config);
+
+        if (isset($config['post_serialize'])) {
+            $postSerialize = $config['post_serialize'];
+            foreach ($result as &$resultItem) {
+                $postSerialize($resultItem);
             }
         }
 
@@ -150,15 +229,17 @@ class EntitySerializer
                         $targetConfig = isset($config['fields'][$field])
                             ? $config['fields'][$field]
                             : [];
-                        if (!empty($targetConfig['fields']) && is_string($targetConfig['fields'])) {
-                            $value = $this->dataAccessor->getValue($value, $targetConfig['fields']);
-                            $value = $this->dataTransformer->transformValue($value);
-                        } elseif ($this->isExcludeAll($targetConfig)) {
-                            $value = $this->serializeItem(
-                                $value,
-                                $entityMetadata->getAssociationTargetClass($field),
-                                $targetConfig
-                            );
+                        if (!empty($targetConfig['fields'])) {
+                            if (is_string($targetConfig['fields'])) {
+                                $value = $this->dataAccessor->getValue($value, $targetConfig['fields']);
+                                $value = $this->dataTransformer->transformValue($value);
+                            } else {
+                                $value = $this->serializeItem(
+                                    $value,
+                                    $entityMetadata->getAssociationTargetClass($field),
+                                    $targetConfig
+                                );
+                            }
                         } else {
                             $value = $this->dataTransformer->transformValue($value);
                         }
@@ -193,7 +274,7 @@ class EntitySerializer
         );
         // make sure identifier fields are added
         foreach ($this->getEntityIdFieldNames($entityClass) as $field) {
-            if (!in_array($field, $fields)) {
+            if (!in_array($field, $fields, true)) {
                 $fields[] = $field;
             }
         }
@@ -424,7 +505,7 @@ class EntitySerializer
     {
         if ($this->isExcludeAll($config)) {
             if (empty($config['fields'])) {
-                $fields = [];
+                $fields = []; //$this->getEntityIdFieldNames($entityClass)
             } elseif (is_string($config['fields'])) {
                 $fields = [$config['fields']];
             } else {
