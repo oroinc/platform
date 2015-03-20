@@ -125,7 +125,8 @@ abstract class AbstractPage
                                 "}" .
                                 "isAppActive = window.mediatorCachedForSelenium.execute('isInAction');" .
                             "} catch(e) {};" .
-                            "return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;",
+                            "return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) " .
+                            "&& !isAppActive;",
                         'args' => array()
                     )
                 );
@@ -288,6 +289,7 @@ abstract class AbstractPage
     public function pin()
     {
         $this->test->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
     }
@@ -298,6 +300,7 @@ abstract class AbstractPage
     public function unpin()
     {
         $this->test->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button gold-icon']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
     }
