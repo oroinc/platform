@@ -505,7 +505,7 @@ class EntitySerializer
     {
         if ($this->isExcludeAll($config)) {
             if (empty($config['fields'])) {
-                $fields = []; //$this->getEntityIdFieldNames($entityClass)
+                $fields = [];
             } elseif (is_string($config['fields'])) {
                 $fields = [$config['fields']];
             } else {
