@@ -10,6 +10,7 @@ css:
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
         # customized libraries' styles
+        - 'bundles/oroui/css/font-awesome-4.3/font-awesome.css'
         - 'bundles/oroui/css/jquery-ui.grid.css'
         - 'bundles/oroui/css/jquery-ui-1.10.2.custom.css'
         # custom styles
