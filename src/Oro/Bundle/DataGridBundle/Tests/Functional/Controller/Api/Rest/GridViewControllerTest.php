@@ -54,7 +54,8 @@ class GridViewControllerTest extends WebTestCase
     {
         $gridView = $this->findFirstGridView();
 
-        $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
+        $url = $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]);
+        $this->client->request('PUT', $url, [
             'label' => 'view2',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid2',

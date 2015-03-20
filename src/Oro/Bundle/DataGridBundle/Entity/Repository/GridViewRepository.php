@@ -12,7 +12,7 @@ class GridViewRepository extends EntityRepository
     /**
      * @param User $user
      * @param string $gridName
-     * 
+     *
      * @return GridView[]
      */
     public function findGridViews(User $user, $gridName)
@@ -25,7 +25,9 @@ class GridViewRepository extends EntityRepository
                 'gv.type = :publicType',
                 $qb->expr()->andX(
                     'gv.type = :privateType',
-                    'gv.owner = :owner')))
+                    'gv.owner = :owner'
+                )
+            ))
             ->setParameters([
                 'owner' => $user,
                 'gridName' => $gridName,

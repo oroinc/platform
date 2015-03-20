@@ -55,7 +55,8 @@ class GridViewControllerUnprivilegedTest extends WebTestCase
 
         $gridView = $this->findPrivateView();
 
-        $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
+        $url = $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]);
+        $this->client->request('PUT', $url, [
             'label' => 'view2',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid2',
@@ -78,7 +79,8 @@ class GridViewControllerUnprivilegedTest extends WebTestCase
 
         $gridView = $this->findPublicView();
 
-        $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
+        $url = $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]);
+        $this->client->request('PUT', $url, [
             'label' => 'view2',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid2',
@@ -101,7 +103,8 @@ class GridViewControllerUnprivilegedTest extends WebTestCase
 
         $gridView = $this->findPrivateView();
 
-        $this->client->request('PUT', $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]), [
+        $url = $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]);
+        $this->client->request('PUT', $url, [
             'label' => 'view2',
             'type' => GridView::TYPE_PRIVATE,
             'grid_name' => 'testing-grid2',

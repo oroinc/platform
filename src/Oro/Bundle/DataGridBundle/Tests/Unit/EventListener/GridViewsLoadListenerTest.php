@@ -19,7 +19,8 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->gridViewRepository = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository')
+        $this->gridViewRepository = $this
+            ->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository')
             ->disableOriginalConstructor()
             ->getMock();
 

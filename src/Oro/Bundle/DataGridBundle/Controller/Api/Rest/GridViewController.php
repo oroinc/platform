@@ -26,7 +26,7 @@ class GridViewController extends RestController
 {
     /**
      * @param int $id
-     * 
+     *
      * @return Response
      * @Post("/gridviews")
      * @ApiDoc(
@@ -49,7 +49,7 @@ class GridViewController extends RestController
 
     /**
      * @param int $id
-     * 
+     *
      * @return Response
      * @Put("/gridviews/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
@@ -80,7 +80,7 @@ class GridViewController extends RestController
 
     /**
      * @param int $id
-     * 
+     *
      * @return Response
      * @Delete("/gridviews/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
