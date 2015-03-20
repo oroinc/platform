@@ -55,6 +55,7 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
                 'SHARE' => true,
                 'EDIT_SHARED' => true,
             ],
+            'gridName' => 'grid',
         ];
         $this->eventDispatcher
             ->expects($this->once())

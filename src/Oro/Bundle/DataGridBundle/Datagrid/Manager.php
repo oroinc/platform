@@ -82,7 +82,7 @@ class Manager implements ManagerInterface
     public function getDatagridUniqueName($name)
     {
         $uniqueName = $name;
-        if ($widgetId = $this->request->get('_widgetId')) {
+        if ($this->request && $widgetId = $this->request->get('_widgetId')) {
             $uniqueName = sprintf('%s_w%s', $uniqueName, $widgetId);
         }
 
