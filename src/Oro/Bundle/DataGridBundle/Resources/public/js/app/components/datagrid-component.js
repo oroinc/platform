@@ -17,7 +17,7 @@ define(function (require) {
         gridContentManager = require('orodatagrid/js/content-manager'),
         FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin'),
         FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
-    
+
     helpers = {
         cellType: function (type) {
             return type + 'Cell';
@@ -77,6 +77,10 @@ define(function (require) {
          * @param options
          */
         processOptions: function (options) {
+            if (typeof options.inputName === 'undefined') {
+                throw new Error('Option inputName has to be specified');
+            }
+
             options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
@@ -93,6 +97,7 @@ define(function (require) {
             this.$el = $('<div>');
             $(options.el).append(this.$el);
             this.gridName = options.gridName;
+            this.inputName = options.inputName;
             this.data = options.data;
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
@@ -172,7 +177,7 @@ define(function (require) {
          */
         combineCollectionOptions: function () {
             return _.extend({
-                inputName: this.gridName,
+                inputName: this.inputName,
                 parse: true,
                 url: '\/user\/json',
                 state: _.extend({

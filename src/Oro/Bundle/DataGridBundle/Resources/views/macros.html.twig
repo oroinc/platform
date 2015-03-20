@@ -30,6 +30,7 @@
             data: data,
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : false,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
+            inputName: oro_datagrid_build_inputname(datagrid.name, renderParams.id|default(null)),
         } %}
 
         <div id="{{ gridId }}"

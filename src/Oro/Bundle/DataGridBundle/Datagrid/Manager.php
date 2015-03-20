@@ -5,6 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
  * Class Manager
  *
@@ -26,6 +28,9 @@ class Manager implements ManagerInterface
 
     /** @var NameStrategyInterface */
     protected $nameStrategy;
+
+    /** @var Request */
+    protected $request;
 
     /**
      * Constructor
@@ -68,6 +73,26 @@ class Manager implements ManagerInterface
     }
 
     /**
+     * Used to generate unique id for grid on page
+     *
+     * @param string $name
+     * @param string $id
+     *
+     * @return string
+     */
+    public function getDatagridUniqueName($name, $id = null)
+    {
+        $inputName = $name;
+        if ($id) {
+            $inputName = sprintf('%s_%s', $inputName, $id);
+        } elseif ($widgetId = $this->request->get('_widgetId')) {
+            $inputName = sprintf('%s_w%s', $inputName, $widgetId);
+        }
+
+        return $inputName;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getDatagridByRequestParams($name, array $additionalParameters = [])
@@ -82,7 +107,8 @@ class Manager implements ManagerInterface
             }
         }
 
-        $parameters = $this->parametersFactory->createParameters($name);
+        $datagridId = $this->getDatagridUniqueName($name);
+        $parameters = $this->parametersFactory->createParameters($datagridId);
         $parameters->add($additionalParameters);
 
         return $this->getDatagrid($name, $parameters);
@@ -102,5 +128,13 @@ class Manager implements ManagerInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param Request|null $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 }

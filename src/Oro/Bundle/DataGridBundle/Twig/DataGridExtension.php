@@ -64,6 +64,7 @@ class DataGridExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_datagrid_metadata', [$this, 'getGridMetadata']),
             new \Twig_SimpleFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
             new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
+            new \Twig_SimpleFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
         ];
     }
 
@@ -144,6 +145,19 @@ class DataGridExtension extends \Twig_Extension
     public function buildGridFullName($name, $scope)
     {
         return $this->nameStrategy->buildGridFullName($name, $scope);
+    }
+
+    /**
+     * Generate grid input name
+     *
+     * @param string $name
+     * @param string $id
+     *
+     * @return string
+     */
+    public function buildGridInputName($name, $id = null)
+    {
+        return $this->manager->getDatagridUniqueName($name, $id);
     }
 
     /**

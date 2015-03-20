@@ -72,6 +72,7 @@ class GridViewsExtension extends AbstractExtension
             $gridViews = $event->getGridViews();
         }
 
+        $gridViews['gridName'] = $config->getName();
         $gridViews['permissions'] = $this->getPermissions();
         $data->offsetSet('gridViews', $gridViews);
     }

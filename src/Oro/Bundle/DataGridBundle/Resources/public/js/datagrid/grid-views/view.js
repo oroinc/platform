@@ -86,6 +86,9 @@ define([
         prevState: {},
 
         /** @property */
+        gridName: {},
+
+        /** @property */
         viewsCollection: GridViewsCollection,
 
         /**
@@ -112,6 +115,7 @@ define([
                 this.permissions = _.extend(this.permissions, options.permissions);
             }
 
+            this.gridName = options.gridName;
             this.collection = options.collection;
             this.enabled = options.enable != false;
 
@@ -122,7 +126,7 @@ define([
 
             options.views = options.views || [];
             _.each(options.views, function(view) {
-                view.grid_name = options.collection.inputName;
+                view.grid_name = this.gridName;
                 view.label = _.first(_.filter(this.choices, function (item) {
                     return view.name == item.value;
                 }, this)).label;
@@ -137,14 +141,13 @@ define([
             this.listenTo(this.viewsCollection, 'remove', this._onModelRemove);
             this.listenTo(this.viewsCollection, 'change', this._onModelChange, this);
 
-            var gridName = options.collection.inputName;
-            this.listenTo(mediator, 'datagrid:' + gridName + ':views:add', function(model) {
+            this.listenTo(mediator, 'datagrid:' + this.gridName + ':views:add', function(model) {
                 this.viewsCollection.add(model);
             }, this);
-            this.listenTo(mediator, 'datagrid:' + gridName + ':views:remove', function(model) {
+            this.listenTo(mediator, 'datagrid:' + this.gridName + ':views:remove', function(model) {
                 this.viewsCollection.remove(model);
             }, this);
-            this.listenTo(mediator, 'datagrid' + gridName + ':views:change', function(model) {
+            this.listenTo(mediator, 'datagrid' + this.gridName + ':views:change', function(model) {
                 this.viewsCollection.get(model).attributes = model.attributes;
                 this.viewDirty = !this._isCurrentStateSynchronized();
                 this.render();
@@ -235,7 +238,7 @@ define([
                 var model = new GridViewModel({
                     label: this.$('input[name=name]').val(),
                     type: 'private',
-                    grid_name: self.collection.inputName,
+                    grid_name: self.gridName,
                     filters: self.collection.state.filters,
                     sorters: self.collection.state.sorters
                 });
@@ -250,7 +253,7 @@ define([
                     this.collection.state.gridView = model.get('name');
                     this.viewDirty = !this._isCurrentStateSynchronized();
                     mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.created'));
-                    mediator.trigger('datagrid:' + this.collection.inputName + ':views:add', model);
+                    mediator.trigger('datagrid:' + this.gridName + ':views:add', model);
                 }, self);
             });
 
@@ -303,7 +306,7 @@ define([
             model.destroy({wait: true});
             model.once('sync', function() {
                 mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
-                mediator.trigger('datagrid:' + this.collection.inputName + ':views:remove', model);
+                mediator.trigger('datagrid:' + this.gridName + ':views:remove', model);
             }, this);
         },
 
@@ -375,7 +378,7 @@ define([
          * @param {GridViewModel} model
          */
         _onModelChange: function(model) {
-            mediator.trigger('datagrid' + this.collection.inputName + ':views:change', model);
+            mediator.trigger('datagrid' + this.gridName + ':views:change', model);
         },
 
         /**

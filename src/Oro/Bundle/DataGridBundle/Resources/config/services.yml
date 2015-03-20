@@ -37,6 +37,8 @@ services:
             - @oro_datagrid.datagrid.builder
             - @oro_datagrid.datagrid.request_parameters_factory
             - @oro_datagrid.datagrid.name_strategy
+        calls:
+            - [setRequest, [@?request=]]
 
     oro_datagrid.datagrid.name_strategy:
         class: %oro_datagrid.datagrid.name_strategy.class%
