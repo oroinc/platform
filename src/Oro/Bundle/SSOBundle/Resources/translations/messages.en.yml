@@ -1,0 +1,14 @@
+oro:
+    sso:
+        login:
+            alternative.label: Or login using
+        system_configuration:
+                groups:
+                    integration_setup.title: Integration
+                    google_settings.title: Google settings
+                    google_integration_settings.title: Google Single Sign-On
+                fields:
+                    enable_google_sso.label: Enable
+                    google_sso_domains.label: Domains
+                    google_sso_client_id.label: Client Id
+                    google_sso_client_secret.label: Client secret
