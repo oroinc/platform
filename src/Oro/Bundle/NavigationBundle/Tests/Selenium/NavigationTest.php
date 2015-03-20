@@ -25,21 +25,18 @@ class NavigationTest extends Selenium2TestCase
             ->tab('System')
             ->menu('User Management')
             ->menu('Users')
-            ->open()
             ->assertElementPresent("//table[@class='grid table-hover table table-bordered table-condensed']/tbody");
 
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('User Management')
             ->menu('Roles')
-            ->open()
             ->assertElementPresent("//table[@class='grid table-hover table table-bordered table-condensed']/tbody");
 
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('User Management')
             ->menu('Groups')
-            ->open()
             ->assertElementPresent("//table[@class='grid table-hover table table-bordered table-condensed']/tbody");
     }
 
