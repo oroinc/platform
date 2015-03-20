@@ -85,13 +85,12 @@ class EntityTest extends Selenium2TestCase
     {
         $login = $this->login();
         /** @var Navigation $login */
-        $login->openNavigation('Oro\Bundle\NavigationBundle')
+        $login = $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
-            ->menu($entityName)
-            ->open()
+            ->menu($entityName);
             /** @var ConfigEntity $login */
-            ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
+        $login->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
             ->checkEntityField('test_field')
             ->checkEntityField('test_field2');
@@ -119,6 +118,6 @@ class EntityTest extends Selenium2TestCase
             ->close()
             ->entityExists(array($entityName));
 
-        $this->assertFalse($entityExist);
+        static::assertFalse($entityExist);
     }
 }
