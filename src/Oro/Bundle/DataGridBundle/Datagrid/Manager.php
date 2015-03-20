@@ -76,16 +76,13 @@ class Manager implements ManagerInterface
      * Used to generate unique id for grid on page
      *
      * @param string $name
-     * @param string $id
      *
      * @return string
      */
-    public function getDatagridUniqueName($name, $id = null)
+    public function getDatagridUniqueName($name)
     {
         $uniqueName = $name;
-        if ($id) {
-            $uniqueName = sprintf('%s_%s', $uniqueName, $id);
-        } elseif ($widgetId = $this->request->get('_widgetId')) {
+        if ($widgetId = $this->request->get('_widgetId')) {
             $uniqueName = sprintf('%s_w%s', $uniqueName, $widgetId);
         }
 

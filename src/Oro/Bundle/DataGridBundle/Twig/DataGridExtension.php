@@ -151,13 +151,12 @@ class DataGridExtension extends \Twig_Extension
      * Generate grid input name
      *
      * @param string $name
-     * @param string $id
      *
      * @return string
      */
-    public function buildGridInputName($name, $id = null)
+    public function buildGridInputName($name)
     {
-        return $this->manager->getDatagridUniqueName($name, $id);
+        return $this->manager->getDatagridUniqueName($name);
     }
 
     /**
