@@ -88,71 +88,16 @@ class OroCronExtensionTest extends \PHPUnit_Framework_TestCase
 
         $additionalConfig = [
             'firewalls' => [
-                'main' => [
-                    'oauth' => [
-                        'resource_owners' => [
-                            'google' => '/login/check-google',
-                        ],
+                'oauth' => [
+                    'resource_owners' => [
+                        'google' => '/login/check-google',
                     ],
                 ],
             ],
         ];
 
-        $expectedConfig = [
-            [
-                'access_decision_manager' => [
-                    'strategy' => 'unanimous',
-                ],
-                'firewalls' => [
-                    'dev' => [
-                        'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
-                        'security' => false,
-                    ],
-                    'main' => [
-                        'pattern' => '^/',
-                        'provider' => 'chain_provider',
-                        'organization-form-login' => [
-                            'csrf_provider' => 'form.csrf_provider',
-                            'check_path' => 'oro_user_security_check',
-                            'login_path' => 'oro_user_security_login',
-                        ],
-                        'logout' => [
-                            'path' => 'oro_user_security_logout',
-                        ],
-                        'organization-remember-me' => [
-                            'key' => '%secret%',
-                            'name' => 'CRMRM',
-                            'lifetime' => 1209600,
-                            'httponly' => true,
-                        ],
-                        'anonymous' => false,
-                        'oauth' => [
-                            'resource_owners' => [
-                                'google' => '/login/check-google',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'firewalls' => [
-                    'main' => [
-                        'organization-http-basic' => [
-                            'realm' => 'Secured REST Area',
-                        ],
-                        'provider' => 'oro_user',
-                        'http-basic' => false,
-                        'organization-form-login' => false,
-                        'logout' => false,
-                        'organization-remember-me' => false,
-                        'anonymous' => true,
-                    ],
-                ],
-                'acl' => [
-                    'connection' => 'default',
-                ],
-            ],
-        ];
+        $expectedConfig = $originalConfig;
+        $expectedConfig[0]['firewalls']['oauth'] = $additionalConfig['firewalls']['oauth'];
 
         $containerBuilder = new OroContainerBuilder();
         $containerBuilder->setExtensionConfig('security', $originalConfig);
