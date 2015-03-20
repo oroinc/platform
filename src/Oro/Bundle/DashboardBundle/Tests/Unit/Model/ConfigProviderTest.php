@@ -53,7 +53,9 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetDashboardConfigs()
     {
         $expected = array('label' => 'test label');
-        $configProvider = new ConfigProvider(array(ConfigProvider::NODE_DASHBOARD => $expected), $this->eventDispatcher);
+        $configProvider = new ConfigProvider(array(
+            ConfigProvider::NODE_DASHBOARD => $expected
+        ), $this->eventDispatcher);
 
         $this->assertEquals($expected, $configProvider->getDashboardConfigs());
     }
@@ -118,11 +120,13 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->will($this->returnCallback(function($name, WidgetConfigurationLoadEvent $event) use ($eventConfiguration) {
-                $event->setConfiguration($eventConfiguration);
+            ->will(
+                $this->returnCallback(function ($name, WidgetConfigurationLoadEvent $event) use ($eventConfiguration) {
+                    $event->setConfiguration($eventConfiguration);
 
-                return $event;
-            }));
+                    return $event;
+                })
+            );
 
         $config = [ConfigProvider::NODE_WIDGET => ['widget' => []]];
         $configProvider = new ConfigProvider($config, $this->eventDispatcher);

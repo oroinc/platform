@@ -48,7 +48,7 @@ class WidgetState
 
     /**
      * @var array
-     * 
+     *
      * @ORM\Column(name="options", type="array", nullable=true)
      */
     protected $options = [];

@@ -27,8 +27,11 @@ class WidgetConfigurationFormProvider
      * @param ConfigProvider $configProvider
      * @param FormFactoryInterface $formFactory
      */
-    public function __construct(ConfigProvider $configProvider, FormFactoryInterface $formFactory, ConstraintFactory $constraintFactory)
-    {
+    public function __construct(
+        ConfigProvider $configProvider,
+        FormFactoryInterface $formFactory,
+        ConstraintFactory $constraintFactory
+    ) {
         $this->configProvider = $configProvider;
         $this->formFactory = $formFactory;
         $this->constraintFactory = $constraintFactory;

@@ -38,7 +38,14 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->target = new WidgetConfigs($this->configProvider, $this->securityFacade, $this->resolver, $em, $stateManager, $eventDispatcher);
+        $this->target = new WidgetConfigs(
+            $this->configProvider,
+            $this->securityFacade,
+            $this->resolver,
+            $em,
+            $stateManager,
+            $eventDispatcher
+        );
     }
 
     public function testGetWidgetAttributesForTwig()
