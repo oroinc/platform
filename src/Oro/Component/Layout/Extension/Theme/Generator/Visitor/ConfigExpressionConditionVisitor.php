@@ -32,7 +32,7 @@ class ConfigExpressionConditionVisitor implements VisitorInterface
         $writer = $visitContext->createWriter();
         $class  = $visitContext->getClass();
 
-        $class->addInterfaceName('Oro\Component\Layout\Extension\Theme\Generator\ExpressionFactoryAwareInterface');
+        $class->addInterfaceName('Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface');
 
         $setFactoryMethod = PhpMethod::create('setExpressionFactory');
         $setFactoryMethod->addParameter(

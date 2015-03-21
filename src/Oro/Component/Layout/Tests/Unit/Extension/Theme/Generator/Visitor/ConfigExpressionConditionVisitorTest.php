@@ -36,7 +36,7 @@ class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CLASS
-class LayoutUpdateClass implements \Oro\Component\Layout\Extension\Theme\Generator\ExpressionFactoryAwareInterface
+class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface
 {
     private \$expressionFactory;
 

@@ -52,7 +52,7 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
         $this->container->set('factory_service_id', $expressionFactory);
 
         $this->initializer->addKnownDependency(
-            'Oro\Component\Layout\Extension\Theme\Generator\ExpressionFactoryAwareInterface',
+            '\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface',
             'setExpressionFactory',
             'factory_service_id'
         );

@@ -1,11 +1,9 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator;
-
-use Oro\Component\ConfigExpression\ExpressionFactoryInterface;
+namespace Oro\Component\ConfigExpression;
 
 /**
- * ExpressionFactoryAwareInterface should be implemented by classes that depends on a expression factory.
+ * ExpressionFactoryAwareInterface should be implemented by classes that depends on the config expression factory.
  */
 interface ExpressionFactoryAwareInterface
 {

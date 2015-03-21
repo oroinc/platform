@@ -20,7 +20,7 @@ services:
         arguments:
             - @service_container
         calls:
-            - [addKnownDependency, ['\Oro\Component\Layout\Extension\Theme\Generator\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
+            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
     oro_layout.theme_factory:
         class:  %oro_layout.theme_factory.class%
