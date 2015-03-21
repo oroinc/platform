@@ -46,7 +46,7 @@ Examples
 Usage of an expression in layout update:
 
 ```yml
-oro_layout:
+layout:
     actions:
         - @add:
             id: debug_init_script:

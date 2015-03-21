@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
-use Symfony\Component\HttpKernel\Tests\Logger;
+use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ChainPathProvider;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
-use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
-use Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer;
+use Oro\Component\Layout\Extension\Theme\Loader\ChainLoader;
+use Oro\Component\Layout\Extension\Theme\Loader\ChainPathProvider;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactory;
+use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
+use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
+use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 
 class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +25,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
     protected $yamlLoader;
 
-    /** @var Logger */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
     protected $logger;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|DependencyInitializer */
@@ -48,14 +48,15 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->provider   = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubContextAwarePathProvider');
-        $this->yamlLoader = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
-        $this->phpLoader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
+        $this->provider   = $this
+            ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
+        $this->yamlLoader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
+        $this->phpLoader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
-        $this->logger = new Logger();
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $this->dependencyInitializer = $this
-            ->getMockBuilder('\Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer')
+            ->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer')
             ->disableOriginalConstructor()->getMock();
 
         $this->extension = new ThemeExtension(
@@ -115,7 +116,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testUpdatesFoundBasedOnMultiplePaths()
     {
         $themeName = 'oro-gold';
-        $this->setUpResourcePathProvider([$themeName], [$themeName.'_index']);
+        $this->setUpResourcePathProvider([$themeName], [$themeName . '_index']);
 
         $callbackBuilder = $this->getCallbackBuilder();
 
@@ -153,13 +154,13 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->phpLoader->expects($this->once())->method('load')->with('resource3.php')
             ->willReturn($update2Mock);
 
+        $this->logger->expects($this->once())
+            ->method('notice')
+            ->with('Skipping resource "resource2.xml" because loader for it not found');
+
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertContains($updateMock, $result);
         $this->assertContains($update2Mock, $result);
-
-        $logs = $this->logger->getLogs('notice');
-        $this->assertCount(1, $logs);
-        $this->assertSame('Skipping resource "resource2.xml" because loader for it not found', reset($logs));
     }
 
     public function testShouldPassDependenciesToUpdateInstance()

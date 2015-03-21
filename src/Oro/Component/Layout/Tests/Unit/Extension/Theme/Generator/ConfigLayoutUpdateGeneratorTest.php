@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator;
 
 use Oro\Component\ConfigExpression\Condition;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
-use Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator;
+use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
+use Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGenerator;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,7 +36,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testShouldValidateData($data, $exception = false)
     {
         if (false !== $exception) {
-            $this->setExpectedException('\Oro\Bundle\LayoutBundle\Exception\SyntaxException', $exception);
+            $this->setExpectedException('\Oro\Component\Layout\Exception\SyntaxException', $exception);
         }
 
         $this->generator->generate('testClassName', new GeneratorData($data));
@@ -266,7 +266,7 @@ CLASS
 
         $this->assertNotEmpty($this->generator->getVisitorCollection());
         $this->assertContainsOnlyInstancesOf(
-            'Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ConfigExpressionConditionVisitor',
+            'Oro\Component\Layout\Extension\Theme\Generator\Visitor\ConfigExpressionConditionVisitor',
             $this->generator->getVisitorCollection()
         );
     }
@@ -292,7 +292,7 @@ CLASS
     }
 
     /**
-     * @expectedException \Oro\Bundle\LayoutBundle\Exception\SyntaxException
+     * @expectedException \Oro\Component\Layout\Exception\SyntaxException
      * @expectedExceptionMessage Syntax error: invalid conditions. assembling failed at "conditions"
      */
     public function testShouldWrapAssemblerExceptionWithSyntaxException()

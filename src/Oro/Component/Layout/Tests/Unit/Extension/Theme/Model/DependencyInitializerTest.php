@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Symfony\Component\DependencyInjection\Container;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer;
+use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 
 class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +32,9 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoKnownDependenciesShouldNotDoAnything()
     {
-        $object = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionFactoryLayoutUpdateInterface');
+        $object = $this->getMock(
+            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ExpressionFactoryLayoutUpdateInterface'
+        );
         $object->expects($this->never())->method('setExpressionFactory');
 
         $this->initializer->initialize($object);
@@ -42,13 +44,15 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
     {
         $expressionFactory = $this->getMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
 
-        $object = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionFactoryLayoutUpdateInterface');
+        $object = $this->getMock(
+            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ExpressionFactoryLayoutUpdateInterface'
+        );
         $object->expects($this->once())->method('setExpressionFactory')->with($this->equalTo($expressionFactory));
 
         $this->container->set('factory_service_id', $expressionFactory);
 
         $this->initializer->addKnownDependency(
-            '\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface',
+            'Oro\Component\Layout\Extension\Theme\Generator\ExpressionFactoryAwareInterface',
             'setExpressionFactory',
             'factory_service_id'
         );

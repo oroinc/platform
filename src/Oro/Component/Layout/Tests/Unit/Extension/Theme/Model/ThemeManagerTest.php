@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Theme;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
-use Oro\Bundle\LayoutBundle\Theme\ThemeFactoryInterface;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 
 class ThemeManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->factory = $this->getMock('Oro\Bundle\LayoutBundle\Theme\ThemeFactoryInterface');
+        $this->factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface');
     }
 
     protected function tearDown()
@@ -48,7 +48,7 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = $this->createManager(['base' => ['label' => 'Oro Base theme']]);
 
-        $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $themeMock = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
 
         $this->factory->expects($this->once())->method('create')
             ->with($this->equalTo('base'), $this->equalTo(['label' => 'Oro Base theme']))
@@ -88,8 +88,8 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
-        $theme1Mock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
-        $theme2Mock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $theme1Mock = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
+        $theme2Mock = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
 
         $this->factory->expects($this->exactly(2))->method('create')
             ->willReturnOnConsecutiveCalls($theme1Mock, $theme2Mock);
@@ -101,9 +101,9 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
-        $theme1Mock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $theme1Mock = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
         $theme1Mock->expects($this->any())->method('getGroups')->willReturn(['base', 'frontend']);
-        $theme2Mock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $theme2Mock = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
         $theme2Mock->expects($this->any())->method('getGroups')->willReturn(['frontend']);
 
         $this->factory->expects($this->exactly(2))->method('create')

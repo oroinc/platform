@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Model;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
-use Oro\Bundle\LayoutBundle\Model\Theme;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
 
 class ThemeTest extends \PHPUnit_Framework_TestCase
 {

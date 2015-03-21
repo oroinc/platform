@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Model;
+namespace Oro\Component\Layout\Extension\Theme\Model;
 
 class Theme
 {

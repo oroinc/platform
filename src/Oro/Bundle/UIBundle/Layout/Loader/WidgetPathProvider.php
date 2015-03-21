@@ -5,7 +5,7 @@ namespace Oro\Bundle\UIBundle\Layout\Loader;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface;
 
 class WidgetPathProvider implements PathProviderInterface, ContextAwareInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Theme;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
-use Oro\Bundle\LayoutBundle\Model\Theme;
-use Oro\Bundle\LayoutBundle\Theme\ThemeFactory;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 
 class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
 {

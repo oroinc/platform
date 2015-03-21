@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
-use Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
-use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubConditionVisitor;
+use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
+use Oro\Component\Layout\Extension\Theme\Generator\PhpLayoutUpdateGenerator;
+use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubConditionVisitor;
 
 class PhpLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {

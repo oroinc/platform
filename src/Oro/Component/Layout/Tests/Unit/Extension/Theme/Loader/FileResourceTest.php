@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
+use Oro\Component\Layout\Extension\Theme\Loader\FileResource;
 
 class FileResourceTest extends \PHPUnit_Framework_TestCase
 {

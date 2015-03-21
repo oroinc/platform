@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactory;
 
 class ResourceFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +25,7 @@ class ResourceFactoryTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->factory->create($filename);
 
-        $this->assertInstanceOf('Oro\Bundle\LayoutBundle\Layout\Loader\FileResource', $result);
+        $this->assertInstanceOf('Oro\Component\Layout\Extension\Theme\Loader\FileResource', $result);
         $this->assertSame($filename, $result->getFilename());
     }
 }

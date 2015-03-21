@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Extension;
+namespace Oro\Component\Layout\Extension\Theme\Model;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

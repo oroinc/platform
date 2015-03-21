@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Theme;
-
-use Oro\Bundle\LayoutBundle\Model\Theme;
+namespace Oro\Component\Layout\Extension\Theme\Model;
 
 class ThemeFactory implements ThemeFactoryInterface
 {

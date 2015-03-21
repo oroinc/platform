@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator;
+namespace Oro\Component\Layout\Extension\Theme\Generator;
 
 use CG\Generator\PhpClass;
 use CG\Generator\Writer;

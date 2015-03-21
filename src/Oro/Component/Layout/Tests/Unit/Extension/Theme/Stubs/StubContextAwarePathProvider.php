@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Stubs;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs;
 
 use Oro\Component\Layout\ContextAwareInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface;
 
 interface StubContextAwarePathProvider extends PathProviderInterface, ContextAwareInterface
 {

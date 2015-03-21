@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Loader;
+namespace Oro\Component\Layout\Extension\Theme\Loader;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
 
-use Oro\Bundle\LayoutBundle\Model\Theme;
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
 class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
 {

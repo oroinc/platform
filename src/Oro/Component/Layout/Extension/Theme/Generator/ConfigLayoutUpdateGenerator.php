@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator;
+namespace Oro\Component\Layout\Extension\Theme\Generator;
 
 use Oro\Component\ConfigExpression\AssemblerInterface;
 
-use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ArrayUtils;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ReflectionUtils;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ConfigExpressionConditionVisitor;
+use Oro\Component\Layout\Exception\SyntaxException;
+use Oro\Component\Layout\Extension\Theme\Generator\Utils\ArrayUtils;
+use Oro\Component\Layout\Extension\Theme\Generator\Utils\ReflectionUtils;
+use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ConfigExpressionConditionVisitor;
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {

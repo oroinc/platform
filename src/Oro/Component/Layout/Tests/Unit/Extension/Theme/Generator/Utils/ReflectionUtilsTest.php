@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator\Utils;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator\Utils;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ReflectionUtils;
+use Oro\Component\Layout\Extension\Theme\Generator\Utils\ReflectionUtils;
 
 class ReflectionUtilsTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,9 @@ class ReflectionUtilsTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->utils = new ReflectionUtils('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubLayoutBuilderInterface');
+        $this->utils = new ReflectionUtils(
+            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubLayoutBuilderInterface'
+        );
     }
 
     protected function tearDown()

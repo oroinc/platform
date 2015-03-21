@@ -6,11 +6,14 @@
     "license": "MIT",
     "require": {
         "php": ">=5.4.9",
+        "psr/log": "~1.0",
         "symfony/form": "~2.3",
         "symfony/options-resolver": "~2.3",
         "symfony/templating": "~2.3"
     },
     "require-dev": {
+        "jms/cg": "~1.1",
+        "symfony/filesystem": "~2.3",
         "symfony/dependency-injection": "~2.3"
     },
     "autoload": {

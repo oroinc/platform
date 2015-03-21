@@ -1,4 +1,4 @@
-oro_layout:
+layout:
     actions:
         - @add:
             id:        change_history_link

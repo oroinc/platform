@@ -3,23 +3,23 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\CacheWarmer;
 
 use Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer;
-use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface;
 
 class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldBeOptional()
     {
-        $factory = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
+        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
+        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
         $this->assertTrue($this->getWarmer($factory, $loader)->isOptional());
     }
 
     public function testWithEmptyResources()
     {
-        $factory = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
+        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
+        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
         $loader->expects($this->never())->method('supports');
         $loader->expects($this->never())->method('load');
@@ -32,8 +32,8 @@ class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
 
     public function testWithUnsupportedResources()
     {
-        $factory = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
+        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
+        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
         $resource = $this->getResourceMock();
 
@@ -48,8 +48,8 @@ class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSkipUnsupportedResourceAndProceedAllThemes()
     {
-        $factory = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
+        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
+        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
         $resourceUnsupported  = $this->getResourceMock();
         $resourceYmlSupported = $this->getResourceMock();
@@ -101,6 +101,6 @@ class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getResourceMock()
     {
-        return $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\FileResource', [], [], '', false);
+        return $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\FileResource', [], [], '', false);
     }
 }

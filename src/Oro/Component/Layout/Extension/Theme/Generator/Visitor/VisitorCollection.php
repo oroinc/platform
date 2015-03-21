@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator\Visitor;
+namespace Oro\Component\Layout\Extension\Theme\Generator\Visitor;
 
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
@@ -35,7 +35,7 @@ class VisitorCollection extends \ArrayIterator
             if (!$condition instanceof VisitorInterface) {
                 throw new UnexpectedTypeException(
                     $condition,
-                    'Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorInterface'
+                    'Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface'
                 );
             }
         }

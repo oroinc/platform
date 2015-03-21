@@ -77,7 +77,7 @@ Let's consider an example when we need to move the email field before the first 
 
 **Example**
 ```yml
-oro_layout:
+layout:
     actions:
         - @move:
             id:        embedded_form_email

@@ -1,12 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\DataProvider;
+namespace Oro\Component\Layout\Extension\Theme\DataProvider;
 
 use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataProviderInterface;
-
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
 class ThemeDataProvider implements DataProviderInterface, ContextAwareInterface
 {

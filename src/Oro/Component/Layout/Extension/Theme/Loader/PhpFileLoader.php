@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Loader;
+namespace Oro\Component\Layout\Extension\Theme\Loader;
 
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
-use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
+use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
 
 /**
  * Evaluates given PHP file resource, context of the file will consist with variables
@@ -17,7 +17,7 @@ use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
  *
  *         $layoutManipulator->add('menu', 'content', 'knp_menu');
  *
- * @see src/Oro/Bundle/LayoutBundle/Tests/Unit/Stubs/Updates/layout_update.php
+ * @see src/Oro/Component/Layout/Tests/Unit/Extension/Theme/Stubs/Updates/layout_update.php
  */
 class PhpFileLoader extends AbstractLoader
 {

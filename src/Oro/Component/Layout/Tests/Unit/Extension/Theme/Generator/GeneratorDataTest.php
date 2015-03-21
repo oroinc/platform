@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
+use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
 
 class GeneratorDataTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Loader;
+namespace Oro\Component\Layout\Extension\Theme\Loader;
 
-use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
-use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\VisitorCollection;
-use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ElementDependentVisitor;
+use Oro\Component\Layout\Exception\SyntaxException;
+use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
+use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ElementDependentVisitor;
+use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
 
 abstract class AbstractLoader implements LoaderInterface
 {

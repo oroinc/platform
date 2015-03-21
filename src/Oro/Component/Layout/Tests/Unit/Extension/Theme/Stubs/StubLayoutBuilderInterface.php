@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Stubs;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs;
 
 interface StubLayoutBuilderInterface
 {

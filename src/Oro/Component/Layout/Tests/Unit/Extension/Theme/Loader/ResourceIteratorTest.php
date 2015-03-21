@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
 
 class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,7 +49,7 @@ class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
     protected function getCreatedResources()
     {
         $created = [];
-        $factory = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface');
+        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
         $factory->expects($this->any())->method('create')
             ->willReturnCallback(
                 function ($resource) use (&$created) {

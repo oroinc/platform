@@ -1,11 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
 
 use Oro\Component\Layout\LayoutContext;
-
-use Oro\Bundle\LayoutBundle\Layout\Loader\ThemePathProvider;
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
+use Oro\Component\Layout\Extension\Theme\Loader\ThemePathProvider;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
 class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +16,7 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->themeManager = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Theme\ThemeManager')
+        $this->themeManager = $this->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\ThemeManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -136,7 +135,7 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getThemeMock($directory = null, $parent = null)
     {
-        $theme = $this->getMock('\Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $theme = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
         $theme->expects($this->any())->method('getParentTheme')->willReturn($parent);
         $theme->expects($this->any())->method('getDirectory')->willReturn($directory);
 

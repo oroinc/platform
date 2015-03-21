@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\ChainPathProvider;
+use Oro\Component\Layout\Extension\Theme\Loader\ChainPathProvider;
 
 class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,9 +21,9 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddProviderUsePriorityForSorting()
     {
-        $provider1 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider3 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider1 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+        $provider2 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+        $provider3 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
         $this->provider->addProvider($provider1, 100);
         $this->provider->addProvider($provider2, -10);
         $this->provider->addProvider($provider3);
@@ -39,8 +39,10 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->getMock('Oro\Component\Layout\ContextInterface');
 
-        $provider1 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\StubContextAwarePathProvider');
+        $provider1 = $this
+            ->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+        $provider2 = $this
+            ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
         $provider2->expects($this->once())
             ->method('setContext')
             ->with($this->identicalTo($context));
@@ -52,9 +54,9 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPaths()
     {
-        $provider1 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
-        $provider3 = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface');
+        $provider1 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+        $provider2 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+        $provider3 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
         $this->provider->addProvider($provider1, 100);
         $this->provider->addProvider($provider2, 0);
         $this->provider->addProvider($provider3, -100);

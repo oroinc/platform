@@ -1,4 +1,4 @@
-oro_layout:
+layout:
     actions:
         - @setBlockTheme:
             themes: 'OroUIBundle:layouts:oro/update/default.html.twig'

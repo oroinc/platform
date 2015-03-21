@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator;
 
 use CG\Generator\PhpClass;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
+use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
 
 class VisitContextTest extends \PHPUnit_Framework_TestCase
 {

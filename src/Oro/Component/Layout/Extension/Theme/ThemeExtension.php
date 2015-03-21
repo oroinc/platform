@@ -1,20 +1,19 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Extension;
+namespace Oro\Component\Layout\Extension\Theme;
 
-use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
-
-use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
-use Oro\Bundle\LayoutBundle\Layout\Loader\PathProviderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
-use Oro\Bundle\LayoutBundle\Layout\Generator\ElementDependentLayoutUpdateInterface;
+use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
+use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
+use Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface;
+use Oro\Component\Layout\Extension\Theme\Generator\ElementDependentLayoutUpdateInterface;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 {
@@ -54,7 +53,6 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
         $this->factory               = $factory;
         $this->dependencyInitializer = $dependencyInitializer;
         $this->pathProvider          = $provider;
-        $this->setLogger(new NullLogger());
     }
 
     /**
@@ -70,11 +68,14 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
                 if ($this->loader->supports($resource)) {
                     $update = $this->loader->load($resource);
                     $this->dependencyInitializer->initialize($update);
-                    $el             = $update instanceof ElementDependentLayoutUpdateInterface ? $update->getElement(
-                    ) : 'root';
+                    $el             = $update instanceof ElementDependentLayoutUpdateInterface
+                        ? $update->getElement()
+                        : 'root';
                     $updates[$el][] = $update;
-                } else {
-                    $this->logger->notice(sprintf('Skipping resource "%s" because loader for it not found', $resource));
+                } elseif ($this->logger) {
+                    $this->logger->notice(
+                        sprintf('Skipping resource "%s" because loader for it not found', $resource)
+                    );
                 }
             }
         }

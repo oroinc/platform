@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator\Visitor;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator\Visitor;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
@@ -9,9 +9,9 @@ use CG\Core\DefaultGeneratorStrategy;
 
 use Oro\Component\ConfigExpression\Condition;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Visitor\ConfigExpressionConditionVisitor;
-use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
+use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ConfigExpressionConditionVisitor;
+use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
 
 class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,7 +36,7 @@ class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CLASS
-class LayoutUpdateClass implements \Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface
+class LayoutUpdateClass implements \Oro\Component\Layout\Extension\Theme\Generator\ExpressionFactoryAwareInterface
 {
     private \$expressionFactory;
 

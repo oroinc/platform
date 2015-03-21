@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator\Visitor;
+namespace Oro\Component\Layout\Extension\Theme\Generator\Visitor;
 
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpProperty;
@@ -8,8 +8,8 @@ use CG\Generator\PhpParameter;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
-use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
+use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
 
 class ConfigExpressionConditionVisitor implements VisitorInterface
 {
@@ -32,12 +32,12 @@ class ConfigExpressionConditionVisitor implements VisitorInterface
         $writer = $visitContext->createWriter();
         $class  = $visitContext->getClass();
 
-        $class->addInterfaceName('\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface');
+        $class->addInterfaceName('Oro\Component\Layout\Extension\Theme\Generator\ExpressionFactoryAwareInterface');
 
         $setFactoryMethod = PhpMethod::create('setExpressionFactory');
         $setFactoryMethod->addParameter(
             PhpParameter::create('expressionFactory')
-                ->setType('\Oro\Component\ConfigExpression\ExpressionFactoryInterface')
+                ->setType('Oro\Component\ConfigExpression\ExpressionFactoryInterface')
         );
         $setFactoryMethod->setBody($writer->write('$this->expressionFactory = $expressionFactory;')->getContent());
         $class->setMethod($setFactoryMethod);

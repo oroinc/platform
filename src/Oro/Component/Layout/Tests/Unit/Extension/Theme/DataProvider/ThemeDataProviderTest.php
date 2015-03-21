@@ -1,11 +1,10 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\DataProvider;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\DataProvider;
 
-use Oro\Bundle\LayoutBundle\Model\Theme;
+use Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\LayoutContext;
-
-use Oro\Bundle\LayoutBundle\Layout\DataProvider\ThemeDataProvider;
 
 class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +19,7 @@ class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->themeManager = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Theme\ThemeManager')
+        $this->themeManager = $this->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\ThemeManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->context      = new LayoutContext();

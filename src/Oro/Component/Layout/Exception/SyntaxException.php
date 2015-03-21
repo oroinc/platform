@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Exception;
+namespace Oro\Component\Layout\Exception;
 
-class SyntaxException extends \LogicException
+class SyntaxException extends LogicException
 {
     /** @var string */
     protected $source;

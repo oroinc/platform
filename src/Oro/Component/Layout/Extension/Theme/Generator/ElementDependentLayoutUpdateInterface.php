@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Generator;
+namespace Oro\Component\Layout\Extension\Theme\Generator;
 
 interface ElementDependentLayoutUpdateInterface
 {
     /**
-     * @return string Element to which it depends
+     * @return string The id of an layout item to which this layout update depends
      */
     public function getElement();
 }

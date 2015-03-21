@@ -4,9 +4,9 @@ namespace Oro\Bundle\LayoutBundle\CacheWarmer;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
+use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface;
 
 class LayoutUpdatesWarmer implements CacheWarmerInterface
 {
