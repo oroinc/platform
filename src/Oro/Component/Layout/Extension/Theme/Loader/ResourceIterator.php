@@ -2,24 +2,22 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Loader;
 
-class ResourceIterator extends \IteratorIterator
+class ResourceIterator implements \Iterator
 {
-    /** @var ResourceFactoryInterface */
-    protected $factory;
+    /** @var int */
+    protected $currentKey;
+
+    /** @var \RecursiveIteratorIterator */
+    protected $iterator;
 
     /**
-     * @param ResourceFactoryInterface $factory
-     * @param array                    $resources
+     * @param array $resources
      */
-    public function __construct(ResourceFactoryInterface $factory, array $resources)
+    public function __construct(array $resources)
     {
-        $this->factory = $factory;
-
-        parent::__construct(
-            new \RecursiveIteratorIterator(
-                new \RecursiveArrayIterator($resources),
-                \RecursiveIteratorIterator::LEAVES_ONLY
-            )
+        $this->iterator = new \RecursiveIteratorIterator(
+            new \RecursiveArrayIterator($resources),
+            \RecursiveIteratorIterator::LEAVES_ONLY
         );
     }
 
@@ -28,6 +26,40 @@ class ResourceIterator extends \IteratorIterator
      */
     public function current()
     {
-        return $this->factory->create(parent::current());
+        return $this->iterator->current();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function key()
+    {
+        return $this->currentKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valid()
+    {
+        return $this->iterator->valid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next()
+    {
+        $this->currentKey++;
+        $this->iterator->next();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind()
+    {
+        $this->currentKey = 0;
+        $this->iterator->rewind();
     }
 }

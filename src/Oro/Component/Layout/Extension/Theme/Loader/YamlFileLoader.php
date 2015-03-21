@@ -26,17 +26,17 @@ class YamlFileLoader extends AbstractLoader
     /**
      * {@inheritdoc}
      */
-    public function supports(FileResource $resource)
+    public function supports($fileName)
     {
-        return 'yml' === pathinfo($resource->getFilename(), PATHINFO_EXTENSION);
+        return 'yml' === pathinfo($fileName, PATHINFO_EXTENSION);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function loadResourceGeneratorData(FileResource $resource)
+    protected function loadResourceGeneratorData($fileName)
     {
-        $data = Yaml::parse($resource->getFilename());
+        $data = Yaml::parse($fileName);
         $data = isset($data['layout']) ? $data['layout'] : [];
 
         return new GeneratorData($data);

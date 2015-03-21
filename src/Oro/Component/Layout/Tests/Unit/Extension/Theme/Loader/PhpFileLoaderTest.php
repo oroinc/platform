@@ -5,7 +5,6 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Loader\FileResource;
 use Oro\Component\Layout\Extension\Theme\Loader\PhpFileLoader;
 use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
 use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
@@ -30,15 +29,15 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'should support php file resource'       => [
-                '$resource'       => new FileResource('test.php'),
+                '$resource'       => 'test.php',
                 '$expectedResult' => true
             ],
             'should not support yml resource'        => [
-                '$resource'       => new FileResource('test.yml'),
+                '$resource'       => 'test.yml',
                 '$expectedResult' => false
             ],
             'should not support zip resource'        => [
-                '$resource'       => new FileResource('test.zip'),
+                '$resource'       => 'test.zip',
                 '$expectedResult' => false
             ]
         ];
@@ -54,7 +53,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.php';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        $update = $loader->load(new FileResource($path));
+        $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 
@@ -71,7 +70,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.php';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        $update = $loader->load(new FileResource($path));
+        $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
         $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($dir)));
 
@@ -102,7 +101,7 @@ MESSAGE;
         $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.php';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        $update = $loader->load(new FileResource($path));
+        $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 

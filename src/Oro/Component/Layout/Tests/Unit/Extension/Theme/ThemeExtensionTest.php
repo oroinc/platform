@@ -6,7 +6,6 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Component\Layout\Extension\Theme\Loader\ChainLoader;
 use Oro\Component\Layout\Extension\Theme\Loader\ChainPathProvider;
-use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactory;
 use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
@@ -61,7 +60,6 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension = new ThemeExtension(
             $this->resources,
-            new ResourceFactory(),
             new ChainLoader([$this->yamlLoader, $this->phpLoader]),
             $this->dependencyInitializer,
             $this->provider
@@ -106,7 +104,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->yamlLoader->expects($this->once())->method('load')->with('resource-gold.yml')
+        $this->yamlLoader->expects($this->once())->method('load')
+            ->with('resource-gold.yml')
             ->willReturn($updateMock);
 
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
@@ -127,7 +126,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->yamlLoader->expects($this->once())->method('load')->with('resource-gold.yml')
+        $this->yamlLoader->expects($this->once())->method('load')
+            ->with('resource-gold.yml')
             ->willReturn($updateMock);
 
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
@@ -149,9 +149,11 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $updateMock  = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $update2Mock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->yamlLoader->expects($this->once())->method('load')->with('resource1.yml')
+        $this->yamlLoader->expects($this->once())->method('load')
+            ->with('resource1.yml')
             ->willReturn($updateMock);
-        $this->phpLoader->expects($this->once())->method('load')->with('resource3.php')
+        $this->phpLoader->expects($this->once())->method('load')
+            ->with('resource3.php')
             ->willReturn($update2Mock);
 
         $this->logger->expects($this->once())
@@ -191,8 +193,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     protected function getCallbackBuilder()
     {
         return function ($extension) {
-            return function ($resource) use ($extension) {
-                return substr($resource, -strlen($extension)) === $extension;
+            return function ($fileName) use ($extension) {
+                return substr($fileName, -strlen($extension)) === $extension;
             };
         };
     }

@@ -6,7 +6,6 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
 use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
-use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface;
 
 class LayoutUpdatesWarmer implements CacheWarmerInterface
 {
@@ -16,18 +15,13 @@ class LayoutUpdatesWarmer implements CacheWarmerInterface
     /** @var LoaderInterface */
     protected $loader;
 
-    /** @var ResourceFactoryInterface */
-    protected $factory;
-
     /**
-     * @param array                    $resources
-     * @param ResourceFactoryInterface $factory
-     * @param LoaderInterface          $loader
+     * @param array           $resources
+     * @param LoaderInterface $loader
      */
-    public function __construct(array $resources, ResourceFactoryInterface $factory, LoaderInterface $loader)
+    public function __construct(array $resources, LoaderInterface $loader)
     {
         $this->resources = $resources;
-        $this->factory   = $factory;
         $this->loader    = $loader;
     }
 
@@ -36,7 +30,7 @@ class LayoutUpdatesWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        foreach (new ResourceIterator($this->factory, $this->resources) as $resource) {
+        foreach (new ResourceIterator($this->resources) as $resource) {
             if (!$this->loader->supports($resource)) {
                 continue;
             }

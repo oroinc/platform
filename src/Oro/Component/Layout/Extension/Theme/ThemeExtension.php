@@ -12,7 +12,6 @@ use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
 use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
 use Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface;
-use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface;
 use Oro\Component\Layout\Extension\Theme\Generator\ElementDependentLayoutUpdateInterface;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
@@ -21,9 +20,6 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 
     /** @var array */
     protected $resources;
-
-    /** @var ResourceFactoryInterface */
-    protected $factory;
 
     /** @var LoaderInterface */
     protected $loader;
@@ -35,22 +31,19 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
     protected $pathProvider;
 
     /**
-     * @param array                    $resources
-     * @param ResourceFactoryInterface $factory
-     * @param LoaderInterface          $loader
-     * @param DependencyInitializer    $dependencyInitializer
-     * @param PathProviderInterface    $provider
+     * @param array                 $resources
+     * @param LoaderInterface       $loader
+     * @param DependencyInitializer $dependencyInitializer
+     * @param PathProviderInterface $provider
      */
     public function __construct(
         array $resources,
-        ResourceFactoryInterface $factory,
         LoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
         PathProviderInterface $provider
     ) {
         $this->resources             = $resources;
         $this->loader                = $loader;
-        $this->factory               = $factory;
         $this->dependencyInitializer = $dependencyInitializer;
         $this->pathProvider          = $provider;
     }
@@ -63,7 +56,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
         $updates = [];
 
         if ($context->getOr('theme')) {
-            $iterator = new ResourceIterator($this->factory, $this->findApplicableResources($context));
+            $iterator = new ResourceIterator($this->findApplicableResources($context));
             foreach ($iterator as $resource) {
                 if ($this->loader->supports($resource)) {
                     $update = $this->loader->load($resource);

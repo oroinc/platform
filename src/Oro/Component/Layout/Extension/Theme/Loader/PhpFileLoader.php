@@ -24,16 +24,16 @@ class PhpFileLoader extends AbstractLoader
     /**
      * {@inheritdoc}
      */
-    public function supports(FileResource $resource)
+    public function supports($fileName)
     {
-        return 'php' === pathinfo($resource->getFilename(), PATHINFO_EXTENSION);
+        return 'php' === pathinfo($fileName, PATHINFO_EXTENSION);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function loadResourceGeneratorData(FileResource $resource)
+    protected function loadResourceGeneratorData($fileName)
     {
-        return new GeneratorData(file_get_contents($resource->getFilename()));
+        return new GeneratorData(file_get_contents($fileName));
     }
 }

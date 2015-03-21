@@ -2,79 +2,59 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\CacheWarmer;
 
-use Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer;
 use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
-use Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface;
+
+use Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer;
 
 class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldBeOptional()
     {
-        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
+        $loader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
-        $this->assertTrue($this->getWarmer($factory, $loader)->isOptional());
+        $this->assertTrue($this->getWarmer($loader)->isOptional());
     }
 
     public function testWithEmptyResources()
     {
-        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
+        $loader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
         $loader->expects($this->never())->method('supports');
         $loader->expects($this->never())->method('load');
 
-        $factory->expects($this->never())->method('create');
-
-        $warmer = $this->getWarmer($factory, $loader);
+        $warmer = $this->getWarmer($loader);
         $warmer->warmUp('');
     }
 
     public function testWithUnsupportedResources()
     {
-        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
+        $loader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
-        $resource = $this->getResourceMock();
+        $loader->expects($this->once())->method('supports')
+            ->with('layout_update.yml')
+            ->willReturn(false);
+        $loader->expects($this->never())->method('load')
+            ->with('layout_update.yml');
 
-        $loader->expects($this->once())->method('supports')->willReturn(false);
-        $loader->expects($this->never())->method('load')->with($this->identicalTo($resource));
-
-        $factory->expects($this->once())->method('create')->willReturn($resource);
-
-        $warmer = $this->getWarmer($factory, $loader, ['oro-black' => ['layout_update.yml']]);
+        $warmer = $this->getWarmer($loader, ['oro-black' => ['layout_update.yml']]);
         $warmer->warmUp('');
     }
 
     public function testShouldSkipUnsupportedResourceAndProceedAllThemes()
     {
-        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
-        $loader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
-
-        $resourceUnsupported  = $this->getResourceMock();
-        $resourceYmlSupported = $this->getResourceMock();
-        $resourcePhpSupported = $this->getResourceMock();
+        $loader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
 
         $loader->expects($this->exactly(2))->method('load');
         $loader->expects($this->exactly(3))->method('supports')
             ->willReturnMap(
                 [
-                    [$resourceUnsupported, false],
-                    [$resourceYmlSupported, true],
-                    [$resourcePhpSupported, true]
+                    ['layout_update_unsupported.xml', false],
+                    ['layout_update_supported.yml', true],
+                    ['supported_update.php', true]
                 ]
             );
 
-        $factory->expects($this->exactly(3))->method('create')->willReturnMap(
-            [
-                ['layout_update_unsupported.xml', $resourceUnsupported],
-                ['layout_update_supported.yml', $resourceYmlSupported],
-                ['supported_update.php', $resourcePhpSupported]
-            ]
-        );
-
         $warmer = $this->getWarmer(
-            $factory,
             $loader,
             [
                 'oro-black' => ['layout_update_unsupported.xml', 'layout_update_supported.yml'],
@@ -85,22 +65,13 @@ class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ResourceFactoryInterface $factory
-     * @param LoaderInterface          $loader
-     * @param array                    $resources
+     * @param LoaderInterface $loader
+     * @param array           $resources
      *
      * @return LayoutUpdatesWarmer
      */
-    protected function getWarmer(ResourceFactoryInterface $factory, LoaderInterface $loader, array $resources = [])
+    protected function getWarmer(LoaderInterface $loader, array $resources = [])
     {
-        return new LayoutUpdatesWarmer($resources, $factory, $loader);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getResourceMock()
-    {
-        return $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\FileResource', [], [], '', false);
+        return new LayoutUpdatesWarmer($resources, $loader);
     }
 }

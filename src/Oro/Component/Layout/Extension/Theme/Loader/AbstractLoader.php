@@ -38,18 +38,17 @@ abstract class AbstractLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load(FileResource $resource)
+    public function load($fileName)
     {
-        $name      = $resource->getFilename();
-        $className = $this->generateClassName($name);
+        $className = $this->generateClassName($fileName);
 
         if (!class_exists($className, false)) {
-            if (false === $cache = $this->getCacheFilename($name)) {
-                eval('?>' . $this->doGenerate($className, $resource));
+            if (false === $cache = $this->getCacheFilename($fileName)) {
+                eval('?>' . $this->doGenerate($className, $fileName));
             } else {
                 // write cache to file, refresh cache if source file fresher then cached one in debug mode
-                if (!is_file($cache) || ($this->isDebug() && filemtime($name) > filemtime($cache))) {
-                    $this->writeCacheFile($cache, $this->doGenerate($className, $resource));
+                if (!is_file($cache) || ($this->isDebug() && filemtime($fileName) > filemtime($fileName))) {
+                    $this->writeCacheFile($cache, $this->doGenerate($className, $fileName));
                 }
 
                 require_once $cache;
@@ -60,23 +59,23 @@ abstract class AbstractLoader implements LoaderInterface
     }
 
     /**
-     * @param string       $className
-     * @param FileResource $resource
+     * @param string $className
+     * @param string $fileName
      *
      * @return string
      */
-    protected function doGenerate($className, FileResource $resource)
+    protected function doGenerate($className, $fileName)
     {
-        $resourceDataForGenerator = $this->loadResourceGeneratorData($resource);
-        $resourceDataForGenerator->setFilename($resource->getFilename());
+        $resourceDataForGenerator = $this->loadResourceGeneratorData($fileName);
+        $resourceDataForGenerator->setFilename($fileName);
 
         try {
-            $visitors = $this->prepareVisitors($resource);
+            $visitors = $this->prepareVisitors($fileName);
 
             return $this->getGenerator()->generate($className, $resourceDataForGenerator, $visitors);
         } catch (SyntaxException $e) {
             $message = $e->getMessage() . "\n" . $this->dumpSource($e->getSource());
-            $message .= str_repeat("\n", 2) . 'Filename: ' . $resource->getFilename();
+            $message .= str_repeat("\n", 2) . 'Filename: ' . $fileName;
 
             throw new \RuntimeException($message, 0, $e);
         }
@@ -85,23 +84,23 @@ abstract class AbstractLoader implements LoaderInterface
     /**
      * Loads file resource content and prepares generator data.
      *
-     * @param FileResource $resource
+     * @param string $fileName
      *
      * @return GeneratorData
      */
-    abstract protected function loadResourceGeneratorData(FileResource $resource);
+    abstract protected function loadResourceGeneratorData($fileName);
 
     /**
-     * @param FileResource $resource
+     * @param string $fileName
      *
      * @return null|VisitorCollection
      */
-    protected function prepareVisitors(FileResource $resource)
+    protected function prepareVisitors($fileName)
     {
-        $filename = pathinfo($resource->getFilename(), PATHINFO_FILENAME);
+        $name = pathinfo($fileName, PATHINFO_FILENAME);
 
-        if (strpos($filename, self::ELEMENT_PREFIX) === 0) {
-            return new VisitorCollection([new ElementDependentVisitor(substr($filename, 1))]);
+        if (strpos($name, self::ELEMENT_PREFIX) === 0) {
+            return new VisitorCollection([new ElementDependentVisitor(substr($name, 1))]);
         }
 
         return null;

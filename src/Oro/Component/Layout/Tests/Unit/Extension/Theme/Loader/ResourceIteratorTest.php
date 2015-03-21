@@ -39,27 +39,7 @@ class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
                 'default_black.yml',
                 'default_black.php'
             ],
-            $this->getCreatedResources()
+            iterator_to_array(new ResourceIterator($this->resources))
         );
-    }
-
-    /**
-     * @return array
-     */
-    protected function getCreatedResources()
-    {
-        $created = [];
-        $factory = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\ResourceFactoryInterface');
-        $factory->expects($this->any())->method('create')
-            ->willReturnCallback(
-                function ($resource) use (&$created) {
-                    return $created[] = $resource;
-                }
-            );
-
-        $iterator = new ResourceIterator($factory, $this->resources);
-        iterator_to_array($iterator);
-
-        return $created;
     }
 }

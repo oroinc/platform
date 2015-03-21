@@ -26,11 +26,11 @@ class ChainLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(FileResource $resource)
+    public function supports($fileName)
     {
         $result = false;
         foreach ($this->loaders as $loader) {
-            if ($loader->supports($resource)) {
+            if ($loader->supports($fileName)) {
                 $result = true;
 
                 break;
@@ -43,12 +43,12 @@ class ChainLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load(FileResource $resource)
+    public function load($fileName)
     {
         $update = false;
         foreach ($this->loaders as $loader) {
-            if ($loader->supports($resource)) {
-                $update = $loader->load($resource);
+            if ($loader->supports($fileName)) {
+                $update = $loader->load($fileName);
 
                 break;
             }

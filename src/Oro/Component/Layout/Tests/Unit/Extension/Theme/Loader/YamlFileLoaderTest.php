@@ -5,7 +5,6 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Loader\FileResource;
 use Oro\Component\Layout\Extension\Theme\Loader\YamlFileLoader;
 use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
 use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
@@ -31,15 +30,15 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'should support yml file resource'       => [
-                '$resource'       => new FileResource('test.yml'),
+                '$resource'       => 'test.yml',
                 '$expectedResult' => true
             ],
             'should not support php resource'        => [
-                '$resource'       => new FileResource('test.php'),
+                '$resource'       => 'test.php',
                 '$expectedResult' => false
             ],
             'should not support zip resource'        => [
-                '$resource'       => new FileResource('test.zip'),
+                '$resource'       => 'test.zip',
                 '$expectedResult' => false
             ]
         ];
@@ -55,7 +54,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        $update = $loader->load(new FileResource($path));
+        $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 
@@ -72,7 +71,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        $update = $loader->load(new FileResource($path));
+        $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
         $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($dir)));
 
@@ -86,7 +85,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/_header.yml';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
-        $resource = new FileResource($path);
+        $resource = $path;
 
         $generator->expects($this->once())->method('generate')
             ->willReturnCallback(
@@ -125,7 +124,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $loader->load(new FileResource($path));
+        $loader->load($path);
     }
 
     public function testProcessSyntaxExceptions()
@@ -151,7 +150,7 @@ Filename: path/to/my/file.yml
 MESSAGE;
         $this->setExpectedException('\RuntimeException', $message);
 
-        $update = $loader->load(new FileResource('path/to/my/file.yml'));
+        $update = $loader->load('path/to/my/file.yml');
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 
