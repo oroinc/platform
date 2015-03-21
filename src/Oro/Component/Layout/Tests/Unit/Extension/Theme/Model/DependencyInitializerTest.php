@@ -16,7 +16,7 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = new Container();
+        $this->container   = new Container();
         $this->initializer = new DependencyInitializer($this->container);
     }
 
@@ -33,28 +33,31 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
     public function testNoKnownDependenciesShouldNotDoAnything()
     {
         $object = $this->getMock(
-            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ExpressionFactoryLayoutUpdateInterface'
+            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithDependency'
         );
-        $object->expects($this->never())->method('setExpressionFactory');
+        $object->expects($this->never())
+            ->method('setContainer');
 
         $this->initializer->initialize($object);
     }
 
     public function testShouldInitializeDependencies()
     {
-        $expressionFactory = $this->getMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
+        $dependency = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $object = $this->getMock(
-            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ExpressionFactoryLayoutUpdateInterface'
+            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithDependency'
         );
-        $object->expects($this->once())->method('setExpressionFactory')->with($this->equalTo($expressionFactory));
+        $object->expects($this->once())
+            ->method('setContainer')
+            ->with($this->identicalTo($dependency));
 
-        $this->container->set('factory_service_id', $expressionFactory);
+        $this->container->set('dependency_service_id', $dependency);
 
         $this->initializer->addKnownDependency(
-            '\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface',
-            'setExpressionFactory',
-            'factory_service_id'
+            '\Symfony\Component\DependencyInjection\ContainerAwareInterface',
+            'setContainer',
+            'dependency_service_id'
         );
 
         $this->initializer->initialize($object);
