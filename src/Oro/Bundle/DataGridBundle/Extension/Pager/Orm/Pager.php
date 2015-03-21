@@ -139,10 +139,11 @@ class Pager extends AbstractPager implements PagerInterface
 
         /** @var QueryBuilder $query */
         $query = $this->getQueryBuilder();
+
         if (count($this->getParameters()) > 0) {
             $query->setParameters($this->getParameters());
         }
-        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
+        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder(), true);
 
         $query->setFirstResult(null);
         $query->setMaxResults(null);
@@ -249,7 +250,7 @@ class Pager extends AbstractPager implements PagerInterface
     /**
      * @param QueryBuilder $query
      */
-    private function setPaginationData(QueryBuilder $query)
+    protected function setPaginationData(QueryBuilder $query)
     {
         if (0 == $this->getPage() || 0 == $this->getMaxPerPage() || 0 == $this->getNbResults()) {
             $this->setLastPage(0);

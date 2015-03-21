@@ -52,7 +52,7 @@ class CountQueryBuilderOptimizer
      * @param QueryBuilder $originalQb
      * @return QueryBuilder
      */
-    public function getCountQueryBuilder(QueryBuilder $originalQb)
+    public function getCountQueryBuilder(QueryBuilder $originalQb, $addOrderBy = false)
     {
         $this->setOriginalQueryBuilder($originalQb);
         $parts = $this->originalQb->getDQLParts();
@@ -75,7 +75,7 @@ class CountQueryBuilderOptimizer
             foreach ($groupByFields as $key => $groupByField) {
                 $alias = '_groupByPart' . $key;
                 $usedGroupByAliases[] = $alias;
-                $fieldsToSelect[] = $groupByField . ' as ' . $alias;
+                $fieldsToSelect[$groupByField] = $groupByField . ' as ' . $alias;
             }
             $qb->groupBy(implode(', ', $usedGroupByAliases));
         } elseif (!$parts['where'] && $parts['having']) {
@@ -94,8 +94,22 @@ class CountQueryBuilderOptimizer
         if ($parts['join']) {
             $this->addJoins($qb, $parts);
         }
+
         if (!$parts['groupBy']) {
-            $fieldsToSelect[] = sprintf('DISTINCT %s', $this->getIdFieldFQN());
+            $qb->distinct(true);
+            $fieldsToSelect[$this->getIdFieldFQN()] = $this->getIdFieldFQN();
+        }
+
+        if ($addOrderBy && $parts['orderBy']) {
+            foreach ($parts['orderBy'] as $orderExpr) {
+                $orderParts = explode(' ', $orderExpr);
+                $field = $this->qbTools->getFieldByAlias($orderParts[0]);
+                if ($field && !isset($fieldsToSelect[$orderParts[0]])) {
+                    // This is an aliased field so add it to the select
+                    $fieldsToSelect[$orderParts[0]] = sprintf('%s AS %s', $field, $orderParts[0]);
+                }
+                $qb->addOrderBy($orderExpr);
+            }
         }
 
         if ($parts['where']) {

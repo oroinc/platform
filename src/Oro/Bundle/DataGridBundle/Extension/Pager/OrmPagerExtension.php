@@ -108,7 +108,7 @@ class OrmPagerExtension extends AbstractExtension
     public function getPriority()
     {
         // Pager should proceed closest to end of accepting chain
-        return -240;
+        return -250;
     }
 
     /**

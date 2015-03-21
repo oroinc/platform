@@ -110,8 +110,8 @@ class OrmSorterExtension extends AbstractExtension
      */
     public function getPriority()
     {
-        // should visit after all extensions
-        return -250;
+        // should visit after all extensions other than paginator
+        return -240;
     }
 
     /**
