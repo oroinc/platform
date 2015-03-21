@@ -14,6 +14,7 @@
     "require-dev": {
         "jms/cg": "~1.1",
         "symfony/filesystem": "~2.3",
+        "symfony/yaml": "~2.3",
         "symfony/dependency-injection": "~2.3"
     },
     "autoload": {

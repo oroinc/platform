@@ -26,7 +26,7 @@ class PhpFileLoader extends AbstractLoader
      */
     public function supports(FileResource $resource)
     {
-        return is_string($resource->getFilename()) && 'php' === pathinfo($resource->getFilename(), PATHINFO_EXTENSION);
+        return 'php' === pathinfo($resource->getFilename(), PATHINFO_EXTENSION);
     }
 
     /**
