@@ -8,6 +8,18 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class ArrayUtils
 {
     /**
+     * Checks whether the array is associative or sequential.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function isAssoc(array $array)
+    {
+        return array_values($array) !== $array;
+    }
+
+    /**
      * Sorts an array by specified property.
      *
      * This method uses the stable sorting algorithm. See http://en.wikipedia.org/wiki/Sorting_algorithm#Stability

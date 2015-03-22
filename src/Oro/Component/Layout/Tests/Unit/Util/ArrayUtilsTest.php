@@ -6,6 +6,25 @@ use Oro\Component\Layout\Util\ArrayUtils;
 
 class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @dataProvider isAssocDataProvider
+     */
+    public function testIsAssoc($array, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ArrayUtils::isAssoc($array));
+    }
+
+    public function isAssocDataProvider()
+    {
+        return [
+            [[1, 2, 3], false],
+            [[0 => 1, 1 => 2, 2 => 3], false],
+            [['a' => 1, 'b' => 2, 'c' => 3], true],
+            [[1, 'b' => 2, 3], true],
+            [[1 => 1, 2 => 2, 3 => 3], true]
+        ];
+    }
+
     public function testSortByEmpty()
     {
         $array = [];
