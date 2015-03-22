@@ -2,26 +2,21 @@
 
 namespace Oro\Component\Layout\Extension\Theme;
 
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerAwareInterface;
-
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
-use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
 use Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface;
 use Oro\Component\Layout\Extension\Theme\Generator\ElementDependentLayoutUpdateInterface;
 
-class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
+class ThemeExtension extends AbstractExtension
 {
-    use LoggerAwareTrait;
-
     /** @var array */
     protected $resources;
 
-    /** @var LoaderInterface */
+    /** @var LayoutUpdateLoaderInterface */
     protected $loader;
 
     /** @var DependencyInitializer */
@@ -31,14 +26,14 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
     protected $pathProvider;
 
     /**
-     * @param array                 $resources
-     * @param LoaderInterface       $loader
-     * @param DependencyInitializer $dependencyInitializer
-     * @param PathProviderInterface $provider
+     * @param array                       $resources
+     * @param LayoutUpdateLoaderInterface $loader
+     * @param DependencyInitializer       $dependencyInitializer
+     * @param PathProviderInterface       $provider
      */
     public function __construct(
         array $resources,
-        LoaderInterface $loader,
+        LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
         PathProviderInterface $provider
     ) {
@@ -57,18 +52,14 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 
         if ($context->getOr('theme')) {
             $iterator = new ResourceIterator($this->findApplicableResources($context));
-            foreach ($iterator as $resource) {
-                if ($this->loader->supports($resource)) {
-                    $update = $this->loader->load($resource);
+            foreach ($iterator as $file) {
+                $update = $this->loader->load($file);
+                if ($update) {
                     $this->dependencyInitializer->initialize($update);
                     $el             = $update instanceof ElementDependentLayoutUpdateInterface
                         ? $update->getElement()
                         : 'root';
                     $updates[$el][] = $update;
-                } elseif ($this->logger) {
-                    $this->logger->notice(
-                        sprintf('Skipping resource "%s" because loader for it not found', $resource)
-                    );
                 }
             }
         }

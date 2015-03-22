@@ -2,8 +2,6 @@ parameters:
     oro_layout.theme_factory.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeFactory
     oro_layout.theme_manager.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeManager
     oro_layout.theme_extension.class:                  Oro\Component\Layout\Extension\Theme\ThemeExtension
-    oro_layout.loader.php_file_loader.class:           Oro\Component\Layout\Extension\Theme\Loader\PhpFileLoader
-    oro_layout.loader.yaml_file_loader.class:          Oro\Component\Layout\Extension\Theme\Loader\YamlFileLoader
     oro_layout.request.listener.theme.class:           Oro\Bundle\LayoutBundle\EventListener\ThemeListener
 
     oro_layout.default_active_theme:    ~
@@ -31,22 +29,22 @@ services:
             - []
 
     oro_layout.loader:
-        class:  Oro\Component\Layout\Extension\Theme\Loader\ChainLoader
+        class:  Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoader
         public: false
         calls:
-            - [addLoader, [@oro_layout.loader.yaml_file_loader]]
-            - [addLoader, [@oro_layout.loader.php_file_loader]]
+            - [addDriver, [yml, @oro_layout.loader.yaml_driver]]
+            - [addDriver, [php, @oro_layout.loader.php_driver]]
 
-    oro_layout.loader.php_file_loader:
-        class:  %oro_layout.loader.php_file_loader.class%
+    oro_layout.loader.php_driver:
+        class:  Oro\Component\Layout\Extension\Theme\Loader\Driver\PhpDriver
         public: false
         arguments:
             - @oro_layout.php_layout_update_generator
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
-    oro_layout.loader.yaml_file_loader:
-        class:  %oro_layout.loader.yaml_file_loader.class%
+    oro_layout.loader.yaml_driver:
+        class:  Oro\Component\Layout\Extension\Theme\Loader\Driver\YamlDriver
         public: false
         arguments:
             - @oro_layout.config_layout_update_generator
@@ -79,8 +77,6 @@ services:
             - @oro_layout.loader
             - @oro_layout.dependency_initializer
             - @oro_layout.loader.path_provider
-        calls:
-            - [setLogger, [ @logger ]]
 
     oro_layout.data_provider.theme:
         class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider

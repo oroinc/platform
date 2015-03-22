@@ -1,49 +1,17 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader\Driver;
 
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Loader\YamlFileLoader;
+use Oro\Component\Layout\Extension\Theme\Loader\Driver\YamlDriver;
 use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
 use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
 use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
 
-class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
+class YamlDriverTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider supportsDataProvider
-     *
-     * @param mixed $resource
-     * @param bool  $expectedResult
-     */
-    public function testSupports($resource, $expectedResult)
-    {
-        $this->assertSame($expectedResult, $this->getLoader()->supports($resource));
-    }
-
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
-    {
-        return [
-            'should support yml file resource'       => [
-                '$resource'       => 'test.yml',
-                '$expectedResult' => true
-            ],
-            'should not support php resource'        => [
-                '$resource'       => 'test.php',
-                '$expectedResult' => false
-            ],
-            'should not support zip resource'        => [
-                '$resource'       => 'test.zip',
-                '$expectedResult' => false
-            ]
-        ];
-    }
-
     public function testLoadInDebugMode()
     {
         $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
@@ -51,7 +19,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.yml';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -68,7 +36,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.yml';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update2.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -83,7 +51,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
-        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/_header.yml';
+        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/_header.yml';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
         $resource = $path;
 
@@ -107,7 +75,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.yml';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $generator->expects($this->once())->method('generate')
@@ -180,7 +148,7 @@ CLASS;
      * @param bool                                $debug
      * @param bool                                $cache
      *
-     * @return YamlFileLoader
+     * @return YamlDriver
      */
     protected function getLoader($generator = null, $debug = false, $cache = false)
     {
@@ -188,6 +156,6 @@ CLASS;
             ? $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface')
             : $generator;
 
-        return new YamlFileLoader($generator, $debug, $cache);
+        return new YamlDriver($generator, $debug, $cache);
     }
 }

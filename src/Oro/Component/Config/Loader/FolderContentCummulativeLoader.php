@@ -60,20 +60,29 @@ class FolderContentCummulativeLoader implements CumulativeResourceLoader
     /** @var bool */
     protected $plainResultStructure;
 
+    /** @var string[] */
+    protected $fileExtensions;
+
     /** @var PropertyAccess */
     protected $propertyAccessor;
 
     /**
-     * @param string $relativeFolderPath
-     * @param int    $maxNestingLevel      Pass -1 to unlimit, if you want to find files in exact path given pass 1
-     * @param bool   $plainResultStructure Indicates whether result should be returned as flat array
-     *                                     or should be nested tree depends on file position in directory hierarchy
+     * @param string   $relativeFolderPath
+     * @param int      $maxNestingLevel      Pass -1 to unlimit, if you want to find files in exact path given pass 1
+     * @param bool     $plainResultStructure Indicates whether result should be returned as flat array
+     *                                       or should be nested tree depends on file position in directory hierarchy
+     * @param string[] $fileExtensions       The extensions of files to be scanned
      */
-    public function __construct($relativeFolderPath, $maxNestingLevel = -1, $plainResultStructure = true)
-    {
+    public function __construct(
+        $relativeFolderPath,
+        $maxNestingLevel = -1,
+        $plainResultStructure = true,
+        array $fileExtensions = []
+    ) {
         $this->relativeFolderPath   = $relativeFolderPath;
         $this->maxNestingLevel      = $maxNestingLevel === -1 ? $maxNestingLevel : --$maxNestingLevel;
         $this->plainResultStructure = $plainResultStructure;
+        $this->fileExtensions       = $fileExtensions;
         $this->resource             = 'Folder contents: ' . $relativeFolderPath;
     }
 
@@ -82,7 +91,14 @@ class FolderContentCummulativeLoader implements CumulativeResourceLoader
      */
     public function serialize()
     {
-        return serialize([$this->relativeFolderPath, $this->maxNestingLevel, $this->plainResultStructure]);
+        return serialize(
+            [
+                $this->relativeFolderPath,
+                $this->maxNestingLevel,
+                $this->plainResultStructure,
+                $this->fileExtensions
+            ]
+        );
     }
 
     /**
@@ -90,7 +106,12 @@ class FolderContentCummulativeLoader implements CumulativeResourceLoader
      */
     public function unserialize($serialized)
     {
-        list($this->relativeFolderPath, $this->maxNestingLevel, $this->plainResultStructure) = unserialize($serialized);
+        list(
+            $this->relativeFolderPath,
+            $this->maxNestingLevel,
+            $this->plainResultStructure,
+            $this->fileExtensions
+            ) = unserialize($serialized);
     }
 
     /**
@@ -202,7 +223,14 @@ class FolderContentCummulativeLoader implements CumulativeResourceLoader
         $iterator = new \CallbackFilterIterator(
             $recursiveIterator,
             function (\SplFileInfo $file) {
-                return $file->isFile();
+                if (!$file->isFile()) {
+                    return false;
+                }
+                if (!empty($this->fileExtensions)) {
+                    return in_array($file->getExtension(), $this->fileExtensions, true);
+                }
+
+                return true;
             }
         );
 

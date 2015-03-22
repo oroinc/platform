@@ -2,11 +2,9 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\Layout\Extension\Theme\Loader\ChainLoader;
+use Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoader;
 use Oro\Component\Layout\Extension\Theme\Loader\ChainPathProvider;
-use Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface;
+use Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 
@@ -18,14 +16,11 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ChainPathProvider */
     protected $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
-    protected $phpLoader;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverInterface */
+    protected $phpDriver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
-    protected $yamlLoader;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
-    protected $logger;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverInterface */
+    protected $yamlDriver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|DependencyInitializer */
     protected $dependencyInitializer;
@@ -49,22 +44,23 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->provider   = $this
             ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
-        $this->yamlLoader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
-        $this->phpLoader  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LoaderInterface');
-
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->yamlDriver = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface');
+        $this->phpDriver  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface');
 
         $this->dependencyInitializer = $this
             ->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer')
             ->disableOriginalConstructor()->getMock();
 
+        $loader = new LayoutUpdateLoader();
+        $loader->addDriver('yml', $this->yamlDriver);
+        $loader->addDriver('php', $this->phpDriver);
+
         $this->extension = new ThemeExtension(
             $this->resources,
-            new ChainLoader([$this->yamlLoader, $this->phpLoader]),
+            $loader,
             $this->dependencyInitializer,
             $this->provider
         );
-        $this->extension->setLogger($this->logger);
     }
 
     protected function tearDown()
@@ -72,9 +68,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         unset(
             $this->extension,
             $this->provider,
-            $this->yamlLoader,
-            $this->phpLoader,
-            $this->logger,
+            $this->yamlDriver,
+            $this->phpDriver,
             $this->dependencyInitializer
         );
     }
@@ -84,8 +79,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $themeName = 'my-theme';
         $this->setUpResourcePathProvider($themeName);
 
-        $this->yamlLoader->expects($this->never())->method('supports');
-        $this->phpLoader->expects($this->never())->method('supports');
+        $this->yamlDriver->expects($this->never())->method('supports');
+        $this->phpDriver->expects($this->never())->method('supports');
 
         $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
@@ -97,14 +92,14 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $callbackBuilder = $this->getCallbackBuilder();
 
-        $this->yamlLoader->expects($this->any())->method('supports')
+        $this->yamlDriver->expects($this->any())->method('supports')
             ->willReturnCallback($callbackBuilder('yml'));
-        $this->phpLoader->expects($this->never())->method('supports')
+        $this->phpDriver->expects($this->never())->method('supports')
             ->willReturnCallback($callbackBuilder('php'));
 
         $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->yamlLoader->expects($this->once())->method('load')
+        $this->yamlDriver->expects($this->once())->method('load')
             ->with('resource-gold.yml')
             ->willReturn($updateMock);
 
@@ -119,14 +114,14 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $callbackBuilder = $this->getCallbackBuilder();
 
-        $this->yamlLoader->expects($this->any())->method('supports')
+        $this->yamlDriver->expects($this->any())->method('supports')
             ->willReturnCallback($callbackBuilder('yml'));
-        $this->phpLoader->expects($this->never())->method('supports')
+        $this->phpDriver->expects($this->never())->method('supports')
             ->willReturnCallback($callbackBuilder('php'));
 
         $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->yamlLoader->expects($this->once())->method('load')
+        $this->yamlDriver->expects($this->once())->method('load')
             ->with('resource-gold.yml')
             ->willReturn($updateMock);
 
@@ -141,24 +136,20 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $callbackBuilder = $this->getCallbackBuilder();
 
-        $this->yamlLoader->expects($this->any())->method('supports')
+        $this->yamlDriver->expects($this->any())->method('supports')
             ->willReturnCallback($callbackBuilder('yml'));
-        $this->phpLoader->expects($this->any())->method('supports')
+        $this->phpDriver->expects($this->any())->method('supports')
             ->willReturnCallback($callbackBuilder('php'));
 
         $updateMock  = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $update2Mock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->yamlLoader->expects($this->once())->method('load')
+        $this->yamlDriver->expects($this->once())->method('load')
             ->with('resource1.yml')
             ->willReturn($updateMock);
-        $this->phpLoader->expects($this->once())->method('load')
+        $this->phpDriver->expects($this->once())->method('load')
             ->with('resource3.php')
             ->willReturn($update2Mock);
-
-        $this->logger->expects($this->once())
-            ->method('notice')
-            ->with('Skipping resource "resource2.xml" because loader for it not found');
 
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertContains($updateMock, $result);
@@ -172,8 +163,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->setUpResourcePathProvider($themeName);
 
         $callbackBuilder = $this->getCallbackBuilder();
-        $this->yamlLoader->expects($this->any())->method('supports')->willReturnCallback($callbackBuilder('yml'));
-        $this->yamlLoader->expects($this->once())->method('load')->willReturn($update);
+        $this->yamlDriver->expects($this->any())->method('supports')->willReturnCallback($callbackBuilder('yml'));
+        $this->yamlDriver->expects($this->once())->method('load')->willReturn($update);
 
         $this->dependencyInitializer->expects($this->once())->method('initialize')->with($this->identicalTo($update));
 

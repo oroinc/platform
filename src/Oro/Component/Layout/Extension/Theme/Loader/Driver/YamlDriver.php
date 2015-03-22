@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Extension\Theme\Loader\Driver;
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -21,22 +21,14 @@ use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
  *
  * @see src/Oro/Component/Layout/Tests/Unit/Extension/Theme/Stubs/Updates/layout_update4.yml
  */
-class YamlFileLoader extends AbstractLoader
+class YamlDriver extends AbstractDriver
 {
     /**
      * {@inheritdoc}
      */
-    public function supports($fileName)
+    protected function loadResourceGeneratorData($file)
     {
-        return 'yml' === pathinfo($fileName, PATHINFO_EXTENSION);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadResourceGeneratorData($fileName)
-    {
-        $data = Yaml::parse($fileName);
+        $data = Yaml::parse($file);
         $data = isset($data['layout']) ? $data['layout'] : [];
 
         return new GeneratorData($data);

@@ -1,26 +1,17 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Extension\Theme\Loader\Driver;
 
 use Oro\Component\Layout\LayoutUpdateInterface;
 
-interface LoaderInterface
+interface DriverInterface
 {
-    /**
-     * Returns whether given file resource is supported by loader impl
-     *
-     * @param string $fileName
-     *
-     * @return bool
-     */
-    public function supports($fileName);
-
     /**
      * Load/generate layout update instance based on given file resource.
      *
-     * @param string $fileName
+     * @param string $file
      *
      * @return LayoutUpdateInterface
      */
-    public function load($fileName);
+    public function load($file);
 }

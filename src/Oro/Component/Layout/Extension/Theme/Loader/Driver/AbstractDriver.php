@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Extension\Theme\Loader\Driver;
 
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
@@ -8,7 +8,7 @@ use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterfac
 use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ElementDependentVisitor;
 use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
 
-abstract class AbstractLoader implements LoaderInterface
+abstract class AbstractDriver implements DriverInterface
 {
     const CLASS_PREFIX = '__Oro_Layout_Update_';
 
@@ -38,17 +38,17 @@ abstract class AbstractLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($fileName)
+    public function load($file)
     {
-        $className = $this->generateClassName($fileName);
+        $className = $this->generateClassName($file);
 
         if (!class_exists($className, false)) {
-            if (false === $cache = $this->getCacheFilename($fileName)) {
-                eval('?>' . $this->doGenerate($className, $fileName));
+            if (false === $cache = $this->getCacheFilename($file)) {
+                eval('?>' . $this->doGenerate($className, $file));
             } else {
                 // write cache to file, refresh cache if source file fresher then cached one in debug mode
-                if (!is_file($cache) || ($this->isDebug() && filemtime($fileName) > filemtime($fileName))) {
-                    $this->writeCacheFile($cache, $this->doGenerate($className, $fileName));
+                if (!is_file($cache) || ($this->isDebug() && filemtime($file) > filemtime($file))) {
+                    $this->writeCacheFile($cache, $this->doGenerate($className, $file));
                 }
 
                 require_once $cache;
@@ -60,22 +60,22 @@ abstract class AbstractLoader implements LoaderInterface
 
     /**
      * @param string $className
-     * @param string $fileName
+     * @param string $file
      *
      * @return string
      */
-    protected function doGenerate($className, $fileName)
+    protected function doGenerate($className, $file)
     {
-        $resourceDataForGenerator = $this->loadResourceGeneratorData($fileName);
-        $resourceDataForGenerator->setFilename($fileName);
+        $resourceDataForGenerator = $this->loadResourceGeneratorData($file);
+        $resourceDataForGenerator->setFilename($file);
 
         try {
-            $visitors = $this->prepareVisitors($fileName);
+            $visitors = $this->prepareVisitors($file);
 
             return $this->getGenerator()->generate($className, $resourceDataForGenerator, $visitors);
         } catch (SyntaxException $e) {
             $message = $e->getMessage() . "\n" . $this->dumpSource($e->getSource());
-            $message .= str_repeat("\n", 2) . 'Filename: ' . $fileName;
+            $message .= str_repeat("\n", 2) . 'Filename: ' . $file;
 
             throw new \RuntimeException($message, 0, $e);
         }
@@ -84,20 +84,20 @@ abstract class AbstractLoader implements LoaderInterface
     /**
      * Loads file resource content and prepares generator data.
      *
-     * @param string $fileName
+     * @param string $file
      *
      * @return GeneratorData
      */
-    abstract protected function loadResourceGeneratorData($fileName);
+    abstract protected function loadResourceGeneratorData($file);
 
     /**
-     * @param string $fileName
+     * @param string $file
      *
      * @return null|VisitorCollection
      */
-    protected function prepareVisitors($fileName)
+    protected function prepareVisitors($file)
     {
-        $name = pathinfo($fileName, PATHINFO_FILENAME);
+        $name = pathinfo($file, PATHINFO_FILENAME);
 
         if (strpos($name, self::ELEMENT_PREFIX) === 0) {
             return new VisitorCollection([new ElementDependentVisitor(substr($name, 1))]);

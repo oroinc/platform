@@ -25,10 +25,16 @@ class FolderContentCummulativeLoaderTest extends \PHPUnit_Framework_TestCase
      * @param array      $expectedRegisteredResources
      * @param string     $path
      * @param int        $nestingLevel
+     * @param string[]   $fileExtensions
      */
-    public function testLoadInFlatMode($expectedResult, $expectedRegisteredResources, $path, $nestingLevel = -1)
-    {
-        $loader = new FolderContentCummulativeLoader($path, $nestingLevel);
+    public function testLoadInFlatMode(
+        $expectedResult,
+        $expectedRegisteredResources,
+        $path,
+        $nestingLevel = -1,
+        $fileExtensions = ['yml', 'xml']
+    ) {
+        $loader = new FolderContentCummulativeLoader($path, $nestingLevel, true, $fileExtensions);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);
@@ -65,50 +71,67 @@ class FolderContentCummulativeLoaderTest extends \PHPUnit_Framework_TestCase
 
         return [
             'empty dir, nothing to load'                                      => [
-                '$expectedResult'              => null,
-                '$expectedRegisteredResources' => [],
-                '$path'                        => 'unknown dir/',
+                'expectedResult'              => null,
+                'expectedRegisteredResources' => [],
+                'path'                        => 'unknown dir/',
             ],
             'loading contents'                                                => [
-                '$expectedResult'              => [
+                'expectedResult'              => [
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.txt'),
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.yml'),
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.txt'),
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
+                ],
+                'expectedRegisteredResources' => [
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.txt'),
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.yml'),
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.txt'),
+                    str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
+                ],
+                'path'                        => 'Resources/folder_to_track/',
+                'nestingLevel'                => -1,
+                'fileExtensions'              => []
+            ],
+            'loading contents filtered by file extensions'                    => [
+                'expectedResult'              => [
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.yml'),
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
                 ],
-                '$expectedRegisteredResources' => [
+                'expectedRegisteredResources' => [
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.yml'),
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
                 ],
-                '$path'                        => 'Resources/folder_to_track/',
-                '$nestingLevel'                => -1
+                'path'                        => 'Resources/folder_to_track/',
+                'nestingLevel'                => -1
             ],
             'loading contents limit nesting level'                            => [
-                '$expectedResult' => [
+                'expectedResult'              => [
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
                 ],
-                [
+                'expectedRegisteredResources' => [
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
                 ],
-                '$path'           => 'Resources/folder_to_track/',
-                '$nestingLevel'   => 1
+                'path'                        => 'Resources/folder_to_track/',
+                'nestingLevel'                => 1
             ],
             'loading contents limit nesting level that takes all files exist' => [
-                '$expectedResult'              => [
+                'expectedResult'              => [
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.yml'),
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
                 ],
-                '$expectedRegisteredResources' => [
+                'expectedRegisteredResources' => [
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.yml'),
                     str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
                 ],
-                '$path'                        => 'Resources/folder_to_track/',
-                '$nestingLevel'                => 2
-            ],
+                'path'                        => 'Resources/folder_to_track/',
+                'nestingLevel'                => 2
+            ]
         ];
     }
 
     public function testLoadInHierarchicalMode()
     {
-        $loader = new FolderContentCummulativeLoader('Resources/folder_to_track/', -1, false);
+        $loader = new FolderContentCummulativeLoader('Resources/folder_to_track/', -1, false, ['yml', 'xml']);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);

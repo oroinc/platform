@@ -1,48 +1,16 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader\Driver;
 
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Loader\PhpFileLoader;
+use Oro\Component\Layout\Extension\Theme\Loader\Driver\PhpDriver;
 use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
 use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
 
-class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
+class PhpDriverTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider supportsDataProvider
-     *
-     * @param mixed $resource
-     * @param bool  $expectedResult
-     */
-    public function testSupports($resource, $expectedResult)
-    {
-        $this->assertSame($expectedResult, $this->getLoader()->supports($resource));
-    }
-
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
-    {
-        return [
-            'should support php file resource'       => [
-                '$resource'       => 'test.php',
-                '$expectedResult' => true
-            ],
-            'should not support yml resource'        => [
-                '$resource'       => 'test.yml',
-                '$expectedResult' => false
-            ],
-            'should not support zip resource'        => [
-                '$resource'       => 'test.zip',
-                '$expectedResult' => false
-            ]
-        ];
-    }
-
     public function testLoadInDebugMode()
     {
         $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
@@ -50,7 +18,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.php';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update.php';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -67,7 +35,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.php';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update2.php';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -98,7 +66,7 @@ Filename:
 MESSAGE;
         $this->setExpectedException('\RuntimeException', $message);
 
-        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.php';
+        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.php';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -135,7 +103,7 @@ CLASS;
      * @param bool                                                                         $debug
      * @param bool                                                                         $cache
      *
-     * @return PhpFileLoader
+     * @return PhpDriver
      */
     protected function getLoader($generator = null, $debug = true, $cache = false)
     {
@@ -143,6 +111,6 @@ CLASS;
             ? $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface')
             : $generator;
 
-        return new PhpFileLoader($generator, $debug, $cache);
+        return new PhpDriver($generator, $debug, $cache);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Extension\Theme\Loader\Driver;
 
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
@@ -19,21 +19,13 @@ use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
  *
  * @see src/Oro/Component/Layout/Tests/Unit/Extension/Theme/Stubs/Updates/layout_update.php
  */
-class PhpFileLoader extends AbstractLoader
+class PhpDriver extends AbstractDriver
 {
     /**
      * {@inheritdoc}
      */
-    public function supports($fileName)
+    protected function loadResourceGeneratorData($file)
     {
-        return 'php' === pathinfo($fileName, PATHINFO_EXTENSION);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadResourceGeneratorData($fileName)
-    {
-        return new GeneratorData(file_get_contents($fileName));
+        return new GeneratorData(file_get_contents($file));
     }
 }
