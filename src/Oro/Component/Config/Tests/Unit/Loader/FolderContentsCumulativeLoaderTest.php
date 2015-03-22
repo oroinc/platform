@@ -5,15 +5,15 @@ namespace Oro\Component\Config\Tests\Unit;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
-use Oro\Component\Config\Loader\FolderContentCummulativeLoader;
+use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 
-class FolderContentCummulativeLoaderTest extends \PHPUnit_Framework_TestCase
+class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testResourceName()
     {
-        $loader = new FolderContentCummulativeLoader('Resources/folder_to_track/');
+        $loader = new FolderContentCumulativeLoader('Resources/folder_to_track/');
 
         $this->assertSame('Folder contents: Resources/folder_to_track/', $loader->getResource());
     }
@@ -34,7 +34,7 @@ class FolderContentCummulativeLoaderTest extends \PHPUnit_Framework_TestCase
         $nestingLevel = -1,
         $fileExtensions = ['yml', 'xml']
     ) {
-        $loader = new FolderContentCummulativeLoader($path, $nestingLevel, true, $fileExtensions);
+        $loader = new FolderContentCumulativeLoader($path, $nestingLevel, true, $fileExtensions);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);
@@ -131,7 +131,7 @@ class FolderContentCummulativeLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadInHierarchicalMode()
     {
-        $loader = new FolderContentCummulativeLoader('Resources/folder_to_track/', -1, false, ['yml', 'xml']);
+        $loader = new FolderContentCumulativeLoader('Resources/folder_to_track/', -1, false, ['yml', 'xml']);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);
@@ -166,7 +166,7 @@ class FolderContentCummulativeLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsResourceFreshNewFileWasAdded()
     {
-        $loader = new FolderContentCummulativeLoader('Resources/tmp/', -1, false);
+        $loader = new FolderContentCumulativeLoader('Resources/tmp/', -1, false);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);
@@ -187,7 +187,7 @@ class FolderContentCummulativeLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsResourceFreshNewFileWasDeleted()
     {
-        $loader = new FolderContentCummulativeLoader('Resources/tmp/', -1, false);
+        $loader = new FolderContentCumulativeLoader('Resources/tmp/', -1, false);
 
         $bundle      = new TestBundle1();
         $bundleClass = get_class($bundle);

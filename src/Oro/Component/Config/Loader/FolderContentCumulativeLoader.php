@@ -49,7 +49,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  *              ]
  *          ]
  */
-class FolderContentCummulativeLoader implements CumulativeResourceLoader
+class FolderContentCumulativeLoader implements CumulativeResourceLoader
 {
     /** @var string */
     protected $relativeFolderPath;
