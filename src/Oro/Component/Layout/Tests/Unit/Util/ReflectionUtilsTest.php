@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator\Utils;
+namespace Oro\Component\Layout\Tests\Unit\Util;
 
-use Oro\Component\Layout\Extension\Theme\Generator\Utils\ReflectionUtils;
+use Oro\Component\Layout\Util\ReflectionUtils;
 
 class ReflectionUtilsTest extends \PHPUnit_Framework_TestCase
 {

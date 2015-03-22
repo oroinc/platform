@@ -5,10 +5,10 @@ namespace Oro\Component\Layout\Extension\Theme\Generator;
 use Oro\Component\ConfigExpression\AssemblerInterface;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Generator\Utils\ArrayUtils;
-use Oro\Component\Layout\Extension\Theme\Generator\Utils\ReflectionUtils;
 use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
 use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ConfigExpressionConditionVisitor;
+use Oro\Component\Layout\Util\ArrayUtils;
+use Oro\Component\Layout\Util\ReflectionUtils;
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {

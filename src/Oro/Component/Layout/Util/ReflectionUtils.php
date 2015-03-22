@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator\Utils;
+namespace Oro\Component\Layout\Util;
 
 class ReflectionUtils
 {
