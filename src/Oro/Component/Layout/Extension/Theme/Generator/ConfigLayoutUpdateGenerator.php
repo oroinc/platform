@@ -2,18 +2,14 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Generator;
 
-use Oro\Component\ConfigExpression\AssemblerInterface;
-
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ConfigExpressionConditionVisitor;
 use Oro\Component\Layout\Util\ArrayUtils;
 use Oro\Component\Layout\Util\ReflectionUtils;
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
     const NODE_ACTIONS   = 'actions';
-    const NODE_CONDITION = 'conditions';
     const NODE_ITEMS     = 'items';
     const NODE_TREE      = 'tree';
 
@@ -22,18 +18,18 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
     const PATH_ATTR = '__path';
 
+    /** @var ConfigLayoutUpdateGeneratorExtensionInterface[] */
+    protected $extensions = [];
+
     /** @var ReflectionUtils */
     protected $helper;
 
-    /** @var AssemblerInterface */
-    protected $expressionAssembler;
-
     /**
-     * @param AssemblerInterface $expressionAssembler
+     * @param ConfigLayoutUpdateGeneratorExtensionInterface $extension
      */
-    public function __construct(AssemblerInterface $expressionAssembler)
+    public function addExtension(ConfigLayoutUpdateGeneratorExtensionInterface $extension)
     {
-        $this->expressionAssembler = $expressionAssembler;
+        $this->extensions[] = $extension;
     }
 
     /**
@@ -125,8 +121,6 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     }
 
     /**
-     * Appends given condition expression from "condition" node to visitor collection.
-     *
      * {@inheritdoc}
      */
     protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
@@ -181,20 +175,9 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 }
             }
 
-            // prepare condition collection
-            if (!empty($source[self::NODE_CONDITION])) {
-                try {
-                    $expr = $this->expressionAssembler->assemble($source[self::NODE_CONDITION]);
-                    if ($expr) {
-                        $visitorCollection->append(new ConfigExpressionConditionVisitor($expr));
-                    }
-                } catch (\Exception $e) {
-                    throw new SyntaxException(
-                        'invalid conditions. ' . $e->getMessage(),
-                        $source[self::NODE_CONDITION],
-                        self::NODE_CONDITION
-                    );
-                }
+            // apply extensions
+            foreach ($this->extensions as $extension) {
+                $extension->prepare($source, $visitorCollection);
             }
         }
 

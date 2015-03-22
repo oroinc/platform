@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator\Visitor;
+namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpProperty;
@@ -10,6 +10,7 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 
 use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
 use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface;
 
 class ConfigExpressionConditionVisitor implements VisitorInterface
 {

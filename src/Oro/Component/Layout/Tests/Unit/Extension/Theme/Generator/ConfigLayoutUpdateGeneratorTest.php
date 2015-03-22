@@ -2,8 +2,6 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator;
 
-use Oro\Component\ConfigExpression\Condition;
-
 use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
 use Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGenerator;
 
@@ -17,14 +15,31 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->expressionAssembler = $this->getMock('Oro\Component\ConfigExpression\AssemblerInterface');
-
         $this->generator = new ConfigLayoutUpdateGenerator($this->expressionAssembler);
     }
 
     protected function tearDown()
     {
         unset($this->generator);
+    }
+
+    public function testShouldCallExtensions()
+    {
+        $source = ['actions' => []];
+
+        $extension = $this->getMock(
+            'Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGeneratorExtensionInterface'
+        );
+        $this->generator->addExtension($extension);
+
+        $extension->expects($this->once())
+            ->method('prepare')
+            ->with(
+                $source,
+                $this->isInstanceOf('Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection')
+            );
+
+        $this->generator->generate('testClassName', new GeneratorData($source));
     }
 
     /**
@@ -251,65 +266,4 @@ CLASS
         );
     }
     // @codingStandardsIgnoreEnd
-
-    public function testShouldProcessCondition()
-    {
-        $this->expressionAssembler->expects($this->once())
-            ->method('assemble')
-            ->with([['@true' => null]])
-            ->willReturn(new Condition\True());
-
-        $this->generator->generate(
-            'testClassName',
-            new GeneratorData(['actions' => [], 'conditions' => [['@true' => null]]])
-        );
-
-        $this->assertNotEmpty($this->generator->getVisitorCollection());
-        $this->assertContainsOnlyInstancesOf(
-            'Oro\Component\Layout\Extension\Theme\Generator\Visitor\ConfigExpressionConditionVisitor',
-            $this->generator->getVisitorCollection()
-        );
-    }
-
-    public function testShouldProcessConditionIfAssemblerReturnsNull()
-    {
-        $this->expressionAssembler->expects($this->once())
-            ->method('assemble')
-            ->with(['not supported'])
-            ->willReturn(null);
-
-        $this->generator->generate(
-            'testClassName',
-            new GeneratorData(
-                [
-                    'actions'    => [],
-                    'conditions' => ['not supported']
-                ]
-            )
-        );
-
-        $this->assertEmpty($this->generator->getVisitorCollection());
-    }
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\SyntaxException
-     * @expectedExceptionMessage Syntax error: invalid conditions. assembling failed at "conditions"
-     */
-    public function testShouldWrapAssemblerExceptionWithSyntaxException()
-    {
-        $this->expressionAssembler->expects($this->once())
-            ->method('assemble')
-            ->with(['error'])
-            ->willThrowException(new \Exception('assembling failed'));
-
-        $this->generator->generate(
-            'testClassName',
-            new GeneratorData(
-                [
-                    'actions'    => [],
-                    'conditions' => ['error']
-                ]
-            )
-        );
-    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator\Visitor;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
@@ -8,10 +8,10 @@ use CG\Generator\PhpParameter;
 use CG\Core\DefaultGeneratorStrategy;
 
 use Oro\Component\ConfigExpression\Condition;
-
 use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ConfigExpressionConditionVisitor;
 use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
+
+use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionConditionVisitor;
 
 class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
 {

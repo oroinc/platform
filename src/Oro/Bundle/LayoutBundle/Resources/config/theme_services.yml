@@ -39,7 +39,7 @@ services:
         class:  Oro\Component\Layout\Extension\Theme\Loader\Driver\PhpDriver
         public: false
         arguments:
-            - @oro_layout.php_layout_update_generator
+            - @oro_layout.layout_update_generator.php
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
@@ -47,7 +47,7 @@ services:
         class:  Oro\Component\Layout\Extension\Theme\Loader\Driver\YamlDriver
         public: false
         arguments:
-            - @oro_layout.config_layout_update_generator
+            - @oro_layout.layout_update_generator.config
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
@@ -94,13 +94,19 @@ services:
         tags:
             - { name: kernel.cache_warmer }
 
-    oro_layout.config_layout_update_generator:
+    oro_layout.layout_update_generator.config:
         class:  Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGenerator
+        public: false
+        calls:
+            - [addExtension, [@oro_layout.layout_update_generator.extension.config_conditions]]
+
+    oro_layout.layout_update_generator.extension.config_conditions:
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
         public: false
         arguments:
             - @oro_layout.expression.assembler
 
-    oro_layout.php_layout_update_generator:
+    oro_layout.layout_update_generator.php:
         class:  Oro\Component\Layout\Extension\Theme\Generator\PhpLayoutUpdateGenerator
         public: false
 
