@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -30,7 +31,13 @@ class WsseAuthProvider extends Provider
     protected function getSecret(UserInterface $user)
     {
         if ($user instanceof AdvancedApiUserInterface) {
-            return $user->getApiKeys();
+            $apiKey = $user->getApiKeys();
+
+            if (null === $apiKey || count($apiKey) === 0) {
+                return uniqid('undefined');
+            }
+
+            return $apiKey;
         }
 
         return parent::getSecret($user);
