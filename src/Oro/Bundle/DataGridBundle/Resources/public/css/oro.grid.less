@@ -31,21 +31,32 @@
   margin: 0 0 0 15px;
 
   .page-title & {
-      float: left;
-
-      .dropdown-menu {
-          right: 0;
-          left: auto;
-      }
+    float: left;
   }
 
   .btn,
   .btn-group.open .btn.dropdown-toggle {
-      background: none;
-      background-color: inherit;
-      text-decoration: none;
+    background: none;
+    background-color: inherit;
+    box-shadow: none;
+    text-decoration: none;
+    line-height: 28px;
+
+    &:focus {
+      font-weight: normal;
+    }
+
+    .caret {
+      margin: 0 0 0 5px;
+      vertical-align: middle;
+    }
+  }
+
+  .actions-group {
+    .btn,
+    .btn-group.open .btn.dropdown-toggle {
       color: #006acc;
-      box-shadow: none;
+    }
   }
 
   .edited-label {
@@ -56,8 +67,8 @@
   }
 
   .btn-toolbar {
-      margin: 0;
-      display: inline-block;
+    margin: 0;
+    display: inline-block;
   }
 }
 

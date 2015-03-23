@@ -41,7 +41,7 @@ define([
                 '<% if (choices.length) { %>' +
                     '<div class="btn-group views-group">' +
                         '<button data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                            '<span class="caret"></span>' +
+                            '<%= title %>' +
                         '</button>' +
                         '<ul class="dropdown-menu">' +
                             '<% _.each(choices, function (choice) { %>' +
@@ -52,9 +52,9 @@ define([
                 '<% } %>' +
                 '<% if (showActions) { %>' +
                     '<div class="btn-group actions-group">' +
-                        '<a class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">' +
+                        '<button class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">' +
                             '<%= actionsLabel %>' +
-                        '</a>' +
+                        '</button>' +
                         '<ul class="dropdown-menu">' +
                             '<% _.each(actions, function(action) { %>' +
                                 '<% if (action.enabled) { %>' +
@@ -69,6 +69,18 @@ define([
                 '<% } %>' +
             '</div>'
         ),
+
+        /** @property */
+        titleTemplate: _.template(
+            '<% if (navbar) { %>' +
+                '<h1 class="oro-subtitle"><%= title %><span class="caret"></span></h1>' +
+            '<% } else { %>' +
+                '<%= title %><span class="caret"></span>' +
+            '<% } %>'
+        ),
+
+        /** @property */
+        title: null,
 
         /** @property */
         enabled: true,
@@ -116,6 +128,10 @@ define([
 
             if (options.permissions) {
                 this.permissions = _.extend(this.permissions, options.permissions);
+            }
+
+            if (options.title) {
+                this.title = options.title;
             }
 
             this.gridName = options.gridName;
@@ -420,12 +436,16 @@ define([
             var html;
             this.$el.empty();
 
-            var actions = this._getCurrentActions();
+            var title = this.titleTemplate({
+                title: this._getCurrentViewLabel(),
+                navbar: Boolean(this.title)
+            });
 
+            var actions = this._getCurrentActions();
             html = this.template({
+                title: title,
                 disabled: !this.enabled,
                 choices: this.choices,
-                current: this._getCurrentViewLabel(),
                 dirty: this.viewDirty,
                 editedLabel: __('oro.datagrid.gridView.data_edited'),
                 actionsLabel: __('oro.datagrid.gridView.actions'),
@@ -526,7 +546,11 @@ define([
         _getCurrentViewLabel: function() {
             var currentView = this._getCurrentView();
 
-            return typeof currentView === 'undefined' ? __('Please select view') : currentView.label;
+            if (typeof currentView === 'undefined') {
+                return this.title ? this.title : __('Please select view');
+            }
+
+            return currentView.label;
         },
 
         /**
