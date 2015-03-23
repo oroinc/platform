@@ -384,7 +384,7 @@ define([
                 return item.value == this.collection.state.gridView;
             }, this);
 
-            if (model.id === this.collection.state.gridView) {
+            if (model.id == this.collection.state.gridView) {
                 this.collection.state.gridView = null;
                 this.viewDirty = !this._isCurrentStateSynchronized();
             }
