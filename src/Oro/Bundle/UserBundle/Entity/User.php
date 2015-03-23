@@ -798,7 +798,7 @@ class User extends ExtendUser implements
      */
     public function getApiKeys()
     {
-        return $this->apiKeys->count() ? $this->apiKeys : new ArrayCollection();
+        return $this->apiKeys;
     }
 
     /**
