@@ -51,6 +51,7 @@ define(function (require) {
             this.built = $.Deferred();
 
             options = options || {};
+            this.fixState(options);
             this.processOptions(options);
             this.initDataGrid(options);
 
@@ -250,6 +251,21 @@ define(function (require) {
                 plugins: plugins
             };
         },
+
+        fixState: function (options) {
+            if (options.metadata && options.metadata.state) {
+                var state = options.metadata.state;
+
+                if (_.isArray(state.filters) && _.isEmpty(state.filters)) {
+                    state.filters = {};
+                }
+
+                if (_.isArray(state.sorters) && _.isempty(state.sorters)) {
+                    state.sorters = {};
+                }
+            }
+        },
+
         dispose: function () {
             // disposes registered sub-components
             if (this.subComponents) {

@@ -40,6 +40,15 @@ define([
          */
         initialize: function (data) {
             this.urlRoot = routing.generate(this.route);
+
+            if (_.isArray(data.filters) && _.isEmpty(data.filters)) {
+                this.set('filters', {});
+            }
+
+            if (_.isArray(data.sorters) && _.isEmpty(data.sorters)) {
+                this.set('sorters', {});
+            }
+
             _.each(data.sorters, function(direction, key) {
                 if (typeof this.directions[direction] !== 'undefined') {
                     data.sorters[key] = this.directions[direction];
