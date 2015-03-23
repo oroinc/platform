@@ -122,6 +122,17 @@ define([
                 throw new TypeError("'collection' is required");
             }
 
+            this.choices = _.union([
+                {
+                    label: __('oro.datagrid.gridView.all') + (options.title || ''),
+                    value: '__all__'
+                },
+                {
+                    label: __('oro.datagrid.gridView.default'),
+                    value: '__default__'
+                }
+            ], this.choices);
+
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
             }
@@ -137,6 +148,9 @@ define([
             this.gridName = options.gridName;
             this.collection = options.collection;
             this.enabled = options.enable != false;
+            if (!this.collection.state.gridView) {
+                this.collection.state.gridView = '__default__';
+            }
 
             this.listenTo(this.collection, "updateState", this.render);
             this.listenTo(this.collection, "beforeFetch", this.render);
@@ -152,6 +166,10 @@ define([
             }, this);
 
             this.viewsCollection = new this.viewsCollection(options.views);
+            this.viewsCollection.get('__default__').set({
+                filters: options.collection.initialState.filters,
+                sorters: options.collection.initialState.sorters
+            });
 
             this.viewDirty = !this._isCurrentStateSynchronized();
             this.prevState = this._getCurrentState();
@@ -220,9 +238,7 @@ define([
         onChange: function (e) {
             e.preventDefault();
             var value = $(e.target).data('value');
-            if (value !== this.collection.state.gridView) {
-                this.changeView(value);
-            }
+            this.changeView(value);
 
             this.prevState = this._getCurrentState();
             this.viewDirty = !this._isCurrentStateSynchronized();
@@ -385,7 +401,7 @@ define([
             }, this);
 
             if (model.id == this.collection.state.gridView) {
-                this.collection.state.gridView = null;
+                this.collection.state.gridView = '__default__';
                 this.viewDirty = !this._isCurrentStateSynchronized();
             }
 
@@ -445,6 +461,7 @@ define([
             var actions = this._getCurrentActions();
             html = this.template({
                 title: title,
+                titleLabel: this.title,
                 disabled: !this.enabled,
                 choices: this.choices,
                 dirty: this.viewDirty,
