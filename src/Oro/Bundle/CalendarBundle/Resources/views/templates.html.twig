@@ -79,9 +79,7 @@
         </form>
         {{ oro_form_js_validation(form)|oro_js_template_content|raw }}
         {% set options = {
-            'view':'orocalendar/js/app/views/change-duration-view',
-            'startSelector': '#' ~ form.start.vars.id,
-            'endSelector': '#' ~ form.end.vars.id
+            'view':'orocalendar/js/app/views/calendar-event-form-view'
         } %}
         <div data-page-component-module="oroui/js/app/components/view-component"
              data-page-component-options="{{ options|json_encode }}"></div>
