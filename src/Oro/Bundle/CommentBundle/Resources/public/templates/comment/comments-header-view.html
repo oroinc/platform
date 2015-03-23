@@ -1,6 +1,13 @@
-<h5>Comments (<%= state.count %>)</h5>
+<h5>
+    Comments
+    <% if (state.count && state.count !== 0) { %>
+        (<%= state.count %>)
+    <% } %>
+</h5>
 <% if (syncState === 'synced') { %>
-    <% if (state.count !== items.length && state.count !== 0) { %>
+    <% if (!state.count || state.count == 0) { %>
+        <div class="no-data"><span>No comments was found.<span></span></span></div>
+    <% } else if (state.count !== items.length && state.count !== 0) { %>
     <a class="load-more"><span>
         Load <%= Math.min(state.loadMoreItemsQuantity, state.count - items.length) %>
         more
