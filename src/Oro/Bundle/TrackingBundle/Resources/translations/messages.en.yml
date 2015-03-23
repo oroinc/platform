@@ -74,6 +74,7 @@ oro:
             event.label:             Event
             visit.label:             Visit
             web_event.label:         Web event
+            parsing_count.label:     Parsing count
 
         trackingeventdictionary:
             entity_label:        Tracking Visit Library

@@ -57,6 +57,13 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     protected $webEvent;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="parsing_count", type="integer", nullable=false, options={"default"=0})
+     */
+    protected $parsingCount = 0;
+
+    /**
      * @return int
      */
     public function getId()
@@ -118,6 +125,25 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     public function setEvent($event)
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getParsingCount()
+    {
+        return $this->parsingCount;
+    }
+
+    /**
+     * @param int $parsingCount
+     * @return $this
+     */
+    public function setParsingCount($parsingCount)
+    {
+        $this->parsingCount = $parsingCount;
 
         return $this;
     }
