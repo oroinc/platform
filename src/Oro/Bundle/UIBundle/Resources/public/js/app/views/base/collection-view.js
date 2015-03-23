@@ -29,8 +29,16 @@ define([
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'loadingContainerSelector',
-                'itemSelector', 'listSelector']));
+                'itemSelector', 'listSelector', 'settings', 'animationDuration']));
             BaseCollectionView.__super__.initialize.apply(this, arguments);
+        },
+
+        getTemplateData: function () {
+            var data = BaseCollectionView.__super__.getTemplateData.call(this, arguments);
+            if (this.settings) {
+                data.settings = this.settings;
+            }
+            return data;
         },
 
         // This class doesn’t inherit from the application-specific View class,
@@ -104,6 +112,20 @@ define([
             }
 
             return this.$loading;
+        },
+
+        delegateListener: function (eventName, target, callback) {
+            var prop;
+            if (target === 'mediator') {
+                this.subscribeEvent(eventName, callback);
+            } else if (!target) {
+                this.on(eventName, callback, this);
+            } else {
+                prop = this[target];
+                if (prop) {
+                    this.listenTo(prop, eventName, callback);
+                }
+            }
         }
     });
 

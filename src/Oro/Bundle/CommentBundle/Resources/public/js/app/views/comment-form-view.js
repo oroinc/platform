@@ -7,7 +7,6 @@ define(function (require) {
         _ = require('underscore'),
         mediator = require('oroui/js/mediator'),
         formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
-        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
 
@@ -28,106 +27,34 @@ define(function (require) {
         },
 
         listen: {
-            'request model': 'onRequest',
-            'sync model': 'onSuccess',
             'error model': 'onError'
-        },
-
-        defaultData: {
-            attachmentURL: null,
-            attachmentFileName: null,
-            attachmentSize: null
         },
 
         initialize: function (options) {
             this.template = _.template($(options.template).html());
-            this.isAddForm = this.model.isNew();
-            if (this.isAddForm) {
-                // save instance of empty model
-                this.original = this.model.clone();
-            }
             CommentFormView.__super__.initialize.apply(this, arguments);
         },
 
-        /**
-         * @inheritDoc
-         */
-        dispose: function () {
-            if (this.disposed) {
-                return;
-            }
-            CommentFormView.__super__.dispose.apply(this, arguments);
-        },
-
-        getTemplateData: function () {
-            var data = CommentFormView.__super__.getTemplateData.call(this);
-            _.defaults(data, this.defaultData);
-            // id is required for template
-            data.id = this.model.id || null;
-            return data;
-        },
-
         render: function () {
-            var loading, self = this;
-
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
                 .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate();
             mediator.execute('layout:init', this.$('form'), this);
-            if (!this.isAddForm) {
-                this.bindData();
-            }
-
-            loading = new LoadingMaskView({
-                container: this.$el
-            });
-            this.subview('loading', loading);
+            this.bindData();
 
             return this;
         },
 
         bindData: function () {
-            var fromView = this,
+            var formView = this,
                 attrs = this.model.toJSON();
             _.each(attrs, function (value, name) {
-                var $elem = fromView.$('[name="' + name + '"]');
+                var $elem = formView.$('[name="' + name + '"]');
                 if ($elem) {
                     setValue($elem, value);
                 }
-            });
-        },
-
-        onSubmit: function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            if (!this.subview('loading').isShown()) {
-                this.trigger('submit', this);
-            }
-        },
-
-        onReset: function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            if (this.isAddForm) {
-                this._clearForm();
-            } else {
-                this.bindData();
-                this.trigger('reset', this);
-            }
-        },
-
-        _elements: function () {
-            return this.$('input, select, textarea').not(':submit, :reset, :image');
-        },
-
-        _clearForm: function () {
-            this.stopListening();
-            this.model = this.original.clone();
-            this.delegateListeners();
-            this._elements().each(function () {
-                setValue($(this), '');
             });
         },
 
@@ -142,34 +69,8 @@ define(function (require) {
         },
 
         /**
-         * Update view after request start
-         *
-         *  - shows loading mask
-         */
-        onRequest: function () {
-            this.subview('loading').show();
-        },
-
-        /**
-         * Update view after successful request
-         *
-         *  - hides loading mask
-         *  - clears form if necessary
-         */
-        onSuccess: function () {
-            if (this.disposed) {
-                return;
-            }
-            this.subview('loading').hide();
-            if (this.isAddForm) {
-                this._clearForm();
-            }
-        },
-
-        /**
          * Update view after failed request
          *
-         *  - hides loading mask
          *  - shows error massages if they exist
          *
          * @param {Model} model
@@ -177,13 +78,24 @@ define(function (require) {
          */
         onError: function (model, jqxhr) {
             var validator;
-            this.subview('loading').hide();
             if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
                 validator = this.$('form').data('validator');
                 if (validator) {
                     validator.showBackendErrors(jqxhr.responseJSON.errors);
                 }
             }
+        },
+
+        onSubmit: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            this.trigger('submit', this);
+        },
+
+        onReset: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            this.render();
         }
     });
 

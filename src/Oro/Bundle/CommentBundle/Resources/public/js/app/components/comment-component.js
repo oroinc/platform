@@ -9,35 +9,41 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         BaseComponent = require('oroui/js/app/components/base/component'),
         CommentFromView = require('orocomment/js/app/views/comment-form-view'),
-        CommentListView = require('orocomment/js/app/views/comment-list-view'),
+        CommentsView = require('orocomment/js/app/views/comments-view'),
         CommentCollection = require('orocomment/js/app/models/comment-collection'),
         LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         DialogWidget = require('oro/dialog-widget');
 
     CommentComponent = BaseComponent.extend({
         listen: {
-            'toEdit collection': 'onCommentEdit',
-            'toAdd collection': 'onCommentAdd'
+            'toEdit commentsView': 'onCommentEdit',
+            'toRemove commentsView': 'onCommentRemove',
+            'toAdd commentsView': 'onCommentAdd'
         },
 
         initialize: function (options) {
             var collectionOptions;
 
             this.options = options || {};
-            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName', 'canCreate']);
+            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName']);
 
             this.collection = new CommentCollection([], collectionOptions);
 
-            this.listView = new CommentListView({
+            this.commentsView = new CommentsView({
                 el: options._sourceElement,
                 collection: this.collection,
-                template: options.listTemplate,
-                canCreate: this.options.canCreate
+                autoRender: true,
+                settings: {
+                    canCreate: Boolean(this.options.canCreate)
+                }
             });
 
             this.formTemplate = options.listTemplate + '-form';
 
+            this._deferredInit();
+
             this.collection.fetch();
+            this.collection.once('sync', this._resolveDeferredInit, this);
         },
 
         onCommentAdd: function () {
@@ -46,7 +52,7 @@ define(function (require) {
                 return;
             }
 
-            model = new this.collection.model();
+            model = this.collection.createComment();
 
             // init dialog
             dialogWidget = new DialogWidget({
@@ -60,9 +66,10 @@ define(function (require) {
                     dialogClass: 'add-comment-dialog'
                 }
             });
-            model.once('synced', function () {
+            model.once('sync', function () {
                 dialogWidget.remove();
-            });
+                this.collection.add(model);
+            }, this);
 
             // init form view
             this._initFormView(dialogWidget, model);
@@ -79,12 +86,45 @@ define(function (require) {
         },
 
         onCommentEdit: function (model) {
-            var parentView;
-            if (!model.get('editable')) {
+            var dialogWidget, loadingMaskView;
+            if (!this.options.canCreate) {
                 return;
             }
-            parentView = this.listView.getItemView(model);
-            this._initFormView(parentView, model);
+
+            // init dialog
+            dialogWidget = new DialogWidget({
+                title: __('oro.comment.dialog.edit_comment.title'),
+                el: $('<div><div class="comment-form-container"/></div>'),
+                stateEnabled: false,
+                incrementalPosition: false,
+                dialogOptions: {
+                    modal: true,
+                    width: '510px',
+                    dialogClass: 'add-comment-dialog'
+                }
+            });
+
+            model.once('sync', function () {
+                dialogWidget.remove();
+                this.collection.add(model);
+            }, this);
+
+            // init form view
+            this._initFormView(dialogWidget, model);
+
+            dialogWidget.render();
+
+            // bind dialog loader
+            loadingMaskView = new LoadingMaskView({
+                container: dialogWidget.loadingElement
+            });
+            dialogWidget.subview('loading', loadingMaskView);
+            loadingMaskView.listenTo(model, 'request', loadingMaskView.show);
+            loadingMaskView.listenTo(model, 'sync error', loadingMaskView.hide);
+        },
+
+        onCommentRemove: function (model) {
+            debugger;
         },
 
         _initFormView: function (parentView, model) {
@@ -96,39 +136,24 @@ define(function (require) {
             });
             parentView.subview('form', formView);
             this.listenTo(formView, 'submit', this.onFormSubmit, this);
-            this.listenTo(formView, 'reset', this.onFormReset, this);
         },
 
         onFormSubmit: function (formView) {
-            var model, listView, options;
+            var model, options;
 
-            listView = this.listView;
             model = formView.model;
-
-            if (model.isNew()) {
-                this.collection.add(model, {at: 0});
-            }
-
-            model.once('sync', function () {
-                var itemView = listView.getItemView(model);
-                if (itemView) {
-                    itemView.render();
-                }
-            });
 
             options = formView.fetchAjaxOptions({
                 url: model.url()
             });
-            model.save(null, options);
-        },
 
-        onFormReset: function (formView) {
-            var model, itemView;
-            model = formView.model;
-            if (!model.isNew()) {
-                itemView = this.listView.getItemView(model);
-                itemView.render();
+            if (model.isNew()) {
+                options.success = _.bind(function () {
+                    this.collection.add(model, {at: 0});
+                }, this);
             }
+
+            model.save(null, options);
         }
     });
 

@@ -49,6 +49,12 @@ a {
 form {
   margin: 0;
 }
+h1, h2, h3, h4, h5, h6 {
+  // supress bootstrap's optimizeLegibility text-rendering
+  // it gives bad results on small size fonts
+  // that could be applied only for fonts larger than 20px
+  text-rendering: auto;
+}
 #main {
   background-color: #fff;
 }

@@ -8,7 +8,11 @@
     <fieldset class="form-horizontal form-horizontal-large comments-block">
         <div class="comments-block-inner">
             <div class="grid-toolbar"></div>
-            <a class="load-more"><span>Load 10 more of 152</span></a>
+            <% if (synced && items && length > items.length) { %>
+                <a class="load-more"><span>
+                    Load <?= Math.min(loadBy, length - items.length) ?>
+                    more of <?= length ?></span></a>
+            <% } %>
             <ul class="unstyled accordion comments-list list-box" id="<%= accordionId %>"></ul>
             <% if (canCreate) { %>
             <div class="pull-right">

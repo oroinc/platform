@@ -19,7 +19,7 @@
             <button class="btn cancel-comment-button" type="reset">
                 <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
             </button>
-            <% if (id) { %>
+            <% if (!isNew) { %>
             <button class="btn btn-primary" type="submit">
                 <%= _.__('oro.comment.from.button.edit_comment.label') %>
             </button>

@@ -10,6 +10,7 @@ oro:
             update: Update Comment
         dialog:
             add_comment.title: Add Comment
+            edit_comment.title: Edit Comment
         from:
             button:
                 send_comment:

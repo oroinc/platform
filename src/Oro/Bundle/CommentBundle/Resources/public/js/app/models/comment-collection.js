@@ -21,8 +21,10 @@ define(function (require) {
             itemsQuantity: 0
         },
 
+        loadBy: 10,
+
         initialize: function (models, options) {
-            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName', 'canCreate']));
+            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName']));
 
             // create own state property
             this.state = _.extend({}, this.state);
@@ -38,8 +40,7 @@ define(function (require) {
         url: function () {
             var options = {
                 relationId:    this.relatedEntityId,
-                relationClass: this.relatedEntityClassName,
-                page:          this.getPage()
+                relationClass: this.relatedEntityClassName
             };
             return routing.generate(this.route, options);
         },
@@ -50,19 +51,10 @@ define(function (require) {
             return result;
         },
 
-        parse: function(response) {
+        parse: function (response) {
             this.finishSync();
             this.state.itemsQuantity = parseInt(response.count, 10) || 0;
             return response.data;
-        },
-
-        onAddNewRecord: function (model, collection, options) {
-            if (model.isNew()) {
-                model.once('sync', function () {
-                    collection.setPage(1);
-                    collection.fetch();
-                });
-            }
         },
 
         onRemoveRecord: function (model, collection, options) {
@@ -110,6 +102,13 @@ define(function (require) {
 
         getRecordsQuantity: function () {
             return this.state.itemsQuantity;
+        },
+
+        createComment: function () {
+            return new CommentModel({}, {
+                relatedEntityClassName: this.relatedEntityClassName,
+                relatedEntityId: this.relatedEntityId
+            });
         }
     });
 
