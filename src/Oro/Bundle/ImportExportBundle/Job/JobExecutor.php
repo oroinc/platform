@@ -26,6 +26,8 @@ class JobExecutor
     const JOB_EXPORT_TEMPLATE_TO_CSV = 'entity_export_template_to_csv';
     const JOB_IMPORT_FROM_CSV = 'entity_import_from_csv';
     const JOB_VALIDATE_IMPORT_FROM_CSV = 'entity_import_validation_from_csv';
+    const SKIP_CLEAR = 'jobSkipClear';
+    const CONTEXT_DATA_KEY = 'contextData';
 
     /**
      * @var EntityManager
@@ -51,6 +53,11 @@ class JobExecutor
      * @var BatchJobRepository
      */
     protected $batchJobRepository;
+
+    /**
+     * @var bool
+     */
+    protected $skipClear = false;
 
     /**
      * @param ConnectorRegistry $jobRegistry
@@ -79,48 +86,11 @@ class JobExecutor
     public function executeJob($jobType, $jobName, array $configuration = [])
     {
         $this->initialize();
+        $jobInstance = $this->createJobInstance($jobType, $jobName, $configuration);
+        $jobExecution = $this->createJobExecution($configuration, $jobInstance);
 
-        // create and persist job instance and job execution
-        $jobInstance = new JobInstance(self::CONNECTOR_NAME, $jobType, $jobName);
-        $jobInstance->setCode($this->generateJobCode($jobName));
-        $jobInstance->setLabel(sprintf('%s.%s', $jobType, $jobName));
-        $jobInstance->setRawConfiguration($configuration);
-
-        // persist batch entities
-        $this->batchJobRepository->getJobManager()->persist($jobInstance);
-        $jobExecution = $this->batchJobRepository->createJobExecution($jobInstance);
-
-        // load configuration to context
-        if ($configuration) {
-            foreach ($configuration as $typeConfiguration) {
-                if (!is_array($typeConfiguration)) {
-                    continue;
-                }
-
-                foreach ($typeConfiguration as $name => $option) {
-                    $jobExecution->getExecutionContext()->put($name, $option);
-                }
-            }
-        }
-
-        // do job
         $jobResult = $this->doJob($jobInstance, $jobExecution);
-
-        // set data to JobResult
-        $jobResult->setJobId($jobInstance->getId());
-        $jobResult->setJobCode($jobInstance->getCode());
-
-        // TODO: Find a way to work with multiple amount of job and step executions
-        // TODO: https://magecore.atlassian.net/browse/BAP-2600
-        /** @var JobExecution $jobExecution */
-        $jobExecution = $jobInstance->getJobExecutions()->first();
-        if ($jobExecution) {
-            $stepExecution = $jobExecution->getStepExecutions()->first();
-            if ($stepExecution) {
-                $context = $this->contextRegistry->getByStepExecution($stepExecution);
-                $jobResult->setContext($context);
-            }
-        }
+        $this->setJobResultData($jobResult, $jobInstance);
 
         return $jobResult;
     }
@@ -166,7 +136,10 @@ class JobExecutor
 
             // trigger save of JobExecution and JobInstance
             $this->batchJobRepository->getJobManager()->flush();
-            $this->batchJobRepository->getJobManager()->clear();
+
+            if (!$this->isClearSkipped($jobExecution)) {
+                $this->batchJobRepository->getJobManager()->clear();
+            }
         } catch (\Exception $exception) {
             if (!$isTransactionRunning) {
                 $this->entityManager->rollback();
@@ -307,5 +280,110 @@ class JobExecutor
     protected function initialize()
     {
         $this->entityManager = $this->managerRegistry->getManager();
+    }
+
+    /**
+     * Set data to JobResult
+     * TODO: Find a way to work with multiple amount of job and step executions
+     * TODO https://magecore.atlassian.net/browse/BAP-2600
+     *
+     * @param JobResult $jobResult
+     * @param JobInstance $jobInstance
+     */
+    protected function setJobResultData(JobResult $jobResult, JobInstance $jobInstance)
+    {
+        $jobResult->setJobId($jobInstance->getId());
+        $jobResult->setJobCode($jobInstance->getCode());
+
+        /** @var JobExecution $jobExecution */
+        $jobExecution = $jobInstance->getJobExecutions()->first();
+        if ($jobExecution) {
+            $stepExecution = $jobExecution->getStepExecutions()->first();
+            if ($stepExecution) {
+                $context = $this->contextRegistry->getByStepExecution($stepExecution);
+                $jobResult->setContext($context);
+            }
+        }
+    }
+
+    /**
+     * Create and persist job instance.
+     *
+     * @param string $jobType
+     * @param string $jobName
+     * @param array $configuration
+     * @return JobInstance
+     */
+    protected function createJobInstance($jobType, $jobName, array $configuration)
+    {
+        $jobInstance = new JobInstance(self::CONNECTOR_NAME, $jobType, $jobName);
+        $jobInstance->setCode($this->generateJobCode($jobName));
+        $jobInstance->setLabel(sprintf('%s.%s', $jobType, $jobName));
+        if (array_key_exists(self::CONTEXT_DATA_KEY, $configuration)) {
+            unset($configuration[self::CONTEXT_DATA_KEY]);
+        }
+        $jobInstance->setRawConfiguration($configuration);
+        $this->batchJobRepository->getJobManager()->persist($jobInstance);
+
+        return $jobInstance;
+    }
+
+    /**
+     * Create JobExecution instance.
+     *
+     * @param array $configuration
+     * @param JobInstance $jobInstance
+     * @return JobExecution
+     */
+    protected function createJobExecution(array $configuration, JobInstance $jobInstance)
+    {
+        $jobExecution = $this->batchJobRepository->createJobExecution($jobInstance);
+
+        // load configuration to context
+        if ($configuration) {
+            foreach ($configuration as $typeConfiguration) {
+                if (!is_array($typeConfiguration)) {
+                    continue;
+                }
+
+                foreach ($typeConfiguration as $name => $option) {
+                    $jobExecution->getExecutionContext()->put($name, $option);
+                }
+            }
+        }
+
+        return $jobExecution;
+    }
+
+    /**
+     * @param JobExecution $jobExecution
+     * @return bool
+     */
+    protected function isClearSkipped(JobExecution $jobExecution)
+    {
+        if ($this->skipClear) {
+            return true;
+        }
+
+        return $skipClear = (bool)$jobExecution->getExecutionContext()->get(self::SKIP_CLEAR);
+    }
+
+    /**
+     * @param boolean $skipClear
+     * @return JobExecutor
+     */
+    public function setSkipClear($skipClear)
+    {
+        $this->skipClear = $skipClear;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSkipClear()
+    {
+        return $this->skipClear;
     }
 }
