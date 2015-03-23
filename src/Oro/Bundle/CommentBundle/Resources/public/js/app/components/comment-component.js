@@ -49,17 +49,10 @@ define(function (require) {
             this.collection.once('sync', this._resolveDeferredInit, this);
         },
 
-        onCommentAdd: function () {
-            var dialogWidget, loadingMaskView, model;
-            if (!this.options.canCreate) {
-                return;
-            }
-
-            model = this.collection.create();
-
-            // init dialog
+        createDialog: function (title, model) {
+            var dialogWidget, loadingMaskView;
             dialogWidget = new DialogWidget({
-                title: __('oro.comment.dialog.add_comment.title'),
+                title: title,
                 el: $('<div><div class="comment-form-container"/></div>'),
                 stateEnabled: false,
                 incrementalPosition: false,
@@ -69,6 +62,33 @@ define(function (require) {
                     dialogClass: 'add-comment-dialog'
                 }
             });
+            // init form view
+            this._initFormView(dialogWidget, model);
+
+            dialogWidget.render();
+
+            // bind dialog loader
+            loadingMaskView = new LoadingMaskView({
+                container: dialogWidget.loadingElement
+            });
+            dialogWidget.subview('loading', loadingMaskView);
+            loadingMaskView.listenTo(model, 'request', loadingMaskView.show);
+            loadingMaskView.listenTo(model, 'sync error', loadingMaskView.hide);
+
+            return dialogWidget;
+        },
+
+        onCommentAdd: function () {
+            var dialogWidget, model;
+            if (!this.options.canCreate) {
+                return;
+            }
+
+            model = this.collection.create();
+
+            // init dialog
+            dialogWidget = this.createDialog(__('oro.comment.dialog.add_comment.title'), model);
+
             model.once('sync', function () {
                 dialogWidget.remove();
                 // update collection
@@ -79,19 +99,6 @@ define(function (require) {
                 }, {silent: true});
                 this.collection.sort();
             }, this);
-
-            // init form view
-            this._initFormView(dialogWidget, model);
-
-            dialogWidget.render();
-
-            // bind dialog loader
-            loadingMaskView = new LoadingMaskView({
-                container: dialogWidget.loadingElement
-            });
-            dialogWidget.subview('loading', loadingMaskView);
-            loadingMaskView.listenTo(model, 'request', loadingMaskView.show);
-            loadingMaskView.listenTo(model, 'sync error', loadingMaskView.hide);
         },
 
         onCommentEdit: function (model) {
@@ -102,34 +109,11 @@ define(function (require) {
             }
 
             // init dialog
-            dialogWidget = new DialogWidget({
-                title: __('oro.comment.dialog.edit_comment.title'),
-                el: $('<div><div class="comment-form-container"/></div>'),
-                stateEnabled: false,
-                incrementalPosition: false,
-                dialogOptions: {
-                    modal: true,
-                    width: '510px',
-                    dialogClass: 'add-comment-dialog'
-                }
-            });
+            dialogWidget = this.createDialog(__('oro.comment.dialog.edit_comment.title'), model);
 
             dialogWidget.listenTo(model, 'sync', _.bind(function () {
                 dialogWidget.remove();
             }, this));
-
-            // init form view
-            this._initFormView(dialogWidget, model);
-
-            dialogWidget.render();
-
-            // bind dialog loader
-            loadingMaskView = new LoadingMaskView({
-                container: dialogWidget.loadingElement
-            });
-            dialogWidget.subview('loading', loadingMaskView);
-            loadingMaskView.listenTo(model, 'request', loadingMaskView.show);
-            loadingMaskView.listenTo(model, 'sync error', loadingMaskView.hide);
         },
 
         onCommentRemove: function (model) {
