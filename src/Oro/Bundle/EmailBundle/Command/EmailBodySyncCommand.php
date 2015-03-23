@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Component\Log\OutputLogger;
 
 class EmailBodySyncCommand extends ContainerAwareCommand
 {
@@ -33,6 +34,8 @@ class EmailBodySyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $logger = new OutputLogger($output);
+
         /** @var EmailCacheManager $emailCacheManager */
         $emailCacheManager = $this->getContainer()->get('oro_email.email.cache.manager');
 
@@ -41,11 +44,12 @@ class EmailBodySyncCommand extends ContainerAwareCommand
         if ($email) {
             try {
                 $emailCacheManager->ensureEmailBodyCached($email);
+                $output->writeln(sprintf('<info>Email body synced for email - %s</info>', $email->getId()));
             } catch (LoadEmailBodyException $e) {
-                // log
+                $warn = sprintf('Email body cannot be loaded for email - %s', $email->getId());
+                $output->writeln('<info>' . $warn . '</info>');
+                $logger->warning($warn);
             }
-        } else {
-            // s
         }
     }
 }
