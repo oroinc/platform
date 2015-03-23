@@ -55,7 +55,12 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
     private function mergeConfigIntoOne(ContainerBuilder $container, $name, array $config = [])
     {
         if (!$container instanceof OroContainerBuilder) {
-            throw new \RuntimeException('Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder is expected to be passed into OroPlatformExtension');
+            throw new \RuntimeException(
+                sprintf(
+                    '%s is expected to be passed into OroPlatformExtension',
+                    'Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder'
+                )
+            );
         }
 
         $originalConfig = $container->getExtensionConfig($name);
@@ -63,9 +68,10 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $originalConfig[] = array();
         }
 
-        $mergedConfig = [array_merge_recursive($originalConfig[0], $config)];
+        $mergedConfig = array_merge_recursive($originalConfig[0], $config);
+        $originalConfig[0] = $mergedConfig;
 
-        $container->setExtensionConfig('security', $mergedConfig);
+        $container->setExtensionConfig('security', $originalConfig);
     }
 
     /**
