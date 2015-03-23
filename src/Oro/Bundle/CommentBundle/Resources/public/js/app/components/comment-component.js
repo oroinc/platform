@@ -56,6 +56,7 @@ define(function (require) {
                 el: $('<div><div class="comment-form-container"/></div>'),
                 stateEnabled: false,
                 incrementalPosition: false,
+                resizable: false,
                 dialogOptions: {
                     modal: true,
                     width: '510px',
