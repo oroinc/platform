@@ -168,6 +168,7 @@ define([
             }, this);
             this.listenTo(mediator, 'datagrid' + this.gridName + ':views:change', function(model) {
                 this.viewsCollection.get(model).attributes = model.attributes;
+                this._getView(model.get('name')).label = model.get('label');
                 this.viewDirty = !this._isCurrentStateSynchronized();
                 this.render();
             }, this);
@@ -340,7 +341,7 @@ define([
             });
             modal.on('ok', function() {
                 model.save({
-                    label: this.$('input[name=name]').val(),
+                    label: this.$('input[name=name]').val()
                 }, {
                     wait: true
                 });
@@ -556,14 +557,24 @@ define([
         /**
          * @private
          *
+         * @param {String} name
          * @returns {undefined|Object}
          */
-        _getCurrentView: function() {
+        _getView: function(name) {
             var currentViews =  _.filter(this.choices, function (item) {
-                return item.value == this.collection.state.gridView;
+                return item.value == name;
             }, this);
 
             return _.first(currentViews);
+        },
+
+        /**
+         * @private
+         *
+         * @returns {undefined|Object}
+         */
+        _getCurrentView: function() {
+            return this._getView(this.collection.state.gridView);
         },
 
         /**
