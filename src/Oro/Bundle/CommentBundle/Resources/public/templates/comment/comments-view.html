@@ -1,9 +1,11 @@
 <div class="comments-view-header"></div>
 <ul class="comments-view-body comments-block"></ul>
 <% if (canCreate) { %>
-<div class="pull-right">
-    <button class="btn add-comment-button" type="submit">
-        <%= _.__('oro.comment.from.button.add_comment.label') %>
-    </button>
+<div class="comments-view-footer"></div>
+    <div class="pull-right">
+        <button class="btn add-comment-button" type="submit">
+            <%= _.__('oro.comment.from.button.add_comment.label') %>
+        </button>
+    </div>
 </div>
 <% } %>
