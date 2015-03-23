@@ -29,16 +29,8 @@ define([
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'loadingContainerSelector',
-                'itemSelector', 'listSelector', 'settings', 'animationDuration']));
+                'itemSelector', 'listSelector', 'animationDuration']));
             BaseCollectionView.__super__.initialize.apply(this, arguments);
-        },
-
-        getTemplateData: function () {
-            var data = BaseCollectionView.__super__.getTemplateData.call(this, arguments);
-            if (this.settings) {
-                data.settings = this.settings;
-            }
-            return data;
         },
 
         // This class doesn’t inherit from the application-specific View class,

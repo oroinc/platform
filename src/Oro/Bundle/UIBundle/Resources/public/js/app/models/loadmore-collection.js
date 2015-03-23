@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['./base/collection', './base/model'
-], function (BaseCollection, BaseModel) {
+define(['./base/use-route-collection', './base/model'
+], function (UseRouteCollection, BaseModel) {
     'use strict';
 
     var LoadMoreCollection;
@@ -9,7 +9,7 @@ define(['./base/collection', './base/model'
     /**
      * Pageable collection
      */
-    LoadMoreCollection = BaseCollection.extend({
+    LoadMoreCollection = UseRouteCollection.extend({
         /**
          * Basic model to store row data
          *
@@ -17,11 +17,16 @@ define(['./base/collection', './base/model'
          */
         model: BaseModel,
 
-        loadMore: function (quantity) {
-            var preparedUrl = '/test';
-            Backbone.sync('read', this, {
-                url: preparedUrl
-            })
+        stateDefaults: {
+            start: 0,
+            end: 5,
+            loadMoreItemsQuantity: 10
+        },
+
+        loadMore: function () {
+            this.state.set({
+                end: this.state.get('end') + this.state.get('loadMoreItemsQuantity')
+            });
         }
     });
     

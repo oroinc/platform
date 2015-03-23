@@ -9,52 +9,20 @@ define(function (require) {
         routing = require('routing'),
         mediator = require('oroui/js/mediator'),
         __ = require('orotranslation/js/translator'),
-        BaseCollection = require('oroui/js/app/models/base/collection'),
+        LoadMoreCollection = require('oroui/js/app/models/loadmore-collection'),
         CommentModel = require('orocomment/js/app/models/comment-model');
 
-    CommentCollection = BaseCollection.extend({
+    CommentCollection = LoadMoreCollection.extend({
         model: CommentModel,
-        route: 'oro_api_comment_get_items',
-        state: {
-            page: 1,
-            itemPerPage: 10,
-            itemsQuantity: 0
-        },
-
-        loadBy: 10,
+        routeName: 'oro_api_comment_get_items',
 
         initialize: function (models, options) {
-            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName']));
-
-            // create own state property
-            this.state = _.extend({}, this.state);
-
             // handel collection size changes
             this.on('add', this.onAddNewRecord, this);
             this.on('remove', this.onRemoveRecord, this);
             this.on('error', this.onErrorResponse, this);
 
             CommentCollection.__super__.initialize.apply(this, arguments);
-        },
-
-        url: function () {
-            var options = {
-                relationId:    this.relatedEntityId,
-                relationClass: this.relatedEntityClassName
-            };
-            return routing.generate(this.route, options);
-        },
-
-        fetch: function () {
-            var result = CommentCollection.__super__.fetch.apply(this, arguments);
-            this.beginSync();
-            return result;
-        },
-
-        parse: function (response) {
-            this.finishSync();
-            this.state.itemsQuantity = parseInt(response.count, 10) || 0;
-            return response.data;
         },
 
         onRemoveRecord: function (model, collection, options) {

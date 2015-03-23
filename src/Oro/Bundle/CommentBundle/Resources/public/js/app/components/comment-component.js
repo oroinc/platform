@@ -22,12 +22,19 @@ define(function (require) {
         },
 
         initialize: function (options) {
-            var collectionOptions;
+            var collectionRouteOptions;
 
             this.options = options || {};
-            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName']);
 
-            this.collection = new CommentCollection([], collectionOptions);
+            this.collection = new CommentCollection(
+                [],
+                {
+                    routeParams: {
+                        relationId: this.options.relatedEntityId,
+                        relationClass: this.options.relatedEntityClassName
+                    }
+                }
+            );
 
             this.commentsView = new CommentsView({
                 el: options._sourceElement,

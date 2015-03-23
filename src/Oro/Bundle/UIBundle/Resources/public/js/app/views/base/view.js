@@ -3,8 +3,9 @@
 define([
     'jquery',
     'underscore',
-    'chaplin'
-], function ($, _, Chaplin) {
+    'chaplin',
+    '../../models/base/collection'
+], function ($, _, Chaplin, BaseCollection) {
     'use strict';
 
     var BaseView;
@@ -15,20 +16,6 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend({
-
-        initialize: function (options) {
-            this.settings = options ? options.settings || {} : {};
-            BaseView.__super__.initialize.call(this, arguments);
-        },
-
-        getTemplateData: function () {
-            var data = BaseView.__super__.getTemplateData.call(this, arguments);
-            if (this.settings) {
-                data.settings = this.settings;
-            }
-            return data;
-        },
-
         delegateListener: function (eventName, target, callback) {
             var prop;
             if (target === 'mediator') {
@@ -57,6 +44,29 @@ define([
             }
 
             return templateFunc;
+        },
+
+        getTemplateData: function() {
+            var data = {}, source;
+            if (this.model) {
+                data = Chaplin.utils.serialize(this.model);
+            } else if (this.collection) {
+                if (this.collection instanceof BaseCollection) {
+                    data = this.collection.serialize();
+                } else {
+                    data = {
+                        items: Chaplin.utils.serialize(this.collection),
+                        length: this.collection.length
+                    };
+                }
+            }
+            source = this.model || this.collection;
+            if (source) {
+                if (typeof source.isSynced === 'function' && !('synced' in data)) {
+                    data.synced = source.isSynced();
+                }
+            }
+            return data;
         },
 
         /**
