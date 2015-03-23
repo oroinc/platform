@@ -17,15 +17,8 @@ define(function (require) {
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     CommentComponent = BaseComponent.extend({
-        listen: {
-            'toEdit commentsView': 'onCommentEdit',
-            'toRemove commentsView': 'onCommentRemove',
-            'toAdd commentsView': 'onCommentAdd'
-        },
 
         initialize: function (options) {
-            var collectionRouteOptions;
-
             this.options = options || {};
 
             this.collection = new CommentCollection(
@@ -44,6 +37,9 @@ define(function (require) {
                 autoRender: true,
                 canCreate: Boolean(this.options.canCreate)
             });
+            this.commentsView.on('toEdit', this.onCommentEdit, this);
+            this.commentsView.on('toRemove', this.onCommentRemove, this);
+            this.commentsView.on('toAdd', this.onCommentAdd, this);
 
             this.formTemplate = options.listTemplate + '-form';
 
@@ -100,7 +96,8 @@ define(function (require) {
 
         onCommentEdit: function (model) {
             var dialogWidget, loadingMaskView;
-            if (!this.options.canCreate) {
+
+            if (!model.get('editable')) {
                 return;
             }
 
@@ -136,6 +133,10 @@ define(function (require) {
         },
 
         onCommentRemove: function (model) {
+            if (!model.get('removable')) {
+                return;
+            }
+
             var confirm = new DeleteConfirmation({
                 content: __('oro.comment.deleteConfirmation')
             });
@@ -172,12 +173,6 @@ define(function (require) {
             options = formView.fetchAjaxOptions({
                 url: model.url()
             });
-
-            if (model.isNew()) {
-                options.success = _.bind(function () {
-                    this.collection.add(model, {at: 0});
-                }, this);
-            }
 
             model.save(null, options);
         }

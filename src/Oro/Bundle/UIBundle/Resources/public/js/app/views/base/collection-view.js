@@ -104,20 +104,6 @@ define([
             }
 
             return this.$loading;
-        },
-
-        delegateListener: function (eventName, target, callback) {
-            var prop;
-            if (target === 'mediator') {
-                this.subscribeEvent(eventName, callback);
-            } else if (!target) {
-                this.on(eventName, callback, this);
-            } else {
-                prop = this[target];
-                if (prop) {
-                    this.listenTo(prop, eventName, callback);
-                }
-            }
         }
     });
 

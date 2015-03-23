@@ -16,20 +16,6 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend({
-        delegateListener: function (eventName, target, callback) {
-            var prop;
-            if (target === 'mediator') {
-                this.subscribeEvent(eventName, callback);
-            } else if (!target) {
-                this.on(eventName, callback, this);
-            } else {
-                prop = this[target];
-                if (prop) {
-                    this.listenTo(prop, eventName, callback);
-                }
-            }
-        },
-
         getTemplateFunction: function () {
             var template, templateFunc;
             template = this.template;
