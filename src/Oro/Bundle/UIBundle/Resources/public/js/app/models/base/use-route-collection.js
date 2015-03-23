@@ -2,8 +2,9 @@
 define([
     './model',
     '../route',
-    './collection'
-], function (BaseModel, Route, BaseCollection) {
+    './collection',
+    'oroui/js/mediator'
+], function (BaseModel, Route, BaseCollection, mediator) {
     'use strict';
 
     var UseRouteCollection;
@@ -19,6 +20,7 @@ define([
             if (!options) {
                 options = {};
             }
+            this.on('error', this.onErrorResponse, this);
             // initialize state
             this.state = new BaseModel(_.extend({}, options.state, this.stateDefaults));
             this.state.on('change', this.checkRouteChange, this);
@@ -68,7 +70,17 @@ define([
             data.state = this.state.toJSON();
             data.syncState = this.syncState();
             return data;
-        }
+        },
+
+        onErrorResponse: function (collection, jqxhr) {
+            this.finishSync();
+            if (jqxhr.status === 403) {
+                mediator.execute('showFlashMessage', 'error', __('oro.ui.forbidden_error'));
+            } else if (jqxhr.status !== 400) {
+                // handling of 400 response should be implemented
+                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+            }
+        },
     });
 
     return UseRouteCollection;

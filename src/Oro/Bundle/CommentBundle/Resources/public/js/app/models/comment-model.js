@@ -12,9 +12,6 @@ define(function (require) {
         route: 'oro_api_comment_get_item',
         routeRemoveAttachment: 'oro_api_comment_remove_attachment_item',
 
-        relatedEntityId: undefined,
-        relatedEntityClassName: undefined,
-
         defaults: {
             owner: '',
             owner_id: null,
@@ -33,30 +30,31 @@ define(function (require) {
         },
 
         initialize: function (attrs, options) {
-            if (options) {
-                this.relatedEntityId = options.relatedEntityId;
-                this.relatedEntityClassName = options.relatedEntityClassName;
-            }
             CommentModel.__super__.initialize.apply(this, arguments);
             this.on('request', this.beginSync);
             this.on('sync', this.finishSync);
             this.on('error', this.unsync);
         },
 
-        urlRoot: function () {
-            var parameters;
-            if (this.collection) {
-                return this.collection.url();
-            } else {
-                if (!this.relatedEntityClassName || !this.relatedEntityId) {
-                    throw "Please specify relatedEntityClassName and relatedEntityId";
+        url: function () {
+            var url, parameters;
+            if (this.isNew()) {
+                if (!this.get('relationClass') || !this.get('relationId')) {
+                    throw "Please specify relationClass and relationId";
                 }
                 parameters = {
-                    relationId:    this.relatedEntityId,
-                    relationClass: this.relatedEntityClassName
+                    relationId:    this.get('relationId'),
+                    relationClass: this.get('relationClass')
                 };
-                return routing.generate('oro_api_comment_get_items', parameters);
+                url = routing.generate('oro_api_comment_get_items', parameters);
+            } else {
+                parameters = {
+                    id: this.get('id'),
+                    _format: 'json'
+                };
+                url = routing.generate(this.route, parameters);
             }
+            return url;
         },
 
         removeAttachment: function () {

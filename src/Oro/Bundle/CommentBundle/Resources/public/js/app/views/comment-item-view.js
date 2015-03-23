@@ -9,7 +9,11 @@ define(function (require) {
     CommentItemView = BaseView.extend({
         template: template,
         tagName: 'li',
-        className: 'comment-item'
+        className: 'comment-item',
+
+        listen: {
+            'change model': 'render'
+        }
     });
 
     return CommentItemView;

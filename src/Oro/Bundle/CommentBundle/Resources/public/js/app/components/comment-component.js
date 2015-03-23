@@ -12,7 +12,8 @@ define(function (require) {
         CommentsView = require('orocomment/js/app/views/comments-view'),
         CommentCollection = require('orocomment/js/app/models/comment-collection'),
         LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
-        DialogWidget = require('oro/dialog-widget');
+        DialogWidget = require('oro/dialog-widget'),
+        DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     CommentComponent = BaseComponent.extend({
         listen: {
@@ -40,9 +41,7 @@ define(function (require) {
                 el: options._sourceElement,
                 collection: this.collection,
                 autoRender: true,
-                settings: {
-                    canCreate: Boolean(this.options.canCreate)
-                }
+                canCreate: Boolean(this.options.canCreate)
             });
 
             this.formTemplate = options.listTemplate + '-form';
@@ -59,7 +58,7 @@ define(function (require) {
                 return;
             }
 
-            model = this.collection.createComment();
+            model = this.collection.create();
 
             // init dialog
             dialogWidget = new DialogWidget({
@@ -75,7 +74,13 @@ define(function (require) {
             });
             model.once('sync', function () {
                 dialogWidget.remove();
+                // update collection
                 this.collection.add(model);
+                this.collection.state.set({
+                    limit: this.collection.state.get('limit') + 1,
+                    count: this.collection.state.get('count') + 1
+                }, {silent: true});
+                this.collection.sort();
             }, this);
 
             // init form view
@@ -111,10 +116,9 @@ define(function (require) {
                 }
             });
 
-            model.once('sync', function () {
+            dialogWidget.listenTo(model, 'sync', _.bind(function () {
                 dialogWidget.remove();
-                this.collection.add(model);
-            }, this);
+            }, this));
 
             // init form view
             this._initFormView(dialogWidget, model);
@@ -131,7 +135,19 @@ define(function (require) {
         },
 
         onCommentRemove: function (model) {
-            debugger;
+            var confirm = new DeleteConfirmation({
+                content: __('oro.comment.deleteConfirmation')
+            });
+
+            confirm.on('ok', _.bind(function () {
+                model.destroy();
+                this.collection.state.set({
+                    limit: this.collection.state.get('limit') - 1,
+                    count: this.collection.state.get('count') - 1
+                }, {silent: true});
+            }, this));
+
+            confirm.open();
         },
 
         _initFormView: function (parentView, model) {
