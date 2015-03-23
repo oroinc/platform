@@ -16,8 +16,6 @@ class Navigation extends AbstractPage
     /** @var \PHPUnit_Extensions_Selenium2TestCase_Element  */
     protected $tabs;
     /** @var \PHPUnit_Extensions_Selenium2TestCase_Element  */
-    protected $menu;
-    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element  */
     protected $pinbar;
     /** @var string  */
     protected $xpathMenu = '';
@@ -40,6 +38,11 @@ class Navigation extends AbstractPage
         $this->test->moveto(
             $this->tabs->element($this->test->using('xpath')->value("ul/li/a[normalize-space(.) = '{$tab}']"))
         );
+        $this->tabs->element(
+            $this->test->using('xpath')->value("ul/li/a[normalize-space(.) = '{$tab}']")
+        )->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
         $this->xpathMenu = "//div[@id = 'main-menu']/ul" . "/li[a[normalize-space(.) = '{$tab}']]";
         return $this;
     }
@@ -50,8 +53,12 @@ class Navigation extends AbstractPage
      */
     public function menu($menu)
     {
-        $this->test->moveto($this->test->byXpath($this->xpathMenu . "/ul/li/a[normalize-space(.) = '{$menu}']"));
-        $this->xpathMenu = $this->xpathMenu . "/ul/li[a[normalize-space(.) = '{$menu}']]";
+        $element = $this->test->byXpath($this->xpathMenu . "/ul/li/a[normalize-space(.) = '{$menu}']");
+        $this->test->moveto($element);
+        $element->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
+        $this->xpathMenu .= "/ul/li[a[normalize-space(.) = '{$menu}']]";
 
         return $this;
     }
