@@ -798,7 +798,7 @@ class User extends ExtendUser implements
      */
     public function getApiKeys()
     {
-        return $this->apiKeys->count() ? $this->apiKeys : uniqid('undefined');
+        return $this->apiKeys;
     }
 
     /**
