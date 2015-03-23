@@ -97,12 +97,13 @@ define(function (require) {
                     limit: this.collection.state.get('limit') + 1,
                     count: this.collection.state.get('count') + 1
                 }, {silent: true});
+                this.collection.trigger('stateChange');
                 this.collection.sort();
             }, this);
         },
 
         onCommentEdit: function (model) {
-            var dialogWidget, loadingMaskView;
+            var dialogWidget;
 
             if (!model.get('editable')) {
                 return;
@@ -133,6 +134,7 @@ define(function (require) {
                     limit: this.collection.state.get('limit') - 1,
                     count: this.collection.state.get('count') - 1
                 }, {silent: true});
+                this.collection.trigger('stateChange');
             }, this));
 
             confirm.open();

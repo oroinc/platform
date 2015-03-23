@@ -23,6 +23,7 @@ define([
             this.on('error', this.onErrorResponse, this);
             // initialize state
             this.state = new BaseModel(_.extend({}, options.state, this.stateDefaults));
+            this.state.on('change', _.bind(this.trigger, this, 'stateChange'));
             this.state.on('change', this.checkRouteChange, this);
 
             // initialize route
@@ -32,6 +33,7 @@ define([
                 options.routeParams,
                 this.routeParams
             ));
+            this.route.on('change', _.bind(this.trigger, this, 'routeChange'));
             this.route.on('change', this.checkRouteChange, this);
             UseRouteCollection.__super__.initialize.apply(this, arguments);
         },
