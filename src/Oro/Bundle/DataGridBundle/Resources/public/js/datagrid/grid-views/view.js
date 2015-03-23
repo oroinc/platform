@@ -7,8 +7,9 @@ define([
     './collection',
     './model',
     './view-name-modal',
-    'oroui/js/mediator'
-], function (Backbone, _, __, GridViewsCollection, GridViewModel, ViewNameModal, mediator) {
+    'oroui/js/mediator',
+    'oroui/js/delete-confirmation'
+], function (Backbone, _, __, GridViewsCollection, GridViewModel, ViewNameModal, mediator, DeleteConfirmation) {
     'use strict';
     var $, GridViewsView;
     $ = Backbone.$;
@@ -339,11 +340,18 @@ define([
             var id = this._getCurrentView().value;
             var model = this.viewsCollection.get(id);
 
-            model.destroy({wait: true});
-            model.once('sync', function() {
-                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
-                mediator.trigger('datagrid:' + this.gridName + ':views:remove', model);
-            }, this);
+            var confirm = new DeleteConfirmation({
+                content: __('Are you sure you want to delete this item?')
+            });
+            confirm.on('ok', _.bind(function() {
+                model.destroy({wait: true});
+                model.once('sync', function() {
+                    mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
+                    mediator.trigger('datagrid:' + this.gridName + ':views:remove', model);
+                }, this);
+            }, this));
+
+            confirm.open();
         },
 
         /**
