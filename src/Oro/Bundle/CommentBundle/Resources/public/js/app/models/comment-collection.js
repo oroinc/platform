@@ -16,6 +16,8 @@ define(function (require) {
         model: CommentModel,
         routeName: 'oro_api_comment_get_items',
 
+        comparator: 'createdAt',
+
         initialize: function (models, options) {
             // handel collection size changes
             this.on('add', this.onAddNewRecord, this);
@@ -41,35 +43,6 @@ define(function (require) {
                 // 400 response is handled by form view
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
             }
-        },
-
-        getPage: function () {
-            return this.state.page;
-        },
-
-        setPage: function (page) {
-            var pages = this.getPagesQuantity();
-            if (page <= 0) {
-                page = 1;
-            } else if (page > pages) {
-                page = pages;
-            }
-            if (this.state.page !== page) {
-                this.state.page = page;
-                this.fetch();
-            }
-        },
-
-        getPagesQuantity: function () {
-            return Math.ceil(this.state.itemsQuantity / this.state.itemPerPage) || 1;
-        },
-
-        setRecordsQuantity: function (quantity) {
-            return this.state.itemsQuantity = quantity;
-        },
-
-        getRecordsQuantity: function () {
-            return this.state.itemsQuantity;
         },
 
         createComment: function () {

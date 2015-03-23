@@ -18,15 +18,23 @@ define(['./base/use-route-collection', './base/model'
         model: BaseModel,
 
         stateDefaults: {
-            start: 0,
-            end: 5,
+            limit: 5,
             loadMoreItemsQuantity: 10
         },
 
         loadMore: function () {
             this.state.set({
-                end: this.state.get('end') + this.state.get('loadMoreItemsQuantity')
+                limit: this.state.get('limit') + this.state.get('loadMoreItemsQuantity')
             });
+            var loadDeferred = $.Deferred();
+            if (this.isSyncing()) {
+                this.once('sync', function () {
+                    loadDeferred.resolve(this);
+                });
+            } else {
+                loadDeferred.resolve(this);
+            }
+            return loadDeferred.promise();
         }
     });
     

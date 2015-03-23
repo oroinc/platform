@@ -1,10 +1,14 @@
-<h5>Comments (<%= state.itemsQuantity %>)</h5>
-<% if (synced && state.itemsQuantity - visibleItemsQuantity !== 0) { %>
+<h5>Comments (<%= state.count %>)</h5>
+<% if (syncState === 'synced') { %>
+    <% if (state.count !== items.length && state.count !== 0) { %>
     <a class="load-more"><span>
-        Load <%= Math.min(loadBy, state.itemsQuantity - visibleItemsQuantity) %>
+        Load <%= Math.min(state.loadMoreItemsQuantity, state.count - items.length) %>
         more
-        <% if (itemsQuantity - visibleItemsQuantity <= loadBy) { %>
-            of <%= state.itemsQuantity - visibleItemsQuantity %>
+        <% if (state.count - items.length > state.loadMoreItemsQuantity) { %>
+            of <%= state.count - items.length %>
         <% } %>
     </span></a>
+    <% } %>
+<% } else { %>
+    <div class="load-more"><span class="loading-indicator"></span></div>
 <% } %>

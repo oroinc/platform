@@ -15,7 +15,7 @@ define(function (require) {
             'click .add-comment-button': 'onAddCommentClick',
             'click .item-remove-button': 'onRemoveCommentClick',
             'click .item-edit-button': 'onEditCommentClick',
-            'click .load-more': 'onLoadMoreClick',
+            'click a.load-more': 'onLoadMoreClick',
             'mouseover .dropdown-toggle': function (e) {
                 $(e.target).trigger('click');
             },
@@ -24,12 +24,23 @@ define(function (require) {
             }
         },
 
+        getTemplateData: function () {
+            var data = CommentsView.__super__.getTemplateData.apply(this, arguments);
+            data.canCreate = this.canCreate;
+            return data;
+        },
+
+        initialize: function (options) {
+            this.canCreate = options.canCreate;
+            CommentsHeaderView.__super__.initialize.apply(this, arguments);
+        },
+
         render: function () {
             CommentsView.__super__.render.apply(this, arguments);
             this.subview('header', window.globalView = new CommentsHeaderView({
                 el: this.$('.comments-view-header'),
                 collection: this.collection,
-                settings: this.settings,
+                canCreate: this.canCreate,
                 autoRender: true
             }));
             this.subview('list', new BaseCollectionView({
@@ -50,7 +61,7 @@ define(function (require) {
         },
 
         onLoadMoreClick: function () {
-            console.log('load more');
+            this.collection.loadMore();
         },
 
         onAddCommentClick: function () {

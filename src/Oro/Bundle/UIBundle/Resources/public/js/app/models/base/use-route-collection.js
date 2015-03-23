@@ -20,7 +20,7 @@ define([
                 options = {};
             }
             // initialize state
-            this.state = new BaseModel(options.state);
+            this.state = new BaseModel(_.extend({}, options.state, this.stateDefaults));
             this.state.on('change', this.checkRouteChange, this);
 
             // initialize route
@@ -46,7 +46,7 @@ define([
 
         parse: function (response) {
             this.finishSync();
-            this.state.set(_.omit(response, ['data']));
+            this.state.set(_.omit(response, ['data']), {silent: true});
             return response.data;
         },
 
@@ -65,7 +65,8 @@ define([
          */
         serialize: function () {
             var data = UseRouteCollection.__super__.serialize.apply(this, arguments);
-            data.state = this.state.serialize();
+            data.state = this.state.toJSON();
+            data.syncState = this.syncState();
             return data;
         }
     });
