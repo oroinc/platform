@@ -43,7 +43,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             ->setEmail('admin@example.com')
             ->setSalt('');
 
-        if (!is_object($admin->getApiKeys())) {
+        if (0 === count($admin->getApiKeys())) {
             $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
             $api          = new UserApi();
             $api->setApiKey('admin_api_key')
