@@ -4,15 +4,15 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class WidgetConfigurationLoadListener
 {
     /**
-     * @var Manager
+     * @var ServiceLink
      */
-    protected $datagridManager;
+    protected $datagridManagerLink;
 
     /**
      * @var Builder
@@ -20,12 +20,12 @@ class WidgetConfigurationLoadListener
     protected $datagridBuilder;
 
     /**
-     * @param Manager $datagridManager
-     * @param Builder $datagridBuilder
+     * @param ServiceLink $datagridManagerLink
+     * @param Builder     $datagridBuilder
      */
-    public function __construct(Manager $datagridManager, Builder $datagridBuilder)
+    public function __construct(ServiceLink $datagridManagerLink, Builder $datagridBuilder)
     {
-        $this->datagridManager = $datagridManager;
+        $this->datagridManagerLink = $datagridManagerLink;
         $this->datagridBuilder = $datagridBuilder;
     }
 
@@ -45,7 +45,7 @@ class WidgetConfigurationLoadListener
         }
         $gridName = $configuration['route_parameters']['gridName'];
 
-        $gridConfiguration = $this->datagridManager->getConfigurationForGrid($gridName);
+        $gridConfiguration = $this->datagridManagerLink->getService()->getConfigurationForGrid($gridName);
         $datagrid = $this->datagridBuilder->build($gridConfiguration, new ParameterBag());
         $metadata = $datagrid->getMetadata();
 
