@@ -2,8 +2,6 @@ define(function (require) {
     'use strict';
 
     var CommentFormView,
-        HIDE_ERRORS_TIMEOUT = 3000, // 3 sec
-        $ = require('jquery'),
         _ = require('underscore'),
         mediator = require('oroui/js/mediator'),
         formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
@@ -39,7 +37,6 @@ define(function (require) {
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
-                .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate();
             mediator.execute('layout:init', this.$('form'), this);
             this.bindData();

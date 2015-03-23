@@ -7,6 +7,7 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
+        mediator = require('oroui/js/mediator'),
         BaseComponent = require('oroui/js/app/components/base/component'),
         CommentFromView = require('orocomment/js/app/views/comment-form-view'),
         CommentsView = require('orocomment/js/app/views/comments-view'),
@@ -140,7 +141,9 @@ define(function (require) {
             });
 
             confirm.on('ok', _.bind(function () {
-                model.destroy();
+                model.destroy({error: function () {
+                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+                }});
                 this.collection.state.set({
                     limit: this.collection.state.get('limit') - 1,
                     count: this.collection.state.get('count') - 1
