@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Selenium\Pages;
 
-use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
@@ -12,49 +11,8 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  * @method Calendar openCalendar() openCalendar(string)
  * {@inheritdoc}
  */
-class Calendar extends AbstractPage
+class Calendar extends Calendars
 {
-    const URL = 'calendar/default';
-
-    public function __construct($testCase, $redirect = true)
-    {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
-
-    /**
-     * @return $this
-     */
-    public function addEvent()
-    {
-        $this->test->byXpath("//td[contains(@class,'fc-today fc-state-highlight')]")->click();
-        $this->waitForAjax();
-        $this->assertElementPresent(
-            "//div[contains(@class,'ui-dialog-titlebar')]".
-            "/span[normalize-space(.)='Add New Event']"
-        );
-
-        return $this;
-    }
-
-    /**
-     * @param string $event
-     * @return $this
-     */
-    public function editEvent($event)
-    {
-        $this->test->byXpath("//td[@class='fc-event-container']/a[contains(., '{$event}')]")->click();
-        $this->waitForAjax();
-        $this->test->byXpath("//button[@type='button'][normalize-space(.)='Edit']")->click();
-        $this->waitForAjax();
-        $this->assertElementPresent(
-            "//div[contains(@class,'ui-dialog-titlebar')]".
-            "/span[normalize-space(.)='Edit Event']"
-        );
-
-        return $this;
-    }
-
     /**
      * @param string $title
      * @return $this
@@ -135,6 +93,60 @@ class Calendar extends AbstractPage
     }
 
     /**
+     * This method adds existing user as a guest to calendar event
+     * @param $username
+     * @return $this
+     */
+    public function setGuestUser($username)
+    {
+        $this->test->byXpath(
+            "//div[starts-with(@id,'s2id_oro_calendar_event_form_invitedUsers')]//input"
+        )->value($username);
+        $this->waitForAjax();
+        $this->assertElementPresent(
+            "//div[@id='select2-drop']//div[contains(., '{$username}')]",
+            "Guest user not found"
+        );
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$username}')]")->click();
+
+        return $this;
+    }
+
+    /**
+     * This method sets reminder and it parameters
+     * @param string $reminderMethod
+     * @param string $reminderInterval
+     * @param string $intervalUnit
+     * @return $this
+     */
+    public function setReminder($reminderMethod = 'Email', $reminderInterval = '10', $intervalUnit = 'minutes')
+    {
+        $this->test->byXPath("//a[@class='btn add-list-item'][contains(., 'Add')]")->click();
+        $this->waitForAjax();
+        $method = $this->test->select($this->test->byXPath("(//select[@id[contains(., 'method')]])[last()]"));
+        $method->selectOptionByLabel($reminderMethod);
+        $interval = $this->test->byXPath("(//input[@id[contains(., 'interval_number')]])[last()]");
+        $interval->value($reminderInterval);
+        $unit = $this->test->select($this->test->byXPath("(//select[@id[contains(., 'interval_unit')]])[last()]"));
+        $unit->selectOptionByLabel($intervalUnit);
+
+        return $this;
+    }
+
+    /**
+     * This methods switch off all day long option in calendar event
+     * @return $this
+     */
+    public function setAllDayEventOff()
+    {
+        if ($this->isElementPresent("//input[@id='oro_calendar_event_form_allDay'][@value='1']")) {
+            $this->test->byXPath("//input[@id='oro_calendar_event_form_allDay']")->click();
+        }
+
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function saveEvent()
@@ -164,34 +176,6 @@ class Calendar extends AbstractPage
         $this->assertElementNotPresent(
             "//div[contains(@class,'ui-dialog-titlebar')]",
             'Event window is still open'
-        );
-
-        return $this;
-    }
-
-    /**
-     * @param string $event
-     * @return $this
-     */
-    public function checkEventPresent($event)
-    {
-        $this->assertElementPresent(
-            "//td[@class='fc-event-container']/a[contains(., '{$event}')]",
-            'Event not found at calendar'
-        );
-
-        return $this;
-    }
-
-    /**
-     * @param string $event
-     * @return $this
-     */
-    public function checkEventNotPresent($event)
-    {
-        $this->assertElementNotPresent(
-            "//td[@class='fc-event-container']/a[contains(., '{$event}')]",
-            'Event is found at calendar'
         );
 
         return $this;

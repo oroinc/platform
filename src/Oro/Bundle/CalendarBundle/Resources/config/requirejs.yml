@@ -12,3 +12,6 @@ config:
         'orocalendar/js/calendar/color-manager': 'bundles/orocalendar/js/calendar/color-manager.js'
         'orocalendar/js/app/views/change-status-view': 'bundles/orocalendar/js/app/views/change-status-view.js'
         'orocalendar/js/app/views/guest-notifier-view': 'bundles/orocalendar/js/app/views/guest-notifier-view.js'
+        'orocalendar/js/app/views/change-duration-view': 'bundles/orocalendar/js/app/views/change-duration-view.js'
+    appmodules:
+        - orocalendar/js/app/modules/calendar-module

@@ -4,6 +4,9 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -12,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -27,15 +31,24 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
+    /** UserConfigManager */
+    protected $userConfigManager;
+
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade           $securityFacade
      * @param Request                  $request Request
+     * @param UserConfigManager        $userConfigManager
      */
-    public function __construct(SecurityContextInterface $security, SecurityFacade $securityFacade, Request $request)
-    {
-        $this->security       = $security;
-        $this->securityFacade = $securityFacade;
+    public function __construct(
+        SecurityContextInterface $security,
+        SecurityFacade           $securityFacade,
+        Request                  $request,
+        UserConfigManager        $userConfigManager
+    ) {
+        $this->security          = $security;
+        $this->securityFacade    = $securityFacade;
+        $this->userConfigManager = $userConfigManager;
 
         if ($request->attributes->get('_route') == 'oro_user_profile_update') {
             $this->isMyProfilePage = true;
@@ -47,6 +60,7 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addEntityFields($builder);
+        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
     }
 
     /**
@@ -220,5 +234,33 @@ class UserType extends AbstractType
                 'data'     => true
             ]
         );
+    }
+
+    /**
+     * Post set data handler
+     *
+     * @param FormEvent $event
+     */
+    public function postSetData(FormEvent $event)
+    {
+        /** @var Form $form */
+        $form = $event->getForm();
+        $data = $form->getData();
+        if ($data instanceof User) {
+            if ($token = $this->security->getToken()) {
+                if (is_object($user = $token->getUser()) && $data->getId() == $user->getId()) {
+                    $form->add(
+                        'signature',
+                        'oro_rich_text',
+                        [
+                            'label'    => 'oro.user.form.signature.label',
+                            'required' => false,
+                            'mapped'   => false,
+                            'data'     => $this->userConfigManager->getUserConfigSignature(),
+                        ]
+                    );
+                }
+            }
+        }
     }
 }

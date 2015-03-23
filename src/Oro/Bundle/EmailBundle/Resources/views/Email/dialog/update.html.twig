@@ -32,7 +32,13 @@
         <div class="form-container">
             <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post">
                 {%
-                    set emailEditorOptions = {entityId: entity.entityId, to: entity.to, cc: entity.cc, bcc: entity.bcc}
+                    set emailEditorOptions = {
+                        entityId: entity.entityId,
+                        to: entity.to,
+                        cc: entity.cc,
+                        bcc: entity.bcc,
+                        appendSignature: appendSignature
+                    }
                 %}
                 <fieldset class="form-horizontal"
                           data-page-component-module="oroemail/js/app/components/email-editor-component"
@@ -47,6 +53,13 @@
                     {{ form_row(form.template) }}
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
+
+                    <div class="control-group">
+                        <div class="controls">
+                            <a class="btn" id="addSignatureButton" href="javascript:void(0);">{{ 'Add signature'|trans }}</a>
+                        </div>
+                    </div>
+
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>

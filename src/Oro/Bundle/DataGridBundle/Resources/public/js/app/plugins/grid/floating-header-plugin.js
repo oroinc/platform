@@ -85,7 +85,9 @@ define(function (require) {
             this.setupCache();
             var headerCells = this.domCache.headerCells,
                 firstRowCells = this.domCache.firstRowCells,
-                totalWidth = 0,
+                totalWidth,
+                sumWidth,
+                widthDecrement = 0,
                 widths = [],
                 self = this,
                 scrollBarWidth = mediator.execute('layout:scrollbarWidth');
@@ -94,21 +96,36 @@ define(function (require) {
             firstRowCells.attr('style', '');
             this.$grid.css({width: ''});
             this.domCache.gridContainer.css({width: ''});
-            if (this.scrollVisible) {
-                this.$grid.css({borderRight: scrollBarWidth + 'px solid transparent'});
-            }
             this.$el.removeClass('floatThead');
 
-            // copy widths
+            // compensate scroll bar
+            if (this.scrollVisible) {
+                this.$grid.css({borderRight: scrollBarWidth + 'px solid transparent'});
+                totalWidth = this.$grid[0].offsetWidth - scrollBarWidth;
+            } else {
+                totalWidth = this.$grid[0].offsetWidth;
+            }
+
+            // save widths
             headerCells.each(function (i, headerCell) {
                 widths.push(headerCell.offsetWidth);
             });
+
+            // FF sometimes gives wrong values, need to check
+            sumWidth = _.reduce(widths, function (a, b) {return a + b});
+            if (sumWidth > totalWidth) {
+                widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001
+            }
+
+            // add scroll bar width to last cell if scroll is visible
+            if (self.scrollVisible) {
+                widths[widths.length - 1] += scrollBarWidth;
+                totalWidth += scrollBarWidth;
+            }
+
+            // set exact sizes to header cells and cells in first row
             headerCells.each(function (i, headerCell) {
-                var cellWidth = widths[i];
-                if (self.scrollVisible && i === headerCells.length - 1) {
-                    cellWidth += scrollBarWidth;
-                }
-                totalWidth += cellWidth;
+                var cellWidth = widths[i] - widthDecrement;
                 headerCell.style.width = cellWidth + 'px';
                 headerCell.style.minWidth = cellWidth + 'px';
                 headerCell.style.boxSizing = 'border-box';
@@ -120,6 +137,7 @@ define(function (require) {
             });
 
             this.$grid.css({borderRight: 'none'});
+
             this.$el.addClass('floatThead');
             this.$grid.css({
                 width: totalWidth
@@ -388,7 +406,7 @@ define(function (require) {
                 return resultRect;
             }
             current = current.parentNode;
-            while (current !== document.documentElement) {
+            while (current && current.getBoundingClientRect) {
                 midRect = current.getBoundingClientRect();
                 borders = $.fn.getBorders(current);
 

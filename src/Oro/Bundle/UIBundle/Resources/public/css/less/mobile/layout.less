@@ -7,11 +7,15 @@
   top: -9999px;
   left: -9999px;
 }
-&, #page {
-  min-height: 100vh;
-}
 &, #page, #top-page {
   height: auto;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+#main {
+  float: none;
+  height: 100%;
 }
 
 #top-page {
@@ -31,9 +35,6 @@
  */
 &.input-focused #oroplatform-header {
   position: absolute;
-}
-#main {
-  float: none;
 }
 
 .row {
@@ -130,8 +131,8 @@
     }
     .container-fluid,
     .grid-toolbar{
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: 10px;
+      padding-right: 10px;
     }
   }
 }
@@ -188,4 +189,9 @@
       }
     }
   }
+}
+
+&.loading > .loader-mask {
+  position: fixed;
+  bottom: 0;
 }

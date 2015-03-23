@@ -91,7 +91,8 @@ class EmailType extends AbstractType
                 ]
             )
             ->add('bodyFooter', 'hidden')
-            ->add('parentEmailId', 'hidden');
+            ->add('parentEmailId', 'hidden')
+            ->add('signature', 'hidden');
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);

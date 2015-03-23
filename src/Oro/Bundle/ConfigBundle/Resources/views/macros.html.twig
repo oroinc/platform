@@ -67,7 +67,7 @@
 {% macro renderTabNavItem(data) %}
     <li {% if data.isActive %}class="active"{% endif %}>
         <a href="{% if data.isActive %}javascript:void(0);{% else %}{{ data.url }}{% endif %}">
-            {% if data.icon is defined and data.icon != '' %}<i class="icon {{ data.icon }}"></i>{% endif %}
+            {% if data.icon is defined and data.icon != '' %}<i class="icon fa {{ data.icon }}"></i>{% endif %}
             {{ data.title|trans }}
         </a>
     </li>

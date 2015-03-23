@@ -280,3 +280,36 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 .filter-item .filter-update-empty {
     margin-left: -2px;
 }
+
+.filter-criteria {
+  .choice-filter {
+    .btn-group.btn-block{
+      width: auto;
+      float: left;
+      .dropdown-toggle {
+        -webkit-border-radius: 3px 0 0 3px;
+        -moz-border-radius: 3px 0 0 3px;
+        border-radius: 3px 0 0 3px;
+      }
+    }
+    .value-field-frame {
+      position: relative;
+      vertical-align: top;
+      width: auto;
+      input[type=text] {
+        max-width: 100%;
+        width: 280px;
+        height: 29px;
+        box-sizing: border-box;
+        border-left-width: 0;
+        border-right-width: 0;
+        margin-bottom: 0;
+      }
+      .filter-update {
+        position: absolute;
+        left: 100%;
+        top: 0;
+      }
+    }
+  }
+}

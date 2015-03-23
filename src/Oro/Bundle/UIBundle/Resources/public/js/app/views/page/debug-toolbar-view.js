@@ -4,8 +4,9 @@ define([
     'jquery',
     'underscore',
     'oroui/js/mediator',
+    'routing',
     './../base/page-region-view'
-], function ($, _, mediator, PageRegionView) {
+], function ($, _, mediator, routing, PageRegionView) {
     'use strict';
 
     var DebugToolbarView;
@@ -40,10 +41,9 @@ define([
          * @param {Object} xhr
          */
         updateToolbar: function (xhr) {
-            var baseUrl, url, token;
-            baseUrl = mediator.execute('retrieveOption', 'root');
+            var url, token;
             token = xhr.getResponseHeader('x-debug-token');
-            url = baseUrl + '_wdt/' + token;
+            url = routing.generate('_wdt', { token: token });
             $.get(url, _.bind(this.render, this, token, url));
         },
 
