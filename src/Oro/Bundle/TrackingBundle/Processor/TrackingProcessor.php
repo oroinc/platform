@@ -109,6 +109,12 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger->notice('Try to process Next batch');
         }
 
+        $this->logger->notice('Recheck previous visit events...');
+        $this->skipList = [];
+        while ($this->identifyPrevVisitEvents()) {
+            $this->logger->notice('Try to process Next batch');
+        }
+
         $this->logger->notice('<info>Done</info>');
     }
 
@@ -127,6 +133,51 @@ class TrackingProcessor implements LoggerAwareInterface
             ->where('entity.parsed = false');
 
         return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Process previous visit events
+     *
+     * @return bool
+     */
+    protected function identifyPrevVisitEvents()
+    {
+        $em             = $this->getEntityManager();
+        $queryBuilder   = $em
+            ->getRepository(self::TRACKING_VISIT_EVENT_ENTITY)
+            ->createQueryBuilder('entity');
+        $queryBuilder
+            ->select('entity')
+            ->andWhere('entity.parsingCount < :maxRetries')
+            ->setParameter('maxRetries', self::MAX_RETRIES);
+
+        if (count($this->skipList)) {
+            $queryBuilder->andWhere('entity.id not in('. implode(',', $this->skipList) .')');
+        }
+
+        $entities = $queryBuilder->getQuery()->getResult();
+        if ($entities) {
+            /** @var TrackingVisitEvent $visitEvent */
+            foreach ($entities as $visitEvent) {
+                $visitEvent->setParsingCount($visitEvent->getParsingCount() + 1);
+                $this->skipList[] = $visitEvent->getId();
+                $targets = $this->trackingIdentification->processEvent($visitEvent);
+                if (!empty($targets)) {
+                    foreach ($targets as $target) {
+                        $visitEvent->addAssociationTarget($target);
+                    }
+                }
+
+                $em->persist($visitEvent);
+            }
+
+            $em->flush();
+            $em->clear();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -290,6 +341,7 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger->info('Processing event - ' . $event->getId());
 
             $trackingVisitEvent = new TrackingVisitEvent();
+            $trackingVisitEvent->setParsingCount(0);
 
             $trackingVisitEvent->setEvent($this->getEventType($event));
 

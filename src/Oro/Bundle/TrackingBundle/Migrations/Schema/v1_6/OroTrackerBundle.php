@@ -15,10 +15,11 @@ class OroTrackerBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->updateOroTrackingVisitTable($schema);
+        $this->updateOroTrackingVisitEventTable($schema);
     }
 
     /**
-     * Create oro_tracking_visit table
+     * Update oro_tracking_visit table
      *
      * @param Schema $schema
      */
@@ -33,5 +34,16 @@ class OroTrackerBundle implements Migration
         $table->addColumn('desktop', 'boolean', ['notnull' => false]);
         $table->addColumn('mobile', 'boolean', ['notnull' => false]);
         $table->addColumn('bot', 'boolean', ['notnull' => false]);
+    }
+
+    /**
+     * Update oro_tracking_visit_event table
+     *
+     * @param Schema $schema
+     */
+    protected function updateOroTrackingVisitEventTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tracking_visit_event');
+        $table->addColumn('parsing_count', 'integer', ['default' => '0']);
     }
 }
