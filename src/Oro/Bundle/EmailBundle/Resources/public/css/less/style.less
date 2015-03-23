@@ -1,4 +1,6 @@
- .emailtemplate-translatation {
+@import "../../../oroui/css/less/mixins";
+
+.emailtemplate-translatation {
   .tab-content {
     padding-top: 20px;
     padding-bottom: 10px;
@@ -105,10 +107,9 @@
     border-radius: 4px;
     .quote,
     .gmail_quote {
-      background-color: #eee;
+      background-color: #fbfbfb;
       padding: 4px;
-      -webkit-border-radius: 4px;
-      border-radius: 4px;
+      .border-radius(4px);
     }
   }
 }
@@ -160,21 +161,78 @@
     position: absolute;
   }
 }
-
-
+.email-thread-action-panel {
+  .email-view-toggle-all {
+    color: #888;
+    text-decoration: underline;
+  }
+}
 .email-info {
   border-bottom: 1px solid #e5e5e5;
   &:last-child {
     border-bottom: none;
   }
-  .email-short, .email-full{
+  .email-recipient {
+    white-space: nowrap;
+  }
+  .email-participants {
+    margin-right: 150px;
+  }
+  .email-sent-date {
+    text-align: right;
+    margin-bottom: 1em;
+  }
+  .email-has-attachment{
+    font-size: 1.3em;
+    margin-right: .5em;
+  }
+  .email-body {
+    padding: 0 15px 10px;
+    margin: 0;
+    /* @todo remove old style */
+  }
+  .email-view-toggle {
+    cursor: pointer;
+    display: inline-block;
     padding: 10px 15px;
+    width: 100%;
+    box-sizing: border-box;
   }
   .email-short {
     background-color: #f5f5f5;
+    .email-recipients {
+      font-style: italic;
+      color: #888;
+    }
+    .email-body {
+      color: #888;
+      margin-top: 2px;
+      .quote,
+      .gmail_quote {
+        background-color: #fbfbfb;
+        padding: 4px;
+        .border-radius(4px);
+      }
+    }
   }
   .email-full {
-    display: block;
+    display: none;
+    .email-author {
+      font-weight: bold;
+    }
+  }
+  &.in {
+    .email-short {
+      display: none;
+    }
+    .email-full {
+      display: block;
+    }
+  }
+  &:last-child {
+    .email-view-toggle {
+      cursor: auto;
+    }
   }
   .btn.dropdown-toggle {
     .caret {
@@ -235,41 +293,6 @@
     }
     .controls {
       margin-left: 80px;
-    }
-  }
-}
-.email-info {
-  .email-recipient {
-    white-space: nowrap;
-  }
-  .email-participants {
-    margin-right: 150px;
-  }
-  .email-sent-date {
-    text-align: right;
-    margin-bottom: 1em;
-  }
-  .email-has-attachment{
-    font-size: 1.3em;
-    margin-right: .5em;
-  }
-  .email-body {
-    margin: 0;
-    /* @todo remove old style */
-  }
-  .email-short {
-    .email-recipients {
-      font-style: italic;
-      color: #888;
-    }
-    .email-body {
-      color: #888;
-      margin-top: 2px;
-    }
-  }
-  .email-full {
-    .email-author {
-      font-weight: bold;
     }
   }
 }

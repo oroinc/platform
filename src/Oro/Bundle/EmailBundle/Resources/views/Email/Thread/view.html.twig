@@ -1,6 +1,10 @@
 {% extends "OroUIBundle:actions:view.html.twig" %}
 
 {% oro_title_set({params : {"%subject%": entity.subject} }) %}
+{% set threadViewOptions = {
+    view: 'oroemail/js/app/views/email-thread-view',
+    actionPanelSelector: '.email-thread-action-panel'
+} %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
@@ -11,6 +15,10 @@
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
+
+{% block pageActions %}
+    <div class="pull-right email-thread-action-panel"></div>
+{% endblock pageActions %}
 
 {% block breadcrumb %}
     {% set breadcrumbs = [
@@ -33,3 +41,11 @@
         }) }}
     </div>
 {% endblock content_data %}
+
+{% block content %}
+    <div data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ threadViewOptions|json_encode }}"
+         data-layout="separate">
+        {{ parent() }}
+    </div>
+{% endblock content %}
