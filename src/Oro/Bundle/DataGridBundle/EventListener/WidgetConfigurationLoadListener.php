@@ -62,6 +62,7 @@ class WidgetConfigurationLoadListener
             'gridView' => [
                 'type' => 'choice',
                 'options' => [
+                    'label' => 'oro.datagrid.dashboard.fields.grid_view.label',
                     'choices' => $viewChoices,
                 ],
             ]

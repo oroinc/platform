@@ -7,6 +7,9 @@ oro_datagrid:
 
 oro:
     datagrid:
+        dashboard:
+            fields:
+                grid_view.label: Filter
         gridview:
             entity_label: Grid view
             entity_plural_label: Grid views
