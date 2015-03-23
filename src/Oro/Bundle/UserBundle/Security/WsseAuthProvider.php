@@ -32,7 +32,7 @@ class WsseAuthProvider extends Provider
         if ($user instanceof AdvancedApiUserInterface) {
             $apiKeys = $user->getApiKeys();
 
-            if (null === $apiKeys || 0 === count($apiKeys)) {
+            if (0 === count($apiKeys)) {
                 return uniqid('undefined');
             }
 
