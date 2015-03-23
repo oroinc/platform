@@ -29,6 +29,6 @@
         });
     </script>
 
-    {{ dataGrid.renderGrid(gridName, params, renderParams) }}
+    {{ dataGrid.renderGrid(gridName, params, {'enableViews': true}|merge(renderParams)) }}
 </div>
 {% endblock %}
