@@ -208,7 +208,7 @@ define(function (require) {
 
             if (storedParentView && storedParentView !== parentView) {
                 throw new Error('Attempt to init container with another parent view');
-            } else if (!storedParentView) {
+            } else if (storedParentView) {
                 // handlers are already bound
                 return;
             }

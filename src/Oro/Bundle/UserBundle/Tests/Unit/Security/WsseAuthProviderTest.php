@@ -15,10 +15,10 @@ use Oro\Bundle\UserBundle\Security\WsseAuthProvider;
 
 class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_SALT     = 'someSalt';
+    const TEST_SALT = 'someSalt';
     const TEST_PASSWORD = 'somePassword';
-    const TEST_NONCE    = 'someNonce';
-    const TEST_API_KEY  = 'someApiKey';
+    const TEST_NONCE = 'someNonce';
+    const TEST_API_KEY = 'someApiKey';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $userProvider;
@@ -105,5 +105,41 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
             'regular user given, should use password and salt' => [$regularUser, self::TEST_PASSWORD, self::TEST_SALT],
             'advanced user given, should take API key only'    => [$advancedUser, $userApiKeys]
         ];
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
+     */
+    public function testGetSecret()
+    {
+        $noApiKeyUser = $this->getMock('Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface');
+        $noApiKeyUser
+            ->expects(static::exactly(2))
+            ->method('getApiKeys')
+            ->will(static::returnValue(new ArrayCollection()));
+
+        $noApiKeyUser->expects(static::never())->method('getPassword');
+        $noApiKeyUser->expects(static::never())->method('getSalt');
+        $noApiKeyUser->expects(static::any())->method('getRoles')->will(static::returnValue([]));
+
+        $this->userProvider
+            ->expects(static::exactly(2))
+            ->method('loadUserByUsername')
+            ->will(static::returnValue($noApiKeyUser));
+
+        $nonce = base64_encode(uniqid(self::TEST_NONCE));
+        $time  = date('Y-m-d H:i:s');
+
+        $digest = $this->encoder->encodePassword(
+            sprintf('%s%s%s', base64_decode($nonce), $time, ''),
+            ''
+        );
+
+        $token = new Token();
+        $token->setAttribute('digest', $digest);
+        $token->setAttribute('nonce', $nonce);
+        $token->setAttribute('created', $time);
+
+        $this->provider->authenticate($token);
     }
 }

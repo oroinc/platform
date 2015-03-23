@@ -1,4 +1,6 @@
 oro:
+    user:
+        google_id.label: Google ID
     sso:
         login:
             alternative.label: Or login using
