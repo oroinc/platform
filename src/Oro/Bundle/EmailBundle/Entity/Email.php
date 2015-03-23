@@ -620,11 +620,16 @@ class Email extends ExtendEmail
     /**
      * Get email references
      *
-     * @return string
+     * @return array
      */
     public function getRefs()
     {
-        return $this->refs;
+        $refs = [];
+        if ($this->refs) {
+            preg_match_all( '/<(.+?)>/is', $this->refs, $refs);
+            $refs = $refs[0];
+        }
+        return $refs;
     }
 
     /**
