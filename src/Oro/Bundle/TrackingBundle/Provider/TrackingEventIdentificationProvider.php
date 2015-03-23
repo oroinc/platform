@@ -79,6 +79,6 @@ class TrackingEventIdentificationProvider
             }
         }
 
-        return $targets;
+        return array_filter($targets);
     }
 }
