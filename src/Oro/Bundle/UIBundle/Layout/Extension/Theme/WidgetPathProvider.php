@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Layout\Loader;
+namespace Oro\Bundle\UIBundle\Layout\Extension\Theme;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;

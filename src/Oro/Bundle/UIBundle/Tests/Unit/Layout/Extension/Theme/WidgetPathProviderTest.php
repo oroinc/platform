@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Loader;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension\Theme;
 
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\UIBundle\Layout\Loader\WidgetPathProvider;
+use Oro\Bundle\UIBundle\Layout\Extension\Theme\WidgetPathProvider;
 
 /**
  * @property WidgetPathProvider provider
