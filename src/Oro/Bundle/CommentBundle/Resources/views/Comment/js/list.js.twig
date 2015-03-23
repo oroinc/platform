@@ -2,25 +2,3 @@
 <script type="text/html" id="{{ (id ~ '-form')|e('html_attr')|raw }}">
     {{ render(path('oro_comment_form'))|oro_js_template_content|raw }}
 </script>
-
-{# comments list template #}
-<script type="text/html" id="{{ id|e('html_attr')|raw }}">
-    <fieldset class="form-horizontal form-horizontal-large comments-block">
-        <div class="comments-block-inner">
-            <div class="grid-toolbar"></div>
-            <% if (synced && items && length > items.length) { %>
-                <a class="load-more"><span>
-                    Load <?= Math.min(loadBy, length - items.length) ?>
-                    more of <?= length ?></span></a>
-            <% } %>
-            <ul class="unstyled accordion comments-list list-box" id="<%= accordionId %>"></ul>
-            <% if (canCreate) { %>
-            <div class="pull-right">
-                <button class="btn add-comment-button" type="submit">
-                    <%= _.__('oro.comment.from.button.add_comment.label') %>
-                </button>
-            </div>
-            <% } %>
-        </div>
-    </fieldset>
-</script>

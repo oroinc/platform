@@ -21,7 +21,8 @@ define(function (require) {
         autoRender: true,
         events: {
             'submit': 'onSubmit',
-            'reset': 'onReset'
+            'reset': 'onReset',
+            'click .remove-attachment': 'removeAttachment'
         },
 
         listen: {
@@ -93,6 +94,16 @@ define(function (require) {
             e.stopPropagation();
             e.preventDefault();
             this.render();
+        },
+
+        removeAttachment: function(e) {
+            var itemView = this;
+            e.stopPropagation();
+            e.preventDefault();
+            this.model.removeAttachment().done(function () {
+                itemView.$('.attachment-item').remove();
+                mediator.execute('showFlashMessage', 'success', __('oro.comment.attachment.delete_message'));
+            });
         }
     });
 
