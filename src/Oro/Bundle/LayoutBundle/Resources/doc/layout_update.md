@@ -156,12 +156,12 @@ Developer reference
 
 Here is a list of key classes involved in the layout update loading mechanism and their responsibilities:
 
- - `Oro\Component\Layout\Extension\Theme\Loader\Driver\YamlDriver` - Loads layout update instructions based on *YAML* config.
- - `Oro\Component\Layout\Extension\Theme\Loader\Driver\PhpDriver` - *PHP* loader, takes *PHP* instructions and compiles them into layout update.
- - `Oro\Component\Layout\Extension\Theme\Generator\AbstractLayoutUpdateGenerator` - base class to implement generator for a new format.
- - `Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGenerator` - config based generator, now utilized by *YAML* loader,
+ - `Oro\Component\Layout\Loader\Driver\YamlDriver` - Loads layout update instructions based on *YAML* config.
+ - `Oro\Component\Layout\Loader\Driver\PhpDriver` - *PHP* loader, takes *PHP* instructions and compiles them into layout update.
+ - `Oro\Component\Layout\Loader\Generator\AbstractLayoutUpdateGenerator` - base class to implement generator for a new format.
+ - `Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator` - config based generator, now utilized by *YAML* loader,
     but may be reused for other formats (such as *XML*, *PHP arrays*) as well.
 
-In order to implement a loader for a new format different form supported, the `Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface`
+In order to implement a loader for a new format different form supported, the `Oro\Component\Layout\Loader\Driver\DriverInterface`
 interface should be implemented and added as a known driver to the loader (add `addDriver` *method call*
 for `oro_layout.loader` service definition).

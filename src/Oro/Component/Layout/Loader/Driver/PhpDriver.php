@@ -1,10 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader\Driver;
+namespace Oro\Component\Layout\Loader\Driver;
 
-use Oro\Component\Layout\LayoutItemInterface;
-use Oro\Component\Layout\LayoutManipulatorInterface;
-use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
 
 /**
  * Evaluates given PHP file resource, context of the file will consist with variables
@@ -12,8 +10,8 @@ use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
  *
  * Example:
  *     <?php
- *         // @var LayoutManipulatorInterface $layoutManipulator
- *         // @var LayoutItemInterface $item
+ *         // @var \Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator
+ *         // @var \Oro\Component\Layout\LayoutItemInterface $item
  *
  *         $layoutManipulator->add('menu', 'content', 'knp_menu');
  *

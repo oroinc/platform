@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator\Visitor;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Visitor;
 
 use CG\Generator\PhpClass;
 use CG\Core\DefaultGeneratorStrategy;
 
-use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ElementDependentVisitor;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
+use Oro\Component\Layout\Loader\Visitor\ElementDependentVisitor;
 
 class ElementDependentVisitorTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +24,7 @@ class ElementDependentVisitorTest extends \PHPUnit_Framework_TestCase
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CONTENT
-class LayoutUpdateClass implements \Oro\Component\Layout\Extension\Theme\Generator\ElementDependentLayoutUpdateInterface
+class LayoutUpdateClass implements \Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface
 {
     public function getElement()
     {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Loader;
 
-use Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface;
+use Oro\Component\Layout\Loader\Driver\DriverInterface;
 
 class LayoutUpdateLoader implements LayoutUpdateLoaderInterface
 {

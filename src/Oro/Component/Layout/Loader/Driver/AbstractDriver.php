@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader\Driver;
+namespace Oro\Component\Layout\Loader\Driver;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
-use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\ElementDependentVisitor;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Visitor\ElementDependentVisitor;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 abstract class AbstractDriver implements DriverInterface
 {

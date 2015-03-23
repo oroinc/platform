@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
-use Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoader;
-use Oro\Component\Layout\Extension\Theme\Loader\ChainPathProvider;
-use Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface;
+use Oro\Component\Layout\Loader\LayoutUpdateLoader;
+use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
+use Oro\Component\Layout\Loader\Driver\DriverInterface;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 
@@ -44,8 +44,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->provider   = $this
             ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
-        $this->yamlDriver = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface');
-        $this->phpDriver  = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\Driver\DriverInterface');
+        $this->yamlDriver = $this->getMock('Oro\Component\Layout\Loader\Driver\DriverInterface');
+        $this->phpDriver  = $this->getMock('Oro\Component\Layout\Loader\Driver\DriverInterface');
 
         $this->dependencyInitializer = $this
             ->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer')

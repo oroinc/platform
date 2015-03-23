@@ -1,24 +1,24 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader\Driver;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Driver;
 
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Loader\Driver\PhpDriver;
-use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
-use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Driver\PhpDriver;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 
 class PhpDriverTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoadInDebugMode()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update.php';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.php';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -30,12 +30,12 @@ class PhpDriverTest extends \PHPUnit_Framework_TestCase
         $fs  = new Filesystem();
         $dir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . time();
 
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $dir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update2.php';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.php';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -47,7 +47,7 @@ class PhpDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessSyntaxExceptions()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
         $exception = new SyntaxException(
@@ -66,7 +66,7 @@ Filename:
 MESSAGE;
         $this->setExpectedException('\RuntimeException', $message);
 
-        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.php';
+        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.php';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -108,7 +108,7 @@ CLASS;
     protected function getLoader($generator = null, $debug = true, $cache = false)
     {
         $generator = null === $generator
-            ? $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface')
+            ? $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface')
             : $generator;
 
         return new PhpDriver($generator, $debug, $cache);

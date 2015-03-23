@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
-use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
+use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
 
 class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
 {

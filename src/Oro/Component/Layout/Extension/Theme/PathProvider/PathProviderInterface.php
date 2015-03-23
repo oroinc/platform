@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Extension\Theme\PathProvider;
 
 interface PathProviderInterface
 {

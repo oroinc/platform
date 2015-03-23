@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator\Visitor;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Visitor;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 
-use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
-use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\SimpleContextValueComparisonConditionVisitor;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
+use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Visitor\SimpleContextValueComparisonConditionVisitor;
 
 class SimpleContextValueComparisonConditionVisitorTest extends \PHPUnit_Framework_TestCase
 {

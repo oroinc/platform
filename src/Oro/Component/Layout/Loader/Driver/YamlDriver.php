@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader\Driver;
+namespace Oro\Component\Layout\Loader\Driver;
 
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
 
 /**
  * Generates layout update object and instantiate it based on yml configuration file content.

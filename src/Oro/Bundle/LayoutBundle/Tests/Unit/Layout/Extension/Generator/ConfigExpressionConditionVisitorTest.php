@@ -8,8 +8,8 @@ use CG\Generator\PhpParameter;
 use CG\Core\DefaultGeneratorStrategy;
 
 use Oro\Component\ConfigExpression\Condition;
-use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
-use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
+use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionConditionVisitor;
 

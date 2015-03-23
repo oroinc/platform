@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator;
+namespace Oro\Component\Layout\Loader\Generator;
 
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 interface ConfigLayoutUpdateGeneratorExtensionInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Stubs;
 
-use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
+use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
 class StubConditionVisitor implements VisitorInterface
 {

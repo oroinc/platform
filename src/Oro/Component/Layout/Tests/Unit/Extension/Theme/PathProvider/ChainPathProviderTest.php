@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\PathProvider;
 
-use Oro\Component\Layout\Extension\Theme\Loader\ChainPathProvider;
+use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
 
 class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,9 +21,9 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddProviderUsePriorityForSorting()
     {
-        $provider1 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
-        $provider3 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+        $provider1 = $this->getMock('Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface');
+        $provider2 = $this->getMock('Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface');
+        $provider3 = $this->getMock('Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface');
         $this->provider->addProvider($provider1, 100);
         $this->provider->addProvider($provider2, -10);
         $this->provider->addProvider($provider3);
@@ -40,7 +40,7 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
         $context = $this->getMock('Oro\Component\Layout\ContextInterface');
 
         $provider1 = $this
-            ->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+            ->getMock('Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface');
         $provider2 = $this
             ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
         $provider2->expects($this->once())
@@ -54,9 +54,9 @@ class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPaths()
     {
-        $provider1 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
-        $provider2 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
-        $provider3 = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface');
+        $provider1 = $this->getMock('Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface');
+        $provider2 = $this->getMock('Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface');
+        $provider3 = $this->getMock('Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface');
         $this->provider->addProvider($provider1, 100);
         $this->provider->addProvider($provider2, 0);
         $this->provider->addProvider($provider3, -100);

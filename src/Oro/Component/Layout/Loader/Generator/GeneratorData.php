@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator;
+namespace Oro\Component\Layout\Loader\Generator;
 
 class GeneratorData
 {

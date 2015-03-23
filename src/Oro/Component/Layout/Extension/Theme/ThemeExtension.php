@@ -6,10 +6,10 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
-use Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoaderInterface;
-use Oro\Component\Layout\Extension\Theme\Loader\ResourceIterator;
-use Oro\Component\Layout\Extension\Theme\Loader\PathProviderInterface;
-use Oro\Component\Layout\Extension\Theme\Generator\ElementDependentLayoutUpdateInterface;
+use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
+use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
+use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
+use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
 
 class ThemeExtension extends AbstractExtension
 {

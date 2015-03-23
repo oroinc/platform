@@ -7,10 +7,9 @@ use CG\Generator\PhpProperty;
 use CG\Generator\PhpParameter;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
-
-use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
-use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
+use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
 class ConfigExpressionConditionVisitor implements VisitorInterface
 {

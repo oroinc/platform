@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator;
+namespace Oro\Component\Layout\Loader\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\Layout\Util\ArrayUtils;
 use Oro\Component\Layout\Util\ReflectionUtils;
 

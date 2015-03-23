@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\CacheWarmer;
 
-use Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoaderInterface;
+use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 
 use Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer;
 
@@ -10,14 +10,14 @@ class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldBeOptional()
     {
-        $loader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoaderInterface');
+        $loader = $this->getMock('Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface');
 
         $this->assertTrue($this->getWarmer($loader)->isOptional());
     }
 
     public function testWithEmptyResources()
     {
-        $loader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoaderInterface');
+        $loader = $this->getMock('Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface');
 
         $loader->expects($this->never())->method('load');
 
@@ -27,7 +27,7 @@ class LayoutUpdatesWarmerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldProceedAllThemes()
     {
-        $loader = $this->getMock('Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoaderInterface');
+        $loader = $this->getMock('Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface');
 
         $loader->expects($this->exactly(3))->method('load');
         $warmer = $this->getWarmer(

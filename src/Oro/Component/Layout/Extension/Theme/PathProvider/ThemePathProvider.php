@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Extension\Theme\PathProvider;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;

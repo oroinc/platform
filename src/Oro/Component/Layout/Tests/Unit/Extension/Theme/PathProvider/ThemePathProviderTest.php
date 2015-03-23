@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\PathProvider;
 
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\Extension\Theme\Loader\ThemePathProvider;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider;
 
 class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
 {

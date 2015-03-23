@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator;
+namespace Oro\Component\Layout\Loader\Generator;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 use CG\Core\DefaultGeneratorStrategy;
 
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInterface
 {

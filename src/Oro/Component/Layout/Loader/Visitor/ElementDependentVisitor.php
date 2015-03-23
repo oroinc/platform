@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator\Visitor;
+namespace Oro\Component\Layout\Loader\Visitor;
 
 use CG\Generator\PhpMethod;
 
-use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
 
 class ElementDependentVisitor implements VisitorInterface
 {
@@ -26,7 +26,7 @@ class ElementDependentVisitor implements VisitorInterface
     {
         $visitContext
             ->getClass()
-            ->addInterfaceName('Oro\Component\Layout\Extension\Theme\Generator\ElementDependentLayoutUpdateInterface');
+            ->addInterfaceName('Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface');
     }
 
     /**

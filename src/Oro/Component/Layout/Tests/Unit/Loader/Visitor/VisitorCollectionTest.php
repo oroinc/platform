@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator\Visitor;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Visitor;
 
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class VisitorCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -10,7 +10,7 @@ class VisitorCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(
             '\Oro\Component\Layout\Exception\UnexpectedTypeException',
-            'Expected argument of type "Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface",'
+            'Expected argument of type "Oro\Component\Layout\Loader\Visitor\VisitorInterface",'
             . ' "stdClass" given.'
         );
         new VisitorCollection([new \stdClass()]);
@@ -19,7 +19,7 @@ class VisitorCollectionTest extends \PHPUnit_Framework_TestCase
     public function testShouldAcceptValidConditionsAsConstructorParameters()
     {
         $collection = new VisitorCollection(
-            [$this->getMock('Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface')]
+            [$this->getMock('Oro\Component\Layout\Loader\Visitor\VisitorInterface')]
         );
 
         $this->assertNotEmpty($collection);
@@ -29,7 +29,7 @@ class VisitorCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(
             '\Oro\Component\Layout\Exception\UnexpectedTypeException',
-            'Expected argument of type "Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface",'
+            'Expected argument of type "Oro\Component\Layout\Loader\Visitor\VisitorInterface",'
             . ' "stdClass" given.'
         );
 
@@ -42,7 +42,7 @@ class VisitorCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new VisitorCollection();
         $this->assertEmpty($collection);
 
-        $collection->append($this->getMock('Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorInterface'));
+        $collection->append($this->getMock('Oro\Component\Layout\Loader\Visitor\VisitorInterface'));
 
         $this->assertNotEmpty($collection);
     }

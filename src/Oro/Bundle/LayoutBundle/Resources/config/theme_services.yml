@@ -29,14 +29,14 @@ services:
             - []
 
     oro_layout.loader:
-        class:  Oro\Component\Layout\Extension\Theme\Loader\LayoutUpdateLoader
+        class:  Oro\Component\Layout\Loader\LayoutUpdateLoader
         public: false
         calls:
             - [addDriver, [yml, @oro_layout.loader.yaml_driver]]
             - [addDriver, [php, @oro_layout.loader.php_driver]]
 
     oro_layout.loader.php_driver:
-        class:  Oro\Component\Layout\Extension\Theme\Loader\Driver\PhpDriver
+        class:  Oro\Component\Layout\Loader\Driver\PhpDriver
         public: false
         arguments:
             - @oro_layout.layout_update_generator.php
@@ -44,7 +44,7 @@ services:
             - %oro_layout.updates_cache_dir%
 
     oro_layout.loader.yaml_driver:
-        class:  Oro\Component\Layout\Extension\Theme\Loader\Driver\YamlDriver
+        class:  Oro\Component\Layout\Loader\Driver\YamlDriver
         public: false
         arguments:
             - @oro_layout.layout_update_generator.config
@@ -52,11 +52,11 @@ services:
             - %oro_layout.updates_cache_dir%
 
     oro_layout.loader.path_provider:
-        class:  Oro\Component\Layout\Extension\Theme\Loader\ChainPathProvider
+        class:  Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider
         public: false
 
     oro_layout.loader.theme_path_provider:
-        class: Oro\Component\Layout\Extension\Theme\Loader\ThemePathProvider
+        class: Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider
         public: false
         arguments:
             - @oro_layout.theme_manager
@@ -95,7 +95,7 @@ services:
             - { name: kernel.cache_warmer }
 
     oro_layout.layout_update_generator.config:
-        class:  Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGenerator
+        class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
         public: false
         calls:
             - [addExtension, [@oro_layout.layout_update_generator.extension.config_conditions]]
@@ -107,7 +107,7 @@ services:
             - @oro_layout.expression.assembler
 
     oro_layout.layout_update_generator.php:
-        class:  Oro\Component\Layout\Extension\Theme\Generator\PhpLayoutUpdateGenerator
+        class:  Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator
         public: false
 
     oro_layout.request.listener.theme:

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
 use Oro\Component\ConfigExpression\Condition;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension;
 

@@ -4,8 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
 use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class ConfigExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Generator;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
-use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
-use Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGenerator;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
         $source = ['actions' => []];
 
         $extension = $this->getMock(
-            'Oro\Component\Layout\Extension\Theme\Generator\ConfigLayoutUpdateGeneratorExtensionInterface'
+            'Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface'
         );
         $this->generator->addExtension($extension);
 
@@ -36,7 +36,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
             ->method('prepare')
             ->with(
                 $source,
-                $this->isInstanceOf('Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection')
+                $this->isInstanceOf('Oro\Component\Layout\Loader\Visitor\VisitorCollection')
             );
 
         $this->generator->generate('testClassName', new GeneratorData($source));

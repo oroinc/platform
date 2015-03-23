@@ -1,25 +1,25 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Loader\Driver;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Driver;
 
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\Layout\Exception\SyntaxException;
-use Oro\Component\Layout\Extension\Theme\Loader\Driver\YamlDriver;
-use Oro\Component\Layout\Extension\Theme\Generator\GeneratorData;
-use Oro\Component\Layout\Extension\Theme\Generator\Visitor\VisitorCollection;
-use Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Driver\YamlDriver;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class YamlDriverTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoadInDebugMode()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update.yml';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -31,12 +31,12 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
         $fs  = new Filesystem();
         $dir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . time();
 
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $dir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update2.yml';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $update = $loader->load($path);
@@ -48,10 +48,10 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testPassElementVisitor()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
-        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/_header.yml';
+        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/_header.yml';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
         $resource = $path;
 
@@ -59,7 +59,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
             ->willReturnCallback(
                 function ($className, $data, VisitorCollection $collection) use ($resource) {
                     $this->assertContainsOnlyInstancesOf(
-                        'Oro\Component\Layout\Extension\Theme\Generator\Visitor\ElementDependentVisitor',
+                        'Oro\Component\Layout\Loader\Visitor\ElementDependentVisitor',
                         $collection
                     );
 
@@ -72,10 +72,10 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testPassesParsedYamlContentToGenerator()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.yml';
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
         $generator->expects($this->once())->method('generate')
@@ -97,7 +97,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessSyntaxExceptions()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
         $exception = new SyntaxException(
@@ -153,7 +153,7 @@ CLASS;
     protected function getLoader($generator = null, $debug = false, $cache = false)
     {
         $generator = null === $generator
-            ? $this->getMock('Oro\Component\Layout\Extension\Theme\Generator\LayoutUpdateGeneratorInterface')
+            ? $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface')
             : $generator;
 
         return new YamlDriver($generator, $debug, $cache);

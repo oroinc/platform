@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Generator\Visitor;
+namespace Oro\Component\Layout\Loader\Visitor;
 
-use Oro\Component\Layout\Extension\Theme\Generator\VisitContext;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
 
 interface VisitorInterface
 {
