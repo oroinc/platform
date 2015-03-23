@@ -45,6 +45,8 @@ class CommandsTest extends WebTestCase
         $apiKey = $doctrine->getRepository('OroUserBundle:UserApi')->findOneBy(
             ['user' => $user, 'organization' => $organization]
         );
+        
+        static::assertInstanceOf('Oro\Bundle\UserBundle\Entity\UserApi', $apiKey, '$apiKey is not an object');
 
         $command = new GenerateWSSEHeaderCommand();
         $command->setApplication($application);
