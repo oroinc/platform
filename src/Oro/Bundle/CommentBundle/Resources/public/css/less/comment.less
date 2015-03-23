@@ -1,3 +1,6 @@
+.comments-view-header, .comments-view-body, .comments-view-footer {
+  margin: 13px 0;
+}
 .comments-view-header {
   .load-more{
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAWCAIAAACOpGH9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAApSURBVBhXY7h79y7D////mRgYGJiANJwNwvfu3UPhI2N0OWS99+7dAwCo4x9xTwLH4wAAAABJRU5ErkJggg==);
@@ -49,7 +52,7 @@
       text-decoration: none;
       border: none;
       background: transparent;
-      font-family: FontAwesome;
+      font-family: FontAwesome !important;
     }
   }
 }
@@ -89,6 +92,8 @@
     /** .horizontal-icon-menu; */
     .dropdown-menu{
       padding: 0;
+      top: -8px;
+      right: 23px;
     }
     .nav-pills {
       padding: 0 0 0 2px;
@@ -98,9 +103,15 @@
     vertical-align: middle;
     padding: 14px;
   }
+  .comment-item:first-child {
+    .comment-title, .comment-content, .comment-actions {
+      padding-top: 0px;
+    }
+  }
   .comment-item:last-child {
     .comment-title, .comment-content, .comment-actions {
       border-bottom: none;
+      padding-bottom: 0px;
     }
   }
 

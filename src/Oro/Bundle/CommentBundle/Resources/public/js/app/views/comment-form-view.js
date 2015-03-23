@@ -3,6 +3,7 @@ define(function (require) {
 
     var CommentFormView,
         _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
         formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
         BaseView = require('oroui/js/app/views/base/view');
@@ -96,7 +97,7 @@ define(function (require) {
             this.render();
         },
 
-        removeAttachment: function(e) {
+        removeAttachment: function (e) {
             var itemView = this;
             e.stopPropagation();
             e.preventDefault();
