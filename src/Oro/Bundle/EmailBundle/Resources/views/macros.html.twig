@@ -181,7 +181,7 @@
 {% endmacro %}
 
 {#
-    Remders email address owner name as text
+    Renders email address owner name as text
     Parameters:
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
@@ -197,7 +197,7 @@
 {% macro email_address_link(emailAddress, label) -%}
     {% set label = label|default(_self.email_address_text(emailAddress)) %}
     <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
-        {{ _self.email_address_text(emailAddress) }}</a>
+        {{ label }}</a>
 {%- endmacro -%}
 
 {#
@@ -337,3 +337,98 @@
     {%- endif %}
 {%- endmacro %}
 
+
+{#
+    Render email address name, owner name or a link to owner view page can be rendered depends on given parameters
+    Parameters:
+        emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
+        emailAddressName - a string contains an email address. It is used if the email address has no owner
+        noLink - determines whether the rendering of a link to the owner view page is forbidden or not. Default value is false
+        knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
+#}
+{% macro email_participant_name_or_me(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% if emailAddress.owner is not null and emailAddress.owner.id == app.user.id -%}
+        {% if noLink|default(false) -%}
+            {{ 'Me'|trans|lower }}
+        {%- else -%}
+            {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
+        {%- endif %}
+    {%- else -%}
+        {# @todo trim email from emailAddressName here #}
+        {{ _self.email_address(emailAddress, emailAddressName, noLink, knownOnly) }}
+    {%- endif %}
+{%- endmacro %}
+
+{#
+
+#}
+{% macro email_participants_name(recipients, noLink, knownOnly) -%}
+    {% set recipientHtmlCollection = [] %}
+    {% for recipient in recipients %}
+        {% set recipientHtml -%}
+            <span class="email-recipient">{{ _self.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) }}</span>
+        {%- endset %}
+        {% set recipientHtmlCollection = recipientHtmlCollection|merge([recipientHtml]) %}
+    {% endfor %}
+    {{ recipientHtmlCollection|join(', ')|raw }}
+{%- endmacro %}
+
+{#
+
+#}
+{% macro email_sent_at(email) -%}
+    {% if date(email.sentAt)|oro_format_date == date()|oro_format_date -%}
+        {# same day -- show only time #}
+        {{ email.sentAt|oro_format_time }}
+    {%- else -%}
+        {{ email.sentAt|oro_format_date }}
+    {%- endif %}
+{%- endmacro %}
+
+{#
+    Render table with detailed information about all participants, send date and subject
+#}
+{% macro email_detailed_info_table(email) %}
+    {% set recipientsTo = [] %}
+    {% set recipientsCc = [] %}
+    {% set recipientsBcc = [] %}
+    {% for recipient in email.recipients %}
+        {% if recipient.type == 'to' %}
+            {% set recipientsTo = recipientsTo|merge([recipient.name|e])%}
+        {% elseif recipient.type == 'cc' %}
+            {% set recipientsCc = recipientsCc|merge([recipient.name|e])%}
+        {% elseif recipient.type == 'bcc' %}
+            {% set recipientsBcc = recipientsBcc|merge([recipient.name|e])%}
+        {% endif %}
+    {% endfor %}
+    {% set data = [{
+            label: 'From'|trans,
+            value: '<b>' ~ email.fromName|e ~ '</b>',
+            cssClass: 'autor'
+        }, {
+            label: 'To'|trans,
+            value: recipientsTo|join(',<br/>')
+        }, {
+            label: 'Cc'|trans,
+            value: recipientsCc|join(',<br/>')
+        }, {
+            label: 'Bcc'|trans,
+            value: recipientsBcc|join(',<br/>')
+        }, {
+            label: 'Date'|trans,
+            value: email.sentAt|oro_format_datetime|e
+        }, {
+            label: 'Subject'|trans,
+            value: email.subject|e
+    }] %}
+    <ul class="form-horizontal">
+    {% for item in data %}
+        {% if item.value is not empty %}
+        <li class="control-group">
+            <label class="control-label">{{ item.label|raw }}:</label>
+            <div class="controls {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% endmacro %}

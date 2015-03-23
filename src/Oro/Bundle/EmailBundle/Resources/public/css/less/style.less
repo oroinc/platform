@@ -1,4 +1,4 @@
-.emailtemplate-translatation {
+ .emailtemplate-translatation {
   .tab-content {
     padding-top: 20px;
     padding-bottom: 10px;
@@ -160,3 +160,117 @@
     position: absolute;
   }
 }
+
+
+.email-info {
+  border-bottom: 1px solid #e5e5e5;
+  &:last-child {
+    border-bottom: none;
+  }
+  .email-short, .email-full{
+    padding: 10px 15px;
+  }
+  .email-short {
+    background-color: #f5f5f5;
+  }
+  .email-full {
+    display: block;
+  }
+  .btn.dropdown-toggle {
+    .caret {
+      margin-left: 0;
+    }
+    & + .dropdown-menu {
+      min-width: 100%;
+    }
+  }
+}
+.email-detailed-info-table {
+  display: inline-block;
+  .dropdown-toggle {
+    cursor: pointer;
+    font-size: .9em;
+  }
+  .dropdown-menu {
+    padding: 5px 10px 0 5px;
+    margin-left: -20px;
+    margin-top: 3px;
+    &:before {
+      content: '';
+      display: inline-block;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 7px solid #ccc;
+      border-bottom-color: rgba(0,0,0,0.2);
+      position: absolute;
+      top: -7px;
+      left: 19px;
+    }
+    &:after {
+      content: '';
+      display: inline-block;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #fff;
+      position: absolute;
+      top: -6px;
+      left: 20px;
+    }
+    ul{
+      margin: 0;
+      list-style: none;
+    }
+  }
+  .control-group {
+    label.control-label,
+    .controls {
+      color: #777;
+      margin-bottom: 5px;
+      padding-top: .3px;
+      line-height: 1.4em;
+      white-space: nowrap;
+    }
+    label.control-label {
+      width: 70px;
+    }
+    .controls {
+      margin-left: 80px;
+    }
+  }
+}
+.email-info {
+  .email-recipient {
+    white-space: nowrap;
+  }
+  .email-participants {
+    margin-right: 150px;
+  }
+  .email-sent-date {
+    text-align: right;
+    margin-bottom: 1em;
+  }
+  .email-has-attachment{
+    font-size: 1.3em;
+    margin-right: .5em;
+  }
+  .email-body {
+    margin: 0;
+    /* @todo remove old style */
+  }
+  .email-short {
+    .email-recipients {
+      font-style: italic;
+      color: #888;
+    }
+    .email-body {
+      color: #888;
+      margin-top: 2px;
+    }
+  }
+  .email-full {
+    .email-author {
+      font-weight: bold;
+    }
+  }
+}
+
