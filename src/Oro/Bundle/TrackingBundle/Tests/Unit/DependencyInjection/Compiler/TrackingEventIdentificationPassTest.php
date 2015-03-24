@@ -6,7 +6,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\TrackingBundle\DependencyInjection\Compiler\TrackingEventIdentificationPass;
 
-
 class TrackingEventIdentificationPassTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
