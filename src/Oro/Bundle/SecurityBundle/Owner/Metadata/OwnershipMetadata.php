@@ -186,7 +186,7 @@ class OwnershipMetadata implements \Serializable
      */
     public function getAdditionalParameters()
     {
-        return $this->additionalParameters;
+        return is_array($this->additionalParameters) ? $this->additionalParameters : [];
     }
 
     /**

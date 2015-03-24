@@ -32,7 +32,7 @@ class AclCondition
     protected $organizationField;
 
     /**
-     * @var int
+     * @var int|int[]
      */
     protected $organizationValue;
 
@@ -42,13 +42,13 @@ class AclCondition
     protected $ignoreOwner;
 
     /**
-     * @param string $entityAlias
-     * @param string $entityField
-     * @param mixed  $value
-     * @param int    $pathExpressionType
-     * @param string $organizationField
-     * @param int    $organizationValue
-     * @param bool   $ignoreOwner
+     * @param string    $entityAlias
+     * @param string    $entityField
+     * @param mixed     $value
+     * @param int       $pathExpressionType
+     * @param string    $organizationField
+     * @param int|int[] $organizationValue
+     * @param bool      $ignoreOwner
      */
     public function __construct(
         $entityAlias,
@@ -141,7 +141,7 @@ class AclCondition
     }
 
     /**
-     * @return int
+     * @return int|int[]
      */
     public function getOrganizationValue()
     {
