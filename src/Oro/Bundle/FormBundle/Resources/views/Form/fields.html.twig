@@ -362,7 +362,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            class: 'input-small ' ~ attrClass,
+            class: 'input-small date ' ~ attrClass,
             'data-validation': dateValidation|json_encode
         },
         datePickerOptions: {
@@ -376,7 +376,7 @@
             placeholder: 'oro.form.choose_time'|trans,
             id: 'time_selector_' ~ id,
             name: 'time_selector_' ~ id,
-            class: 'input-small ' ~ attrClass,
+            class: 'input-small time ' ~ attrClass,
             'data-validation': timeValidation|json_encode
         },
         timePickerOptions: {

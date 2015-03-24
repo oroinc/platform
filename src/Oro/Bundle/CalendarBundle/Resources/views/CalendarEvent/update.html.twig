@@ -74,7 +74,8 @@
         'dataBlocks': dataBlocks
     } %}
     {% set options = {
-        'view':'orocalendar/js/app/views/calendar-event-form-view'
+        'view':'orocalendar/js/app/views/calendar-event-form-view',
+        'nativeMode': isMobileVersion()
     } %}
     <div data-page-component-module="oroui/js/app/components/view-component"
          data-page-component-options="{{ options|json_encode }}"
