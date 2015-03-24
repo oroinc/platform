@@ -4,6 +4,7 @@ namespace Oro\Bundle\TrackingBundle\Tests\Unit\Entity;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 use Oro\Bundle\TrackingBundle\Entity\TrackingEventDictionary;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
@@ -70,14 +71,16 @@ class TrackingVisitEventTest extends \PHPUnit_Framework_TestCase
      */
     public function propertyProvider()
     {
-        $visit = new TrackingVisit();
-        $event = new TrackingEventDictionary();
+        $visit    = new TrackingVisit();
+        $event    = new TrackingEventDictionary();
         $webEvent = new TrackingEvent();
+        $webSite  = new TrackingWebsite();
 
         return [
             ['visit', $visit, $visit],
             ['event', $event, $event],
-            ['webEvent', $webEvent, $webEvent]
+            ['webEvent', $webEvent, $webEvent],
+            ['website', $webSite, $webSite]
         ];
     }
 }
