@@ -59,8 +59,9 @@ class EntitySecurityMetadataProvider
     /**
      * Checks whether an entity is protected using the given security type.
      *
-     * @param  string $className    The entity class name
-     * @param  string $securityType The security type. Defaults to ACL.
+     * @param string $className    The entity class name
+     * @param string $securityType The security type. Defaults to ACL.
+     *
      * @return bool
      */
     public function isProtectedEntity($className, $securityType = self::ACL_SECURITY_TYPE)
@@ -73,7 +74,8 @@ class EntitySecurityMetadataProvider
     /**
      * Gets metadata for all entities marked with the given security type.
      *
-     * @param  string $securityType The security type. Defaults to ACL.
+     * @param string $securityType The security type. Defaults to ACL.
+     *
      * @return EntitySecurityMetadata[]
      */
     public function getEntities($securityType = self::ACL_SECURITY_TYPE)
@@ -170,10 +172,13 @@ class EntitySecurityMetadataProvider
      */
     protected function loadMetadata($securityType)
     {
-        $data = array();
+        $data = [];
+
         $securityConfigs = $this->securityConfigProvider->getConfigs();
+
         foreach ($securityConfigs as $securityConfig) {
             $className = $securityConfig->getId()->getClassName();
+
             if ($securityConfig->get('type') === $securityType
                 && $this->extendConfigProvider->getConfig($className)->in(
                     'state',
@@ -181,17 +186,21 @@ class EntitySecurityMetadataProvider
                 )
             ) {
                 $label = '';
+
                 if ($this->entityConfigProvider->hasConfig($className)) {
                     $label = $this->entityConfigProvider
                         ->getConfig($className)
                         ->get('label');
                 }
+
                 $permissions = $securityConfig->get('permissions');
+
                 if (!$permissions || $permissions == 'All') {
                     $permissions = array();
                 } else {
                     $permissions = explode(';', $permissions);
                 }
+
                 $data[$className] = new EntitySecurityMetadata(
                     $securityType,
                     $className,

@@ -55,10 +55,10 @@ class OwnershipMetadataProvider
     /**
      * Constructor
      *
-     * @param array $owningEntityNames
-     * @param ConfigProvider $configProvider
+     * @param array               $owningEntityNames
+     * @param ConfigProvider      $configProvider
      * @param EntityClassResolver $entityClassResolver
-     * @param CacheProvider|null $cache
+     * @param CacheProvider|null  $cache
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -74,12 +74,12 @@ class OwnershipMetadataProvider
         $this->businessUnitClass = $entityClassResolver === null
             ? $owningEntityNames['business_unit']
             : $entityClassResolver->getEntityClass($owningEntityNames['business_unit']);
-        $this->userClass = $entityClassResolver === null
+        $this->userClass         = $entityClassResolver === null
             ? $owningEntityNames['user']
             : $entityClassResolver->getEntityClass($owningEntityNames['user']);
 
         $this->configProvider = $configProvider;
-        $this->cache = $cache;
+        $this->cache          = $cache;
 
         $this->noOwnershipMetadata = new OwnershipMetadata();
     }
@@ -88,6 +88,7 @@ class OwnershipMetadataProvider
      * Get the ownership related metadata for the given entity
      *
      * @param string $className
+     *
      * @return OwnershipMetadata
      */
     public function getMetadata($className)
@@ -173,6 +174,7 @@ class OwnershipMetadataProvider
      * Makes sure that metadata for the given class are loaded
      *
      * @param string $className
+     *
      * @throws InvalidConfigurationException
      */
     protected function ensureMetadataLoaded($className)
@@ -186,14 +188,15 @@ class OwnershipMetadataProvider
                 if ($this->configProvider->hasConfig($className)) {
                     $config = $this->configProvider->getConfig($className);
                     try {
-                        $ownerType = $config->get('owner_type');
-                        $ownerFieldName = $config->get('owner_field_name');
-                        $ownerColumnName = $config->get('owner_column_name');
-                        $organizationFieldName = $config->get('organization_field_name');
+                        $ownerType              = $config->get('owner_type');
+                        $ownerFieldName         = $config->get('owner_field_name');
+                        $ownerColumnName        = $config->get('owner_column_name');
+                        $organizationFieldName  = $config->get('organization_field_name');
                         $organizationColumnName = $config->get('organization_column_name');
+                        $additionalParameters   = $config->get('additional_params');
 
                         if (!$organizationFieldName && $ownerType == OwnershipType::OWNER_TYPE_ORGANIZATION) {
-                            $organizationFieldName = $ownerFieldName;
+                            $organizationFieldName  = $ownerFieldName;
                             $organizationColumnName = $ownerColumnName;
                         }
 
@@ -202,7 +205,8 @@ class OwnershipMetadataProvider
                             $ownerFieldName,
                             $ownerColumnName,
                             $organizationFieldName,
-                            $organizationColumnName
+                            $organizationColumnName,
+                            $additionalParameters
                         );
                     } catch (\InvalidArgumentException $ex) {
                         throw new InvalidConfigurationException(
