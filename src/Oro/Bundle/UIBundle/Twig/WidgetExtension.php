@@ -15,7 +15,7 @@ class WidgetExtension extends \Twig_Extension
      *
      * @var bool
      */
-    protected $rendered = array();
+    protected $rendered = [];
 
     /**
      * @var Request
@@ -29,28 +29,28 @@ class WidgetExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             'oro_widget_render' => new \Twig_Function_Method(
                 $this,
                 'render',
-                array(
-                    'is_safe' => array('html'),
+                [
+                    'is_safe'           => ['html'],
                     'needs_environment' => true
-                )
+                ]
             )
-        );
+        ];
     }
 
     /**
      * Renders a widget.
      *
      * @param \Twig_Environment $environment
-     * @param array $options
+     * @param array             $options
      *
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function render(Twig_Environment $environment, array $options = array())
+    public function render(Twig_Environment $environment, array $options = [])
     {
         $optionsHash = md5(json_encode($options));
 
@@ -87,7 +87,12 @@ class WidgetExtension extends \Twig_Extension
             $options['container'] = '#' . $elementId;
         }
 
-        $options['url'] = $this->getUrlWithContainer($options['url'], $widgetType, $options['wid'], $options['state']['id']);
+        $options['url'] = $this->getUrlWithContainer(
+            $options['url'],
+            $widgetType,
+            $options['wid'],
+            $options['state']['id']
+        );
 
         if ($this->request) {
             $options['url'] = $this->addRequestParameters($options['url']);
@@ -95,11 +100,11 @@ class WidgetExtension extends \Twig_Extension
 
         return $environment->render(
             'OroUIBundle::widget_loader.html.twig',
-            array(
+            [
                 'elementId'  => $elementId,
                 'options'    => $options,
                 'widgetType' => $widgetType,
-            )
+            ]
         );
     }
 
@@ -112,12 +117,12 @@ class WidgetExtension extends \Twig_Extension
     protected function getUrlWithContainer($url, $widgetType, $wid, $id)
     {
         if (strpos($url, '_widgetContainer=') === false) {
-            $parts = parse_url($url);
+            $parts      = parse_url($url);
             $widgetPart = '_widgetContainer=' . $widgetType . '&_wid=' . $wid;
             if (array_key_exists('query', $parts)) {
                 $separator = $parts['query'] ? '&' : '';
-                $newQuery = $parts['query'] . $separator . $widgetPart;
-                $url = str_replace($parts['query'], $newQuery, $url);
+                $newQuery  = $parts['query'] . $separator . $widgetPart;
+                $url       = str_replace($parts['query'], $newQuery, $url);
             } else {
                 $url .= '?' . $widgetPart;
             }
@@ -141,8 +146,8 @@ class WidgetExtension extends \Twig_Extension
     {
         $urlParts = parse_url($url);
 
-        $urlPath = !empty($urlParts['path']) ? $urlParts['path'] : '';
-        $urlParams = array();
+        $urlPath   = !empty($urlParts['path']) ? $urlParts['path'] : '';
+        $urlParams = [];
         if (!empty($urlParts['query'])) {
             parse_str($urlParts['query'], $urlParams);
         }
