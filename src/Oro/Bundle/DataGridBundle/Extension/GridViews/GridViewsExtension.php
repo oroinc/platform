@@ -66,7 +66,9 @@ class GridViewsExtension extends AbstractExtension
             ],
         ];
         if ($list !== false) {
-            $gridViews = $list->getMetadata();
+            $configuredGridViews = $list->getMetadata();
+            $configuredGridViews['views'] = array_merge($configuredGridViews['views'], $gridViews['views']);
+            $gridViews = $configuredGridViews;
         }
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {

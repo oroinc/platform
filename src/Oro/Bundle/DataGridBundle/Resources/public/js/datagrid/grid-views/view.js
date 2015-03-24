@@ -359,6 +359,7 @@ define([
          */
         onRename: function(e) {
             var model = this._getCurrentViewModel();
+            var self = this;
 
             var modal = new ViewNameModal({
                 defaultValue: model.get('label')
@@ -371,7 +372,7 @@ define([
                 });
 
                 model.once('sync', function() {
-                    this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }, this);
             });
 
