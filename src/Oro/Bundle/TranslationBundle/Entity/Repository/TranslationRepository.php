@@ -47,7 +47,9 @@ class TranslationRepository extends EntityRepository
     }
 
     /**
-     * @param $locale
+     * Returns the list of all existing in the database translation domains for the given locale.
+     *
+     * @param string $locale
      *
      * @return array
      */
@@ -61,12 +63,9 @@ class TranslationRepository extends EntityRepository
             ->setParameter('locale', $locale);
 
         $domains = $qb->getQuery()->getArrayResult();
-        array_walk(
-            $domains,
-            function (&$domain) {
-                $domain = reset($domain);
-            }
-        );
+        foreach ($domains as &$domain) {
+            $domain = reset($domain);
+        }
 
         return $domains;
     }

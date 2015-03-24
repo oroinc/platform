@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
@@ -32,18 +33,26 @@ class LocaleListener implements EventSubscriberInterface
     protected $isInstalled;
 
     /**
-     * @param LocaleSettings       $localeSettings
-     * @param TranslatableListener $translatableListener
-     * @param bool|null|string     $installed
+     * @var RequestContextAwareInterface
+     */
+    protected $router;
+
+    /**
+     * @param LocaleSettings               $localeSettings
+     * @param TranslatableListener         $translatableListener
+     * @param bool|null|string             $installed
+     * @param RequestContextAwareInterface $router
      */
     public function __construct(
         LocaleSettings $localeSettings,
         TranslatableListener $translatableListener,
-        $installed
+        $installed,
+        RequestContextAwareInterface $router = null
     ) {
         $this->localeSettings       = $localeSettings;
         $this->translatableListener = $translatableListener;
         $this->isInstalled          = !empty($installed);
+        $this->router               = $router;
     }
 
     /**
@@ -58,6 +67,9 @@ class LocaleListener implements EventSubscriberInterface
         if ($this->isInstalled) {
             if (!$request->attributes->get('_locale')) {
                 $request->setLocale($this->localeSettings->getLanguage());
+                if (null !== $this->router) {
+                    $this->router->getContext()->setParameter('_locale', $this->localeSettings->getLanguage());
+                }
             }
             $this->setPhpDefaultLocale($this->localeSettings->getLocale());
 
@@ -116,8 +128,8 @@ class LocaleListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            // must be registered before Symfony's original LocaleListener
-            KernelEvents::REQUEST  => array(array('onKernelRequest', 17)),
+            // must be registered after Symfony's original LocaleListener
+            KernelEvents::REQUEST  => array(array('onKernelRequest', -15)),
             ConsoleEvents::COMMAND => array(array('onConsoleCommand')),
         );
     }

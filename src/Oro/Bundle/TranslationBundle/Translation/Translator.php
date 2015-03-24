@@ -171,6 +171,7 @@ class Translator extends BaseTranslator
                 }
             );
             if (!$databaseResource) {
+                // register resources for all domains to load all available translations into cache
                 $availableDomains = $this->container->get('doctrine')
                     ->getRepository(Translation::ENTITY_NAME)
                     ->findAvailableDomains($locale);
