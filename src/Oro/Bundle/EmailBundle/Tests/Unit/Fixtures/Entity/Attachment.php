@@ -8,12 +8,20 @@ class Attachment extends BaseAttachment
 {
     protected $supportTarget = true;
 
+    /**
+     * @param $supportTarget
+     */
     public function setSupportTarget($supportTarget)
     {
         $this->supportTarget = $supportTarget;
     }
 
-    public function supportTarget()
+    /**
+     * @param string $targetClass
+     *
+     * @return bool
+     */
+    public function supportTarget($targetClass)
     {
         return $this->supportTarget;
     }
