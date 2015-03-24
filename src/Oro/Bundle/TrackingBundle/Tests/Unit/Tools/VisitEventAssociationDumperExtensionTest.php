@@ -4,17 +4,15 @@ namespace Oro\Bundle\TrackingBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
+use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
+use Oro\Bundle\TrackingBundle\Tools\VisitEventAssociationDumperExtension;
 
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
-use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
-use Oro\Bundle\TrackingBundle\Tools\IdentifierVisitConfigDumperExtension;
-
-class IdentifierVisitConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class VisitEventAssociationDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var IdentifierVisitConfigDumperExtension */
+    /** @var VisitEventAssociationDumperExtension */
     protected $extension;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -42,7 +40,7 @@ class IdentifierVisitConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new IdentifierVisitConfigDumperExtension(
+        $this->extension = new VisitEventAssociationDumperExtension(
             $this->identifyProvider,
             $this->configManager,
             $this->associationBuilder
@@ -125,7 +123,7 @@ class IdentifierVisitConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         $this->associationBuilder
             ->expects($this->once())
             ->method('createManyToOneAssociation')
-            ->with(TrackingVisit::ENTITY_NAME, $data[0], IdentifierEventExtension::ASSOCIATION_KIND);
+            ->with(TrackingVisitEvent::ENTITY_NAME, $data[0], VisitEventAssociationExtension::ASSOCIATION_KIND);
 
         $this->extension->preUpdate();
     }
@@ -138,7 +136,7 @@ class IdentifierVisitConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
     {
         $this->identifyProvider
             ->expects($this->once())
-            ->method('getTargetIdentityEntities')
+            ->method('getEventTargetEntities')
             ->will($this->returnValue([$className]));
 
         $extendConfig = new Config(new EntityConfigId('extend', $className));
@@ -158,7 +156,7 @@ class IdentifierVisitConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         $extendProvider
             ->expects($this->any())
             ->method('hasConfig')
-            ->with(TrackingVisit::ENTITY_NAME)
+            ->with(TrackingVisitEvent::ENTITY_NAME)
             ->will($this->returnValue(true));
 
         $this->configManager

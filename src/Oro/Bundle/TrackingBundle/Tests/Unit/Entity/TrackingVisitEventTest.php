@@ -71,8 +71,8 @@ class TrackingVisitEventTest extends \PHPUnit_Framework_TestCase
      */
     public function propertyProvider()
     {
-        $visit = new TrackingVisit();
-        $event = new TrackingEventDictionary();
+        $visit    = new TrackingVisit();
+        $event    = new TrackingEventDictionary();
         $webEvent = new TrackingEvent();
         $website = new TrackingWebsite();
 
