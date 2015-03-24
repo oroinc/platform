@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment as BaseAttachment;
 
