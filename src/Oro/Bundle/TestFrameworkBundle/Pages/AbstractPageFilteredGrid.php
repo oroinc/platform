@@ -80,10 +80,10 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
         //select criteria
         if ($condition != '') {
             //expand condition list
-            $criteria->element($this->test->using('xpath')->value("div/div/div/button[@class ='btn dropdown-toggle']"))
+            $criteria->element($this->test->using('xpath')->value("div/div/button[@class ='btn dropdown-toggle']"))
                 ->click();
 
-            $criteria->element($this->test->using('xpath')->value("div/div/div/ul/li/a[text()='{$condition}']"))
+            $criteria->element($this->test->using('xpath')->value("div/div/ul/li/a[text()='{$condition}']"))
                 ->click();
         }
         $criteria->element($this->test->using('xpath')->value("div/div/button[contains(@class, 'filter-update')]"))

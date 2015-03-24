@@ -72,6 +72,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
              * @private
              */
             _confirmOpenLink: function (event) {
+                // prevent showing message when user tries to add something into collection
+                if ($(event.target).hasClass('add-list-item')) {
+                    return;
+                }
+
                 if (this.isChanged()) {
                     event.prevented = !confirm(this.CONFIRMATION_MESSAGE);
                 }

@@ -38,7 +38,9 @@ define([
             this.listenTo(page, 'error', this.onPageError);
             this.model = page;
 
-            isInAction = false;
+            // application is in action till first 'page:afterChange' event
+            isInAction = true;
+
             this.subscribeEvent('page:beforeChange', function () {
                 isInAction = true;
             });
