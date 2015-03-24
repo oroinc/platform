@@ -59,15 +59,20 @@ class GridViewsExtension extends AbstractExtension
         /** @var AbstractViewsList $list */
         $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
         $gridViews = [
-            'choices' => [],
+            'choices' => [
+                [
+                    'label' => 'All',
+                    'value' => '__all__',
+                ],
+            ],
             'views' => [
                 (new View('__all__'))->getMetadata(),
-                (new View('__default__'))->getMetadata(),
             ],
         ];
         if ($list !== false) {
             $configuredGridViews = $list->getMetadata();
             $configuredGridViews['views'] = array_merge($configuredGridViews['views'], $gridViews['views']);
+            $configuredGridViews['choices'] = array_merge($configuredGridViews['choices'], $gridViews['choices']);
             $gridViews = $configuredGridViews;
         }
 

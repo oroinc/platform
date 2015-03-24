@@ -24,6 +24,7 @@ define([
              options.content = options.content || this.contentTemplate({
                  value: options.defaultValue || ''
              });
+             options.okText =  __('oro.datagrid.gridView.save_name');
 
              ViewNameModal.__super__.initialize.call(this, options);
          }

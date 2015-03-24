@@ -123,19 +123,9 @@ define([
                 throw new TypeError("'collection' is required");
             }
 
-            this.choices = _.union([
-                {
-                    label: __('oro.datagrid.gridView.all') + (options.title || ''),
-                    value: '__all__'
-                },
-                {
-                    label: __('oro.datagrid.gridView.default'),
-                    value: '__default__'
-                }
-            ], this.choices);
-
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
+                this._getView('__all__').label = __('oro.datagrid.gridView.all') + (options.title || '');
             }
 
             if (options.permissions) {
@@ -149,9 +139,6 @@ define([
             this.gridName = options.gridName;
             this.collection = options.collection;
             this.enabled = options.enable != false;
-            if (!this.collection.state.gridView) {
-                this.collection.state.gridView = '__default__';
-            }
 
             this.listenTo(this.collection, "updateState", this.render);
             this.listenTo(this.collection, "beforeFetch", this.render);
@@ -167,10 +154,6 @@ define([
             }, this);
 
             this.viewsCollection = new this.viewsCollection(options.views);
-            this.viewsCollection.get('__default__').set({
-                filters: options.collection.initialState.filters,
-                sorters: options.collection.initialState.sorters
-            });
 
             this.viewDirty = !this._isCurrentStateSynchronized();
             this.prevState = this._getCurrentState();
@@ -410,7 +393,7 @@ define([
             }, this);
 
             if (model.id == this.collection.state.gridView) {
-                this.collection.state.gridView = '__default__';
+                this.collection.state.gridView = '__all__';
                 this.viewDirty = !this._isCurrentStateSynchronized();
             }
 

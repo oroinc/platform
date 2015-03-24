@@ -47,7 +47,7 @@ oro_datagrid.action.reset: "Reset"
 oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.action.save_grid_view": Save
 "oro.datagrid.action.rename_grid_view": Rename
-"oro.datagrid.name_modal.title": Filter configuration
+"oro.datagrid.name_modal.title": Grid view
 "oro.datagrid.action.discard_grid_view_changes": Discard changes
 "oro.datagrid.action.save_grid_view_as": Save As
 "oro.datagrid.action.share_grid_view": Share With Others
@@ -61,3 +61,4 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.name": Name
 "oro.datagrid.gridView.actions": Options
 "oro.datagrid.gridView.data_edited": Edited
+"oro.datagrid.gridView.save_name": Save
