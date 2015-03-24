@@ -74,7 +74,7 @@ class TrackingVisitEventTest extends \PHPUnit_Framework_TestCase
         $visit    = new TrackingVisit();
         $event    = new TrackingEventDictionary();
         $webEvent = new TrackingEvent();
-        $website = new TrackingWebsite();
+        $website  = new TrackingWebsite();
 
         return [
             ['visit', $visit, $visit],
