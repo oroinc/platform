@@ -73,7 +73,13 @@ class EmailController extends Controller
     public function threadWidgetAction(Email $entity)
     {
         $config = $this->get('oro_config.global');
-        if ($config->get('oro_email.use_threads_in_emails')) {
+        $ids = $this->getRequest()->get('ids');
+        if ($ids) {
+            if (!is_array($ids)) {
+                $ids = [$ids];
+            }
+            $emails = $this->get('doctrine')->getRepository("OroEmailBundle:Email")->findInIds($ids);
+        } else if ($config->get('oro_email.use_threads_in_emails')) {
             $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
                 $this->get('doctrine')->getManager(),
                 $entity

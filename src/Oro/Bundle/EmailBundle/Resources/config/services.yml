@@ -458,6 +458,7 @@ services:
         class: %oro_email.twig.extension.email.class%
         arguments:
             - @oro_email.email_holder_helper
+            - @oro_email.email.address.helper
         tags:
             - { name: twig.extension }
 
