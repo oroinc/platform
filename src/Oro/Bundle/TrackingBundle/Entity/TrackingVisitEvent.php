@@ -57,6 +57,14 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     protected $webEvent;
 
     /**
+     * @var TrackingWebsite
+     *
+     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
+     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $website;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="parsing_count", type="integer", nullable=false, options={"default"=0})
@@ -146,5 +154,21 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
         $this->parsingCount = $parsingCount;
 
         return $this;
+    }
+
+    /**
+     * @return TrackingWebsite
+     */
+    public function getWebsite()
+    {
+        return $this->website;
+    }
+
+    /**
+     * @param TrackingWebsite $website
+     */
+    public function setWebsite($website)
+    {
+        $this->website = $website;
     }
 }

@@ -45,5 +45,14 @@ class OroTrackerBundle implements Migration
     {
         $table = $schema->getTable('oro_tracking_visit_event');
         $table->addColumn('parsing_count', 'integer', ['default' => '0']);
+        $table->addColumn('website_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['website_id'], 'idx_b39eeebf18f45c82', []);
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_tracking_website'),
+            ['website_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
     }
 }

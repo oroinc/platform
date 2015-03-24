@@ -351,6 +351,7 @@ class TrackingProcessor implements LoggerAwareInterface
             $trackingVisit = $this->getTrackingVisit($event, $decodedData);
             $trackingVisitEvent->setVisit($trackingVisit);
             $trackingVisitEvent->setWebEvent($event);
+            $trackingVisitEvent->setWebsite($event->getWebsite());
 
             $targets = $this->trackingIdentification->processEvent($trackingVisitEvent);
             if (!empty($targets)) {
