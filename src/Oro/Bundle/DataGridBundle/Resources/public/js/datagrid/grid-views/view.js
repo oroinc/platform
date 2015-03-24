@@ -260,7 +260,7 @@ define([
             });
 
             model.once('sync', function() {
-                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+                this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
             }, this);
         },
 
@@ -289,7 +289,7 @@ define([
                     this.changeView(model.get('name'));
                     this.collection.state.gridView = model.get('name');
                     this.viewDirty = !this._isCurrentStateSynchronized();
-                    mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.created'));
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                     mediator.trigger('datagrid:' + this.gridName + ':views:add', model);
                 }, self);
             });
@@ -311,7 +311,7 @@ define([
             });
 
             model.once('sync', function() {
-                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+                this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
             }, this);
         },
 
@@ -329,7 +329,7 @@ define([
             });
 
             model.once('sync', function() {
-                mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+                this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
             }, this);
         },
 
@@ -346,7 +346,7 @@ define([
             confirm.on('ok', _.bind(function() {
                 model.destroy({wait: true});
                 model.once('sync', function() {
-                    mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.deleted'));
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.deleted'));
                     mediator.trigger('datagrid:' + this.gridName + ':views:remove', model);
                 }, this);
             }, this));
@@ -371,7 +371,7 @@ define([
                 });
 
                 model.once('sync', function() {
-                    mediator.execute('showFlashMessage', 'success', __('oro.datagrid.gridView.updated'));
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }, this);
             });
 
@@ -643,6 +643,24 @@ define([
                 filters: this.collection.state.filters,
                 sorters: this.collection.state.sorters
             };
+        },
+
+        /**
+         * @private
+         *
+         * Takes the same arguments as showFlashMessage command
+         */
+        _showFlashMessage: function(type, message, options) {
+            var opts = options || {};
+            var id = this.$el.closest('.ui-widget-content').attr('id');
+
+            if (id) {
+                opts = _.extend(opts, {
+                    container: '#' + id + ' .flash-messages'
+                });
+            }
+
+            mediator.execute('showFlashMessage', type, message, opts);
         }
     });
 
