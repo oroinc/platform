@@ -8,6 +8,7 @@ use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 use Oro\Bundle\TrackingBundle\Entity\TrackingEventDictionary;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
+use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 
 class TrackingVisitEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -73,11 +74,13 @@ class TrackingVisitEventTest extends \PHPUnit_Framework_TestCase
         $visit = new TrackingVisit();
         $event = new TrackingEventDictionary();
         $webEvent = new TrackingEvent();
+        $website = new TrackingWebsite();
 
         return [
             ['visit', $visit, $visit],
             ['event', $event, $event],
-            ['webEvent', $webEvent, $webEvent]
+            ['webEvent', $webEvent, $webEvent],
+            ['website', $website, $website]
         ];
     }
 }
