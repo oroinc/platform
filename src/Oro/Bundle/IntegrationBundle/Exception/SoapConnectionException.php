@@ -14,9 +14,18 @@ class SoapConnectionException extends TransportException
      */
     public static function createFromResponse($response, \Exception $exception = null, $request = '', $headers = '')
     {
-        $exceptionMessage = null !== $exception ? $exception->getMessage() : '';
-        $exceptionCode    = null !== $exception ? $exception->getCode() : 0;
-        $code             = !empty($headers['code']) ? $headers['code'] : 'unknown';
+        $exceptionMessage = '';
+        $exceptionCode = 0;
+        $code = 'unknown';
+
+        if (null !== $exception) {
+            $exceptionMessage = $exception->getMessage();
+            $exceptionCode = $exception->getCode();
+        }
+
+        if (!empty($headers['code'])) {
+            $code = $headers['code'];
+        }
 
         $message = PHP_EOL;
         $message .= str_pad('[message]', 20, ' ', STR_PAD_RIGHT) . $exceptionMessage . PHP_EOL;
