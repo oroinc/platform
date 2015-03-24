@@ -251,6 +251,36 @@ class EmailController extends Controller
     }
 
     /**
+     * @param Email  $email
+     * @param string $entityClass
+     * @param int    $entityId
+     *
+     * @return Response
+     *
+     * @Route("/attach-to-entity/{id}/{entityClass}/{entityId}",
+     *  name="oro_email_attach_to_entity",
+     *  requirements={"id"="\d+", "entityClass"="\w+", "entityId"="\d+"}
+     * )
+     * @AclAncestor("oro_email_create")
+     */
+    public function attachToEntity(Email $email, $entityClass, $entityId)
+    {
+        try {
+            $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
+
+            $entity = $this->getDoctrine()->getRepository($entityClass)->find($entityId);
+
+            $violations = $this->get('oro_email.manager.email_attachment_manager')
+                ->linkEmailAttachmentsToEntity($email, $entity);
+            $response = $violations ? "<pre>" . print_r($violations, true) . "</pre>": 'ok';
+        } catch (\Exception $e) {
+            $response = $e->getMessage();
+        }
+
+        return new Response($response);
+    }
+
+    /**
      * Get email cache manager
      *
      * @return EmailCacheManager

@@ -197,4 +197,13 @@ class EmailAttachment
 
         return $this;
     }
+
+    public function getExtension()
+    {
+        if ($this->fileName) {
+            return pathinfo($this->fileName, PATHINFO_EXTENSION);
+        } else {
+            return null;
+        }
+    }
 }
