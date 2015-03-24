@@ -13,7 +13,7 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 
-class PostProcessingStepExecutor extends StepExecutor implements StepExecutionAwareInterface
+class PostProcessStepExecutor extends StepExecutor implements StepExecutionAwareInterface
 {
     const JOB_TYPE_KEY = 'type';
     const JOB_NAME_KEY = 'name';
@@ -52,7 +52,7 @@ class PostProcessingStepExecutor extends StepExecutor implements StepExecutionAw
 
     /**
      * @param JobExecutor $jobExecutor
-     * @return PostProcessingStepExecutor
+     * @return PostProcessStepExecutor
      */
     public function setJobExecutor(JobExecutor $jobExecutor)
     {
@@ -63,7 +63,7 @@ class PostProcessingStepExecutor extends StepExecutor implements StepExecutionAw
 
     /**
      * @param StepExecution $stepExecution
-     * @return PostProcessingStepExecutor
+     * @return PostProcessStepExecutor
      */
     public function setStepExecution(StepExecution $stepExecution)
     {
@@ -129,11 +129,10 @@ class PostProcessingStepExecutor extends StepExecutor implements StepExecutionAw
      */
     protected function executePostProcessingJob($jobType, $jobName)
     {
-        $jobExecutor = $this->jobExecutor;
-        $clearSkipped = $jobExecutor->isSkipClear();
-        $jobExecutor->setSkipClear(true);
-        $jobResult = $jobExecutor->executeJob($jobType, $jobName, $this->getJobConfiguration());
-        $jobExecutor->setSkipClear($clearSkipped);
+        $clearSkipped = $this->jobExecutor->isSkipClear();
+        $this->jobExecutor->setSkipClear(true);
+        $jobResult = $this->jobExecutor->executeJob($jobType, $jobName, $this->getJobConfiguration());
+        $this->jobExecutor->setSkipClear($clearSkipped);
 
         return $jobResult;
     }
@@ -153,7 +152,7 @@ class PostProcessingStepExecutor extends StepExecutor implements StepExecutionAw
         }
 
         foreach ($this->contextSharedKeys as $key) {
-            $configuration[JobExecutor::CONTEXT_DATA_KEY][$key] = $jobContext->get($key);
+            $configuration[JobExecutor::JOB_CONTEXT_DATA_KEY][$key] = $jobContext->get($key);
         }
 
         return $configuration;

@@ -8,17 +8,17 @@ use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
-class PostProcessingItemStep extends ItemStep
+class PostProcessItemStep extends ItemStep
 {
     /**
-     * @var array|null
+     * @var array
      */
-    protected $postProcessingJobs;
+    protected $postProcessingJobs = [];
 
     /**
-     * @var array|null
+     * @var array
      */
-    protected $contextSharedKeys;
+    protected $contextSharedKeys = [];
 
     /**
      * @var JobExecutor
@@ -65,7 +65,7 @@ class PostProcessingItemStep extends ItemStep
     {
         $this->initializeStepElements($stepExecution);
 
-        $stepExecutor = new PostProcessingStepExecutor();
+        $stepExecutor = new PostProcessStepExecutor();
         $stepExecutor
             ->setStepExecution($stepExecution)
             ->setJobExecutor($this->jobExecutor)

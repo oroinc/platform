@@ -26,8 +26,8 @@ class JobExecutor
     const JOB_EXPORT_TEMPLATE_TO_CSV = 'entity_export_template_to_csv';
     const JOB_IMPORT_FROM_CSV = 'entity_import_from_csv';
     const JOB_VALIDATE_IMPORT_FROM_CSV = 'entity_import_validation_from_csv';
-    const SKIP_CLEAR = 'jobSkipClear';
-    const CONTEXT_DATA_KEY = 'contextData';
+    const JOB_SKIP_CLEAR = 'jobSkipClear';
+    const JOB_CONTEXT_DATA_KEY = 'contextData';
 
     /**
      * @var EntityManager
@@ -319,8 +319,8 @@ class JobExecutor
         $jobInstance = new JobInstance(self::CONNECTOR_NAME, $jobType, $jobName);
         $jobInstance->setCode($this->generateJobCode($jobName));
         $jobInstance->setLabel(sprintf('%s.%s', $jobType, $jobName));
-        if (array_key_exists(self::CONTEXT_DATA_KEY, $configuration)) {
-            unset($configuration[self::CONTEXT_DATA_KEY]);
+        if (array_key_exists(self::JOB_CONTEXT_DATA_KEY, $configuration)) {
+            unset($configuration[self::JOB_CONTEXT_DATA_KEY]);
         }
         $jobInstance->setRawConfiguration($configuration);
         $this->batchJobRepository->getJobManager()->persist($jobInstance);
@@ -365,11 +365,11 @@ class JobExecutor
             return true;
         }
 
-        return $skipClear = (bool)$jobExecution->getExecutionContext()->get(self::SKIP_CLEAR);
+        return (bool)$jobExecution->getExecutionContext()->get(self::JOB_SKIP_CLEAR);
     }
 
     /**
-     * @param boolean $skipClear
+     * @param bool $skipClear
      * @return JobExecutor
      */
     public function setSkipClear($skipClear)
@@ -380,7 +380,7 @@ class JobExecutor
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isSkipClear()
     {
