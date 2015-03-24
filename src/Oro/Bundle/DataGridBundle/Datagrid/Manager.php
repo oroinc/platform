@@ -84,6 +84,11 @@ class Manager implements ManagerInterface
         $uniqueName = $name;
         if ($this->request && $widgetId = $this->request->get('_widgetId')) {
             $uniqueName = sprintf('%s_w%s', $uniqueName, $widgetId);
+        } elseif ($this->request->query->count() === 1) {
+            $paramName = array_keys($this->request->query->all())[0];
+            if (strpos($paramName, $name) === 0) {
+                $uniqueName = $paramName;
+            }
         }
 
         return $uniqueName;
