@@ -85,7 +85,7 @@ class OAuthProvider extends HWIOAuthProvider
 
     /**
      * Guess organization
-     * 
+     *
      * @param User $user
      * @param TokenInterface $token
      *

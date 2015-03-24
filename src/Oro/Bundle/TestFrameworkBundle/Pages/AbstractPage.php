@@ -289,6 +289,7 @@ abstract class AbstractPage
     public function pin()
     {
         $this->test->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
     }
@@ -299,6 +300,7 @@ abstract class AbstractPage
     public function unpin()
     {
         $this->test->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button gold-icon']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
     }

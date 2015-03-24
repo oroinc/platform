@@ -11,7 +11,7 @@ trait OrganizationContextTokenTrait
 
     /**
      * Returns organization
-     * 
+     *
      * @return Organization
      */
     public function getOrganizationContext()
@@ -21,7 +21,7 @@ trait OrganizationContextTokenTrait
 
     /**
      * Set an organization
-     * 
+     *
      * @param Organization $organization
      */
     public function setOrganizationContext(Organization $organization)
