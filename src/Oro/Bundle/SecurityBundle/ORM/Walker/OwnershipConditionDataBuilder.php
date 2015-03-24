@@ -338,7 +338,7 @@ class OwnershipConditionDataBuilder
             return [
                 null,
                 null,
-                null,
+                PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                 $organizationField,
                 $organizationValue,
                 $ignoreOwner

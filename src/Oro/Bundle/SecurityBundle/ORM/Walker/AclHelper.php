@@ -99,7 +99,7 @@ class AclHelper
      *
      * @return Query
      */
-    public function apply($query, $permission = "VIEW", $checkRelations = true)
+    public function apply($query, $permission = 'VIEW', $checkRelations = true)
     {
         $this->entityAliases = [];
         if ($query instanceof QueryBuilder) {
