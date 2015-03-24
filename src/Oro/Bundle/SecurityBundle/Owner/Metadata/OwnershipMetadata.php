@@ -38,6 +38,11 @@ class OwnershipMetadata implements \Serializable
     protected $organizationColumnName;
 
     /**
+     * @var array
+     */
+    protected $additionalParameters;
+
+    /**
      * Constructor
      *
      * @param string $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
@@ -45,6 +50,8 @@ class OwnershipMetadata implements \Serializable
      * @param string $ownerColumnName
      * @param string $organizationFieldName
      * @param string $organizationColumnName
+     * @param array  $additionalParameters
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -52,7 +59,8 @@ class OwnershipMetadata implements \Serializable
         $ownerFieldName = '',
         $ownerColumnName = '',
         $organizationFieldName = '',
-        $organizationColumnName = ''
+        $organizationColumnName = '',
+        $additionalParameters = []
     ) {
         switch ($ownerType) {
             case 'ORGANIZATION':
@@ -81,9 +89,10 @@ class OwnershipMetadata implements \Serializable
         if ($this->ownerType !== self::OWNER_TYPE_NONE && empty($ownerColumnName)) {
             throw new \InvalidArgumentException('The owner column name must not be empty.');
         }
-        $this->ownerColumnName = $ownerColumnName;
+        $this->ownerColumnName        = $ownerColumnName;
         $this->organizationColumnName = $organizationColumnName;
-        $this->organizationFieldName = $organizationFieldName;
+        $this->organizationFieldName  = $organizationFieldName;
+        $this->additionalParameters   = $additionalParameters;
     }
 
     /**
@@ -173,6 +182,14 @@ class OwnershipMetadata implements \Serializable
     }
 
     /**
+     * @return array
+     */
+    public function getAdditionalParameters()
+    {
+        return $this->additionalParameters;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -183,7 +200,8 @@ class OwnershipMetadata implements \Serializable
                 $this->ownerFieldName,
                 $this->ownerColumnName,
                 $this->organizationFieldName,
-                $this->organizationColumnName
+                $this->organizationColumnName,
+                $this->additionalParameters
             )
         );
     }
@@ -198,7 +216,8 @@ class OwnershipMetadata implements \Serializable
             $this->ownerFieldName,
             $this->ownerColumnName,
             $this->organizationFieldName,
-            $this->organizationColumnName
+            $this->organizationColumnName,
+            $this->additionalParameters
             ) = unserialize($serialized);
     }
 
@@ -206,17 +225,19 @@ class OwnershipMetadata implements \Serializable
      * The __set_state handler
      *
      * @param array $data Initialization array
+     *
      * @return OwnershipMetadata A new instance of a OwnershipMetadata object
      */
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result                  = new OwnershipMetadata();
-        $result->ownerType       = $data['ownerType'];
-        $result->ownerFieldName  = $data['ownerFieldName'];
-        $result->ownerColumnName = $data['ownerColumnName'];
+        $result                         = new OwnershipMetadata();
+        $result->ownerType              = $data['ownerType'];
+        $result->ownerFieldName         = $data['ownerFieldName'];
+        $result->ownerColumnName        = $data['ownerColumnName'];
         $result->organizationColumnName = $data['organizationColumnName'];
-        $result->organizationFieldName = $data['organizationFieldName'];
+        $result->organizationFieldName  = $data['organizationFieldName'];
+        $result->additionalParameters   = $data['additionalParameters'];
 
         return $result;
     }

@@ -27,7 +27,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     protected $label;
 
     /**
-     * @var string[]
+     * @var array
      */
     protected $permissions;
 
@@ -38,15 +38,20 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
      * @param string   $className
      * @param string   $group
      * @param string   $label
-     * @param string[] $permissions
+     * @param array    $permissions
      */
-    public function __construct($securityType = '', $className = '', $group = '', $label = '', $permissions = array())
-    {
-        $this->securityType = $securityType;
-        $this->className    = $className;
-        $this->group        = $group;
-        $this->label        = $label;
-        $this->permissions  = $permissions;
+    public function __construct(
+        $securityType = '',
+        $className = '',
+        $group = '',
+        $label = '',
+        $permissions = []
+    ) {
+        $this->securityType     = $securityType;
+        $this->className        = $className;
+        $this->group            = $group;
+        $this->label            = $label;
+        $this->permissions      = $permissions;
     }
 
     /**
@@ -92,7 +97,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     /**
      * Gets permissions
      *
-     * @return string[]
+     * @return array
      */
     public function getPermissions()
     {
@@ -110,7 +115,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
                 $this->className,
                 $this->group,
                 $this->label,
-                $this->permissions,
+                $this->permissions
             )
         );
     }
@@ -129,22 +134,22 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
             ) = unserialize($serialized);
     }
 
-
     /**
      * The __set_state handler
      *
      * @param array $data Initialization array
+     *
      * @return EntitySecurityMetadata A new instance of a EntitySecurityMetadata object
      */
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result               = new EntitySecurityMetadata();
-        $result->securityType = $data['securityType'];
-        $result->className    = $data['className'];
-        $result->group        = $data['group'];
-        $result->label        = $data['label'];
-        $result->permissions  = $data['permissions'];
+        $result                   = new EntitySecurityMetadata();
+        $result->securityType     = $data['securityType'];
+        $result->className        = $data['className'];
+        $result->group            = $data['group'];
+        $result->label            = $data['label'];
+        $result->permissions      = $data['permissions'];
 
         return $result;
     }
