@@ -4,18 +4,28 @@ namespace Oro\Bundle\TrackingBundle\Tests\Unit\Entity;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 use Oro\Bundle\TrackingBundle\Entity\TrackingEventDictionary;
 
 class TrackingEventDictionaryTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TrackingEventDictionary
-     */
+    /** @var TrackingEventDictionary */
     protected $trackingEvents;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->trackingEvents = new TrackingEventDictionary();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->trackingEvents);
     }
 
     public function testId()
@@ -50,9 +60,12 @@ class TrackingEventDictionaryTest extends \PHPUnit_Framework_TestCase
      */
     public function propertyProvider()
     {
+        $website = new TrackingWebsite();
+
         return [
             ['name', 'visit', 'visit'],
-            ['visitEvents', [], []]
+            ['visitEvents', [], []],
+            ['website', $website, $website]
         ];
     }
 }

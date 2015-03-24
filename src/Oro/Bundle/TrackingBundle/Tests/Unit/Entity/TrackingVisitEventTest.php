@@ -11,19 +11,36 @@ use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 
 class TrackingVisitEventTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TrackingVisitEvent
-     */
+    /** @var TrackingVisitEvent */
     protected $trackingVisitEvent;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->trackingVisitEvent = new TrackingVisitEvent();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->trackingVisitEvent);
+    }
+
     public function testId()
     {
         $this->assertNull($this->trackingVisitEvent->getId());
+    }
+
+    public function testParsingCount()
+    {
+        $this->assertEquals(0, $this->trackingVisitEvent->getParsingCount());
+
+        $this->trackingVisitEvent->setParsingCount(1);
+        $this->assertEquals(1, $this->trackingVisitEvent->getParsingCount());
     }
 
     /**
@@ -60,7 +77,7 @@ class TrackingVisitEventTest extends \PHPUnit_Framework_TestCase
         return [
             ['visit', $visit, $visit],
             ['event', $event, $event],
-            ['webEvent', $webEvent, $webEvent],
+            ['webEvent', $webEvent, $webEvent]
         ];
     }
 }
