@@ -27,6 +27,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 
 /**
  * Class AclWalker
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclWalker extends TreeWalkerAdapter
 {
@@ -294,7 +296,6 @@ class AclWalker extends TreeWalkerAdapter
     protected function getOrganizationCheckCondition(AclCondition $whereCondition)
     {
         if ($whereCondition->getOrganizationField() && $whereCondition->getOrganizationValue() !== null) {
-
             $organizationValue = $whereCondition->getOrganizationValue();
 
             $pathExpression       = new PathExpression(
@@ -341,10 +342,17 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getInExpression(AclCondition $whereCondition, $iterationField = 'value')
     {
+        if ('value' === $iterationField) {
+            $field = 'entityField';
+        } else {
+            $field = 'organizationField';
+        }
+
+
         $arithmeticExpression                             = new ArithmeticExpression();
         $arithmeticExpression->simpleArithmeticExpression = $this->getPathExpression(
             $whereCondition,
-            'organizationField'
+            $field
         );
 
         $expression           = new InExpression($arithmeticExpression);

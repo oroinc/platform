@@ -37,10 +37,8 @@ class OwnershipMetadata implements \Serializable
      */
     protected $organizationColumnName;
 
-    /**
-     * @var array
-     */
-    protected $additionalParameters;
+    /** @var string */
+    protected $globalView;
 
     /**
      * Constructor
@@ -50,7 +48,7 @@ class OwnershipMetadata implements \Serializable
      * @param string $ownerColumnName
      * @param string $organizationFieldName
      * @param string $organizationColumnName
-     * @param array  $additionalParameters
+     * @param string $globalView
      *
      * @throws \InvalidArgumentException
      */
@@ -60,7 +58,7 @@ class OwnershipMetadata implements \Serializable
         $ownerColumnName = '',
         $organizationFieldName = '',
         $organizationColumnName = '',
-        $additionalParameters = []
+        $globalView = ''
     ) {
         switch ($ownerType) {
             case 'ORGANIZATION':
@@ -92,7 +90,7 @@ class OwnershipMetadata implements \Serializable
         $this->ownerColumnName        = $ownerColumnName;
         $this->organizationColumnName = $organizationColumnName;
         $this->organizationFieldName  = $organizationFieldName;
-        $this->additionalParameters   = $additionalParameters;
+        $this->globalView             = $globalView;
     }
 
     /**
@@ -182,11 +180,11 @@ class OwnershipMetadata implements \Serializable
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getAdditionalParameters()
+    public function getGlobalView()
     {
-        return is_array($this->additionalParameters) ? $this->additionalParameters : [];
+        return $this->globalView;
     }
 
     /**
@@ -201,7 +199,7 @@ class OwnershipMetadata implements \Serializable
                 $this->ownerColumnName,
                 $this->organizationFieldName,
                 $this->organizationColumnName,
-                $this->additionalParameters
+                $this->globalView
             )
         );
     }
@@ -217,7 +215,7 @@ class OwnershipMetadata implements \Serializable
             $this->ownerColumnName,
             $this->organizationFieldName,
             $this->organizationColumnName,
-            $this->additionalParameters
+            $this->globalView
             ) = unserialize($serialized);
     }
 
@@ -237,7 +235,7 @@ class OwnershipMetadata implements \Serializable
         $result->ownerColumnName        = $data['ownerColumnName'];
         $result->organizationColumnName = $data['organizationColumnName'];
         $result->organizationFieldName  = $data['organizationFieldName'];
-        $result->additionalParameters   = $data['additionalParameters'];
+        $result->globalView             = $data['globalView'];
 
         return $result;
     }

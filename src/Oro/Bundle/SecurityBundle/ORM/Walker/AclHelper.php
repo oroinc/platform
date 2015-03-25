@@ -344,7 +344,7 @@ class AclHelper
         $entityName = $rangeVariableDeclaration->abstractSchemaName;
         $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
 
-        $resultData = null;
+
         $isUserTable = in_array($rangeVariableDeclaration->abstractSchemaName, [self::ORO_USER_CLASS]);
         $resultData = false;
         if (!$isUserTable || $rangeVariableDeclaration->isRoot) {
