@@ -107,6 +107,9 @@ define([
         /** @property */
         viewsCollection: GridViewsCollection,
 
+        /** @property */
+        originalTitle: null,
+
         /**
          * Initializer.
          *
@@ -135,6 +138,8 @@ define([
             if (options.title) {
                 this.title = options.title;
             }
+
+            this.originalTitle = $(document).prop('title');
 
             this.gridName = options.gridName;
             this.collection = options.collection;
@@ -174,6 +179,8 @@ define([
                 this.viewDirty = !this._isCurrentStateSynchronized();
                 this.render();
             }, this);
+
+            $(document).prop('title', this._createTitle());
 
             GridViewsView.__super__.initialize.call(this, options);
         },
@@ -223,6 +230,7 @@ define([
             e.preventDefault();
             var value = $(e.target).data('value');
             this.changeView(value);
+            $(document).prop('title', this._createTitle());
 
             this.prevState = this._getCurrentState();
             this.viewDirty = !this._isCurrentStateSynchronized();
@@ -627,6 +635,20 @@ define([
                 filters: this.collection.state.filters,
                 sorters: this.collection.state.sorters
             };
+        },
+
+        /**
+         * @private
+         *
+         * @returns {String}
+         */
+        _createTitle: function() {
+            var currentView = this._getCurrentView();
+            if (!currentView) {
+                return this.originalTitle;
+            }
+
+            return currentView.label + ' - ' + this.originalTitle;
         },
 
         /**
