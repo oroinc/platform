@@ -27,6 +27,14 @@
     font-weight: bold;
 }
 
+.emailtemplate-variables .variables .nav-list > li > a {
+    display: inline;
+}
+
+.emailtemplate-variables .variables .nav-list > li > span {
+    padding-left: 8px;
+}
+
 .modal-body .loading-content {
     background: #fff url('../img/loader.gif') no-repeat center left;
     padding-left: 30px;

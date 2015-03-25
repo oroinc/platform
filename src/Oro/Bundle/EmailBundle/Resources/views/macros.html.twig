@@ -29,6 +29,7 @@
                 <a href="javascript:void(0);"
                    class="variable"
                    title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
+                <span><%= variable.label %></span>
             </li>
             <% }); %>
         </ul>
@@ -64,6 +65,7 @@
                         <a href="javascript:void(0);"
                            class="variable"
                            title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
+                        <span><%= variable.label %></span>
                     </li>
                     <% }); %>
                 </ul>
@@ -79,6 +81,7 @@
                            class="reference"
                            data-path="<%= path + '/' + varName %>"
                            title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
+                        <span><%= variable.label %></span>
                     </li>
                     <% }); %>
                 </ul>
