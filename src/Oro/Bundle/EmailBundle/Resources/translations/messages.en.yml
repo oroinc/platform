@@ -93,11 +93,17 @@ oro:
                 page_size:
                     all: "All"
                 view:
-                    system_templates: "System only"
+                    system_templates: System only
+                    all_templates: All
             emails:
                 action:
                     view: "View"
 
+            emailfolder:
+                view:
+                    inbox: Inbox
+                    sent: Sent Mail
+                    all: All Mail
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -122,6 +128,8 @@ oro:
         sent_at.label:            Sent at
         sent_by.label:            sent by {{ user }} on {{ date }}
         subject.label:            Subject
+        to.label:                 To
+        cc_bcc.label:             Cc/Bcc
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
         template.label:           Apply template
