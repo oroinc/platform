@@ -159,6 +159,9 @@ define([
             }, this);
 
             this.viewsCollection = new this.viewsCollection(options.views);
+            if (!this.collection.state.gridView) {
+                this.collection.state.gridView = '__all__';
+            }
 
             this.viewDirty = !this._isCurrentStateSynchronized();
             this.prevState = this._getCurrentState();

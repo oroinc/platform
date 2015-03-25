@@ -53,7 +53,7 @@ class GridViewsExtension extends AbstractExtension
     {
         $params      = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         $currentView = isset($params[self::VIEWS_PARAM_KEY]) ? $params[self::VIEWS_PARAM_KEY] : null;
-        $data->offsetAddToArray('initialState', ['gridView' => '__default__']);
+        $data->offsetAddToArray('initialState', ['gridView' => null]);
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 
         /** @var AbstractViewsList $list */
@@ -71,8 +71,8 @@ class GridViewsExtension extends AbstractExtension
         ];
         if ($list !== false) {
             $configuredGridViews = $list->getMetadata();
-            $configuredGridViews['views'] = array_merge($configuredGridViews['views'], $gridViews['views']);
-            $configuredGridViews['choices'] = array_merge($configuredGridViews['choices'], $gridViews['choices']);
+            $configuredGridViews['views'] = array_merge($gridViews['views'], $configuredGridViews['views']);
+            $configuredGridViews['choices'] = array_merge($gridViews['choices'], $configuredGridViews['choices']);
             $gridViews = $configuredGridViews;
         }
 
