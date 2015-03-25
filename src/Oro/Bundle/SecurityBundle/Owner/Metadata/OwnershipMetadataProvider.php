@@ -197,13 +197,14 @@ class OwnershipMetadataProvider
                             $organizationColumnName = $ownerColumnName;
                         }
 
-                        $data = new OwnershipMetadata(
+                        $data = $this->getOwnershipMetadata(
                             $ownerType,
                             $ownerFieldName,
                             $ownerColumnName,
                             $organizationFieldName,
                             $organizationColumnName
                         );
+
                     } catch (\InvalidArgumentException $ex) {
                         throw new InvalidConfigurationException(
                             sprintf('Invalid entity ownership configuration for "%s".', $className),
@@ -223,5 +224,31 @@ class OwnershipMetadataProvider
 
             $this->localCache[$className] = $data;
         }
+    }
+
+    /**
+     * @param $ownerType
+     * @param $ownerFieldName
+     * @param $ownerColumnName
+     * @param $organizationFieldName
+     * @param $organizationColumnName
+     *
+     * @return OwnershipMetadata
+     */
+    protected function getOwnershipMetadata(
+        $ownerType,
+        $ownerFieldName,
+        $ownerColumnName,
+        $organizationFieldName,
+        $organizationColumnName
+    ) {
+        $data = new OwnershipMetadata(
+            $ownerType,
+            $ownerFieldName,
+            $ownerColumnName,
+            $organizationFieldName,
+            $organizationColumnName
+        );
+        return $data;
     }
 }
