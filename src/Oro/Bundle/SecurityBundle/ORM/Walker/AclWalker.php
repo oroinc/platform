@@ -309,7 +309,8 @@ class AclWalker extends TreeWalkerAdapter
             if (is_array($organizationValue)) {
                 $resultCondition->simpleConditionalExpression = $this->getInExpression(
                     $whereCondition,
-                    'organizationValue'
+                    'organizationValue',
+                    'organizationField'
                 );
 
                 return $resultCondition;
@@ -331,31 +332,28 @@ class AclWalker extends TreeWalkerAdapter
         return false;
     }
 
-
     /**
      * generate "in()" expression
      *
      * @param AclCondition $whereCondition
-     * @param string       $iterationField = 'value'
+     * @param string       $iterationValue = 'value'
+     * @param string       $iterationField = 'entityField'
      *
      * @return InExpression
      */
-    protected function getInExpression(AclCondition $whereCondition, $iterationField = 'value')
-    {
-        $field = 'organizationField';
-
-        if ('value' === $iterationField) {
-            $field = 'entityField';
-        }
-
+    protected function getInExpression(
+        AclCondition $whereCondition,
+        $iterationValue = 'value',
+        $iterationField = 'entityField'
+    ) {
         $arithmeticExpression                             = new ArithmeticExpression();
         $arithmeticExpression->simpleArithmeticExpression = $this->getPathExpression(
             $whereCondition,
-            $field
+            $iterationField
         );
 
         $expression           = new InExpression($arithmeticExpression);
-        $expression->literals = $this->getLiterals($whereCondition, $iterationField);
+        $expression->literals = $this->getLiterals($whereCondition, $iterationValue);
 
         return $expression;
     }

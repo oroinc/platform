@@ -38,7 +38,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
      * @param string   $className
      * @param string   $group
      * @param string   $label
-     * @param array    $permissions
+     * @param string[] $permissions
      */
     public function __construct(
         $securityType = '',

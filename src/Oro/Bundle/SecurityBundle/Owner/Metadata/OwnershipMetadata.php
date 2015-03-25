@@ -37,18 +37,18 @@ class OwnershipMetadata implements \Serializable
      */
     protected $organizationColumnName;
 
-    /** @var string */
+    /** @var boolean */
     protected $globalView;
 
     /**
      * Constructor
      *
-     * @param string $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
-     * @param string $ownerFieldName
-     * @param string $ownerColumnName
-     * @param string $organizationFieldName
-     * @param string $organizationColumnName
-     * @param string $globalView
+     * @param string  $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
+     * @param string  $ownerFieldName
+     * @param string  $ownerColumnName
+     * @param string  $organizationFieldName
+     * @param string  $organizationColumnName
+     * @param boolean $globalView
      *
      * @throws \InvalidArgumentException
      */
@@ -58,7 +58,7 @@ class OwnershipMetadata implements \Serializable
         $ownerColumnName = '',
         $organizationFieldName = '',
         $organizationColumnName = '',
-        $globalView = ''
+        $globalView = false
     ) {
         switch ($ownerType) {
             case 'ORGANIZATION':
@@ -180,11 +180,11 @@ class OwnershipMetadata implements \Serializable
     }
 
     /**
-     * @return string
+     * @return boolean
      */
-    public function getGlobalView()
+    public function isGlobalView()
     {
-        return $this->globalView;
+        return 'true' === $this->globalView;
     }
 
     /**
