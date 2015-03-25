@@ -342,12 +342,11 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getInExpression(AclCondition $whereCondition, $iterationField = 'value')
     {
+        $field = 'organizationField';
+
         if ('value' === $iterationField) {
             $field = 'entityField';
-        } else {
-            $field = 'organizationField';
         }
-
 
         $arithmeticExpression                             = new ArithmeticExpression();
         $arithmeticExpression->simpleArithmeticExpression = $this->getPathExpression(
