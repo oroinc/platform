@@ -113,17 +113,22 @@ class WidgetConfigs
     }
 
     /**
-     * Returns a list of options for current widget
+     * Returns a list of options for widget with id $widgetId or current widget if $widgetId is not specified
+     *
+     * @param int|null $widgetId
      *
      * @return WidgetOptionBag
      */
-    public function getCurrentWidgetOptions()
+    public function getWidgetOptions($widgetId = null)
     {
         if (!$this->request) {
             return new WidgetOptionBag();
         }
 
-        $widgetId = $this->request->query->get('_widgetId', null);
+        if (!$widgetId) {
+            $widgetId = $this->request->query->get('_widgetId', null);
+        }
+
         if (!$widgetId) {
             return new WidgetOptionBag();
         }
