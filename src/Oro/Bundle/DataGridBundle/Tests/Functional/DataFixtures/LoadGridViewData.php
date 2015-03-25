@@ -15,12 +15,20 @@ class LoadGridViewData extends AbstractFixture implements DependentFixtureInterf
      */
     public function load(ObjectManager $manager)
     {
-        $gridView = new GridView();
-        $gridView
+        $privateView = new GridView();
+        $privateView
             ->setName('gridView')
             ->setGridName('testing-grid')
             ->setOwner($this->getReference('simple_user'));
-        $manager->persist($gridView);
+        $manager->persist($privateView);
+
+        $publicView = new GridView();
+        $publicView
+            ->setName('gridView')
+            ->setType(GridView::TYPE_PUBLIC)
+            ->setGridName('testing-grid')
+            ->setOwner($this->getReference('simple_user'));
+        $manager->persist($publicView);
 
         $manager->flush();
     }
@@ -31,7 +39,7 @@ class LoadGridViewData extends AbstractFixture implements DependentFixtureInterf
     public function getDependencies()
     {
         return [
-            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData',
+            'Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadUserData',
         ];
     }
 }
