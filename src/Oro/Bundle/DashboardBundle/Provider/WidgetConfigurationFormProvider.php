@@ -11,6 +11,8 @@ use Symfony\Component\Form\FormInterface;
 
 class WidgetConfigurationFormProvider
 {
+    const FORM_FIELDS_KEY = 'configuration';
+
     /** @var array */
     protected $config;
 
@@ -46,7 +48,7 @@ class WidgetConfigurationFormProvider
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widget);
 
-        return isset($widgetConfig['fields']);
+        return isset($widgetConfig[static::FORM_FIELDS_KEY]);
     }
 
     /**
@@ -62,7 +64,7 @@ class WidgetConfigurationFormProvider
         }
 
         $widgetConfig = $this->configProvider->getWidgetConfig($widget);
-        $fields = $widgetConfig['fields'];
+        $fields = $widgetConfig[static::FORM_FIELDS_KEY];
 
         $builder = $this->formFactory->createNamedBuilder($widget);
         foreach ($fields as $name => $config) {
