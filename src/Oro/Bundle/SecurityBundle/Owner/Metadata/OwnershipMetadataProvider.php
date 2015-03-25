@@ -9,6 +9,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 /**
  * This class provides access to the ownership metadata of a domain object
@@ -188,25 +189,7 @@ class OwnershipMetadataProvider
                 if ($this->configProvider->hasConfig($className)) {
                     $config = $this->configProvider->getConfig($className);
                     try {
-                        $ownerType              = $config->get('owner_type');
-                        $ownerFieldName         = $config->get('owner_field_name');
-                        $ownerColumnName        = $config->get('owner_column_name');
-                        $organizationFieldName  = $config->get('organization_field_name');
-                        $organizationColumnName = $config->get('organization_column_name');
-
-                        if (!$organizationFieldName && $ownerType == OwnershipType::OWNER_TYPE_ORGANIZATION) {
-                            $organizationFieldName  = $ownerFieldName;
-                            $organizationColumnName = $ownerColumnName;
-                        }
-
-                        $data = $this->getOwnershipMetadata(
-                            $ownerType,
-                            $ownerFieldName,
-                            $ownerColumnName,
-                            $organizationFieldName,
-                            $organizationColumnName
-                        );
-
+                        $data = $this->getOwnershipMetadata($config);
                     } catch (\InvalidArgumentException $ex) {
                         throw new InvalidConfigurationException(
                             sprintf('Invalid entity ownership configuration for "%s".', $className),
@@ -229,21 +212,23 @@ class OwnershipMetadataProvider
     }
 
     /**
-     * @param $ownerType
-     * @param $ownerFieldName
-     * @param $ownerColumnName
-     * @param $organizationFieldName
-     * @param $organizationColumnName
+     * @param ConfigInterface $config
      *
      * @return OwnershipMetadata
      */
-    protected function getOwnershipMetadata(
-        $ownerType,
-        $ownerFieldName,
-        $ownerColumnName,
-        $organizationFieldName,
-        $organizationColumnName
-    ) {
+    protected function getOwnershipMetadata(ConfigInterface $config)
+    {
+        $ownerType              = $config->get('owner_type');
+        $ownerFieldName         = $config->get('owner_field_name');
+        $ownerColumnName        = $config->get('owner_column_name');
+        $organizationFieldName  = $config->get('organization_field_name');
+        $organizationColumnName = $config->get('organization_column_name');
+
+        if (!$organizationFieldName && $ownerType == OwnershipType::OWNER_TYPE_ORGANIZATION) {
+            $organizationFieldName  = $ownerFieldName;
+            $organizationColumnName = $ownerColumnName;
+        }
+
         $data = new OwnershipMetadata(
             $ownerType,
             $ownerFieldName,
