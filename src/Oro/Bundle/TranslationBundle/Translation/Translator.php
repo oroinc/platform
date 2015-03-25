@@ -4,6 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+
 class Translator extends BaseTranslator
 {
     /**
@@ -169,12 +171,18 @@ class Translator extends BaseTranslator
                 }
             );
             if (!$databaseResource) {
-                $this->addResource(
-                    'oro_database_translation',
-                    new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
-                    $locale,
-                    'messages'
-                );
+                // register resources for all domains to load all available translations into cache
+                $availableDomains = $this->container->get('doctrine')
+                    ->getRepository(Translation::ENTITY_NAME)
+                    ->findAvailableDomains($locale);
+                foreach ($availableDomains as $domain) {
+                    $this->addResource(
+                        'oro_database_translation',
+                        new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
+                        $locale,
+                        $domain
+                    );
+                }
             }
         }
     }
