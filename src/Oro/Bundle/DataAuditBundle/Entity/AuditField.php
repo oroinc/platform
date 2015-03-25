@@ -46,98 +46,98 @@ class AuditField
     /**
      * @var int
      *
-     * @ORM\Column(name="old_integer", type="bigint")
+     * @ORM\Column(name="old_integer", type="bigint", nullable=true)
      */
     protected $oldInteger;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="old_float", type="float")
+     * @ORM\Column(name="old_float", type="float", nullable=true)
      */
     protected $oldFloat;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(name="old_boolean", type="boolean")
+     * @ORM\Column(name="old_boolean", type="boolean", nullable=true)
      */
     protected $oldBoolean;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="old_text", type="text")
+     * @ORM\Column(name="old_text", type="text", nullable=true)
      */
     protected $oldText;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="old_date", type="date")
+     * @ORM\Column(name="old_date", type="date", nullable=true)
      */
     protected $oldDate;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="old_time", type="time")
+     * @ORM\Column(name="old_time", type="time", nullable=true)
      */
     protected $oldTime;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="old_date_time", type="datetime")
+     * @ORM\Column(name="old_date_time", type="datetime", nullable=true)
      */
     protected $oldDatetime;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="new_integer", type="bigint")
+     * @ORM\Column(name="new_integer", type="bigint", nullable=true)
      */
     protected $newInteger;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="new_float", type="float")
+     * @ORM\Column(name="new_float", type="float", nullable=true)
      */
     protected $newFloat;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="new_boolean", type="boolean")
+     * @ORM\Column(name="new_boolean", type="boolean", nullable=true)
      */
     protected $newBoolean;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="new_text", type="text")
+     * @ORM\Column(name="new_text", type="text", nullable=true)
      */
     protected $newText;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="new_date", type="date")
+     * @ORM\Column(name="new_date", type="date", nullable=true)
      */
     protected $newDate;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="new_time", type="time")
+     * @ORM\Column(name="new_time", type="time", nullable=true)
      */
     protected $newTime;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="new_date_time", type="datetime")
+     * @ORM\Column(name="new_date_time", type="datetime", nullable=true)
      */
     protected $newDatetime;
 
