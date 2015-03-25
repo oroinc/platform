@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
@@ -89,6 +91,13 @@ class Audit extends AbstractLogEntry
     protected $data;
 
     /**
+     * @var AuditField[]|Collection
+     *
+     * @ORM\OneToMany(targetEntity="AuditField", mappedBy="audit")
+     */
+    protected $fields;
+
+    /**
      * @var string $username
      *
      * @Soap\ComplexType("string", nillable=true)
@@ -112,6 +121,14 @@ class Audit extends AbstractLogEntry
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->fields = new ArrayCollection();
+    }
 
     /**
      * Set user
@@ -190,5 +207,32 @@ class Audit extends AbstractLogEntry
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * Get fields
+     *
+     * @return AuditField[]|Collection
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * Create field
+     *
+     * @param string $field
+     * @param string $dataType
+     * @param mixed $newValue
+     * @param mixed $oldValue
+     * @return Audit
+     */
+    public function createField($field, $dataType, $newValue, $oldValue)
+    {
+        $auditField = new AuditField($this, $field, $dataType, $newValue, $oldValue);
+        $this->fields->add($auditField);
+
+        return $this;
     }
 }

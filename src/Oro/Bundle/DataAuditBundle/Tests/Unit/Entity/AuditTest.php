@@ -30,4 +30,22 @@ class AuditTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($name, $audit->getObjectName());
     }
+
+    public function testFieldsShouldBeEmptyWhenNewInstanceIsCreated()
+    {
+        $audit = new Audit();
+        $this->assertEmpty($audit->getFields());
+    }
+
+    public function testCreateFieldShouldAddNewFieldToAudit()
+    {
+        $audit = new Audit();
+        $audit->createField('field', 'integer', 1, 0);
+
+        $this->assertCount(1, $audit->getFields());
+        $field = $audit->getFields()->first();
+        $this->assertEquals('integer', $field->getDataType());
+        $this->assertEquals(1, $field->getNewValue());
+        $this->assertEquals(0, $field->getOldValue());
+    }
 }
