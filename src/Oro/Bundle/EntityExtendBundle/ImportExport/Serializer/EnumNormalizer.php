@@ -16,6 +16,10 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        if (!empty($context['mode']) && $context['mode'] === 'short') {
+            return ['id' => $object->getId()];
+        }
+
         return [
             'id' => $object->getId(),
             'name' => $object->getName(),
