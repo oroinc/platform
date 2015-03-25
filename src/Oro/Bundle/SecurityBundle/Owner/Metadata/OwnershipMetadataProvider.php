@@ -193,7 +193,6 @@ class OwnershipMetadataProvider
                         $ownerColumnName        = $config->get('owner_column_name');
                         $organizationFieldName  = $config->get('organization_field_name');
                         $organizationColumnName = $config->get('organization_column_name');
-                        $globalView   = $config->get('global_view');
 
                         if (!$organizationFieldName && $ownerType == OwnershipType::OWNER_TYPE_ORGANIZATION) {
                             $organizationFieldName  = $ownerFieldName;
@@ -205,8 +204,7 @@ class OwnershipMetadataProvider
                             $ownerFieldName,
                             $ownerColumnName,
                             $organizationFieldName,
-                            $organizationColumnName,
-                            $globalView
+                            $organizationColumnName
                         );
                     } catch (\InvalidArgumentException $ex) {
                         throw new InvalidConfigurationException(
