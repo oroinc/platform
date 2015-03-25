@@ -97,6 +97,35 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/view-items", name="oro_email_items_view")
+     * @AclAncestor("oro_email_view")
+     * @Template
+     */
+    public function itemsAction()
+    {
+        $emails = [];
+        $ids = $this->getRequest()->get('ids');
+        if ($ids) {
+            if (!is_array($ids)) {
+                $ids = explode(',', $ids);
+            }
+            $emails = $this->get('doctrine')->getRepository("OroEmailBundle:Email")->findInIds($ids);
+        }
+
+        foreach ($emails as $email) {
+            try {
+                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
+            } catch (LoadEmailBodyException $e) {
+                // do nothing
+            }
+        }
+
+        return [
+            'items' => $emails,
+        ];
+    }
+
+    /**
      * @Route("/view-group/{id}", name="oro_email_view_group", requirements={"id"="\d+"})
      * @Acl(
      *      id="oro_email_view",
