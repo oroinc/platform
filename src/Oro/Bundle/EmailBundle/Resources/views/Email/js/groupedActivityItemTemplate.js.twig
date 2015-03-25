@@ -6,56 +6,50 @@
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
     <div class="accordion-group">
         <div class="accordion-heading">
-            <div class="title-item <% if(is_head && !ignoreHead) { %>head<% } %>">
-                <a href="#accordion-item<%= id %><% if(is_head && !ignoreHead) { %>head<% } %>" data-toggle="collapse"
-                   class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
-                <span class="icon <% if(is_head && !ignoreHead) { %>head<% } %>">
-                    <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
-                </span>
-                <% if(is_head && !ignoreHead) { %>
-                <span class="icon head-alt">
+            <a href="#accordion-item<%= id %><% if(is_head && !ignoreHead) { %>head<% } %>" data-toggle="collapse"
+               class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
+            <% if(is_head && !ignoreHead) { %>
+                <div class="icon head-alt">
                     <i class="icon-envelope-alt"></i>
-                </span>
-                <% } %>
-                <span class="visual">
-                    <span class="details">
-                        {{ entityName|raw }}
-                        <%
-                            var hasLink   = !!data.ownerLink;
-                            var ownerLink = hasLink
-                                    ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.ownerName) + '</a>'
-                                    : '<span class="user">' + _.escape(data.ownerName) + '</span>';
-                            var updatedAt = updatedAt;
-                            var subject = subject;
-                            if(is_head && !ignoreHead) {
-                                ownerLink = hasLink
-                                    ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.headOwnerName) + '</a>'
-                                    : '<span class="user">' + _.escape(data.headOwnerName) + '</span>';
-                                updatedAt = dateFormatter.formatDateTime(data.headSentAt);
-                                subject = data.headSubject;
-                            }
+                </div>
+            <% } else { %>
+                <div class="icon <% if(is_head && !ignoreHead) { %>head<% } %>">
+                    <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
+                </div>
+            <% } %>
+            <div class="details">
+                {{ entityName|raw }}
+                <%
+                    var hasLink   = !!data.ownerLink;
+                    var ownerLink = hasLink
+                            ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.ownerName) + '</a>'
+                            : '<span class="user">' + _.escape(data.ownerName) + '</span>';
+                    var updatedAt = updatedAt;
+                    var subject = subject;
+                    if(is_head && !ignoreHead) {
+                        ownerLink = hasLink
+                            ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.headOwnerName) + '</a>'
+                            : '<span class="user">' + _.escape(data.headOwnerName) + '</span>';
+                        updatedAt = dateFormatter.formatDateTime(data.headSentAt);
+                        subject = data.headSubject;
+                    }
 
-                        %>
-                        <%= _.template(
-                        {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
-                            { interpolate: /\{\{(.+?)\}\}/g }
-                        )({
-                            user: ownerLink,
-                            date: '<i class="date">' + updatedAt + '</i>'
-                        }) %>
-                    </span>
-                    <% if(!is_head || ignoreHead) { %>
-                    <span class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
-                          title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
-                        <i class="icon icon-comment"></i><span class="count"><%= commentCount %></span>
-                    </span>
-                <% } %>
-                    <span class="message-item message">
-                        <a href="#accordion-item<%= id %><% if(is_head && !ignoreHead) { %>head<% } %>" data-toggle="collapse"
-                           class="accordion-toggle<% if (collapsed) { %> collapsed<% } %>"><%= subject %></a>
-                    </span>
-                </span>
+                %>
+                <%= _.template(
+                {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
+                    { interpolate: /\{\{(.+?)\}\}/g }
+                )({
+                    user: ownerLink,
+                    date: '<i class="date">' + updatedAt + '</i>'
+                }) %>
             </div>
+            <% if(!is_head || ignoreHead) { %>
+            <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
+                  title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
+                <i class="icon icon-comment"></i><span class="count"><%= commentCount %></span>
+            </div>
+            <% } %>
+            <div class="message-item message"><%= subject %></div>
             <div class="actions action-cell">
                 <div class="more-bar-holder">
                     <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle activity-item" href="javascript:void(0);">...</a>

@@ -1,5 +1,6 @@
 @import "../../../oroui/css/less/mixins";
 .activity-list-widget {
+  min-width: 700px;
   position: relative;
   .actions-bottom {
     border-top: 1px solid #ddd;
@@ -46,36 +47,12 @@
       &:hover {
         background-color: transparent;
       }
-      .visual {
-        position: relative;
-        top: -2px;
-      }
       .user {
         font-style: normal;
       }
       .date {
         font-style: normal;
         font-size: smaller;
-      }
-      .actions {
-        white-space: nowrap;
-        float: right;
-        margin: 0;
-      }
-    }
-    .title-item {
-      white-space: nowrap;
-      .icon {
-        display: inline-block;
-        width: 27px;
-        font-size: 18px;
-        margin: 0;
-        color: #999;
-      }
-      .message-item {
-        display: block;
-        line-height: 12px;
-        padding: 0 0 0 51px;
       }
     }
     .list-item:last-child {
@@ -104,36 +81,72 @@
     }
   }
   .accordion-heading {
-    display: table;
+    height: 46px;
     width: 100%;
-    padding: 3px 10px 5px 10px;
+    padding: 5px 10px;
+
     &:hover {
       background-color: #f8f8f8;
     }
-    & > div {
-      display: table-cell;
+
+    >.icon, >.accordion-icon, >.details, >.comment-count, >.message, >.created-at, >.actions {
+      position: absolute;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .actions{
+
+    > .accordion-icon {
+      padding: 0;
+      margin: 7px 0 0 5px;
+      &:before {
+        content: '\f117';
+        font-family: FontAwesome;
+        font-size: 20px;
+        color: #999;
+      }
+      &:hover:before {
+        color: #444;
+      }
+      &.collapsed:before {
+        content: '\f116';
+      }
+    }
+    > .icon {
+      width: 27px;
+      font-size: 18px;
+      color: #999;
+      margin: 8px 0 0 26px;
+    }
+
+    > .actions{
+      right: 5px;
+      margin: 8px 0px 0px 0px;
+      overflow: visible;
       .horizontal-icon-menu;
     }
-  }
-  .accordion-toggle {
-    display: inline-block;
-    padding: 0;
-    min-width: 17px;
-  }
-  .accordion-icon {
-    &:before {
-      content: '\f117';
-      font-family: FontAwesome;
-      font-size: 20px;
-      color: #999;
+    > .details {
+      margin: 9px 0px 0px 55px;
+      padding: 0px 5px;
+      width: 247px;
     }
-    &:hover:before {
-      color: #444;
+    > .details:hover {
+      background: #fafafa;
+      width: auto;
+      z-index: 1;
     }
-    &.collapsed:before {
-      content: '\f116';
+    > .created-at {
+      right: 41px;
+      margin-top: 8px;
+      color: #888;
+    }
+    > .comment-count {
+      display: none;
+    }
+    > .message-item {
+      margin: 9px 180px 0 318px;
+      width: calc(~"100% - 510px");
+      color: #888;
     }
   }
   .accordion-body {
