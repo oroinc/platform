@@ -395,10 +395,10 @@ class AclWalker extends TreeWalkerAdapter
 
         if (!is_array($whereValue)) {
             $whereCondition->setValue(array($whereCondition->getValue()));
-        }
-
-        foreach ($whereValue as $row) {
-            $literals[] = new Literal(Literal::NUMERIC, $row);
+        } else {
+            foreach ($whereValue as $row) {
+                $literals[] = new Literal(Literal::NUMERIC, $row);
+            }
         }
 
         return $literals;
