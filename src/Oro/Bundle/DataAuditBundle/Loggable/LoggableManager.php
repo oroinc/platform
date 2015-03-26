@@ -8,6 +8,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadata as DoctrineClassMetadata;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
@@ -46,6 +48,9 @@ class LoggableManager
     /** @var string */
     protected $logEntityClass;
 
+    /** @var string */
+    protected $logEntityFieldClass;
+
     /** @var array */
     protected $pendingLogEntityInserts = array();
 
@@ -63,16 +68,19 @@ class LoggableManager
 
     /**
      * @param string $logEntityClass
+     * @param string $logEntityFieldClass
      * @param ConfigProvider $auditConfigProvider
      * @param ServiceLink $securityContextLink
      */
     public function __construct(
         $logEntityClass,
+        $logEntityFieldClass,
         ConfigProvider $auditConfigProvider,
         ServiceLink $securityContextLink
     ) {
         $this->auditConfigProvider = $auditConfigProvider;
         $this->logEntityClass      = $logEntityClass;
+        $this->logEntityFieldClass = $logEntityFieldClass;
         $this->securityContextLink = $securityContextLink;
     }
 
@@ -191,17 +199,18 @@ class LoggableManager
             foreach ($this->pendingRelatedEntities[$oid] as $props) {
                 /** @var Audit $logEntry */
                 $logEntry = $props['log'];
-                $oldData  = $data = $logEntry->getData();
+                $data     = $logEntry->getData();
                 if (empty($data[$props['field']]['new'])) {
-                    $data[$props['field']]['new'] = $identifiers;
-                    $logEntry->setData($data);
-
-                    $uow->scheduleExtraUpdate(
-                        $logEntry,
-                        array(
-                            'data' => array($oldData, $data)
-                        )
+                    $data[$props['field']]['new'] = implode(', ', $identifiers);
+                    $oldField = $logEntry->getField($props['field']);
+                    $logEntry->createField(
+                        $oldField->getField(),
+                        $oldField->getDataType(),
+                        $data[$props['field']]['new'],
+                        $oldField->getOldValue()
                     );
+
+                    $uow->computeChangeSet($logEntryMeta, $logEntry);
                     $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $data);
                 }
             }
@@ -384,6 +393,7 @@ class LoggableManager
                 $newValues[$field] = array(
                     'old' => $old,
                     'new' => $new,
+                    'type' => $this->getFieldType($entityMeta, $field),
                 );
             }
 
@@ -397,11 +407,14 @@ class LoggableManager
 
                     if ($changes['old'] != $changes['new']) {
                         $newValues[$field] = $changes;
+                        $newValues[$field]['type'] = $this->getFieldType($entityMeta, $field);
                     }
                 }
             }
 
-            $logEntry->setData($newValues);
+            foreach ($newValues as $field => $newValue) {
+                $logEntry->createField($field, $newValue['type'], $newValue['new'], $newValue['old']);
+            }
         }
 
         if ($action === self::ACTION_UPDATE && 0 === count($newValues)) {
@@ -423,6 +436,12 @@ class LoggableManager
 
         $this->em->persist($logEntry);
         $uow->computeChangeSet($logEntryMeta, $logEntry);
+
+        $logEntryFieldMeta = $this->em->getClassMetadata($this->logEntityFieldClass);
+        foreach ($logEntry->getFields() as $field) {
+            $this->em->persist($field);
+            $uow->computeChangeSet($logEntryFieldMeta, $field);
+        }
     }
 
     /**
@@ -550,5 +569,32 @@ class LoggableManager
         $metadata  = $this->em->getClassMetadata($className);
 
         return serialize($metadata->getIdentifierValues($entity));
+    }
+
+    /**
+     * @param DoctrineClassMetadata $entityMeta
+     * @param string                $field
+     *
+     * @return string
+     */
+    private function getFieldType(DoctrineClassMetadata $entityMeta, $field)
+    {
+        $type = null;
+        if ($entityMeta->hasField($field)) {
+            $type = $entityMeta->getTypeOfField($field);
+            if ($type instanceof Type) {
+                $type = $type->getName();
+            }
+        } elseif ($entityMeta->hasAssociation($field)) {
+            $type = Type::STRING;
+        } else {
+            throw new \InvalidArgumentExcepttion(sprintf(
+                'Field "%s" does is not mapped field of "%s" entity.',
+                $field,
+                $entityMeta->getName()
+            ));
+        }
+
+        return $type;
     }
 }

@@ -82,18 +82,12 @@ class Audit extends AbstractLogEntry
      */
     protected $version;
 
-    /**
-     * @var string $data
-     *
-     * @ORM\Column(type="array", nullable=true)
-     * @Soap\ComplexType("Oro\Bundle\DataAuditBundle\Entity\AuditData[]", nillable=true)
-     */
     protected $data;
 
     /**
      * @var AuditField[]|Collection
      *
-     * @ORM\OneToMany(targetEntity="AuditField", mappedBy="audit")
+     * @ORM\OneToMany(targetEntity="AuditField", mappedBy="audit", cascade={"persist"})
      */
     protected $fields;
 
@@ -216,7 +210,47 @@ class Audit extends AbstractLogEntry
      */
     public function getFields()
     {
+        if ($this->fields === null) {
+            $this->fields = new ArrayCollection();
+        }
+
         return $this->fields;
+    }
+
+    /**
+     * Get field
+     *
+     * @return AuditField[]|Collection|false
+     */
+    public function getField($field)
+    {
+        return $this->fields->filter(function(AuditField $auditField) use ($field) {
+            return $auditField->getField() === $field;
+        })->first();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        $data = [];
+        foreach ($this->getFields() as $field) {
+            $data[$field->getField()] = [
+                'old' => $field->getOldValue(),
+                'new' => $field->getNewValue(),
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * @throws BadMethodCallException
+     */
+    public function setData($data)
+    {
+        throw new \BadMethodCallException('Method "setData" is not supported. Use "createField" method instead.');
     }
 
     /**
@@ -230,6 +264,14 @@ class Audit extends AbstractLogEntry
      */
     public function createField($field, $dataType, $newValue, $oldValue)
     {
+        if ($this->fields === null) {
+            $this->fields = new ArrayCollection();
+        }
+
+        if ($existingField = $this->getField($field)) {
+            $this->fields->removeElement($existingField);
+        }
+
         $auditField = new AuditField($this, $field, $dataType, $newValue, $oldValue);
         $this->fields->add($auditField);
 

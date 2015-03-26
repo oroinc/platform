@@ -48,4 +48,22 @@ class AuditTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $field->getNewValue());
         $this->assertEquals(0, $field->getOldValue());
     }
+
+    public function testGetDataShouldRetrieveOldFormadUsingFields()
+    {
+        $audit = new Audit();
+        $audit->createField('field', 'integer', 1, 0);
+        $audit->createField('field2', 'string', 'new_', '_old');
+
+        $this->assertEquals([
+            'field' => [
+                'new' => 1,
+                'old' => 0,
+            ],
+            'field2' => [
+                'new' => 'new_',
+                'old' => '_old',
+            ],
+        ], $audit->getData());
+    }
 }

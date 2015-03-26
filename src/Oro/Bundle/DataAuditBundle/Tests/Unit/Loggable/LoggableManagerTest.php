@@ -69,6 +69,7 @@ class LoggableManagerTest extends AbstractMetadataTest
 
         $this->loggableManager = new LoggableManager(
             'Oro\Bundle\DataAuditBundle\Entity\Audit',
+            'Oro\Bundle\DataAuditBundle\Entity\AuditField',
             $provider,
             $securityContextLink
         );

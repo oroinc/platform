@@ -8,6 +8,7 @@ parameters:
     oro_dataaudit.loggable.loggable_manager.class:  Oro\Bundle\DataAuditBundle\Loggable\LoggableManager
 
     oro_dataaudit.loggable.entity.class:            Oro\Bundle\DataAuditBundle\Entity\Audit
+    oro_dataaudit.loggable.entity_field.class:      Oro\Bundle\DataAuditBundle\Entity\AuditField
 
     oro_dataaudit.event_listener.dataaudit_grid_listener.class: Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener
     oro_dataaudit.event_listener.dataaudit_history_grid_listener.class: Oro\Bundle\DataAuditBundle\EventListener\AuditHistoryGridListener
@@ -21,6 +22,7 @@ services:
         class:                                      %oro_dataaudit.loggable.loggable_manager.class%
         arguments:
             - %oro_dataaudit.loggable.entity.class%
+            - %oro_dataaudit.loggable.entity_field.class%
             - @oro_entity_config.provider.dataaudit
             - @security.context.link
 
