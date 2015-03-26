@@ -37,7 +37,7 @@ define(function (require) {
 
         render: function () {
             CommentsView.__super__.render.apply(this, arguments);
-            this.subview('header', window.globalView = new CommentsHeaderView({
+            this.subview('header', new CommentsHeaderView({
                 el: this.$('.comments-view-header'),
                 collection: this.collection,
                 canCreate: this.canCreate,

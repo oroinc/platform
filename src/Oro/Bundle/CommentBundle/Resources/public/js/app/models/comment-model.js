@@ -40,7 +40,7 @@ define(function (require) {
             var url, parameters;
             if (this.isNew()) {
                 if (!this.get('relationClass') || !this.get('relationId')) {
-                    throw "Please specify relationClass and relationId";
+                    throw 'Please specify relationClass and relationId';
                 }
                 parameters = {
                     relationId:    this.get('relationId'),

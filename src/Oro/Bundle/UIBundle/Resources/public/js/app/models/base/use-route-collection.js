@@ -70,7 +70,7 @@ define([
             // initialize state
             this.state = new BaseModel(_.extend({}, options.state, this.stateDefaults));
             this.state.on('change', _.bind(this.trigger, this, 'stateChange'));
-            this.state.on('change', this.checkRouteChange, this);
+            this.state.on('change', this.checkUrlChange, this);
 
             // initialize route
             this.route = new RouteModel(_.extend(
@@ -80,7 +80,7 @@ define([
                 this.routeParams
             ));
             this.route.on('change', _.bind(this.trigger, this, 'routeChange'));
-            this.route.on('change', this.checkRouteChange, this);
+            this.route.on('change', this.checkUrlChange, this);
             UseRouteCollection.__super__.initialize.apply(this, arguments);
         },
 
@@ -110,9 +110,10 @@ define([
         },
 
         /**
-         * Callback for state and route changes
+         * Fetches collection if url is changed.
+         * Callback for state and route changes.
          */
-        checkRouteChange: function () {
+        checkUrlChange: function () {
             var newUrl = this.url();
             if (newUrl !== this._lastUrl) {
                 this.fetch();
