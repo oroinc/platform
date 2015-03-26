@@ -129,7 +129,6 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
             ) = unserialize($serialized);
     }
 
-
     /**
      * The __set_state handler
      *
