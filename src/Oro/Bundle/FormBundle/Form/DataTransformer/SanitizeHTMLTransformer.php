@@ -10,7 +10,7 @@ use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 class SanitizeHTMLTransformer implements DataTransformerInterface
 {
     const SUB_DIR = 'ezyang';
-    const MODE = 0777;
+    const MODE = 0775;
 
     /**
      * @var string|null
@@ -84,9 +84,7 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     protected function fillCacheConfig($config)
     {
         if ($this->cacheDir) {
-            $cacheDir = $this->cacheDir
-                . DIRECTORY_SEPARATOR . 'vendor'
-                . DIRECTORY_SEPARATOR . self::SUB_DIR;
+            $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . self::SUB_DIR;
             $this->touchCacheDir($cacheDir);
             $config->set('Cache.SerializerPath', $cacheDir);
             $config->set('Cache.SerializerPermissions', self::MODE);
