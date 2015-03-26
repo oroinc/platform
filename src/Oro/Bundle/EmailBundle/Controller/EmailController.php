@@ -324,7 +324,7 @@ class EmailController extends Controller
     {
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
-        if (is_null($entityClassName)) {
+        if (null === $entityClassName) {
             return false;
         }
 
@@ -345,7 +345,7 @@ class EmailController extends Controller
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
         $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
-        if (is_null($targetEntityClass) || is_null($targetEntityId)) {
+        if (null === $targetEntityClass || null === $targetEntityId) {
             return [];
         }
         return [
