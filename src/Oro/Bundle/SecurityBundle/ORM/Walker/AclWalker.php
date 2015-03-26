@@ -394,7 +394,8 @@ class AclWalker extends TreeWalkerAdapter
         $whereValue = $this->getPropertyAccessor()->getValue($whereCondition, $iterationField);
 
         if (!is_array($whereValue)) {
-            $whereCondition->setValue(array($whereCondition->getValue()));
+            $whereValue = [$whereValue];
+            $this->getPropertyAccessor()->setValue($whereCondition, $iterationField, $whereValue);
         }
 
         foreach ($whereValue as $row) {
