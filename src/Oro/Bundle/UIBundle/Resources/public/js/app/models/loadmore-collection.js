@@ -7,7 +7,7 @@ define(['./base/use-route-collection', './base/model'
     var LoadMoreCollection;
 
     /**
-     * Pageable collection
+     * Collection with "load more" functionality support
      */
     LoadMoreCollection = UseRouteCollection.extend({
         stateDefaults: {

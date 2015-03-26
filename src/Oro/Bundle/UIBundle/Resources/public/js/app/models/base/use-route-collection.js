@@ -16,7 +16,7 @@ define([
      *
      * Basic usage:
      * ```
-     * CommentCollection = LoadMoreCollection.extend({
+     * CommentCollection = UseRouteCollection.extend({
      *     routeName: 'oro_api_comment_get_items',
      *     routeAccepts: ['page', 'limit'],
      *     stateDefaults: {
@@ -65,8 +65,9 @@ define([
         /**
          * Route object which used to generate urls. Collection will reload whenever route is changed
          * @type {RouteModel}
+         * @protected
          */
-        route: null,
+        _route: null,
 
         /**
          * State model. Collection will reload whenever state is changed
@@ -108,14 +109,15 @@ define([
             this.state.on('change', this.checkUrlChange, this);
 
             // initialize route
-            this.route = new RouteModel(_.extend(
+            this._route = new RouteModel(_.extend(
                 {routeName: this.routeName, routeAccepts: this.routeAccepts},
-                _.pick(options, ['routeName']),
+                this.routeParams,
                 options.routeParams,
-                this.routeParams
+                _.pick(options, ['routeName']) // route name cannot be overridden
             ));
-            this.route.on('change', _.bind(this.trigger, this, 'routeChange'));
-            this.route.on('change', this.checkUrlChange, this);
+            this._route.on('change', _.bind(this.trigger, this, 'routeChange'));
+            this._route.on('change', this.checkUrlChange, this);
+
             UseRouteCollection.__super__.initialize.apply(this, arguments);
         },
 
@@ -123,7 +125,7 @@ define([
          * @inheritDoc
          */
         url: function () {
-            return this.route.getUrl(this.state.toJSON());
+            return this._route.getUrl(this.state.toJSON());
         },
 
         /**

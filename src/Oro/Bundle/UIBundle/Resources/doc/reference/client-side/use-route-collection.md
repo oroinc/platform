@@ -1,6 +1,34 @@
 <a name="module_UseRouteCollection"></a>
 ## UseRouteCollection
-UseRouteCollection is an abstraction of collection which uses Oro routing system.It keeps itself in actual state when route or state changes.Basic usage:```CommentCollection = LoadMoreCollection.extend({    routeName: 'oro_api_comment_get_items',    routeAccepts: ['page', 'limit'],    stateDefaults: {        page: 1,        limit: 10    }});var commentCollection = new CommentCollection([], {    routeParams: {        // specify required parameters        relationId: 1,        relationClass: 'Some/Class'    }});// load first pagecommentCollection.fetch()// load second pagecommentCollection.state.set({page: 2})```
+UseRouteCollection is an abstraction of collection which uses Oro routing system.
+
+It keeps itself in actual state when route or state changes.
+
+Basic usage:
+```
+CommentCollection = UseRouteCollection.extend({
+    routeName: 'oro_api_comment_get_items',
+    routeAccepts: ['page', 'limit'],
+    stateDefaults: {
+        page: 1,
+        limit: 10
+    }
+});
+
+var commentCollection = new CommentCollection([], {
+    routeParams: {
+        // specify required parameters
+        relationId: 1,
+        relationClass: 'Some/Class'
+    }
+});
+
+// load first page
+commentCollection.fetch()
+
+// load second page
+commentCollection.state.set({page: 2})
+```
 
 
 * [UseRouteCollection](#module_UseRouteCollection)
@@ -26,7 +54,8 @@ Route name this collection belongs to
 **See**: RouteModel.routeName  
 <a name="module_UseRouteCollection#routeAccepts"></a>
 ### useRouteCollection.routeAccepts : <code>Array.&lt;string&gt;</code>
-List of query parameters which this route accepts.There is no need to specify here arguments which is required to build route path.
+List of query parameters which this route accepts.
+There is no need to specify here arguments which is required to build route path.
 
 **Kind**: instance property of <code>[UseRouteCollection](#module_UseRouteCollection)</code>  
 **See**: RouteModel.routeAccepts  
@@ -64,7 +93,8 @@ Default route parameters
 **Kind**: instance method of <code>[UseRouteCollection](#module_UseRouteCollection)</code>  
 <a name="module_UseRouteCollection#checkUrlChange"></a>
 ### useRouteCollection.checkUrlChange()
-Fetches collection if url is changed.Callback for state and route changes.
+Fetches collection if url is changed.
+Callback for state and route changes.
 
 **Kind**: instance method of <code>[UseRouteCollection](#module_UseRouteCollection)</code>  
 <a name="module_UseRouteCollection#serialize"></a>
@@ -72,7 +102,8 @@ Fetches collection if url is changed.Callback for state and route changes.
 **Kind**: instance method of <code>[UseRouteCollection](#module_UseRouteCollection)</code>  
 <a name="module_UseRouteCollection#_onErrorResponse"></a>
 ### useRouteCollection._onErrorResponse()
-Default error response handler functionIt will show error messages for all HTTP error codes except 400.
+Default error response handler function
+It will show error messages for all HTTP error codes except 400.
 
 **Kind**: instance method of <code>[UseRouteCollection](#module_UseRouteCollection)</code>  
 **Access:** protected  

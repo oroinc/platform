@@ -13,24 +13,24 @@ define(function (require) {
          * @inheritDoc
          */
         initialize: function (options) {
-            this.updateAccepts();
-            this.on('change:routeAccepts change:routeName', this.updateAccepts, this);
+            this.updateRouteParams();
+            this.on('change:routeAccepts change:routeName', this.updateRouteParams, this);
         },
 
         /**
          * Updates list of route arguments accepted by this route
          */
-        updateAccepts: function () {
-            var route, variableTokens, variables;
-            route = require('routing').getRoute(this.get('routeName'));
+        updateRouteParams: function () {
+            var route, variableTokens, variableNames;
+            route = routing.getRoute(this.get('routeName'));
             variableTokens = _.filter(route.tokens, function (tokenPart){
                 return tokenPart[0] === 'variable';
             });
-            variables = _.map(variableTokens, function (tokenPart) {
+            variableNames = _.map(variableTokens, function (tokenPart) {
                 return tokenPart[3];
             });
-            variables.push.apply(variables, this.get('routeAccepts'));
-            this.accepts = variables;
+            variableNames.push.apply(variableNames, this.get('routeAccepts'));
+            this.routeParams = variableNames;
         },
 
         /**
@@ -41,7 +41,7 @@ define(function (require) {
          */
         getUrl: function (options) {
             var routeParams = _.extend(this.toJSON(), options);
-            return routing.generate(this.get('routeName'), _.pick(routeParams, this.accepts));
+            return routing.generate(this.get('routeName'), _.pick(routeParams, this.routeParams));
         }
     });
 
