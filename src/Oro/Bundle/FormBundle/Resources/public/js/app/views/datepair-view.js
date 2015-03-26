@@ -30,11 +30,6 @@ define([
         nativeDateFormat: 'YYYY-MM-DD',
 
         /**
-         * Date Time Separator
-         */
-        dateTimeSeparator: ' ',
-
-        /**
          * Default options
          */
         options: {
@@ -42,15 +37,13 @@ define([
             endClass: 'end',
             timeClass: 'time',
             dateClass: 'date',
-            containerSelector: 'form',
             defaultDateDelta: 0,
             defaultTimeDelta: 3600000
         },
 
-        /**
-         * {Object} Container
-         */
-        $container: null,
+        events: {
+            rangeError: 'handleRangeError'
+        },
 
         /**
          * @constructor
@@ -58,30 +51,22 @@ define([
          * @param {Object} options
          */
         initialize: function (options) {
-            $.extend(this, _.pick(options, ['nativeMode']));
+            _.extend(this, _.pick(options, ['nativeMode']));
             DatepairView.__super__.initialize.apply(this, arguments);
-            this.$container = $(this.$el.parents(this.options.containerSelector));
             this.initDatepair();
-            this.bindContainerHandler();
         },
 
         initDatepair: function () {
-            this.$container.datepair({
+            this.$el.datepair({
                 startClass: this.options.startClass,
                 endClass: this.options.endClass,
                 timeClass: this.options.timeClass,
                 dateClass: this.options.dateClass,
-                parseTime: this._parseTime,
-                updateTime: this._updateTime,
-                setMinTime: this._setMinTime,
-                parseDate: this._parseDate,
-                updateDate: this._updateDate,
-
-                nativeMode: this.nativeMode,
-                getNativeDateTimeFormat: this.getNativeDateTimeFormat,
-                dateTimeSeparator: this.dateTimeSeparator,
-                nativeTimeFormat: this.nativeTimeFormat,
-                nativeDateFormat: this.nativeDateFormat
+                parseTime: _.bind(this._parseTime, this),
+                updateTime: _.bind(this._updateTime, this),
+                setMinTime: _.bind(this._setMinTime, this),
+                parseDate: _.bind(this._parseDate, this),
+                updateDate: _.bind(this._updateDate, this)
             });
         },
 
@@ -134,28 +119,18 @@ define([
             }
         },
 
-        bindContainerHandler: function () {
-            var self = this;
-            this.$container.on('rangeError', function () {
-                // resets 'start' and 'end' fields to default values on range error
-                var startDateInput = self.$container.find('.' + self.options.startClass + '.' + self.options.dateClass),
-                    endDateInput = self.$container.find('.' + self.options.endClass + '.' + self.options.dateClass),
-                    startTimeInput = self.$container.find('.' + self.options.startClass + '.' + self.options.timeClass),
-                    endTimeInput = self.$container.find('.' + self.options.endClass + '.' + self.options.timeClass);
-                var startDate = self._parseDate($(startDateInput)),
-                    startTime = self._parseTime($(startTimeInput));
-                var newDate = new Date(startDate.getTime() + self.options.defaultDateDelta * _ONE_DAY);
-                var newTime = new Date(startTime.getTime() + self.options.defaultTimeDelta);
-                self._updateDate($(endDateInput), newDate);
-                self._updateTime($(endTimeInput), newTime);
-            });
-        },
-
-        /**
-         * @returns {string}
-         */
-        getNativeDateTimeFormat: function () {
-            return this.nativeDateFormat + this.dateTimeSeparator + this.nativeTimeFormat;
+        handleRangeError: function () {
+            // resets 'start' and 'end' fields to default values on range error
+            var startDateInput = this.$('.' + this.options.startClass + '.' + this.options.dateClass),
+                endDateInput = this.$('.' + this.options.endClass + '.' + this.options.dateClass),
+                startTimeInput = this.$('.' + this.options.startClass + '.' + this.options.timeClass),
+                endTimeInput = this.$('.' + this.options.endClass + '.' + this.options.timeClass);
+            var startDate = this._parseDate($(startDateInput)),
+                startTime = this._parseTime($(startTimeInput));
+            var newDate = new Date(startDate.getTime() + this.options.defaultDateDelta * _ONE_DAY);
+            var newTime = new Date(startTime.getTime() + this.options.defaultTimeDelta);
+            this._updateDate($(endDateInput), newDate);
+            this._updateTime($(endTimeInput), newTime);
         }
     });
 
