@@ -354,8 +354,8 @@
             {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
         {%- endif %}
     {%- else -%}
-        {# @todo trim email from emailAddressName here #}
-        {{ _self.email_address(emailAddress, emailAddressName, noLink, knownOnly) }}
+        {% set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName)) %}
+        {{ _self.email_address(emailAddress, name, noLink, knownOnly) }}
     {%- endif %}
 {%- endmacro %}
 
