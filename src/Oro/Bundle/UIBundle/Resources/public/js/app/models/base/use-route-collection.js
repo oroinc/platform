@@ -16,7 +16,7 @@ define([
      *
      * Basic usage:
      * ```
-     * CommentCollection = UseRouteCollection.extend({
+     * var CommentCollection = UseRouteCollection.extend({
      *     routeName: 'oro_api_comment_get_items',
      *     routeAccepts: ['page', 'limit'],
      *     stateDefaults: {
