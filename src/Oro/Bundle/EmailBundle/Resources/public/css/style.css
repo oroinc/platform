@@ -131,3 +131,6 @@
     line-height: 12px;
     border-radius: 2px;
 }
+a.attachment .icon .icon-link {
+    color: #999;
+}
