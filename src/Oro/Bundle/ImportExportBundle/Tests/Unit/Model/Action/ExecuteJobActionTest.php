@@ -1,10 +1,12 @@
 <?php
-
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Model\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +16,7 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|JobExecutor
      */
     protected $jobExecutor;
 
@@ -32,6 +34,7 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
 
         $this->action = new ExecuteJobAction($this->contextAccessor, $this->jobExecutor);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -104,7 +107,7 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider invalidExecuteOptionsDataProvider
      * @param array $options
      * @param mixed $context
-     * @param string$expectedExceptionMessage
+     * @param string $expectedExceptionMessage
      */
     public function testExecuteExceptions(array $options, $context, $expectedExceptionMessage)
     {
@@ -200,12 +203,10 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
             'configuration' => ['c' => new PropertyPath('c'), 'd' => 'e'],
             'attribute' => new PropertyPath('attr')
         ];
-
         $context = new \stdClass();
         $context->a = 'name';
         $context->c = 'test';
         $context->attr = null;
-
         $jobResult = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\JobResult')
             ->disableOriginalConstructor()
             ->getMock();
@@ -213,10 +214,8 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
             ->method('executeJob')
             ->with('type', 'name', ['c' => 'test', 'd' => 'e'])
             ->will($this->returnValue($jobResult));
-
         $this->action->initialize($options);
         $this->action->execute($context);
-
         $expectedContext = new \stdClass();
         $expectedContext->a = 'name';
         $expectedContext->c = 'test';
