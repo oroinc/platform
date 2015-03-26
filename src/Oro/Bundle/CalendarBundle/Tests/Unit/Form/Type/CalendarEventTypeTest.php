@@ -53,7 +53,11 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'start',
                 'oro_datetime',
-                array('required' => true, 'label' => 'oro.calendar.calendarevent.start.label')
+                [
+                    'required' => true,
+                    'label'    => 'oro.calendar.calendarevent.start.label',
+                    'attr'     => ['class' => 'start'],
+                ]
             )
             ->will($this->returnSelf());
         $builder->expects($this->at(3))
@@ -61,7 +65,11 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'end',
                 'oro_datetime',
-                array('required' => true, 'label' => 'oro.calendar.calendarevent.end.label')
+                [
+                    'required' => true,
+                    'label'    => 'oro.calendar.calendarevent.end.label',
+                    'attr'     => ['class' => 'end'],
+                ]
             )
             ->will($this->returnSelf());
         $builder->expects($this->at(4))
