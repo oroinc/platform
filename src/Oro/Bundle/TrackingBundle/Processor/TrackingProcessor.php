@@ -161,9 +161,9 @@ class TrackingProcessor implements LoggerAwareInterface
             $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
         }
 
+        /** @var TrackingVisitEvent[] $entities */
         $entities = $queryBuilder->getQuery()->getResult();
         if ($entities) {
-            /** @var TrackingVisitEvent $visitEvent */
             foreach ($entities as $visitEvent) {
                 $visitEvent->setParsingCount($visitEvent->getParsingCount() + 1);
                 $this->skipList[] = $visitEvent->getId();
@@ -277,14 +277,24 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->setParameter('visitorUid', $visit->getVisitorUid())
                     ->setParameter('maxDate', $visit->getFirstActionTime())
                     ->setParameter('website', $visit->getTrackingWebsite())
-                    ->getDQL();
-
-                $qb->update(self::TRACKING_VISIT_EVENT_ENTITY, 'event')
-                    ->set('event.' . $associationName, ':identifier')
-                    ->where($qb->expr()->in('event.visit', $subSelect))
-                    ->setParameter('identifier', $identifier)
                     ->getQuery()
-                    ->execute();
+                    ->getArrayResult();
+                if (!empty($subSelect)) {
+                    array_walk(
+                        $subSelect,
+                        function (&$value) {
+                            $value = $value['id'];
+                        }
+                    );
+
+                    $this->getEntityManager()->createQueryBuilder()
+                        ->update(self::TRACKING_VISIT_EVENT_ENTITY, 'event')
+                        ->set('event.' . $associationName, ':identifier')
+                        ->where('event.visit in(' . implode(',', $subSelect) .')')
+                        ->setParameter('identifier', $identifier)
+                        ->getQuery()
+                        ->execute();
+                }
 
                 $associationName = ExtendHelper::buildAssociationName(
                     ClassUtils::getClass($identifier),
@@ -310,6 +320,8 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->execute();
             }
         }
+
+        $this->deviceDetector->clearInstances();
     }
 
     /**
@@ -452,20 +464,24 @@ class TrackingProcessor implements LoggerAwareInterface
     /**
      * @param TrackingVisit $visit
      * @param string        $ua
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * because of ternary operators which in current case is clear enough to replace it with 'if' statement.
      */
     protected function processUserAgentString(TrackingVisit $visit, $ua)
     {
         $device = $this->deviceDetector->getInstance($ua);
         $os     = $device->getOs();
         if (is_array($os)) {
-            $visit->setOs($os['name']);
-            $visit->setOsVersion($os['version']);
+            $visit->setOs(isset($os['name']) ? $os['name'] : null);
+            $visit->setOsVersion(isset($os['version']) ? $os['version'] : null);
         }
+
         $client = $device->getClient();
         if (is_array($client)) {
-            $visit->setClient($client['name']);
-            $visit->setClientType($client['type']);
-            $visit->setClientVersion($client['version']);
+            $visit->setClient(isset($client['name']) ? $client['name'] : null);
+            $visit->setClientType(isset($client['type']) ? $client['type'] : null);
+            $visit->setClientVersion(isset($client['version']) ? $client['version'] : null);
         }
 
         $visit->setDesktop($device->isDesktop());

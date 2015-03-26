@@ -6,7 +6,8 @@ use DeviceDetector\DeviceDetector;
 
 class DeviceDetectorFactory
 {
-    protected static $deviceDetectorInstances = array();
+    /** @var array Collection of parsed user agents */
+    protected static $deviceDetectorInstances = [];
 
     /**
      * Returns a Singleton instance of DeviceDetector for the given user agent
@@ -26,5 +27,13 @@ class DeviceDetectorFactory
         self::$deviceDetectorInstances[$userAgent] = $deviceDetector;
 
         return $deviceDetector;
+    }
+
+    /**
+     * Clears users agents collection
+     */
+    public static function clearInstances()
+    {
+        self::$deviceDetectorInstances = [];
     }
 }
