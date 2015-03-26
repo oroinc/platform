@@ -12,15 +12,18 @@ class EmailTemplatesViewList extends AbstractViewsList
      */
     protected function getViewsList()
     {
-        return array(
+        return [
+            new View(
+                'oro.email.datagrid.emailtemplate.view.all_templates'
+            ),
             new View(
                 'oro.email.datagrid.emailtemplate.view.system_templates',
-                array(
-                    'isSystem' => array(
-                        'value' => 1,
-                    ),
-                )
+                [
+                    'isSystem' => [
+                        'value' => 1
+                    ]
+                ]
             )
-        );
+        ];
     }
 }

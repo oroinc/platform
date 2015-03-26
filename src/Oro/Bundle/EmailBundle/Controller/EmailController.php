@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -62,7 +61,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        return ['entity' => $entity,];
+        return ['entity' => $entity];
     }
 
     /**
@@ -72,15 +71,10 @@ class EmailController extends Controller
      */
     public function threadWidgetAction(Email $entity)
     {
-        $config = $this->get('oro_config.global');
-        if ($config->get('oro_email.use_threads_in_emails')) {
-            $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
-                $this->get('doctrine')->getManager(),
-                $entity
-            );
-        } else {
-            $emails = [$entity];
-        }
+        $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
+            $this->get('doctrine')->getManager(),
+            $entity
+        );
 
         foreach ($emails as $email) {
             try {
@@ -92,7 +86,7 @@ class EmailController extends Controller
 
         return [
             'entity' => $entity,
-            'thread' => $emails,
+            'thread' => $emails
         ];
     }
 
@@ -280,7 +274,7 @@ class EmailController extends Controller
         $responseData = [
             'entity' => $emailModel,
             'saved' => false,
-            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature'),
+            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature')
         ];
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;
