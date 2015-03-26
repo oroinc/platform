@@ -4,7 +4,9 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -102,6 +104,8 @@ class Processor
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
+        $this->addAttachments($message, $model);
+
         $messageId = '<' . $message->generateId() . '>';
 
         if (!$this->mailer->send($message)) {
@@ -146,6 +150,26 @@ class Processor
         $this->getEntityManager()->flush();
 
         return $email;
+    }
+
+    /**
+     * @param \Swift_Message $message
+     * @param EmailModel     $model
+     */
+    protected function addAttachments(\Swift_Message $message, EmailModel $model)
+    {
+        /** @var EmailAttachment $attachment */
+        foreach ($model->getAttachments() as $attachment) {
+            $swiftAttachment = new \Swift_Attachment(
+                ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                ),
+                $attachment->getFileName(),
+                $attachment->getContentType()
+            );
+            $message->attach($swiftAttachment);
+        }
     }
 
     /**
