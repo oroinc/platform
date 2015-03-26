@@ -1,4 +1,5 @@
 /*global define*/
+/** @lends UseRouteCollection */
 define([
     'underscore',
     'orotranslation/js/translator',
@@ -8,33 +9,67 @@ define([
     'oroui/js/mediator'
 ], function (_, __, BaseModel, RouteModel, BaseCollection, mediator) {
     'use strict';
-
-    var UseRouteCollection;
     /**
+     * UseRouteCollection is an abstraction of collection which uses Oro routing system.
      *
-     * @type {*|Object|void}
+     * It keeps itself in actual state when route or state changes.
+     *
+     * Basic usage:
+     * ```
+     * CommentCollection = LoadMoreCollection.extend({
+     *     routeName: 'oro_api_comment_get_items',
+     *     routeAccepts: ['page', 'limit'],
+     *     stateDefaults: {
+     *         page: 1,
+     *         limit: 10
+     *     }
+     * });
+     *
+     * var commentCollection = new CommentCollection([], {
+     *     routeParams: {
+     *         // specify required parameters
+     *         relationId: 1,
+     *         relationClass: 'Some/Class'
+     *     }
+     * });
+     *
+     * // load first page
+     * commentCollection.fetch()
+     *
+     * // load second page
+     * commentCollection.state.set({page: 2})
+     * ```
+     *
+     * @class
+     * @exports UseRouteCollection
      */
-    UseRouteCollection = BaseCollection.extend({
+    var UseRouteCollection;
+
+    UseRouteCollection = BaseCollection.extend(/** @exports UseRouteCollection.prototype */{
         /**
          * Route name this collection belongs to
+         * @see RouteModel.routeName
          * @type {string}
          */
         routeName: '',
 
         /**
-         * Arguments which route accepts
+         * List of query parameters which this route accepts.
+         * There is no need to specify here arguments which is required to build route path.
+         *
+         * @see RouteModel.routeAccepts
          * @type {Array.<string>}
          */
         routeAccepts: [],
 
         /**
-         * Route object which used to generate urls
+         * Route object which used to generate urls. Collection will reload whenever route is changed
          * @type {RouteModel}
          */
         route: null,
 
         /**
-         * State model
+         * State model. Collection will reload whenever state is changed
          * @type {BaseModel}
          */
         state: null,
@@ -66,7 +101,7 @@ define([
             if (!options) {
                 options = {};
             }
-            this.on('error', this.onErrorResponse, this);
+            this.on('error', this._onErrorResponse, this);
             // initialize state
             this.state = new BaseModel(_.extend({}, options.state, this.stateDefaults));
             this.state.on('change', _.bind(this.trigger, this, 'stateChange'));
@@ -131,10 +166,11 @@ define([
         },
 
         /**
-         * Default error response handle function
-         * It will show errors for all http error codes except 400.
+         * Default error response handler function
+         * It will show error messages for all HTTP error codes except 400.
+         * @protected
          */
-        onErrorResponse: function (collection, jqxhr) {
+        _onErrorResponse: function (collection, jqxhr) {
             this.finishSync();
             if (jqxhr.status === 403) {
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.forbidden_error'));
