@@ -18,8 +18,8 @@ define(function (require) {
 
         create: function () {
             return new CommentModel({
-                relationId: this.route.get('relationId'),
-                relationClass: this.route.get('relationClass')
+                relationId: this._route.get('relationId'),
+                relationClass: this._route.get('relationClass')
             });
         }
     });
