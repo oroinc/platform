@@ -61,6 +61,11 @@ class ExecuteJobAction extends AbstractAction
         $configuration = $this->getConfiguration($context);
 
         $jobResult = $this->jobExecutor->executeJob($jobType, $jobName, $configuration);
+
+        if (!$jobResult->isSuccessful() && $jobResult->getFailureExceptions()) {
+            throw new \RuntimeException(implode(PHP_EOL, $jobResult->getFailureExceptions()));
+        }
+
         $this->contextAccessor->setValue($context, $this->attribute, $jobResult);
     }
 
