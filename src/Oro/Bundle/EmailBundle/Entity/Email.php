@@ -23,7 +23,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          @ORM\Index(name="oro_email_is_head", columns={"is_head"})
  *      }
  * )
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository")
  * @ORM\HasLifecycleCallbacks
  *
  * @Config(
