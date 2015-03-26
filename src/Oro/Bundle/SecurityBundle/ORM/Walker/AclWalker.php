@@ -393,7 +393,11 @@ class AclWalker extends TreeWalkerAdapter
         $literals = [];
 
         if (!is_array($this->getPropertyAccessor()->getValue($whereCondition, $iterationField))) {
-            $whereCondition->setValue([$whereCondition->getValue()]);
+            $this->getPropertyAccessor()->setValue(
+                $whereCondition,
+                $iterationField,
+                [$this->getPropertyAccessor()->getValue($whereCondition, $iterationField)]
+            );
         }
 
         $whereValue = $this->getPropertyAccessor()->getValue($whereCondition, $iterationField);
