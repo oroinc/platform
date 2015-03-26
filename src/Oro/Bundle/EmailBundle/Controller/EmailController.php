@@ -97,12 +97,9 @@ class EmailController extends Controller
     public function itemsAction()
     {
         $emails = [];
-        $ids = $this->getRequest()->get('ids');
-        if ($ids) {
-            if (!is_array($ids)) {
-                $ids = explode(',', $ids);
-            }
-            $emails = $this->get('doctrine')->getRepository("OroEmailBundle:Email")->findByIds($ids);
+        $ids = $this->prepareArrayParam('ids');
+        if (count($ids) !== 0) {
+            $emails = $this->get('doctrine')->getRepository("OroEmailBundle:Email")->findEmailsByIds($ids);
         }
         $this->loadEmailBody($emails);
 
@@ -304,9 +301,9 @@ class EmailController extends Controller
     }
 
     /**
-     * @param $emails
+     * @param Email[] $emails
      */
-    protected function loadEmailBody($emails)
+    protected function loadEmailBody(array $emails)
     {
         foreach ($emails as $email) {
             try {
@@ -315,5 +312,31 @@ class EmailController extends Controller
                 // do nothing
             }
         }
+    }
+
+    /**
+     * @param string $param
+     *
+     * @return array
+     */
+    protected function prepareArrayParam($param)
+    {
+        $result = [];
+        $ids = $this->getRequest()->get($param);
+        if ($ids) {
+            if (is_string($ids)) {
+                $ids = explode(',', $ids);
+            }
+            if (is_array($ids)) {
+                $result = array_map(
+                    function ($id) {
+                        return (int)$id;
+                    },
+                    $ids
+                );
+            }
+        }
+
+        return $result;
     }
 }
