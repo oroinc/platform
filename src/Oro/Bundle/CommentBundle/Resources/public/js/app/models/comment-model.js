@@ -5,7 +5,6 @@ define(function (require) {
     var CommentModel,
         Chaplin = require('chaplin'),
         routing = require('routing'),
-        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
         BaseModel = require('oroui/js/app/models/base/model');
 
     CommentModel = BaseModel.extend({
@@ -80,14 +79,6 @@ define(function (require) {
             data.hasActions = data.removable || data.editable;
             data.message = this.getMessage();
             data.shortMessage = this.getShortMessage();
-            data.isCollapsible = data.message !== data.shortMessage || data.attachmentURL;
-            data.collapsed = this.collapsed;
-            if (data.createdAt) {
-                data.createdTime = dateTimeFormatter.formatDateTime(data.createdAt);
-            }
-            if (data.updatedAt) {
-                data.updatedTime = dateTimeFormatter.formatDateTime(data.updatedAt);
-            }
             if (data.owner_id) {
                 data.owner_url = routing.generate('oro_user_view', {id: data.owner_id});
             }
