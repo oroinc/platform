@@ -14,7 +14,7 @@ class EmailRepository extends EntityRepository
      * @param array $ids
      * @return array
      */
-    public function findInIds($ids)
+    public function findByIds($ids)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->createQueryBuilder('e');

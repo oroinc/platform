@@ -81,18 +81,11 @@ class EmailController extends Controller
         } else {
             $emails = [$entity];
         }
-
-        foreach ($emails as $email) {
-            try {
-                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
-            } catch (LoadEmailBodyException $e) {
-                // do nothing
-            }
-        }
+        $this->loadEmailBody($emails);
 
         return [
             'entity' => $entity,
-            'thread' => $emails,
+            'thread' => $emails
         ];
     }
 
@@ -109,20 +102,11 @@ class EmailController extends Controller
             if (!is_array($ids)) {
                 $ids = explode(',', $ids);
             }
-            $emails = $this->get('doctrine')->getRepository("OroEmailBundle:Email")->findInIds($ids);
+            $emails = $this->get('doctrine')->getRepository("OroEmailBundle:Email")->findByIds($ids);
         }
+        $this->loadEmailBody($emails);
 
-        foreach ($emails as $email) {
-            try {
-                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
-            } catch (LoadEmailBodyException $e) {
-                // do nothing
-            }
-        }
-
-        return [
-            'items' => $emails,
-        ];
+        return ['items' => $emails];
     }
 
     /**
@@ -317,5 +301,19 @@ class EmailController extends Controller
         $responseData['form'] = $this->get('oro_email.form.email')->createView();
 
         return $responseData;
+    }
+
+    /**
+     * @param $emails
+     */
+    protected function loadEmailBody($emails)
+    {
+        foreach ($emails as $email) {
+            try {
+                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
+            } catch (LoadEmailBodyException $e) {
+                // do nothing
+            }
+        }
     }
 }
