@@ -337,9 +337,9 @@
     {%- endif %}
 {%- endmacro %}
 
-
 {#
-    Render email address name, owner name or a link to owner view page can be rendered depends on given parameters
+    Render email participant name or "me" if it is current user,
+        owner name or a link to owner view page can be rendered depends on given parameters
     Parameters:
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
         emailAddressName - a string contains an email address. It is used if the email address has no owner
@@ -360,7 +360,11 @@
 {%- endmacro %}
 
 {#
-
+    Render list of participants using email_participant_name_or_me macros
+    Parameters:
+        recipients - an array of Oro\Bundle\EmailBundle\Entity\EmailRecipients
+        noLink - determines whether the rendering of a link to the owner view page is forbidden or not. Default value is false
+        knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_participants_name(recipients, noLink, knownOnly) -%}
     {% set recipientHtmlCollection = [] %}
@@ -374,19 +378,25 @@
 {%- endmacro %}
 
 {#
-
+    Render date in proper format
+    Parameters:
+        date - DateTime
 #}
-{% macro email_sent_at(email) -%}
-    {% if date(email.sentAt)|oro_format_date == date()|oro_format_date -%}
+{% macro date_smart_format(date) -%}
+    {% if date(date)|oro_format_date == date()|oro_format_date -%}
         {# same day -- show only time #}
-        {{ email.sentAt|oro_format_time }}
+        {{ date|oro_format_time }}
+    {%- elseif date(date)|oro_format_date == date('-1days')|oro_format_date -%}
+        {{ 'yesterday'|trans }}
     {%- else -%}
-        {{ email.sentAt|oro_format_date }}
+        {{ date|oro_format_date }}
     {%- endif %}
 {%- endmacro %}
 
 {#
     Render table with detailed information about all participants, send date and subject
+    Parameters:
+        email - email entity Oro\Bundle\EmailBundle\Entity\Email
 #}
 {% macro email_detailed_info_table(email) %}
     {% set recipientsTo = [] %}
