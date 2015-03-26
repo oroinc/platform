@@ -10,23 +10,30 @@ define(['./base/use-route-collection', './base/model'
      * Pageable collection
      */
     LoadMoreCollection = UseRouteCollection.extend({
-        /**
-         * Basic model to store row data
-         *
-         * @property {Function}
-         */
-        model: BaseModel,
-
         stateDefaults: {
+            /**
+             * Initial quantity of items to load
+             * @type {number}
+             */
             limit: 5,
+
+            /**
+             * Quantity of extra items to load on loadMore() call
+             * @type {number}
+             */
             loadMoreItemsQuantity: 10
         },
 
+        /**
+         * Loads additional state.loadMoreItemsQuantity items to this collection
+         * @returns {$.Promise} promise
+         */
         loadMore: function () {
+            var loadDeferred;
             this.state.set({
                 limit: this.state.get('limit') + this.state.get('loadMoreItemsQuantity')
             });
-            var loadDeferred = $.Deferred();
+            loadDeferred = $.Deferred();
             if (this.isSyncing()) {
                 this.once('sync', function () {
                     loadDeferred.resolve(this);

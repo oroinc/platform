@@ -12,6 +12,7 @@ define(function (require) {
     CommentCollection = LoadMoreCollection.extend({
         model: CommentModel,
         routeName: 'oro_api_comment_get_items',
+        routeAccepts: ['page', 'limit', 'createdAt', 'updatedAt'],
 
         comparator: 'createdAt',
 
