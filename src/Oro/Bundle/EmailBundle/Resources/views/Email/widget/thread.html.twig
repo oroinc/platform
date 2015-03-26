@@ -9,7 +9,7 @@
 
 <div class="widget-content thread-view">
     {% for email in thread|reverse %}
-        {% if shortEmailThread and loop.index > 2 and loop.index < (loop.length - 1) %}
+        {% if shortEmailThread is defined and shortEmailThread and loop.index > 2 and loop.index < (loop.length - 1) %}
             {% set skippedEmails = skippedEmails|merge([email.id]) %}
             {% if loop.index == loop.length - 2 %}
                 load more emails:
@@ -34,12 +34,14 @@
                             <span class="email-recipients">{{ 'To'|trans|lower }} {{ EA.email_participants_name(email.recipients, true, false) }}</span>
                         </div>
                         <div class="email-body">
-                            {# @todo output short email body #}
-                            Twig 1.17.0 has just been released. It contains a new “dynamic” autoescaping strategy, named ‘filename’.
+                            {% if email.emailBody %}
+                                {{ email.emailBody.bodyContent|striptags[:200]|raw }}
+                            {% else %}
+                                {{ 'oro.email.body_is_unavailable'|trans }}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-
                 <div class="email-full">
                     <div class="email-view-toggle">
                         <div class="pull-right">

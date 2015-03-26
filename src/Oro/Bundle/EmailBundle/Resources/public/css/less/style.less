@@ -197,6 +197,9 @@
     padding: 10px 15px;
     width: 100%;
     box-sizing: border-box;
+    .email-body {
+      padding: 0;
+    }
   }
   .email-short {
     background-color: #f5f5f5;
@@ -206,12 +209,12 @@
     }
     .email-body {
       color: #888;
-      margin-top: 2px;
-      .quote,
-      .gmail_quote {
-        background-color: #fbfbfb;
-        padding: 4px;
-        .border-radius(4px);
+      margin: 2px 150px 0 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      &:after {
+        content: '\2026';
       }
     }
   }
