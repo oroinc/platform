@@ -4,7 +4,7 @@
     * form         - Oro\Bundle\EmailBundle\Form\type\EmailType
     * saved        - bool
 #}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroEmailBundle:Form:fields.html.twig'] %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block page_container %}
@@ -30,7 +30,7 @@
             </div>
         {% endif %}
         <div class="form-container">
-            <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post">
+            <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post" enctype="multipart/form-data">
                 {%
                     set emailEditorOptions = {
                         entityId: entity.entityId,
@@ -54,6 +54,11 @@
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
+                    {% set emailAttachmentOptions = {
+                        dialogButton: 'attach-file'
+                    } %}
+                    {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
+
                     <div class="control-group">
                         <div class="controls">
                             <a class="btn" id="addSignatureButton" href="javascript:void(0);">{{ 'Add signature'|trans }}</a>
@@ -61,7 +66,8 @@
                     </div>
 
                     {{ form_rest(form) }}
-                    <div class="widget-actions form-actions" style="display: none;">
+                    <div class="widget-actions form-actoins" style="display: none;">
+                        <a id="attach-file" href="javascript:void(0);">{{ 'Attach file'|trans }}</a>
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
                         <button class="btn btn-primary" type="submit">{{ 'Send'|trans }}</button>
                     </div>

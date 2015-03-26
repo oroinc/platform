@@ -90,6 +90,14 @@ class EmailType extends AbstractType
                     'expanded'   => true
                 ]
             )
+            ->add('attachments', 'oro_email_attachments', [
+                'type' => 'oro_email_attachment',
+                'required' => false,
+                'allow_add' => true,
+                'options' => [
+                    'required' => false,
+                ],
+            ])
             ->add('bodyFooter', 'hidden')
             ->add('parentEmailId', 'hidden')
             ->add('signature', 'hidden');

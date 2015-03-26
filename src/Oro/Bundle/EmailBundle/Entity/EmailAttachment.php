@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Doctrine\ORM\Mapping as ORM;
+
+use JMS\Serializer\Annotation as JMS;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Email Attachment
@@ -60,6 +64,11 @@ class EmailAttachment
      * @JMS\Exclude
      */
     protected $emailBody;
+
+    /**
+     * @var UploadedFile
+     */
+    protected $file;
 
     /**
      * Get id
@@ -161,6 +170,26 @@ class EmailAttachment
     public function setEmailBody(EmailBody $emailBody)
     {
         $this->emailBody = $emailBody;
+
+        return $this;
+    }
+
+    /**
+     * @return UploadedFile
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param UploadedFile $file
+     *
+     * @return $this
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
 
         return $this;
     }
