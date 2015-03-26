@@ -155,3 +155,6 @@
     height: 0;
     border: none;
 }
+a.attachment .icon .icon-link {
+    color: #999;
+}

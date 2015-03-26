@@ -260,7 +260,9 @@ define(function (require) {
                     type: 'get',
                     dataType: 'html',
                     data: {
-                        _widgetContainer: 'dialog'
+                        _widgetContainer: 'dialog',
+                        targetEntityClass: model.get('targetEntityData').class,
+                        targetEntityId: model.get('targetEntityData').id
                     }
                 };
 
@@ -270,6 +272,7 @@ define(function (require) {
                     .done(function (data) {
                         var response = $('<html />').html(data);
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
+                        mediator.execute('layout:init', that.$el, that);
                         that._hideLoading();
                     })
                     .fail(
