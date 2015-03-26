@@ -36,7 +36,6 @@ define([
         handleLayoutInit: function () {
             var opts, datepair;
             opts = this.options;
-            opts.container = this.$el;
             datepair = new DatepairView(opts);
             this.subview('datepair', datepair);
         }
