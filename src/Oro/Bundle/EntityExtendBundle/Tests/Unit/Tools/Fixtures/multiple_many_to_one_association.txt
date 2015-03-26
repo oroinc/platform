@@ -1,0 +1,58 @@
+namespace Test;
+
+class Entity
+{
+    /**
+     * Checks if this entity can be associated with the given target entity type
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportTestTarget($targetClass)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);
+        if ($className === 'Test\TargetEntity1') { return true; }
+        if ($className === 'Test\TargetEntity2') { return true; }
+        return false;
+    }
+
+    /**
+     * Gets the entities this entity is associated with
+     *
+     * @return object[]
+     */
+    public function getTestTargets()
+    {
+        $targets = [];
+        $entity = $this->target_entity1_2ce134a6;
+        if ($entity) {
+            $targets[] = $entity;
+        }
+        $entity = $this->target_entity2_b5e8651c;
+        if ($entity) {
+            $targets[] = $entity;
+        }
+        return $targets;
+    }
+
+    /**
+     * Sets the entity this entity is associated with
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function addTestTarget($target)
+    {
+        if (null === $target) { $this->resetTestTargets(); return $this; }
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if ($className === 'Test\TargetEntity1') { $this->target_entity1_2ce134a6 = $target; return $this; }
+        if ($className === 'Test\TargetEntity2') { $this->target_entity2_b5e8651c = $target; return $this; }
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+
+    private function resetTestTargets()
+    {
+        $this->target_entity1_2ce134a6 = null;
+        $this->target_entity2_b5e8651c = null;
+    }
+}
