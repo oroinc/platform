@@ -390,15 +390,16 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getLiterals(AclCondition $whereCondition, $iterationField = 'value')
     {
-        $literals   = [];
+        $literals = [];
+
+        if (!is_array($this->getPropertyAccessor()->getValue($whereCondition, $iterationField))) {
+            $whereCondition->setValue([$whereCondition->getValue()]);
+        }
+
         $whereValue = $this->getPropertyAccessor()->getValue($whereCondition, $iterationField);
 
-        if (!is_array($whereValue)) {
-            $whereCondition->setValue(array($whereCondition->getValue()));
-        } else {
-            foreach ($whereValue as $row) {
-                $literals[] = new Literal(Literal::NUMERIC, $row);
-            }
+        foreach ($whereValue as $row) {
+            $literals[] = new Literal(Literal::NUMERIC, $row);
         }
 
         return $literals;
