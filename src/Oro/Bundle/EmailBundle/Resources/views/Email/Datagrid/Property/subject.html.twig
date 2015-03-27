@@ -1,3 +1,6 @@
 {% set emailBody = record.getValue('emailBody') %}
 
-<strong>{{ value }}</strong> - {{ emailBody.bodyContent|striptags[:150]|raw }}
+<strong>{{ value }}</strong>
+{% if emailBody.bodyContent is defined %}
+    - {{ emailBody.bodyContent|striptags[:150]|raw }}
+{% endif %}
