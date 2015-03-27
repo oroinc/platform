@@ -17,12 +17,14 @@ use Oro\Bundle\SearchBundle\Engine\EngineInterface;
  */
 class ReindexCommand extends ContainerAwareCommand
 {
+    const COMMAND_NAME = 'oro:search:reindex';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:search:reindex')
+        $this->setName(self::COMMAND_NAME)
             ->addArgument(
                 'class',
                 InputArgument::OPTIONAL,
