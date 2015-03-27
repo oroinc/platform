@@ -414,9 +414,11 @@
             {% set recipientsBcc = recipientsBcc|merge([recipient.name|e])%}
         {% endif %}
     {% endfor %}
+    {% set fromUserName = oro_get_email_address_name(email.fromName) %}
+    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName) ~ '&gt;' %}
     {% set data = [{
             label: 'From'|trans,
-            value: '<b>' ~ email.fromName|e ~ '</b>',
+            value: fromUserName ? '<b>' ~ fromUserName|e ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
             cssClass: 'autor'
         }, {
             label: 'To'|trans,
