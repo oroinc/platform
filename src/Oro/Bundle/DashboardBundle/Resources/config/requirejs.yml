@@ -4,6 +4,7 @@ config:
             'oro/dashboard-item-widget': 'orodashboard/js/widget/dashboard-item'
     paths:
         'orodashboard/js/widget/dashboard-item': 'bundles/orodashboard/js/widget/dashboard-item.js'
+        'orodashboard/js/widget/configuration-widget': 'bundles/orodashboard/js/widget/configuration-widget.js'
         'orodashboard/js/dashboard-container': 'bundles/orodashboard/js/dashboard-container.js'
         'orodashboard/js/widget-picker': 'bundles/orodashboard/js/widget-picker.js'
         'orodashboard/js/dashboard-util': 'bundles/orodashboard/js/dashboard-util.js'

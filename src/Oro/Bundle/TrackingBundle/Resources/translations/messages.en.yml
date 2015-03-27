@@ -52,20 +52,45 @@ oro:
             parsed_u_i_d.label:        Parsed UID
             parsing_count.label:       Parsing count
             ip.label:                  IP
+            client.label:              Client
+            client_type.label:         Client type
+            client_version.label:      Client version
+            os.label:                  Operating system
+            os_version.label:          Operating system
+            desktop.label:             Is desktop
+            mobile.label:              Is mobile
+            bot.label:                 Is bot
             user_identifier.label:     User identifier
             visitor_uid.label:         Unique visitor ID
             identifier_detected.label: Is UID detected
             tracking_website.label:    Tracking website
 
         trackingvisitevent:
-            entity_label:        Tracking Visit Event
-            entity_plural_label: Tracking Visit Events
-            entity_description:  Tracked visit events
+            entity_label:        Visitor event
+            entity_plural_label: Visitor events
+            entity_description:  Tracked visitor events
 
             id.label:                Id
             event.label:             Event
             visit.label:             Visit
             web_event.label:         Web event
+            parsing_count.label:     Parsing count
+            website.label:           Tracking website
+
+            ip.label:                IP
+            bot.label:               Bot
+            os.label:                OS
+            os_version.label:        OS version
+            client.label:            Client name
+            client_version.label:    Client version
+            client_type.label:       Client type
+            desktop.label:           Desktop
+            mobile.label:            Mobile
+            url.label:               URL
+            title.label:             Title
+            type.label:              Type
+            event_date.label:        Event date
+            identifier_detected.label: Logged in
 
         trackingeventdictionary:
             entity_label:        Tracking Visit Library

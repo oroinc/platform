@@ -16,3 +16,6 @@ UPGRADE FROM 1.6 to 1.7
   
 ####Composer dependencies:
 - Removed abandoned package `guzzle/http` in favor of `guzzle/guzzle`.
+
+####OroEntityExtendBundle:
+- Added parameter `DoctrineHelper $doctrineHelper` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension` class
