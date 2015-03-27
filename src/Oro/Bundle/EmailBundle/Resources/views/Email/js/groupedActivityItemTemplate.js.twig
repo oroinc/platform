@@ -111,9 +111,6 @@
                 <div class="info responsive-cell <% if (is_head && !ignoreHead) { %>thread<% } %>" id="grouped-entity-<%= data.entityId %>"></div>
                 <% if (has_comments && commentable && (!is_head || ignoreHead)) { %>
                 <div class="responsive-cell">
-                    <h5 class="user-fieldset">
-                        <span><%= _.__('oro.comment.entity_plural_label') %></span>
-                    </h5>
                     {# paceholder for comments block#}
                     <div class="comment"></div>
                 </div>
