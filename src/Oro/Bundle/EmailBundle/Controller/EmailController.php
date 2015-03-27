@@ -62,7 +62,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        return ['entity' => $entity,];
+        return ['entity' => $entity];
     }
 
     /**
@@ -85,7 +85,7 @@ class EmailController extends Controller
 
         return [
             'entity' => $entity,
-            'thread' => $emails
+            'thread' => $emails,
         ];
     }
 

@@ -9,10 +9,11 @@ datagrid:
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
                 join:
+                    inner:
+                        - { join: e.folders, alias: f }
                     left:
                         - { join: e.recipients, alias: r_to, conditionType: WITH, condition: r_to.type = 'to' }
                         - { join: e.recipients, alias: r_cc_bcc, conditionType: WITH, condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc' }
-
         columns:
             thread:
                 type: twig
@@ -31,12 +32,12 @@ datagrid:
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
             to:
                 type: twig
-                label: To
+                label: oro.email.to.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             ccBcc:
                 type: twig
-                label: Cc/Bcc
+                label: oro.email.cc_bcc.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             sentAt:
@@ -64,6 +65,11 @@ datagrid:
 
     email-grid:
         extends: base-email-grid
+        source:
+            query:
+                where:
+                    and:
+                        - e.head = true
         filters:
             columns:
                 fromEmailExpression: { type: string,   data_name: fromEmailExpression }
@@ -71,6 +77,8 @@ datagrid:
                 to:                  { type: string,   data_name: r_to.name }
                 ccBcc:               { type: string,   data_name: r_cc_bcc.name }
                 sentAt:              { type: datetime, data_name: e.sentAt }
+                folders:             { type: string,   data_name: f.name, label: oro.email.folders.label }
+        views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:
         extends: email-grid
