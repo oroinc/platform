@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
