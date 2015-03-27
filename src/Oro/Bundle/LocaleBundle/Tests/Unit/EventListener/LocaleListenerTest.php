@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 use Oro\Bundle\LocaleBundle\EventListener\LocaleListener;
@@ -25,6 +26,11 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     protected $transListener;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $router;
+
+    /**
      * @var string
      */
     protected $defaultLocale;
@@ -35,6 +41,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->transListener = $this->getMock('Gedmo\Translatable\TranslatableListener');
+        $this->router = $this->getMock('Symfony\Component\Routing\RequestContextAwareInterface');
 
         $this->defaultLocale = \Locale::getDefault();
     }
@@ -55,13 +62,15 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $customLocale = 'fr';
 
         $request = new Request();
+        $context = new RequestContext();
         $request->setDefaultLocale($this->defaultLocale);
 
         if ($isSetLocale) {
-            $this->localeSettings->expects($this->exactly(2))->method('getLanguage')
+            $this->localeSettings->expects($this->exactly(3))->method('getLanguage')
                 ->will($this->returnValue($customLanguage));
             $this->localeSettings->expects($this->once())->method('getLocale')
                 ->will($this->returnValue($customLocale));
+            $this->router->expects($this->once())->method('getContext')->willReturn($context);
         } else {
             $this->localeSettings->expects($this->never())->method('getLanguage');
             $this->localeSettings->expects($this->never())->method('getLocale');
@@ -70,12 +79,14 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new LocaleListener(
             $this->localeSettings,
             $this->transListener,
-            $installed
+            $installed,
+            $this->router
         );
         $this->listener->onKernelRequest($this->createGetResponseEvent($request));
 
         if ($isSetLocale) {
             $this->assertEquals($customLanguage, $request->getLocale());
+            $this->assertEquals($customLanguage, $context->getParameter('_locale'));
             $this->assertEquals($customLocale, \Locale::getDefault());
         } else {
             $this->assertEquals($this->defaultLocale, $request->getLocale());
