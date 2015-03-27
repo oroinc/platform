@@ -62,6 +62,7 @@ config:
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
+        'oroform/js/app/views/datepair-view': 'bundles/oroform/js/app/views/datepair-view.js'
 build:
     paths:
         'tinymce/tinymce.min': 'empty:'

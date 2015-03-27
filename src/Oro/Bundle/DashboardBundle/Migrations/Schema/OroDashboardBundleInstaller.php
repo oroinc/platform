@@ -17,7 +17,7 @@ class OroDashboardBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -106,6 +106,7 @@ class OroDashboardBundleInstaller implements Installation
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('widget_id', 'integer', ['notnull' => false]);
         $table->addColumn('is_expanded', 'boolean', []);
+        $table->addColumn('options', 'array', ['comment' => '(DC2Type:array)', 'notnull' => false]);
         $table->addIndex(['user_owner_id'], 'idx_4b4f5f879eb185f9', []);
         $table->addIndex(['widget_id'], 'idx_4b4f5f87fbe885e2', []);
         $table->setPrimaryKey(['id']);

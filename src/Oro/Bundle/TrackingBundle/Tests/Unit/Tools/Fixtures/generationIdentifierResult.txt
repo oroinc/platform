@@ -1,0 +1,71 @@
+namespace Test;
+
+class Entity
+{
+    /**
+     * Checks if this entity can be associated with the given target entity type
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportIdentifierTarget($targetClass)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);
+        if ($className === 'Test\TargetEntity1') { return true; }
+        if ($className === 'Test\TargetEntity2') { return true; }
+        return false;
+    }
+
+    /**
+     * Sets the entity this entity is associated with
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function setIdentifierTarget($target)
+    {
+        if (null === $target) { $this->resetIdentifierTargets(); return $this; }
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        // This entity can be associated with only one another entity
+        if ($className === 'Test\TargetEntity1') { $this->resetIdentifierTargets(); $this->target_entity1_fd2bb2b7 = $target; return $this; }
+        if ($className === 'Test\TargetEntity2') { $this->resetIdentifierTargets(); $this->target_entity2_6422e30d = $target; return $this; }
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+
+    /**
+     * Returns array with all associated entities
+     *
+     * @return array
+     */
+    public function getIdentifierTargetEntities()
+    {
+        $associationEntities = [];
+        $entity = $this->target_entity1_fd2bb2b7;
+        if ($entity) {
+            $associationEntities[] = $entity;
+        }
+        $entity = $this->target_entity2_6422e30d;
+        if ($entity) {
+            $associationEntities[] = $entity;
+        }
+        return $associationEntities;
+    }
+
+    /**
+     * Gets the entity this entity is associated with
+     *
+     * @return object|null Any configurable entity
+     */
+    public function getIdentifierTarget()
+    {
+        if (null !== $this->target_entity1_fd2bb2b7) { return $this->target_entity1_fd2bb2b7; }
+        if (null !== $this->target_entity2_6422e30d) { return $this->target_entity2_6422e30d; }
+        return null;
+    }
+
+    private function resetIdentifierTargets()
+    {
+        $this->target_entity1_fd2bb2b7 = null;
+        $this->target_entity2_6422e30d = null;
+    }
+}

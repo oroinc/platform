@@ -40,6 +40,9 @@ config:
         'jquery.ajax.queue':
             deps:
                 - 'jquery'
+        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair':
+            deps:
+                - 'oroui/lib/jquery.datepair-0.4.4/datepair'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
@@ -154,3 +157,4 @@ build:
 #       therefore it's excluded
         'backbone-bootstrap-modal': 'empty:'
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'empty:'
+        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty'
