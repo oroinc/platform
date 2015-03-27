@@ -387,7 +387,7 @@
         {# same day -- show only time #}
         {{ date|oro_format_time }}
     {%- elseif date(date)|oro_format_date == date('-1days')|oro_format_date -%}
-        {{ 'yesterday'|trans }}
+        {{ 'yesterday'|trans|capitalize }}
     {%- elseif date(date).format('Y') == date().format('Y') -%}
         {# same year -- month and daty #}
         {{ date|oro_format_day }}

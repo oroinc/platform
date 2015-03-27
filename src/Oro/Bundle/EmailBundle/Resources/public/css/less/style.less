@@ -166,6 +166,16 @@
   .email-load-more{
     border-bottom: 1px solid #e5e5e5;
     .load-more-items(#e5e5e5, #f5f5f5, #888);
+    .load-more-label {
+      &.process {
+        .process('../../../oroui/img/loader-16.gif');
+        &:after {
+          background-color: #f5f5f5;
+          background-position: center center;
+          padding-left: 10px;
+        }
+      }
+    }
   }
 }
 .email-thread-action-panel {
