@@ -337,3 +337,67 @@
     {%- endif %}
 {%- endmacro %}
 
+{#
+    Render the given email recipients
+    Parameters:
+        recipients - an array of Oro\Bundle\EmailBundle\Entity\EmailRecipients
+        noLink - determines whether the rendering of a link to the owner view page is forbidden or not. Default value is false
+        knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
+#}
+{% macro recipient_email_addresses_short(recipients, noLink, knownOnly) -%}
+    {% set addresses = {} -%}
+    {% for recipient in recipients -%}
+        {% set address = _self.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
+        {%- if address|length > 0 -%}
+            {% set addresses = addresses|merge([address]) %}
+        {% else %}
+            {% set addresses = addresses|merge([recipient.emailAddress.email]) %}
+        {%- endif %}
+    {%- endfor -%}
+
+    {% for address in addresses -%}
+        {{ address }}
+        {%- if not loop.last %}; {% endif %}
+    {% else %}
+        {{ 'N/A'|trans }}
+    {%- endfor %}
+{%- endmacro %}
+
+
+
+{# remove it #}
+{% macro date_smart_format(date) -%}
+    {% if date(date)|oro_format_date == date()|oro_format_date -%}
+        {# same day -- show only time #}
+        {{ date|oro_format_time }}
+    {%- elseif date(date)|oro_format_date == date('-1days')|oro_format_date -%}
+        {{ 'yesterday'|trans|capitalize }}
+    {%- elseif date(date).format('Y') == date().format('Y') -%}
+        {# same year -- month and daty #}
+        {{ date|oro_format_day }}
+    {%- else -%}
+        {{ date|oro_format_date }}
+    {%- endif %}
+{%- endmacro %}
+{% macro email_participants_name(recipients, noLink, knownOnly) -%}
+    {% set recipientHtmlCollection = [] %}
+    {% for recipient in recipients %}
+        {% set recipientHtml -%}
+        <span class="email-recipient">{{ _self.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) }}</span>
+        {%- endset %}
+        {% set recipientHtmlCollection = recipientHtmlCollection|merge([recipientHtml]) %}
+    {% endfor %}
+    {{ recipientHtmlCollection|join(', ')|raw }}
+{%- endmacro %}
+{% macro email_participant_name_or_me(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% if emailAddress.owner is not null and emailAddress.owner.id == app.user.id -%}
+        {% if noLink|default(false) -%}
+            {{ 'Me'|trans|lower }}
+        {%- else -%}
+            {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
+        {%- endif %}
+    {%- else -%}
+        {% set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName)) %}
+        {{ _self.email_address(emailAddress, name, noLink, knownOnly) }}
+    {%- endif %}
+{%- endmacro %}

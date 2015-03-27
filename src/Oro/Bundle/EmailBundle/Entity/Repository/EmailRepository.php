@@ -19,7 +19,7 @@ class EmailRepository extends EntityRepository
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->createQueryBuilder('e');
         $criteria = new Criteria();
-        $criteria->where($criteria->expr()->in('id', $ids));
+        $criteria->where(Criteria::expr()->in('id', $ids));
         $criteria->orderBy(['sentAt' => Criteria::DESC]);
         $queryBuilder->addCriteria($criteria);
         $result = $queryBuilder->getQuery()->getResult();

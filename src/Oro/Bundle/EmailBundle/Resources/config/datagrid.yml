@@ -15,43 +15,33 @@ datagrid:
                         - { join: e.recipients, alias: r_to, conditionType: WITH, condition: r_to.type = 'to' }
                         - { join: e.recipients, alias: r_cc_bcc, conditionType: WITH, condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc' }
         columns:
-            thread:
-                type: twig
-                label:
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/thread.html.twig
-            fromEmailExpression:
-                type: twig
-                label: oro.email.from_name.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
+            contact:
+                  type: twig
+                  label: oro.email.contact.label
+                  frontend_type: html
+                  template: OroEmailBundle:Email:Datagrid/Property/contact.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
-            to:
+            attachments:
                 type: twig
-                label: oro.email.to.label
+                label:
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
-            ccBcc:
-                type: twig
-                label: oro.email.cc_bcc.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
+                template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
             sentAt:
-                label: oro.email.sent_at.label
-                frontend_type: datetime
+                type: twig
+                label: oro.email.date.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/date.html.twig
         properties:
             id: ~
         sorters:
             columns:
                 subject: { data_name: e.subject }
+                contact: { data_name: contact }
                 sentAt:  { data_name: e.sentAt }
-                to:      { data_name: r_to.name }
-                ccBcc:   { data_name: r_cc_bcc.name }
-                fromEmailExpression: { data_name: fromEmailExpression }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
@@ -72,12 +62,11 @@ datagrid:
                         - e.head = true
         filters:
             columns:
-                fromEmailExpression: { type: string,   data_name: fromEmailExpression }
-                subject:             { type: string,   data_name: e.subject }
-                to:                  { type: string,   data_name: r_to.name }
-                ccBcc:               { type: string,   data_name: r_cc_bcc.name }
-                sentAt:              { type: datetime, data_name: e.sentAt }
-                folders:             { type: string,   data_name: f.name, label: oro.email.folders.label }
+                subject: { type: string,   data_name: e.subject }
+                to:      { type: string,   data_name: r_to.name, label: oro.email.to.label }
+                ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
+                date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
+                folders: { type: string,   data_name: f.name, label: oro.email.folders.label }
         views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:
@@ -99,6 +88,7 @@ datagrid:
                 label: oro.grid.action.view
                 link: view_thread_link
                 icon: eye-open
+                rowAction: true
 
     dashboard-recent-emails-grid:
         source:

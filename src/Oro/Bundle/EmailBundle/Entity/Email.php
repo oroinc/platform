@@ -755,6 +755,9 @@ class Email extends ExtendEmail
         return $this->getRecipients(EmailRecipient::BCC);
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getToCc()
     {
         return new ArrayCollection(
@@ -763,12 +766,38 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @return EmailRecipient[]
+     * @return ArrayCollection
      */
     public function getCcBcc()
     {
         return new ArrayCollection(
             array_merge($this->getCc()->toArray(), $this->getBcc()->toArray())
         );
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getContact()
+    {
+        return new ArrayCollection(
+            array_merge(
+                $this->getTo()->toArray(),
+                $this->getCcBcc()->toArray()
+            )
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAttachments()
+    {
+        $hasAttachment = false;
+        if (null !== $this->getEmailBody()) {
+            $hasAttachment = $this->getEmailBody()->getHasAttachments();
+        }
+
+        return $hasAttachment;
     }
 }

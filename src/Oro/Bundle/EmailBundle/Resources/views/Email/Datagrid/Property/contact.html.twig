@@ -1,0 +1,31 @@
+{% import 'OroEmailBundle::macros.html.twig' as EA %}
+
+{% set folders = record.getValue('folders') %}
+
+{% if folders|length > 0 %}
+    {% set folder = folders[0] %}
+    {% if folder.type == 'sent' %}
+        <span class="icon grid">
+            <i class="icon-signout"></i>
+        </span>
+    {% elseif folder.type == 'inbox' %}
+        <span class="icon grid">
+            <i class="icon-signin"></i>
+        </span>
+    {% endif %}
+{% endif %}
+
+{% if (value.toArray|length > 0 and value.toArray|length < 3) %}
+    <strong>{{ EA.recipient_email_addresses_short(value.toArray, true, true) }}</strong>
+{% else %}
+    <strong>
+        {% set firstEmail = value.toArray[0] %}
+        {% set lastEmail = value.toArray[value.toArray|length - 1] %}
+        {{
+            EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, true)
+        }}..{{
+            EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, true)
+        }}
+        ({{ value.toArray|length }})
+    </strong>
+{% endif %}

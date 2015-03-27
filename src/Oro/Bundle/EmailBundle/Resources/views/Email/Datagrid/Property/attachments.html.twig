@@ -1,0 +1,7 @@
+{% set hasAttachments = record.getValue('attachments') %}
+
+{% if hasAttachments == true %}
+    <span class="icon grid">
+        <i class="icon-paperclip"></i>
+    </span>
+{% endif %}
