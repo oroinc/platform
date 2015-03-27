@@ -47,6 +47,30 @@ class TranslationRepository extends EntityRepository
     }
 
     /**
+     * Returns the list of all existing in the database translation domains for the given locale.
+     *
+     * @param string $locale
+     *
+     * @return array
+     */
+    public function findAvailableDomains($locale)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->distinct(true)
+            ->select('t.domain')
+            ->where('t.locale = :locale')
+            ->orderBy('t.locale', 'ASC')
+            ->setParameter('locale', $locale);
+
+        $domains = $qb->getQuery()->getArrayResult();
+        foreach ($domains as &$domain) {
+            $domain = reset($domain);
+        }
+
+        return $domains;
+    }
+
+    /**
      * Update existing translation value or create new one if it does not exist
      *
      * @param string $key

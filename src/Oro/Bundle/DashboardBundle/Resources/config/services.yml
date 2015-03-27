@@ -10,6 +10,7 @@ parameters:
     oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
     oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
+    oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
 
 services:
     oro_dashboard.config_resolver:
@@ -23,6 +24,10 @@ services:
             - @oro_dashboard.config_provider
             - @oro_security.security_facade
             - @oro_dashboard.config_resolver
+            - @doctrine.orm.entity_manager
+            - @oro_dashboard.manager.state
+        calls:
+            - [setRequest, ["@?request="]]
 
     oro_dashboard.manager:
         class: %oro_dashboard.manager.class%
@@ -48,6 +53,7 @@ services:
         class: %oro_dashboard.config_provider.class%
         arguments:
             - []
+            - @event_dispatcher
 
     oro_dashboard.navigation_listener:
         class: %oro_dashboard.navigation_listener.class%
@@ -68,3 +74,10 @@ services:
             - @oro_dashboard.manager
         tags:
             - { name: form.type, alias: "oro_dashboard_select" }
+
+    oro_dashboard.provider.widget_configuration_form_provider:
+        class: %oro_dashboard.provider.widget_configuration_form_provider.class%
+        arguments:
+            - @oro_dashboard.config_provider
+            - @form.factory
+            - @oro_form.validator.constraint_factory
