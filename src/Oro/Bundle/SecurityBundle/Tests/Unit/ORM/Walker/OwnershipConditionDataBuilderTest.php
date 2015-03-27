@@ -288,7 +288,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     null,
                     null,
-                    null,
+                    AccessLevel::GLOBAL_LEVEL,
                     'organization',
                     'org4',
                     true
@@ -301,7 +301,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 AccessLevel::GLOBAL_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
-                array(null, null, null, 'organization', 'org4', true)
+                array(null, null, AccessLevel::GLOBAL_LEVEL, 'organization', 'org4', true)
             ),
             'for the TEST entity with GLOBAL ACL, userId, grant and USER ownerType' => array(
                 'user4',
@@ -310,7 +310,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 AccessLevel::GLOBAL_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
-                array(null, null, null, 'organization', 'org4', true)
+                array(null, null, AccessLevel::GLOBAL_LEVEL, 'organization', 'org4', true)
             ),
             'for the ORGANIZATION entity without ownerType; with GLOBAL ACL, userId, grant' => array(
                 'user4',

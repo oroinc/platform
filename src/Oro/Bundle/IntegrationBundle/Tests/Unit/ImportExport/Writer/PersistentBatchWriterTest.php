@@ -41,7 +41,7 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
         $this->entityManager   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->registry->expects($this->atLeastOnce())->method('getManager')
+        $this->registry->expects($this->any())->method('getManager')
             ->will($this->returnValue($this->entityManager));
     }
 

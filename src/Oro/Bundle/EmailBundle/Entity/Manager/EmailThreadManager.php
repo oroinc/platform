@@ -72,9 +72,7 @@ class EmailThreadManager
                 $thread = $this->emailThreadProvider->getEmailThread($entityManager, $entity);
                 if ($thread) {
                     $entityManager->persist($thread);
-                    $uow = $entityManager->getUnitOfWork();
-                    $metaData = $entityManager->getClassMetadata(EmailThread::ENTITY_CLASS);
-                    $uow->computeChangeSet($metaData, $thread);
+                    $this->computeChanges($entityManager, $thread);
                     $entity->setThread($thread);
                 }
                 $this->updateRefs($entityManager, $entity);
@@ -110,6 +108,7 @@ class EmailThreadManager
             foreach ($this->emailThreadProvider->getEmailReferences($entityManager, $entity) as $email) {
                 $email->setThread($entity->getThread());
                 $entityManager->persist($email);
+                $this->computeChanges($entityManager, $email);
                 $this->addEmailToQueue($email);
             }
         }
@@ -182,5 +181,16 @@ class EmailThreadManager
     public function addEmailToQueue(Email $email)
     {
         $this->queue[] = $email;
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     * @param $entity
+     */
+    protected function computeChanges(EntityManager $entityManager, $entity)
+    {
+        $uow = $entityManager->getUnitOfWork();
+        $metaData = $entityManager->getClassMetadata(EmailThread::ENTITY_CLASS);
+        $uow->computeChangeSet($metaData, $entity);
     }
 }
