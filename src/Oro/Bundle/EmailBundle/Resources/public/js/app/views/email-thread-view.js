@@ -61,7 +61,9 @@ define(function (require) {
                     .on('click', _.bind(this.onToggleAllClick, this));
                 this.updateToggleAllAction();
             }
-            return EmailTreadView.__super__.render.apply(this, arguments);
+            EmailTreadView.__super__.render.apply(this, arguments);
+            mediator.execute('layout:init', this.$el, this);
+            return this;
         },
 
         /**
