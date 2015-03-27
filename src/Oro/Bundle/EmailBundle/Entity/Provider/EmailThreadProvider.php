@@ -57,7 +57,7 @@ class EmailThreadProvider
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->in('messageId', explode(' ', $refs)));
+            $criteria->where(Criteria::expr()->in('messageId', explode(' ', $refs)));
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
         }
@@ -80,7 +80,7 @@ class EmailThreadProvider
         if ($thread) {
             $emails = new ArrayCollection($this->getThreadEmails($entityManager, $entity));
             $criteria = new Criteria();
-            $criteria->andWhere($criteria->expr()->eq('seen', false));
+            $criteria->andWhere(Criteria::expr()->eq('seen', false));
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $criteria->setMaxResults(1);
             $unseenEmails = $emails->matching($criteria);
@@ -109,7 +109,7 @@ class EmailThreadProvider
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->eq('thread', $thread));
+            $criteria->where(Criteria::expr()->eq('thread', $thread));
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
