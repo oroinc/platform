@@ -126,7 +126,7 @@ services:
             - @oro_locale.settings
             - @stof_doctrine_extensions.listener.translatable
             - %installed%
-            - @router
+            - @?router
         calls:
             - [ setRequest, [@?request=] ]
         tags:
