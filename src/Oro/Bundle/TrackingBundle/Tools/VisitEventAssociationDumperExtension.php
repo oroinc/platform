@@ -8,11 +8,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
-use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
+use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
+use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider;
 
-class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExtension
+class VisitEventAssociationDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var  TrackingEventIdentificationProvider */
     protected $identifyProvider;
@@ -49,9 +49,8 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
         if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
             $targetEntities = $this->getTargetEntities();
 
-            return
-                !empty($targetEntities)
-                && $this->configManager->getProvider('extend')->hasConfig(TrackingVisit::ENTITY_NAME);
+            return !empty($targetEntities)
+            && $this->configManager->getProvider('extend')->hasConfig(TrackingVisitEvent::ENTITY_NAME);
         }
 
         return false;
@@ -65,9 +64,9 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
         $targetEntities = $this->getTargetEntities();
         foreach ($targetEntities as $targetEntity) {
             $this->associationBuilder->createManyToOneAssociation(
-                TrackingVisit::ENTITY_NAME,
+                TrackingVisitEvent::ENTITY_NAME,
                 $targetEntity,
-                IdentifierEventExtension::ASSOCIATION_KIND
+                VisitEventAssociationExtension::ASSOCIATION_KIND
             );
         }
     }
@@ -80,8 +79,10 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
     protected function getTargetEntities()
     {
         if (null === $this->targetEntities) {
-            $targetEntityClasses = $this->identifyProvider->getTargetIdentityEntities();
-            $configs             = $this->configManager->getProvider('extend')->getConfigs();
+            $targetEntityClasses       = $this->identifyProvider->getEventTargetEntities();
+            $this->targetEntityConfigs = [];
+
+            $configs = $this->configManager->getProvider('extend')->getConfigs();
             foreach ($configs as $config) {
                 if ($config->is('upgradeable')
                     && in_array($config->getId()->getClassName(), $targetEntityClasses)

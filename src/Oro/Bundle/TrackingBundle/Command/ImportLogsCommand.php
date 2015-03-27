@@ -170,7 +170,7 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
         $currentPart    = 1;
         if ($logRotateInterval > 0 && $logRotateInterval < 60) {
             $rotateInterval = (int)$logRotateInterval;
-            $passingMinute  = intval(date('i')) + 1;
+            $passingMinute  = (int)(date('i')) + 1;
             $currentPart    = ceil($passingMinute / $rotateInterval);
         }
 
