@@ -2,12 +2,20 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigProvider
 {
     const NODE_DASHBOARD = 'dashboards';
     const NODE_WIDGET = 'widgets';
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * Array of oro_dashboard_config config section
@@ -18,10 +26,12 @@ class ConfigProvider
 
     /**
      * @param array $configs
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(array $configs)
+    public function __construct(array $configs, EventDispatcherInterface $eventDispatcher)
     {
         $this->configs = $configs;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -105,7 +115,14 @@ class ConfigProvider
             throw new InvalidConfigurationException($widgetName);
         }
 
-        return $this->copyConfigurationArray($this->configs[self::NODE_WIDGET][$widgetName]);
+        $config = $this->copyConfigurationArray($this->configs[self::NODE_WIDGET][$widgetName]);
+        if ($this->eventDispatcher->hasListeners(WidgetConfigurationLoadEvent::EVENT_NAME)) {
+            $event = new WidgetConfigurationLoadEvent($config);
+            $this->eventDispatcher->dispatch(WidgetConfigurationLoadEvent::EVENT_NAME, $event);
+            $config = $event->getConfiguration();
+        }
+
+        return $config;
     }
 
     /**
