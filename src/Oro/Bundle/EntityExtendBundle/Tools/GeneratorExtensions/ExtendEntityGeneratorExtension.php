@@ -90,7 +90,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
         $toString = [];
         foreach ($schema['property'] as $fieldName => $config) {
             if ($schema['doctrine'][$schema['entity']]['fields'][$fieldName]['type'] == 'string') {
-                $toString[] = '$this->get' . ucfirst(Inflector::camelize($fieldName)) . '()';
+                $toString[] = '$this->' . $this->generateGetMethodName($fieldName) . '()';
             }
         }
 
@@ -113,17 +113,50 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
                 ->setProperty(PhpProperty::create($fieldName)->setVisibility('protected'))
                 ->setMethod(
                     $this->generateClassMethod(
-                        'get' . ucfirst(Inflector::camelize($fieldName)),
+                        $this->generateGetMethodName($fieldName),
                         'return $this->' . $fieldName . ';'
                     )
                 )
                 ->setMethod(
                     $this->generateClassMethod(
-                        'set' . ucfirst(Inflector::camelize($fieldName)),
-                        '$this->' . $fieldName . ' = $value; return $this;',
+                        $this->generateSetMethodName($fieldName),
+                        $this->getSetterBody($fieldName, $schema),
                         ['value']
                     )
                 );
+        }
+    }
+
+    /**
+     * @param string $fieldName
+     * @param array $schema
+     * @return string
+     */
+    protected function getSetterBody($fieldName, array $schema)
+    {
+        if (!isset($schema['addremove'][$fieldName])) {
+            return '$this->' . $fieldName . ' = $value; return $this;';
+        } else {
+            $removeMethodName = $this->generateRemoveMethodName($fieldName);
+            $addMethodName = $this->generateAddMethodName($fieldName);
+            $body = <<<METHOD_BODY
+if ((!\$value instanceof \Traversable && !is_array(\$value) && !\$value instanceof \ArrayAccess) ||
+    !\$this->$fieldName instanceof \Doctrine\Common\Collections\Collection) {
+    \$this->$fieldName = \$value;
+
+    return \$this;
+}
+
+foreach (\$this->$fieldName as \$item) {
+    \$this->$removeMethodName(\$item);
+}
+foreach (\$value as \$item) {
+    \$this->$addMethodName(\$item);
+}
+
+return \$this;
+METHOD_BODY;
+            return $body;
         }
     }
 
@@ -143,11 +176,13 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
                 '    $this->' . $fieldName . '->removeElement($value);',
             ];
             if (isset($config['target'])) {
-                $addMethodBody[]    = '    $value->' . ($config['is_target_addremove'] ? 'add' : 'set')
-                    . ucfirst(Inflector::camelize($config['target'])) . '($this);';
-                $removeMethodBody[] = '    $value->' . ($config['is_target_addremove'] ? 'remove' : 'set')
-                    . ucfirst(Inflector::camelize($config['target']))
-                    . '(' . ($config['is_target_addremove'] ? '$this' : 'null') . ');';
+                if ($config['is_target_addremove']) {
+                    $addMethodBody[] = "    \$value->{$this->generateAddMethodName($config['target'])}(\$this);";
+                    $removeMethodBody[] = "    \$value->{$this->generateRemoveMethodName($config['target'])}(\$this);";
+                } else {
+                    $addMethodBody[] = "    \$value->{$this->generateSetMethodName($config['target'])}(\$this);";
+                    $removeMethodBody[] = "    \$value->{$this->generateSetMethodName($config['target'])}(null);";
+                }
             }
             $addMethodBody[]    = '}';
             $removeMethodBody[] = '}';
@@ -155,18 +190,54 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
             $class
                 ->setMethod(
                     $this->generateClassMethod(
-                        'add' . ucfirst(Inflector::camelize($config['self'])),
+                        $this->generateAddMethodName($config['self']),
                         implode("\n", $addMethodBody),
                         ['value']
                     )
                 )
                 ->setMethod(
                     $this->generateClassMethod(
-                        'remove' . ucfirst(Inflector::camelize($config['self'])),
+                        $this->generateRemoveMethodName($config['self']),
                         implode("\n", $removeMethodBody),
                         ['value']
                     )
                 );
         }
+    }
+
+    /**
+     * @param string $fieldName
+     * @return string
+     */
+    protected function generateGetMethodName($fieldName)
+    {
+        return 'get' . ucfirst(Inflector::camelize($fieldName));
+    }
+
+    /**
+     * @param string $fieldName
+     * @return string
+     */
+    protected function generateSetMethodName($fieldName)
+    {
+        return 'set' . ucfirst(Inflector::camelize($fieldName));
+    }
+
+    /**
+     * @param string $fieldName
+     * @return string
+     */
+    protected function generateAddMethodName($fieldName)
+    {
+        return 'add' . ucfirst(Inflector::camelize($fieldName));
+    }
+
+    /**
+     * @param string $fieldName
+     * @return string
+     */
+    protected function generateRemoveMethodName($fieldName)
+    {
+        return 'remove' . ucfirst(Inflector::camelize($fieldName));
     }
 }
