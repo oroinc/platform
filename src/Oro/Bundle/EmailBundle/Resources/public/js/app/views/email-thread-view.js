@@ -2,8 +2,11 @@ define(function (require) {
     'use strict';
 
     var EmailTreadView,
+        $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
+        mediator = require('oroui/js/mediator'),
+        routing = require('routing'),
         BaseView = require('oroui/js/app/views/base/view');
 
     EmailTreadView = BaseView.extend({
@@ -16,7 +19,9 @@ define(function (require) {
         },
 
         selectors: {
-            emailItem: '.email-info'
+            emailItem: '.email-info',
+            loadMore: '.email-load-more',
+            toggleAll: '.email-view-toggle-all'
         },
 
         /**
@@ -35,10 +40,25 @@ define(function (require) {
         /**
          * @inheritDoc
          */
+        dispose: function () {
+            if (this.$actionPanel) {
+                this.$actionPanel.find(this.selectors.toggleAll).remove();
+                delete this.$actionPanel;
+            }
+            EmailTreadView.__super__.dispose.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function () {
             if (this.actionPanelSelector) {
                 // add toggleAll action element
-                this.$(this.actionPanelSelector).append('<a href="#" class="email-view-toggle-all"></a>');
+                this.$actionPanel = $(this.actionPanelSelector);
+                this.$actionPanel
+                    .append('<a href="#" class="email-view-toggle-all"></a>')
+                    .find(this.selectors.toggleAll)
+                    .on('click', _.bind(this.onToggleAllClick, this));
                 this.updateToggleAllAction();
             }
             return EmailTreadView.__super__.render.apply(this, arguments);
@@ -51,9 +71,11 @@ define(function (require) {
          * @param {jQuery.Event} e
          */
         onToggleAllClick: function (e) {
-            var $emails = this.$(this.selectors.emailItem).not(':last'),
-                show = this._hasHiddenEmails();
-            this.toggleEmail($emails, show);
+            this.loadEmails().done(_.bind(function () {
+                var $emails = this.$(this.selectors.emailItem).not(':last'),
+                    show = this._hasHiddenEmails();
+                this.toggleEmail($emails, show);
+            }, this));
         },
 
         /**
@@ -87,7 +109,50 @@ define(function (require) {
          * @param {jQuery.Event} e
          */
         onLoadMoreClick: function (e) {
-            console.log(e);
+            this.loadEmails();
+        },
+
+        /**
+         * Loads emails' html
+         *
+         * @returns {Promise}
+         */
+        loadEmails: function () {
+            var url, ids, promise;
+            ids = this.$(this.selectors.loadMore).addClass('process').data('emailsItems');
+            if (ids) {
+                url = routing.generate('oro_email_items_view', {ids: ids.join(',')});
+                promise = $.ajax(url)
+                    .done(_.bind(this.onDoneLoadEmails, this))
+                    .fail(_.bind(this.onFailLoadEmails, this));
+            } else {
+                promise = $.Deferred().resolve('').promise();
+            }
+            return promise;
+        },
+
+        /**
+         * Handles emails load and update email thread
+         *
+         * @param {string} content
+         */
+        onDoneLoadEmails: function (content) {
+            if (this.disposed) {
+                return;
+            }
+            this.$(this.selectors.loadMore).replaceWith(content);
+            mediator.execute('layout:init', this.$el, this);
+        },
+
+        /**
+         * Handles emails loading error
+         */
+        onFailLoadEmails: function () {
+            if (this.disposed) {
+                return;
+            }
+            this.$(this.selectors.loadMore).removeClass('process');
+            mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
         },
 
         /**
@@ -112,7 +177,7 @@ define(function (require) {
             translationPrefix = 'oro.email.thread.' + (hasHiddenEmails ? 'expand_all' : 'collapse_all');
 
             // update action element
-            $toggleAllAction = this.$('.email-view-toggle-all');
+            $toggleAllAction = this.$actionPanel.find(this.selectors.toggleAll);
             $toggleAllAction[hasMultipleEmails ? 'show' : 'hide']();
             $toggleAllAction.text(__(translationPrefix + '.label'));
             $toggleAllAction.attr('title', __(translationPrefix + '.tooltip'));
@@ -125,7 +190,10 @@ define(function (require) {
          * @protected
          */
         _hasHiddenEmails: function () {
-            return Boolean(this.$(this.selectors.emailItem).not('.in').length);
+            var hasCollapsedEmails, hasEmailsToLoad;
+            hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
+            hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
+            return hasCollapsedEmails|| hasEmailsToLoad;
         }
     });
 

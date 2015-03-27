@@ -1,14 +1,16 @@
-{% import "OroEmailBundle::actions.html.twig" as Actions %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroEmailBundle::macros.html.twig' as EA %}
-
 {% if shortEmailThread is not defined and thread|length >= 7 %}
     {# if shortEmailThread is not turned off and length of thread over 6 emails -- render short thread #}
     {% set shortEmailThread = true %}
     {% set skippedEmails = [] %}
 {% endif %}
-
-<div class="widget-content thread-view">
+{% set threadViewOptions = {
+    view: 'oroemail/js/app/views/email-thread-view',
+    actionPanelSelector: '.email-thread-action-panel'
+} %}
+<div class="widget-content thread-view"
+     data-page-component-module="oroui/js/app/components/view-component"
+     data-page-component-options="{{ threadViewOptions|json_encode }}"
+     data-layout="separate">
     {% for email in thread|reverse %}
         {% if shortEmailThread is defined and shortEmailThread and loop.index > 2 and loop.index < (loop.length - 1) %}
             {% set skippedEmails = skippedEmails|merge([email.id]) %}
