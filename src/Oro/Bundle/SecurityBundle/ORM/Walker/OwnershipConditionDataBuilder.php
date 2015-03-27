@@ -178,9 +178,11 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * @return int|null
+     * @param OwnershipMetadata $metadata
+     *
+     * @return array|int|null
      */
-    protected function getOrganizationId()
+    protected function getOrganizationId(OwnershipMetadata $metadata = null)
     {
         $token = $this->getSecurityContext()->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
@@ -318,9 +320,9 @@ class OwnershipConditionDataBuilder
     {
         $organizationField = null;
         $organizationValue = null;
-        if ($metadata->getOrganizationColumnName() && $this->getOrganizationId()) {
+        if ($metadata->getOrganizationColumnName() && $this->getOrganizationId($metadata)) {
             $organizationField = $metadata->getOrganizationFieldName();
-            $organizationValue = $this->getOrganizationId();
+            $organizationValue = $this->getOrganizationId($metadata);
         }
 
         if (!$ignoreOwner && !empty($idOrIds)) {
@@ -336,7 +338,7 @@ class OwnershipConditionDataBuilder
             return [
                 null,
                 null,
-                null,
+                PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                 $organizationField,
                 $organizationValue,
                 $ignoreOwner
