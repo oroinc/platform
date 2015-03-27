@@ -55,7 +55,8 @@
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
                     {% set emailAttachmentOptions = {
-                        dialogButton: 'attach-file'
+                        dialogButton: 'attach-file',
+                        items: entity.attachments.toArray
                     } %}
                     {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
 

@@ -9,17 +9,16 @@ define(function (require) {
 
     EmailAttachmentView = BaseView.extend({
         initialize: function(options) {
+            this.options = options;
             this.template = _.template($('#email-attachment-item').html());
             this.inputName = options.inputName;
 
-            this.options = options;
-            if (this.options.items) {
-                this.collection = new EmailAttachmentCollection(this.options.items);
-            } else {
-                this.collection = new EmailAttachmentCollection();
-            }
-
+            this.collection = new EmailAttachmentCollection();
             this.initEvents();
+
+            if (this.options.items) {
+                this.collection.add(this.options.items);
+            }
         },
 
         add: function(model) {
@@ -43,12 +42,16 @@ define(function (require) {
                     inputName: self.inputName
                 });
                 var $view = $(view);
-                $view.hide();
-
                 self.$el.append($view);
+                $view.find('i.icon-remove').click(function() {
+                    self.collection.remove(model.cid);
+                });
+                var $input = $view.find('input[type="file"]');
+                $input.prop('disabled', true);
 
                 if (!model.get('id')) {
-                    var $input = $view.find('input[type="file"]');
+                    $view.hide();
+                    $input.prop('disabled', false);
 
                     $input.change(function() {
                         var value = $input.val().replace(/^.*[\\\/]/, ''); // extracting file basename
@@ -57,12 +60,9 @@ define(function (require) {
                             model.set('fileName', value);
                             $view.find('span.label').html(value);
                             $view.show();
+                            $input.prop('disabled', true);
 
                             self.render();
-
-                            $view.find('i.icon-remove').click(function() {
-                                self.collection.remove(model.cid);
-                            });
                         } else {
                             self.collection.remove(model.cid);
                         }

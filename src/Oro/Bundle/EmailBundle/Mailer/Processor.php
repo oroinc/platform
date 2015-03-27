@@ -137,6 +137,7 @@ class Processor
 
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
+        $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
         if ($model->hasEntity()) {
@@ -169,6 +170,22 @@ class Processor
                 $attachment->getContentType()
             );
             $message->attach($swiftAttachment);
+        }
+    }
+
+    /**
+     * @param EmailModel $model
+     * @param Email      $email
+     */
+    protected function persistAttachments(EmailModel $model, Email $email)
+    {
+        /** @var EmailAttachment $attachment */
+        foreach ($model->getAttachments() as $attachment) {
+            $email->getEmailBody()->addAttachment($attachment);
+            $attachment->setEmailBody($email->getEmailBody());
+            if (!$attachment->getId()) {
+                $this->getEntityManager()->persist($attachment);
+            }
         }
     }
 

@@ -30,10 +30,20 @@
             <span data-id="<%= entity.get('id') %>" class="label label-info"><%= entity.get('fileName') %></span>
             <i class="icon-remove"></i>
             <input name="<%= inputName %>[][file]" type="file"/>
+            <input name="<%= inputName %>[][id]" type="text" value="<%= entity.get('id') %>"/>
         </div>
     </script>
 
-    {% set options = options|merge({container: id, inputName: full_name}) %}
+    {% set itemsArray = [] %}
+    {% for item in options.items %}
+        {% set itemArray = {
+            'id': item.id,
+            'fileName': item.fileName
+        } %}
+        {% set itemsArray = itemsArray|merge(itemArray) %}
+    {% endfor %}
+
+    {% set options = options|merge({container: id, inputName: full_name, items: itemsArray}) %}
 
     <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
          data-page-component-options="{{ options|json_encode }}">

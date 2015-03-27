@@ -36,11 +36,12 @@ define(function (require) {
             });
         },
 
-        initContainer: function(container) {
+        initContainer: function($container) {
+            $container.html('');
             var items = typeof this.options.items == 'undefined' ? [] : this.options.items;
             this.attachmentsView = new EmailAttachmentView({
                 items: items,
-                el: container,
+                el: $container,
                 inputName: this.options.inputName
             });
         }
