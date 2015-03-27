@@ -16,15 +16,15 @@
 {% endif %}
 
 {% if (value.toArray|length > 0 and value.toArray|length < 3) %}
-    <strong>{{ EA.recipient_email_addresses_short(value.toArray, true, true) }}</strong>
+    <strong>{{ EA.email_participants_name(value.toArray, true, false) }}</strong>
 {% else %}
     <strong>
         {% set firstEmail = value.toArray[0] %}
         {% set lastEmail = value.toArray[value.toArray|length - 1] %}
         {{
-            EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, true)
+            EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
         }}..{{
-            EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, true)
+            EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
         }}
         ({{ value.toArray|length }})
     </strong>
