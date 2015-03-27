@@ -111,6 +111,9 @@ define(function (require) {
          * @param {jQuery.Event} e
          */
         onLoadMoreClick: function (e) {
+            if (this.$(this.selectors.loadMore).hasClass('process')) {
+                return;
+            }
             this.loadEmails();
         },
 
@@ -180,7 +183,7 @@ define(function (require) {
 
             // update action element
             $toggleAllAction = this.$actionPanel.find(this.selectors.toggleAll);
-            $toggleAllAction[hasMultipleEmails ? 'show' : 'hide']();
+            $toggleAllAction.toggle(hasMultipleEmails);
             $toggleAllAction.text(__(translationPrefix + '.label'));
             $toggleAllAction.attr('title', __(translationPrefix + '.tooltip'));
         },
@@ -195,7 +198,7 @@ define(function (require) {
             var hasCollapsedEmails, hasEmailsToLoad;
             hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
             hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
-            return hasCollapsedEmails|| hasEmailsToLoad;
+            return hasCollapsedEmails || hasEmailsToLoad;
         }
     });
 

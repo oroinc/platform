@@ -182,6 +182,9 @@
   .email-view-toggle-all {
     color: #888;
     text-decoration: underline;
+    &:hover {
+      color: #777;
+    }
   }
 }
 .email-info {
@@ -197,7 +200,7 @@
   }
   .email-sent-date {
     text-align: right;
-    margin-bottom: 1em;
+    margin-bottom: .5em;
   }
   .email-has-attachment{
     font-size: 1.3em;
@@ -275,6 +278,11 @@
         margin-right: 1px;
       }
     }
+  }
+  .email-prev-body {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #000000;
   }
 }
 .email-detailed-info-table {
