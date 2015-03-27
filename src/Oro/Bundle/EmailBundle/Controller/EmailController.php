@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -71,23 +72,38 @@ class EmailController extends Controller
      */
     public function threadWidgetAction(Email $entity)
     {
-        $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
-            $this->get('doctrine')->getManager(),
-            $entity
-        );
-
-        foreach ($emails as $email) {
-            try {
-                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
-            } catch (LoadEmailBodyException $e) {
-                // do nothing
-            }
+        $config = $this->get('oro_config.global');
+        if ($config->get('oro_email.use_threads_in_emails')) {
+            $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
+                $this->get('doctrine')->getManager(),
+                $entity
+            );
+        } else {
+            $emails = [$entity];
         }
+        $this->loadEmailBody($emails);
 
         return [
             'entity' => $entity,
-            'thread' => $emails
+            'thread' => $emails,
         ];
+    }
+
+    /**
+     * @Route("/view-items", name="oro_email_items_view")
+     * @AclAncestor("oro_email_view")
+     * @Template
+     */
+    public function itemsAction()
+    {
+        $emails = [];
+        $ids = $this->prepareArrayParam('ids');
+        if (count($ids) !== 0) {
+            $emails = $this->get('doctrine')->getRepository("OroEmailBundle:Email")->findEmailsByIds($ids);
+        }
+        $this->loadEmailBody($emails);
+
+        return ['items' => $emails];
     }
 
     /**
@@ -274,7 +290,7 @@ class EmailController extends Controller
         $responseData = [
             'entity' => $emailModel,
             'saved' => false,
-            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature')
+            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature'),
         ];
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;
@@ -282,5 +298,45 @@ class EmailController extends Controller
         $responseData['form'] = $this->get('oro_email.form.email')->createView();
 
         return $responseData;
+    }
+
+    /**
+     * @param Email[] $emails
+     */
+    protected function loadEmailBody(array $emails)
+    {
+        foreach ($emails as $email) {
+            try {
+                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
+            } catch (LoadEmailBodyException $e) {
+                // do nothing
+            }
+        }
+    }
+
+    /**
+     * @param string $param
+     *
+     * @return array
+     */
+    protected function prepareArrayParam($param)
+    {
+        $result = [];
+        $ids = $this->getRequest()->get($param);
+        if ($ids) {
+            if (is_string($ids)) {
+                $ids = explode(',', $ids);
+            }
+            if (is_array($ids)) {
+                $result = array_map(
+                    function ($id) {
+                        return (int)$id;
+                    },
+                    $ids
+                );
+            }
+        }
+
+        return $result;
     }
 }
