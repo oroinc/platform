@@ -9,6 +9,12 @@ oro:
             apply_template_confirmation_content: Body content will be replaced by an other template. Are you sure you want to proceed?
         thread:
             load_error: Sorry, email thread was not loaded correctly.
+            collapse_all:
+                label: Collapse All
+                tooltip: Collapse all emails in the thread
+            expand_all:
+                label: Expand All
+                tooltip: Expand all emails in the thread
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"

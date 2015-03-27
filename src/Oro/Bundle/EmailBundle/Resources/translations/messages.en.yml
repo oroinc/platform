@@ -136,6 +136,7 @@ oro:
         refs.label:               References Header
         seen.label:               Is Seen
         thread_id.label:          Thread ID
+        show_details.tooltip:     Show details
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
@@ -151,6 +152,7 @@ oro:
         forward:                  Forward
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
+        load_more_emails:         "%quantity% older messages"
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
@@ -167,3 +169,6 @@ oro:
 "Cc/Bcc": "Cc/Bcc"
 "Thread view": "Thread view"
 "Add signature": "Add signature"
+"Date": "Date"
+"Me": "me"
+yesterday: yesterday
