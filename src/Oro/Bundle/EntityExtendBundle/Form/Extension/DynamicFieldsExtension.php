@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -31,18 +32,26 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     protected $translator;
 
     /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
      * @param ConfigManager       $configManager
      * @param RouterInterface     $router
      * @param TranslatorInterface $translator
+     * @param DoctrineHelper      $doctrineHelper
      */
     public function __construct(
         ConfigManager $configManager,
         RouterInterface $router,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->configManager = $configManager;
         $this->router        = $router;
         $this->translator    = $translator;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -144,7 +153,15 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     protected function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
     {
         $data      = $form->getData();
-        $dataId    = $data->getId() ? $data->getId() : 0;
+        if (!is_object($data)) {
+            return;
+        }
+        $dataId = $this->doctrineHelper->getSingleEntityIdentifier($data);
+        /**
+         * 0 is default id value for oro_entity_relation
+         * we need to set it if entity is new
+         */
+        $dataId = $dataId == null ? 0 : $dataId;
 
         /** @var FieldConfigId $extendConfigId */
         $extendConfigId = $extendConfig->getId();
