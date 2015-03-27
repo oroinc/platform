@@ -59,7 +59,6 @@ class TranslationRepository extends EntityRepository
             ->distinct(true)
             ->select('t.domain')
             ->where('t.locale = :locale')
-            ->orderBy('t.locale', 'ASC')
             ->setParameter('locale', $locale);
 
         $domains = $qb->getQuery()->getArrayResult();
