@@ -13,15 +13,9 @@ define(function (require) {
         template: template,
         events: {
             'click .add-comment-button': 'onAddCommentClick',
-            'click .item-remove-button': 'onRemoveCommentClick',
-            'click .item-edit-button': 'onEditCommentClick',
-            'click a.load-more': 'onLoadMoreClick',
-            'mouseover .dropdown-toggle': function (e) {
-                $(e.target).trigger('click');
-            },
-            'mouseleave .dropdown-menu': function (e) {
-                $(e.target).parent().find('a.dropdown-toggle').trigger('click');
-            }
+            'comment-edit': 'onEditComment',
+            'comment-remove': 'onRemoveComment',
+            'click a.load-more': 'onLoadMoreClick'
         },
 
         getTemplateData: function () {
@@ -52,14 +46,6 @@ define(function (require) {
             }));
         },
 
-        findModelByEl: function ($el) {
-            var listView = this.subview('list');
-            return this.collection.find(function (model) {
-                var itemView = listView.subview('itemView:' + model.cid);
-                return itemView && _.contains($el.parents(), itemView.el);
-            });
-        },
-
         onLoadMoreClick: function () {
             this.collection.loadMore();
         },
@@ -68,12 +54,12 @@ define(function (require) {
             this.trigger('toAdd');
         },
 
-        onEditCommentClick: function (e) {
-            this.trigger('toEdit', this.findModelByEl($(e.target)));
+        onEditComment: function (e, model) {
+            this.trigger('toEdit', model);
         },
 
-        onRemoveCommentClick: function (e) {
-            this.trigger('toRemove', this.findModelByEl($(e.target)));
+        onRemoveComment: function (e, model) {
+            this.trigger('toRemove', model);
         }
     });
 

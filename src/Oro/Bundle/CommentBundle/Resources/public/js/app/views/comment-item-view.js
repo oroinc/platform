@@ -16,6 +16,19 @@ define(function (require) {
             'change model': 'render'
         },
 
+        events: {
+            'click .item-remove-button': 'onRemoveCommentClick',
+            'click .item-edit-button': 'onEditCommentClick',
+
+            // open/close dropdown on hover
+            'mouseover .dropdown-toggle': function (e) {
+                $(e.target).trigger('click');
+            },
+            'mouseleave .dropdown-menu': function (e) {
+                $(e.target).parent().find('a.dropdown-toggle').trigger('click');
+            }
+        },
+
         getTemplateData: function () {
             var data = CommentItemView.__super__.getTemplateData.apply(this, arguments);
             if (data.createdAt) {
@@ -25,6 +38,14 @@ define(function (require) {
                 data.updatedTime = dateTimeFormatter.formatDateTime(data.updatedAt);
             }
             return data;
+        },
+
+        onEditCommentClick: function () {
+            this.$el.trigger('comment-edit', [this.model]);
+        },
+
+        onRemoveCommentClick: function () {
+            this.$el.trigger('comment-remove', [this.model]);
         }
     });
 

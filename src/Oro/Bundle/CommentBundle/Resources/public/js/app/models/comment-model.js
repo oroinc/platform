@@ -3,6 +3,7 @@ define(function (require) {
     'use strict';
 
     var CommentModel,
+        _ = require('underscore'),
         Chaplin = require('chaplin'),
         routing = require('routing'),
         BaseModel = require('oroui/js/app/models/base/model');
