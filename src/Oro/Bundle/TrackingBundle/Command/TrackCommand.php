@@ -20,7 +20,7 @@ class TrackCommand extends ContainerAwareCommand implements CronCommandInterface
      */
     public function getDefaultDefinition()
     {
-        return '*/1 * * * *';
+        return '*/15 * * * *';
     }
 
     /**
