@@ -2,6 +2,7 @@
 
 {% set folders = record.getValue('folders') %}
 
+<span class="nowrap">
 {% if folders|length > 0 %}
     {% set folder = folders[0] %}
     {% if folder.type == 'sent' %}
@@ -29,3 +30,4 @@
         ({{ value.toArray|length }})
     </strong>
 {% endif %}
+</span>
