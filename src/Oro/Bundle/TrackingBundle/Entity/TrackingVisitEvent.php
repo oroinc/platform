@@ -21,6 +21,8 @@ use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisitEvent;
  */
 class TrackingVisitEvent extends ExtendTrackingVisitEvent
 {
+    const ENTITY_NAME = 'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent';
+
     /**
      * @var integer
      *
@@ -53,6 +55,21 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
      * @ORM\JoinColumn(name="web_event_id", referencedColumnName="id")
      */
     protected $webEvent;
+
+    /**
+     * @var TrackingWebsite
+     *
+     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
+     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $website;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="parsing_count", type="integer", nullable=false, options={"default"=0})
+     */
+    protected $parsingCount = 0;
 
     /**
      * @return int
@@ -118,5 +135,40 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
         $this->event = $event;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getParsingCount()
+    {
+        return $this->parsingCount;
+    }
+
+    /**
+     * @param int $parsingCount
+     * @return $this
+     */
+    public function setParsingCount($parsingCount)
+    {
+        $this->parsingCount = $parsingCount;
+
+        return $this;
+    }
+
+    /**
+     * @return TrackingWebsite
+     */
+    public function getWebsite()
+    {
+        return $this->website;
+    }
+
+    /**
+     * @param TrackingWebsite $website
+     */
+    public function setWebsite($website)
+    {
+        $this->website = $website;
     }
 }

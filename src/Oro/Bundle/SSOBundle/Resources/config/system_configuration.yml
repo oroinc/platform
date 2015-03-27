@@ -1,0 +1,59 @@
+oro_system_configuration:
+    groups:
+        google_settings:
+            icon: fa-google
+            title: oro.sso.system_configuration.groups.google_settings.title
+        google_integration_settings:
+            title: oro.sso.system_configuration.groups.google_integration_settings.title
+        integration_setup:
+            title: oro.sso.system_configuration.groups.integration_setup.title
+
+    fields:
+        oro_sso.enable_google_sso:
+            data_type: boolean
+            type: oro_config_checkbox
+            options:
+                label: oro.sso.system_configuration.fields.enable_google_sso.label
+                required: false
+                resettable: false
+            priority: 40
+        oro_sso.google_sso_domains:
+            data_type: array
+            type: oro_textlist
+            options:
+                label: oro.sso.system_configuration.fields.google_sso_domains.label
+                tooltip: oro.sso.system_configuration.fields.google_sso_domains.tooltip
+                required: false
+                resettable: false
+            priority: 10
+        oro_sso.google_sso_client_id:
+            data_type: string
+            type: text
+            options:
+                label: oro.sso.system_configuration.fields.google_sso_client_id.label
+                resettable: false
+                required: false
+            priority: 30
+        oro_sso.google_sso_client_secret:
+            data_type: string
+            type: text
+            options:
+                label: oro.sso.system_configuration.fields.google_sso_client_secret.label
+                resettable: false
+                required: false
+            priority: 20
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    integration_setup:
+                        children:
+                            google_settings:
+                                children:
+                                    google_integration_settings:
+                                        children:
+                                            - oro_sso.enable_google_sso
+                                            - oro_sso.google_sso_domains
+                                            - oro_sso.google_sso_client_id
+                                            - oro_sso.google_sso_client_secret
