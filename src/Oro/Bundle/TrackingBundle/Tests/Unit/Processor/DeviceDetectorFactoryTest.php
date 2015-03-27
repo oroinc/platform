@@ -12,5 +12,7 @@ class DeviceDetectorFactoryTest extends \PHPUnit_Framework_TestCase
         $detector = DeviceDetectorFactory::getInstance($testUA);
         $this->assertEquals('Safari', $detector->getClient()['name']);
         $this->assertSame($detector, DeviceDetectorFactory::getInstance($testUA));
+        DeviceDetectorFactory::clearInstances();
+        $this->assertNotSame($detector, DeviceDetectorFactory::getInstance($testUA));
     }
 }
