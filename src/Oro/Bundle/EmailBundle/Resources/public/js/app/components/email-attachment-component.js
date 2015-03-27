@@ -21,8 +21,7 @@ define(function (require) {
             if (this.options.dialogButton) {
                 this.initDialogButton(this.options.dialogButton);
             }
-            var $container = this.options._sourceElement.find('#' + this.options.container);
-            this.initContainer($container);
+            this.initView();
 
             this.attachmentsView.render();
         },
@@ -36,12 +35,14 @@ define(function (require) {
             });
         },
 
-        initContainer: function($container) {
-            $container.html('');
+        initView: function() {
+            var $container = this.options._sourceElement.find('#' + this.options.container);
+            $container.css('padding-top', 5);
             var items = typeof this.options.items == 'undefined' ? [] : this.options.items;
             this.attachmentsView = new EmailAttachmentView({
                 items: items,
-                el: $container,
+                el: this.options._sourceElement,
+                $container: $container,
                 inputName: this.options.inputName
             });
         }

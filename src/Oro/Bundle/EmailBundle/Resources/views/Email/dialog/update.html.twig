@@ -54,21 +54,22 @@
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
+                    <div class="control-group">
+                        <div class="controls">
+                            <span class="email-body-action"><a id="add-signature" href="javascript:void(0);">{{ 'oro.email.form.add_signature'|trans }}</a></span>
+                            <span class="email-body-action"><a id="attach-file" href="javascript:void(0);">{{ 'oro.email.form.attach_file'|trans }}</a></span>
+                            <span class="email-body-action"><a id="add-context" href="javascript:void(0);">{{ 'oro.email.form.add_context'|trans }}</a></span>
+                        </div>
+                    </div>
+
                     {% set emailAttachmentOptions = {
                         dialogButton: 'attach-file',
                         items: entity.attachments.toArray
                     } %}
                     {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
 
-                    <div class="control-group">
-                        <div class="controls">
-                            <a class="btn" id="addSignatureButton" href="javascript:void(0);">{{ 'Add signature'|trans }}</a>
-                        </div>
-                    </div>
-
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actoins" style="display: none;">
-                        <a id="attach-file" href="javascript:void(0);">{{ 'Attach file'|trans }}</a>
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
                         <button class="btn btn-primary" type="submit">{{ 'Send'|trans }}</button>
                     </div>

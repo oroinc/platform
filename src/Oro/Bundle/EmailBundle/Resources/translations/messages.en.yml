@@ -9,7 +9,12 @@ oro:
 
     email:
         controller.emailtemplate.saved.message: "Template saved"
-        form.choose_template:                   ""
+        form:
+            choose_template:                     ""
+            add_signature:                       Add Signature
+            attach_file:                         Attach File
+            add_context:                         Add Context
+
         variable.not.found:                     N/A
 
         system_configuration:
@@ -168,5 +173,3 @@ oro:
 "Content": "Content"
 "Cc/Bcc": "Cc/Bcc"
 "Thread view": "Thread view"
-"Add signature": "Add signature"
-"Attach file": "Attach file"
