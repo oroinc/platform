@@ -138,7 +138,7 @@ define([
 
         updateCommentsQuantity: function (collection) {
             if (collection instanceof Backbone.Collection) {
-                this.model.set('commentCount', collection.getRecordsQuantity());
+                this.model.set('commentCount', collection.state.get('count'));
             }
         }
     });

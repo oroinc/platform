@@ -32,25 +32,11 @@ define([
             return templateFunc;
         },
 
-        getTemplateData: function() {
-            var data = {}, source;
-            if (this.model) {
-                data = Chaplin.utils.serialize(this.model);
-            } else if (this.collection) {
-                if (this.collection instanceof BaseCollection) {
-                    data = this.collection.serialize();
-                } else {
-                    data = {
-                        items: Chaplin.utils.serialize(this.collection),
-                        length: this.collection.length
-                    };
-                }
-            }
-            source = this.model || this.collection;
-            if (source) {
-                if (typeof source.isSynced === 'function' && !('synced' in data)) {
-                    data.synced = source.isSynced();
-                }
+        getTemplateData: function () {
+            var data;
+            data = BaseView.__super__.getTemplateData.apply(this, arguments);
+            if (!this.model && this.collection && this.collection instanceof BaseCollection) {
+                _.extend(data, this.collection.serializeExtraData());
             }
             return data;
         },

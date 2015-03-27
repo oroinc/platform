@@ -11,13 +11,10 @@ define([
         model: BaseModel,
 
         /**
-         * @inheritDoc
+         * Returns additional parameters to be merged into serialized object
          */
-        serialize: function () {
-            return {
-                items: this.map(Chaplin.utils.serialize),
-                length: this.length
-            };
+        serializeExtraData: function () {
+            return {};
         }
     });
 

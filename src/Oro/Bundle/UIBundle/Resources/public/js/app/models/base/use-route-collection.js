@@ -160,11 +160,11 @@ define([
         /**
          * @inheritDoc
          */
-        serialize: function () {
-            var data = UseRouteCollection.__super__.serialize.apply(this, arguments);
-            data.state = this.state.toJSON();
-            data.syncState = this.syncState();
-            return data;
+        serializeExtraData: function () {
+            return {
+                state: this.state.toJSON(),
+                syncState: this.syncState()
+            };
         },
 
         /**
