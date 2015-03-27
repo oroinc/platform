@@ -349,6 +349,12 @@
         {% set timeValidation = timeValidation|merge({'NotBlank' : {}}) %}
     {% endif %}
 
+    {% if attribute(attr, 'class') is defined %}
+        {% set attrClass = attr['class'] %}
+    {% else %}
+        {% set attrClass = '' %}
+    {% endif %}
+
     {% set options = {
         view: 'oroui/js/app/views/datepicker/datetimepicker-view',
         nativeMode: isMobileVersion(),
@@ -356,7 +362,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            class: 'input-small',
+            class: 'input-small date ' ~ attrClass,
             'data-validation': dateValidation|json_encode
         },
         datePickerOptions: {
@@ -370,7 +376,7 @@
             placeholder: 'oro.form.choose_time'|trans,
             id: 'time_selector_' ~ id,
             name: 'time_selector_' ~ id,
-            class: 'input-small',
+            class: 'input-small time ' ~ attrClass,
             'data-validation': timeValidation|json_encode
         },
         timePickerOptions: {
