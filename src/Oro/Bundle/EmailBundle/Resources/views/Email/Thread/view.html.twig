@@ -12,6 +12,10 @@
     {{ parent() }}
 {% endblock pageHeader %}
 
+{% block pageActions %}
+    <div class="pull-right email-thread-action-panel"></div>
+{% endblock pageActions %}
+
 {% block breadcrumb %}
     {% set breadcrumbs = [
         {'label': "Thread view"|trans },
