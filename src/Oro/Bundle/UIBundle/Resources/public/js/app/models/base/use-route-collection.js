@@ -15,10 +15,10 @@ define([
      * It keeps itself in actual state when route or state changes.
      *
      * Basic usage:
-     * ```
+     * ```javascript
      * var CommentCollection = UseRouteCollection.extend({
      *     routeName: 'oro_api_comment_get_items',
-     *     routeAccepts: ['page', 'limit'],
+     *     routeQueryParameters: ['page', 'limit'],
      *     stateDefaults: {
      *         page: 1,
      *         limit: 10
@@ -28,15 +28,15 @@ define([
      * var commentCollection = new CommentCollection([], {
      *     routeParams: {
      *         // specify required parameters
-     *         relationId: 1,
-     *         relationClass: 'Some/Class'
+     *         relationId: 123,
+     *         relationClass: 'Some_Class'
      *     }
      * });
      *
-     * // load first page
-     * commentCollection.fetch()
+     * // load first page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=1)
+     * commentCollection.fetch();
      *
-     * // load second page
+     * // load second page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2)
      * commentCollection.state.set({page: 2})
      * ```
      *
@@ -55,12 +55,11 @@ define([
 
         /**
          * List of query parameters which this route accepts.
-         * There is no need to specify here arguments which is required to build route path.
          *
-         * @see RouteModel.routeAccepts
+         * @see RouteModel.routeQueryParameters
          * @type {Array.<string>}
          */
-        routeAccepts: [],
+        routeQueryParameters: [],
 
         /**
          * Route object which used to generate urls. Collection will reload whenever route is changed
@@ -110,7 +109,7 @@ define([
 
             // initialize route
             this._route = new RouteModel(_.extend(
-                {routeName: this.routeName, routeAccepts: this.routeAccepts},
+                {routeName: this.routeName, routeQueryParameters: this.routeQueryParameters},
                 this.routeParams,
                 options.routeParams,
                 _.pick(options, ['routeName']) // route name cannot be overridden
