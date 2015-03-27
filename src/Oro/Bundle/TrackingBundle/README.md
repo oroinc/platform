@@ -8,6 +8,8 @@ Provides:
     - Tracking event data parsing
     - Finding identifying objects by provided criteria
     - Assigning tracking with identified objects
+    - Assigning tracking with platform data objects
+    - Ability to create reports based on tracked data
 
 # Notes
 
@@ -26,6 +28,8 @@ The main goal of processing(parsing) tracking events is to identify object(s) fo
 - The next stage is identification. It represented with "**TrackingEventIdentificationProvider**" which is chain provider and service "**oro_tracking.provider.identifier_provider**". You can implement own identification provider for your purposes. The only requirement - it should implement "**TrackingEventIdentifierInterface**" and be registered in services with tag "**oro_tracking.provider.identification**". Also you can prioritise your provider with priority parameter.
 
 - Please note, that the input data for such provider is "**TrackingVisit**" object.
+
+- To connect tracking event with your data, provider should have 3 additional methods: **isApplicableVisitEvent**, **processEvent**, **getEventTargets**
 
 ## Example
 
@@ -97,10 +101,40 @@ class TestCustomerIdentification implements TrackingEventIdentifierInterface
     /**
      * {@inheritdoc}
      */
-    public function getTarget()
+    public function getIdentityTarget()
     {
         /**
          * Here we should return object's class name for which given tracking visit will be assigned to.
+         */
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function isApplicableVisitEvent(TrackingVisitEvent $trackingVisitEvent)
+    {
+        /**
+         * should return true if this processor can process given visit event
+         */
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function processEvent(TrackingVisitEvent $trackingVisitEvent)
+    {
+        /**
+         *  Here should be some logic that returns array with target entity classes
+         */
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventTargets()
+    {
+        /**
+         *  Should return array with necessary event targets 
          */
     }
 
@@ -125,3 +159,40 @@ class TestCustomerIdentification implements TrackingEventIdentifierInterface
 }
 ```
 
+# Tracked data in report builder
+
+User can crate reports based on tracked event data.
+
+The main entity for this data is **Visitor event**. This entity have next fields:
+
+ - **Type**. Virtual string field. Type of event. Each tracking website can use own list of event types.
+ 
+ - **IP**. Virtual string field. IP address of visitor
+ 
+ - **URL**. Virtual string field. URL action comes from.
+ 
+ - **Title**.  Virtual string field. Title of page action comes from.
+  
+ - **Bot**. Virtual boolean field. Shows is visitor is bot
+  
+ - **Client name**.  Virtual string field. Visitor client name (e.g., Firefox, Chrome)
+  
+ - **Client type**. Virtual string field. Visitor client type (e.g., Browser)
+  
+ - **Client version**. Virtual string field. Version number of visitor's client.
+ 
+ - **OS**. Virtual string field. Visitor's operating system name. (e.g., Windows, Mac)
+ 
+ - **OS version**. Virtual string field. Visitor's operating system name.(e.g., XP, 10.10)
+ 
+ - **Desktop**. Virtual boolean field. True if visitor comes from desktop system 
+ 
+ - **Mobile**. Virtual boolean field. True if visitor comes from mobile system 
+ 
+ - **Logged in**. Virtual boolean field. True if visitor was detected. (Non anonymous event) 
+ 
+ - **Event date**. Virtual datetime field. Date than event was executed
+ 
+ - **Tracking website** Link to website tracking config record.
+ 
+ - List of connected records to the event event entity.

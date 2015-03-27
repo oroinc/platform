@@ -100,6 +100,62 @@ class TrackingVisit extends ExtendTrackingVisit
     protected $ip;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="client", type="string", length=255, nullable=true)
+     */
+    protected $client;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="client_version", type="string", length=255, nullable=true)
+     */
+    protected $clientVersion;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="client_type", type="string", length=255, nullable=true)
+     */
+    protected $clientType;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="os", type="string", length=255, nullable=true)
+     */
+    protected $os;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="os_version", type="string", length=255, nullable=true)
+     */
+    protected $osVersion;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="desktop", type="boolean", nullable=true)
+     */
+    protected $desktop;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="mobile", type="boolean", nullable=true)
+     */
+    protected $mobile;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="bot", type="boolean", nullable=true)
+     */
+    protected $bot;
+
+    /**
      * @return int
      */
     public function getId()
@@ -273,5 +329,163 @@ class TrackingVisit extends ExtendTrackingVisit
     public function setIdentifierDetected($identifierDetected)
     {
         $this->identifierDetected = $identifierDetected;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param string $client
+     * @return $this
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOs()
+    {
+        return $this->os;
+    }
+
+    /**
+     * @param string $os
+     * @return $this
+     */
+    public function setOs($os)
+    {
+        $this->os = $os;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDesktop()
+    {
+        return $this->desktop;
+    }
+
+    /**
+     * @param boolean $desktop
+     *
+     * @return $this
+     */
+    public function setDesktop($desktop)
+    {
+        $this->desktop = $desktop;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param boolean $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientVersion()
+    {
+        return $this->clientVersion;
+    }
+
+    /**
+     * @param string $clientVersion
+     *
+     * @return $this
+     */
+    public function setClientVersion($clientVersion)
+    {
+        $this->clientVersion = $clientVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientType()
+    {
+        return $this->clientType;
+    }
+
+    /**
+     * @param string $clientType
+     *
+     * @return $this
+     */
+    public function setClientType($clientType)
+    {
+        $this->clientType = $clientType;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOsVersion()
+    {
+        return $this->osVersion;
+    }
+
+    /**
+     * @param string $osVersion
+     *
+     * @return $this
+     */
+    public function setOsVersion($osVersion)
+    {
+        $this->osVersion = $osVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBot()
+    {
+        return $this->bot;
+    }
+
+    /**
+     * @param boolean $bot
+     *
+     * @return $this
+     */
+    public function setBot($bot)
+    {
+        $this->bot = $bot;
+
+        return $this;
     }
 }
