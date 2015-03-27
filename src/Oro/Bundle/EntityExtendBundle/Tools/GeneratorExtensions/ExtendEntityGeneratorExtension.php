@@ -137,7 +137,6 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
         if (!isset($schema['addremove'][$fieldName])) {
             return '$this->' . $fieldName . ' = $value; return $this;';
         } else {
-            $removeMethodName = $this->generateRemoveMethodName($fieldName);
             $addMethodName = $this->generateAddMethodName($fieldName);
             $body = <<<METHOD_BODY
 if ((!\$value instanceof \Traversable && !is_array(\$value) && !\$value instanceof \ArrayAccess) ||
@@ -147,9 +146,7 @@ if ((!\$value instanceof \Traversable && !is_array(\$value) && !\$value instance
     return \$this;
 }
 
-foreach (\$this->$fieldName as \$item) {
-    \$this->$removeMethodName(\$item);
-}
+\$this->{$fieldName}->clear();
 foreach (\$value as \$item) {
     \$this->$addMethodName(\$item);
 }
