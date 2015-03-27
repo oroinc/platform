@@ -10,12 +10,15 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
      * @param AbstractEnumValue $object
-     * @param null|string $format
-     * @param array $context
-     * @return array
+     *
+     * {@inheritdoc}
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        if (!$object instanceof AbstractEnumValue) {
+            return null;
+        }
+
         if (!empty($context['mode']) && $context['mode'] === 'short') {
             return ['id' => $object->getId()];
         }

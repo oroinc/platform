@@ -100,6 +100,6 @@ class PostProcessItemStep extends ItemStep
         $result = explode(',', $scalar);
         $result = array_map('trim', $result);
 
-        return $result;
+        return array_filter($result);
     }
 }

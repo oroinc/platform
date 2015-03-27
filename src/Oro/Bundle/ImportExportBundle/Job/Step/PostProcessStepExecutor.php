@@ -146,7 +146,7 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
 
         $jobContext = $this->getJobContext();
         foreach ($jobContext->getKeys() as $contextKey) {
-            if (!in_array($contextKey, $this->contextSharedKeys)) {
+            if (!in_array($contextKey, $this->contextSharedKeys, true)) {
                 $configuration[$contextKey] = $jobContext->get($contextKey);
             }
         }
