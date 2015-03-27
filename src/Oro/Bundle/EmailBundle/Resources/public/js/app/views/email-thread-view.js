@@ -56,6 +56,7 @@ define(function (require) {
                 // add toggleAll action element
                 this.$actionPanel = $(this.actionPanelSelector);
                 this.$actionPanel
+                    .empty()
                     .append('<a href="#" class="email-view-toggle-all"></a>')
                     .find(this.selectors.toggleAll)
                     .on('click', _.bind(this.onToggleAllClick, this));
