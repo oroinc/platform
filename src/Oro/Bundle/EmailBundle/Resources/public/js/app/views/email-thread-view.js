@@ -11,7 +11,8 @@ define(function (require) {
 
         events: {
             'click .email-view-toggle': 'onEmailHeadClick',
-            'click .email-view-toggle-all': 'onToggleAllClick'
+            'click .email-view-toggle-all': 'onToggleAllClick',
+            'click .email-load-more': 'onLoadMoreClick'
         },
 
         selectors: {
@@ -78,6 +79,15 @@ define(function (require) {
             }
 
             this.toggleEmail($email);
+        },
+
+        /**
+         * Handles click on load more email action element
+         *
+         * @param {jQuery.Event} e
+         */
+        onLoadMoreClick: function (e) {
+            console.log(e);
         },
 
         /**

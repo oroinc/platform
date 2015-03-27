@@ -149,6 +149,7 @@ oro:
         forward:                  Forward
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
+        load_more_emails:         "%quantity% older messages"
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
