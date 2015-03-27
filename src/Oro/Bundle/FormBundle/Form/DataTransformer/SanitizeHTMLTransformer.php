@@ -10,6 +10,7 @@ use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 class SanitizeHTMLTransformer implements DataTransformerInterface
 {
     const SUB_DIR = 'ezyang';
+    const MODE = 0775;
 
     /**
      * @var string|null
@@ -55,34 +56,54 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     protected function sanitize($value)
     {
         $config = \HTMLPurifier_Config::createDefault();
-        $converter = new TagDefinitionConverter();
-        if ($this->allowedElements) {
-            $config->set('HTML.AllowedElements', $converter->getElements($this->allowedElements));
-            $config->set('HTML.AllowedAttributes', $converter->getAttributes($this->allowedElements));
-        }
-        if ($this->cacheDir) {
-            $cacheDir = $this->cacheDir
-                . DIRECTORY_SEPARATOR . '..'
-                . DIRECTORY_SEPARATOR . 'vendor'
-                . DIRECTORY_SEPARATOR . self::SUB_DIR;
-            $this->touchCacheDir($cacheDir);
-            $config->set('Cache.SerializerPath', $cacheDir);
-        } else {
-            $config->set('Cache.DefinitionImpl', null);
-        }
+        $this->fillAllowedElementsConfig($config);
+        $this->fillCacheConfig($config);
         $purifier = new \HTMLPurifier($config);
 
         return $purifier->purify($value);
     }
 
     /**
+     * Create cache dir if need
+     *
      * @param string $cacheDir
      */
     protected function touchCacheDir($cacheDir)
     {
         $fs = new Filesystem();
         if (!$fs->exists($cacheDir)) {
-            $fs->mkdir($cacheDir, 0777);
+            $fs->mkdir($cacheDir, self::MODE);
+        }
+    }
+
+    /**
+     * Configure cache
+     *
+     * @param \HTMLPurifier_Config $config
+     */
+    protected function fillCacheConfig($config)
+    {
+        if ($this->cacheDir) {
+            $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . self::SUB_DIR;
+            $this->touchCacheDir($cacheDir);
+            $config->set('Cache.SerializerPath', $cacheDir);
+            $config->set('Cache.SerializerPermissions', self::MODE);
+        } else {
+            $config->set('Cache.DefinitionImpl', null);
+        }
+    }
+
+    /**
+     * Configure allowed tags
+     *
+     * @param \HTMLPurifier_Config $config
+     */
+    protected function fillAllowedElementsConfig($config)
+    {
+        $converter = new TagDefinitionConverter();
+        if ($this->allowedElements) {
+            $config->set('HTML.AllowedElements', $converter->getElements($this->allowedElements));
+            $config->set('HTML.AllowedAttributes', $converter->getAttributes($this->allowedElements));
         }
     }
 }
