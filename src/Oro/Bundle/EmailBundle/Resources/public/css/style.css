@@ -151,9 +151,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    width: 0;
-    height: 0;
+    width: 0 !important;
+    height: 0 !important;
     border: none;
+    z-index: -1;
 }
 a.attachment .icon .icon-link {
     color: #999;

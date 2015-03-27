@@ -84,7 +84,7 @@ class EmailHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
 
-            if ($this->form->isValid()) {
+             if ($this->form->isValid()) {
                 try {
                     $this->emailProcessor->process($model);
                     return true;

@@ -47,11 +47,9 @@ define(function (require) {
                     self.collection.remove(model.cid);
                 });
                 var $input = $view.find('input[type="file"]');
-                $input.prop('disabled', true);
 
                 if (!model.get('id')) {
                     $view.hide();
-                    $input.prop('disabled', false);
 
                     $input.change(function() {
                         var value = $input.val().replace(/^.*[\\\/]/, ''); // extracting file basename
@@ -60,7 +58,6 @@ define(function (require) {
                             model.set('fileName', value);
                             $view.find('span.label').html(value);
                             $view.show();
-                            $input.prop('disabled', true);
 
                             self.render();
                         } else {

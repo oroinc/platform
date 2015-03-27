@@ -16,6 +16,9 @@ class EmailAttachmentType extends AbstractType
         return 'oro_email_attachment';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
@@ -29,6 +32,7 @@ class EmailAttachmentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('id', 'text');
         $builder->add('file', 'file');
     }
 }

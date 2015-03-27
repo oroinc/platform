@@ -181,11 +181,17 @@ class Processor
     {
         /** @var EmailAttachment $attachment */
         foreach ($model->getAttachments() as $attachment) {
-            $email->getEmailBody()->addAttachment($attachment);
-            $attachment->setEmailBody($email->getEmailBody());
             if (!$attachment->getId()) {
                 $this->getEntityManager()->persist($attachment);
+            } else {
+                $attachmentContent = clone $attachment->getContent();
+                $attachment = clone $attachment;
+                $attachment->setContent($attachmentContent);
+                $this->getEntityManager()->persist($attachment);
             }
+
+            $email->getEmailBody()->addAttachment($attachment);
+            $attachment->setEmailBody($email->getEmailBody());
         }
     }
 

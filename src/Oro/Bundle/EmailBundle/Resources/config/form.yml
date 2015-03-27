@@ -71,6 +71,7 @@ services:
         class: %oro_email.form.type.email.class%
         arguments:
             - @security.context
+            - @doctrine
         tags:
             - { name: form.type, alias: oro_email_email }
 

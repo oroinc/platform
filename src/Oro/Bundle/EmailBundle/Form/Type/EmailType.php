@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -12,6 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
@@ -24,11 +26,18 @@ class EmailType extends AbstractType
     protected $securityContext;
 
     /**
-     * @param SecurityContextInterface $securityContext
+     * @var Registry
      */
-    public function __construct(SecurityContextInterface $securityContext)
+    protected $doctrine;
+
+    /**
+     * @param SecurityContextInterface $securityContext
+     * @param Registry                 $registry
+     */
+    public function __construct(SecurityContextInterface $securityContext, Registry $registry)
     {
         $this->securityContext = $securityContext;
+        $this->doctrine        = $registry;
     }
 
     /**
@@ -148,6 +157,8 @@ class EmailType extends AbstractType
 
     public function initAttachments(FormEvent $event)
     {
+        $repo = $this->doctrine->getManager()->getRepository('OroEmailBundle:EmailAttachment');
+
         $model = $event->getData();
 
         if ($model instanceof Email) {
@@ -155,7 +166,9 @@ class EmailType extends AbstractType
 
             /** @var EmailAttachment $attachment */
             foreach ($attachments as $attachment) {
-                if ($attachment->getFile() && !$attachment->getContent()) {
+                if (!$attachment) {
+                    $attachments->removeElement($attachment);
+                } elseif ($attachment->getFile() && !$attachment->getContent()) {
                     $attachmentContent = new EmailAttachmentContent();
                     $attachmentContent->setContent(
                         base64_encode(file_get_contents($attachment->getFile()->getRealPath()))
@@ -166,6 +179,9 @@ class EmailType extends AbstractType
                     $attachment->setContent($attachmentContent);
                     $attachment->setContentType($attachment->getFile()->getMimeType());
                     $attachment->setFileName($attachment->getFile()->getClientOriginalName());
+                } elseif ($attachment->getId()) {
+                    $a = $repo->find($attachment->getId());
+                    $attachments->set($attachments->indexOf($attachment), $a);
                 }
             }
         }

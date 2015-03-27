@@ -10,14 +10,6 @@ class EmailAttachmentsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults([]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return 'collection';

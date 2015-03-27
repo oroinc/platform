@@ -71,6 +71,18 @@ class EmailAttachment
     protected $file;
 
     /**
+     * @param $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer
@@ -192,5 +204,13 @@ class EmailAttachment
         $this->file = $file;
 
         return $this;
+    }
+
+    /**
+     * Clone record as new one
+     */
+    public function __clone()
+    {
+        $this->id = null;
     }
 }

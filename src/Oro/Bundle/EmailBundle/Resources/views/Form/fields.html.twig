@@ -29,8 +29,8 @@
         <div class="attachment-item" style="border: none" data-cid="<%= entity.cid %>">
             <span data-id="<%= entity.get('id') %>" class="label label-info"><%= entity.get('fileName') %></span>
             <i class="icon-remove"></i>
-            <input name="<%= inputName %>[][file]" type="file"/>
-            <input name="<%= inputName %>[][id]" type="text" value="<%= entity.get('id') %>"/>
+            <input name="<%= inputName %>[<%= entity.cid %>][id]" type="text" value="<%= entity.get('id') %>"/>
+            <input name="<%= inputName %>[<%= entity.cid %>][file]" type="file"/>
         </div>
     </script>
 
@@ -40,7 +40,7 @@
             'id': item.id,
             'fileName': item.fileName
         } %}
-        {% set itemsArray = itemsArray|merge(itemArray) %}
+        {% set itemsArray = itemsArray|merge([itemArray]) %}
     {% endfor %}
 
     {% set options = options|merge({container: id, inputName: full_name, items: itemsArray}) %}
