@@ -778,7 +778,7 @@ class Email extends ExtendEmail
     /**
      * @return ArrayCollection
      */
-    public function getContact()
+    public function getContacts()
     {
         return new ArrayCollection(
             array_merge(

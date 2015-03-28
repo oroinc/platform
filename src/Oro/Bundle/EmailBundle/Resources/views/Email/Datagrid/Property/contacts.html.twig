@@ -1,6 +1,12 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
 {% set folders = record.getValue('folders') %}
+{% set thread = record.getValue('thread') %}
+{% if thread is not null  %}
+    {% set recipients = oro_get_email_thread_recipients(thread) %}
+{% else %}
+    {% set recipients = record.getValue('recipients') %}
+{% endif %}
 
 <span class="nowrap">
 {% if folders|length > 0 %}
@@ -16,18 +22,18 @@
     {% endif %}
 {% endif %}
 
-{% if (value.toArray|length > 0 and value.toArray|length < 3) %}
-    <strong>{{ EA.email_participants_name(value.toArray, true, false) }}</strong>
+{% if (recipients|length > 0 and recipients|length < 3) %}
+    <strong>{{ EA.email_participants_name(recipients, true, false) }}</strong>
 {% else %}
     <strong>
-        {% set firstEmail = value.toArray[0] %}
-        {% set lastEmail = value.toArray[value.toArray|length - 1] %}
+        {% set firstEmail = recipients[0] %}
+        {% set lastEmail = recipients[recipients|length - 1] %}
         {{
             EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
         }}..{{
             EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
         }}
-        ({{ value.toArray|length }})
+        ({{ recipients|length }})
     </strong>
 {% endif %}
 </span>

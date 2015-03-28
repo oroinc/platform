@@ -50,20 +50,20 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityManager->expects($this->exactly(2))
+        $entityManager->expects($this->exactly(4))
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
         $entityManager->expects($this->exactly(2))
             ->method('persist');
-        $entityManager->expects($this->exactly(1))
+        $entityManager->expects($this->exactly(3))
             ->method('getClassMetadata')
             ->will($this->returnValue($metaClass));
 
         $uow->expects($this->once())
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue([$email, new \stdClass()]));
-        $uow->expects($this->once())
-            ->method('computeChangeSet');
+        $uow->expects($this->exactly(3))
+            ->method('recomputeSingleEntityChangeSet');
 
         $this->manager->handleOnFlush(new OnFlushEventArgs($entityManager));
     }
