@@ -8,7 +8,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
@@ -73,7 +72,7 @@ class Attachment extends ExtendAttachment
 
     /**
      * @var string
-     *g
+     *
      * @ORM\Column(name="comment", type="text", nullable=true)
      */
     protected $comment;
@@ -114,13 +113,6 @@ class Attachment extends ExtendAttachment
      * )
      */
     protected $updatedAt;
-
-    /**
-     * @var EmailAttachment
-     *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailAttachment", mappedBy="attachment")
-     */
-    protected $emailAttachment;
 
     /**
      * Get id
@@ -289,25 +281,5 @@ class Attachment extends ExtendAttachment
     public function getOrganization()
     {
         return $this->organization;
-    }
-
-    /**
-     * @param EmailAttachment $emailAttachment
-     *
-     * @return $this
-     */
-    public function setEmailAttachment(EmailAttachment $emailAttachment)
-    {
-        $this->emailAttachment = $emailAttachment;
-
-        return $this;
-    }
-
-    /**
-     * @return EmailAttachment
-     */
-    public function getEmailAttachment()
-    {
-        return $this->emailAttachment;
     }
 }

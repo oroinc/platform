@@ -8,7 +8,7 @@ use JMS\Serializer\Annotation as JMS;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
  * Email Attachment
@@ -66,13 +66,13 @@ class EmailAttachment
     protected $emailBody;
 
     /**
-     * @var Attachment
+     * @var File
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\Attachment", inversedBy="emailAttachment")
-     * @ORM\JoinColumn(name="attachment_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File", inversedBy="emailAttachment")
+     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @JMS\Exclude
      */
-    protected $attachment;
+    protected $file;
 
     /**
      * Get id
@@ -179,31 +179,36 @@ class EmailAttachment
     }
 
     /**
-     * @return Attachment
+     * Get attachment file
+     *
+     * @return File
      */
-    public function getAttachment()
+    public function getFile()
     {
-        return $this->attachment;
+        return $this->file;
     }
 
     /**
-     * @param Attachment $attachment
+     * Set email attachment
+     *
+     * @param File $file
      *
      * @return $this
      */
-    public function setAttachment(Attachment $attachment)
+    public function setFile(File $file = null)
     {
-        $this->attachment = $attachment;
+        $this->file = $file;
 
         return $this;
     }
 
+    /**
+     * Get file extension
+     *
+     * @return string
+     */
     public function getExtension()
     {
-        if ($this->fileName) {
-            return pathinfo($this->fileName, PATHINFO_EXTENSION);
-        } else {
-            return null;
-        }
+        return pathinfo($this->fileName, PATHINFO_EXTENSION);
     }
 }

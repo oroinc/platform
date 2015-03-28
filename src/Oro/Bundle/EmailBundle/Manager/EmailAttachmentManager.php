@@ -4,44 +4,31 @@ namespace Oro\Bundle\EmailBundle\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
 use Gaufrette\Filesystem;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
-use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 
 /**
  * Class EmailAttachmentManager
  *
  * @package Oro\Bundle\EmailBundle\Manager
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailAttachmentManager
 {
-    /**
-     * @var EmailCacheManager
-     */
-    protected $emailCacheManager;
-
-    /**
-     * @var AttachmentManager
-     */
-    protected $attachmentManager;
+    const ATTACHMENT_DIR = 'attachment';
 
     /**
      * @var Filesystem
@@ -49,9 +36,9 @@ class EmailAttachmentManager
     protected $filesystem;
 
     /**
-     * @var Registry
+     * @var EntityManager
      */
-    protected $registry;
+    protected $em;
 
     /**
      * @var string
@@ -59,123 +46,114 @@ class EmailAttachmentManager
     protected $attachmentDir;
 
     /**
-     * @var ConfigFileValidator
-     */
-    protected $configFileValidator;
-
-    /**
      * @var ServiceLink
      */
     protected $securityFacadeLink;
 
     /**
-     * @param EmailCacheManager   $emailCacheManager
-     * @param FileSystemMap       $filesystemMap
-     * @param Registry            $registry
-     * @param ConfigFileValidator $configFileValidator
-     * @param KernelInterface     $kernel
-     * @param ServiceLink         $securityFacadeLink
+     * @var EmailActivityListProvider
+     */
+    protected $activityListProvider;
+
+    /**
+     * @param FileSystemMap             $filesystemMap
+     * @param EntityManager             $em
+     * @param KernelInterface           $kernel
+     * @param ServiceLink               $securityFacadeLink
+     * @param EmailActivityListProvider $activityListProvider
      */
     public function __construct(
-        EmailCacheManager $emailCacheManager,
         FilesystemMap $filesystemMap,
-        Registry $registry,
-        ConfigFileValidator $configFileValidator,
+        EntityManager $em,
         KernelInterface $kernel,
-        ServiceLink $securityFacadeLink
+        ServiceLink $securityFacadeLink,
+        EmailActivityListProvider $activityListProvider
     ) {
-        $this->emailCacheManager   = $emailCacheManager;
-        $this->filesystem          = $filesystemMap->get('attachments');
-        $this->registry            = $registry;
-        $this->configFileValidator = $configFileValidator;
-        $this->attachmentDir       = $kernel->getRootDir() . DIRECTORY_SEPARATOR . 'attachment';
-        $this->securityFacadeLink  = $securityFacadeLink;
+        $this->filesystem           = $filesystemMap->get('attachments');
+        $this->em                   = $em;
+        $this->attachmentDir        = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
+        $this->securityFacadeLink   = $securityFacadeLink;
+        $this->activityListProvider = $activityListProvider;
+    }
+
+    /**
+     * @param EmailAttachment $emailAttachment
+     * @param object $entity
+     */
+    public function linkEmailAttachmentToTargetEntity(EmailAttachment $emailAttachment, $entity)
+    {
+        $this->cpEmailAttachmentsToFile([$emailAttachment]);
+        $this->linkAttachmentsToEntities([$emailAttachment], [$entity]);
     }
 
     /**
      * @param Email $email
-     * @param       $entity
-     * @throws LoadEmailBodyException
-     *
-     * @return array
      */
-    public function linkEmailAttachmentsToEntity(Email $email, $entity)
+    public function linkEmailAttachmentsToTargetEntities(Email $email)
     {
-        $this->emailCacheManager->ensureEmailBodyCached($email);
+        $entities = $this->activityListProvider->getTargetEntities($email);
+        $this->cpEmailAttachmentsToFile($email->getEmailBody()->getAttachments());
+        $this->linkAttachmentsToEntities($email->getEmailBody()->getAttachments(), $entities);
+    }
 
-        $em = $this->registry->getManager();
-        $violations = [];
-        $entityClass = ClassUtils::getClass($entity);
-        $emailAttachments = $email->getEmailBody()->getAttachments();
-
-        foreach ($emailAttachments as $emailAttachment) {
-            $attachment = $emailAttachment->getAttachment() ?: new Attachment();
-            if ($attachment->supportTarget($entityClass)) {
-                if ($attachment->getId() == null) {
-                    $this->createAttachmentFromDB($attachment, $emailAttachment);
-
-                    $fileViolations = $this->configFileValidator->validate($entityClass, $attachment->getFile());
-                    if ($fileViolations->count() > 0) {
-                        $violations[$emailAttachment->getId()] = $this->transformViolations($fileViolations);
-
-                        $this->filesystem->get($attachment->getFile()->getFilename())->delete();
-                    } else {
-                        $emailAttachment->setAttachment($attachment);
-                        $em->persist($attachment);
-                    }
+    /**
+     * @param EmailAttachment[] $emailAttachments
+     * @param array $entities
+     */
+    protected function linkAttachmentsToEntities($emailAttachments, $entities)
+    {
+        $doFlush = false;
+        foreach ($entities as $entity) {
+            $entityClass = ClassUtils::getClass($entity);
+            foreach ($emailAttachments as $emailAttachment) {
+                /** @var EmailAttachment $emailAttachment */
+                if (!$emailAttachment->getFile()) {
+                    continue;
                 }
+                $attachment = new Attachment();
+                if (!$attachment->supportTarget($entityClass)) {
+                    continue;
+                }
+                $attachment->setFile($emailAttachment->getFile());
                 $attachment->setTarget($entity);
+                $this->em->persist($attachment);
+                $doFlush = true;
             }
         }
 
-        $em->flush();
-
-        return $violations;
-    }
-
-    /**
-     * @param Attachment      $attachment
-     * @param EmailAttachment $emailAttachment
-     */
-    protected function createAttachmentFromDB(Attachment $attachment, EmailAttachment $emailAttachment)
-    {
-        $file = new File();
-        $file->setExtension($emailAttachment->getExtension());
-        $file->setOriginalFilename($emailAttachment->getFileName());
-        $file->setMimeType($emailAttachment->getContentType());
-        $file->setFilename(uniqid() . '.' . $file->getExtension());
-
-        $content = ContentDecoder::decode(
-            $emailAttachment->getContent()->getContent(),
-            $emailAttachment->getContent()->getContentTransferEncoding()
-        );
-
-        $this->filesystem->write($file->getFilename(), $content);
-
-        $f = new ComponentFile($this->getAttachmentFullPath($file->getFilename()));
-        $file->setFile($f);
-        $file->setFileSize($f->getSize());
-        $file->setUploaded(false);
-
-        $file->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
-
-        $attachment->setFile($file);
-    }
-
-    /**
-     * @param ConstraintViolationListInterface $violations
-     *
-     * @return array
-     */
-    protected function transformViolations(ConstraintViolationListInterface $violations)
-    {
-        $v = [];
-        /** @var $violation ConstraintViolation */
-        foreach ($violations as $violation) {
-            $v[] = $violation->getMessage();
+        if ($doFlush) {
+            $this->em->flush();
         }
+    }
 
-        return $v;
+    /**
+     * @param array $emailAttachments
+     */
+    protected function cpEmailAttachmentsToFile($emailAttachments)
+    {
+        foreach ($emailAttachments as $emailAttachment) {
+            $file = new File();
+            $file->setExtension($emailAttachment->getExtension());
+            $file->setOriginalFilename($emailAttachment->getFileName());
+            $file->setMimeType($emailAttachment->getContentType());
+            $file->setFilename(uniqid() . '.' . $file->getExtension());
+
+            $content = ContentDecoder::decode(
+                $emailAttachment->getContent()->getContent(),
+                $emailAttachment->getContent()->getContentTransferEncoding()
+            );
+
+            $this->filesystem->write($file->getFilename(), $content);
+
+            $f = new ComponentFile($this->getAttachmentFullPath($file->getFilename()));
+            $file->setFile($f);
+            $file->setFileSize($f->getSize());
+            $file->setUploaded(false);
+
+            $file->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
+
+            $emailAttachment->setFile($file);
+        }
     }
 
     /**

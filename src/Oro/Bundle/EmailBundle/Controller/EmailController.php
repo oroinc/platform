@@ -222,10 +222,13 @@ class EmailController extends Controller
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_view")
      */
-    public function linkAction(EmailAttachment $entity)
+    public function linkAction(EmailAttachment $emailAttachment, $targetEntityClass, $targetEntityId)
     {
         // TODO: Add link to entity after done - CRM-2906
         try {
+            $entity = $this->get('oro_entity.routing_helper')->getEntity($targetEntityClass, $targetEntityId);
+            $this->get('oro_email.manager.email_attachment_manager')
+                ->linkEmailAttachmentToTargetEntity($emailAttachment, $entity);
             $result = [];
         } catch (\Exception $e) {
             $result = [
@@ -273,36 +276,6 @@ class EmailController extends Controller
     public function userEmailsAction()
     {
         return [];
-    }
-
-    /**
-     * @param Email  $email
-     * @param string $entityClass
-     * @param int    $entityId
-     *
-     * @return Response
-     *
-     * @Route("/attach-to-entity/{id}/{entityClass}/{entityId}",
-     *  name="oro_email_attach_to_entity",
-     *  requirements={"id"="\d+", "entityClass"="\w+", "entityId"="\d+"}
-     * )
-     * @AclAncestor("oro_email_create")
-     */
-    public function attachToEntity(Email $email, $entityClass, $entityId)
-    {
-        try {
-            $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
-
-            $entity = $this->getDoctrine()->getRepository($entityClass)->find($entityId);
-
-            $violations = $this->get('oro_email.manager.email_attachment_manager')
-                ->linkEmailAttachmentsToEntity($email, $entity);
-            $response = $violations ? "<pre>" . print_r($violations, true) . "</pre>": 'ok';
-        } catch (\Exception $e) {
-            $response = $e->getMessage();
-        }
-
-        return new Response($response);
     }
 
     /**

@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
+use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 
 class EmailCacheManager implements LoggerAwareInterface
 {
@@ -22,16 +23,24 @@ class EmailCacheManager implements LoggerAwareInterface
     /** @var EntityManager */
     protected $em;
 
+    /** @var EmailAttachmentManager */
+    protected $attachmentManager;
+
     /**
      * Constructor.
      *
      * @param EmailBodyLoaderSelector $selector
      * @param EntityManager           $em
+     * @param EmailAttachmentManager  $attachmentManager
      */
-    public function __construct(EmailBodyLoaderSelector $selector, EntityManager $em)
-    {
-        $this->selector = $selector;
-        $this->em       = $em;
+    public function __construct(
+        EmailBodyLoaderSelector $selector,
+        EntityManager $em,
+        EmailAttachmentManager $attachmentManager
+    ) {
+        $this->selector          = $selector;
+        $this->em                = $em;
+        $this->attachmentManager = $attachmentManager;
     }
 
     /**
@@ -71,6 +80,7 @@ class EmailCacheManager implements LoggerAwareInterface
         }
 
         $email->setEmailBody($emailBody);
+        $this->attachmentManager->linkEmailAttachmentsToTargetEntities($email);
 
         $this->em->persist($email);
         $this->em->flush();
