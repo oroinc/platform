@@ -104,7 +104,7 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
                 ->getMockForAbstractClass();
             $query->expects($self->once())
                 ->method('execute')
-                ->will($self->returnValue($entity));
+                ->will($self->returnValue([$entity]));
 
             $qb = $self->getMockBuilder('Doctrine\ORM\QueryBuilder')
                 ->disableOriginalConstructor()
