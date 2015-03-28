@@ -82,7 +82,7 @@ class EmailAttachmentManager
      */
     public function linkEmailAttachmentToTargetEntity(EmailAttachment $emailAttachment, $entity)
     {
-        $this->cpEmailAttachmentsToFile([$emailAttachment]);
+        $this->cpEmailAttachmentsToFileSystem([$emailAttachment]);
         $this->linkAttachmentsToEntities([$emailAttachment], [$entity]);
     }
 
@@ -92,7 +92,7 @@ class EmailAttachmentManager
     public function linkEmailAttachmentsToTargetEntities(Email $email)
     {
         $entities = $this->activityListProvider->getTargetEntities($email);
-        $this->cpEmailAttachmentsToFile($email->getEmailBody()->getAttachments());
+        $this->cpEmailAttachmentsToFileSystem($email->getEmailBody()->getAttachments());
         $this->linkAttachmentsToEntities($email->getEmailBody()->getAttachments(), $entities);
     }
 
@@ -129,7 +129,7 @@ class EmailAttachmentManager
     /**
      * @param array $emailAttachments
      */
-    protected function cpEmailAttachmentsToFile($emailAttachments)
+    protected function cpEmailAttachmentsToFileSystem($emailAttachments)
     {
         foreach ($emailAttachments as $emailAttachment) {
             $file = new File();
