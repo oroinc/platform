@@ -204,8 +204,8 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         /**
          * Support different line endings
          */
-        $expectedBody = str_replace(PHP_EOL, "\n", $expectedBody);
-        $classBody = str_replace(PHP_EOL, "\n", $classBody);
+        $expectedBody = str_replace("\r\n", "\n", $expectedBody);
+        $classBody = str_replace("\r\n", "\n", $classBody);
         $expectedBody = trim($expectedBody);
         $classBody = trim($classBody);
 
