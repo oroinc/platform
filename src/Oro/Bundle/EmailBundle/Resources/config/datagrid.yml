@@ -10,13 +10,16 @@ datagrid:
                     - { table: OroEmailBundle:Email, alias: e }
                 join:
                     left:
-                        - { join: e.thread, alias: t }
-                        - { join: t.emails, alias: te }
-                        - { join: te.recipients, alias: ter }
-                        - { join: te.emailBody, alias: teb }
-                        - { join: teb.attachments, alias: teba }
-                        - { join: te.recipients, alias: r_to, conditionType: WITH, condition: r_to.type = 'to' }
-                        - { join: te.recipients, alias: r_cc_bcc, conditionType: WITH, condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc' }
+                        -
+                            join: e.recipients
+                            alias: r_to
+                            conditionType: WITH
+                            condition: r_to.type = 'to'
+                        -
+                            join: e.recipients
+                            alias: r_cc_bcc
+                            conditionType: WITH
+                            condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
 
         columns:
             contacts:
