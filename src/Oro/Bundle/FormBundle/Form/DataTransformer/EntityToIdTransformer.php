@@ -130,7 +130,8 @@ class EntityToIdTransformer implements DataTransformerInterface
             if (!$qb instanceof QueryBuilder) {
                 throw new UnexpectedTypeException($qb, 'Doctrine\ORM\QueryBuilder');
             }
-            return $qb->getQuery()->execute();
+            $result = $qb->getQuery()->execute();
+            return $result ? reset($result) : null;
         } else {
             return $repository->find($id);
         }
