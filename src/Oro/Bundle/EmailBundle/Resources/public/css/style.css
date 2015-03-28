@@ -27,6 +27,22 @@
     font-weight: bold;
 }
 
+.emailtemplate-variables .variables .nav-list > li > a {
+    display: inline-block;
+}
+
+.emailtemplate-variables ul.caption {
+    float: none;
+    list-style: none;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+.emailtemplate-variables ul.caption > li {
+    display: inline-block;
+}
+
 .modal-body .loading-content {
     background: #fff url('../img/loader.gif') no-repeat center left;
     padding-left: 30px;
@@ -130,4 +146,7 @@
     background: white;
     line-height: 12px;
     border-radius: 2px;
+}
+a.attachment .icon .icon-link {
+    color: #999;
 }

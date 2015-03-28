@@ -68,8 +68,7 @@ class RelatedEntityTest extends Selenium2TestCase
         $login = $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
-            ->menu($entityData['entityName'])
-            ->open();
+            ->menu($entityData['entityName']);
 
         /** @var ConfigEntity $login */
         $login->openConfigEntity('Oro\Bundle\EntityConfigBundle')

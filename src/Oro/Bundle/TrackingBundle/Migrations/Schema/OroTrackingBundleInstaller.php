@@ -20,7 +20,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -173,6 +173,14 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('visitor_uid', 'string', ['length' => 255]);
         $table->addColumn('ip', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('client', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('client_type', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('client_version', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('os', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('os_version', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('desktop', 'boolean', ['notnull' => false]);
+        $table->addColumn('mobile', 'boolean', ['notnull' => false]);
+        $table->addColumn('bot', 'boolean', ['notnull' => false]);
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('first_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('last_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
@@ -195,10 +203,13 @@ class OroTrackingBundleInstaller implements Installation
         $table = $schema->createTable('oro_tracking_visit_event');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('event_id', 'integer', ['notnull' => false]);
+        $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('visit_id', 'integer', ['notnull' => false]);
         $table->addColumn('web_event_id', 'integer', ['notnull' => false]);
+        $table->addColumn('parsing_count', 'integer', ['default' => '0']);
         $table->addIndex(['event_id'], 'idx_b39eee8f71f7e88b', []);
         $table->addIndex(['visit_id'], 'idx_b39eee8f75fa0ff2', []);
+        $table->addIndex(['website_id'], 'idx_b39eeebf18f45c82', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['web_event_id'], 'uniq_b39eee8f66a8f966');
     }
@@ -243,6 +254,12 @@ class OroTrackingBundleInstaller implements Installation
             ['web_event_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_tracking_website'),
+            ['website_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 

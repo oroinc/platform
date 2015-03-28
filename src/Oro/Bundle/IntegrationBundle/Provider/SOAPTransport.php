@@ -66,7 +66,10 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         try {
             $result = $this->client->__soapCall($action, $params);
         } catch (\Exception $e) {
-            if ($this->isAttemptNecessary()) {
+            $isUnknownMethod = strpos($e->getMessage(), 'is not a valid method') !== false
+                || $e->getMessage() === sprintf("Procedure '%s' not present", $action);
+
+            if (!$isUnknownMethod && $this->isAttemptNecessary()) {
                 $result = $this->makeNewAttempt($action, $params);
             } else {
                 $this->resetAttemptCount();

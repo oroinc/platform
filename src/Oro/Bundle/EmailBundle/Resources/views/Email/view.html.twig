@@ -57,7 +57,11 @@
         {% set attributes = attributes | merge([UI.attibuteRow('', notFoundMessage)]) %}
     {% else %}
         {% if entity.emailBody.hasAttachments %}
-            {% set attributes = attributes | merge([UI.attibuteRow('Attachments'|trans, EA.attachments(entity.emailBody.attachments))]) %}
+            {% set attributes = attributes |
+                merge([UI.attibuteRow(
+                    'Attachments'|trans,
+                    EA.attachments(entity.emailBody.attachments, canLinkAttachment, targetEntityData)
+                )]) %}
         {% endif %}
         {% if entity.emailBody.bodyContent is empty %}
             {% set attributes = attributes | merge([UI.attibuteRow('', 'oro.email.empty_body'|trans)]) %}

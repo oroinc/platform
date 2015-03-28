@@ -29,6 +29,7 @@
                 <a href="javascript:void(0);"
                    class="variable"
                    title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
+                <span>( <%= variable.label %> )</span>
             </li>
             <% }); %>
         </ul>
@@ -39,7 +40,7 @@
             <% var breadcrumbPath = ''; %>
             <% for (var i = 0; i < breadcrumbs.length; i++) { %>
             <% breadcrumbPath += '/' + breadcrumbs[i]; %>
-            <% breadcrumbItemLabel = (i === 0 ? entityLabel : breadcrumbs[i]); %>
+            <% breadcrumbItemLabel = (i === 0 ? entityLabel : pathLabels[breadcrumbs[i]]); %>
             <li<% if (i === breadcrumbs.length - 1) { %> class="active"<% } %>>
                 <% if (i !== breadcrumbs.length - 1) { %>
                 <a href="javascript:void(0);"
@@ -47,7 +48,7 @@
                    data-path="<%= breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbItemLabel %></a>
                 <span class="divider">/&nbsp;</span>
                 <% } else { %>
-                <%= breadcrumbItemLabel %>
+                    <%= breadcrumbItemLabel %>
                 <% } %>
             </li>
             <% } %>
@@ -60,10 +61,21 @@
                 <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
                 <ul class="nav nav-list">
                     <% _.each(fields, function(variable, varName) { %>
-                   <li>
+                    <li>
                         <a href="javascript:void(0);"
                            class="variable"
                            title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
+                        <span>(</span>
+                        <ul class="caption">
+                            <% for (var i = 1; i < breadcrumbs.length; i++) { %>
+                            <li>
+                                <span><%= pathLabels[breadcrumbs[i]] %></span>
+                                <span>/</span>
+                            </li>
+                            <% } %>
+                            <li><%= variable.label %></li>
+                        </ul>
+                        <span>)</span>
                     </li>
                     <% }); %>
                 </ul>
@@ -79,6 +91,7 @@
                            class="reference"
                            data-path="<%= path + '/' + varName %>"
                            title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
+                        <span>( <%= variable.label %> )</span>
                     </li>
                     <% }); %>
                 </ul>
@@ -314,12 +327,40 @@
     Render the given email attachments
     Parameters:
         attachments - an array of Oro\Bundle\EmailBundle\Entity\EmailAttachment
+        canLinkAttachment - bool
+        targetEntityData - target entity class and id
 #}
-{% macro attachments(attachments) -%}
+{% macro attachments(attachments, canLinkAttachment, targetEntityData) -%}
     {%- for attachment in attachments -%}
     <a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
         <span class="label label-info">{{ attachment.fileName }}</span>
     </a>
+    {% if canLinkAttachment and targetEntityData.targetEntityClass is defined %}
+        {% set options = {
+            'view': 'oroemail/js/app/views/email-attachment-link-view',
+            'url': path(
+                    'oro_email_attachment_link',
+                    {
+                        id: attachment.id,
+                        targetEntityClass: targetEntityData.targetEntityClass,
+                        targetEntityId: targetEntityData.targetEntityId
+                    }
+                )
+        } %}
+        <a data-page-component-module="oroui/js/app/components/view-component"
+           data-page-component-options="{{ options|json_encode }}" class="attachment" href="{{
+                path(
+                    'oro_email_attachment_link',
+                    {
+                        id: attachment.id,
+                        targetEntityClass: targetEntityData.targetEntityClass,
+                        targetEntityId: targetEntityData.targetEntityId
+                    }
+                )
+            }}">
+            <span class="icon"><i class="icon-link"></i></span>
+        </a>
+    {% endif %}
     {%- endfor -%}
 {%- endmacro %}
 

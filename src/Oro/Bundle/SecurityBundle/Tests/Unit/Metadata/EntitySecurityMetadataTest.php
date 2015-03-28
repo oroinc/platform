@@ -11,24 +11,35 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entity = new EntitySecurityMetadata('SomeType', 'SomeClass', 'SomeGroup', 'SomeLabel');
+        $this->entity = new EntitySecurityMetadata(
+            'SomeType',
+            'SomeClass',
+            'SomeGroup',
+            'SomeLabel'
+        );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->entity);
     }
 
     public function testGetters()
     {
-        $this->assertEquals('SomeType', $this->entity->getSecurityType());
-        $this->assertEquals('SomeClass', $this->entity->getClassName());
-        $this->assertEquals('SomeGroup', $this->entity->getGroup());
-        $this->assertEquals('SomeLabel', $this->entity->getLabel());
+        static::assertEquals('SomeType', $this->entity->getSecurityType());
+        static::assertEquals('SomeClass', $this->entity->getClassName());
+        static::assertEquals('SomeGroup', $this->entity->getGroup());
+        static::assertEquals('SomeLabel', $this->entity->getLabel());
     }
 
     public function testSerialize()
     {
-        $data = serialize($this->entity);
+        $data        = serialize($this->entity);
         $emptyEntity = unserialize($data);
-        $this->assertEquals('SomeType', $emptyEntity->getSecurityType());
-        $this->assertEquals('SomeClass', $emptyEntity->getClassName());
-        $this->assertEquals('SomeGroup', $emptyEntity->getGroup());
-        $this->assertEquals('SomeLabel', $this->entity->getLabel());
+
+        static::assertEquals('SomeType', $emptyEntity->getSecurityType());
+        static::assertEquals('SomeClass', $emptyEntity->getClassName());
+        static::assertEquals('SomeGroup', $emptyEntity->getGroup());
+        static::assertEquals('SomeLabel', $emptyEntity->getLabel());
     }
 }

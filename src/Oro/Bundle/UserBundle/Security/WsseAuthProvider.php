@@ -30,7 +30,13 @@ class WsseAuthProvider extends Provider
     protected function getSecret(UserInterface $user)
     {
         if ($user instanceof AdvancedApiUserInterface) {
-            return $user->getApiKeys();
+            $apiKeys = $user->getApiKeys();
+
+            if (0 === count($apiKeys)) {
+                return uniqid('undefined');
+            }
+
+            return $apiKeys;
         }
 
         return parent::getSecret($user);

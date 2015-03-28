@@ -52,39 +52,40 @@
     <div class="widget-content">
         <div class="alert alert-error" style="display: none;"></div>
         <form id="{{ form.vars.name }}" action="#">
-            <fieldset class="form-horizontal">
-                {{ UI.scrollSubblock(null, data, true, false)|oro_js_template_content|raw }}
-                <% if (typeof notifiable !== 'undefined' && notifiable) { %>
-                    {{ invitations.notifyGuestsComponent() }}
-                <% } %>
-                <div class="widget-actions form-actions" style="display: none;">
-                    <% if (id != null && removable) { %>
-                    {{
-                        UI.deleteButton({
-                            'aCss': 'no-hash',
-                            'id': 'btn-remove-calendarevent',
-                            'dataMessage': 'oro.calendar.delete_event.confirmation'|trans,
-                            'title': 'oro.calendar.delete_event.title'|trans,
-                            'label': 'Delete'|trans,
-                            'data': {'action-name': 'delete'}
-                        })
-                    }}
+            {% set options = {
+                'view':'orocalendar/js/app/views/calendar-event-form-view',
+                'nativeMode': isMobileVersion()
+            } %}
+            <div data-page-component-module="oroui/js/app/components/view-component"
+                 data-page-component-options="{{ options|json_encode }}"
+                 data-layout="separate">
+                <fieldset class="form-horizontal">
+                    {{ UI.scrollSubblock(null, data, true, false)|oro_js_template_content|raw }}
+                    <% if (typeof notifiable !== 'undefined' && notifiable) { %>
+                        {{ invitations.notifyGuestsComponent() }}
                     <% } %>
-                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                    <% if (id == null || (id != null && editable)) { %>
-                    <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
-                    <% } %>
-                </div>
-            </fieldset>
+                    <div class="widget-actions form-actions" style="display: none;">
+                        <% if (id != null && removable) { %>
+                        {{
+                            UI.deleteButton({
+                                'aCss': 'no-hash',
+                                'id': 'btn-remove-calendarevent',
+                                'dataMessage': 'oro.calendar.delete_event.confirmation'|trans,
+                                'title': 'oro.calendar.delete_event.title'|trans,
+                                'label': 'Delete'|trans,
+                                'data': {'action-name': 'delete'}
+                            })
+                        }}
+                        <% } %>
+                        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                        <% if (id == null || (id != null && editable)) { %>
+                        <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                        <% } %>
+                    </div>
+                </fieldset>
+            </div>
         </form>
         {{ oro_form_js_validation(form)|oro_js_template_content|raw }}
-        {% set options = {
-            'view':'orocalendar/js/app/views/change-duration-view',
-            'startSelector': '#' ~ form.start.vars.id,
-            'endSelector': '#' ~ form.end.vars.id
-        } %}
-        <div data-page-component-module="oroui/js/app/components/view-component"
-             data-page-component-options="{{ options|json_encode }}"></div>
     </div>
 </script>
 {% endmacro %}
