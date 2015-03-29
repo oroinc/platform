@@ -131,6 +131,7 @@ class EmailAttachmentManager
      */
     protected function cpEmailAttachmentsToFileSystem($emailAttachments)
     {
+        /** @var EmailAttachment $emailAttachment */
         foreach ($emailAttachments as $emailAttachment) {
             $file = new File();
             $file->setExtension($emailAttachment->getExtension());
