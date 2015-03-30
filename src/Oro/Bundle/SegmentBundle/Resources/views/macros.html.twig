@@ -7,6 +7,17 @@
             fieldsLoaderSelector: '#' ~ params.entity_choice_id
         }
     } %}
+
+    {% set dataAuditConditionOptions = {
+        auditFields: render(path('oro_api_get_audit_fields')),
+        fieldChoice: {
+            select2: {
+                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
+            },
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id,
+        },
+    } %}
+
     {% set segmentConditionOptions = {
         segmentChoice: {
             select2: {
@@ -25,7 +36,7 @@
         criteriaListSelector: '#' ~ params.criteria_list_id,
         entityChoiceSelector: '#' ~ params.entity_choice_id,
         onFieldsUpdate: {
-            toggleCriteria: ['condition-item', 'condition-segment', 'conditions-group']
+            toggleCriteria: ['condition-data-audit', 'condition-item', 'condition-segment', 'conditions-group']
         }
     } %}
     <div class="condition-builder left-panel-container">
@@ -35,6 +46,12 @@
                     <div class="span3 filter-criteria">
                         <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
                         <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                            <li class="option" data-criteria="condition-data-audit"
+                                data-module="orodataaudit/js/data-audit-condition"
+                                data-widget="dataAuditCondition"
+                                data-options="{{ dataAuditConditionOptions|json_encode }}">
+                                {{ 'oro.dataaudit.condition_builder.criteria.data_audit'|trans }}
+                            </li>
                             <li class="option" data-criteria="condition-item"
                                 data-module="oroquerydesigner/js/field-condition"
                                 data-widget="fieldCondition"

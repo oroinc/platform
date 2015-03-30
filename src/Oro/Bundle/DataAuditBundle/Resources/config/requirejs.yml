@@ -1,0 +1,3 @@
+config:
+    paths:
+        'orodataaudit/js/data-audit-condition': 'bundles/orodataaudit/js/data-audit-condition.js'

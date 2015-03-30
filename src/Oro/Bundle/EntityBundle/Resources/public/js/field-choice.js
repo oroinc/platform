@@ -14,6 +14,7 @@ define(function (require) {
         options: {
             entity: null,
             data: {},
+            dataFilter: null,
             select2: {
                 pageableResults: true,
                 dropdownAutoWidth: true
@@ -196,6 +197,10 @@ define(function (require) {
 
             if (!_.isEmpty(this.options.exclude)) {
                 entityFields = Util.filterFields(entityFields, this.options.exclude);
+            }
+
+            if (this.options.dataFilter) {
+                entityFields = this.options.dataFilter.call(this, entityName, entityFields);
             }
 
             $.each(entityFields, function () {

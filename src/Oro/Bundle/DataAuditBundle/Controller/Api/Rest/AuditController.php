@@ -7,10 +7,12 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -104,6 +106,74 @@ class AuditController extends RestGetController implements ClassResourceInterfac
     public function getAction($id)
     {
         return $this->handleGetRequest($id);
+    }
+
+    /**
+     * Get auditable entities with auditable fields
+     *
+     * @QueryParam(
+     *      name="with-relations",
+     *      nullable=true,
+     *      requirements="true|false",
+     *      default="true",
+     *      strict=true,
+     *      description="Indicates whether association fields should be returned as well."
+     * )
+     *
+     * @return Response
+     * @ApiDoc(
+     *      description="Get auditable entities with auditable fields",
+     *      resource=true
+     * )
+     *
+     * @AclAncestor("oro_dataaudit_history")
+     */
+    public function getFieldsAction()
+    {
+        /** @var EntityWithFieldsProvider $provider */
+        $provider = $this->get('oro_query_designer.entity_field_list_provider');
+        $withRelations = filter_var($this->getRequest()->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
+        $statusCode = Codes::HTTP_OK;
+
+        try {
+            $entities = $provider->getFields(true, true, $withRelations);
+            $result = $this->filterAuditableEntities($entities);
+        } catch (InvalidEntityException $ex) {
+            $statusCode = Codes::HTTP_NOT_FOUND;
+            $result = ['message' => $ex->getMessage()];
+        }
+
+        return $this->handleView($this->view($result, $statusCode));
+    }
+
+    /**
+     * @param array $entities
+     *
+     * @return array
+     */
+    private function filterAuditableEntities(array $entities = [])
+    {
+        $auditConfigProvider = $this->get('oro_entity_config.provider.dataaudit');
+
+        $auditableEntities = [];
+        foreach ($entities as $entityClass => $entityData) {
+            if (!$auditConfigProvider->getConfig($entityClass)->is('auditable')) {
+                continue;
+            }
+
+            $auditableEntities[$entityClass] = [];
+            foreach ($entityData['fields'] as $fieldData) {
+                if (!$auditConfigProvider->hasConfig($entityClass, $fieldData['name']) ||
+                    !$auditConfigProvider->getConfig($entityClass, $fieldData['name'])->is('auditable')
+                ) {
+                    continue;
+                }
+
+                $auditableEntities[$entityClass][] = $fieldData;
+            }
+        }
+
+        return $auditableEntities;
     }
 
     /**

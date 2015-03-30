@@ -485,7 +485,7 @@ define(function (require) {
 
         configureFilters: function () {
             var self, options, metadata,
-                $fieldCondition, $segmentCondition, $builder, $criteria;
+                $fieldCondition, $dataAuditCondition, $segmentCondition, $builder, $criteria;
 
             self = this;
             options = this.options.filters;
@@ -503,6 +503,15 @@ define(function (require) {
             $fieldCondition = $criteria.find('[data-criteria=condition-item]');
             if (!_.isEmpty($fieldCondition)) {
                 $.extend(true, $fieldCondition.data('options'), {
+                    fieldChoice: this.options.fieldChoiceOptions,
+                    filters: metadata.filters,
+                    hierarchy: metadata.hierarchy
+                });
+            }
+
+            $dataAuditCondition = $criteria.find('[data-criteria=condition-data-audit]');
+            if (!_.isEmpty($dataAuditCondition)) {
+                $.extend(true, $dataAuditCondition.data('options'), {
                     fieldChoice: this.options.fieldChoiceOptions,
                     filters: metadata.filters,
                     hierarchy: metadata.hierarchy
