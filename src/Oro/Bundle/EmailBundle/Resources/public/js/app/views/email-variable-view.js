@@ -123,7 +123,8 @@ define(function (require) {
                 $tabEl = this._getSectionTab(this.sections.entity),
                 entityVars = this.model.getEntityVariables(),
                 entityLabel = this.model.getEntityLabel(),
-                path = this.model.getPath();
+                path = this.model.getPath(),
+                pathLabels = this.model.getPathLabels();
 
             // remove old content
             $el.empty();
@@ -155,7 +156,7 @@ define(function (require) {
                     $el.removeAttr("style");
                 }
                 // add new content
-                $el.html(this._getEntityVariablesHtml(entityVars, entityLabel, path));
+                $el.html(this._getEntityVariablesHtml(entityVars, entityLabel, path, pathLabels));
                 this._applyDraggable($el);
             }
         },
@@ -188,12 +189,13 @@ define(function (require) {
 
         /**
          * @param {Array}  variables
-         * @param {string} path
          * @param {string} entityLabel
+         * @param {string} path
+         * @param {Array}  pathLabels
          * @returns {string}
          * @private
          */
-        _getEntityVariablesHtml: function (variables, entityLabel, path) {
+        _getEntityVariablesHtml: function (variables, entityLabel, path, pathLabels) {
             var fields = {},
                 relations = {};
             _.each(variables, function (variable, varName) {
@@ -209,6 +211,7 @@ define(function (require) {
                 relations: relations,
                 entityLabel: entityLabel,
                 path: path,
+                pathLabels: pathLabels,
                 root: this.sections.entity
             });
         },
