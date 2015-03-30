@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query;
@@ -16,6 +17,9 @@ use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\ComparisonExpression;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
@@ -23,6 +27,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 
 /**
  * Class AclWalker
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclWalker extends TreeWalkerAdapter
 {
@@ -104,7 +110,8 @@ class AclWalker extends TreeWalkerAdapter
 
     /**
      * @param ConditionalPrimary $factor
-     * @param int $factorId
+     * @param int                $factorId
+     *
      * @return Subselect
      */
     protected function getSubSelectFromFactor(ConditionalPrimary $factor, $factorId)
@@ -229,7 +236,7 @@ class AclWalker extends TreeWalkerAdapter
                             $aclConditionalFactors
                         );
                     } else {
-                        $conditionalPrimary = new ConditionalPrimary();
+                        $conditionalPrimary                        = new ConditionalPrimary();
                         $conditionalPrimary->conditionalExpression = $AST->whereClause->conditionalExpression;
                         array_unshift($aclConditionalFactors, $conditionalPrimary);
                         $AST->whereClause->conditionalExpression = new ConditionalTerm($aclConditionalFactors);
@@ -258,7 +265,7 @@ class AclWalker extends TreeWalkerAdapter
             $expression = $this->getInExpression($condition);
         }
 
-        $resultCondition = new ConditionalPrimary();
+        $resultCondition                              = new ConditionalPrimary();
         $resultCondition->simpleConditionalExpression = $expression;
 
         return $resultCondition;
@@ -271,9 +278,9 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getAccessDeniedExpression()
     {
-        $leftExpression = new ArithmeticExpression();
-        $leftExpression->simpleArithmeticExpression = new Literal(Literal::NUMERIC, 1);
-        $rightExpression = new ArithmeticExpression();
+        $leftExpression                              = new ArithmeticExpression();
+        $leftExpression->simpleArithmeticExpression  = new Literal(Literal::NUMERIC, 1);
+        $rightExpression                             = new ArithmeticExpression();
         $rightExpression->simpleArithmeticExpression = new Literal(Literal::NUMERIC, 0);
 
         return new ComparisonExpression($leftExpression, '=', $rightExpression);
@@ -289,44 +296,64 @@ class AclWalker extends TreeWalkerAdapter
     protected function getOrganizationCheckCondition(AclCondition $whereCondition)
     {
         if ($whereCondition->getOrganizationField() && $whereCondition->getOrganizationValue() !== null) {
-            $pathExpression = new PathExpression(
+            $organizationValue = $whereCondition->getOrganizationValue();
+
+            $pathExpression       = new PathExpression(
                 self::EXPECTED_TYPE,
                 $whereCondition->getEntityAlias(),
                 $whereCondition->getOrganizationField()
             );
-
             $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
-            $leftExpression = new ArithmeticExpression();
-            $leftExpression->simpleArithmeticExpression = $pathExpression;
-            $rightExpression = new ArithmeticExpression();
-            $rightExpression->simpleArithmeticExpression =
-                new Literal(Literal::NUMERIC, (int) $whereCondition->getOrganizationValue());
+            $resultCondition      = new ConditionalPrimary();
 
-            $resultCondition = new ConditionalPrimary();
-            $resultCondition->simpleConditionalExpression =
-                new ComparisonExpression($leftExpression, '=', $rightExpression);
+            if (is_array($organizationValue)) {
+                $resultCondition->simpleConditionalExpression = $this->getInExpression(
+                    $whereCondition,
+                    'organizationValue',
+                    'organizationField'
+                );
 
-            return $resultCondition;
+                return $resultCondition;
+
+            } else {
+                $leftExpression                              = new ArithmeticExpression();
+                $leftExpression->simpleArithmeticExpression  = $pathExpression;
+                $rightExpression                             = new ArithmeticExpression();
+                $rightExpression->simpleArithmeticExpression =
+                    new Literal(Literal::NUMERIC, (int)$organizationValue);
+
+                $resultCondition->simpleConditionalExpression =
+                    new ComparisonExpression($leftExpression, '=', $rightExpression);
+
+                return $resultCondition;
+            }
         }
 
         return false;
     }
 
-
     /**
      * generate "in()" expression
      *
      * @param AclCondition $whereCondition
+     * @param string       $iterationValue = 'value'
+     * @param string       $iterationField = 'entityField'
      *
      * @return InExpression
      */
-    protected function getInExpression(AclCondition $whereCondition)
-    {
-        $arithmeticExpression = new ArithmeticExpression();
-        $arithmeticExpression->simpleArithmeticExpression = $this->getPathExpression($whereCondition);
+    protected function getInExpression(
+        AclCondition $whereCondition,
+        $iterationValue = 'value',
+        $iterationField = 'entityField'
+    ) {
+        $arithmeticExpression                             = new ArithmeticExpression();
+        $arithmeticExpression->simpleArithmeticExpression = $this->getPathExpression(
+            $whereCondition,
+            $iterationField
+        );
 
-        $expression = new InExpression($arithmeticExpression);
-        $expression->literals = $this->getLiterals($whereCondition);
+        $expression           = new InExpression($arithmeticExpression);
+        $expression->literals = $this->getLiterals($whereCondition, $iterationValue);
 
         return $expression;
     }
@@ -335,15 +362,17 @@ class AclWalker extends TreeWalkerAdapter
      * Generate path expression
      *
      * @param AclCondition $whereCondition
+     * @param string       $field
      *
      * @return PathExpression
      */
-    protected function getPathExpression(AclCondition $whereCondition)
+    protected function getPathExpression(AclCondition $whereCondition, $field = 'entityField')
     {
+        $entityField    = $this->getPropertyAccessor()->getValue($whereCondition, $field);
         $pathExpression = new PathExpression(
             self::EXPECTED_TYPE,
             $whereCondition->getEntityAlias(),
-            $whereCondition->getEntityField()
+            $entityField
         );
 
         $pathExpression->type = $whereCondition->getPathExpressionType();
@@ -355,20 +384,36 @@ class AclWalker extends TreeWalkerAdapter
      * Get array with literal from acl condition value array
      *
      * @param AclCondition $whereCondition
+     * @param string       $iterationField = 'value'
      *
      * @return array
      */
-    protected function getLiterals(AclCondition $whereCondition)
+    protected function getLiterals(AclCondition $whereCondition, $iterationField = 'value')
     {
-        $literals = [];
+        $literals   = [];
+        $whereValue = $this->getPropertyAccessor()->getValue($whereCondition, $iterationField);
 
-        if (!is_array($whereCondition->getValue())) {
-            $whereCondition->setValue(array($whereCondition->getValue()));
+        if (!is_array($whereValue)) {
+            $whereValue = [$whereValue];
+            $this->getPropertyAccessor()->setValue($whereCondition, $iterationField, $whereValue);
         }
-        foreach ($whereCondition->getValue() as $value) {
-            $literals[] = new Literal(Literal::NUMERIC, $value);
+
+        foreach ($whereValue as $row) {
+            $literals[] = new Literal(Literal::NUMERIC, $row);
         }
 
         return $literals;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if (empty($this->propertyAccessor)) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

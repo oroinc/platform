@@ -73,12 +73,13 @@
         'formErrors': form_errors(form)? form_errors(form) : null,
         'dataBlocks': dataBlocks
     } %}
-    {{ parent() }}
     {% set options = {
-        'view':'orocalendar/js/app/views/change-duration-view',
-        'startSelector': '#' ~ form.start.vars.id,
-        'endSelector': '#' ~ form.end.vars.id
+        'view':'orocalendar/js/app/views/calendar-event-form-view',
+        'nativeMode': isMobileVersion()
     } %}
     <div data-page-component-module="oroui/js/app/components/view-component"
-         data-page-component-options="{{ options|json_encode }}"></div>
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate">
+        {{ parent() }}
+    </div>
 {% endblock content_data %}
