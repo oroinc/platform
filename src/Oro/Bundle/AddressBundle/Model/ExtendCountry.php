@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Model;
 
-class ExtendCountry 
+class ExtendCountry
 {
     /**
      * Constructor
