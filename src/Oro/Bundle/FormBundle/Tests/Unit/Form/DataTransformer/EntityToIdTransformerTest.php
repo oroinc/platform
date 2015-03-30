@@ -129,10 +129,53 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The value "1" does not exist or not unique.
+     */
+    public function testReverseTransformTransformationFailedException()
+    {
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $self = $this;
+
+        $callback = function () use ($self) {
+            $query = $self->getMockBuilder('Doctrine\ORM\AbstractQuery')
+                ->disableOriginalConstructor()
+                ->setMethods(array('execute'))
+                ->getMockForAbstractClass();
+            $query->expects($self->once())
+                ->method('execute')
+                ->will($self->returnValue([]));
+
+            $qb = $self->getMockBuilder('Doctrine\ORM\QueryBuilder')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $qb->expects($self->once())
+                ->method('getQuery')
+                ->will($self->returnValue($query));
+
+            return $qb;
+        };
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with('TestClass')
+            ->will($this->returnValue($repository));
+
+        $transformer = new EntityToIdTransformer($em, 'TestClass', 'id', $callback, true);
+        $transformer->reverseTransform(1);
+    }
+
+    /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "Doctrine\ORM\QueryBuilder", "NULL" given
      */
-    public function testReverseTransformQueryBuilderException()
+    public function testReverseTransformQueryBuilderUnexpectedTypeException()
     {
         $entity = $this->createMockEntity('id', 1);
 
