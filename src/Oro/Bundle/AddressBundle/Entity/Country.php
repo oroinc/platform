@@ -12,6 +12,7 @@ use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\AddressBundle\Model\ExtendCountry;
 
 /**
  * Country
@@ -33,7 +34,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class Country implements Translatable
+class Country extends ExtendCountry implements Translatable
 {
     /**
      * @var string

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TrackingBundle\Provider;
 
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
+use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 
 class TrackingEventIdentificationProvider
 {
@@ -42,13 +43,42 @@ class TrackingEventIdentificationProvider
      *
      * @return array
      */
-    public function getTargetEntities()
+    public function getTargetIdentityEntities()
     {
-        $targetEntityClassses = [];
+        $targetEntityClasses = [];
         foreach ($this->providers as $provider) {
-            $targetEntityClassses[] = $provider->getTarget();
+            $targetEntityClasses[] = $provider->getIdentityTarget();
         }
 
-        return $targetEntityClassses;
+        return $targetEntityClasses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEventTargetEntities()
+    {
+        $targetEntityClasses = [];
+        foreach ($this->providers as $provider) {
+            $targetEntityClasses = array_merge($targetEntityClasses, $provider->getEventTargets());
+        }
+
+        return array_unique($targetEntityClasses);
+    }
+
+    /**
+     * @param TrackingVisitEvent $trackingVisitEvent
+     * @return array
+     */
+    public function processEvent(TrackingVisitEvent $trackingVisitEvent)
+    {
+        $targets = [];
+        foreach ($this->providers as $provider) {
+            if ($provider->isApplicableVisitEvent($trackingVisitEvent)) {
+                $targets = array_merge($targets, $provider->processEvent($trackingVisitEvent));
+            }
+        }
+
+        return array_filter($targets);
     }
 }
