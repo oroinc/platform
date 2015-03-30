@@ -52,6 +52,12 @@ class WidgetExtension extends \Twig_Extension
      */
     public function render(Twig_Environment $environment, array $options = [])
     {
+        $options = array_merge([
+            'state' => [
+                'id' => null,
+            ],
+        ], $options);
+
         $optionsHash = md5(json_encode($options));
 
         if (!empty($this->rendered[$optionsHash])) {
@@ -91,7 +97,7 @@ class WidgetExtension extends \Twig_Extension
             $options['url'],
             $widgetType,
             $options['wid'],
-            isset($options['state']) && isset($options['state']['id']) ? $options['state']['id'] : null
+            $options['state']['id']
         );
 
         if ($this->request) {
