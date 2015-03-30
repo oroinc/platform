@@ -91,7 +91,7 @@ class WidgetExtension extends \Twig_Extension
             $options['url'],
             $widgetType,
             $options['wid'],
-            $options['state']['id']
+            isset($options['state']) && isset($options['state']['id']) ? $options['state']['id'] : null
         );
 
         if ($this->request) {
