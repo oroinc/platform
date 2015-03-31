@@ -77,7 +77,7 @@ class CommentApiManager extends ApiEntityManager
         $this->pager             = $pager;
         $this->attachmentManager = $attachmentManager;
         $this->aclHelper         = $aclHelper;
-        $this->configManager    = $configManager;
+        $this->configManager     = $configManager;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
