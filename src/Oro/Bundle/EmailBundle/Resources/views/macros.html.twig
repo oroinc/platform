@@ -460,3 +460,13 @@
     {% endfor %}
     </ul>
 {% endmacro %}
+
+{#
+    Strips email body from HTML-tags, removes sequence of '-' chars and cuts to fit the length
+    Parameters:
+        emailBody - email body entity Oro\Bundle\EmailBundle\Entity\EmailBody
+#}
+{% macro email_short_body(emailBody, length) %}
+    {%- set length = length|default(150) -%}
+    {{ emailBody.bodyContent|striptags|replace({'-': ''})[:length]|raw }}
+{% endmacro %}
