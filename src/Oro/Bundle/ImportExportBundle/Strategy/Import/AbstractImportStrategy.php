@@ -129,7 +129,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
             $existingEntity = $this->findEntityByIdentityValues($entityName, $identityValues);
         }
 
-        if ($existingEntity) {
+        if ($existingEntity && !$identifier) {
             $identifier = $this->databaseHelper->getIdentifier($existingEntity);
             $identifierName = $this->databaseHelper->getIdentifierFieldName($entity);
             $this->fieldHelper->setObjectValue($entity, $identifierName, $identifier);

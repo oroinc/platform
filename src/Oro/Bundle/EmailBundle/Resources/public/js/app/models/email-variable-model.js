@@ -27,7 +27,7 @@ define(function (require) {
         entityLabel: null,
 
         /**
-         * @property {array} Each item is {Object} with 'relatedEntityName' and 'fieldName' properties
+         * @property {array} Each item is {Object} with 'relatedEntityName', 'fieldName' and 'fieldLabel' properties
          */
         path: [],
 
@@ -68,6 +68,17 @@ define(function (require) {
         },
 
         /**
+         * @returns {array}
+         */
+        getPathLabels: function () {
+            var result = [];
+            _.each(this.path, function (item) {
+                result[item.fieldName] = item.fieldLabel;
+            });
+            return result;
+        },
+
+        /**
          * @param {string} path For example '/field1/field2'. The empty string represents the root
          */
         setPath: function (path) {
@@ -76,7 +87,8 @@ define(function (require) {
                 if (fieldName) {
                     this.path.push({
                         relatedEntityName: this._getRelatedEntityName(this._getCurrentEntityName(), fieldName),
-                        fieldName: fieldName
+                        fieldName: fieldName,
+                        fieldLabel: this._getEntityLabel(this._getCurrentEntityName(), fieldName)
                     });
                 }
             }, this);
@@ -118,6 +130,16 @@ define(function (require) {
          */
         _getRelatedEntityName: function (entityName, fieldName) {
             return this.attributes.entity[entityName][fieldName].related_entity_name;
+        },
+
+        /**
+         * @param {string} entityName
+         * @param {string} fieldName
+         * @returns {string}
+         * @private
+         */
+        _getEntityLabel: function (entityName, fieldName) {
+            return this.attributes.entity[entityName][fieldName].label;
         }
     });
 
