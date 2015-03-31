@@ -5,6 +5,7 @@ namespace Oro\Bundle\CommentBundle\Entity\Manager;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 
@@ -22,9 +23,13 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class CommentApiManager extends ApiEntityManager
 {
+    const AVATAR_FIELD_NAME = 'avatar';
+
     /** @var ObjectManager */
     protected $em;
 
@@ -43,6 +48,9 @@ class CommentApiManager extends ApiEntityManager
     /** @var aclHelper */
     protected $aclHelper;
 
+    /** @var aclHelper */
+    protected $configManager;
+
     /**
      * @param Registry          $doctrine
      * @param SecurityFacade    $securityFacade
@@ -51,6 +59,7 @@ class CommentApiManager extends ApiEntityManager
      * @param EventDispatcher   $eventDispatcher
      * @param AttachmentManager $attachmentManager
      * @param AclHelper         $aclHelper
+     * @param ConfigManager     $configManager
      */
     public function __construct(
         Registry $doctrine,
@@ -59,7 +68,8 @@ class CommentApiManager extends ApiEntityManager
         Pager $pager,
         EventDispatcher $eventDispatcher,
         AttachmentManager $attachmentManager,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        ConfigManager $configManager
     ) {
         $this->em                = $doctrine->getManager();
         $this->securityFacade    = $securityFacade;
@@ -67,6 +77,7 @@ class CommentApiManager extends ApiEntityManager
         $this->pager             = $pager;
         $this->attachmentManager = $attachmentManager;
         $this->aclHelper         = $aclHelper;
+        $this->configManager    = $configManager;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -195,6 +206,7 @@ class CommentApiManager extends ApiEntityManager
             'removable'     => $this->securityFacade->isGranted('DELETE', $entity),
         ];
         $result = array_merge($result, $this->getAttachmentInfo($entity));
+        $result = array_merge($result, $this->getCommentAvatarImageUrl($entity->getOwner()));
 
         return $result;
     }
@@ -205,6 +217,30 @@ class CommentApiManager extends ApiEntityManager
     public function isCommentable()
     {
         return $this->securityFacade->isGranted('oro_comment_view');
+    }
+
+    /**
+     * Get resized avatar
+     *
+     * @param User $user
+     *
+     * @return string
+     */
+    protected function getCommentAvatarImageUrl($user)
+    {
+        $attachment = PropertyAccess::createPropertyAccessor()->getValue($user, self::AVATAR_FIELD_NAME);
+        if ($attachment && $attachment->getFilename()) {
+            $entityClass = ClassUtils::getRealClass($user);
+            $config = $this->configManager
+                ->getProvider('attachment')
+                ->getConfig($entityClass, self::AVATAR_FIELD_NAME);
+            return [
+                'avatarUrl' => $this->attachmentManager
+                    ->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'))
+            ];
+        }
+
+        return [];
     }
 
     /**
