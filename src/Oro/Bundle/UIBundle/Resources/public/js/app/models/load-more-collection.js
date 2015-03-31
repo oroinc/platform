@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['./base/use-route-collection', './base/model'
-], function (UseRouteCollection, BaseModel) {
+define(['./base/routing-collection'
+], function (UseRouteCollection) {
     'use strict';
 
     var LoadMoreCollection;
@@ -10,13 +10,15 @@ define(['./base/use-route-collection', './base/model'
      * Collection with "load more" functionality support
      */
     LoadMoreCollection = UseRouteCollection.extend({
-        stateDefaults: {
+        routeParams: {
             /**
              * Initial quantity of items to load
              * @type {number}
              */
-            limit: 5,
+            limit: 5
+        },
 
+        stateDefaults: {
             /**
              * Quantity of extra items to load on loadMore() call
              * @type {number}
@@ -30,8 +32,8 @@ define(['./base/use-route-collection', './base/model'
          */
         loadMore: function () {
             var loadDeferred;
-            this.state.set({
-                limit: this.state.get('limit') + this.state.get('loadMoreItemsQuantity')
+            this.route.set({
+                limit: this.route.get('limit') + this.state.get('loadMoreItemsQuantity')
             });
             loadDeferred = $.Deferred();
             if (this.isSyncing()) {
@@ -42,6 +44,23 @@ define(['./base/use-route-collection', './base/model'
                 loadDeferred.resolve(this);
             }
             return loadDeferred.promise();
+        },
+
+        /**
+         * Getter for totalQuantity
+         * @returns {number}
+         */
+        getTotalQuantity: function () {
+            return this.state.get('count');
+        },
+
+        /**
+         * Setter for totalQuantity
+         *
+         * @param value {number}
+         */
+        setTotalQuantity: function (value) {
+            this.state.set('count', value);
         }
     });
     

@@ -15,18 +15,18 @@ define(function (require) {
             'click .add-comment-button': 'onAddCommentClick',
             'comment-edit': 'onEditComment',
             'comment-remove': 'onRemoveComment',
-            'click a.load-more': 'onLoadMoreClick'
+            'comment-load-more': 'onLoadMore'
+        },
+
+        initialize: function (options) {
+            this.canCreate = options.canCreate;
+            CommentsView.__super__.initialize.apply(this, arguments);
         },
 
         getTemplateData: function () {
             var data = CommentsView.__super__.getTemplateData.apply(this, arguments);
             data.canCreate = this.canCreate;
             return data;
-        },
-
-        initialize: function (options) {
-            this.canCreate = options.canCreate;
-            CommentsHeaderView.__super__.initialize.apply(this, arguments);
         },
 
         render: function () {
@@ -46,19 +46,23 @@ define(function (require) {
             }));
         },
 
-        onLoadMoreClick: function () {
-            this.collection.loadMore();
+        onLoadMore: function (e) {
+            e.stopImmediatePropagation();
+            this.trigger('loadMore');
         },
 
-        onAddCommentClick: function () {
+        onAddCommentClick: function (e) {
+            e.stopImmediatePropagation();
             this.trigger('toAdd');
         },
 
         onEditComment: function (e, model) {
+            e.stopImmediatePropagation();
             this.trigger('toEdit', model);
         },
 
         onRemoveComment: function (e, model) {
+            e.stopImmediatePropagation();
             this.trigger('toRemove', model);
         }
     });

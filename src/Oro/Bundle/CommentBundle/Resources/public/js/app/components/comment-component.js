@@ -40,6 +40,7 @@ define(function (require) {
             this.commentsView.on('toEdit', this.onCommentEdit, this);
             this.commentsView.on('toRemove', this.onCommentRemove, this);
             this.commentsView.on('toAdd', this.onCommentAdd, this);
+            this.commentsView.on('loadMore', this.onLoadMore, this);
 
             this.formTemplate = options.listTemplate + '-form';
 
@@ -94,11 +95,12 @@ define(function (require) {
                 dialogWidget.remove();
                 // update collection
                 this.collection.add(model);
-                this.collection.state.set({
-                    limit: this.collection.state.get('limit') + 1,
-                    count: this.collection.state.get('count') + 1
+                this.collection.updateRoute({
+                    limit: this.collection.route.get('limit') + 1
                 }, {silent: true});
-                this.collection.trigger('stateChange');
+                this.collection.state.set({
+                    count: this.collection.state.get('count') + 1
+                });
                 this.collection.sort();
             }, this);
         },
@@ -131,14 +133,19 @@ define(function (require) {
                 model.destroy({error: function () {
                     mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
                 }});
-                this.collection.state.set({
-                    limit: this.collection.state.get('limit') - 1,
-                    count: this.collection.state.get('count') - 1
+                this.collection.updateRoute({
+                    limit: this.collection.route.get('limit') - 1
                 }, {silent: true});
-                this.collection.trigger('stateChange');
+                this.collection.state.set({
+                    count: this.collection.state.get('count') - 1
+                });
             }, this));
 
             confirm.open();
+        },
+
+        onLoadMore: function () {
+            this.collection.loadMore();
         },
 
         _initFormView: function (parentView, model) {

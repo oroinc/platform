@@ -36,43 +36,34 @@ define(function (require) {
         _ = require('underscore'),
         routing = require('routing'),
         BaseModel = require('./base/model');
+
     RouteModel = BaseModel.extend(/** @exports RouteModel.prototype */{
-        defaults: {
-            /**
-             * Name of the route
-             * @type {string}
-             */
-            routeName: null,
+        defaults: function () {
+            return {
+                /**
+                 * Name of the route
+                 * @type {string}
+                 */
+                routeName: null,
 
-            /**
-             * List of acceptable query parameters for this route
-             * @type {Array.<string>}
-             */
-            routeQueryParameters: []
+                /**
+                 * List of acceptable query parameters for this route
+                 * @type {Array.<string>}
+                 */
+                routeQueryParameters: []
+            };
         },
 
         /**
-         * List of all parameters accepted by route, includes "path" and "query" parameter names
-         *
-         * @type {Array.<string>}
+         * Return list of parameter names accepted by this route
          * @protected
+         * @returns {Array.<string>}
          */
-        _routeParameters: null,
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function (options) {
-            this._updateRouteParameters();
-            this.on('change:routeName change:routeQueryParameters', this._updateRouteParameters, this);
-        },
-
-        /**
-         * Updates list of route arguments accepted by this route
-         * @protected
-         */
-        _updateRouteParameters: function () {
+        getAcceptableParameters: function () {
             var route, variableTokens, routeParameters;
+            if (!this.get('routeName')) {
+                throw new Error('routeName must be specified');
+            }
             route = routing.getRoute(this.get('routeName'));
             variableTokens = _.filter(route.tokens, function (tokenPart){
                 return tokenPart[0] === 'variable';
@@ -81,18 +72,19 @@ define(function (require) {
                 return tokenPart[3];
             });
             routeParameters.push.apply(routeParameters, this.get('routeQueryParameters'));
-            this._routeParameters = routeParameters;
+            return routeParameters;
         },
 
         /**
          * Returns url defined by this model
          *
-         * @param options {object} parameters to override
+         * @param options {Object=} parameters to override
          * @returns {string} route url
          */
         getUrl: function (options) {
-            var routeParams = _.extend(this.toJSON(), options);
-            return routing.generate(this.get('routeName'), _.pick(routeParams, this._routeParameters));
+            var routeParameters = _.extend(this.toJSON(), options),
+                acceptableParameters = this.getAcceptableParameters();
+            return routing.generate(this.get('routeName'), _.pick(routeParameters, acceptableParameters));
         }
     });
 

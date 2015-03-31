@@ -4,9 +4,8 @@ define(function (require) {
     'use strict';
 
     var CommentCollection,
-        Chaplin = require('chaplin'),
         _ = require('underscore'),
-        LoadMoreCollection = require('oroui/js/app/models/loadmore-collection'),
+        LoadMoreCollection = require('oroui/js/app/models/load-more-collection'),
         CommentModel = require('orocomment/js/app/models/comment-model');
 
     CommentCollection = LoadMoreCollection.extend({
@@ -18,13 +17,11 @@ define(function (require) {
 
         create: function () {
             return new CommentModel({
-                relationId: this._route.get('relationId'),
-                relationClass: this._route.get('relationClass')
+                relationId: this.route.get('relationId'),
+                relationClass: this.route.get('relationClass')
             });
         }
     });
-
-    _.extend(CommentCollection.prototype, Chaplin.SyncMachine);
 
     return CommentCollection;
 

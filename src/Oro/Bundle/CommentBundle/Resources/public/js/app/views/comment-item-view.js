@@ -40,11 +40,13 @@ define(function (require) {
             return data;
         },
 
-        onEditCommentClick: function () {
+        onEditCommentClick: function (e) {
+            e.stopImmediatePropagation();
             this.$el.trigger('comment-edit', [this.model]);
         },
 
-        onRemoveCommentClick: function () {
+        onRemoveCommentClick: function (e) {
+            e.stopImmediatePropagation();
             this.$el.trigger('comment-remove', [this.model]);
         }
     });
