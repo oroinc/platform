@@ -45,7 +45,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     {
         $this->resetAttemptCount();
         $this->settings = $transportEntity->getSettingsBag();
-        $wsdlUrl        = $this->settings->get('wsdl_url');
+        $wsdlUrl = $this->settings->get('wsdl_url');
 
         if (!$wsdlUrl) {
             throw new InvalidConfigurationException("SOAP Transport require 'wsdl_url' option to be defined.");
@@ -134,16 +134,16 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     /**
      * @param string $wsdlUrl
      *
+     * @param array $options
      * @return \SoapClient
      */
-    protected function getSoapClient($wsdlUrl)
+    protected function getSoapClient($wsdlUrl, array $options = [])
     {
-        $options          = [];
         $options['trace'] = true;
-        $urlParts         = parse_url($wsdlUrl);
+        $urlParts = parse_url($wsdlUrl);
 
         if (isset($urlParts['user'], $urlParts['pass'])) {
-            $options['login']    = $urlParts['user'];
+            $options['login'] = $urlParts['user'];
             $options['password'] = $urlParts['pass'];
             unset($urlParts['user'], $urlParts['pass']);
         }
@@ -215,7 +215,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         $couldPerform = $this->multipleAttemptsEnabled && ($this->attempted < count($this->sleepBetweenAttempt) - 1);
 
         if ($couldPerform) {
-            $headers  = $this->getLastResponseHeaders();
+            $headers = $this->getLastResponseHeaders();
             $response = $this->getLastResponse();
 
             if (!empty($headers) && !$this->isResultOk($headers)) {
