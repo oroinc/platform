@@ -626,7 +626,7 @@ class Email extends ExtendEmail
     {
         $refs = [];
         if ($this->refs) {
-            preg_match_all( '/<(.+?)>/is', $this->refs, $refs);
+            preg_match_all('/<(.+?)>/is', $this->refs, $refs);
             $refs = $refs[0];
         }
         return $refs;
