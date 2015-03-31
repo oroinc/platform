@@ -13,6 +13,16 @@
 <div id="{{ widgetContentId }}" class="invisible widget-content {{ widgetType }}-widget-content {{ widgetClass }}-widget-content">
     {% block content %}
     {% endblock %}
+    {% for configName, config in widgetConfiguration %}
+        {% if config.show_on_widget and config.value is not null%}
+            {% if config.options is defined and config.options.label is defined %}
+                {% set label = config.options.label %}
+            {% else %}
+                {% set label = configName %}
+            {% endif %}
+            <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ config.value }}</div>
+        {% endif %}
+    {% endfor %}
     {% block actions %}
         <div class="widget-actions">
             {% if actions is defined %}

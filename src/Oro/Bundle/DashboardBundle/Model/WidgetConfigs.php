@@ -5,8 +5,8 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
-use Oro\Bundle\DashboardBundle\Model\StateManager;
 
+use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -33,25 +33,31 @@ class WidgetConfigs
     /** @var Request|null */
     protected $request;
 
+    /** @var ConfigValueProvider */
+    protected $valueProvider;
+
     /**
      * @param ConfigProvider          $configProvider
      * @param SecurityFacade          $securityFacade
      * @param ResolverInterface       $resolver
      * @param EntityManagerInterface  $entityManager
      * @param StateManager            $stateManager
+     * @param ConfigValueProvider $valueProvider
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
         ResolverInterface $resolver,
         EntityManagerInterface $entityManager,
-        StateManager $stateManager
+        StateManager $stateManager,
+        ConfigValueProvider $valueProvider
     ) {
         $this->configProvider   = $configProvider;
         $this->securityFacade   = $securityFacade;
         $this->resolver         = $resolver;
         $this->entityManager    = $entityManager;
         $this->stateManager     = $stateManager;
+        $this->valueProvider = $valueProvider;
     }
 
     /**
@@ -72,6 +78,14 @@ class WidgetConfigs
         unset($widget['route_parameters']);
         unset($widget['acl']);
         unset($widget['items']);
+
+        $options = $widget['configuration'];
+        foreach ($options as $name => $config) {
+            $widget['configuration'][$name]['value'] = $this->valueProvider->getViewValue(
+                $config['type'],
+                $this->getWidgetOptions()->get($name)
+            );
+        }
 
         foreach ($widget as $key => $val) {
             $attrName = 'widget';
@@ -135,8 +149,15 @@ class WidgetConfigs
 
         $widget = $this->findWidget($widgetId);
         $widgetState = $this->stateManager->getWidgetState($widget);
+        $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName())['configuration'];
 
-        return new WidgetOptionBag($widgetState->getOptions());
+        $options = $widgetState->getOptions();
+
+        foreach ($options as $name => $value) {
+            $options[$name] = $this->valueProvider->getConvertedValue($widgetConfig[$name]['type'], $value);
+        }
+
+        return new WidgetOptionBag($options);
     }
 
     /**

@@ -11,6 +11,8 @@ parameters:
     oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
     oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
+    oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
+    oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
 
 services:
     oro_dashboard.config_resolver:
@@ -26,8 +28,19 @@ services:
             - @oro_dashboard.config_resolver
             - @doctrine.orm.entity_manager
             - @oro_dashboard.manager.state
+            - @oro_dashboard.widget_config_value.provider
         calls:
             - [setRequest, ["@?request="]]
+
+    oro_dashboard.widget_config_value.provider:
+        class: %oro_dashboard.widget_config_value.provider.class%
+
+    oro_dashboard.widget_config_value.date_range.converter:
+        class: %oro_dashboard.widget_config_value.date_range.converter.class%
+        arguments:
+            - @oro_locale.formatter.date_time
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_date_range_filter" }
 
     oro_dashboard.manager:
         class: %oro_dashboard.manager.class%
