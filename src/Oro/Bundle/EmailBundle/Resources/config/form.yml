@@ -71,7 +71,6 @@ services:
         class: %oro_email.form.type.email.class%
         arguments:
             - @security.context
-            - @doctrine
         tags:
             - { name: form.type, alias: oro_email_email }
 
@@ -82,6 +81,8 @@ services:
 
     oro_email.form.type.attachment:
         class: %oro_email.form.type.attachment.class%
+        arguments:
+            - @doctrine.orm.entity_manager
         tags:
             - { name: form.type, alias: oro_email_attachment }
 
