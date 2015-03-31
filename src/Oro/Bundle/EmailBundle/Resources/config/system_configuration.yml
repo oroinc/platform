@@ -47,8 +47,8 @@ oro_system_configuration:
             options:
                 label: oro.email.system_configuration.attachment_configuration.link_to_scope.label
                 choices:
-                    1: oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label
                     0: oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label
+                    1: oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label
 
     tree:
         system_configuration:

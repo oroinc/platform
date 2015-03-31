@@ -7,11 +7,13 @@ use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
-use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Oro\Bundle\EmailBundle\Event\EmailBodySyncAfter;
 
 class EmailCacheManager implements LoggerAwareInterface
 {
@@ -23,24 +25,24 @@ class EmailCacheManager implements LoggerAwareInterface
     /** @var EntityManager */
     protected $em;
 
-    /** @var EmailAttachmentManager */
-    protected $attachmentManager;
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
 
     /**
      * Constructor.
      *
-     * @param EmailBodyLoaderSelector $selector
-     * @param EntityManager           $em
-     * @param EmailAttachmentManager  $attachmentManager
+     * @param EmailBodyLoaderSelector  $selector
+     * @param EntityManager            $em
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EmailBodyLoaderSelector $selector,
         EntityManager $em,
-        EmailAttachmentManager $attachmentManager
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->selector          = $selector;
         $this->em                = $em;
-        $this->attachmentManager = $attachmentManager;
+        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
@@ -80,9 +82,11 @@ class EmailCacheManager implements LoggerAwareInterface
         }
 
         $email->setEmailBody($emailBody);
-        $this->attachmentManager->linkEmailAttachmentsToTargetEntities($email);
 
         $this->em->persist($email);
         $this->em->flush();
+
+        $event = new EmailBodySyncAfter($email);
+        $this->eventDispatcher->dispatch(EmailBodySyncAfter::NAME, $event);
     }
 }
