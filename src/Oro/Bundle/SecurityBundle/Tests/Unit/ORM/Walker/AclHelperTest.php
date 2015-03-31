@@ -262,7 +262,31 @@ class AclHelperTest extends OrmTestCase
                 'resultHelper5',
                 'resultWalker5',
                 []
-            ]
+            ],
+            [
+                $this->getRequest6(),
+                [
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
+                        'user',
+                        [10],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1,
+                        false
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
+                        'id',
+                        [3, 2, 1],
+                        PathExpression::TYPE_STATE_FIELD,
+                        null,
+                        null,
+                        false
+                    ],
+                ],
+                'resultHelper6',
+                'resultWalker6',
+                []
+            ],
         ];
     }
 
@@ -510,6 +534,50 @@ class AclHelperTest extends OrmTestCase
                 ->whereClause->conditionalExpression
                 ->conditionalFactors[0]->conditionalExpression->conditionalTerms
         );
+    }
+
+    protected function getRequest6()
+    {
+        $qb = $this->getQueryBuilder();
+        $qb->select('u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->join('u.articles', 'art')
+            ->join('art.comments', 'comments')
+            ->where('art.id IS NOT NULL')
+            ->andWhere('comments.id IS NOT NULL')
+            ->andWhere(
+                $qb->expr()->in(
+                    'u.id',
+                    'SELECT users.id FROM Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser users
+                       JOIN users.articles articles
+                       WHERE articles.id in (1,2,3)
+                    '
+                )
+            );
+
+        return $qb;
+    }
+
+    protected function resultHelper6($hints)
+    {
+        $whereCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getWhereConditions()[0];
+        $joinCondition  = $hints[AclWalker::ORO_ACL_CONDITION]->getJoinConditions()[0];
+        $subRequest     = $hints[AclWalker::ORO_ACL_CONDITION]->getSubRequests()[0];
+        $this->assertEquals([3, 2, 1], $whereCondition->getValue());
+        $this->assertEquals([10], $joinCondition->getValue());
+        $this->assertEquals(2, $subRequest->getFactorId());
+    }
+
+    protected function resultWalker6(SelectStatement $resultAst)
+    {
+        $subselect  = $resultAst->whereClause
+            ->conditionalExpression
+            ->conditionalFactors[2]
+            ->simpleConditionalExpression
+            ->subselect;
+        $expression = $subselect->whereClause->conditionalExpression
+            ->conditionalFactors[1]->simpleConditionalExpression;
+        $this->assertEquals([3, 2, 1], $this->collectLiterals($expression->literals));
     }
 
     /**
