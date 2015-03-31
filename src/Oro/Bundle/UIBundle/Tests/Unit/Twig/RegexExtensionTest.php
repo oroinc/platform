@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\UIBundle\Twig\RegexExtension;
 
 class RegexExtensionTest extends \PHPUnit_Framework_TestCase
