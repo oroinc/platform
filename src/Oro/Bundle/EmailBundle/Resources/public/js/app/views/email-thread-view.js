@@ -15,11 +15,14 @@ define(function (require) {
         events: {
             'click .email-view-toggle': 'onEmailHeadClick',
             'click .email-view-toggle-all': 'onToggleAllClick',
-            'click .email-load-more': 'onLoadMoreClick'
+            'click .email-load-more': 'onLoadMoreClick',
+            'click .email-extra-body-toggle': 'onEmailExtraBodyToggle'
         },
 
         selectors: {
             emailItem: '.email-info',
+            emailBody: '.email-body',
+            emailExtraBody: '.email-body>.quote, .email-body>.gmail_extra',
             loadMore: '.email-load-more',
             toggleAll: '.email-view-toggle-all'
         },
@@ -63,7 +66,7 @@ define(function (require) {
                 this.updateToggleAllAction();
             }
             EmailTreadView.__super__.render.apply(this, arguments);
-            mediator.execute('layout:init', this.$el, this);
+            this.updateThreadLayout();
             return this;
         },
 
@@ -147,7 +150,7 @@ define(function (require) {
                 return;
             }
             this.$(this.selectors.loadMore).replaceWith(content);
-            mediator.execute('layout:init', this.$el, this);
+            this.updateThreadLayout();
         },
 
         /**
@@ -159,6 +162,37 @@ define(function (require) {
             }
             this.$(this.selectors.loadMore).removeClass('process');
             mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+        },
+
+        /**
+         * Updates layout for view's element
+         *  - executes layout init
+         *  - marks email extra-body part and adds the toggler
+         */
+        updateThreadLayout: function () {
+            mediator.execute('layout:init', this.$el, this);
+            this.markEmailExtraBody();
+        },
+
+        /**
+         * Marks email extra-body part and adds the toggler
+         */
+        markEmailExtraBody: function () {
+            var $extraBodies = this.$(this.selectors.emailExtraBody)
+                .not('.email-extra-body')
+                .addClass('email-extra-body');
+            $('<div class="email-extra-body-toggle"></div>').insertBefore($extraBodies);
+        },
+
+        /**
+         * Handles click on email extra-body toggle button
+         * @param e
+         */
+        onEmailExtraBodyToggle: function (e) {
+            this.$(e.currentTarget)
+                .closest(this.selectors.emailBody)
+                .find('.email-extra-body:first')
+                .toggleClass('in');
         },
 
         /**
