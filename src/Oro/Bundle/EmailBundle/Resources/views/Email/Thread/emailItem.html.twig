@@ -65,7 +65,11 @@
         </div>
         <div class="email-body">
             {% if email.emailBody %}
-                {{ email.emailBody.bodyContent|raw }}
+                {% if email.emailBody.bodyIsText %}
+                    {{ email.emailBody.bodyContent|nl2br }}
+                {% else %}
+                    {{ email.emailBody.bodyContent|raw }}
+                {% endif %}
             {% else %}
                 {{ 'oro.email.body_is_unavailable'|trans }}
             {% endif %}
