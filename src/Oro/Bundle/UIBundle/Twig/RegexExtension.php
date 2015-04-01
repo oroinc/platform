@@ -25,16 +25,17 @@ class RegexExtension extends \Twig_Extension
     }
 
     /**
+     * @param string $subject
      * @param string $pattern
      * @param string $replacement
-     * @param string $subject
+     * @param int $limit
      *
      * @return mixed
      */
-    public function pregReplace($pattern, $replacement = '', $subject = '')
+    public function pregReplace($subject, $pattern, $replacement, $limit = -1)
     {
         if (is_string($subject) && strlen($subject)) {
-            $subject = preg_replace($pattern, $replacement, $subject);
+            $subject = preg_replace($pattern, $replacement, $subject, $limit);
         }
 
         return $subject;

@@ -35,15 +35,16 @@ class RegexExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $expected
+     * @param string $subject
      * @param string $pattern
      * @param string $replacement
-     * @param string $subject
+     * @param string $limit
      *
      * @dataProvider addDataProvider
      */
-    public function testRegex($expected, $pattern, $replacement, $subject)
+    public function testRegex($expected, $subject, $pattern, $replacement, $limit)
     {
-        $this->assertEquals($expected, $this->extension->pregReplace($pattern, $replacement, $subject));
+        $this->assertEquals($expected, $this->extension->pregReplace($subject, $pattern, $replacement, $limit));
     }
 
     /**
@@ -54,15 +55,24 @@ class RegexExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             'pattern 1' => [
                 'expected' => 'aaaaa aaaaaabbccccccccaaaaad d d d d d d ddde',
+                'subject'   => 'aaaaa   aaaaaabbccccccccaaaaad d d d   d      d d ddde',
                 'pattern'   => '/(\s){2,}/',
                 'replacement'   => '$1',
-                'subject'   => 'aaaaa   aaaaaabbccccccccaaaaad d d d   d      d d ddde',
+                'limit' => -1
             ],
             'pattern 2' => [
                 'expected' => '-asd-',
+                'subject'   => '------------asd----------',
                 'pattern'   => '/(-){2,}/',
                 'replacement'   => '$1',
-                'subject'   => '------------asd----------',
+                'limit' => -1,
+            ],
+            'pattern 3' => [
+                'expected' => '-asd-',
+                'subject'   => '-asd----------',
+                'pattern'   => '/(-){2,}/',
+                'replacement'   => '$1',
+                'limit' => 1,
             ],
         ];
     }
