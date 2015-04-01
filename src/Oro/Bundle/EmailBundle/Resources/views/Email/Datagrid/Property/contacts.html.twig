@@ -33,7 +33,9 @@
         }}..{{
             EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
         }}
-        ({{ recipients|length }})
     </strong>
+{% endif %}
+{% if thread is not null and thread.emails|length > 1 %}
+    <strong>({{ thread.emails|length }})</strong>
 {% endif %}
 </span>
