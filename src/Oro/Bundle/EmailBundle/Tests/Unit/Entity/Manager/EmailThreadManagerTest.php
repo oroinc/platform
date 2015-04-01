@@ -102,7 +102,7 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->manager->getQueueThreadUpdate());
     }
 
-    public function testUpdateThreadCreate()
+    public function testThreadCreateO()
     {
         $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
         $emailFromThread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
@@ -140,7 +140,7 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->manager->getQueueThreadUpdate());
     }
 
-    public function testUpdateThreadCreateThreadNotFound()
+    public function testThreadCreateWhenNotFound()
     {
         $emailFromThread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
 
