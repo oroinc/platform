@@ -229,6 +229,32 @@ span.icon.grid .icon-paperclip {
     padding: 0 15px 10px;
     margin: 0;
     /* @todo remove old style */
+    .email-extra-body {
+      display: none;
+      &.in {
+        display: block;
+      }
+    }
+    .email-extra-body-toggle {
+      cursor: pointer;
+      margin: 10px 0;
+      width: 22px;
+      height: 10px;
+      text-align: center;
+      line-height: 1px;
+      background-color: #f1f1f1;
+      border: 1px solid #ddd;
+      color: #888;
+      &:hover {
+        background-color: #d8d8d8;
+        border-color: #cdcdcd;
+        color: #000;
+        font-weight: bold;
+      }
+      &:before {
+        content: '...';
+      }
+    }
   }
   .email-view-toggle {
     cursor: pointer;
