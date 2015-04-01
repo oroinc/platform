@@ -153,8 +153,9 @@ class WidgetConfigs
 
         $options = $widgetState->getOptions();
 
-        foreach ($options as $name => $value) {
-            $options[$name] = $this->valueProvider->getConvertedValue($widgetConfig[$name]['type'], $value);
+        foreach ($widgetConfig as $name => $config) {
+            $value = isset($options[$name]) ? $options[$name] : null;
+            $options[$name] = $this->valueProvider->getConvertedValue($config['type'], $value);
         }
 
         return new WidgetOptionBag($options);

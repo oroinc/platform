@@ -18,11 +18,20 @@ class FilterDateTimeRangeConverter implements ConfigValueConverter
     /**
      * @inheritdoc
      */
-    public function getConvertedValue($value)
+    public function getConvertedValue($value = null)
     {
+        if (is_null($value)) {
+            $end = new \DateTime('now', new \DateTimeZone('UTC'));
+            $start = clone $end;
+            $start = $start->sub(new \DateInterval('P1M'));
+        } else {
+            $start = $value['value']['start'];
+            $end = $value['value']['end'];
+        }
+
         return [
-            'start' => $value['value']['start'],
-            'end' => $value['value']['end']
+            'start' => $start,
+            'end' => $end
         ];
     }
 

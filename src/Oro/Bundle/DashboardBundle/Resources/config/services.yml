@@ -13,6 +13,7 @@ parameters:
     oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
     oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
     oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
+    oro_dashboard.datetime.hepler.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
 
 services:
     oro_dashboard.config_resolver:
@@ -94,3 +95,8 @@ services:
             - @oro_dashboard.config_provider
             - @form.factory
             - @oro_form.validator.constraint_factory
+
+    oro_dashboard.datetime.hepler:
+        class: %oro_dashboard.datetime.hepler.class%
+        arguments:
+            - @oro_locale.formatter.date_time

@@ -57,3 +57,9 @@ oro:
         delete_dashboard_link:
             title: Remove current dashboard
             text:  Delete dashboard
+        chart:
+            year.label: Year
+            month.label: Month
+            week.label: Week
+            day.label: Day
+            hour.label: Hour
