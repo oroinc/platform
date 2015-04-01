@@ -16,11 +16,13 @@ class EmailRecipientRepository extends EntityRepository
      *
      * @return EmailRecipient[]
      */
-    public function getThreadRecipients(EmailThread $thread)
+    public function getThreadUniqueRecipients(EmailThread $thread)
     {
         $queryBuilder = $this->createQueryBuilder('er')
+            ->select('er')
             ->leftJoin('er.email', 'e')
             ->andWhere('e.thread = :thread')
+            ->groupBy('er.emailAddress')
             ->setParameter('thread', $thread);
         $result = $queryBuilder->getQuery()->getResult();
 

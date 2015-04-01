@@ -75,7 +75,7 @@ class EmailExtension extends \Twig_Extension
      */
     public function getEmailThreadRecipients($thread)
     {
-        $result = $this->em->getRepository("OroEmailBundle:EmailRecipient")->getThreadRecipients($thread);
+        $result = $this->em->getRepository("OroEmailBundle:EmailRecipient")->getThreadUniqueRecipients($thread);
 
         return $result;
     }
