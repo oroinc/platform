@@ -110,7 +110,7 @@ class EmailAttachmentManager
                 if (!$emailAttachment->getFile()) {
                     continue;
                 }
-                $attachment = new Attachment();
+                $attachment = $this->getNewAttachment();
                 if (!$attachment->supportTarget($entityClass)) {
                     continue;
                 }
@@ -165,5 +165,13 @@ class EmailAttachmentManager
     protected function getAttachmentFullPath($path)
     {
         return $this->attachmentDir . '/' . $path;
+    }
+
+    /**
+     * @return Attachment
+     */
+    public function getNewAttachment()
+    {
+        return new Attachment();
     }
 }

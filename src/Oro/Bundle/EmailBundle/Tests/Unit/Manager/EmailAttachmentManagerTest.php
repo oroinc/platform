@@ -4,6 +4,7 @@ namespace Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 
 use Gaufrette\Filesystem;
 
@@ -14,14 +15,13 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Attachment;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 /**
  * Class EmailAttachmentManagerTest
@@ -74,7 +74,22 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
      */
+    protected $om;
+
+    /**
+     * @var EmailActivityListProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $activityListProvider;
+
+    /**
+     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $em;
+
+    /**
+     * @var Attachment|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $attachment;
 
     protected function setUp()
     {
@@ -108,13 +123,13 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRootDir')
             ->willReturn('');
 
-        $this->em = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->registry->expects($this->any())
             ->method('getManager')
-            ->will($this->returnValue($this->em));
+            ->will($this->returnValue($this->om));
 
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->setMethods(['getLoggedUser'])
@@ -131,16 +146,32 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getService')
             ->will($this->returnValue($this->securityFacade));
 
+        $this->activityListProvider = $this
+            ->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
+            ->setMethods(['getTargetEntities'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->attachment = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Entity\Attachment')
+            ->setMethods(['supportTarget', 'setFile'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailAttachmentManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager')
-            ->setMethods(['getAttachmentFullPath'])
-            ->setConstructorArgs([
-                $this->emailCacheManager,
+            ->setMethods(['getAttachmentFullPath', 'getNewAttachment'])
+            ->setConstructorArgs(
+                [
                 $filesystemMap,
-                $this->registry,
-                $this->configFileValidator,
+                $this->em,
                 $this->kernel,
-                $this->securityFacadeLink
-            ])
+                $this->securityFacadeLink,
+                $this->activityListProvider
+                ]
+            )
             ->getMock();
 
         $this->configFileValidator->expects($this->any())
@@ -152,56 +183,109 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(__DIR__ . '/../Fixtures/attachment/test.txt');
     }
 
-    public function testLinkEmailAttachmentsToEntity()
+    public function testLinkEmailAttachmentToTargetEntity()
     {
-        $email = $this->createEmailEntity();
+        $emailAttachment = $this->getEmailAttachment();
 
-        $this->emailCacheManager->expects($this->once())
-            ->method('ensureEmailBodyCached')
-            ->with($email);
+        $this->attachment->expects($this->any())
+            ->method('supportTarget')
+            ->withAnyParameters()
+            ->will($this->returnValue(true));
 
-        $this->configFileValidator->expects($this->exactly(2))
-            ->method('validate');
+        $this->emailAttachmentManager
+            ->method('getNewAttachment')
+            ->withAnyParameters()
+            ->will($this->returnValue($this->attachment));
 
-        $this->em->expects($this->exactly(2))
-            ->method('persist');
+        $emailAttachment->expects($this->exactly(1))
+            ->method('setFile')
+            ->withAnyParameters();
 
-        $this->emailAttachmentManager->linkEmailAttachmentsToEntity($email, new SomeEntity());
+        $this->attachment->expects($this->exactly(1))
+            ->method('setFile')
+            ->withAnyParameters();
+
+        $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
+    }
+
+    public function testLinkEmailAttachmentsToTargetEntities()
+    {
+        $emailAttachment = $this->getEmailAttachment();
+        $email = $this->getEmailMock($emailAttachment);
+
+        $this->attachment->expects($this->any())
+            ->method('supportTarget')
+            ->withAnyParameters()
+            ->will($this->returnValue(true));
+
+        $this->emailAttachmentManager
+            ->method('getNewAttachment')
+            ->withAnyParameters()
+            ->will($this->returnValue($this->attachment));
+
+        $this->activityListProvider
+            ->method('getTargetEntities')
+            ->withAnyParameters()
+            ->will($this->returnValue([new SomeEntity()]));
+
+        $emailAttachment->expects($this->exactly(1))
+            ->method('setFile')
+            ->withAnyParameters();
+
+        $this->attachment->expects($this->exactly(1))
+            ->method('setFile')
+            ->withAnyParameters();
+
+        $this->emailAttachmentManager->linkEmailAttachmentsToTargetEntities($email);
+    }
+
+    protected function getContentMock()
+    {
+        $content = $this->getMockBuilder('\stdClass')
+            ->setMethods(['getContent', 'getContentTransferEncoding'])
+            ->getMock();
+        $content->expects($this->any())
+            ->method('getContent')
+            ->will($this->returnValue('content'));
+        $content->expects($this->any())
+            ->method('getContentTransferEncoding')
+            ->will($this->returnValue('base64'));
+
+        return $content;
+    }
+
+    protected function getEmailAttachment()
+    {
+        $emailAttachment = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailAttachment')
+            ->setMethods(['getContent', 'setFile', 'getFile'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailAttachment->expects($this->any())
+            ->method('getContent')
+            ->will($this->returnValue($this->getContentMock()));
+        $emailAttachment->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue(true));
+
+        return $emailAttachment;
     }
 
     /**
-     * @return Email
+     * @param EmailAttachment $emailAttachment
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createEmailEntity()
+    protected function getEmailMock(EmailAttachment $emailAttachment)
     {
-        $email = new Email();
-        $emailBody = new EmailBody();
-
-        $email->setEmailBody($emailBody);
-
-        $attachment1 = new EmailAttachment();
-        $attachment1->setFileName('attachment1');
-        $attachment1->setContentType('allowed_content_type');
-        $attachment1->setEmailBody($emailBody);
-        $attachment1->setAttachment(new Attachment());
-        $emailBody->addAttachment($attachment1);
-
-        $content1 = new EmailAttachmentContent();
-        $content1->setContent(base64_encode('content1'));
-        $content1->setContentTransferEncoding('base64');
-        $attachment1->setContent($content1);
-
-        $attachment2 = new EmailAttachment();
-        $attachment2->setFileName('attachment2');
-        $attachment2->setContentType('disallowed_content_type');
-        $attachment2->setEmailBody($emailBody);
-        $attachment2->setAttachment(new Attachment());
-        $emailBody->addAttachment($attachment2);
-
-        $content2 = new EmailAttachmentContent();
-        $content2->setContent(base64_encode('content2'));
-        $content2->setContentTransferEncoding('base64');
-        $attachment2->setContent($content2);
+        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
+            ->setMethods(['getEmailBody', 'getAttachments'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $email->expects($this->any())
+            ->method('getEmailBody')
+            ->will($this->returnValue($email));
+        $email->expects($this->any())
+            ->method('getAttachments')
+            ->will($this->returnValue([$emailAttachment]));
 
         return $email;
     }
