@@ -194,6 +194,6 @@ class Translator extends BaseTranslator
      */
     private function isInstalled()
     {
-        return $this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed');
+        return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
     }
 }
