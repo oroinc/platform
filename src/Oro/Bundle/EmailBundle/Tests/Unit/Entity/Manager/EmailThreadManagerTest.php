@@ -23,49 +23,28 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleOnFlush()
     {
-        $metaClass = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
-        $emailFromThread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $emailFromThread->expects($this->once())
-            ->method('setThread')
-            ->with($thread);
-        $this->emailThreadProvider->expects($this->once())
-            ->method('getEmailThread')
-            ->will($this->returnValue($thread));
-        $this->emailThreadProvider->expects($this->once())
-            ->method('getEmailReferences')
-            ->will($this->returnValue([$emailFromThread]));
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->once())
-            ->method('setThread')
-            ->with($thread);
-        $email->expects($this->exactly(2))
-            ->method('getThread')
-            ->will($this->returnValue($thread));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityManager->expects($this->exactly(2))
+        $entityManager->expects($this->exactly(1))
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
-        $entityManager->expects($this->exactly(2))
-            ->method('persist');
-        $entityManager->expects($this->exactly(1))
-            ->method('getClassMetadata')
-            ->will($this->returnValue($metaClass));
 
         $uow->expects($this->once())
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue([$email, new \stdClass()]));
         $uow->expects($this->once())
-            ->method('computeChangeSet');
+            ->method('getScheduledEntityUpdates')
+            ->will($this->returnValue([$email, new \stdClass()]));
 
         $this->manager->handleOnFlush(new OnFlushEventArgs($entityManager));
+
+        $this->assertCount(1, $this->manager->getQueueHeadUpdate());
+        $this->assertCount(1, $this->manager->getQueueThreadUpdate());
     }
 
     public function testHandlePostFlush()
@@ -79,7 +58,7 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(1));
 
-        $this->manager->addEmailToQueue($email);
+        $this->manager->addEmailToQueueHeadUpdate($email);
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -101,19 +80,103 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
     }
 
-    public function testAddResetQueue()
+    public function testAddResetHeadQueue()
     {
         $emailFromThread1 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromThread2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $this->manager->addEmailToQueue($emailFromThread1);
-        $this->manager->addEmailToQueue($emailFromThread2);
-        $this->assertCount(2, $this->manager->getQueue());
-        $this->manager->resetQueue();
-        $this->assertEmpty($this->manager->getQueue());
+        $this->manager->addEmailToQueueHeadUpdate($emailFromThread1);
+        $this->manager->addEmailToQueueHeadUpdate($emailFromThread2);
+        $this->assertCount(2, $this->manager->getQueueHeadUpdate());
+        $this->manager->resetQueueHeadUpdate();
+        $this->assertEmpty($this->manager->getQueueHeadUpdate());
+    }
+
+    public function testAddResetThreadQueue()
+    {
+        $emailFromThread1 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $emailFromThread2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $this->manager->addEmailToQueueThreadUpdate($emailFromThread1);
+        $this->manager->addEmailToQueueThreadUpdate($emailFromThread2);
+        $this->assertCount(2, $this->manager->getQueueThreadUpdate());
+        $this->manager->resetQueueThreadUpdate();
+        $this->assertEmpty($this->manager->getQueueThreadUpdate());
+    }
+
+    public function testUpdateThreadCreate()
+    {
+        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
+        $emailFromThread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+
+        $emailFromThread->expects($this->exactly(1))
+            ->method('getThread')
+            ->will($this->returnValue(null));
+
+        $this->emailThreadProvider->expects($this->once())
+            ->method('getEmailThread')
+            ->will($this->returnValue($thread));
+        $this->emailThreadProvider->expects($this->once())
+            ->method('getEmailReferences')
+            ->will($this->returnValue([$emailFromThread]));
+
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email->expects($this->exactly(2))
+            ->method('getThread')
+            ->will($this->returnValue($thread));
+        $emailFromThread->expects($this->once())
+            ->method('setThread')
+            ->with($thread);
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->exactly(2))
+            ->method('persist');
+        $entityManager->expects($this->exactly(1))
+            ->method('flush');
+
+        $this->manager->addEmailToQueueThreadUpdate($email);
+        $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
+
+        $this->assertEmpty($this->manager->getQueueThreadUpdate());
+    }
+
+    public function testUpdateThreadCreateThreadNotFound()
+    {
+        $emailFromThread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+
+        $emailFromThread->expects($this->never())
+            ->method('getThread');
+
+        $this->emailThreadProvider->expects($this->once())
+            ->method('getEmailThread')
+            ->will($this->returnValue(null));
+        $this->emailThreadProvider->expects($this->never())
+            ->method('getEmailReferences')
+            ->will($this->returnValue([$emailFromThread]));
+
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email->expects($this->exactly(1))
+            ->method('getThread')
+            ->will($this->returnValue(null));
+        $emailFromThread->expects($this->never())
+            ->method('setThread');
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->never())
+            ->method('persist');
+        $entityManager->expects($this->exactly(1))
+            ->method('flush');
+
+        $this->manager->addEmailToQueueThreadUpdate($email);
+        $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
+
+        $this->assertEmpty($this->manager->getQueueThreadUpdate());
     }
 
     /**
-     * @dataProvider dataProvider
+     * @dataProvider dataHeadProvider
      *
      * @param array $heads
      * @param array $seens
@@ -124,7 +187,6 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $seens,
         $calls
     ) {
-        $threadId = 'testThreadId';
         $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
         $thread->expects($this->any())
             ->method('getId')
@@ -190,14 +252,16 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $entityManager->expects($this->exactly(4))
             ->method('persist');
+        $entityManager->expects($this->exactly(1))
+            ->method('flush');
 
-        $this->manager->addEmailToQueue($email);
+        $this->manager->addEmailToQueueHeadUpdate($email);
         $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
 
-        $this->assertEmpty($this->manager->getQueue());
+        $this->assertEmpty($this->manager->getQueueHeadUpdate());
     }
 
-    public function dataProvider()
+    public function dataHeadProvider()
     {
         return [
             'last unseen' =>
