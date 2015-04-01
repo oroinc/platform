@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Job\Step;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
@@ -106,20 +107,69 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
      */
     public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
     {
-        parent::execute($warningHandler);
+        $itemsToWrite = [];
+        $writeCount   = 0;
 
-        $requirePostprocessing = false;
+        try {
+            $stopExecution = false;
+            while (!$stopExecution) {
+                try {
+                    $readItem = $this->reader->read();
+                    if (null === $readItem) {
+                        $stopExecution = true;
+                        continue;
+                    }
+
+                } catch (InvalidItemException $e) {
+                    $this->handleStepExecutionWarning($this->reader, $e, $warningHandler);
+
+                    continue;
+                }
+
+                $processedItem = $this->process($readItem, $warningHandler);
+                if (null !== $processedItem) {
+                    $itemsToWrite[] = $processedItem;
+                    $writeCount++;
+                    if (0 === $writeCount % $this->batchSize) {
+                        $this->write($itemsToWrite, $warningHandler);
+                        $itemsToWrite = [];
+                    }
+                }
+
+                if (0 === count($this->getSharedData()) % $this->batchSize) {
+                    $this->runPostProcessingJobs();
+                }
+            }
+
+            if (count($itemsToWrite) > 0) {
+                $this->write($itemsToWrite, $warningHandler);
+            }
+
+            if ((bool)$this->getSharedData()) {
+                $this->runPostProcessingJobs();
+            }
+
+            $this->ensureResourcesReleased($warningHandler);
+        } catch (\Exception $error) {
+            $this->ensureResourcesReleased($warningHandler);
+            throw $error;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getSharedData()
+    {
+        $sharedData = [];
         foreach ($this->contextSharedKeys as $key) {
-            $sharedData = $this->getJobContext()->get($key);
-            if (!empty($sharedData)) {
-                $requirePostprocessing = true;
-                break;
+            $value = $this->getJobContext()->get($key);
+            if ($value) {
+                $sharedData = array_merge($sharedData, $value);
             }
         }
 
-        if ($requirePostprocessing) {
-            $this->runPostProcessingJobs();
-        }
+        return $sharedData;
     }
 
     /**
