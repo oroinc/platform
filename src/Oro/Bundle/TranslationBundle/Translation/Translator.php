@@ -162,7 +162,10 @@ class Translator extends BaseTranslator
      */
     private function ensureDatabaseLoaderAdded($locale)
     {
-        if (null !== $this->databaseTranslationMetadataCache && $this->container->getParameter('installed')) {
+        $isInstalled = $this->getContainer()->hasParameter('installed')
+            && $this->getContainer()->getParameter('installed');
+
+        if (null !== $this->databaseTranslationMetadataCache && $isInstalled) {
             $resources        = !empty($this->dynamicResources[$locale]) ? $this->dynamicResources[$locale] : [];
             $databaseResource = array_filter(
                 $resources,
