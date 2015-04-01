@@ -58,15 +58,19 @@ define(function (require) {
                 $addSignatureButton = this.options._sourceElement.find('#addSignatureButton');
 
             $addSignatureButton.on('click', function() {
-                var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
-                if (bodyEditorComponent.view.tinymceConnected) {
-                    var tinyMCE= bodyEditorComponent.view.tinymceInstance;
-                    tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                if ($signature.val()) {
+                    var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
+                    if (bodyEditorComponent.view.tinymceConnected) {
+                        var tinyMCE = bodyEditorComponent.view.tinymceInstance;
+                        tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                    } else {
+                        $body.focus();
+                        var caretPos = $body.getCursorPosition();
+                        var body = $body.val();
+                        $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig, "") + body.substring(caretPos));
+                    }
                 } else {
-                    $body.focus();
-                    var caretPos = $body.getCursorPosition();
-                    var body = $body.val();
-                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos));
+                    messenger.notificationMessage('info', __('oro.email.thread.no_signature'));
                 }
             });
 
