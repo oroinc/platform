@@ -22,6 +22,7 @@ define(function (require) {
             relationId: null,
             createdAt: '',
             updatedAt: '',
+            avatarUrl: null,
             attachmentURL: null,
             attachmentFileName: null,
             attachmentSize: null,

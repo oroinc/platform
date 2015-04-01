@@ -1,15 +1,20 @@
 /*jslint nomen:true*/
 /*global define*/
+/** @lends LoadMoreCollection */
 define(['./base/routing-collection'
-], function (UseRouteCollection) {
+], function (RoutingCollection) {
     'use strict';
 
+    /**
+     * @class
+     * @exports LoadMoreCollection
+     */
     var LoadMoreCollection;
 
     /**
      * Collection with "load more" functionality support
      */
-    LoadMoreCollection = UseRouteCollection.extend({
+    LoadMoreCollection = RoutingCollection.extend(/** @exports LoadMoreCollection.prototype */{
         routeParams: {
             /**
              * Initial quantity of items to load

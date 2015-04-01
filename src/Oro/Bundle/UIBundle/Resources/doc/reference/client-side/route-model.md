@@ -4,28 +4,29 @@ Abstraction of routeBasic usage:```javascriptvar route = new RouteModel({  
 
 
 * [RouteModel](#module_RouteModel)
-  * [._routeParameters](#module_RouteModel#_routeParameters) : <code>Array.&lt;string&gt;</code>
-  * [.initialize()](#module_RouteModel#initialize)
-  * [._updateRouteParameters()](#module_RouteModel#_updateRouteParameters)
-  * [.getUrl(options)](#module_RouteModel#getUrl) ⇒ <code>string</code>
+  * [.routeName](#module_RouteModel#routeName) : <code>string</code>
+  * [.routeQueryParameters](#module_RouteModel#routeQueryParameters) : <code>Array.&lt;string&gt;</code>
+  * [.getAcceptableParameters()](#module_RouteModel#getAcceptableParameters) ⇒ <code>Array.&lt;string&gt;</code>
+  * [.getUrl([options])](#module_RouteModel#getUrl) ⇒ <code>string</code>
 
-<a name="module_RouteModel#_routeParameters"></a>
-### routeModel._routeParameters : <code>Array.&lt;string&gt;</code>
-List of all parameters accepted by route, includes "path" and "query" parameter names
+<a name="module_RouteModel#routeName"></a>
+### routeModel.routeName : <code>string</code>
+Name of the route
 
 **Kind**: instance property of <code>[RouteModel](#module_RouteModel)</code>  
-**Access:** protected  
-<a name="module_RouteModel#initialize"></a>
-### routeModel.initialize()
-**Kind**: instance method of <code>[RouteModel](#module_RouteModel)</code>  
-<a name="module_RouteModel#_updateRouteParameters"></a>
-### routeModel._updateRouteParameters()
-Updates list of route arguments accepted by this route
+<a name="module_RouteModel#routeQueryParameters"></a>
+### routeModel.routeQueryParameters : <code>Array.&lt;string&gt;</code>
+List of acceptable query parameters for this route
+
+**Kind**: instance property of <code>[RouteModel](#module_RouteModel)</code>  
+<a name="module_RouteModel#getAcceptableParameters"></a>
+### routeModel.getAcceptableParameters() ⇒ <code>Array.&lt;string&gt;</code>
+Return list of parameter names accepted by this route
 
 **Kind**: instance method of <code>[RouteModel](#module_RouteModel)</code>  
 **Access:** protected  
 <a name="module_RouteModel#getUrl"></a>
-### routeModel.getUrl(options) ⇒ <code>string</code>
+### routeModel.getUrl([options]) ⇒ <code>string</code>
 Returns url defined by this model
 
 **Kind**: instance method of <code>[RouteModel](#module_RouteModel)</code>  
@@ -33,5 +34,5 @@ Returns url defined by this model
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>object</code> | parameters to override |
+| [options] | <code>Object</code> | parameters to override |
 

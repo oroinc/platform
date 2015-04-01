@@ -1,7 +1,9 @@
 <div class="comment-title">
-    <div class="comment-title-avatar">
-        <img src="/bundles/oroui/img/info-user.png" />
-    </div>
+    <% if (avatarUrl) { %>
+        <img class="comment-title-avatar" src="<%= avatarUrl %>" />
+    <% } else { %>
+        <div class="comment-title-avatar no-avatar" />
+    <% } %>
     <div class="comment-title-info">
         <% if (owner_id) {  %>
             <%= _.__('oro.comment.item.added',{
