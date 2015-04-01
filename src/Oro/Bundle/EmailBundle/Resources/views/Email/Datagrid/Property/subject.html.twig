@@ -1,6 +1,7 @@
+{% import 'OroEmailBundle::macros.html.twig' as EA %}
 {% set emailBody = record.getValue('emailBody') %}
 
 <strong>{{ value }}</strong>
 {% if emailBody.bodyContent is defined %}
-    - {{ emailBody.bodyContent|striptags[:150]|raw }}
+    - {{ EA.email_short_body(emailBody) }}
 {% endif %}
