@@ -1,5 +1,4 @@
-/*jslint nomen:true*/
-/*global define, base64_encode*/
+/*global define*/
 define([
     'jquery',
     'underscore',
@@ -9,7 +8,7 @@ define([
     'oroui/js/modal',
     'oroui/js/app/views/base/view',
     'base64'
-], function ($, _, routing, __, mediator, Modal, BaseView) {
+], function ($, _, routing, __, mediator, Modal, BaseView, base64) {
     'use strict';
 
     var PageStateView;
@@ -28,6 +27,9 @@ define([
             'remove collection': 'toggleStateTrace'
         },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function () {
             var confirmModal;
 
@@ -352,7 +354,7 @@ define([
         _combinePageId: function () {
             var route;
             route = this._parseCurrentURL();
-            return base64_encode(route.path);
+            return base64.encode(route.path);
         },
 
         /**
