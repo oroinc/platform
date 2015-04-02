@@ -104,7 +104,8 @@ class EmailTemplateController extends RestController
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
-        $templates = $emailTemplateRepository->getTemplateByEntityName($entityName, $organization, $includeSystem);
+        $templates = $emailTemplateRepository
+            ->getTemplateByEntityName($entityName, $organization, (bool)$includeSystem);
 
         return $this->handleView(
             $this->view($templates, Codes::HTTP_OK)
