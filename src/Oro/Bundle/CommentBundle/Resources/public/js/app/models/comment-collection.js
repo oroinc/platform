@@ -10,15 +10,21 @@ define(function (require) {
 
     CommentCollection = LoadMoreCollection.extend({
         model: CommentModel,
-        routeName: 'oro_api_comment_get_items',
-        routeQueryParameters: ['page', 'limit', 'createdAt', 'updatedAt'],
+
+        /**
+         * @inheritDoc
+         */
+        routeDefaults: {
+            routeName: 'oro_api_comment_get_items',
+            routeQueryParameterNames: ['page', 'limit', 'createdAt', 'updatedAt']
+        },
 
         comparator: 'createdAt',
 
         create: function () {
             return new CommentModel({
-                relationId: this.route.get('relationId'),
-                relationClass: this.route.get('relationClass')
+                relationId: this._route.get('relationId'),
+                relationClass: this._route.get('relationClass')
             });
         }
     });

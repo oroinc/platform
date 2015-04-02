@@ -12,7 +12,7 @@ define(function (require) {
      * var route = new RouteModel({
      *     // route specification
      *     routeName: 'oro_api_comment_get_items',
-     *     routeQueryParameters: ['page', 'limit'],
+     *     routeQueryParameterNames: ['page', 'limit'],
      *
      *     // required parameters for route path
      *     relationId: 123,
@@ -47,10 +47,10 @@ define(function (require) {
                 routeName: null,
 
                 /**
-                 * List of acceptable query parameters for this route
+                 * List of acceptable query parameter names for this route
                  * @type {Array.<string>}
                  */
-                routeQueryParameters: []
+                routeQueryParameterNames: []
             };
         },
 
@@ -71,7 +71,7 @@ define(function (require) {
             routeParameters = _.map(variableTokens, function (tokenPart) {
                 return tokenPart[3];
             });
-            routeParameters.push.apply(routeParameters, this.get('routeQueryParameters'));
+            routeParameters.push.apply(routeParameters, this.get('routeQueryParameterNames'));
             return routeParameters;
         },
 

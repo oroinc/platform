@@ -12,10 +12,13 @@ define(['./base/routing-collection'
     var LoadMoreCollection;
 
     /**
-     * Collection with "load more" functionality support
+     * Collection with "load more" functionality support. Any add/remove actions will be considered like already done
+     * on the server and collection will update `state.totalItemsQuantity` and `route.limit`
+     *
+     * Requires API route which accepts `limit` query parameter
      */
     LoadMoreCollection = RoutingCollection.extend(/** @exports LoadMoreCollection.prototype */{
-        routeParams: {
+        routeDefaults: {
             /**
              * Initial quantity of items to load
              * @type {number}
@@ -28,7 +31,20 @@ define(['./base/routing-collection'
              * Quantity of extra items to load on loadMore() call
              * @type {number}
              */
-            loadMoreItemsQuantity: 10
+            loadMoreItemsQuantity: 10,
+
+            /**
+             * Contains quantity of items on server
+             */
+            totalItemsQuantity: 0
+        },
+
+        /**
+         * @inheritDoc
+         */
+        parse: function (response) {
+            this._state.set('totalItemsQuantity', response.count || 0);
+            return LoadMoreCollection.__super__.parse.apply(this, arguments);;
         },
 
         /**
@@ -37,8 +53,8 @@ define(['./base/routing-collection'
          */
         loadMore: function () {
             var loadDeferred;
-            this.route.set({
-                limit: this.route.get('limit') + this.state.get('loadMoreItemsQuantity')
+            this._route.set({
+                limit: this._route.get('limit') + this._state.get('loadMoreItemsQuantity')
             });
             loadDeferred = $.Deferred();
             if (this.isSyncing()) {
@@ -52,20 +68,35 @@ define(['./base/routing-collection'
         },
 
         /**
-         * Getter for totalQuantity
-         * @returns {number}
+         * @inheritDoc
          */
-        getTotalQuantity: function () {
-            return this.state.get('count');
+        _onAdd: function () {
+            // ignore add events during syncing
+            if (this.isSyncing()) {
+                return;
+            }
+            this._route.set({
+                limit: this._route.get('limit') + 1
+            }, {silent: true});
+            this._state.set({
+                totalItemsQuantity: this._state.get('totalItemsQuantity') + 1
+            });
         },
 
         /**
-         * Setter for totalQuantity
-         *
-         * @param value {number}
+         * @inheritDoc
          */
-        setTotalQuantity: function (value) {
-            this.state.set('count', value);
+        _onRemove: function () {
+            // ignore remove events during syncing
+            if (this.isSyncing()) {
+                return;
+            }
+            this._route.set({
+                limit: this._route.get('limit') - 1
+            }, {silent: true});
+            this._state.set({
+                totalItemsQuantity: this._state.get('totalItemsQuantity') - 1
+            });
         }
     });
     

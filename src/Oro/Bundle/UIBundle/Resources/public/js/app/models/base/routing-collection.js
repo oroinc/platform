@@ -47,24 +47,12 @@ define([
     var RoutingCollection;
 
     RoutingCollection = BaseCollection.extend(/** @exports RoutingCollection.prototype */{
-        /**
-         * Route name this collection belongs to
-         * @see RouteModel.routeName
-         * @type {string}
-         */
-        routeName: '',
-
-        /**
-         * List of query parameters which this route accepts.
-         *
-         * @see RouteModel.routeQueryParameters
-         * @type {Array.<string>}
-         */
-        routeQueryParameters: [],
 
         /**
          * Route object which used to generate urls. Collection will reload whenever route is changed.
          * Attributes will be available at the view as <%= route.page %>
+         *
+         * Access to route attributes should be realized in descendants. (e.g. `setPage()` or `setPerPage()`)
          *
          * @protected
          * @type {RouteModel}
@@ -72,12 +60,41 @@ define([
         _route: null,
 
         /**
-         * State model. Contains unparsed part of server response. Attributes will be available at the
-         * view as `<%= state.count %>`
+         * State of the collection. Must contain both settings and server response parts such as totalItemsQuantity of items
+         * on server. Attributes will be available at the view as `<%= state.totalItemsQuantity %>`.
          *
+         * The `stateChange` event is fired when state is changed.
+         *
+         * Override `parse()` function to add values from server response to the state
+         *
+         * @protected
          * @type {BaseModel}
          */
-        state: null,
+        _state: null,
+
+        /**
+         * Default route attributes
+         *
+         * @type {object}
+         */
+        routeDefaults: function () {
+            return {
+                /**
+                 * Route name this collection belongs to
+                 * @see RouteModel.prototype.routeName
+                 * @type {string}
+                 */
+                routeName: '',
+
+                /**
+                 * List of query parameters which this route accepts.
+                 *
+                 * @see RouteModel.prototype.routeQueryParameterNames
+                 * @type {Array.<string>}
+                 */
+                routeQueryParameterNames: []
+            };
+        },
 
         /**
          * Default state
@@ -85,13 +102,6 @@ define([
          * @type {object}
          */
         stateDefaults: {},
-
-        /**
-         * Default route parameters
-         *
-         * @type {object}
-         */
-        routeParams: {},
 
         /**
          * Last url from which data was fetched
@@ -109,41 +119,96 @@ define([
                 options = {};
             }
             this.on('error', this._onErrorResponse, this);
+
             // initialize state
-            this.state = new BaseModel(_.extend({}, options.state, this.stateDefaults));
-            this.state.on('change', _.bind(this.trigger, this, 'stateChange'));
+            this._state = this._createState(options.state);
+            this._state.on('change', _.bind(this.trigger, this, 'stateChange'));
 
             // initialize route
-            this.route = new RouteModel(_.extend(
-                {routeName: this.routeName, routeQueryParameters: this.routeQueryParameters},
-                this.routeParams,
-                options.routeParams,
-                _.pick(options, ['routeName']) // route name cannot be overridden
-            ));
-            this.route.on('change', _.bind(this.trigger, this, 'routeChange'));
-            this.route.on('change', this.checkUrlChange, this);
+            this._route = this._createRoute(options.routeParameters);
+            this._route.on('change', _.bind(this.trigger, this, 'routeChange'));
+            this._route.on('change', this.checkUrlChange, this);
+
+            //listen base events
+            this.on('add', this._onAdd);
+            this.on('remove', this._onRemove);
 
             RoutingCollection.__super__.initialize.apply(this, arguments);
         },
 
         /**
-         * Clean way to pass new parameters to route
+         * Creates state object. Merges attributes from all stateDefaults objects/functions in class hierarchy.
          *
-         * @param newParameters
-         * @param options
+         * @param parameters {Object}
+         * @protected
          */
-        updateRoute: function (newParameters, options) {
-            this.route.set(newParameters, options);
-            if (options && options.silent) {
-                this._lastUrl = this.url();
+        _createState: function (parameters) {
+            return new BaseModel(_.extend(
+                {},
+                this._mergeAllPropertyVersions('stateDefaults'),
+                parameters
+            ));
+        },
+
+        /**
+         * Creates route. Merges attributes from all routeDefaults objects/functions in class hierarchy.
+         *
+         * @param parameters {Object}
+         * @protected
+         */
+        _createRoute: function (parameters) {
+            return new RouteModel(_.extend(
+                {},
+                this._mergeAllPropertyVersions('routeDefaults'),
+                parameters
+            ));
+        },
+
+        /**
+         * Utility function. Extends `Chaplin.utils.getAllPropertyVersions` with merge and `_.result()` like call,
+         * if property is function
+         *
+         * @param attrName {string} attribute to merge
+         * @returns {Object}
+         * @protected
+         */
+        _mergeAllPropertyVersions: function (attrName) {
+            var attrVersion,
+                result = {},
+                attrVersions = Chaplin.utils.getAllPropertyVersions(this, attrName);
+            for (var i = 0; i < attrVersions.length; i++) {
+                attrVersion = attrVersions[i];
+                if (_.isFunction(attrVersion)) {
+                    attrVersion = attrVersion.call(this);
+                }
+                _.extend(result, attrVersion);
             }
+            return result
+        },
+
+        /**
+         * Returns collection state
+         *
+         * @returns {Object}
+         */
+        getRouteParameters: function () {
+            return this._route.serialize();
+        },
+
+        /**
+         * Returns collection state
+         *
+         * @returns {Object}
+         */
+        getState: function () {
+            return this._state.serialize();
         },
 
         /**
          * @inheritDoc
          */
         url: function () {
-            return this.route.getUrl();
+            return this._route.getUrl();
         },
 
         /**
@@ -152,6 +217,7 @@ define([
         sync: function (type, self, options) {
             this.beginSync();
             this._lastUrl = options.url || this.url();
+            this.once('sync error', this.finishSync, this);
             return RoutingCollection.__super__.sync.apply(this, arguments);
         },
 
@@ -159,8 +225,6 @@ define([
          * @inheritDoc
          */
         parse: function (response) {
-            this.finishSync();
-            this.state.set(_.omit(response, ['data']));
             return response.data;
         },
 
@@ -180,8 +244,8 @@ define([
          */
         serializeExtraData: function () {
             return {
-                route: this.route.serialize(),
-                state: this.state.serialize(),
+                route: this._route.serialize(),
+                state: this._state.serialize(),
                 syncState: this.syncState()
             };
         },
@@ -199,6 +263,33 @@ define([
                 // handling of 400 response should be implemented
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
             }
+        },
+
+        /**
+         * General callback for 'add' event
+         *
+         * @protected
+         */
+        _onAdd: function () {
+
+        },
+
+        /**
+         * General callback for 'remove' event
+         *
+         * @protected
+         */
+        _onRemove: function () {
+
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            this._route.dispose();
+            this._state.dispose();
+            RoutingCollection.__super__.dispose.apply(this, arguments);
         }
     });
 

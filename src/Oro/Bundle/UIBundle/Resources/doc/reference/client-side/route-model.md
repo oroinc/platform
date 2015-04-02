@@ -1,11 +1,11 @@
 <a name="module_RouteModel"></a>
 ## RouteModel
-Abstraction of routeBasic usage:```javascriptvar route = new RouteModel({    // route specification    routeName: 'oro_api_comment_get_items',    routeQueryParameters: ['page', 'limit'],    // required parameters for route path    relationId: 123,    relationClass: 'Some_Class'    // default query parameter    limit: 10});// returns api/rest/latest/relation/Some_Class/123/comment?limit=10route.getUrl();// returns api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2route.getUrl({page: 2})```
+Abstraction of routeBasic usage:```javascriptvar route = new RouteModel({    // route specification    routeName: 'oro_api_comment_get_items',    routeQueryParameterNames: ['page', 'limit'],    // required parameters for route path    relationId: 123,    relationClass: 'Some_Class'    // default query parameter    limit: 10});// returns api/rest/latest/relation/Some_Class/123/comment?limit=10route.getUrl();// returns api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2route.getUrl({page: 2})```
 
 
 * [RouteModel](#module_RouteModel)
   * [.routeName](#module_RouteModel#routeName) : <code>string</code>
-  * [.routeQueryParameters](#module_RouteModel#routeQueryParameters) : <code>Array.&lt;string&gt;</code>
+  * [.routeQueryParameterNames](#module_RouteModel#routeQueryParameterNames) : <code>Array.&lt;string&gt;</code>
   * [.getAcceptableParameters()](#module_RouteModel#getAcceptableParameters) ⇒ <code>Array.&lt;string&gt;</code>
   * [.getUrl([options])](#module_RouteModel#getUrl) ⇒ <code>string</code>
 
@@ -14,9 +14,9 @@ Abstraction of routeBasic usage:```javascriptvar route = new RouteModel({  
 Name of the route
 
 **Kind**: instance property of <code>[RouteModel](#module_RouteModel)</code>  
-<a name="module_RouteModel#routeQueryParameters"></a>
-### routeModel.routeQueryParameters : <code>Array.&lt;string&gt;</code>
-List of acceptable query parameters for this route
+<a name="module_RouteModel#routeQueryParameterNames"></a>
+### routeModel.routeQueryParameterNames : <code>Array.&lt;string&gt;</code>
+List of acceptable query parameter names for this route
 
 **Kind**: instance property of <code>[RouteModel](#module_RouteModel)</code>  
 <a name="module_RouteModel#getAcceptableParameters"></a>

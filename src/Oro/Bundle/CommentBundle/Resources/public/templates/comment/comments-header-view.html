@@ -1,21 +1,21 @@
 <h5>
     <%= _.__('oro.comment.entity_plural_label') %>
-    <% if (state.count && state.count !== 0) { %>
-        (<%= state.count %>)
+    <% if (state.totalItemsQuantity !== 0) { %>
+        (<%= state.totalItemsQuantity %>)
     <% } %>
 </h5>
 <% if (syncState === 'synced') { %>
-    <% if (!state.count || state.count == 0) { %>
+    <% if (state.totalItemsQuantity == 0) { %>
         <div class="no-data"><span><%= _.__('oro.comment.noData') %></span></div>
-    <% } else if (state.count !== items.length && state.count !== 0) { %>
+    <% } else if (state.totalItemsQuantity !== items.length && state.totalItemsQuantity !== 0) { %>
     <a class="load-more"><span>
         <%= _.__(
-            state.count - items.length > state.loadMoreItemsQuantity ?
+            state.totalItemsQuantity - items.length > state.loadMoreItemsQuantity ?
                 'oro.comment.loadMoreWithTotals' :
                 'oro.comment.loadMore',
             {
-                count: Math.min(state.loadMoreItemsQuantity, state.count - items.length),
-                total: state.count - items.length
+                count: Math.min(state.loadMoreItemsQuantity, state.totalItemsQuantity - items.length),
+                total: state.totalItemsQuantity - items.length
             }
         ) %>
     </span></a>

@@ -24,7 +24,7 @@ define(function (require) {
             this.collection = new CommentCollection(
                 [],
                 {
-                    routeParams: {
+                    routeParameters: {
                         relationId: this.options.relatedEntityId,
                         relationClass: this.options.relatedEntityClassName
                     }
@@ -93,15 +93,8 @@ define(function (require) {
 
             model.once('sync', function () {
                 dialogWidget.remove();
-                // update collection
+                // add item to collection after it is stored on server
                 this.collection.add(model);
-                this.collection.updateRoute({
-                    limit: this.collection.route.get('limit') + 1
-                }, {silent: true});
-                this.collection.state.set({
-                    count: this.collection.state.get('count') + 1
-                });
-                this.collection.sort();
             }, this);
         },
 
@@ -133,12 +126,6 @@ define(function (require) {
                 model.destroy({error: function () {
                     mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
                 }});
-                this.collection.updateRoute({
-                    limit: this.collection.route.get('limit') - 1
-                }, {silent: true});
-                this.collection.state.set({
-                    count: this.collection.state.get('count') - 1
-                });
             }, this));
 
             confirm.open();
