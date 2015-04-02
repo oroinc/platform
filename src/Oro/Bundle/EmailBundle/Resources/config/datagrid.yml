@@ -9,17 +9,24 @@ datagrid:
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
                 join:
-                    inner:
-                        - { join: e.folders, alias: f }
                     left:
-                        - { join: e.recipients, alias: r_to, conditionType: WITH, condition: r_to.type = 'to' }
-                        - { join: e.recipients, alias: r_cc_bcc, conditionType: WITH, condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc' }
+                        -
+                            join: e.recipients
+                            alias: r_to
+                            conditionType: WITH
+                            condition: r_to.type = 'to'
+                        -
+                            join: e.recipients
+                            alias: r_cc_bcc
+                            conditionType: WITH
+                            condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
+
         columns:
-            contact:
-                  type: twig
-                  label: oro.email.contact.label
-                  frontend_type: html
-                  template: OroEmailBundle:Email:Datagrid/Property/contact.html.twig
+            contacts:
+                type: twig
+                label: oro.email.contact.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/contacts.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
@@ -39,9 +46,8 @@ datagrid:
             id: ~
         sorters:
             columns:
-                subject: { data_name: e.subject }
-                contact: { data_name: contact }
-                sentAt:  { data_name: e.sentAt }
+                subject:  { data_name: e.subject }
+                sentAt:   { data_name: e.sentAt }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email

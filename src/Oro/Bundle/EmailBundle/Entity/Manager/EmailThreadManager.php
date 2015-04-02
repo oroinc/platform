@@ -5,9 +5,9 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
 class EmailThreadManager
@@ -74,6 +74,7 @@ class EmailThreadManager
                     $entityManager->persist($thread);
                     $this->computeChanges($entityManager, $thread);
                     $entity->setThread($thread);
+                    $this->computeChanges($entityManager, $entity);
                 }
                 $this->updateRefs($entityManager, $entity);
                 $this->addEmailToQueue($entity);
@@ -185,12 +186,12 @@ class EmailThreadManager
 
     /**
      * @param EntityManager $entityManager
-     * @param $entity
+     * @param object $entity
      */
     protected function computeChanges(EntityManager $entityManager, $entity)
     {
         $uow = $entityManager->getUnitOfWork();
-        $metaData = $entityManager->getClassMetadata(EmailThread::ENTITY_CLASS);
-        $uow->computeChangeSet($metaData, $entity);
+        $metaData = $entityManager->getClassMetadata(ClassUtils::getClass($entity));
+        $uow->recomputeSingleEntityChangeSet($metaData, $entity);
     }
 }

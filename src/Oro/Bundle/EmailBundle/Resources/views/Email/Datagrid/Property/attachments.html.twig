@@ -1,6 +1,12 @@
-{% set hasAttachments = record.getValue('attachments') %}
+{% set thread = record.getValue('thread') %}
+{% set emailBody = record.getValue('emailBody') %}
+{% if thread is not null  %}
+    {% set hasAttachments = oro_get_email_thread_attachments(thread)|length %}
+{% elseif emailBody is not null %}
+    {% set hasAttachments = emailBody.hasAttachments %}
+{% endif %}
 
-{% if hasAttachments == true %}
+{% if hasAttachments is defined and hasAttachments > 0 %}
     <span class="icon grid">
         <i class="icon-paperclip"></i>
     </span>
