@@ -57,7 +57,7 @@ class EmailThreadProvider
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->in('messageId', explode(' ', $refs)));
+            $criteria->where($criteria->expr()->in('messageId', $refs));
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
         }

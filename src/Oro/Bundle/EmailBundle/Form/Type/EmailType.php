@@ -12,8 +12,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
@@ -26,18 +24,11 @@ class EmailType extends AbstractType
     protected $securityContext;
 
     /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
      * @param SecurityContextInterface $securityContext
-     * @param Registry                 $registry
      */
-    public function __construct(SecurityContextInterface $securityContext, Registry $registry)
+    public function __construct(SecurityContextInterface $securityContext)
     {
         $this->securityContext = $securityContext;
-        $this->doctrine        = $registry;
     }
 
     /**
@@ -116,7 +107,6 @@ class EmailType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'initAttachments']);
     }
 
     /**
@@ -154,38 +144,6 @@ class EmailType extends AbstractType
             ],
             ['choice_list', 'choices']
         );
-    }
-
-    public function initAttachments(FormEvent $event)
-    {
-        $repo = $this->doctrine->getManager()->getRepository('OroEmailBundle:EmailAttachment');
-
-        $model = $event->getData();
-
-        if ($model instanceof Email) {
-            $attachments = $model->getAttachments();
-
-            /** @var EmailAttachment $attachment */
-            foreach ($attachments as $attachment) {
-                if (!$attachment) {
-                    $attachments->removeElement($attachment);
-                } elseif ($attachment->getFile() && !$attachment->getContent()) {
-                    $attachmentContent = new EmailAttachmentContent();
-                    $attachmentContent->setContent(
-                        base64_encode(file_get_contents($attachment->getFile()->getRealPath()))
-                    );
-                    $attachmentContent->setContentTransferEncoding('base64');
-                    $attachmentContent->setEmailAttachment($attachment);
-
-                    $attachment->setContent($attachmentContent);
-                    $attachment->setContentType($attachment->getFile()->getMimeType());
-                    $attachment->setFileName($attachment->getFile()->getClientOriginalName());
-                } elseif ($attachment->getId()) {
-                    $a = $repo->find($attachment->getId());
-                    $attachments->set($attachments->indexOf($attachment), $a);
-                }
-            }
-        }
     }
 
     /**
