@@ -144,6 +144,8 @@ class EmailModelBuilder
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
+        // link attachments of forwarded email to current email instance
+        $this->applyAttachments($emailModel, $parentEmailEntity);
 
         return $this->createEmailModel($emailModel);
     }
@@ -272,6 +274,23 @@ class EmailModelBuilder
         $signature = $this->configManager->get('oro_email.signature');
         if ($signature) {
             $emailModel->setSignature($signature);
+        }
+    }
+
+    /**
+     * @param EmailModel  $emailModel
+     * @param EmailEntity $emailEntity
+     */
+    protected function applyAttachments(EmailModel $emailModel, EmailEntity $emailEntity)
+    {
+        try {
+            $this->helper->ensureEmailBodyCached($emailEntity);
+
+            foreach ($emailEntity->getEmailBody()->getAttachments() as $attachment) {
+                $emailModel->addAttachment($attachment);
+            }
+        } catch (\Exception $e) {
+            // maybe show notice to a user that attachments could not be loaded
         }
     }
 }
