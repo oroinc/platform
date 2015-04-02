@@ -24,6 +24,35 @@
     {{ form_row(form) }}
 {% endblock %}
 
+{% block oro_email_attachments_row %}
+    <script type="text/template" id="email-attachment-item">
+        <div class="attachment-item" style="border: none" data-cid="<%= entity.cid %>">
+            <span data-id="<%= entity.get('id') %>" class="filename">
+                <span class="filename-label"><%= entity.get('fileName') %></span>
+                <i class="icon-remove"></i>
+            </span>
+            <input name="<%= inputName %>[<%= entity.cid %>][id]" type="text" value="<%= entity.get('id') %>"/>
+            <input name="<%= inputName %>[<%= entity.cid %>][file]" type="file"/>
+        </div>
+    </script>
+
+    {% set itemsArray = [] %}
+    {% for item in options.items %}
+        {% set itemArray = {
+            'id': item.id,
+            'fileName': item.fileName
+        } %}
+        {% set itemsArray = itemsArray|merge([itemArray]) %}
+    {% endfor %}
+
+    {% set options = options|merge({container: id, inputName: full_name, items: itemsArray}) %}
+
+    <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
+         data-page-component-options="{{ options|json_encode }}">
+        {{ form_row(form) }}
+    </div>
+{% endblock %}
+
 {% block oro_email_emailtemplate_translatation_widget %}
     <div class="emailtemplate-translatation oro-tabs tabbable">
         <ul class="nav nav-tabs">

@@ -4,7 +4,9 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -102,6 +104,8 @@ class Processor
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
+        $this->addAttachments($message, $model);
+
         $messageId = '<' . $message->generateId() . '>';
 
         if (!$this->mailer->send($message)) {
@@ -133,6 +137,7 @@ class Processor
 
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
+        $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
         if ($model->hasEntity()) {
@@ -146,6 +151,48 @@ class Processor
         $this->getEntityManager()->flush();
 
         return $email;
+    }
+
+    /**
+     * @param \Swift_Message $message
+     * @param EmailModel     $model
+     */
+    protected function addAttachments(\Swift_Message $message, EmailModel $model)
+    {
+        /** @var EmailAttachment $attachment */
+        foreach ($model->getAttachments() as $attachment) {
+            $swiftAttachment = new \Swift_Attachment(
+                ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                ),
+                $attachment->getFileName(),
+                $attachment->getContentType()
+            );
+            $message->attach($swiftAttachment);
+        }
+    }
+
+    /**
+     * @param EmailModel $model
+     * @param Email      $email
+     */
+    protected function persistAttachments(EmailModel $model, Email $email)
+    {
+        /** @var EmailAttachment $attachment */
+        foreach ($model->getAttachments() as $attachment) {
+            if (!$attachment->getId()) {
+                $this->getEntityManager()->persist($attachment);
+            } else {
+                $attachmentContent = clone $attachment->getContent();
+                $attachment = clone $attachment;
+                $attachment->setContent($attachmentContent);
+                $this->getEntityManager()->persist($attachment);
+            }
+
+            $email->getEmailBody()->addAttachment($attachment);
+            $attachment->setEmailBody($email->getEmailBody());
+        }
     }
 
     /**

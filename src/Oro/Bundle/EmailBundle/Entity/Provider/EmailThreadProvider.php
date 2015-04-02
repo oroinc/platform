@@ -57,7 +57,7 @@ class EmailThreadProvider
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->in('messageId', explode(' ', $refs)));
+            $criteria->where($criteria->expr()->in('messageId', $refs));
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
         }
@@ -113,6 +113,10 @@ class EmailThreadProvider
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
+            // todo temporary workaround
+            if (!$result) {
+                $result = [$entity];
+            }
         } else {
             $result = [$entity];
         }

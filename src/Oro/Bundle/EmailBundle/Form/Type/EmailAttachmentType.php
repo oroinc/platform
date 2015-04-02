@@ -1,0 +1,89 @@
+<?php
+
+namespace Oro\Bundle\EmailBundle\Form\Type;
+
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Oro\Bundle\FormBundle\Form\Exception\FormException;
+
+class EmailAttachmentType extends AbstractType
+{
+    /**
+     * @var ObjectManager
+     */
+    protected $em;
+
+    /**
+     * @param ObjectManager $objectManager
+     */
+    public function __construct(ObjectManager $objectManager)
+    {
+        $this->em = $objectManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+        return 'oro_email_attachment';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults([
+            'data_class'         => 'Oro\Bundle\EmailBundle\Entity\EmailAttachment',
+            'intention'          => 'email_attachment',
+        ]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add('id', 'text', ['mapped' => false]);
+        $builder->add('file', 'file');
+
+        $builder->addEventListener(FormEvents::SUBMIT, [$this, 'initAttachmentEntity']);
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function initAttachmentEntity(FormEvent $event)
+    {
+        /** @var EmailAttachment $attachment */
+        $attachment = $event->getData();
+
+        if ($attachment instanceof EmailAttachment && $attachment->getFile()) {
+            $attachmentContent = new EmailAttachmentContent();
+            $attachmentContent->setContent(
+                base64_encode(file_get_contents($attachment->getFile()->getRealPath()))
+            );
+            $attachmentContent->setContentTransferEncoding('base64');
+            $attachmentContent->setEmailAttachment($attachment);
+
+            $attachment->setContent($attachmentContent);
+            $attachment->setContentType($attachment->getFile()->getMimeType());
+            $attachment->setFileName($attachment->getFile()->getClientOriginalName());
+        } elseif ($id = $event->getForm()->get('id')->getData()) {
+            $repo = $this->em->getRepository('OroEmailBundle:EmailAttachment');
+            $attachment = $repo->find($id);
+        }
+
+        $event->setData($attachment);
+    }
+}

@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
@@ -71,6 +75,11 @@ class EmailAttachment
      * @ORM\OneToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
      * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @JMS\Exclude
+     */
+    protected $file;
+
+    /**
+     * @var UploadedFile
      */
     protected $file;
 
@@ -210,5 +219,33 @@ class EmailAttachment
     public function getExtension()
     {
         return pathinfo($this->fileName, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return UploadedFile
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param UploadedFile $file
+     *
+     * @return $this
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
+     * Clone record as new one
+     */
+    public function __clone()
+    {
+        $this->id = null;
     }
 }
