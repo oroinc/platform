@@ -96,6 +96,7 @@ class EmailType extends AbstractType
                 'type' => 'oro_email_attachment',
                 'required' => false,
                 'allow_add' => true,
+                'prototype' => false,
                 'options' => [
                     'required' => false,
                 ],

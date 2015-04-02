@@ -10,8 +10,12 @@ define(function (require) {
     EmailAttachmentView = BaseView.extend({
         initialize: function(options) {
             this.options = options;
+
             this.template = _.template($('#email-attachment-item').html());
             this.inputName = options.inputName;
+            this.$container = options.$container;
+
+            this.$container.html('');
 
             this.collection = new EmailAttachmentCollection();
             this.initEvents();
@@ -27,7 +31,9 @@ define(function (require) {
 
         render: function() {
             if (this.collection.models.length == 0) {
-                this.$el.append($('<i class="no-attachments">No attachments</i>')); // todo translate
+                this.$el.hide();
+            } else {
+                this.$el.show();
             }
         },
 
@@ -35,14 +41,12 @@ define(function (require) {
             var self = this;
 
             this.collection.on('add', function(model) {
-                self.$el.find('i.no-attachments').remove();
-
                 var view = self.template({
                     entity: model,
                     inputName: self.inputName
                 });
                 var $view = $(view);
-                self.$el.append($view);
+                self.$container.append($view);
                 $view.find('i.icon-remove').click(function() {
                     self.collection.remove(model.cid);
                 });
@@ -56,7 +60,7 @@ define(function (require) {
 
                         if (value) {
                             model.set('fileName', value);
-                            $view.find('span.label').html(value);
+                            $view.find('span.filename span.filename-label').html(value);
                             $view.show();
 
                             self.render();
@@ -70,7 +74,7 @@ define(function (require) {
             });
 
             this.collection.on('remove', function(model) {
-                var $view = self.$el.find('[data-cid="' + model.cid + '"]');
+                var $view = self.$container.find('[data-cid="' + model.cid + '"]');
                 $view.remove();
                 self.render();
             });

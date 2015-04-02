@@ -151,14 +151,16 @@
     display: inline-block;
     float: left;
     position: relative;
-    margin-right: 4px;
+    margin-right: 8px;
 }
-.attachment-item span.label {
-    padding: 2px 4px;
-    margin: 0 0 0 4px;
+.attachment-item span.filename {
+    padding: 2px 5px;
+    color: #006acc;
+    background-color: #F2F2F2;
 }
 .attachment-item i.icon-remove {
     cursor: pointer;
+    opacity: 0.2;
 }
 .attachment-item input {
     opacity: 0;
@@ -174,4 +176,7 @@
 }
 a.attachment .icon .icon-link {
     color: #999;
+}
+.control-group .email-body-action {
+    margin-right: 15px;
 }
