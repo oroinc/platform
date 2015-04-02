@@ -31,8 +31,17 @@ define(function (require) {
                 }
             );
 
+            this.formTemplate = options.listTemplate + '-form';
+
+            this._deferredInit();
+
+            this.collection.fetch();
+            this.collection.once('sync', this.onCollectionSynced, this);
+        },
+
+        onCollectionSynced: function () {
             this.commentsView = new CommentsView({
-                el: options._sourceElement,
+                el: this.options._sourceElement,
                 collection: this.collection,
                 autoRender: true,
                 canCreate: Boolean(this.options.canCreate)
@@ -42,12 +51,7 @@ define(function (require) {
             this.commentsView.on('toAdd', this.onCommentAdd, this);
             this.commentsView.on('loadMore', this.onLoadMore, this);
 
-            this.formTemplate = options.listTemplate + '-form';
-
-            this._deferredInit();
-
-            this.collection.fetch();
-            this.collection.once('sync', this._resolveDeferredInit, this);
+            this._resolveDeferredInit();
         },
 
         createDialog: function (title, model) {
