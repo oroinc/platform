@@ -99,5 +99,3 @@ services:
 
     oro_dashboard.datetime.hepler:
         class: %oro_dashboard.datetime.hepler.class%
-        arguments:
-            - @oro_locale.formatter.date_time

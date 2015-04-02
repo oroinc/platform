@@ -3,23 +3,11 @@
 namespace Oro\Bundle\DashboardBundle\Helper;
 
 use \DateTime;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
+use Doctrine\ORM\QueryBuilder;
 
 class DateHelper
 {
-    /** @var DateTimeFormatter */
-    protected $dateTimeFormatter;
-
-    /**
-     * @param DateTimeFormatter $dateTimeFormatter
-     */
-    public function __construct(DateTimeFormatter $dateTimeFormatter)
-    {
-        $this->dateTimeFormatter = $dateTimeFormatter;
-    }
-
     /**
      * @param DateTime $start
      * @param DateTime $end
@@ -74,7 +62,7 @@ class DateHelper
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('weekCreated');
                 break;
-            case 'date':
+            case 'day':
                 $qb->addSelect(sprintf('YEAR(%s) as yearCreated', $entityField));
                 $qb->addSelect(sprintf('MONTH(%s) as monthCreated', $entityField));
                 $qb->addSelect(sprintf('DAY(%s) as dayCreated', $entityField));
@@ -108,7 +96,7 @@ class DateHelper
             case 'year':
                 return $row['yearCreated'];
                 break;
-            case 'date':
+            case 'day':
                 $time = strtotime(sprintf('%s-%s-%s', $row['yearCreated'], $row['monthCreated'], $row['dayCreated']));
                 break;
             case 'week':
@@ -152,8 +140,8 @@ class DateHelper
         } elseif ($diff->days > 2) {
             $intervalString = 'P1D';
             $valueStringFormat = 'Y-m-d';
-            $chartType = 'date';
-            $viewType = 'date';
+            $chartType = 'day';
+            $viewType = 'day';
         } else {
             $intervalString = 'PT1H';
             $valueStringFormat = 'Y-m-d-H';
@@ -190,10 +178,9 @@ class DateHelper
                 }
                 $wDate = new \DateTime();
                 $wDate->setISODate($date->format('Y'), $date->format('W'));
-
                 return $wDate->format('Y-m-d');
                 break;
-            case 'date':
+            case 'day':
                 return $date->format('Y-m-d');
                 break;
             case 'hour':

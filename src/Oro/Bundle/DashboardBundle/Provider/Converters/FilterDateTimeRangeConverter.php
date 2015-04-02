@@ -16,6 +16,10 @@ class FilterDateTimeRangeConverter implements ConfigValueConverter
     /** @var Compiler */
     protected $dateCompiler;
 
+    /**
+     * @param DateTimeFormatter $formatter
+     * @param Compiler          $dateCompiler
+     */
     public function __construct(DateTimeFormatter $formatter, Compiler $dateCompiler)
     {
         $this->formatter = $formatter;
