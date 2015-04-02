@@ -63,3 +63,4 @@ oro:
             week.label: Week
             day.label: Day
             hour.label: Hour
+        date_range.label: Date range
