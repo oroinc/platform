@@ -110,7 +110,7 @@ oro_entity:
             eventDate:
                 query:
                     select:
-                        expr: trackingEvent.eventData
+                        expr: trackingEvent.loggedAt
                         return_type: datetime
                     join:
                         left:
