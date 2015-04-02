@@ -8,8 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -81,7 +79,7 @@ class EmailAttachment
     /**
      * @var UploadedFile
      */
-    protected $file;
+    protected $uploadedFile;
 
     /**
      * Get id
@@ -224,9 +222,9 @@ class EmailAttachment
     /**
      * @return UploadedFile
      */
-    public function getFile()
+    public function getUploadedFile()
     {
-        return $this->file;
+        return $this->uploadedFile;
     }
 
     /**
@@ -234,9 +232,9 @@ class EmailAttachment
      *
      * @return $this
      */
-    public function setFile($file)
+    public function setUploadedFile($file)
     {
-        $this->file = $file;
+        $this->uploadedFile = $file;
 
         return $this;
     }

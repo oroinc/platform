@@ -55,7 +55,7 @@ class EmailAttachmentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('id', 'text', ['mapped' => false]);
-        $builder->add('file', 'file');
+        $builder->add('uploaded_file', 'file');
 
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'initAttachmentEntity']);
     }
@@ -68,17 +68,17 @@ class EmailAttachmentType extends AbstractType
         /** @var EmailAttachment $attachment */
         $attachment = $event->getData();
 
-        if ($attachment instanceof EmailAttachment && $attachment->getFile()) {
+        if ($attachment instanceof EmailAttachment && $attachment->getUploadedFile()) {
             $attachmentContent = new EmailAttachmentContent();
             $attachmentContent->setContent(
-                base64_encode(file_get_contents($attachment->getFile()->getRealPath()))
+                base64_encode(file_get_contents($attachment->getUploadedFile()->getRealPath()))
             );
             $attachmentContent->setContentTransferEncoding('base64');
             $attachmentContent->setEmailAttachment($attachment);
 
             $attachment->setContent($attachmentContent);
-            $attachment->setContentType($attachment->getFile()->getMimeType());
-            $attachment->setFileName($attachment->getFile()->getClientOriginalName());
+            $attachment->setContentType($attachment->getUploadedFile()->getMimeType());
+            $attachment->setFileName($attachment->getUploadedFile()->getClientOriginalName());
         } elseif ($id = $event->getForm()->get('id')->getData()) {
             $repo = $this->em->getRepository('OroEmailBundle:EmailAttachment');
             $attachment = $repo->find($id);
