@@ -28,8 +28,12 @@ class DateHelper
     public function getDatePeriod(DateTime $start, DateTime $end)
     {
         $config = self::getFormatStrings($start, $end);
-
-        $datePeriod = new \DatePeriod($start, new \DateInterval($config['intervalString']), $end);
+        $interval = new \DateInterval($config['intervalString']);
+        $incrementedEnd = clone $end;
+        // we should add 1 interval to the end date, because Date Period
+        // iterator deletes last item if the end is DateTime object
+        $incrementedEnd->add($interval);
+        $datePeriod = new \DatePeriod($start, $interval, $incrementedEnd);
         $increment = 0;
         $dates = [];
         // create dates by date period
@@ -154,7 +158,7 @@ class DateHelper
             $intervalString = 'PT1H';
             $valueStringFormat = 'Y-m-d-H';
             $chartType = 'hour';
-            $viewType = 'string';
+            $viewType = 'time';
         }
 
         return [
@@ -193,10 +197,7 @@ class DateHelper
                 return $date->format('Y-m-d');
                 break;
             case 'hour':
-                if ($increment === 0 || $date->format('H') === '00') {
-                    return $this->dateTimeFormatter->formatDate($date);
-                };
-                return $this->dateTimeFormatter->formatTime($date);
+                return $date->format('c');
         }
     }
 }

@@ -40,6 +40,10 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                         return numberFormatter.formatCurrency(data);
                     case 'percent':
                         return numberFormatter.formatPercent(data);
+                    case 'time':
+                        var date = new Date();
+                        date.setTime(data);
+                        return dateTimeFormatter.getMomentForBackendDateTime(date).format(dateTimeFormatter.getTimeFormat());
                     default:
                         return null;
                 }
@@ -72,6 +76,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                     case 'month':
                         return Date.parse(data); //add convert to date
                     case 'datetime':
+                    case 'time':
                         var date = dateTimeFormatter.unformatBackendDateTime(data);
                         return date.getTime();
                     default:
