@@ -45,7 +45,7 @@ define(function (require) {
             this.$el.hide();
 
             $fileInput.change(function() {
-                var value = self.formatFileName($fileInput.val());
+                var value = $fileInput.val().replace(/^.*[\\\/]/, '');
 
                 if (value) {
                     self.model.set('fileName', value);
@@ -59,15 +59,6 @@ define(function (require) {
 
         fileNameChange: function() {
             this.$el.find('span.filename-label').html(this.model.get('fileName'));
-        },
-
-        formatFileName: function(fileName) {
-            var value = fileName.replace(/^.*[\\\/]/, '');
-            if (value.length > 15) {
-                value = value.substr(0, 7) + '..' + value.substr(value.length - 10);
-            }
-
-            return value;
         }
     });
 
