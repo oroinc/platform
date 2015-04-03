@@ -139,8 +139,6 @@ class EmailModelBuilder
     {
         $emailModel = new EmailModel();
 
-        $emailModel->setParentEmailId($parentEmailEntity->getId());
-
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
         $emailModel->setBodyFooter($body);

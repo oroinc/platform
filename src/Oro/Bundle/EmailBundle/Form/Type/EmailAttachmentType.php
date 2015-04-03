@@ -82,6 +82,7 @@ class EmailAttachmentType extends AbstractType
         } elseif ($id = $event->getForm()->get('id')->getData()) {
             $repo = $this->em->getRepository('OroEmailBundle:EmailAttachment');
             $attachment = $repo->find($id);
+            $attachment->setFile();
         }
 
         $event->setData($attachment);
