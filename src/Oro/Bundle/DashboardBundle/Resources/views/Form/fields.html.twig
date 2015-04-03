@@ -13,10 +13,20 @@
                     var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(constant('JSON_UNESCAPED_SLASHES'))|raw }}');
                     var DatetimeFilterWithMeta = WidgetConfigDatetimeRangeFilter.extend(metadata);
                     var dateRangeFilter = new DatetimeFilterWithMeta();
-                    var value = {
+
+                    var valueConfig = {};
+                    {% if form.vars.value.value == null %}
+                        valueConfig = {start: '', end: ''};
+                    {% else %}
+                        valueConfig = JSON.parse('{{ form.vars.value.value|json_encode|raw }}');
+                    {% endif %}
+
+                    valueConfig.startEndPrefix = '{{ form.vars.full_name }}';
+
+                    value = {
                         part: 'source',
                         type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
-                        value: {% if form.vars.value.value == null %} {start: '', end: ''} {% else %} JSON.parse('{{ form.vars.value.value|json_encode|raw }}') {% endif %}
+                        value: valueConfig
                     };
                     dateRangeFilter.setValue(value);
                     dateRangeFilter.render();
