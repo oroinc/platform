@@ -1,0 +1,31 @@
+{% extends 'OroUIBundle:Form:fields.html.twig' %}
+
+{% block oro_type_widget_date_range_widget %}
+    <div class="date-range-filter filter-criteria date-range-filter-{{ form.vars.name }}">
+        <!-- datetime range filter placeholder -->
+        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="source"/>
+    </div>
+    <script type="text/javascript">
+        require(
+            ['jquery', 'underscore', 'orodashboard/js/widget/datetime-range'],
+            function ($, _, WidgetConfigDatetimeRangeFilter) {
+                $(function () {
+                    var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(constant('JSON_UNESCAPED_SLASHES'))|raw }}');
+                    var DatetimeFilterWithMeta = WidgetConfigDatetimeRangeFilter.extend(metadata);
+                    var dateRangeFilter = new DatetimeFilterWithMeta();
+                    var value = {
+                        part: 'source',
+                        type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
+                        value: {% if form.vars.value.value == null %} {start: '', end: ''} {% else %} JSON.parse('{{ form.vars.value.value|json_encode|raw }}') {% endif %}
+                    };
+                    dateRangeFilter.setValue(value);
+
+                    dateRangeFilter.render();
+
+                    $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
+                    $('div.widget-configuration').parent().css('overflow', 'inherit');
+                });
+            }
+        );
+    </script>
+{% endblock oro_type_widget_date_range_widget %}
