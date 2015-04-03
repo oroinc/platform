@@ -165,11 +165,12 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getAttachmentFullPath', 'getNewAttachment'])
             ->setConstructorArgs(
                 [
-                $filesystemMap,
-                $this->em,
-                $this->kernel,
-                $this->securityFacadeLink,
-                $this->activityListProvider
+                    $filesystemMap,
+                    $this->em,
+                    $this->kernel,
+                    $this->securityFacadeLink,
+                    $this->activityListProvider,
+                    $this->configFileValidator
                 ]
             )
             ->getMock();

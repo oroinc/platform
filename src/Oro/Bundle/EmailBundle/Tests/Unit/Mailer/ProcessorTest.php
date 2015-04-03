@@ -41,6 +41,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $emailActivityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $dispatcher;
+
     /** @var Processor */
     protected $emailProcessor;
 
@@ -61,6 +64,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->emailActivityManager =
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager')
                 ->disableOriginalConstructor()
@@ -77,7 +83,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             new EmailAddressHelper(),
             $this->emailEntityBuilder,
             $this->emailOwnerProvider,
-            $this->emailActivityManager
+            $this->emailActivityManager,
+            $this->dispatcher
         );
     }
 
@@ -454,7 +461,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                         new EmailAddressHelper(),
                         $this->emailEntityBuilder,
                         $this->emailOwnerProvider,
-                        $this->emailActivityManager
+                        $this->emailActivityManager,
+                        $this->dispatcher
                     ]
                 )
                 ->setMethods(['createUserInternalOrigin'])
