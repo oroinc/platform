@@ -69,6 +69,9 @@ class ConnectorContextMediator
      */
     public function getInitializedTransport(Integration $integration, $markReadOnly = false)
     {
+        // TODO: Find a way to transfer data between connectors (https://magecore.atlassian.net/browse/BAP-7984)
+        // We reuse data stored in transport object for different connectors (e.g. $serverTime).
+        // We need a more robust way of sharing data in case if we want to use different transports for connectors
         if (!empty($this->transportByIntegration[$integration->getId()])) {
             return $this->transportByIntegration[$integration->getId()];
         }
