@@ -8,6 +8,11 @@ use Doctrine\ORM\QueryBuilder;
 
 class DateHelper
 {
+    const YEAR_TYPE_DAYS  = 1460;
+    const MONTH_TYPE_DAYS = 93;
+    const WEEK_TYPE_DAYS  = 60;
+    const DAY_TYPE_DAYS   = 2;
+
     /**
      * @param DateTime $start
      * @param DateTime $end
@@ -15,19 +20,19 @@ class DateHelper
      */
     public function getDatePeriod(DateTime $start, DateTime $end)
     {
-        $config = self::getFormatStrings($start, $end);
-        $interval = new \DateInterval($config['intervalString']);
+        $config         = self::getFormatStrings($start, $end);
+        $interval       = new \DateInterval($config['intervalString']);
         $incrementedEnd = clone $end;
         // we should add 1 interval to the end date, because Date Period
         // iterator deletes last item if the end is DateTime object
         $incrementedEnd->add($interval);
         $datePeriod = new \DatePeriod($start, $interval, $incrementedEnd);
-        $increment = 0;
-        $dates = [];
+        $increment  = 0;
+        $dates      = [];
         // create dates by date period
         /** @var \DateTime $dt */
         foreach ($datePeriod as $dt) {
-            $key = $dt->format($config['valueStringFormat']);
+            $key         = $dt->format($config['valueStringFormat']);
             $dates[$key] = [
                 'date' => $this->getFormattedLabel($config, $dt, $increment),
             ];
@@ -45,7 +50,7 @@ class DateHelper
      */
     public function addDatePartsSelect(DateTime $start, DateTime $end, QueryBuilder $qb, $entityField)
     {
-        switch ($this->getFormatStrings($start, $end)['chartType']) {
+        switch ($this->getFormatStrings($start, $end)['viewType']) {
             case 'year':
                 $qb->addSelect(sprintf('YEAR(%s) as yearCreated', $entityField));
                 $qb->addGroupBy('yearCreated');
@@ -56,7 +61,7 @@ class DateHelper
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
                 break;
-            case 'week':
+            case 'date':
                 $qb->addSelect(sprintf('YEAR(%s) as yearCreated', $entityField));
                 $qb->addSelect(sprintf('WEEK(%s) as weekCreated', $entityField));
                 $qb->addGroupBy('yearCreated');
@@ -70,7 +75,7 @@ class DateHelper
                 $qb->addGroupBy('monthCreated');
                 $qb->addGroupBy('dayCreated');
                 break;
-            case 'hour':
+            case 'time':
                 $qb->addSelect(sprintf('DATE(%s) as dateCreated', $entityField));
                 $qb->addSelect(sprintf('HOUR(%s) as hourCreated', $entityField));
                 $qb->addGroupBy('dateCreated');
@@ -87,9 +92,9 @@ class DateHelper
      */
     public function getKey(DateTime $start, DateTime $end, $row)
     {
-        $config = $this->getFormatStrings($start, $end);
 
-        switch ($config['chartType']) {
+        $config = $this->getFormatStrings($start, $end);
+        switch ($config['viewType']) {
             case 'month':
                 $time = strtotime(sprintf('%s-%s', $row['yearCreated'], $row['monthCreated']));
                 break;
@@ -99,12 +104,12 @@ class DateHelper
             case 'day':
                 $time = strtotime(sprintf('%s-%s-%s', $row['yearCreated'], $row['monthCreated'], $row['dayCreated']));
                 break;
-            case 'week':
+            case 'date':
                 $week = $row['weekCreated'] < 10 ? '0' . $row['weekCreated'] : $row['weekCreated'];
                 return $row['yearCreated'] . '-' . $week;
                 break;
-            case 'hour':
-                return $row['dateCreated'] . '-' .$row['hourCreated'];
+            case 'time':
+                return $row['dateCreated'] . '-' . $row['hourCreated'];
         }
 
         return date(
@@ -122,38 +127,32 @@ class DateHelper
     {
         $diff = $end->diff($start);
 
-        if ($diff->days >= 1460) { // 4 years
-            $intervalString = 'P1Y';
+        if ($diff->days >= self::YEAR_TYPE_DAYS) { // 4 years
+            $intervalString    = 'P1Y';
             $valueStringFormat = 'Y';
-            $chartType = 'year';
-            $viewType = 'year';
-        } elseif ($diff->days > 93) {
-            $intervalString = 'P1M';
+            $viewType          = 'year';
+        } elseif ($diff->days > self::MONTH_TYPE_DAYS) {
+            $intervalString    = 'P1M';
             $valueStringFormat = 'Y-m';
-            $chartType = 'month';
-            $viewType = 'month';
-        } elseif ($diff->days > 60) {
-            $intervalString = 'P1W';
+            $viewType          = 'month';
+        } elseif ($diff->days > self::WEEK_TYPE_DAYS) {
+            $intervalString    = 'P1W';
             $valueStringFormat = 'Y-W';
-            $chartType = 'week';
-            $viewType = 'date';
-        } elseif ($diff->days > 2) {
-            $intervalString = 'P1D';
+            $viewType          = 'date';
+        } elseif ($diff->days > self::DAY_TYPE_DAYS) {
+            $intervalString    = 'P1D';
             $valueStringFormat = 'Y-m-d';
-            $chartType = 'day';
-            $viewType = 'day';
+            $viewType          = 'day';
         } else {
-            $intervalString = 'PT1H';
+            $intervalString    = 'PT1H';
             $valueStringFormat = 'Y-m-d-H';
-            $chartType = 'hour';
-            $viewType = 'time';
+            $viewType          = 'time';
         }
 
         return [
-            'intervalString' => $intervalString,
+            'intervalString'    => $intervalString,
             'valueStringFormat' => $valueStringFormat,
-            'chartType' => $chartType,
-            'viewType' => $viewType
+            'viewType'          => $viewType
         ];
     }
 
@@ -165,14 +164,14 @@ class DateHelper
      */
     protected function getFormattedLabel($config, DateTime $date, $increment)
     {
-        switch ($config['chartType']) {
+        switch ($config['viewType']) {
             case 'year':
                 return $date->format('Y');
                 break;
             case 'month':
                 return $date->format('Y-m-01');
                 break;
-            case 'week':
+            case 'date':
                 if ($increment === 0) {
                     return $date->format('Y-m-d');
                 }
@@ -183,7 +182,7 @@ class DateHelper
             case 'day':
                 return $date->format('Y-m-d');
                 break;
-            case 'hour':
+            case 'time':
                 return $date->format('c');
         }
     }

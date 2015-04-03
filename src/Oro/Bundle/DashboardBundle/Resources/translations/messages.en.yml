@@ -60,7 +60,7 @@ oro:
         chart:
             year.label: Year
             month.label: Month
-            week.label: Week
+            date.label: Week
             day.label: Day
-            hour.label: Hour
+            time.label: Hour
         date_range.label: Date range
