@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
-use Oro\Bundle\EmailBundle\Event\EmailBodySyncAfter;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 
 class EmailCacheManager implements LoggerAwareInterface
 {
@@ -86,7 +86,7 @@ class EmailCacheManager implements LoggerAwareInterface
         $this->em->persist($email);
         $this->em->flush();
 
-        $event = new EmailBodySyncAfter($email);
-        $this->eventDispatcher->dispatch(EmailBodySyncAfter::NAME, $event);
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
     }
 }

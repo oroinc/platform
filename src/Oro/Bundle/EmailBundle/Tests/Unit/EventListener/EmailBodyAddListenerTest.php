@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Event\EmailBodySyncAfter;
-use Oro\Bundle\EmailBundle\EventListener\EmailBodySyncListener;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 
-class EmailBodySyncListenerTest extends \PHPUnit_Framework_TestCase
+class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var EmailBodySyncListener */
     protected $listener;
@@ -24,7 +24,7 @@ class EmailBodySyncListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->emailAttachmentManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager')
             ->disableOriginalConstructor()->getMock();
-        $this->listener = new EmailBodySyncListener($this->emailAttachmentManager, $this->configManager);
+        $this->listener = new EmailBodyAddListener($this->emailAttachmentManager, $this->configManager);
     }
 
     /**
@@ -34,7 +34,7 @@ class EmailBodySyncListenerTest extends \PHPUnit_Framework_TestCase
     {
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()->getMock();
-        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodySyncAfter')
+        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
             ->disableOriginalConstructor()->getMock();
 
         $this->configManager
