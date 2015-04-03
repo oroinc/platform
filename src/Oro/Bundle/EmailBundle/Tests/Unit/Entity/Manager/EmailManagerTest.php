@@ -52,8 +52,6 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $email->expects($this->once())
             ->method('setSeen')
             ->with(true);
-        $this->emailThreadManager->expects($this->once())
-            ->method('addEmailToQueue');
         $this->em->expects($this->once())
             ->method('persist');
         $this->em->expects($this->once())
