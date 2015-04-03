@@ -19,13 +19,13 @@
                         value: {% if form.vars.value.value == null %} {start: '', end: ''} {% else %} JSON.parse('{{ form.vars.value.value|json_encode|raw }}') {% endif %}
                     };
                     dateRangeFilter.setValue(value);
-
                     dateRangeFilter.render();
+                    dateRangeFilter._formatRawValue(value);
 
                     $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
                     $('div.widget-configuration').parent().css('overflow', 'inherit');
                 });
             }
-        );
+        )
     </script>
 {% endblock oro_type_widget_date_range_widget %}
