@@ -7,63 +7,68 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
+        mediator = require('oroui/js/mediator'),
         BaseComponent = require('oroui/js/app/components/base/component'),
         CommentFromView = require('orocomment/js/app/views/comment-form-view'),
-        CommentListView = require('orocomment/js/app/views/comment-list-view'),
+        CommentsView = require('orocomment/js/app/views/comments-view'),
         CommentCollection = require('orocomment/js/app/models/comment-collection'),
         LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
-        DialogWidget = require('oro/dialog-widget');
+        DialogWidget = require('oro/dialog-widget'),
+        DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     CommentComponent = BaseComponent.extend({
-        listen: {
-            'toEdit collection': 'onCommentEdit',
-            'toAdd collection': 'onCommentAdd'
-        },
 
         initialize: function (options) {
-            var collectionOptions;
-
             this.options = options || {};
-            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName', 'canCreate']);
 
-            this.collection = new CommentCollection([], collectionOptions);
-
-            this.listView = new CommentListView({
-                el: options._sourceElement,
-                collection: this.collection,
-                template: options.listTemplate,
-                canCreate: this.options.canCreate
-            });
+            this.collection = new CommentCollection(
+                [],
+                {
+                    routeParameters: {
+                        relationId: this.options.relatedEntityId,
+                        relationClass: this.options.relatedEntityClassName
+                    }
+                }
+            );
 
             this.formTemplate = options.listTemplate + '-form';
 
+            this._deferredInit();
+
             this.collection.fetch();
+            this.collection.once('sync', this.onCollectionSynced, this);
         },
 
-        onCommentAdd: function () {
-            var dialogWidget, loadingMaskView, model;
-            if (!this.options.canCreate) {
-                return;
-            }
+        onCollectionSynced: function () {
+            this.commentsView = new CommentsView({
+                el: this.options._sourceElement,
+                collection: this.collection,
+                autoRender: true,
+                canCreate: Boolean(this.options.canCreate)
+            });
 
-            model = new this.collection.model();
+            this.listenTo(this.commentsView, 'toEdit', this.onCommentEdit, this);
+            this.listenTo(this.commentsView, 'toRemove', this.onCommentRemove, this);
+            this.listenTo(this.commentsView, 'toAdd', this.onCommentAdd, this);
+            this.listenTo(this.commentsView, 'loadMore', this.onLoadMore, this);
 
-            // init dialog
+            this._resolveDeferredInit();
+        },
+
+        createDialog: function (title, model) {
+            var dialogWidget, loadingMaskView;
             dialogWidget = new DialogWidget({
-                title: __('oro.comment.dialog.add_comment.title'),
+                title: title,
                 el: $('<div><div class="comment-form-container"/></div>'),
                 stateEnabled: false,
                 incrementalPosition: false,
+                resizable: false,
                 dialogOptions: {
                     modal: true,
                     width: '510px',
                     dialogClass: 'add-comment-dialog'
                 }
             });
-            model.once('synced', function () {
-                dialogWidget.remove();
-            });
-
             // init form view
             this._initFormView(dialogWidget, model);
 
@@ -76,15 +81,63 @@ define(function (require) {
             dialogWidget.subview('loading', loadingMaskView);
             loadingMaskView.listenTo(model, 'request', loadingMaskView.show);
             loadingMaskView.listenTo(model, 'sync error', loadingMaskView.hide);
+
+            return dialogWidget;
+        },
+
+        onCommentAdd: function () {
+            var dialogWidget, model;
+            if (!this.options.canCreate) {
+                return;
+            }
+
+            model = this.collection.create();
+
+            // init dialog
+            dialogWidget = this.createDialog(__('oro.comment.dialog.add_comment.title'), model);
+
+            model.once('sync', function () {
+                dialogWidget.remove();
+                // add item to collection after it is stored on server
+                this.collection.add(model);
+            }, this);
         },
 
         onCommentEdit: function (model) {
-            var parentView;
+            var dialogWidget;
+
             if (!model.get('editable')) {
                 return;
             }
-            parentView = this.listView.getItemView(model);
-            this._initFormView(parentView, model);
+
+            // init dialog
+            dialogWidget = this.createDialog(__('oro.comment.dialog.edit_comment.title'), model);
+
+            dialogWidget.listenTo(model, 'sync', _.bind(function () {
+                dialogWidget.remove();
+            }, this));
+        },
+
+        onCommentRemove: function (model) {
+            if (!model.get('removable')) {
+                return;
+            }
+
+            var confirm = new DeleteConfirmation({
+                content: __('oro.comment.deleteConfirmation')
+            });
+
+            confirm.on('ok', _.bind(function () {
+                model.destroy({error: function () {
+                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+                }});
+            }, this));
+
+            confirm.open();
+        },
+
+        onLoadMore: function () {
+            this.collection.loadMore();
         },
 
         _initFormView: function (parentView, model) {
@@ -96,39 +149,18 @@ define(function (require) {
             });
             parentView.subview('form', formView);
             this.listenTo(formView, 'submit', this.onFormSubmit, this);
-            this.listenTo(formView, 'reset', this.onFormReset, this);
         },
 
         onFormSubmit: function (formView) {
-            var model, listView, options;
+            var model, options;
 
-            listView = this.listView;
             model = formView.model;
-
-            if (model.isNew()) {
-                this.collection.add(model, {at: 0});
-            }
-
-            model.once('sync', function () {
-                var itemView = listView.getItemView(model);
-                if (itemView) {
-                    itemView.render();
-                }
-            });
 
             options = formView.fetchAjaxOptions({
                 url: model.url()
             });
-            model.save(null, options);
-        },
 
-        onFormReset: function (formView) {
-            var model, itemView;
-            model = formView.model;
-            if (!model.isNew()) {
-                itemView = this.listView.getItemView(model);
-                itemView.render();
-            }
+            model.save(null, options);
         }
     });
 

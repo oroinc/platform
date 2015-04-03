@@ -1,3 +1,45 @@
+.comments-view-header, .comments-view-body, .comments-view-footer {
+  margin: 13px 0;
+  &:empty {
+    display: none;
+  }
+}
+.comments-view-header {
+  > .no-data {
+    margin: 0px;
+  }
+  .load-more{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAWCAIAAACOpGH9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAApSURBVBhXY7h79y7D////mRgYGJiANJwNwvfu3UPhI2N0OWS99+7dAwCo4x9xTwLH4wAAAABJRU5ErkJggg==);
+    background-repeat: repeat;
+    height: 22px;
+    display: block;
+    text-align: center;
+    color: #888;
+    > span {
+      display: inline-block;
+      background: white;
+      margin: 5px auto;
+      line-height: 1em;
+      padding: 0 0.5em;
+      font-size: 13px;
+      text-decoration: none;
+    }
+    > span.loading-indicator {
+      padding: 0 0 0 4px;
+      margin: 3px auto;
+
+    }
+  }
+  a.load-more{
+    &:hover {
+      color: #08c;
+      cursor: pointer;
+    }
+  }
+}
+.comments-view-footer {
+  margin-top: 10px;
+}
 .comment-form-container {
   .comment-form {
     .comment-text-field {
@@ -9,6 +51,14 @@
     }
     span.filename {
       width: 160px;
+    }
+  }
+  .attachment-item {
+    .remove-attachment {
+      text-decoration: none;
+      border: none;
+      background: transparent;
+      font-family: FontAwesome !important;
     }
   }
 }
@@ -24,61 +74,93 @@
   }
 }
 .comments-block {
+  color: #888;
+  margin: 0;
+  display: table;
+  width: 100%;
   min-width: initial;
   .comment-item {
-    border-bottom: 1px solid #f0f0f0;
-    min-height: 57px;
+    display: table-row !important;
+  }
+  .comment-title, .comment-content, .comment-actions {
+    display: table-cell;
+    line-height: 1.3em;
+    padding: 13px 0 14px 0;
+    border-bottom: 1px solid #e5e5e5;
+    vertical-align: top;
+  }
+  .comment-title {
+    width: 30px;
     position: relative;
-    &:last-child {
-      border-bottom: none;
+  }
+  .comment-actions {
+    width: 23px;
+    /** .horizontal-icon-menu; */
+    .dropdown-menu{
+      padding: 0;
+      top: -8px;
+      right: 23px;
     }
-    .title-item{
-      margin-left: 20px;
-      .accordion-icon {
-        margin-left: -20px;
+    .nav-pills {
+      padding: 0 0 0 2px;
+    }
+  }
+  .comment-content {
+    vertical-align: middle;
+    padding: 14px;
+  }
+  .comment-item:first-child {
+    .comment-title, .comment-content, .comment-actions {
+      padding-top: 0px;
+    }
+  }
+  .comment-item:last-child {
+    .comment-title, .comment-content, .comment-actions {
+      border-bottom: none;
+      padding-bottom: 0px;
+    }
+  }
+
+  .comment-title {
+    .comment-title-avatar{
+      width: 29px;
+      height: 29px;
+    }
+    .no-avatar {
+      background: url(../../../oroui/img/info-user.png);
+      background-size: 29px 29px;
+    }
+    .comment-title-info {
+      display: none;
+    }
+    &:hover {
+      .comment-title-info {
+        border: 1px solid rgba(0,0,0,0.2);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        display: block;
+        position: absolute;
+        background: white;
+        max-width: 260px;
+        z-index: 1;
+        top: 44px;
+        left: 10px;
+        border-radius: 3px;
+        padding: 0.5em;
       }
     }
   }
-  .short-comment {
-    padding-top: 2px;
-    padding-left: 20px;
+
+  .comment-body{
     display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    height: 22px;
   }
-  .accordion-icon:before {
-    vertical-align: top;
+  .comment-attachments {
+    margin: 0.5em 0 0 0;
   }
-  .accordion-heading {
-    padding: 5px 10px 9px 10px;
-    display: block;
-    > div {
-      display: block;
-    }
-    &:hover {
-      background-color: transparent;
-    }
-  }
-  .accordion-body {
-    margin-top: -29px;
-  }
-  .accordion-inner {
-    border-top: none;
-    padding-top: 0;
-    padding-left: 30px;
-    background-color: #fff;
-  }
+
   .attachment-icon.accordion-toggle {
     display: none;
     &.collapsed {
       display: inline-block;
-    }
-  }
-  .attachment-item {
-    .item-remove-attachment {
-      text-decoration: none;
     }
   }
 }
