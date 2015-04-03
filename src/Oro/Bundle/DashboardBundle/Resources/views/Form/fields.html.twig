@@ -39,3 +39,8 @@
         )
     </script>
 {% endblock oro_type_widget_date_range_widget %}
+
+{% block oro_type_widget_title_widget %}
+    {{ form_widget(form.title) }}
+    {{ form_row(form.useDefault) }}
+{% endblock oro_type_widget_title_widget %}

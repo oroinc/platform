@@ -4,6 +4,8 @@ oro:
             main:            Dashboard
             quick_launchpad: Quick Launchpad
             chose_dashboard: Choose dashboard
+            label: Widget title
+            use_default.label: Use default setting
 
         entity_label:        Dashboard
         entity_plural_label: Dashboards

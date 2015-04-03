@@ -149,13 +149,13 @@ class WidgetConfigs
 
         $widget = $this->findWidget($widgetId);
         $widgetState = $this->stateManager->getWidgetState($widget);
-        $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName())['configuration'];
+        $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
 
         $options = $widgetState->getOptions();
 
-        foreach ($widgetConfig as $name => $config) {
+        foreach ($widgetConfig['configuration'] as $name => $config) {
             $value = isset($options[$name]) ? $options[$name] : null;
-            $options[$name] = $this->valueProvider->getConvertedValue($config['type'], $value);
+            $options[$name] = $this->valueProvider->getConvertedValue($widgetConfig, $config['type'], $value);
         }
 
         return new WidgetOptionBag($options);

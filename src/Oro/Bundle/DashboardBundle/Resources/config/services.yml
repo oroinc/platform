@@ -14,9 +14,11 @@ parameters:
     oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
     oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
     oro_dashboard.datetime.hepler.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
+    oro_dashboard.widget_config_value.widget_title.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter
 
     oro_dashboard.form.type.widget_date_range.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType
     oro_dashboard.form.type.date_range_value.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeValueType
+    oro_dashboard.form.type.widget_widget_title.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
 
 services:
     oro_dashboard.config_resolver:
@@ -115,3 +117,12 @@ services:
         tags:
             - { name: form.type, alias: "oro_type_widget_date_range_value" }
 
+    oro_dashboard.form.type.widget_widget_title:
+        class: %oro_dashboard.form.type.widget_widget_title.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_title" }
+
+    oro_dashboard.widget_config_value.widget_title.converter:
+        class: %oro_dashboard.widget_config_value.widget_title.converter.class%
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_title" }

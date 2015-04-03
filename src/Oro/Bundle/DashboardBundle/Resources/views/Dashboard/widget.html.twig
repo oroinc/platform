@@ -5,6 +5,8 @@
 {% if not widgetTitle is defined %}
     {% if not widgetLabel is defined %}
         {% set widgetTitle = false %}
+    {% elseif widgetConfiguration.title is defined and widgetConfiguration.title.value is not empty %}
+        {% set widgetTitle = widgetConfiguration.title.value|trans %}
     {% else %}
         {% set widgetTitle = widgetLabel|trans %}
     {% endif %}

@@ -9,10 +9,10 @@ class ConfigValueProvider
     protected $converters;
 
     /**
-     * @param string               $formType
-     * @param ConfigValueConverter $converter
+     * @param string                       $formType
+     * @param ConfigValueConverterAbstract $converter
      */
-    public function addConverter($formType, ConfigValueConverter $converter)
+    public function addConverter($formType, ConfigValueConverterAbstract $converter)
     {
         $this->converters[$formType] = $converter;
     }
@@ -22,10 +22,10 @@ class ConfigValueProvider
      * @param mixed $value
      * @return mixed
      */
-    public function getConvertedValue($formType, $value = null)
+    public function getConvertedValue($widgetConfig, $formType, $value = null)
     {
         if(in_array($formType, array_keys($this->converters))) {
-            return $this->converters[$formType]->getConvertedValue($value);
+            return $this->converters[$formType]->getConvertedValue($widgetConfig, $value);
         }
 
         return $value;
