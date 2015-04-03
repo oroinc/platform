@@ -22,6 +22,7 @@ define([
             'page:update mediator': 'onPageUpdate',
             'page:afterChange mediator': 'afterPageChange',
             'page:beforeRefresh mediator': 'beforePageRefresh',
+            'openLink:before mediator': 'beforePageChange',
 
             'add collection': 'toggleStateTrace',
             'remove collection': 'toggleStateTrace'
@@ -33,7 +34,7 @@ define([
         initialize: function () {
             var confirmModal;
 
-            this._initialData = null;
+            this._initialState = null;
             this._resetChanges = false;
 
             confirmModal = new Modal({
@@ -45,6 +46,21 @@ define([
                 cancelText: __('Cancel')
             });
             this.subview('confirmModal', confirmModal);
+
+            $(window).on('beforeunload' + this.eventNamespace(), _.bind(this.onWindowUnload, this));
+
+            PageStateView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            $(window).off(this.eventNamespace());
+            PageStateView.__super__.dispose.apply(this, arguments);
         },
 
         /**
@@ -56,8 +72,9 @@ define([
          * @param {Array} queue
          */
         beforePageRefresh: function (queue) {
-            var deferred, confirmModal, self;
-            if (this._initialData !== null && this.model.get('data') !== this._initialData) {
+            var deferred, confirmModal, self,
+                preservedState = JSON.parse(this.model.get('data'));
+            if (this._isStateChanged(preservedState)) {
                 self = this;
                 confirmModal = this.subview('confirmModal');
                 deferred = $.Deferred();
@@ -78,10 +95,22 @@ define([
         },
 
         /**
+         * Handles navigation action and shows confirm dialog
+         * if page changes is not preserved and the state is changed from initial
+         * (excludes cancel action)
+         */
+        beforePageChange: function (e) {
+            var action = $(e.target).data('action');
+            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
+                e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
+            }
+        },
+
+        /**
          * Clear page state timer and model on page request is started
          */
         onPageRequest: function () {
-            this._initialData = null;
+            this._initialState = null;
             this._resetChanges = false;
             this._switchOffTrace();
         },
@@ -98,10 +127,24 @@ define([
         },
 
         /**
+         * Handles window unload event and shows confirm dialog
+         * if page changes is not preserved and the state is changed from initial
+         */
+        onWindowUnload: function () {
+            if (!this._isStateTraceRequired() && this._isStateChanged()) {
+                return __('oro.ui.leave_page_with_unsaved_data_confirm');
+            }
+        },
+
+        /**
          * Fetches model's attributes from cache on page changes is done
          */
         afterPageChange: function () {
             var options;
+
+            if (this._hasForm()){
+                this._initialState = this._collectFormsData();
+            }
             if (!this._hasForm() || !this._isStateTraceRequired()) {
                 return;
             }
@@ -183,13 +226,14 @@ define([
          * @protected
          */
         _initStateTracer: function (attributes, options) {
+            var currentData;
             options = options || {};
-            this._initialData = this._collectFormsData();
+            currentData = JSON.stringify(this._collectFormsData());
             if (!attributes.data || options.initial) {
-                attributes.data = this._initialData;
+                attributes.data = currentData;
             }
             this.model.set(attributes);
-            if (attributes.data !== this._initialData) {
+            if (attributes.data !== currentData) {
                 this._restoreState();
             }
             this.$el.on('change.page-state', _.bind(this._collectState, this));
@@ -247,7 +291,7 @@ define([
                 return;
             }
 
-            data = this._collectFormsData();
+            data = JSON.stringify(this._collectFormsData());
 
             if (data === this.model.get('data')) {
                 return;
@@ -261,7 +305,7 @@ define([
 
         /**
          * Goes through the form and collects data
-         * @returns {string}
+         * @returns {Array}
          * @protected
          */
         _collectFormsData: function () {
@@ -294,7 +338,6 @@ define([
                     data[index].push(itemData);
                 });
             });
-            data = JSON.stringify(data);
             return data;
         },
 
@@ -307,19 +350,17 @@ define([
             data = this.model.get('data');
 
             if (data) {
-                this._restoreForms(data);
-                mediator.trigger("pagestate_restored");
+                this._restoreForms(JSON.parse(data));
+                mediator.trigger('pagestate_restored');
             }
         },
 
         /**
          * Updates form from data
-         * @param {string} data JSON
+         * @param {Array} data
          * @protected
          */
         _restoreForms: function (data) {
-            data = JSON.parse(data);
-
             $.each(data, function (index, el) {
                 var form = $('form[data-collect=true]').eq(index);
 
@@ -379,6 +420,40 @@ define([
          */
         _isStateTraceRequired: function () {
             return Boolean(this.collection.getCurrentModel());
+        },
+
+        /**
+         * Check if passed or current state is different from initial sate
+         *
+         * @param {Array=} state if not passed collects current state
+         * @returns {boolean}
+         * @protected
+         */
+        _isStateChanged: function (state) {
+            state = state || this._collectFormsData();
+            return this._initialState !== null && this._isDifferentFromInitialSate(state);
+        },
+
+        /**
+         * Check if passed state is different from initial state
+         * compares just name-value pairs
+         * (comparison of JSON strings is not in use, because field items can contain extra-data)
+         *
+         * @param {Array} state
+         * @returns {boolean}
+         * @protected
+         */
+        _isDifferentFromInitialSate: function (state) {
+            var isSame,
+                initialState = this._initialState;
+            isSame = initialState && _.every(state, function (form, i) {
+                return _.isArray(initialState[i]) && _.every(form, function (field, j) {
+                    return _.isObject(initialState[i][j]) &&
+                        initialState[i][j].name === field.name &&
+                            initialState[i][j].value === field.value;
+                });
+            });
+            return !isSame;
         }
     });
 
