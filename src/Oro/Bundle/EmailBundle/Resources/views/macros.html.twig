@@ -333,7 +333,13 @@
 {% macro attachments(attachments, canLinkAttachment, targetEntityData) -%}
     {%- for attachment in attachments -%}
     <a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-        <span class="label label-info">{{ attachment.fileName }}</span>
+        <span class="label label-info">
+            {% if attachment.fileName|length > 15 %}
+                {{ attachment.fileName[:7]}}..{{attachment.fileName[-7:7] }}
+            {% else %}
+                {{ attachment.fileName }}
+            {% endif %}
+        </span>
     </a>
     {% if canLinkAttachment and targetEntityData.targetEntityClass is defined %}
         {% set options = {
