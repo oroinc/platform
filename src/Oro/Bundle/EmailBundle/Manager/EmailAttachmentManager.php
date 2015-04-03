@@ -126,8 +126,8 @@ class EmailAttachmentManager
                     $this->em->persist($emailAttachment);
                 } else {
                     $this->em->persist($attachment);
-                    $doFlush = true;
                 }
+                $doFlush = true;
             }
         }
 
