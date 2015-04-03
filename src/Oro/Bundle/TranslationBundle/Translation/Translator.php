@@ -162,7 +162,7 @@ class Translator extends BaseTranslator
      */
     private function ensureDatabaseLoaderAdded($locale)
     {
-        if (null !== $this->databaseTranslationMetadataCache) {
+        if (null !== $this->databaseTranslationMetadataCache && $this->isInstalled()) {
             $resources        = !empty($this->dynamicResources[$locale]) ? $this->dynamicResources[$locale] : [];
             $databaseResource = array_filter(
                 $resources,
@@ -185,5 +185,15 @@ class Translator extends BaseTranslator
                 }
             }
         }
+    }
+
+    /*
+     * Check if the platform is installed
+     *
+     * @return bool
+     */
+    private function isInstalled()
+    {
+        return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
     }
 }
