@@ -6,14 +6,19 @@ define([
 
     Flotr.defaultOptions.title = ' ';
 
-    var originalInitCanvas = Flotr.Graph.prototype._initCanvas;
-    Flotr.Graph.prototype._initCanvas = function () {
-        var result = originalInitCanvas.apply(this, arguments);
+    /**
+     * Squeezes labels together so they're not readable
+     */
+    var originalCalculateSpacing = Flotr.Graph.prototype.calculateSpacing;
+    Flotr.Graph.prototype.calculateSpacing = function () {
+        var result = originalCalculateSpacing.apply(this, arguments);
 
-        if (!this._oro_initialized) {
-            this.canvasWidth -= 10;
-            this._oro_initialized = true;
-        }
+        this.plotWidth -= (this.axes.x.maxLabel.width / 2);
+        this.axes.x.length = this.plotWidth;
+        this.axes.x2.length = this.plotWidth;
+
+        this.axes.x.setScale();
+        this.axes.x2.setScale();
 
         return result;
     };
