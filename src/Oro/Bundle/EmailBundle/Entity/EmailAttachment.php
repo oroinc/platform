@@ -10,6 +10,8 @@ use JMS\Serializer\Annotation as JMS;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
+
 /**
  * Email Attachment
  *
@@ -66,9 +68,18 @@ class EmailAttachment
     protected $emailBody;
 
     /**
-     * @var UploadedFile
+     * @var File
+     *
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
+     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @JMS\Exclude
      */
     protected $file;
+
+    /**
+     * @var UploadedFile
+     */
+    protected $uploadedFile;
 
     /**
      * Get id
@@ -175,7 +186,9 @@ class EmailAttachment
     }
 
     /**
-     * @return UploadedFile
+     * Get attachment file
+     *
+     * @return File
      */
     public function getFile()
     {
@@ -183,13 +196,45 @@ class EmailAttachment
     }
 
     /**
+     * Set email attachment
+     *
+     * @param File $file
+     *
+     * @return $this
+     */
+    public function setFile(File $file = null)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
+     * Get file extension
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return pathinfo($this->fileName, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return UploadedFile
+     */
+    public function getUploadedFile()
+    {
+        return $this->uploadedFile;
+    }
+
+    /**
      * @param UploadedFile $file
      *
      * @return $this
      */
-    public function setFile($file)
+    public function setUploadedFile($file)
     {
-        $this->file = $file;
+        $this->uploadedFile = $file;
 
         return $this;
     }

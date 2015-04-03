@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
@@ -120,7 +123,6 @@ class EmailTypeTest extends TypeTestCase
         $this->assertEquals('oro_email_email', $type->getName());
     }
 
-
     public function messageDataProvider()
     {
         return [
@@ -131,6 +133,7 @@ class EmailTypeTest extends TypeTestCase
                     'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
                     'subject' => 'Test subject',
                     'type' => 'text',
+                    'attachments' => new EmailAttachmentsType(),
                     'template' => new EmailTemplate(),
                 ],
                 ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],

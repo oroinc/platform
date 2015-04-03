@@ -6,8 +6,9 @@ define([
     'orotranslation/js/translator',
     'backbone',
     'oroui/js/messenger',
-    'oroui/js/app/views/base/view'
-], function ($, _, __, Backbone, messenger, BaseView) {
+    'oroui/js/app/views/base/view',
+    'oroui/js/mediator'
+], function ($, _, __, Backbone, messenger, BaseView, mediator) {
     'use strict';
 
     var EmailAttachmentLink;
@@ -35,6 +36,7 @@ define([
          * onClick event listener
          */
         linkAttachment: function (e) {
+            var self = this;
             e.preventDefault();
             $.getJSON(
                 this.options.url,
@@ -42,12 +44,17 @@ define([
                 function (response) {
                     if (_.isUndefined(response.error)) {
                         messenger.notificationFlashMessage('success', __('oro.email.attachment.added'));
+                        self.reloadAttachmentGrid();
                     } else {
                         messenger.notificationFlashMessage('error', __(response.error));
                     }
                 }
             );
             return false;
+        },
+
+        reloadAttachmentGrid: function() {
+            mediator.trigger('datagrid:doRefresh:attachment-grid');
         }
     });
 

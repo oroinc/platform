@@ -13,7 +13,6 @@ oro:
             choose_template:                     ""
             add_signature:                       Add Signature
             attach_file:                         Attach File
-            add_context:                         Add Context
 
         variable.not.found:                     N/A
 
