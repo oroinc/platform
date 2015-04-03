@@ -26,14 +26,14 @@ class PackagesProvider
      * @param ServiceLink $pmLink
      * @param array $bundles
      * @param string $kernelRootDir
-     * @param string $composer_cache_home
+     * @param string $composerCacheHome
      */
-    public function __construct(ServiceLink $pmLink, array $bundles, $kernelRootDir, $composer_cache_home)
+    public function __construct(ServiceLink $pmLink, array $bundles, $kernelRootDir, $composerCacheHome)
     {
         $this->pmLink            = $pmLink;
         $this->bundles           = $bundles;
         $this->kernelRootDir     = $kernelRootDir;
-        $this->composerCacheHome = $composer_cache_home;
+        $this->composerCacheHome = $composerCacheHome;
     }
 
     /**
