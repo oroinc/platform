@@ -6,17 +6,17 @@ define(['./base/routing-collection'
     'use strict';
 
     /**
-     * @class
-     * @exports LoadMoreCollection
-     */
-    var LoadMoreCollection;
-
-    /**
      * Collection with "load more" functionality support. Any add/remove actions will be considered like already done
      * on the server and collection will update `state.totalItemsQuantity` and `route.limit`
      *
      * Requires API route which accepts `limit` query parameter
+     *
+     * @class
+     * @augment RoutingCollection
+     * @exports LoadMoreCollection
      */
+    var LoadMoreCollection;
+
     LoadMoreCollection = RoutingCollection.extend(/** @exports LoadMoreCollection.prototype */{
         routeDefaults: {
             /**

@@ -46,10 +46,11 @@ define(function (require) {
                 autoRender: true,
                 canCreate: Boolean(this.options.canCreate)
             });
-            this.commentsView.on('toEdit', this.onCommentEdit, this);
-            this.commentsView.on('toRemove', this.onCommentRemove, this);
-            this.commentsView.on('toAdd', this.onCommentAdd, this);
-            this.commentsView.on('loadMore', this.onLoadMore, this);
+
+            this.listenTo(this.commentsView, 'toEdit', this.onCommentEdit, this);
+            this.listenTo(this.commentsView, 'toRemove', this.onCommentRemove, this);
+            this.listenTo(this.commentsView, 'toAdd', this.onCommentAdd, this);
+            this.listenTo(this.commentsView, 'loadMore', this.onLoadMore, this);
 
             this._resolveDeferredInit();
         },

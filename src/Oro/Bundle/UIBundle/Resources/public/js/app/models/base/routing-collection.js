@@ -18,16 +18,24 @@ define([
      * Basic usage:
      * ```javascript
      * var CommentCollection = RoutingCollection.extend({
-     *     routeName: 'oro_api_comment_get_items',
-     *     routeQueryParameters: ['page', 'limit'],
+     *     routeDefaults: {
+     *         routeName: 'oro_api_comment_get_items',
+     *         routeQueryParameters: ['page', 'limit']
+     *     },
+     *
      *     stateDefaults: {
      *         page: 1,
      *         limit: 10
+     *     },
+     *
+     *     // provide access to route
+     *     setPage: function (pageNo) {
+     *         this._route.set({page: pageNo});
      *     }
      * });
      *
      * var commentCollection = new CommentCollection([], {
-     *     routeParams: {
+     *     routeParameters: {
      *         // specify required parameters
      *         relationId: 123,
      *         relationClass: 'Some_Class'
@@ -38,10 +46,11 @@ define([
      * commentCollection.fetch();
      *
      * // load second page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2)
-     * commentCollection.state.set({page: 2})
+     * commentCollection.setPage(2)
      * ```
      *
      * @class
+     * @augment BaseCollection
      * @exports RoutingCollection
      */
     var RoutingCollection;
@@ -75,10 +84,10 @@ define([
         /**
          * Default route attributes
          *
-         * @type {object}
+         * @member {Object}
          */
         routeDefaults: function () {
-            return {
+            return /** @lends RouteCollection.routeDefaults */{
                 /**
                  * Route name this collection belongs to
                  * @see RouteModel.prototype.routeName
@@ -99,7 +108,7 @@ define([
         /**
          * Default state
          *
-         * @type {object}
+         * @type {Object}
          */
         stateDefaults: {},
 
@@ -187,7 +196,7 @@ define([
         },
 
         /**
-         * Returns collection state
+         * Returns current route parameters
          *
          * @returns {Object}
          */

@@ -1,15 +1,14 @@
 <a name="module_RoutingCollection"></a>
 ## RoutingCollection
-RoutingCollection is an abstraction of collection which uses Oro routing system.It keeps itself in actual state when route or state changes.Basic usage:```javascriptvar CommentCollection = RoutingCollection.extend({    routeName: 'oro_api_comment_get_items',    routeQueryParameters: ['page', 'limit'],    stateDefaults: {        page: 1,        limit: 10    }});var commentCollection = new CommentCollection([], {    routeParams: {        // specify required parameters        relationId: 123,        relationClass: 'Some_Class'    }});// load first page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=1)commentCollection.fetch();// load second page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2)commentCollection.state.set({page: 2})```
+RoutingCollection is an abstraction of collection which uses Oro routing system.It keeps itself in actual state when route or state changes.Basic usage:```javascriptvar CommentCollection = RoutingCollection.extend({    routeDefaults: {        routeName: 'oro_api_comment_get_items',        routeQueryParameters: ['page', 'limit']    },    stateDefaults: {        page: 1,        limit: 10    },    // provide access to route    setPage: function (pageNo) {        this._route.set({page: pageNo});    }});var commentCollection = new CommentCollection([], {    routeParameters: {        // specify required parameters        relationId: 123,        relationClass: 'Some_Class'    }});// load first page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=1)commentCollection.fetch();// load second page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2)commentCollection.setPage(2)```
 
+**Augment**: BaseCollection  
 
 * [RoutingCollection](#module_RoutingCollection)
   * [._route](#module_RoutingCollection#_route) : <code>RouteModel</code>
   * [._state](#module_RoutingCollection#_state) : <code>BaseModel</code>
-  * [.routeName](#module_RoutingCollection#routeName) : <code>string</code>
-  * [.routeQueryParameterNames](#module_RoutingCollection#routeQueryParameterNames) : <code>Array.&lt;string&gt;</code>
-  * [.stateDefaults](#module_RoutingCollection#stateDefaults) : <code>object</code>
-  * [.routeDefaults()](#module_RoutingCollection#routeDefaults) : <code>object</code>
+  * [.routeDefaults](#module_RoutingCollection#routeDefaults) : <code>Object</code>
+  * [.stateDefaults](#module_RoutingCollection#stateDefaults) : <code>Object</code>
   * [.initialize()](#module_RoutingCollection#initialize)
   * [._createState(parameters)](#module_RoutingCollection#_createState)
   * [._createRoute(parameters)](#module_RoutingCollection#_createRoute)
@@ -38,28 +37,16 @@ State of the collection. Must contain both settings and server response parts su
 
 **Kind**: instance property of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 **Access:** protected  
-<a name="module_RoutingCollection#routeName"></a>
-### routingCollection.routeName : <code>string</code>
-Route name this collection belongs to
+<a name="module_RoutingCollection#routeDefaults"></a>
+### routingCollection.routeDefaults : <code>Object</code>
+Default route attributes
 
 **Kind**: instance property of <code>[RoutingCollection](#module_RoutingCollection)</code>  
-**See**: RouteModel.prototype.routeName  
-<a name="module_RoutingCollection#routeQueryParameterNames"></a>
-### routingCollection.routeQueryParameterNames : <code>Array.&lt;string&gt;</code>
-List of query parameters which this route accepts.
-
-**Kind**: instance property of <code>[RoutingCollection](#module_RoutingCollection)</code>  
-**See**: RouteModel.prototype.routeQueryParameterNames  
 <a name="module_RoutingCollection#stateDefaults"></a>
-### routingCollection.stateDefaults : <code>object</code>
+### routingCollection.stateDefaults : <code>Object</code>
 Default state
 
 **Kind**: instance property of <code>[RoutingCollection](#module_RoutingCollection)</code>  
-<a name="module_RoutingCollection#routeDefaults"></a>
-### routingCollection.routeDefaults() : <code>object</code>
-Default route attributes
-
-**Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 <a name="module_RoutingCollection#initialize"></a>
 ### routingCollection.initialize()
 **Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
@@ -98,7 +85,7 @@ Utility function. Extends `Chaplin.utils.getAllPropertyVersions` with merge and 
 
 <a name="module_RoutingCollection#getRouteParameters"></a>
 ### routingCollection.getRouteParameters() ⇒ <code>Object</code>
-Returns collection state
+Returns current route parameters
 
 **Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 <a name="module_RoutingCollection#getState"></a>

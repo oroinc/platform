@@ -30,6 +30,7 @@ define(function (require) {
      * ```
      *
      * @class
+     * @augment BaseModel
      * @exports RouteModel
      */
     var RouteModel,
@@ -38,8 +39,12 @@ define(function (require) {
         BaseModel = require('./base/model');
 
     RouteModel = BaseModel.extend(/** @exports RouteModel.prototype */{
+        /**
+         * @inheritDoc
+         * @member {Object}
+         */
         defaults: function () {
-            return {
+            return /** lends RouteModel.attributes */ {
                 /**
                  * Name of the route
                  * @type {string}
@@ -55,8 +60,12 @@ define(function (require) {
         },
 
         /**
-         * Return list of parameter names accepted by this route
-         * @protected
+         * Return list of parameter names accepted by this route.
+         * Includes both query and route parameters,
+         *
+         * E.g. for route `api/rest/latest/<relationClass>/<relationId/comments?page=<page>&limit=<limit>`
+         * this function will return `['relationClass', 'relationId', 'page', 'limit']`
+         *
          * @returns {Array.<string>}
          */
         getAcceptableParameters: function () {
@@ -72,17 +81,17 @@ define(function (require) {
                 return tokenPart[3];
             });
             routeParameters.push.apply(routeParameters, this.get('routeQueryParameterNames'));
-            return routeParameters;
+            return _.uniq(routeParameters);
         },
 
         /**
          * Returns url defined by this model
          *
-         * @param options {Object=} parameters to override
+         * @param parameters {Object=} parameters to override
          * @returns {string} route url
          */
-        getUrl: function (options) {
-            var routeParameters = _.extend(this.toJSON(), options),
+        getUrl: function (parameters) {
+            var routeParameters = _.extend(this.toJSON(), parameters),
                 acceptableParameters = this.getAcceptableParameters();
             return routing.generate(this.get('routeName'), _.pick(routeParameters, acceptableParameters));
         }
