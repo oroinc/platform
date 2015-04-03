@@ -4,26 +4,31 @@ define(function (require) {
 
     var BaseComponent = require('oroui/js/app/components/base/component'),
         $ = require('jquery'),
-        EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view');
+        EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection'),
+        EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
 
     /**
      * @exports EmailAttachmentComponent
      */
     return BaseComponent.extend({
-        attachmentsView: null,
+        collection: null,
+        collectionView: null,
 
         initialize: function(options) {
-            this.options = options;
-            this.init();
-        },
+            this.collection = new EmailAttachmentCollection();
+            this.collectionView = new EmailAttachmentCollectionView({
+                collection: this.collection,
+                el: options._sourceElement,
+                listSelector: '#' + options.container,
+                inputName: options.inputName
+            });
 
-        init: function() {
-            if (this.options.dialogButton) {
-                this.initDialogButton(this.options.dialogButton);
+            if (options.dialogButton) {
+                this.initDialogButton(options.dialogButton);
             }
-            this.initView();
 
-            this.attachmentsView.render();
+            var models = options.items == 'undefined' ? [] : options.items;
+            this.collection.add(models);
         },
 
         initDialogButton: function(dialogButton) {
@@ -31,19 +36,7 @@ define(function (require) {
 
             var $dialogButton = $('#' + dialogButton);
             $dialogButton.click(function() {
-                self.attachmentsView.add({});
-            });
-        },
-
-        initView: function() {
-            var $container = this.options._sourceElement.find('#' + this.options.container);
-            $container.css('padding-top', 5);
-            var items = typeof this.options.items == 'undefined' ? [] : this.options.items;
-            this.attachmentsView = new EmailAttachmentView({
-                items: items,
-                el: this.options._sourceElement,
-                $container: $container,
-                inputName: this.options.inputName
+                self.collection.add({});
             });
         }
     });
