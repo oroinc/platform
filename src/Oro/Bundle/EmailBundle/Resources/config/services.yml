@@ -67,7 +67,7 @@ parameters:
     oro_email.workflow.action.send_email_template.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate
 
     oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
-    oro_email.listener.email_body_sync_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailBodySyncListener
+    oro_email.listener.email_body_add_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener
 
     # Validators
     oro_email.validator.email_template_syntax_validator.class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
@@ -343,6 +343,7 @@ services:
             - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
+            - @event_dispatcher
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
@@ -494,11 +495,12 @@ services:
             - @kernel
             - @oro_security.security_facade.link
             - @oro_email.activity_list.provider
+            - @oro_attachment.validator.file_config_validator
 
-    oro_email.listener.email_body_sync_listener:
-        class: %oro_email.listener.email_body_sync_listener.class%
+    oro_email.listener.email_body_add_listener:
+        class: %oro_email.listener.email_body_add_listener.class%
         arguments:
             - @oro_email.manager.email_attachment_manager
             - @oro_config.user
         tags:
-            - { name: kernel.event_listener, event: oro_email.email_cache_manager.email_body_sync.after, method: linkToScopeEvent, priority: 10 }
+            - { name: kernel.event_listener, event: oro_email.email_attachment_manager.email_body_added, method: linkToScopeEvent, priority: 10 }

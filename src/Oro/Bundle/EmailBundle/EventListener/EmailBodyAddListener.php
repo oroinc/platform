@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Event\EmailBodySyncAfter;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 
-class EmailBodySyncListener
+class EmailBodyAddListener
 {
     const LINK_ATTACHMENT_CONFIG_OPTION = 'oro_email.link_email_attachments_to_scope_entity';
 
@@ -25,9 +25,9 @@ class EmailBodySyncListener
     }
 
     /**
-     * @param EmailBodySyncAfter $event
+     * @param EmailBodyAdded $event
      */
-    public function linkToScopeEvent(EmailBodySyncAfter $event)
+    public function linkToScopeEvent(EmailBodyAdded $event)
     {
         $email = $event->getEmail();
         if ((bool)$this->configManager->get(self::LINK_ATTACHMENT_CONFIG_OPTION)) {

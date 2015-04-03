@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -18,6 +20,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 
 /**
  * Class Processor
@@ -49,16 +52,20 @@ class Processor
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var array */
     protected $origins = array();
 
     /**
-     * @param DoctrineHelper       $doctrineHelper
-     * @param \Swift_Mailer        $mailer
-     * @param EmailAddressHelper   $emailAddressHelper
-     * @param EmailEntityBuilder   $emailEntityBuilder
-     * @param EmailOwnerProvider   $emailOwnerProvider
+     * @param DoctrineHelper $doctrineHelper
+     * @param \Swift_Mailer $mailer
+     * @param EmailAddressHelper $emailAddressHelper
+     * @param EmailEntityBuilder $emailEntityBuilder
+     * @param EmailOwnerProvider $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -66,14 +73,16 @@ class Processor
         EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
-        EmailActivityManager $emailActivityManager
+        EmailActivityManager $emailActivityManager,
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->doctrineHelper       = $doctrineHelper;
-        $this->mailer               = $mailer;
-        $this->emailAddressHelper   = $emailAddressHelper;
-        $this->emailEntityBuilder   = $emailEntityBuilder;
-        $this->emailOwnerProvider   = $emailOwnerProvider;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->mailer = $mailer;
+        $this->emailAddressHelper = $emailAddressHelper;
+        $this->emailEntityBuilder = $emailEntityBuilder;
+        $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -149,6 +158,7 @@ class Processor
 
         // flush all changes to the database
         $this->getEntityManager()->flush();
+        $this->eventEmailBody($email);
 
         return $email;
     }
@@ -335,5 +345,14 @@ class Processor
         }
 
         return $this->em;
+    }
+
+    /**
+     * @param $email
+     */
+    protected function eventEmailBody($email)
+    {
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
     }
 }

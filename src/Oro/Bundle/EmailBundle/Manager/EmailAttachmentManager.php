@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
@@ -20,6 +19,9 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Class EmailAttachmentManager
@@ -61,19 +63,22 @@ class EmailAttachmentManager
      * @param KernelInterface           $kernel
      * @param ServiceLink               $securityFacadeLink
      * @param EmailActivityListProvider $activityListProvider
+     * @param ConfigFileValidator       $configFileValidator
      */
     public function __construct(
         FilesystemMap $filesystemMap,
         EntityManager $em,
         KernelInterface $kernel,
         ServiceLink $securityFacadeLink,
-        EmailActivityListProvider $activityListProvider
+        EmailActivityListProvider $activityListProvider,
+        ConfigFileValidator $configFileValidator
     ) {
         $this->filesystem           = $filesystemMap->get('attachments');
         $this->em                   = $em;
         $this->attachmentDir        = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
         $this->securityFacadeLink   = $securityFacadeLink;
         $this->activityListProvider = $activityListProvider;
+        $this->configFileValidator  = $configFileValidator;
     }
 
     /**
@@ -116,8 +121,15 @@ class EmailAttachmentManager
                 }
                 $attachment->setFile($emailAttachment->getFile());
                 $attachment->setTarget($entity);
-                $this->em->persist($attachment);
-                $doFlush = true;
+                $fileViolations = $this->configFileValidator->validate($entityClass, $attachment->getFile());
+                if ($fileViolations->count() > 0) {
+                    $this->filesystem->get($attachment->getFile()->getFilename())->delete();
+                    $emailAttachment->setFile(null);
+                    $this->em->persist($emailAttachment);
+                } else {
+                    $this->em->persist($attachment);
+                    $doFlush = true;
+                }
             }
         }
 

@@ -5,9 +5,9 @@ namespace Oro\Bundle\EmailBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
-class EmailBodySyncAfter extends Event
+class EmailBodyAdded extends Event
 {
-    const NAME = 'oro_email.email_cache_manager.email_body_sync.after';
+    const NAME = 'oro_email.email_attachment_manager.email_body_added';
 
     /** @var Email */
     protected $email;
