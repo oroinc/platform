@@ -1,45 +1,7 @@
-<script type="text/html" id="{{ id|e('html_attr')|raw }}">
-    <div class="accordion-group">
-        <div class="accordion-heading">
-            <div class="title-item">
-                <a href="#accordion-item<%= id %>" data-toggle="collapse"
-                   class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
-                <span class="icon">
-                    <i class="icon-check-empty"></i>
-                </span>
-                <span class="visual">
-                    <span class="details">
-                        <i class="date"><%= createdAt %></i>
-                        <i class="date"><%= updatedAt %></i>
-                    </span>
-                    <span class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
-                          title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
-                        <i class="icon icon-comment"></i><span class="count"><%= commentCount %></span>
-                    </span>
-                    <span class="message-item message">
-                        <a href="#accordion-item<%= id %>" data-toggle="collapse"
-                           class="accordion-toggle<% if (collapsed) { %> collapsed<% } %>"><%= subject %></a>
-                    </span>
-                </span>
-            </div>
-            <div class="actions">
-                {# Activity type action buttons #}
-            </div>
-        </div>
-        <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
-            <div class="message">
-                {# Do NOT remove. Placeholder for activity view #}
-                <div class="info responsive-cell"></div>
-                <% if (has_comments && commentable) { %>
-                <div class="responsive-cell">
-                    <h5 class="user-fieldset">
-                        <span><%= _.__('oro.comment.entity_plural_label') %></span>
-                    </h5>
-                    {# paceholder for comments block#}
-                    <div class="comment"></div>
-                </div>
-                <% } %>
-            </div>
-        </div>
-    </div>
-</script>
+{% extends 'OroActivityBundle:js:activityItemTemplate.js.twig' %}
+{% set entityClass = 'Oro\\Bundle\\NoteBundle\\Entity\\Note' %}
+{% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
+
+{% block activityDetails %}
+    {{ entityName|raw }}
+{% endblock %}

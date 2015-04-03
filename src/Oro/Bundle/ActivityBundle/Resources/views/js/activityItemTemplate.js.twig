@@ -5,6 +5,7 @@
                class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
             <div class="icon">
                 {% block activityIcon %}
+                    <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
                 {% endblock %}
             </div>
             <div class="details">
@@ -27,21 +28,6 @@
             </div>
             <div class="actions">
                 {% block activityActions %}
-                    <div class="more-bar-holder">
-                        <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle activity-item" href="javascript:void(0);">...</a>
-                            <div class="dropdown-menu activity-item pull-right launchers-dropdown-menu">
-                                {% block activityActionsList %}
-                                    <ul class="nav nav-pills icons-holder launchers-list">
-                                        {% for action in actions %}
-                                        <li class="launcher-item">
-                                            {{ action|raw }}
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endblock %}
-                            </div>
-                        </div>
-                    </div>
                 {% endblock %}
             </div>
         </div>
