@@ -3,8 +3,10 @@
 namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -150,14 +152,21 @@ class SegmentFilter extends EntityFilter
 
         /** @var Segment $segment */
         $segment = $data['value'];
-        /** @var Query $query */
+
+        /** @var QueryBuilder $queryBuilder */
         if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
-            $query = $this->dynamicSegmentQueryBuilderLink->getService()->build($segment);
+            $queryBuilder = $this->dynamicSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         } else {
-            $query = $this->staticSegmentQueryBuilderLink->getService()->build($segment);
+            $queryBuilder = $this->staticSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         }
         $field = $this->get(FilterUtility::DATA_NAME_KEY);
-        $expr  = $ds->expr()->in($field, $query->getDQL());
+
+        $queryBuilder->andWhere($this->getIdentityFieldWithAlas($queryBuilder) . ' = ' . $field);
+
+        /** @var Query $query */
+        $query = $queryBuilder->getQuery();
+        $expr  = $ds->expr()->exists($query->getDQL());
+
         $this->applyFilterToClause($ds, $expr);
 
         $params = $query->getParameters();
@@ -167,5 +176,24 @@ class SegmentFilter extends EntityFilter
         }
 
         return true;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return string
+     */
+    protected function getIdentityFieldWithAlas(QueryBuilder $queryBuilder)
+    {
+        $tableAliases = $queryBuilder->getRootAliases();
+        $em           = $queryBuilder->getEntityManager();
+        $entities     = $queryBuilder->getRootEntities();
+
+        /** @var ClassMetaData $metaData */
+        $metaData   = $em->getClassMetadata($entities[0]);
+        /** @var array $primaryKey */
+        $primaryKey = $metaData->getIdentifierFieldNames();
+
+        return $tableAliases[0] . '.' . $primaryKey[0];
     }
 }

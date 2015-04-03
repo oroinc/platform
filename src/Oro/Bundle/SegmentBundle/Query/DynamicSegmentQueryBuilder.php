@@ -59,6 +59,16 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
      */
     public function build(Segment $segment)
     {
+        $qb = $this->getQueryBuilder($segment);
+
+        return $qb->getQuery();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryBuilder(Segment $segment)
+    {
         $converter = new SegmentQueryConverter(
             $this->manager,
             $this->virtualFieldProvider,
@@ -70,10 +80,9 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
             $converter->setVirtualRelationProvider($this->virtualRelationProvider);
         }
 
-        $qb = $converter->convert(
-            new RestrictionSegmentProxy($segment, $this->doctrine->getManagerForClass($segment->getEntity()))
-        );
+        $om = $this->doctrine->getManagerForClass($segment->getEntity());
+        $qb = $converter->convert(new RestrictionSegmentProxy($segment, $om));
 
-        return $qb->getQuery();
+        return $qb;
     }
 }
