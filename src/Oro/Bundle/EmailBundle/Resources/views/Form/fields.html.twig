@@ -10,7 +10,11 @@
                 new View({
                     el: $templateSelectorEl.closest('form').find('[name$="[{{ depends_on_parent_field }}]"]'),
                     target: $templateSelectorEl,
-                    collection: new Collection('{{ data_route }}', {{ data_route_parameter|json_encode|raw }})
+                    collection: new Collection(
+                        '{{ data_route }}',
+                        {{ data_route_parameter|json_encode|raw }},
+                        {{ includeSystem is defined and includeSystem ? 'true' : 'false' }}
+                    )
                 });
             });
         })
