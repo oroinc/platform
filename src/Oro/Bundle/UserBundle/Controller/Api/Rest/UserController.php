@@ -17,6 +17,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Group;
@@ -43,6 +44,13 @@ class UserController extends RestController implements ClassResourceInterface
      *      nullable=true,
      *      description="Number of items per page. defaults to 10."
      * )
+     * @QueryParam(
+     *     name="phone",
+     *     requirements=".+",
+     *     nullable=true,
+     *     description="Phone number."
+     * )
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get the list of users",
@@ -59,7 +67,9 @@ class UserController extends RestController implements ClassResourceInterface
         $page = (int) $this->getRequest()->get('page', 1);
         $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        return $this->handleGetListRequest($page, $limit);
+        $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters(__FUNCTION__));
+
+        return $this->handleGetListRequest($page, $limit, $criteria);
     }
 
     /**
