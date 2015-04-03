@@ -4,80 +4,70 @@ define(function (require) {
 
     var EmailAttachmentView,
         $ = require('jquery'),
-        EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection'),
+        _ = require('underscore'),
+        EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model'),
         BaseView= require('oroui/js/app/views/base/view');
 
     EmailAttachmentView = BaseView.extend({
-        initialize: function(options) {
-            this.options = options;
+        model: EmailAttachmentModel,
+        inputName: '',
 
-            this.template = _.template($('#email-attachment-item').html());
-            this.inputName = options.inputName;
-            this.$container = options.$container;
+        events: {
+            'click i.icon-remove': 'removeClick'
+        },
 
-            this.$container.html('');
+        listen: {
+            'change:fileName model': 'fileNameChange'
+        },
 
-            this.collection = new EmailAttachmentCollection();
-            this.initEvents();
-
-            if (this.options.items) {
-                this.collection.add(this.options.items);
+        getTemplateFunction: function() {
+            if (!this.template) {
+                this.template = $('#email-attachment-item').html();
             }
+
+            return EmailAttachmentView.__super__.getTemplateFunction.call(this);
         },
 
-        add: function(model) {
-            this.collection.add(model);
+        getTemplateData: function() {
+            return {
+                entity: this.model,
+                inputName: this.inputName
+            };
         },
 
-        render: function() {
-            if (this.collection.models.length == 0) {
-                this.$el.hide();
-            } else {
-                this.$el.show();
-            }
+        removeClick: function() {
+            this.model.trigger('destroy', this.model, this);
         },
 
-        initEvents: function() {
+        fileSelect: function() {
             var self = this;
+            var $fileInput = this.$el.find('input[type="file"]');
+            this.$el.hide();
 
-            this.collection.on('add', function(model) {
-                var view = self.template({
-                    entity: model,
-                    inputName: self.inputName
-                });
-                var $view = $(view);
-                self.$container.append($view);
-                $view.find('i.icon-remove').click(function() {
-                    self.collection.remove(model.cid);
-                });
-                var $input = $view.find('input[type="file"]');
+            $fileInput.change(function() {
+                var value = self.formatFileName($fileInput.val());
 
-                if (!model.get('id')) {
-                    $view.hide();
-
-                    $input.change(function() {
-                        var value = $input.val().replace(/^.*[\\\/]/, ''); // extracting file basename
-
-                        if (value) {
-                            model.set('fileName', value);
-                            $view.find('span.filename span.filename-label').html(value);
-                            $view.show();
-
-                            self.render();
-                        } else {
-                            self.collection.remove(model.cid);
-                        }
-                    });
-
-                    $input.click();
+                if (value) {
+                    self.model.set('fileName', value);
+                    self.$el.show();
+                } else {
+                    self.collection.remove(self.model);
                 }
             });
+            $fileInput.click();
+        },
 
-            this.collection.on('remove', function(model) {
-                var $view = self.$container.find('[data-cid="' + model.cid + '"]');
-                $view.remove();
-                self.render();
-            });
+        fileNameChange: function() {
+            this.$el.find('span.filename-label').html(this.model.get('fileName'));
+        },
+
+        formatFileName: function(fileName) {
+            var value = fileName.replace(/^.*[\\\/]/, '');
+            if (value.length > 15) {
+                value = value.substr(0, 7) + '..' + value.substr(value.length - 10);
+            }
+
+            return value;
         }
     });
 

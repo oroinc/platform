@@ -10,7 +10,7 @@ define(function (require) {
      */
     EmailAttachmentModel = BaseModel.extend({
         defaults: {
-            id: '',
+            id: null,
             fileName: ''
         }
     });
