@@ -3,6 +3,7 @@ define(function (require) {
     'use strict';
 
     var CommentModel,
+        _ = require('underscore'),
         Chaplin = require('chaplin'),
         routing = require('routing'),
         BaseModel = require('oroui/js/app/models/base/model');
@@ -21,6 +22,7 @@ define(function (require) {
             relationId: null,
             createdAt: '',
             updatedAt: '',
+            avatarUrl: null,
             attachmentURL: null,
             attachmentFileName: null,
             attachmentSize: null,
@@ -28,7 +30,7 @@ define(function (require) {
             removable: true
         },
 
-        initialize: function() {
+        initialize: function (attrs, options) {
             CommentModel.__super__.initialize.apply(this, arguments);
             this.on('request', this.beginSync);
             this.on('sync', this.finishSync);
@@ -37,19 +39,26 @@ define(function (require) {
 
         url: function () {
             var url, parameters;
-            if (!this.isNew()) {
+            if (this.isNew()) {
+                if (!this.get('relationClass') || !this.get('relationId')) {
+                    throw 'Please specify relationClass and relationId';
+                }
+                parameters = {
+                    relationId:    this.get('relationId'),
+                    relationClass: this.get('relationClass')
+                };
+                url = routing.generate('oro_api_comment_get_items', parameters);
+            } else {
                 parameters = {
                     id: this.get('id'),
                     _format: 'json'
                 };
                 url = routing.generate(this.route, parameters);
-            } else {
-                url = CommentModel.__super__.url.call(this);
             }
             return url;
         },
 
-        removeAttachment: function() {
+        removeAttachment: function () {
             var model = this,
                 url = routing.generate(this.routeRemoveAttachment, {id: model.id});
             return $.ajax({
@@ -64,6 +73,37 @@ define(function (require) {
                     model.trigger('error', model, jqxhr);
                 }
             });
+        },
+
+        serialize: function () {
+            var data = CommentModel.__super__.serialize.call(this);
+            data.isNew = this.isNew();
+            data.hasActions = data.removable || data.editable;
+            data.message = this.getMessage();
+            data.shortMessage = this.getShortMessage();
+            if (data.owner_id) {
+                data.owner_url = routing.generate('oro_user_view', {id: data.owner_id});
+            }
+            if (data.editor_id) {
+                data.editor_url = routing.generate('oro_user_view', {id: data.editor_id});
+            }
+            return data;
+        },
+
+        getShortMessage: function () {
+            var shortMessage = this.getMessage(),
+                lineBreak = shortMessage.indexOf('<br />');
+            if (lineBreak > 0) {
+                shortMessage = shortMessage.substr(0, shortMessage.indexOf('<br />'));
+            }
+            shortMessage = _.trunc(shortMessage, 70, true);
+            return shortMessage;
+        },
+
+        getMessage: function () {
+            var message = this.get('message');
+            message = _.nl2br(_.escape(message));
+            return message;
         }
     });
 

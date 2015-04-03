@@ -8,7 +8,14 @@ define([
     var BaseCollection;
 
     BaseCollection = Chaplin.Collection.extend({
-        model: BaseModel
+        model: BaseModel,
+
+        /**
+         * Returns additional parameters to be merged into serialized object
+         */
+        serializeExtraData: function () {
+            return {};
+        }
     });
 
     return BaseCollection;
