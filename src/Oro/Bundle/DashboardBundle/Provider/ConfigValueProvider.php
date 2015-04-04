@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider;
 
-
 class ConfigValueProvider
 {
     /** @var array */
@@ -19,12 +18,12 @@ class ConfigValueProvider
 
     /**
      * @param string $formType
-     * @param mixed $value
+     * @param mixed  $value
      * @return mixed
      */
     public function getConvertedValue($widgetConfig, $formType, $value = null)
     {
-        if(in_array($formType, array_keys($this->converters))) {
+        if (in_array($formType, array_keys($this->converters))) {
             return $this->converters[$formType]->getConvertedValue($widgetConfig, $value);
         }
 
@@ -38,7 +37,7 @@ class ConfigValueProvider
      */
     public function getViewValue($formType, $value)
     {
-        if(in_array($formType, array_keys($this->converters))) {
+        if (in_array($formType, array_keys($this->converters))) {
             return $this->converters[$formType]->getViewValue($value);
         }
 
