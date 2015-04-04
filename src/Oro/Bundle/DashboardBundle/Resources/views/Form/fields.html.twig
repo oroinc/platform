@@ -43,4 +43,23 @@
 {% block oro_type_widget_title_widget %}
     {{ form_widget(form.title) }}
     {{ form_row(form.useDefault) }}
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            $(function () {
+                var title     = $('input#{{ form.title.vars.id }}');
+                var isDefault = $('input#{{ form.useDefault.vars.id }}');
+
+                if (isDefault.prop('checked') == true) {
+                    $(title).prop('readonly', 'readonly');
+                }
+                $(isDefault).change(function() {
+                    if ($(this).is(':checked')) {
+                        $(title).prop('readonly', 'readonly');
+                    } else {
+                        $(title).removeAttr('readonly');
+                    }
+                });
+            });
+        })
+    </script>
 {% endblock oro_type_widget_title_widget %}

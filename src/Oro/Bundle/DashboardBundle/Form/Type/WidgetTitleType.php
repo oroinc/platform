@@ -4,13 +4,15 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class WidgetTitleType extends AbstractType
 {
     const NAME = 'oro_type_widget_title';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -18,7 +20,7 @@ class WidgetTitleType extends AbstractType
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -28,16 +30,24 @@ class WidgetTitleType extends AbstractType
             [
                 'required' => false
             ]
-        )->add(
+        );
+        $builder->add(
             'useDefault',
             'checkbox',
             [
-                'label' => 'oro.dashboard.title.use_default.label',
-                'required' => false,
-                'attr' => [
-                    'checked' => 'checked'
-                ]
+                'label'      => 'oro.dashboard.title.use_default.label',
+                'required'   => false
             ]
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        if (!isset($view->vars['value'], $view->vars['value']['useDefault'] )) {
+            $form->get('useDefault')->setData(true);
+        }
     }
 }
