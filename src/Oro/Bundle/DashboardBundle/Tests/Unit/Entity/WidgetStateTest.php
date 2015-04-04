@@ -21,11 +21,6 @@ class WidgetStateTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->state->getId());
     }
 
-    public function testOptions()
-    {
-        $this->assertEquals([], $this->state->getOptions());
-    }
-
     public function testOwner()
     {
         $this->assertNull($this->state->getOwner());

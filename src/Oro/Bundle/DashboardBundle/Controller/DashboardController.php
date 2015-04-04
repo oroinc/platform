@@ -107,12 +107,11 @@ class DashboardController extends Controller
         $form  = $this->getFormProvider()->getForm($widget->getName());
         $saved = false;
 
-        $widgetState = $this->getStateManager()->getWidgetState($widget);
-        $form->setData($widgetState->getOptions());
+        $form->setData($widget->getOptions());
 
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $widgetState->setOptions($form->getData());
+            $widget->setOptions($form->getData());
             $this->getEntityManager()->flush();
             $saved = true;
         }

@@ -122,7 +122,8 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                         'empty_board' => array(
                             'twig' => 'OroDashboardBundle:Index:default.html.twig'
                         )
-                    )
+                    ),
+                    'default_configuration' => []
                 ),
             ),
         );
