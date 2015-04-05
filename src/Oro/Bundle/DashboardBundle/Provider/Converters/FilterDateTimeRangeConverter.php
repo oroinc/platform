@@ -42,13 +42,16 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
             $startValue = $value['value']['start'];
             $endValue = $value['value']['end'];
 
-            switch ($value['type']) {
-                case AbstractDateFilterType::TYPE_LESS_THAN:
-                    $startValue = new DateTime('2000-01-01', new \DateTimeZone('UTC'));
-                    break;
-                case AbstractDateFilterType::TYPE_MORE_THAN:
-                    $endValue = new DateTime('now', new \DateTimeZone('UTC'));
-                    break;
+            if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
+                || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
+            ) {
+                $startValue = new DateTime('2000-01-01', new \DateTimeZone('UTC'));
+            }
+
+            if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
+                || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
+            ) {
+                $endValue = new DateTime('now', new \DateTimeZone('UTC'));
             }
 
             $start = $startValue instanceof DateTime ? $startValue : $this->dateCompiler->compile($startValue);

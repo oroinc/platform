@@ -103,6 +103,8 @@ services:
 
     oro_dashboard.datetime.hepler:
         class: %oro_dashboard.datetime.hepler.class%
+        arguments:
+            - @oro_locale.settings
 
     oro_dashboard.form.type.widget_date_range:
         class: %oro_dashboard.form.type.widget_date_range.class%

@@ -6,12 +6,28 @@ use \DateTime;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+
 class DateHelper
 {
-    const YEAR_TYPE_DAYS  = 1460;
+    const YEAR_TYPE_DAYS = 1460;
     const MONTH_TYPE_DAYS = 93;
-    const WEEK_TYPE_DAYS  = 60;
-    const DAY_TYPE_DAYS   = 2;
+    const WEEK_TYPE_DAYS = 60;
+    const DAY_TYPE_DAYS = 2;
+
+    /** @var string */
+    private $offset;
+
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
+    /**
+     * @param LocaleSettings $localeSettings
+     */
+    public function __construct(LocaleSettings $localeSettings)
+    {
+        $this->localeSettings = $localeSettings;
+    }
 
     /**
      * @param DateTime $start
@@ -20,13 +36,11 @@ class DateHelper
      */
     public function getDatePeriod(DateTime $start, DateTime $end)
     {
-        $config         = self::getFormatStrings($start, $end);
-        $interval       = new \DateInterval($config['intervalString']);
-        $incrementedEnd = clone $end;
-        // we should add 1 interval to the end date, because Date Period
-        // iterator deletes last item if the end is DateTime object
-        $incrementedEnd->add($interval);
-        $datePeriod = new \DatePeriod($start, $interval, $incrementedEnd);
+        $start      = clone $start;
+        $end        = clone $end;
+        $config     = self::getFormatStrings($start, $end);
+        $interval   = new \DateInterval($config['intervalString']);
+        $datePeriod = new \DatePeriod($start, $interval, $end);
         $increment  = 0;
         $dates      = [];
         // create dates by date period
@@ -52,32 +66,34 @@ class DateHelper
     {
         switch ($this->getFormatStrings($start, $end)['viewType']) {
             case 'year':
-                $qb->addSelect(sprintf('YEAR(%s) as yearCreated', $entityField));
+                $qb->addSelect(sprintf('%s as yearCreated', $this->getEnforcedTimezoneFunction('YEAR', $entityField)));
                 $qb->addGroupBy('yearCreated');
                 break;
             case 'month':
-                $qb->addSelect(sprintf('YEAR(%s) as yearCreated', $entityField));
-                $qb->addSelect(sprintf('MONTH(%s) as monthCreated', $entityField));
+                $qb->addSelect(sprintf('%s as yearCreated', $this->getEnforcedTimezoneFunction('YEAR', $entityField)));
+                $qb->addSelect(sprintf('%s as monthCreated',
+                    $this->getEnforcedTimezoneFunction('MONTH', $entityField)));
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
                 break;
             case 'date':
-                $qb->addSelect(sprintf('YEAR(%s) as yearCreated', $entityField));
-                $qb->addSelect(sprintf('WEEK(%s) as weekCreated', $entityField));
+                $qb->addSelect(sprintf("%s as yearCreated", $this->getEnforcedTimezoneFunction('YEAR', $entityField)));
+                $qb->addSelect(sprintf('%s as weekCreated', $this->getEnforcedTimezoneFunction('WEEK', $entityField)));
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('weekCreated');
                 break;
             case 'day':
-                $qb->addSelect(sprintf('YEAR(%s) as yearCreated', $entityField));
-                $qb->addSelect(sprintf('MONTH(%s) as monthCreated', $entityField));
-                $qb->addSelect(sprintf('DAY(%s) as dayCreated', $entityField));
+                $qb->addSelect(sprintf("%s as yearCreated", $this->getEnforcedTimezoneFunction('YEAR', $entityField)));
+                $qb->addSelect(sprintf("%s as monthCreated",
+                    $this->getEnforcedTimezoneFunction('MONTH', $entityField)));
+                $qb->addSelect(sprintf("%s as dayCreated", $this->getEnforcedTimezoneFunction('DAY', $entityField)));
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
                 $qb->addGroupBy('dayCreated');
                 break;
             case 'time':
-                $qb->addSelect(sprintf('DATE(%s) as dateCreated', $entityField));
-                $qb->addSelect(sprintf('HOUR(%s) as hourCreated', $entityField));
+                $qb->addSelect(sprintf('%s as dateCreated', $this->getEnforcedTimezoneFunction('DATE', $entityField)));
+                $qb->addSelect(sprintf('%s as hourCreated', $this->getEnforcedTimezoneFunction('HOUR', $entityField)));
                 $qb->addGroupBy('dateCreated');
                 $qb->addGroupBy('hourCreated');
                 break;
@@ -127,7 +143,7 @@ class DateHelper
     {
         $diff = $end->diff($start);
 
-        if ($diff->days >= self::YEAR_TYPE_DAYS) { // 4 years
+        if ($diff->days >= self::YEAR_TYPE_DAYS) {
             $intervalString    = 'P1Y';
             $valueStringFormat = 'Y';
             $viewType          = 'year';
@@ -157,7 +173,7 @@ class DateHelper
     }
 
     /**
-     * @param          $config
+     * @param array    $config
      * @param DateTime $date
      * @param          $increment
      * @return string
@@ -167,10 +183,8 @@ class DateHelper
         switch ($config['viewType']) {
             case 'year':
                 return $date->format('Y');
-                break;
             case 'month':
                 return $date->format('Y-m-01');
-                break;
             case 'date':
                 if ($increment === 0) {
                     return $date->format('Y-m-d');
@@ -178,12 +192,44 @@ class DateHelper
                 $wDate = new \DateTime();
                 $wDate->setISODate($date->format('Y'), $date->format('W'));
                 return $wDate->format('Y-m-d');
-                break;
             case 'day':
                 return $date->format('Y-m-d');
-                break;
-            case 'time':
-                return $date->format('c');
         }
+
+        return $date->format('c');
+    }
+
+
+    /**
+     * Check whenever user timezone not UTC then wrap field name with convert timezone func
+     *
+     * @param string $functionName
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    protected function getEnforcedTimezoneFunction($functionName, $fieldName)
+    {
+        if ('UTC' !== $this->localeSettings->getTimeZone()) {
+            $fieldName = sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
+        }
+        $result = sprintf('%s(%s)', $functionName, $fieldName);
+
+        return $result;
+    }
+
+    /**
+     * Get current timezone offset
+     *
+     * @return string
+     */
+    protected function getTimeZoneOffset()
+    {
+        if (null === $this->offset) {
+            $time         = new \DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
+            $this->offset = $time->format('P');
+        }
+
+        return $this->offset;
     }
 }

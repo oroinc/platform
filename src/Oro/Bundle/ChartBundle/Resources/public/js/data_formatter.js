@@ -45,9 +45,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                         date.setTime(data);
                         return dateTimeFormatter.getMomentForBackendDate(date).format('MMM DD');
                     case 'time':
-                        var date = new Date();
-                        date.setTime(data);
-                        return dateTimeFormatter.getMomentForBackendDateTime(date).format(dateTimeFormatter.getTimeFormat());
+                        return moment(data).format(dateTimeFormatter.getTimeFormat());
                     default:
                         return null;
                 }
@@ -83,7 +81,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                     case 'datetime':
                     case 'time':
                         var date = dateTimeFormatter.unformatBackendDateTime(data);
-                        return date.getTime();
+                        return date;
                     default:
                         return null;
                 }
