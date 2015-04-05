@@ -203,3 +203,33 @@ oro_dashboard_config:
  
 Also there are some additional TWIG templates for mostly used widgets, for example `tabbed`, `itemized` (a widget contains some items, for example links), `chart` and others.
 You can find them in `OroDashboardBundle/Resources/views/Dashboard` directory.
+
+Widget configuration
+---------------------
+
+Each widget can have own configuration. Configuration values stores for each widget instance on dashboard.
+
+To add configuration, the widget configuration should contain 'configuration' block, there should be list of available configuration values. For example:
+
+```yaml
+oro_dashboard_config:
+    widgets:
+        my_test_chart:
+  ...
+            configuration:
+                testValue:                       # field name
+                    type: text                   # field type
+                    options:                     # field options    
+                       label: acme.test.label    # field label            
+                    show_on_widget: true         # if true - value of config parameter will be shown at the bottom of widget. By default - false
+```
+If developer wants to add some config value to all widgets, he can use 'default_configuration' block of dashboard.yml file. For example:
+
+```yaml
+oro_dashboard_config:
+    default_configuration:
+        globalConfigParameter:
+            type: text
+            options:
+               label: acme.globalConfigParameter.label
+```
