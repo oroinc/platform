@@ -290,7 +290,7 @@ define(function (require) {
             _.extend(options, {
                 nativeMode: tools.isMobile(),
                 dateInputAttrs: {
-                    'class': this.inputClass
+                    'class': 'input-small date ' + this.inputClass
                 },
                 datePickerOptions: this.dateWidgetOptions,
                 dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector),
