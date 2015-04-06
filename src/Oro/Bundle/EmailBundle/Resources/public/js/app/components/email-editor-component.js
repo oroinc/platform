@@ -8,7 +8,6 @@ define(function (require) {
         select2 = require('jquery.select2'),
         routing = require('routing'),
         __ = require('orotranslation/js/translator'),
-        messenger = require('oroui/js/messenger'),
         mediator = require('oroui/js/mediator'),
         ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
@@ -70,7 +69,7 @@ define(function (require) {
                         $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig, "") + body.substring(caretPos));
                     }
                 } else {
-                    messenger.notificationMessage('info', __('oro.email.thread.no_signature'));
+                    mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature'));
                 }
             });
 
@@ -119,7 +118,7 @@ define(function (require) {
                                 .trigger('change');
                         },
                         error: function () {
-                            messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
+                            mediator.execute('notificationMessage', 'error', __('oro.email.emailtemplate.load_failed'));
                         },
                         dataType: 'json'
                     }).always(function () {
