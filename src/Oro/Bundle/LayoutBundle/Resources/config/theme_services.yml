@@ -1,13 +1,8 @@
 parameters:
-    oro_layout.theme_factory.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeFactory
-    oro_layout.theme_manager.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeManager
-    oro_layout.theme_extension.class:                  Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension
+    oro_layout.theme_factory.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeFactory
+    oro_layout.theme_manager.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeManager
+    oro_layout.theme_extension.class:                  Oro\Component\Layout\Extension\Theme\ThemeExtension
     oro_layout.request.listener.theme.class:           Oro\Bundle\LayoutBundle\EventListener\ThemeListener
-
-    oro_layout.loader.default_resource_factory.class:  Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory
-
-    oro_layout.loader.php_file_loader.class:           Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader
-    oro_layout.loader.yaml_file_loader.class:          Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader
 
     oro_layout.default_active_theme:    ~
     oro_layout.theme_updates_resources: []
@@ -15,12 +10,12 @@ parameters:
 
 services:
     oro_layout.dependency_initializer:
-        class:  Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer
+        class:  Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer
         public: false
         arguments:
             - @service_container
         calls:
-            - [addKnownDependency, ['\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
+            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
     oro_layout.theme_factory:
         class:  %oro_layout.theme_factory.class%
@@ -34,38 +29,34 @@ services:
             - []
 
     oro_layout.loader:
-        class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader
+        class:  Oro\Component\Layout\Loader\LayoutUpdateLoader
         public: false
         calls:
-            - [addLoader, [@oro_layout.loader.yaml_file_loader]]
-            - [addLoader, [@oro_layout.loader.php_file_loader]]
+            - [addDriver, [yml, @oro_layout.loader.yaml_driver]]
+            - [addDriver, [php, @oro_layout.loader.php_driver]]
 
-    oro_layout.loader.default_resource_factory:
-        class:  %oro_layout.loader.default_resource_factory.class%
-        public: false
-
-    oro_layout.loader.php_file_loader:
-        class:  %oro_layout.loader.php_file_loader.class%
+    oro_layout.loader.php_driver:
+        class:  Oro\Component\Layout\Loader\Driver\PhpDriver
         public: false
         arguments:
-            - @oro_layout.php_layout_update_generator
+            - @oro_layout.layout_update_generator.php
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
-    oro_layout.loader.yaml_file_loader:
-        class:  %oro_layout.loader.yaml_file_loader.class%
+    oro_layout.loader.yaml_driver:
+        class:  Oro\Component\Layout\Loader\Driver\YamlDriver
         public: false
         arguments:
-            - @oro_layout.config_layout_update_generator
+            - @oro_layout.layout_update_generator.config
             - %kernel.debug%
             - %oro_layout.updates_cache_dir%
 
     oro_layout.loader.path_provider:
-        class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainPathProvider
+        class:  Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider
         public: false
 
     oro_layout.loader.theme_path_provider:
-        class: Oro\Bundle\LayoutBundle\Layout\Loader\ThemePathProvider
+        class: Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider
         public: false
         arguments:
             - @oro_layout.theme_manager
@@ -83,15 +74,12 @@ services:
         class: %oro_layout.theme_extension.class%
         arguments:
             - %oro_layout.theme_updates_resources%
-            - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader
             - @oro_layout.dependency_initializer
             - @oro_layout.loader.path_provider
-        calls:
-            - [setLogger, [ @logger ]]
 
     oro_layout.data_provider.theme:
-        class: Oro\Bundle\LayoutBundle\Layout\DataProvider\ThemeDataProvider
+        class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider
         arguments:
             - @oro_layout.theme_manager
         tags:
@@ -102,19 +90,24 @@ services:
         public: false
         arguments:
             - %oro_layout.theme_updates_resources%
-            - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader
         tags:
             - { name: kernel.cache_warmer }
 
-    oro_layout.config_layout_update_generator:
-        class:  Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator
+    oro_layout.layout_update_generator.config:
+        class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
+        public: false
+        calls:
+            - [addExtension, [@oro_layout.layout_update_generator.extension.config_conditions]]
+
+    oro_layout.layout_update_generator.extension.config_conditions:
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
         public: false
         arguments:
             - @oro_layout.expression.assembler
 
-    oro_layout.php_layout_update_generator:
-        class:  Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator
+    oro_layout.layout_update_generator.php:
+        class:  Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator
         public: false
 
     oro_layout.request.listener.theme:

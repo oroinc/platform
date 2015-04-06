@@ -4,30 +4,24 @@ namespace Oro\Bundle\LayoutBundle\CacheWarmer;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
+use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
+use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
 
 class LayoutUpdatesWarmer implements CacheWarmerInterface
 {
     /** @var array */
     protected $resources;
 
-    /** @var LoaderInterface */
+    /** @var LayoutUpdateLoaderInterface */
     protected $loader;
 
-    /** @var ResourceFactoryInterface */
-    protected $factory;
-
     /**
-     * @param array                    $resources
-     * @param ResourceFactoryInterface $factory
-     * @param LoaderInterface          $loader
+     * @param array                       $resources
+     * @param LayoutUpdateLoaderInterface $loader
      */
-    public function __construct(array $resources, ResourceFactoryInterface $factory, LoaderInterface $loader)
+    public function __construct(array $resources, LayoutUpdateLoaderInterface $loader)
     {
         $this->resources = $resources;
-        $this->factory   = $factory;
         $this->loader    = $loader;
     }
 
@@ -36,12 +30,9 @@ class LayoutUpdatesWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        foreach (new ResourceIterator($this->factory, $this->resources) as $resource) {
-            if (!$this->loader->supports($resource)) {
-                continue;
-            }
-
-            $this->loader->load($resource);
+        $iterator = new ResourceIterator($this->resources);
+        foreach ($iterator as $file) {
+            $this->loader->load($file);
         }
     }
 

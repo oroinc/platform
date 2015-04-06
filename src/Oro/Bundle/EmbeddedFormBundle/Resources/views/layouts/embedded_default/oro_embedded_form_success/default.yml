@@ -1,4 +1,4 @@
-oro_layout:
+layout:
     actions:
         - @add:
             id:        success_message

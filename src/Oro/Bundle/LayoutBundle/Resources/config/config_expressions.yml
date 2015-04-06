@@ -95,11 +95,6 @@ services:
         tags:
             - { name: oro_layout.expression, alias: value|get }
 
-    oro_layout.expression.array:
-        class: Oro\Component\ConfigExpression\Func\GetArray
-        tags:
-            - { name: oro_layout.expression, alias: array }
-
     oro_layout.expression.iif:
         class: Oro\Component\ConfigExpression\Func\Iif
         tags:

@@ -1,5 +1,0 @@
-oro_layout:
-    actions:
-        - @add:
-            id: logo
-            parent: header

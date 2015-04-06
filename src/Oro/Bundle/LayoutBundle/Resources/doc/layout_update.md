@@ -48,7 +48,7 @@ arguments that will be passed directly to proxied method call. Arguments can be 
 
 **Example**
 ```yml
-oro_layout:
+layout:
     actions:
         - @add: # Sequential list
             - block_id
@@ -70,7 +70,7 @@ Optional parameters can be skipped in case when named arguments are used. In the
 
 **Example**
 ```yml
-oro_layout:
+layout:
     actions:
         - @move:
             id:        block_id
@@ -89,7 +89,7 @@ parent block.
 
 **Example**
 ```yml
-oro_layout:
+layout:
     actions:
         - @addTree:
             items:
@@ -123,7 +123,7 @@ Special grouping conditions (such as `@or`, `@and`) could be utilized in order t
 
 **Example**
 ```yml
-oro_layout:
+layout:
     actions:
         ....
     conditions:
@@ -156,12 +156,12 @@ Developer reference
 
 Here is a list of key classes involved in the layout update loading mechanism and their responsibilities:
 
- - `\Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader` - Loads layout update instructions based on *YAML* config.
- - `\Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader` - *PHP* loader, takes *PHP* instructions and compiles them into layout update.
- - `\Oro\Bundle\LayoutBundle\Layout\Generator\AbstractLayoutUpdateGenerator` - base class to implement generator for a new format.
- - `\Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator` - config based generator, now utilized by *YAML* loader,
+ - `Oro\Component\Layout\Loader\Driver\YamlDriver` - Loads layout update instructions based on *YAML* config.
+ - `Oro\Component\Layout\Loader\Driver\PhpDriver` - *PHP* loader, takes *PHP* instructions and compiles them into layout update.
+ - `Oro\Component\Layout\Loader\Generator\AbstractLayoutUpdateGenerator` - base class to implement generator for a new format.
+ - `Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator` - config based generator, now utilized by *YAML* loader,
     but may be reused for other formats (such as *XML*, *PHP arrays*) as well.
 
-In order to implement a loader for a new format different form supported, the `\Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface`
-interface should be implemented and added as a known loader to the loaders chain (add `addLoader` *method call*
+In order to implement a loader for a new format different form supported, the `Oro\Component\Layout\Loader\Driver\DriverInterface`
+interface should be implemented and added as a known driver to the loader (add `addDriver` *method call*
 for `oro_layout.loader` service definition).

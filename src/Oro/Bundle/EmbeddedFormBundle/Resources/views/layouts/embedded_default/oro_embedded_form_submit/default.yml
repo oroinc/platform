@@ -1,4 +1,4 @@
-oro_layout:
+layout:
     actions:
         - @add:
             id:        embedded_form

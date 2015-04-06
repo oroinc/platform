@@ -29,7 +29,9 @@ class CoreExtension extends AbstractExtension
             new Condition\NotBlank(),
             new Condition\True(),
             new Condition\False(),
+            new Func\GetValue(),
             new Func\Iif(),
+            new Func\Join(),
             new Func\Trim()
         ];
     }

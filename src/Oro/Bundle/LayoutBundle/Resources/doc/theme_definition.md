@@ -100,7 +100,7 @@ Developer reference
 
 Here is a list of key classes involved in the theme layout search process:
 
- - `\Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension` - the **layout extension** responsible for obtaining
+ - `Oro\Component\Layout\Extension\Theme\ThemeExtension` - the **layout extension** responsible for obtaining
     updates depending on current context.
- - `\Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator` - iterates through known layout updates and accepts those
+ - `Oro\Component\Layout\Extension\Theme\Model\ResourceIterator` - iterates through known layout updates and accepts those
     that match given criteria.

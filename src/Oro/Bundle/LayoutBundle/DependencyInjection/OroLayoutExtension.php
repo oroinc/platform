@@ -9,10 +9,11 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\Config\Loader\FolderContentCummulativeLoader;
+use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 
 class OroLayoutExtension extends Extension
 {
+    const UPDATE_LOADER_SERVICE_ID = 'oro_layout.loader';
     const THEME_MANAGER_SERVICE_ID = 'oro_layout.theme_manager';
 
     /**
@@ -65,13 +66,20 @@ class OroLayoutExtension extends Extension
         if (isset($config['active_theme'])) {
             $container->setParameter('oro_layout.default_active_theme', $config['active_theme']);
         }
-        $managerDefinition = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
-        $managerDefinition->replaceArgument(1, $config['themes']);
+        $themeManagerDef = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
+        $themeManagerDef->replaceArgument(1, $config['themes']);
 
         $foundThemeLayoutUpdates = [];
-        $updatesLoader           = new CumulativeConfigLoader(
+        $updateFileExtensions    = [];
+        $updateLoaderDef         = $container->getDefinition(self::UPDATE_LOADER_SERVICE_ID);
+        foreach ($updateLoaderDef->getMethodCalls() as $methodCall) {
+            if ($methodCall[0] === 'addDriver') {
+                $updateFileExtensions[] = $methodCall[1][0];
+            }
+        }
+        $updatesLoader = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            [new FolderContentCummulativeLoader('Resources/views/layouts/', -1, false)]
+            [new FolderContentCumulativeLoader('Resources/views/layouts/', -1, false, $updateFileExtensions)]
         );
 
         $resources = $updatesLoader->load($container);
