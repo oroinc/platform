@@ -8,10 +8,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 class EmptyArrayLoader extends ArrayLoader
 {
     /**
-     * @param mixed $resource
-     * @param string $locale
-     * @param string $domain
-     * @return MessageCatalogue
+     * {@inheritdoc}
      */
     public function load($resource, $locale, $domain = 'messages')
     {
