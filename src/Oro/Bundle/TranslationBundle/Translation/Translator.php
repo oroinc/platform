@@ -4,6 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+
 class Translator extends BaseTranslator
 {
     /**
@@ -160,7 +162,7 @@ class Translator extends BaseTranslator
      */
     private function ensureDatabaseLoaderAdded($locale)
     {
-        if (null !== $this->databaseTranslationMetadataCache) {
+        if (null !== $this->databaseTranslationMetadataCache && $this->isInstalled()) {
             $resources        = !empty($this->dynamicResources[$locale]) ? $this->dynamicResources[$locale] : [];
             $databaseResource = array_filter(
                 $resources,
@@ -169,13 +171,29 @@ class Translator extends BaseTranslator
                 }
             );
             if (!$databaseResource) {
-                $this->addResource(
-                    'oro_database_translation',
-                    new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
-                    $locale,
-                    'messages'
-                );
+                // register resources for all domains to load all available translations into cache
+                $availableDomains = $this->container->get('doctrine')
+                    ->getRepository(Translation::ENTITY_NAME)
+                    ->findAvailableDomains($locale);
+                foreach ($availableDomains as $domain) {
+                    $this->addResource(
+                        'oro_database_translation',
+                        new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
+                        $locale,
+                        $domain
+                    );
+                }
             }
         }
+    }
+
+    /*
+     * Check if the platform is installed
+     *
+     * @return bool
+     */
+    private function isInstalled()
+    {
+        return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
     }
 }
