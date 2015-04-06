@@ -49,7 +49,8 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
         if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
             $targetEntities = $this->getTargetEntities();
 
-            return !empty($targetEntities)
+            return
+                !empty($targetEntities)
                 && $this->configManager->getProvider('extend')->hasConfig(TrackingVisit::ENTITY_NAME);
         }
 
@@ -79,10 +80,8 @@ class IdentifierVisitConfigDumperExtension extends AbstractEntityConfigDumperExt
     protected function getTargetEntities()
     {
         if (null === $this->targetEntities) {
-            $targetEntityClasses       = $this->identifyProvider->getTargetEntities();
-            $this->targetEntityConfigs = [];
-
-            $configs = $this->configManager->getProvider('extend')->getConfigs();
+            $targetEntityClasses = $this->identifyProvider->getTargetIdentityEntities();
+            $configs             = $this->configManager->getProvider('extend')->getConfigs();
             foreach ($configs as $config) {
                 if ($config->is('upgradeable')
                     && in_array($config->getId()->getClassName(), $targetEntityClasses)

@@ -17,17 +17,25 @@ use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
+use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider;
 
+/**
+ * Class TrackingProcessor
+ * @package Oro\Bundle\TrackingBundle\Processor
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class TrackingProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const TRACKING_EVENT_ENTITY = 'OroTrackingBundle:TrackingEvent';
-    const TRACKING_VISIT_ENTITY = 'OroTrackingBundle:TrackingVisit';
+    const TRACKING_EVENT_ENTITY       = 'OroTrackingBundle:TrackingEvent';
+    const TRACKING_VISIT_ENTITY       = 'OroTrackingBundle:TrackingVisit';
+    const TRACKING_VISIT_EVENT_ENTITY = 'OroTrackingBundle:TrackingVisitEvent';
 
     /** Batch size for tracking events */
-    const BATCH_SIZE  = 100;
+    const BATCH_SIZE = 100;
 
     /** Max retries to identify tracking visit */
     const MAX_RETRIES = 100;
@@ -50,6 +58,9 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var array */
     protected $skipList = [];
 
+    /** @var DeviceDetectorFactory */
+    protected $deviceDetector;
+
     /**
      * @param ManagerRegistry                     $doctrine
      * @param TrackingEventIdentificationProvider $trackingIdentification
@@ -58,6 +69,7 @@ class TrackingProcessor implements LoggerAwareInterface
     {
         $this->doctrine               = $doctrine;
         $this->trackingIdentification = $trackingIdentification;
+        $this->deviceDetector         = new DeviceDetectorFactory();
     }
 
     /**
@@ -103,6 +115,12 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger->notice('Try to process Next batch');
         }
 
+        $this->logger->notice('Recheck previous visit events...');
+        $this->skipList = [];
+        while ($this->identifyPrevVisitEvents()) {
+            $this->logger->notice('Try to process Next batch');
+        }
+
         $this->logger->notice('<info>Done</info>');
     }
 
@@ -124,12 +142,57 @@ class TrackingProcessor implements LoggerAwareInterface
     }
 
     /**
+     * Process previous visit events
+     *
+     * @return bool
+     */
+    protected function identifyPrevVisitEvents()
+    {
+        $em           = $this->getEntityManager();
+        $queryBuilder = $em
+            ->getRepository(self::TRACKING_VISIT_EVENT_ENTITY)
+            ->createQueryBuilder('entity');
+        $queryBuilder
+            ->select('entity')
+            ->andWhere('entity.parsingCount < :maxRetries')
+            ->setParameter('maxRetries', self::MAX_RETRIES);
+
+        if (count($this->skipList)) {
+            $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
+        }
+
+        /** @var TrackingVisitEvent[] $entities */
+        $entities = $queryBuilder->getQuery()->getResult();
+        if ($entities) {
+            foreach ($entities as $visitEvent) {
+                $visitEvent->setParsingCount($visitEvent->getParsingCount() + 1);
+                $this->skipList[] = $visitEvent->getId();
+                $targets          = $this->trackingIdentification->processEvent($visitEvent);
+                if (!empty($targets)) {
+                    foreach ($targets as $target) {
+                        $visitEvent->addAssociationTarget($target);
+                    }
+                }
+
+                $em->persist($visitEvent);
+            }
+
+            $em->flush();
+            $em->clear();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      *  Identify previous visits in case than we haven't data to identify visit previously
      */
     protected function identifyPrevVisits()
     {
-        $em             = $this->getEntityManager();
-        $queryBuilder   = $em
+        $em           = $this->getEntityManager();
+        $queryBuilder = $em
             ->getRepository(self::TRACKING_VISIT_ENTITY)
             ->createQueryBuilder('entity');
         $queryBuilder
@@ -141,7 +204,7 @@ class TrackingProcessor implements LoggerAwareInterface
             ->setParameter('maxRetries', self::MAX_RETRIES);
 
         if (count($this->skipList)) {
-            $queryBuilder->andWhere('entity.id not in('. implode(',', $this->skipList) .')');
+            $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
         }
 
         $entities = $queryBuilder->getQuery()->getResult();
@@ -195,6 +258,44 @@ class TrackingProcessor implements LoggerAwareInterface
 
             $identifier = $visit->getIdentifierTarget();
             if ($identifier) {
+                // update tracking event identifiers
+                $associationName = ExtendHelper::buildAssociationName(
+                    ClassUtils::getClass($identifier),
+                    VisitEventAssociationExtension::ASSOCIATION_KIND
+                );
+
+                $qb = $this->getEntityManager()
+                    ->createQueryBuilder();
+
+                $subSelect = $qb->select('entity.id')
+                    ->from(self::TRACKING_VISIT_ENTITY, 'entity')
+                    ->where('entity.visitorUid = :visitorUid')
+                    ->andWhere('entity.firstActionTime < :maxDate')
+                    ->andWhere('entity.identifierDetected = false')
+                    ->andWhere('entity.parsedUID = 0')
+                    ->andWhere('entity.trackingWebsite  = :website')
+                    ->setParameter('visitorUid', $visit->getVisitorUid())
+                    ->setParameter('maxDate', $visit->getFirstActionTime())
+                    ->setParameter('website', $visit->getTrackingWebsite())
+                    ->getQuery()
+                    ->getArrayResult();
+                if (!empty($subSelect)) {
+                    array_walk(
+                        $subSelect,
+                        function (&$value) {
+                            $value = $value['id'];
+                        }
+                    );
+
+                    $this->getEntityManager()->createQueryBuilder()
+                        ->update(self::TRACKING_VISIT_EVENT_ENTITY, 'event')
+                        ->set('event.' . $associationName, ':identifier')
+                        ->where('event.visit in(' . implode(',', $subSelect) .')')
+                        ->setParameter('identifier', $identifier)
+                        ->getQuery()
+                        ->execute();
+                }
+
                 $associationName = ExtendHelper::buildAssociationName(
                     ClassUtils::getClass($identifier),
                     IdentifierEventExtension::ASSOCIATION_KIND
@@ -219,6 +320,8 @@ class TrackingProcessor implements LoggerAwareInterface
                     ->execute();
             }
         }
+
+        $this->deviceDetector->clearInstances();
     }
 
     /**
@@ -256,15 +359,23 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger->info('Processing event - ' . $event->getId());
 
             $trackingVisitEvent = new TrackingVisitEvent();
-
+            $trackingVisitEvent->setParsingCount(0);
             $trackingVisitEvent->setEvent($this->getEventType($event));
 
             $eventData   = $event->getEventData();
-            $decodedData = json_decode($eventData->getData());
+            $decodedData = json_decode($eventData->getData(), true);
 
             $trackingVisit = $this->getTrackingVisit($event, $decodedData);
             $trackingVisitEvent->setVisit($trackingVisit);
             $trackingVisitEvent->setWebEvent($event);
+            $trackingVisitEvent->setWebsite($event->getWebsite());
+
+            $targets = $this->trackingIdentification->processEvent($trackingVisitEvent);
+            if (!empty($targets)) {
+                foreach ($targets as $target) {
+                    $trackingVisitEvent->addAssociationTarget($target);
+                }
+            }
 
             $event->setParsed(true);
 
@@ -292,13 +403,13 @@ class TrackingProcessor implements LoggerAwareInterface
 
     /**
      * @param TrackingEvent $trackingEvent
-     * @param \stdClass     $decodedData
+     * @param array         $decodedData
      *
      * @return TrackingVisit
      */
     protected function getTrackingVisit(TrackingEvent $trackingEvent, $decodedData)
     {
-        $visitorUid     = $decodedData->_id;
+        $visitorUid     = $decodedData['_id'];
         $userIdentifier = $trackingEvent->getUserIdentifier();
 
         $hash = md5($visitorUid . $userIdentifier);
@@ -327,6 +438,14 @@ class TrackingProcessor implements LoggerAwareInterface
             $visit->setTrackingWebsite($trackingEvent->getWebsite());
             $visit->setIdentifierDetected(false);
 
+            if (!empty($decodedData['cip'])) {
+                $visit->setIp($decodedData['cip']);
+            }
+
+            if (!empty($decodedData['ua'])) {
+                $this->processUserAgentString($visit, $decodedData['ua']);
+            }
+
             $this->identifyTrackingVisit($visit);
 
             $this->collectedVisits[$hash] = $visit;
@@ -340,6 +459,34 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         return $visit;
+    }
+
+    /**
+     * @param TrackingVisit $visit
+     * @param string        $ua
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * because of ternary operators which in current case is clear enough to replace it with 'if' statement.
+     */
+    protected function processUserAgentString(TrackingVisit $visit, $ua)
+    {
+        $device = $this->deviceDetector->getInstance($ua);
+        $os     = $device->getOs();
+        if (is_array($os)) {
+            $visit->setOs(isset($os['name']) ? $os['name'] : null);
+            $visit->setOsVersion(isset($os['version']) ? $os['version'] : null);
+        }
+
+        $client = $device->getClient();
+        if (is_array($client)) {
+            $visit->setClient(isset($client['name']) ? $client['name'] : null);
+            $visit->setClientType(isset($client['type']) ? $client['type'] : null);
+            $visit->setClientVersion(isset($client['version']) ? $client['version'] : null);
+        }
+
+        $visit->setDesktop($device->isDesktop());
+        $visit->setMobile($device->isMobile());
+        $visit->setBot($device->isBot());
     }
 
     /**
@@ -357,7 +504,7 @@ class TrackingProcessor implements LoggerAwareInterface
                 $this->eventDictionary[$eventWebsite->getId()][$event->getName()]
             )
         ) {
-            $eventType = $this->eventDictionary[$event->getWebsite()->getId()][$event->getName()];
+            $eventType = $this->eventDictionary[$eventWebsite->getId()][$event->getName()];
         } else {
             $eventType = $this->getEntityManager()
                 ->getRepository('OroTrackingBundle:TrackingEventDictionary')

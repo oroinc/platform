@@ -102,7 +102,7 @@ class Processor
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
-        $messageId = $message->generateId();
+        $messageId = '<' . $message->generateId() . '>';
 
         if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');

@@ -44,7 +44,8 @@ class CalendarEventType extends AbstractType
                 'oro_datetime',
                 [
                     'required' => true,
-                    'label'    => 'oro.calendar.calendarevent.start.label'
+                    'label'    => 'oro.calendar.calendarevent.start.label',
+                    'attr'     => ['class' => 'start'],
                 ]
             )
             ->add(
@@ -52,7 +53,8 @@ class CalendarEventType extends AbstractType
                 'oro_datetime',
                 [
                     'required' => true,
-                    'label'    => 'oro.calendar.calendarevent.end.label'
+                    'label'    => 'oro.calendar.calendarevent.end.label',
+                    'attr'     => ['class' => 'end'],
                 ]
             )
             ->add(

@@ -2,9 +2,16 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+
+use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Model\StateManager;
+
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+
+use Symfony\Component\HttpFoundation\Request;
 
 class WidgetConfigs
 {
@@ -17,19 +24,34 @@ class WidgetConfigs
     /** @var ResolverInterface */
     protected $resolver;
 
+    /** @var StateManager */
+    protected $stateManager;
+
+    /** @var EntityManagerInterface */
+    protected $entityManager;
+
+    /** @var Request|null */
+    protected $request;
+
     /**
-     * @param ConfigProvider    $configProvider
-     * @param SecurityFacade    $securityFacade
-     * @param ResolverInterface $resolver
+     * @param ConfigProvider          $configProvider
+     * @param SecurityFacade          $securityFacade
+     * @param ResolverInterface       $resolver
+     * @param EntityManagerInterface  $entityManager
+     * @param StateManager            $stateManager
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
-        ResolverInterface $resolver
+        ResolverInterface $resolver,
+        EntityManagerInterface $entityManager,
+        StateManager $stateManager
     ) {
-        $this->configProvider = $configProvider;
-        $this->securityFacade = $securityFacade;
-        $this->resolver       = $resolver;
+        $this->configProvider   = $configProvider;
+        $this->securityFacade   = $securityFacade;
+        $this->resolver         = $resolver;
+        $this->entityManager    = $entityManager;
+        $this->stateManager     = $stateManager;
     }
 
     /**
@@ -91,6 +113,33 @@ class WidgetConfigs
     }
 
     /**
+     * Returns a list of options for widget with id $widgetId or current widget if $widgetId is not specified
+     *
+     * @param int|null $widgetId
+     *
+     * @return WidgetOptionBag
+     */
+    public function getWidgetOptions($widgetId = null)
+    {
+        if (!$this->request) {
+            return new WidgetOptionBag();
+        }
+
+        if (!$widgetId) {
+            $widgetId = $this->request->query->get('_widgetId', null);
+        }
+
+        if (!$widgetId) {
+            return new WidgetOptionBag();
+        }
+
+        $widget = $this->findWidget($widgetId);
+        $widgetState = $this->stateManager->getWidgetState($widget);
+
+        return new WidgetOptionBag($widgetState->getOptions());
+    }
+
+    /**
      * Filter widget configs based on acl enabled and applicable flag
      *
      * @param array $items
@@ -118,5 +167,23 @@ class WidgetConfigs
                 return $enabled && $accessGranted && $applicable;
             }
         );
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Widget
+     */
+    protected function findWidget($id)
+    {
+        return $this->entityManager->getRepository('OroDashboardBundle:Widget')->find($id);
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 }

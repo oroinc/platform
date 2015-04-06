@@ -64,6 +64,9 @@ define([], function () {
             if (!blackPreference) {
                 blackPreference = 0.58;
             }
+            if (!rgb) {
+                return '#000000';
+            }
             return (this.colorDifference(rgb, black) * blackPreference > this.colorDifference(rgb, white)) ? '#000000' : '#FFFFFF';
         }
     };

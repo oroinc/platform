@@ -75,7 +75,11 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
 
         return
             $fieldConfigId instanceof FieldConfigId
-            && $fieldConfigId->getFieldType() === $this->getAssociationType()
+            && ($fieldConfigId->getFieldType() === $this->getAssociationType()
+                || ($this->getAssociationType() === 'multipleManyToOne'
+                    && RelationType::MANY_TO_ONE === $fieldConfigId->getFieldType()
+                )
+            )
             && $fieldConfigId->getFieldName() === ExtendHelper::buildAssociationName(
                 $relationData['target_entity'],
                 $this->getAssociationKind()
@@ -97,11 +101,122 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             case RelationType::MANY_TO_MANY:
                 $this->generateManyToManyAssociationMethods($schema, $class);
                 break;
+            case 'multipleManyToOne':
+                $this->generateMultipleManyToOneAssociationMethods($schema, $class);
+                break;
             default:
                 throw new \RuntimeException(
                     sprintf('The "%s" association is not supported.', $this->getAssociationType())
                 );
         }
+    }
+
+    /**
+     * @param array    $schema
+     * @param PhpClass $class
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    protected function generateMultipleManyToOneAssociationMethods(array $schema, PhpClass $class)
+    {
+        $prefix = $this->getAssociationKind();
+        $prefix = Inflector::classify(null === $prefix ? '' : $prefix);
+
+        $supportMethodName = sprintf('support%sTarget', $prefix);
+        $getMethodName     = sprintf('get%sTargets', $prefix);
+        $setMethodName     = sprintf('add%sTarget', $prefix);
+        $resetMethodName   = sprintf('reset%sTargets', $prefix);
+
+        $supportMethodBody = [
+            '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
+        ];
+        $getMethodBody     = [
+            '$targets = [];',
+        ];
+        $setMethodBody     = [
+            'if (null === $target) { $this->' . $resetMethodName . '(); return $this; }',
+            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
+        ];
+        $resetMethodBody   = [];
+
+        foreach ($schema['relationData'] as $relationData) {
+            if (!$this->isSupportedRelation($relationData)) {
+                continue;
+            }
+
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId   = $relationData['field_id'];
+            $fieldName       = $fieldConfigId->getFieldName();
+            $targetClassName = $relationData['target_entity'];
+
+            $supportMethodBody[] = sprintf(
+                'if ($className === \'%s\') { return true; }',
+                $targetClassName
+            );
+            $getMethodBody[]  = str_replace(
+                ['{field}'],
+                [$fieldName],
+                "\$entity = \$this->{field};\n"
+                . "if (\$entity) {\n"
+                . "    \$targets[] = \$entity;\n"
+                . "}"
+            );
+            $setMethodBody[]     = sprintf(
+                'if ($className === \'%s\') { $this->%s = %s; return $this; }',
+                $targetClassName,
+                $fieldName,
+                '$target'
+            );
+            $resetMethodBody[]   = sprintf(
+                '$this->%s = null;',
+                $fieldName
+            );
+        }
+
+        $supportMethodBody[] = 'return false;';
+        $getMethodBody[]     = "return \$targets;";
+        $setMethodBody[]     = 'throw new \RuntimeException(sprintf('
+            . '\'The association with "%s" entity was not configured.\', $className));';
+
+        $supportMethodDocblock = "/**\n"
+            . " * Checks if this entity can be associated with the given target entity type\n"
+            . " *\n"
+            . " * @param string \$targetClass The class name of the target entity\n"
+            . " * @return bool\n"
+            . " */";
+        $getMethodDocblock     = "/**\n"
+            . " * Gets the entities this entity is associated with\n"
+            . " *\n"
+            . " * @return object[]\n"
+            . " */";
+        $setMethodDocblock     = "/**\n"
+            . " * Sets the entity this entity is associated with\n"
+            . " *\n"
+            . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
+            . " * @return object This object\n"
+            . " */";
+
+        $class
+            ->setMethod(
+                $this
+                    ->generateClassMethod($resetMethodName, implode("\n", $resetMethodBody))
+                    ->setVisibility('private')
+            )
+            ->setMethod(
+                $this
+                    ->generateClassMethod($supportMethodName, implode("\n", $supportMethodBody), ['targetClass'])
+                    ->setDocblock($supportMethodDocblock)
+            )
+            ->setMethod(
+                $this
+                    ->generateClassMethod($getMethodName, implode("\n", $getMethodBody))
+                    ->setDocblock($getMethodDocblock)
+            )
+            ->setMethod(
+                $this
+                    ->generateClassMethod($setMethodName, implode("\n", $setMethodBody), ['target'])
+                    ->setDocblock($setMethodDocblock)
+            );
     }
 
     /**

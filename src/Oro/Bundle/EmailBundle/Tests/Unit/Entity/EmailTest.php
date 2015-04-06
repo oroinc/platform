@@ -149,7 +149,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['xMessageId', 'testXMessageId'],
             ['thread', new EmailThread()],
             ['xThreadId', 'testxXThreadId'],
-            ['refs', 'testRefs'],
             ['seen', true],
             ['seen', ''],
             ['seen', 0],

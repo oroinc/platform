@@ -1,16 +1,18 @@
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oro/block-widget'],
-    function (_, Backbone, __, mediator, BlockWidget) {
+define([
+    'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oro/block-widget'
+], function (_, Backbone, __, mediator, BlockWidget) {
     'use strict';
 
-    var $ = Backbone.$;
+    var DashboardItemWidget,
+        $ = Backbone.$;
 
     /**
      * @export  orodashboard/js/widget/dashboard-item
      * @class   orodashboard.DashboardItemWidget
      * @extends oro.BlockWidget
      */
-    return BlockWidget.extend({
+    DashboardItemWidget = BlockWidget.extend({
         /**
          * Widget events
          *
@@ -32,6 +34,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             'click .default-actions-container .remove-action': function(event) {
                 event.preventDefault();
                 this.onRemoveFromDashboard();
+            },
+            'click .default-actions-container .configure-action': function(event) {
+                event.preventDefault();
+                this.onConfigure();
             }
         },
 
@@ -75,6 +81,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
                                     '<i class="icon-move hide-text"></i>' +
                                 '</a>' +
                             '</span>' +
+                            '<% if (showConfig) { %>' +
+                                '<span class="action-wrapper">' +
+                                    '<a class="configure-action" href="#" title="<%- _.__(\'oro.dashboard.widget.configure\') %>">' +
+                                        '<i class="icon-cog hide-text"></i>' +
+                                    '</a>' +
+                                '</span>' +
+                            '<% } %>' +
                             '<span class="action-wrapper">' +
                                 '<a class="remove-action" href="#" title="<%- _.__(\'oro.dashboard.widget.remove\') %>">' +
                                     '<i class="icon-trash hide-text"></i>' +
@@ -97,7 +110,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             this.options = _.defaults(options || {}, this.options);
             this.options.templateParams.allowEdit = this.options.allowEdit;
             this.options.templateParams.collapsed = options.state.expanded;
-            BlockWidget.prototype.initialize.apply(this, arguments);
+            this.options.templateParams.showConfig = this.options.showConfig;
+            DashboardItemWidget.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -107,7 +121,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
          */
         initializeWidget: function(options) {
             this._initState(options);
-            BlockWidget.prototype.initializeWidget.apply(this, arguments);
+            DashboardItemWidget.__super__.initializeWidget.apply(this, arguments);
+        },
+
+        _afterLayoutInit: function () {
+            this.$el.removeClass('invisible');
+            DashboardItemWidget.__super__._afterLayoutInit.apply(this, arguments);
         },
 
         /**
@@ -244,6 +263,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
         onRemoveFromDashboard: function() {
             this.trigger('removeFromDashboard', this.$el, this);
             mediator.trigger('widget:dashboard:removeFromDashboard:' + this.getWid(), this.$el, this);
+        },
+
+        /**
+         * Trigger configure action
+         */
+        onConfigure: function() {
+            this.trigger('configure', this.$el, this);
+            mediator.trigger('widget:dashboard:configure:' + this.getWid(), this.$el, this);
         }
     });
+
+    return DashboardItemWidget;
 });

@@ -30,7 +30,22 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
 
-        $this->target = new WidgetConfigs($this->configProvider, $this->securityFacade, $this->resolver);
+        $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+
+        $stateManager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\StateManager')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $this->target = new WidgetConfigs(
+            $this->configProvider,
+            $this->securityFacade,
+            $this->resolver,
+            $em,
+            $stateManager,
+            $eventDispatcher
+        );
     }
 
     public function testGetWidgetAttributesForTwig()
