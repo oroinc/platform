@@ -8,7 +8,6 @@ define(function (require) {
         select2 = require('jquery.select2'),
         routing = require('routing'),
         __ = require('orotranslation/js/translator'),
-        messenger = require('oroui/js/messenger'),
         mediator = require('oroui/js/mediator'),
         ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
@@ -58,15 +57,19 @@ define(function (require) {
                 $addSignatureButton = this.options._sourceElement.find('#addSignatureButton');
 
             $addSignatureButton.on('click', function() {
-                var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
-                if (bodyEditorComponent.view.tinymceConnected) {
-                    var tinyMCE= bodyEditorComponent.view.tinymceInstance;
-                    tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                if ($signature.val()) {
+                    var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
+                    if (bodyEditorComponent.view.tinymceConnected) {
+                        var tinyMCE = bodyEditorComponent.view.tinymceInstance;
+                        tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                    } else {
+                        $body.focus();
+                        var caretPos = $body.getCursorPosition();
+                        var body = $body.val();
+                        $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig, "") + body.substring(caretPos));
+                    }
                 } else {
-                    $body.focus();
-                    var caretPos = $body.getCursorPosition();
-                    var body = $body.val();
-                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos));
+                    mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature'));
                 }
             });
 
@@ -115,7 +118,7 @@ define(function (require) {
                                 .trigger('change');
                         },
                         error: function () {
-                            messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
+                            mediator.execute('notificationMessage', 'error', __('oro.email.emailtemplate.load_failed'));
                         },
                         dataType: 'json'
                     }).always(function () {
