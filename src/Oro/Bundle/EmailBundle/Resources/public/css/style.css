@@ -153,10 +153,8 @@
     position: relative;
     margin-right: 8px;
 }
-.attachment-item span.filename {
-    padding: 2px 5px;
+.attachment-item span.filename-label {
     color: #006acc;
-    background-color: #F2F2F2;
 }
 .attachment-item i.icon-remove {
     cursor: pointer;

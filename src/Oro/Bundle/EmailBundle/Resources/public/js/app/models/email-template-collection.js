@@ -25,7 +25,6 @@ define(function (require) {
          * @param includeSystem {bool}
          */
         initialize: function (route, routeId, includeSystem) {
-            console.log(includeSystem);
             this.route = route;
             this.routeId = routeId;
             this.includeSystem = includeSystem;
