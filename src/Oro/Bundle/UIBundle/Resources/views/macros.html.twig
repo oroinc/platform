@@ -10,16 +10,16 @@
     <div data-content="{{ name }}">
         <div class="row-oro oro-multiselect-holder">
             <div class="float-holder ">
-            {{ form_errors(form) }}
-            {% if form.children|length  %}
-                {% for child in form %}
-                    {{ form_errors(child) }}
-                    {{ form_widget(child) }}
-                {% endfor %}
-            {% else %}
-                {{ form_widget(form) }}
-            {% endif %}
-            {{ form_rest(form) }}
+                {{ form_errors(form) }}
+                {% if form.children|length  %}
+                    {% for child in form %}
+                        {{ form_errors(child) }}
+                        {{ form_widget(child) }}
+                    {% endfor %}
+                {% else %}
+                    {{ form_widget(form) }}
+                {% endif %}
+                {{ form_rest(form) }}
             </div>
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
         </div>
