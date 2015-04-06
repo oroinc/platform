@@ -70,7 +70,7 @@ define([
             }
             if (data.editor_id) {
                 data.editor_url = routing.generate('oro_user_view', {'id': data.editor_id});
-            }else {
+            } else {
                 data.editor_url = '';
             }
             data.routing = routing;
@@ -101,6 +101,10 @@ define([
 
         onToggle: function (e) {
             e.preventDefault();
+            this.toggle();
+        },
+
+        toggle: function () {
             if (!this.options.ignoreHead && this.model.get('is_head')) {
                 this.model.collection.trigger('toViewGroup', this.model);
             } else {

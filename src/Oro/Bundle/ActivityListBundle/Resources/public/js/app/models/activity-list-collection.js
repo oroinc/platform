@@ -50,6 +50,69 @@ define([
             this.pager.pagesize = pagesize;
         },
 
+        reset: function (models, options) {
+            var iPrev, iNew,
+                modelCurrent, modelNew,
+                correspondingModel,
+                newAttributes;
+            // to keep collection-view in actual state
+            // need to make dirty check
+
+            options || (options = {});
+            options.previousModels = this.models;
+
+            if (options.parse) {
+                models = this.parse(models, options);
+            }
+
+            // dirty check
+            iPrev = 0;
+            iNew = 0;
+            while (iPrev < this.models.length || iNew < models.length) {
+                modelCurrent = this.models[iPrev];
+                modelNew = models[iNew];
+
+                if (!modelCurrent) {
+                    // all current models are processed
+                    // just add last new models
+                    this.add(models.slice(iNew));
+                    // mark everything is processed
+                    iPrev = this.models.length;
+                    iNew = models.length;
+                } else if (!modelNew) {
+                    // all new models are processed
+                    // just remove last old models
+                    this.remove(this.models.slice(iPrev));
+                } else if (correspondingModel = this.find(function (item) {return item.id === modelNew.id; })) {
+                    // if model has corresponding current models
+                    // if updatedAt attribute was changed - replace model
+                    newAttributes = modelNew instanceof this.model ? modelNew.toJSON() : modelNew;
+                    if (correspondingModel.get('updatedAt') !== newAttributes.updatedAt) {
+                        this.remove(correspondingModel);
+                        modelNew = this._prepareModel(modelNew, options);
+                        this.add(modelNew, {at: iPrev});
+                    } else {
+                        // remove all models before found
+                        while (this.models.indexOf(correspondingModel) !== iPrev) {
+                            this.remove(this.models[iPrev]);
+                        }
+                    }
+
+                    iPrev++;
+                    iNew++;
+                } else {
+                    // model is new
+                    this.add(this._prepareModel(modelNew, options), {at: iPrev});
+                    iPrev++;
+                    iNew++;
+                }
+            }
+
+            this.trigger('reset', this, options);
+
+            return models;
+        },
+
         getCount: function () {
             return parseInt(this.pager.count);
         },

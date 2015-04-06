@@ -60,7 +60,7 @@ define(function (require) {
             /**
              * on adding activity item listen to "widget:doRefresh:activity-list-widget"
              */
-            mediator.on('widget:doRefresh:activity-list-widget', this._reload, this );
+            mediator.on('widget:doRefresh:activity-list-widget', this._reload, this);
 
             /**
              * on editing activity item listen to "widget_success:activity_list:item:update"
@@ -90,7 +90,7 @@ define(function (require) {
             ActivityListView.__super__.dispose.call(this);
         },
 
-        initItemView: function(model) {
+        initItemView: function (model) {
             var className = model.getRelatedActivityClass(),
                 configuration = this.options.configuration[className];
             if (this.itemView) {
@@ -231,16 +231,39 @@ define(function (require) {
         },
 
         _reload: function () {
+            var viewsState;
             this._showLoading();
             if (this.options.doNotFetch) {
                 this._hideLoading();
                 return;
             }
             try {
+                // store views state
+                viewsState = _.map(this.getItemViews(), function (view) {
+                    return {
+                        id: view.model.id,
+                        collapsed: view.isCollapsed()
+                    };
+                });
+
                 this.collection.fetch({
                     reset: true,
                     success: _.bind(function () {
-                        this._hideLoading();
+                        // restore state
+                        var itemViews = this.getItemViews(),
+                            viewsToggleRequested = false;
+                        _.each(viewsState, _.bind(function (item) {
+                            // find corresponding view
+                            var view = _.find(itemViews, function (view) {return view.model.id === item.id;});
+                            if (view && !item.collapsed && view.isCollapsed()) {
+                                view.toggle();
+                                view.$('.accordion-body').addClass('in');
+                                viewsToggleRequested = true;
+                            }
+                        }, this));
+                        if (!viewsToggleRequested) {
+                            this._hideLoading();
+                        }
                         this._initPager();
                     }, this),
                     error: _.bind(function (collection, response) {
