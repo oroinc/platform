@@ -86,7 +86,7 @@ define(function (require) {
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
                 timezoneShift: 0,
                 timeInputAttrs: {
-                    'class': 'input-small time'
+                    'class': 'timepicker-input'
                 }
             });
             return options;
