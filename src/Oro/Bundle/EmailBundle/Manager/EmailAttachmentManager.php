@@ -15,10 +15,8 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 /**
@@ -30,37 +28,23 @@ class EmailAttachmentManager
 {
     const ATTACHMENT_DIR = 'attachment';
 
-    /**
-     * @var Filesystem
-     */
+    /** @var Filesystem */
     protected $filesystem;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $attachmentDir;
 
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $securityFacadeLink;
-
-    /**
-     * @var EmailActivityListProvider
-     */
-    protected $activityListProvider;
 
     /**
      * @param FileSystemMap             $filesystemMap
      * @param EntityManager             $em
      * @param KernelInterface           $kernel
      * @param ServiceLink               $securityFacadeLink
-     * @param EmailActivityListProvider $activityListProvider
      * @param ConfigFileValidator       $configFileValidator
      */
     public function __construct(
@@ -68,14 +52,12 @@ class EmailAttachmentManager
         EntityManager $em,
         KernelInterface $kernel,
         ServiceLink $securityFacadeLink,
-        EmailActivityListProvider $activityListProvider,
         ConfigFileValidator $configFileValidator
     ) {
         $this->filesystem           = $filesystemMap->get('attachments');
         $this->em                   = $em;
         $this->attachmentDir        = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
         $this->securityFacadeLink   = $securityFacadeLink;
-        $this->activityListProvider = $activityListProvider;
         $this->configFileValidator  = $configFileValidator;
     }
 
@@ -85,86 +67,64 @@ class EmailAttachmentManager
      */
     public function linkEmailAttachmentToTargetEntity(EmailAttachment $emailAttachment, $entity)
     {
-        $this->cpEmailAttachmentsToFileSystem([$emailAttachment]);
-        $this->linkAttachmentsToEntities([$emailAttachment], [$entity]);
+        $this->copyEmailAttachmentToFileSystem($emailAttachment);
+        $this->linkAttachmentsToEntities($emailAttachment, $entity);
     }
 
     /**
-     * @param Email $email
+     * @param EmailAttachment $emailAttachment
+     * @param object $entity
      */
-    public function linkEmailAttachmentsToTargetEntities(Email $email)
+    protected function linkAttachmentsToEntities(EmailAttachment $emailAttachment, $entity)
     {
-        $entities = $this->activityListProvider->getTargetEntities($email);
-        $this->cpEmailAttachmentsToFileSystem($email->getEmailBody()->getAttachments());
-        $this->linkAttachmentsToEntities($email->getEmailBody()->getAttachments(), $entities);
+        $entityClass = ClassUtils::getClass($entity);
+        if (!$emailAttachment->getFile()) {
+            return;
+        }
+        $attachment = $this->buildAttachmentInstance();
+        if (!$attachment->supportTarget($entityClass)) {
+            return;
+        }
+        $attachment->setFile($emailAttachment->getFile());
+        $attachment->setTarget($entity);
+        $file = $attachment->getFile();
+        $fileViolations = $this->configFileValidator->validate($entityClass, $file);
+        if ($fileViolations->count() > 0) {
+            $this->filesystem->get($file->getFilename())->delete();
+            $emailAttachment->setFile(null);
+            $this->em->persist($emailAttachment);
+        } else {
+            $this->em->persist($attachment);
+        }
+        $this->em->flush();
     }
 
     /**
-     * @param EmailAttachment[] $emailAttachments
-     * @param array $entities
+     * @param EmailAttachment $emailAttachment
      */
-    protected function linkAttachmentsToEntities($emailAttachments, $entities)
+    protected function copyEmailAttachmentToFileSystem(EmailAttachment $emailAttachment)
     {
-        $doFlush = false;
-        foreach ($entities as $entity) {
-            $entityClass = ClassUtils::getClass($entity);
-            foreach ($emailAttachments as $emailAttachment) {
-                /** @var EmailAttachment $emailAttachment */
-                if (!$emailAttachment->getFile()) {
-                    continue;
-                }
-                $attachment = $this->getNewAttachment();
-                if (!$attachment->supportTarget($entityClass)) {
-                    continue;
-                }
-                $attachment->setFile($emailAttachment->getFile());
-                $attachment->setTarget($entity);
-                $fileViolations = $this->configFileValidator->validate($entityClass, $attachment->getFile());
-                if ($fileViolations->count() > 0) {
-                    $this->filesystem->get($attachment->getFile()->getFilename())->delete();
-                    $emailAttachment->setFile(null);
-                    $this->em->persist($emailAttachment);
-                } else {
-                    $this->em->persist($attachment);
-                }
-                $doFlush = true;
-            }
-        }
+        $file = new File();
+        $file->setExtension($emailAttachment->getExtension());
+        $file->setOriginalFilename($emailAttachment->getFileName());
+        $file->setMimeType($emailAttachment->getContentType());
+        $file->setFilename(uniqid() . '.' . $file->getExtension());
 
-        if ($doFlush) {
-            $this->em->flush();
-        }
-    }
+        $content = ContentDecoder::decode(
+            $emailAttachment->getContent()->getContent(),
+            $emailAttachment->getContent()->getContentTransferEncoding()
+        );
 
-    /**
-     * @param array $emailAttachments
-     */
-    protected function cpEmailAttachmentsToFileSystem($emailAttachments)
-    {
-        /** @var EmailAttachment $emailAttachment */
-        foreach ($emailAttachments as $emailAttachment) {
-            $file = new File();
-            $file->setExtension($emailAttachment->getExtension());
-            $file->setOriginalFilename($emailAttachment->getFileName());
-            $file->setMimeType($emailAttachment->getContentType());
-            $file->setFilename(uniqid() . '.' . $file->getExtension());
+        $this->filesystem->write($file->getFilename(), $content);
 
-            $content = ContentDecoder::decode(
-                $emailAttachment->getContent()->getContent(),
-                $emailAttachment->getContent()->getContentTransferEncoding()
-            );
+        $f = new ComponentFile($this->getAttachmentFullPath($file->getFilename()));
+        $file->setFile($f);
+        $file->setFileSize($f->getSize());
+        $file->setUploaded(false);
 
-            $this->filesystem->write($file->getFilename(), $content);
+        $file->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
 
-            $f = new ComponentFile($this->getAttachmentFullPath($file->getFilename()));
-            $file->setFile($f);
-            $file->setFileSize($f->getSize());
-            $file->setUploaded(false);
-
-            $file->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
-
-            $emailAttachment->setFile($file);
-        }
+        $emailAttachment->setFile($file);
     }
 
     /**
@@ -180,7 +140,7 @@ class EmailAttachmentManager
     /**
      * @return Attachment
      */
-    public function getNewAttachment()
+    public function buildAttachmentInstance()
     {
         return new Attachment();
     }

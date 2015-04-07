@@ -341,32 +341,32 @@
             {% endif %}
         </span>
     </a>
-    {#{% if canLinkAttachment and targetEntityData.targetEntityClass is defined %}#}
-        {#{% set options = {#}
-            {#'view': 'oroemail/js/app/views/email-attachment-link-view',#}
-            {#'url': path(#}
-                    {#'oro_email_attachment_link',#}
-                    {#{#}
-                        {#id: attachment.id,#}
-                        {#targetEntityClass: targetEntityData.targetEntityClass,#}
-                        {#targetEntityId: targetEntityData.targetEntityId#}
-                    {#}#}
-                {#)#}
-        {#} %}#}
-        {#<a data-page-component-module="oroui/js/app/components/view-component"#}
-           {#data-page-component-options="{{ options|json_encode }}" class="attachment" href="{{#}
-                {#path(#}
-                    {#'oro_email_attachment_link',#}
-                    {#{#}
-                        {#id: attachment.id,#}
-                        {#targetEntityClass: targetEntityData.targetEntityClass,#}
-                        {#targetEntityId: targetEntityData.targetEntityId#}
-                    {#}#}
-                {#)#}
-            {#}}">#}
-            {#<span class="icon"><i class="icon-link"></i></span>#}
-        {#</a>#}
-    {#{% endif %}#}
+    {% if canLinkAttachment and targetEntityData.targetEntityClass is defined %}
+        {% set options = {
+            'view': 'oroemail/js/app/views/email-attachment-link-view',
+            'url': path(
+                    'oro_email_attachment_link',
+                    {
+                        id: attachment.id,
+                        targetEntityClass: targetEntityData.targetEntityClass,
+                        targetEntityId: targetEntityData.targetEntityId
+                    }
+                )
+        } %}
+        <a data-page-component-module="oroui/js/app/components/view-component"
+           data-page-component-options="{{ options|json_encode }}" class="attachment" href="{{
+                path(
+                    'oro_email_attachment_link',
+                    {
+                        id: attachment.id,
+                        targetEntityClass: targetEntityData.targetEntityClass,
+                        targetEntityId: targetEntityData.targetEntityId
+                    }
+                )
+            }}">
+            <span class="icon"><i class="icon-link"></i></span>
+        </a>
+    {% endif %}
     {%- endfor -%}
 {%- endmacro %}
 

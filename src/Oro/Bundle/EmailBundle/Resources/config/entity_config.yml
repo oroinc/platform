@@ -13,3 +13,19 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
+    attachment:
+        entity:
+            items:
+                auto_link_attachments:
+                    options:
+                        require_schema_update:  false
+                        priority:               100
+                        default_value:          false
+                    form:
+                        type:                   choice
+                        options:
+                            block:              attachments
+                            choices:            ['oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label', 'oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label']
+                            empty_value:        false
+                            required:           true
+                            label:              oro.email.system_configuration.attachment_configuration.link_to_scope.label
