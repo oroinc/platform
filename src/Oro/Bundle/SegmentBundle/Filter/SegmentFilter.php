@@ -169,6 +169,31 @@ class SegmentFilter extends EntityFilter
             throw new \LogicException('The SegmentFilter supports ORM data source only.');
         }
 
+        $queryBuilder = $this->getQueryBuilder($data);
+        $query        = $queryBuilder->getQuery();
+
+        /**@var OrmFilterDatasourceAdapter $ormFilterDatasourceAdapter */
+        $ormFilterDatasourceAdapter = $ds->expr();
+        $expr                       = $ormFilterDatasourceAdapter->exists($query->getDQL());
+
+        $this->applyFilterToClause($ds, $expr);
+
+        $params = $query->getParameters();
+        /** @var Parameter $param */
+        foreach ($params as $param) {
+            $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return QueryBuilder
+     */
+    protected function getQueryBuilder($data)
+    {
         /** @var Segment $segment */
         $segment = $data['value'];
 
@@ -182,22 +207,7 @@ class SegmentFilter extends EntityFilter
 
         $queryBuilder->andWhere($this->getIdentityFieldWithAlias($queryBuilder, $segment) . ' = ' . $field);
 
-        /** @var Query $query */
-        $query = $queryBuilder->getQuery();
-
-        /** @var OrmFilterDatasourceAdapter $ormFilterDatasourceAdapter */
-        $ormFilterDatasourceAdapter = $ds->expr();
-        $expr                       = $ormFilterDatasourceAdapter->exists($query->getDQL());
-
-        $this->applyFilterToClause($ds, $expr);
-
-        $params = $query->getParameters();
-        /** @var Parameter $param */
-        foreach ($params as $param) {
-            $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
-        }
-
-        return true;
+        return $queryBuilder;
     }
 
     /**
