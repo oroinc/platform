@@ -23,7 +23,7 @@ interface QueryBuilderInterface
 
     /**
      * Builds QueryBuilder based on segment definition
-     * Returns QueryBuilder that could be applied for building WHERE statement and for filtering by segment conditions
+     * Returns QueryBuilder that could be used for filtering by segment conditions
      *
      * @param Segment $segment
      *

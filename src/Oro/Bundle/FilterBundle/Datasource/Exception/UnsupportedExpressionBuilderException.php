@@ -4,8 +4,14 @@ namespace Oro\Bundle\FilterBundle\Datasource\Exception;
 
 class UnsupportedExpressionBuilderException extends \LogicException
 {
-    public function __construct()
+    /**
+     * @param string $message
+     */
+    public function __construct($message = '')
     {
-        parent::__construct('The SegmentFilter supports ORM data source only.');
+        if (empty($message)) {
+            $message = 'The SegmentFilter supports ORM data source only.';
+        }
+        parent::__construct($message);
     }
 }
