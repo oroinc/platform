@@ -188,7 +188,8 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
-     * Returns QueryBuilder for static or dynamic segment and adds where condition based on parameter data_name
+     * Returns QueryBuilder for static or dynamic segment
+     * And adds where condition based on parameter FilterUtility::DATA_NAME_KEY
      *
      * @param mixed $data
      *
