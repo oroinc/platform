@@ -30,13 +30,14 @@
 
 {% block oro_email_attachments_row %}
     <script type="text/template" id="email-attachment-item">
-        <div class="attachment-item" style="border: none" data-cid="<%= entity.cid %>">
-            <span data-id="<%= entity.get('id') %>" class="filename">
-                <span class="filename-label"><%= entity.get('fileName') %></span>
+        <div class="attachment-item" style="border: none">
+            <span data-id="<%= id %>" class="filename">
+                <i class="icon icon-file-alt"></i>
+                <span class="filename-label"><%= fileName %></span>
                 <i class="icon-remove"></i>
             </span>
-            <input name="<%= inputName %>[<%= entity.cid %>][id]" type="text" value="<%= entity.get('id') %>"/>
-            <input name="<%= inputName %>[<%= entity.cid %>][uploaded_file]" type="file"/>
+            <input name="<%= inputName %>[<%= cid %>][id]" type="text" value="<%= id %>"/>
+            <input name="<%= inputName %>[<%= cid %>][uploaded_file]" type="file"/>
         </div>
     </script>
 
