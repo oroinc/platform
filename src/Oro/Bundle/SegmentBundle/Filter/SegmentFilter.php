@@ -172,9 +172,9 @@ class SegmentFilter extends EntityFilter
         $queryBuilder = $this->getQueryBuilder($data);
         $query        = $queryBuilder->getQuery();
 
-        /**@var OrmFilterDatasourceAdapter $ormFilterDatasourceAdapter */
-        $ormFilterDatasourceAdapter = $ds->expr();
-        $expr                       = $ormFilterDatasourceAdapter->exists($query->getDQL());
+        /**@var OrmExpressionBuilder $expressionBuilder */
+        $expressionBuilder = $ds->expr();
+        $expr              = $expressionBuilder->exists($query->getDQL());
 
         $this->applyFilterToClause($ds, $expr);
 
@@ -188,6 +188,8 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
+     * Returns QueryBuilder for static or dynamic segment and adds where condition based on parameter data_name
+     *
      * @param mixed $data
      *
      * @return QueryBuilder
