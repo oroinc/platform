@@ -35,7 +35,7 @@ define(function (require) {
 
         formatFileName: function(fileName) {
             if (fileName.length > 15) {
-                fileName = fileName.substr(0, 7) + '..' + fileName.substr(fileName.length - 10);
+                fileName = fileName.substr(0, 7) + '..' + fileName.substr(fileName.length - 7);
             }
 
             return fileName;
