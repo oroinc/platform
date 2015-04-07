@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Filter;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
@@ -23,9 +24,12 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Exception\UnsupportedExpressionBuilderException;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
 class SegmentFilter extends EntityFilter
 {
+    const SNAPSHOT_ENTITY = 'Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot';
+
     /** @var ServiceLink */
     protected $dynamicSegmentQueryBuilderLink;
 
@@ -171,14 +175,14 @@ class SegmentFilter extends EntityFilter
         $segment = $data['value'];
 
         /** @var QueryBuilder $queryBuilder */
-        if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
+        if ($this->isDynamic($segment)) {
             $queryBuilder = $this->dynamicSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         } else {
             $queryBuilder = $this->staticSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         }
         $field = $this->get(FilterUtility::DATA_NAME_KEY);
 
-        $queryBuilder->andWhere($this->getIdentityFieldWithAlas($queryBuilder) . ' = ' . $field);
+        $queryBuilder->andWhere($this->getIdentityFieldWithAlas($queryBuilder, $segment) . ' = ' . $field);
 
         /** @var Query $query */
         $query = $queryBuilder->getQuery();
@@ -196,21 +200,36 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
+     * @param Segment $segment
+     *
+     * @return bool
+     */
+    protected function isDynamic(Segment $segment)
+    {
+        return $segment->getType()->getName() === SegmentType::TYPE_DYNAMIC;
+    }
+
+    /**
      * @param QueryBuilder $queryBuilder
+     * @param Segment $segment
      *
      * @return string
      */
-    protected function getIdentityFieldWithAlas(QueryBuilder $queryBuilder)
+    protected function getIdentityFieldWithAlas(QueryBuilder $queryBuilder, Segment $segment)
     {
         $tableAliases = $queryBuilder->getRootAliases();
         $em           = $queryBuilder->getEntityManager();
         $entities     = $queryBuilder->getRootEntities();
 
-        /** @var ClassMetaData $metaData */
-        $metaData   = $em->getClassMetadata($entities[0]);
-        /** @var array $primaryKey */
-        $primaryKey = $metaData->getIdentifierFieldNames();
+        if ($this->isDynamic($segment)) {
+            /** @var ClassMetaData $metaData */
+            $metaData = $em->getClassMetadata($entities[0]);
+            /** @var array $primaryKey */
+            $primaryKey = $metaData->getIdentifierFieldNames();
 
-        return $tableAliases[0] . '.' . $primaryKey[0];
+            return $tableAliases[0] . '.' . $primaryKey[0];
+        }
+
+        return $tableAliases[0] . '.' . SegmentSnapshot::ENTITY_REF_FIELD;
     }
 }
