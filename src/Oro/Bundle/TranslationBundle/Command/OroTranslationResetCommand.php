@@ -31,7 +31,7 @@ class OroTranslationResetCommand extends ContainerAwareCommand
                 'force',
                 'f',
                 InputOption::VALUE_NONE,
-                'Forces reset custom translations to default values.'
+                'Forces operation to be executed.'
             );
     }
 
