@@ -1,0 +1,22 @@
+<script type="text/template" id="date-filter-template-wo-actions">
+    <div class="control-group">
+        <%= parts.join('') %>
+    </div>
+    <div>
+        <div class="filter-start-date">
+            <input type="text" class="<%= inputClass %>"
+                   value="<%= value.value.start %>"
+                   name="<%= value.value.startEndPrefix %>[value][start]"
+                   placeholder="<%- _.__('from') %>"
+            />
+        </div>
+        <span class="filter-separator">-</span>
+        <div class="filter-end-date">
+            <input type="text" class="<%= inputClass %>"
+                   value="<%= value.value.end %>"
+                   name="<%= value.value.startEndPrefix %>[value][end]"
+                   placeholder="<%- _.__('to') %>"
+            />
+        </div>
+    </div>
+</script>

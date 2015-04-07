@@ -456,6 +456,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 ->method('getName')
                 ->will($this->returnValue($expectedData['name']));
 
+            $widgetMock->expects($this->once())
+                ->method('getOptions')
+                ->will($this->returnValue([]));
+
             $this->factory->expects($this->at($index))
                 ->method('createWidgetModel')
                 ->with(
