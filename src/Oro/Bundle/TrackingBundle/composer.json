@@ -24,7 +24,8 @@
         "oro/user-bundle": "@dev",
         "oro/batch-bundle": "@dev",
         "oro/migration-bundle": "@dev",
-        "oro/testframework-bundle": "@dev"
+        "oro/testframework-bundle": "@dev",
+        "piwik/device-detector": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\TrackingBundle": "" }

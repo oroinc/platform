@@ -214,13 +214,14 @@
                     oro_widget_render({
                         'widgetType': 'dashboard-item',
                         'wid': options.widgetIdPrefix ~ widget.id,
-                        'url': path(widget.config.route, widget.config.route_parameters),
+                        'url': path(widget.config.route, widget.config.route_parameters|merge({'_widgetId': widget.id})),
                         'state': {
                             'id': widget.id,
                             'expanded': widget.expanded,
                             'layoutPosition': widget.layoutPosition,
                         },
-                        'allowEdit': options.allowEdit
+                        'allowEdit': options.allowEdit,
+                        'showConfig': options.allowEdit and widget.config.configuration|length > 0,
                     })
                 }}
             {% endif %}

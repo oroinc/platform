@@ -49,10 +49,6 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
 
         $entities = $this->loadEntitiesByIds($value);
 
-        if (count($entities) !== count($value)) {
-            throw new TransformationFailedException('Could not find all entities for the given IDs');
-        }
-
         return $entities;
     }
 
@@ -62,6 +58,7 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
      * @param array $ids
      * @return array
      * @throws UnexpectedTypeException if query builder callback returns invalid type
+     * @throws TransformationFailedException if values not matched given $ids
      */
     protected function loadEntitiesByIds(array $ids)
     {
@@ -78,6 +75,12 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
                 ->setParameter('ids', $ids);
         }
 
-        return $qb->getQuery()->execute();
+        $result = $qb->getQuery()->execute();
+
+        if (count($result) !== count($ids)) {
+            throw new TransformationFailedException('Could not find all entities for the given IDs');
+        }
+
+        return $result;
     }
 }
