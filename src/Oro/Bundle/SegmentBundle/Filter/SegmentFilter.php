@@ -5,7 +5,6 @@ namespace Oro\Bundle\SegmentBundle\Filter;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
@@ -25,11 +24,10 @@ use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Exception\UnsupportedExpressionBuilderException;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 class SegmentFilter extends EntityFilter
 {
-    const SNAPSHOT_ENTITY = 'Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot';
-
     /** @var ServiceLink */
     protected $dynamicSegmentQueryBuilderLink;
 
@@ -182,11 +180,14 @@ class SegmentFilter extends EntityFilter
         }
         $field = $this->get(FilterUtility::DATA_NAME_KEY);
 
-        $queryBuilder->andWhere($this->getIdentityFieldWithAlas($queryBuilder, $segment) . ' = ' . $field);
+        $queryBuilder->andWhere($this->getIdentityFieldWithAlias($queryBuilder, $segment) . ' = ' . $field);
 
         /** @var Query $query */
         $query = $queryBuilder->getQuery();
-        $expr  = $ds->expr()->exists($query->getDQL());
+
+        /** @var OrmFilterDatasourceAdapter $ormFilterDatasourceAdapter */
+        $ormFilterDatasourceAdapter = $ds->expr();
+        $expr                       = $ormFilterDatasourceAdapter->exists($query->getDQL());
 
         $this->applyFilterToClause($ds, $expr);
 
@@ -211,11 +212,11 @@ class SegmentFilter extends EntityFilter
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param Segment $segment
+     * @param Segment      $segment
      *
      * @return string
      */
-    protected function getIdentityFieldWithAlas(QueryBuilder $queryBuilder, Segment $segment)
+    protected function getIdentityFieldWithAlias(QueryBuilder $queryBuilder, Segment $segment)
     {
         $tableAliases = $queryBuilder->getRootAliases();
         $em           = $queryBuilder->getEntityManager();
