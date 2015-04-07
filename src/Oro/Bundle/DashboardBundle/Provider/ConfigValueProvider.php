@@ -21,10 +21,10 @@ class ConfigValueProvider
      * @param mixed  $value
      * @return mixed
      */
-    public function getConvertedValue($widgetConfig, $formType, $value = null)
+    public function getConvertedValue($widgetConfig, $formType, $value = null, $converterAttributes = [], $options = [])
     {
         if (in_array($formType, array_keys($this->converters))) {
-            return $this->converters[$formType]->getConvertedValue($widgetConfig, $value);
+            return $this->converters[$formType]->getConvertedValue($widgetConfig, $value, $converterAttributes, $options);
         }
 
         return $value;

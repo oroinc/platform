@@ -30,7 +30,7 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
     /**
      * @inheritdoc
      */
-    public function getConvertedValue(array $widgetConfig, $value = null)
+    public function getConvertedValue(array $widgetConfig, $value = null, $converterAttributes = [], $options = [])
     {
         if (is_null($value)
             || ($value['value']['start'] === null && $value['value']['end'] === null)

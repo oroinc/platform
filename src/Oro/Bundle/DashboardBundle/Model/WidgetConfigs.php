@@ -119,6 +119,24 @@ class WidgetConfigs
         return $items;
     }
 
+    public function getWidgetItemsData($widgetName, $widgetId)
+    {
+        $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
+        $widgetOptions = $this->getWidgetOptions($widgetId);
+
+        $items = isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [];
+        $items = $this->filterWidgets($items, $widgetOptions->get('subWidgets', []));
+
+        foreach ($items as $itemName => $config) {
+            $items[$itemName]['value'] = $this->resolver->resolve(
+                [$config['data_provider']],
+                ['widgetOptions' => $widgetOptions]
+            )[0];
+        }
+
+        return $items;
+    }
+
     /**
      * Returns a list of options for widget with id $widgetId or current widget if $widgetId is not specified
      *
@@ -146,7 +164,8 @@ class WidgetConfigs
 
         foreach ($widgetConfig['configuration'] as $name => $config) {
             $value          = isset($options[$name]) ? $options[$name] : null;
-            $options[$name] = $this->valueProvider->getConvertedValue($widgetConfig, $config['type'], $value);
+            $converterAttributes = isset($config['converter_attributes']) ? $config['converter_attributes'] : [];
+            $options[$name] = $this->valueProvider->getConvertedValue($widgetConfig, $config['type'], $value, $converterAttributes, $options);
         }
 
         return new WidgetOptionBag($options);
@@ -159,14 +178,19 @@ class WidgetConfigs
      *
      * @return array filtered items
      */
-    protected function filterWidgets(array $items)
+    protected function filterWidgets(array $items, $visibleWidgets = [])
     {
         $securityFacade = $this->securityFacade;
         $resolver       = $this->resolver;
 
         return array_filter(
             $items,
-            function (&$item) use ($securityFacade, $resolver) {
+            function (&$item) use ($securityFacade, $resolver, $visibleWidgets, &$items) {
+                $visible = true;
+                if (count($visibleWidgets) && !in_array(key($items), $visibleWidgets) ) {
+                    $visible = false;
+                }
+                next($items);
                 $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
                 $applicable    = true;
                 $enabled       = $item['enabled'];
@@ -177,7 +201,7 @@ class WidgetConfigs
 
                 unset ($item['acl'], $item['applicable'], $item['enabled']);
 
-                return $enabled && $accessGranted && $applicable;
+                return $visible && $enabled && $accessGranted && $applicable;
             }
         );
     }

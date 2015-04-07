@@ -11,7 +11,7 @@ abstract class ConfigValueConverterAbstract
      * @param mixed $value
      * @return mixed
      */
-    public function getConvertedValue(array $widgetConfig, $value = null)
+    public function getConvertedValue(array $widgetConfig, $value = null, $converterAttributes = [], $options = [])
     {
         return $value;
     }
