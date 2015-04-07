@@ -223,11 +223,11 @@ oro_dashboard_config:
                        label: acme.test.label    # field label            
                     show_on_widget: true         # if true - value of config parameter will be shown at the bottom of widget. By default - false
 ```
-If developer wants to add some config value to all widgets, he can use 'default_configuration' block of dashboard.yml file. For example:
+If developer wants to add some config value to all widgets, he can use 'widgets_configuration' block of dashboard.yml file. For example:
 
 ```yaml
 oro_dashboard_config:
-    default_configuration:
+    widgets_configuration:
         globalConfigParameter:
             type: text
             options:

@@ -10,13 +10,13 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateHelper
 {
-    const YEAR_TYPE_DAYS = 1460;
+    const YEAR_TYPE_DAYS  = 1460;
     const MONTH_TYPE_DAYS = 93;
-    const WEEK_TYPE_DAYS = 60;
-    const DAY_TYPE_DAYS = 2;
+    const WEEK_TYPE_DAYS  = 60;
+    const DAY_TYPE_DAYS   = 2;
 
     /** @var string */
-    private $offset;
+    protected $offset;
 
     /** @var LocaleSettings */
     protected $localeSettings;
@@ -71,8 +71,12 @@ class DateHelper
                 break;
             case 'month':
                 $qb->addSelect(sprintf('%s as yearCreated', $this->getEnforcedTimezoneFunction('YEAR', $entityField)));
-                $qb->addSelect(sprintf('%s as monthCreated',
-                    $this->getEnforcedTimezoneFunction('MONTH', $entityField)));
+                $qb->addSelect(
+                    sprintf(
+                        '%s as monthCreated',
+                        $this->getEnforcedTimezoneFunction('MONTH', $entityField)
+                    )
+                );
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
                 break;
@@ -84,8 +88,12 @@ class DateHelper
                 break;
             case 'day':
                 $qb->addSelect(sprintf("%s as yearCreated", $this->getEnforcedTimezoneFunction('YEAR', $entityField)));
-                $qb->addSelect(sprintf("%s as monthCreated",
-                    $this->getEnforcedTimezoneFunction('MONTH', $entityField)));
+                $qb->addSelect(
+                    sprintf(
+                        "%s as monthCreated",
+                        $this->getEnforcedTimezoneFunction('MONTH', $entityField)
+                    )
+                );
                 $qb->addSelect(sprintf("%s as dayCreated", $this->getEnforcedTimezoneFunction('DAY', $entityField)));
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
@@ -108,7 +116,6 @@ class DateHelper
      */
     public function getKey(DateTime $start, DateTime $end, $row)
     {
-
         $config = $this->getFormatStrings($start, $end);
         switch ($config['viewType']) {
             case 'month':
@@ -122,16 +129,14 @@ class DateHelper
                 break;
             case 'date':
                 $week = $row['weekCreated'] < 10 ? '0' . $row['weekCreated'] : $row['weekCreated'];
+
                 return $row['yearCreated'] . '-' . $week;
                 break;
             case 'time':
                 return $row['dateCreated'] . '-' . $row['hourCreated'];
         }
 
-        return date(
-            $config['valueStringFormat'],
-            $time
-        );
+        return date($config['valueStringFormat'], $time);
     }
 
     /**
@@ -191,6 +196,7 @@ class DateHelper
                 }
                 $wDate = new \DateTime();
                 $wDate->setISODate($date->format('Y'), $date->format('W'));
+
                 return $wDate->format('Y-m-d');
             case 'day':
                 return $date->format('Y-m-d');
@@ -198,7 +204,6 @@ class DateHelper
 
         return $date->format('c');
     }
-
 
     /**
      * Check whenever user timezone not UTC then wrap field name with convert timezone func

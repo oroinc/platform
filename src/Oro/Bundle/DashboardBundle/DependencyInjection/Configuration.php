@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('oro_dashboard')
             ->children()
-                ->arrayNode('default_configuration')
+                ->arrayNode('widgets_configuration')
                     ->info('Form fields used for widget configuration that will be added to each widget')
                         ->useAttributeAsKey('name')
                         ->prototype('array')

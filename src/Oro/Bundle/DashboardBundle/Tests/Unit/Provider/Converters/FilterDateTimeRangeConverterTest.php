@@ -16,7 +16,6 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dateCompiler;
 
-
     public function setUp()
     {
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')

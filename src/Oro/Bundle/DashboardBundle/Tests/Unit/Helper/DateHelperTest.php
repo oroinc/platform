@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Helper;
 
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
@@ -110,7 +111,7 @@ class DateHelperTest extends OrmTestCase
                     '2000-03-01-20' => ['date' => '2000-03-01T20:00:00+00:00'],
                     '2000-03-01-21' => ['date' => '2000-03-01T21:00:00+00:00'],
                     '2000-03-01-22' => ['date' => '2000-03-01T22:00:00+00:00'],
-                    '2000-03-01-23' => ['date' => '2000-03-01T23:00:00+00:00'],
+                    '2000-03-01-23' => ['date' => '2000-03-01T23:00:00+00:00']
                 ]
             ]
         ];

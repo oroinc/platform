@@ -36,7 +36,7 @@ class OroDashboardExtension extends Extension
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $dashboardConfigs);
-        $this->prepareWidgets($config['widgets'], $config['default_configuration']);
+        $this->prepareWidgets($config['widgets'], $config['widgets_configuration']);
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
