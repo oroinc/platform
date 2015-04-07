@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 
-class OroTranslationResetCustomCommand extends ContainerAwareCommand
+class OroTranslationResetCommand extends ContainerAwareCommand
 {
     const BATCH_SIZE = 1000;
 
@@ -25,7 +25,7 @@ class OroTranslationResetCustomCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:translation:reset-custom')
+            ->setName('oro:translation:reset')
             ->setDescription('Reset user defined translations')
             ->addOption(
                 'force',
