@@ -353,7 +353,7 @@ class SegmentFilterTest extends OrmTestCase
         $expectedResult = [
             'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
             'EXISTS(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 ' .
-            'WHERE ts1.segmentId = :segment AND ts1.id = t1.id)'
+            'WHERE ts1.segmentId = :segment AND ts1.entityId = t1.id)'
         ];
         $expectedResult = implode(' ', $expectedResult);
 
