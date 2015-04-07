@@ -4,7 +4,6 @@ define(function (require) {
 
     var EmailAttachmentView,
         $ = require('jquery'),
-        _ = require('underscore'),
         EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model'),
         BaseView= require('oroui/js/app/views/base/view');
 
@@ -29,36 +28,38 @@ define(function (require) {
         },
 
         getTemplateData: function() {
-            return {
-                entity: this.model,
-                inputName: this.inputName
-            };
+            var data = EmailAttachmentView.__super__.getTemplateData.call(this);
+            data.cid = this.model.cid;
+            data.inputName = this.inputName;
+
+            return data;
         },
 
         removeClick: function() {
-            this.model.trigger('destroy', this.model, this);
+            this.model.destroy();
         },
 
         fileSelect: function() {
             var self = this;
-            var $fileInput = this.$el.find('input[type="file"]');
+            var $fileInput = this.$('input[type="file"]');
             this.$el.hide();
 
-            $fileInput.change(function() {
+            $fileInput.on('change', function() {
                 var value = $fileInput.val().replace(/^.*[\\\/]/, '');
 
                 if (value) {
                     self.model.set('fileName', value);
                     self.$el.show();
-                } else {
-                    self.collection.remove(self.model);
+
+                    // temporary
+                    self.collectionView.$el.show();
                 }
             });
             $fileInput.click();
         },
 
         fileNameChange: function() {
-            this.$el.find('span.filename-label').html(this.model.get('fileName'));
+            this.$('span.filename-label').html(this.model.get('fileName'));
         }
     });
 

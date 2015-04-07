@@ -7,6 +7,7 @@ parameters:
     oro_ui.twig.date.class:              Oro\Bundle\UIBundle\Twig\DateExtension
     oro_ui.twig.skype_button.class:      Oro\Bundle\UIBundle\Twig\SkypeButtonExtension
     oro_ui.twig.form.class:              Oro\Bundle\UIBundle\Twig\FormExtension
+    oro_ui.twig.formatter.class:         Oro\Bundle\UIBundle\Twig\FormatterExtension
     oro_ui.twig.placeholder.class:       Oro\Bundle\UIBundle\Twig\PlaceholderExtension
     oro_ui.twig.tab.class:               Oro\Bundle\UIBundle\Twig\TabExtension
     oro_ui.twig.content.class:           Oro\Bundle\UIBundle\Twig\ContentExtension
@@ -46,6 +47,11 @@ services:
         class: %oro_ui.twig.form.class%
         arguments:
             - @event_dispatcher
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.formatter_extension:
+        class: %oro_ui.twig.formatter.class%
         tags:
             - { name: twig.extension }
 

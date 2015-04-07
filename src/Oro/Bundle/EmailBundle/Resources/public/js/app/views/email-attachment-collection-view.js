@@ -21,11 +21,12 @@ define(function (require) {
         initialize: function(options) {
             BaseCollectionView.__super__.initialize.apply(this, options);
             this.itemView = this.itemView.extend({
-                inputName: options.inputName
+                inputName: options.inputName,
+                collectionView: this
             });
 
             this.listSelector = options.listSelector;
-            $(this.listSelector).css('padding', 5);
+            $(this.listSelector).css('padding-top', 5);
             $(this.listSelector).html('');
             this.$el.hide();
         },
@@ -34,7 +35,6 @@ define(function (require) {
             if (!model.get('id')) {
                 this.getItemView(model).fileSelect();
             }
-            this.showHideAttachmentRow();
         },
 
         collectionRemove: function() {
@@ -47,6 +47,11 @@ define(function (require) {
             } else {
                 this.$el.show();
             }
+        },
+
+        collectionChange: function() {
+            this.sanitizeCollection();
+            this.showHideAttachmentRow();
         }
     });
 
