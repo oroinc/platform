@@ -31,7 +31,7 @@ class OroTranslationResetCustomCommand extends ContainerAwareCommand
                 'force',
                 'f',
                 InputOption::VALUE_NONE,
-                'Forces reset custom translations to default values. No confirmation will be ask'
+                'Forces reset custom translations to default values.'
             );
     }
 
@@ -40,8 +40,8 @@ class OroTranslationResetCustomCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $locale = $this->getContainer()->getParameter('kernel.default_locale');
-        $container = $this->getContainer();
+        $locale                = $this->getContainer()->getParameter('kernel.default_locale');
+        $container             = $this->getContainer();
         $translationRepository = $this->getEntityManager()->getRepository(Translation::ENTITY_NAME);
         /**
          * disable database loader to not get translations from database
@@ -51,39 +51,36 @@ class OroTranslationResetCustomCommand extends ContainerAwareCommand
             new EmptyArrayLoader()
         );
 
-        $translations = $container->get('translator.default')->getTranslations();
+        $translations       = $container->get('translator.default')->getTranslations();
         $customTranslations = $translationRepository->findBy(['locale' => $locale]);
-        $force = $input->getOption('force');
+        $force              = $input->getOption('force');
 
         if (!$force) {
+            $output->writeln('<fg=red>Your custom translations will be reset to default values.</fg=red>');
+            $output->writeln('To reset your custom values to default - run command with <info>--force</info> option:');
+            $output->writeln(sprintf('<info>%s --force</info>', $this->getName()));
+
             $updated = $this->countCustomTranslations($customTranslations, $translations);
             $message = sprintf('<info>Will be updated %d values</info>', $updated);
-            $output->writeln(
-                'To reset your custom values to default - run command with <info>--force</info> option:'
-            );
-            $output->writeln(sprintf('<info>%s --force</info>', $this->getName()));
         } else {
             $updated = $this->doResetCustomTranslations($customTranslations, $translations);
             $message = sprintf('<info>Updated %d values</info>', $updated);
         }
 
         $output->writeln($message);
-        $output->writeln('');
     }
 
     /**
      * @param Translation[] $customTranslations
-     * @param array $translations
+     * @param array         $translations
      * @return int
      */
     protected function doResetCustomTranslations(array $customTranslations, array $translations)
     {
         $updated = 0;
-        $em = $this->getEntityManager();
+        $em      = $this->getEntityManager();
         foreach ($customTranslations as $customTranslation) {
-            if (isset (
-                $translations[$customTranslation->getDomain()][$customTranslation->getKey()])
-            ) {
+            if (isset($translations[$customTranslation->getDomain()][$customTranslation->getKey()])) {
                 $customTranslation->setValue(
                     $translations[$customTranslation->getDomain()][$customTranslation->getKey()]
                 );
@@ -103,16 +100,14 @@ class OroTranslationResetCustomCommand extends ContainerAwareCommand
 
     /**
      * @param Translation[] $customTranslations
-     * @param array $translations
+     * @param array         $translations
      * @return int
      */
     protected function countCustomTranslations(array $customTranslations, array $translations)
     {
         $updated = 0;
         foreach ($customTranslations as $customTranslation) {
-            if (isset (
-                $translations[$customTranslation->getDomain()][$customTranslation->getKey()])
-            ) {
+            if (isset($translations[$customTranslation->getDomain()][$customTranslation->getKey()])) {
                 $updated++;
             }
         }
