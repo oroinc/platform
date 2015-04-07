@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
@@ -79,9 +81,9 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
         if ($this->virtualRelationProvider) {
             $converter->setVirtualRelationProvider($this->virtualRelationProvider);
         }
-
-        $om = $this->doctrine->getManagerForClass($segment->getEntity());
-        $qb = $converter->convert(new RestrictionSegmentProxy($segment, $om));
+        /** @var EntityManager  $em */
+        $em = $this->doctrine->getManagerForClass($segment->getEntity());
+        $qb = $converter->convert(new RestrictionSegmentProxy($segment, $em));
 
         return $qb;
     }
