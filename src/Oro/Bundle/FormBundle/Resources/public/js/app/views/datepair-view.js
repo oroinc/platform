@@ -103,6 +103,8 @@ define([
                 $(input).trigger('change');
             } else {
                 $(input).timepicker('setTime', dateObj);
+                // triggers event to update backend field
+                $(input).trigger('change');
             }
         },
 
