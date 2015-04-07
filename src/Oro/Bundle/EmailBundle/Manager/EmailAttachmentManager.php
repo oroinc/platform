@@ -29,6 +29,7 @@ use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 class EmailAttachmentManager
 {
     const ATTACHMENT_DIR = 'attachment';
+    const ATTACHMENT_CLASS = 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
 
     /**
      * @var Filesystem
@@ -94,6 +95,10 @@ class EmailAttachmentManager
      */
     public function linkEmailAttachmentsToTargetEntities(Email $email)
     {
+        if (!$this->securityFacadeLink->getService()
+            ->isGranted('CREATE', 'entity:' . self::ATTACHMENT_CLASS)) {
+            return;
+        }
         $entities = $this->activityListProvider->getTargetEntities($email);
         $this->cpEmailAttachmentsToFileSystem($email->getEmailBody()->getAttachments());
         $this->linkAttachmentsToEntities($email->getEmailBody()->getAttachments(), $entities);
