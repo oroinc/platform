@@ -4,7 +4,11 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -16,6 +20,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 
 /**
  * Class Processor
@@ -47,16 +52,20 @@ class Processor
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var array */
     protected $origins = array();
 
     /**
-     * @param DoctrineHelper       $doctrineHelper
-     * @param \Swift_Mailer        $mailer
-     * @param EmailAddressHelper   $emailAddressHelper
-     * @param EmailEntityBuilder   $emailEntityBuilder
-     * @param EmailOwnerProvider   $emailOwnerProvider
+     * @param DoctrineHelper $doctrineHelper
+     * @param \Swift_Mailer $mailer
+     * @param EmailAddressHelper $emailAddressHelper
+     * @param EmailEntityBuilder $emailEntityBuilder
+     * @param EmailOwnerProvider $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -64,14 +73,16 @@ class Processor
         EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
-        EmailActivityManager $emailActivityManager
+        EmailActivityManager $emailActivityManager,
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->doctrineHelper       = $doctrineHelper;
-        $this->mailer               = $mailer;
-        $this->emailAddressHelper   = $emailAddressHelper;
-        $this->emailEntityBuilder   = $emailEntityBuilder;
-        $this->emailOwnerProvider   = $emailOwnerProvider;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->mailer = $mailer;
+        $this->emailAddressHelper = $emailAddressHelper;
+        $this->emailEntityBuilder = $emailEntityBuilder;
+        $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -101,6 +112,8 @@ class Processor
         $message->setBcc($this->getAddresses($model->getBcc()));
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
+
+        $this->addAttachments($message, $model);
 
         $messageId = '<' . $message->generateId() . '>';
 
@@ -133,6 +146,7 @@ class Processor
 
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
+        $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
         if ($model->hasEntity()) {
@@ -144,8 +158,51 @@ class Processor
 
         // flush all changes to the database
         $this->getEntityManager()->flush();
+        $this->eventEmailBody($email);
 
         return $email;
+    }
+
+    /**
+     * @param \Swift_Message $message
+     * @param EmailModel     $model
+     */
+    protected function addAttachments(\Swift_Message $message, EmailModel $model)
+    {
+        /** @var EmailAttachment $attachment */
+        foreach ($model->getAttachments() as $attachment) {
+            $swiftAttachment = new \Swift_Attachment(
+                ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                ),
+                $attachment->getFileName(),
+                $attachment->getContentType()
+            );
+            $message->attach($swiftAttachment);
+        }
+    }
+
+    /**
+     * @param EmailModel $model
+     * @param Email      $email
+     */
+    protected function persistAttachments(EmailModel $model, Email $email)
+    {
+        /** @var EmailAttachment $attachment */
+        foreach ($model->getAttachments() as $attachment) {
+            if (!$attachment->getId()) {
+                $this->getEntityManager()->persist($attachment);
+            } else {
+                $attachmentContent = clone $attachment->getContent();
+                $attachment = clone $attachment;
+                $attachment->setContent($attachmentContent);
+                $this->getEntityManager()->persist($attachment);
+            }
+
+            $email->getEmailBody()->addAttachment($attachment);
+            $attachment->setEmailBody($email->getEmailBody());
+        }
     }
 
     /**
@@ -288,5 +345,14 @@ class Processor
         }
 
         return $this->em;
+    }
+
+    /**
+     * @param $email
+     */
+    protected function eventEmailBody($email)
+    {
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
     }
 }

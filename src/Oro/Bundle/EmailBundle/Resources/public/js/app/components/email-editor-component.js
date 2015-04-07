@@ -54,7 +54,7 @@ define(function (require) {
                 $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]'),
                 $parentEmailId = this.options._sourceElement.find('[name$="[parentEmailId]"]'),
                 $signature = this.options._sourceElement.find('[name$="[signature]"]'),
-                $addSignatureButton = this.options._sourceElement.find('#addSignatureButton');
+                $addSignatureButton = this.options._sourceElement.find('#add-signature');
 
             $addSignatureButton.on('click', function() {
                 if ($signature.val()) {

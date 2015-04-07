@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,6 +22,7 @@ use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * Class EmailController
@@ -44,7 +45,12 @@ class EmailController extends Controller
      */
     public function viewAction(Email $entity)
     {
-        $templateVars = ['entity' => $entity, 'noBodyFound' => false];
+        $templateVars = [
+            'entity' => $entity,
+            'noBodyFound' => false,
+            'canLinkAttachment' => $this->canLinkAttachment(),
+            'targetEntityData' => $this->getTargetEntityConfig()
+        ];
         try {
             $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
         } catch (LoadEmailBodyException $e) {
@@ -211,6 +217,28 @@ class EmailController extends Controller
     }
 
     /**
+     * Link attachment to entity
+     *
+     * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_view")
+     */
+    public function linkAction(EmailAttachment $emailAttachment)
+    {
+        try {
+            $entity = $this->getTargetEntity();
+            $this->get('oro_email.manager.email_attachment_manager')
+                ->linkEmailAttachmentToTargetEntity($emailAttachment, $entity);
+            $result = [];
+        } catch (\Exception $e) {
+            $result = [
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return new JsonResponse($result);
+    }
+
+    /**
      * @Route("/widget", name="oro_email_widget_emails")
      * @Template
      * @AclAncestor("oro_email_view")
@@ -288,5 +316,59 @@ class EmailController extends Controller
         $responseData['form'] = $this->get('oro_email.form.email')->createView();
 
         return $responseData;
+    }
+
+    /**
+     * Check possibility link attachment to target entity
+     *
+     * @return bool
+     */
+    protected function canLinkAttachment()
+    {
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
+        if (null === $entityClassName) {
+            return false;
+        }
+
+        /** @var ConfigProvider $targetConfigProvider */
+        $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
+        $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
+
+        return $enabledAttachment;
+    }
+
+    /**
+     * Get target entity parameters
+     *
+     * @return array
+     */
+    protected function getTargetEntityConfig()
+    {
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
+        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
+        if (null === $targetEntityClass || null === $targetEntityId) {
+            return [];
+        }
+        return [
+            'targetEntityClass' => $entityRoutingHelper->encodeClassName($targetEntityClass),
+            'targetEntityId' => $targetEntityId
+        ];
+    }
+
+    /**
+     * Get target entity
+     *
+     * @return object
+     */
+    protected function getTargetEntity()
+    {
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
+        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
+        $entity = $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
+
+        return $entity;
     }
 }
