@@ -349,6 +349,12 @@
         {% set timeValidation = timeValidation|merge({'NotBlank' : {}}) %}
     {% endif %}
 
+    {% if attribute(attr, 'class') is defined %}
+        {% set attrClass = attr['class'] %}
+    {% else %}
+        {% set attrClass = '' %}
+    {% endif %}
+
     {% set options = {
         view: 'oroui/js/app/views/datepicker/datetimepicker-view',
         nativeMode: isMobileVersion(),
@@ -356,7 +362,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            class: 'input-small',
+            class: 'input-small date ' ~ attrClass,
             'data-validation': dateValidation|json_encode
         },
         datePickerOptions: {
@@ -370,7 +376,7 @@
             placeholder: 'oro.form.choose_time'|trans,
             id: 'time_selector_' ~ id,
             name: 'time_selector_' ~ id,
-            class: 'input-small',
+            class: 'input-small time ' ~ attrClass,
             'data-validation': timeValidation|json_encode
         },
         timePickerOptions: {
@@ -581,13 +587,18 @@
 {% endblock %}
 
 {% block oro_entity_create_or_select_inline_widget %}
-    <div id="{{ id }}-el" class="entity-create-or-select-container {% if form.vars.create_enabled %}entity-create-enabled{% endif %}">
-        <div class="input-append">
+    {% set isButtonsEnabled = not disabled and not read_only %}
+    <div id="{{ id }}-el"
+        {% if isButtonsEnabled %}class="entity-create-or-select-container {% if form.vars.create_enabled %}entity-create-enabled{% endif %}"{% endif %}>
+        <div {% if isButtonsEnabled %}class="input-append"{% endif %}>
             {{ form_widget(form) }}
-            <button class="add-on btn entity-select-btn"{% if disabled or read_only %} disabled="disabled"{% endif %}><i class="icon-bars"></i></button>
 
-            {% if form.vars.create_enabled %}
-                <button class="btn entity-create-btn"{% if disabled or read_only %} disabled="disabled"{% endif %}><i class="icon-plus"></i></button>
+            {% if isButtonsEnabled %}
+                <button class="add-on btn entity-select-btn"><i class="icon-bars"></i></button>
+
+                {% if form.vars.create_enabled %}
+                    <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+                {% endif %}
             {% endif %}
         </div>
     </div>

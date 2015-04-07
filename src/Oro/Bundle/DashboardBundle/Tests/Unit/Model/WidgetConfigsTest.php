@@ -57,22 +57,22 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->widgetRepository));
     }
 
-    public function testGetCurrentWidgetOptionsShouldReturnEmptyArrayIfRequestIsNull()
+    public function testGetWidgetOptionsShouldReturnEmptyArrayIfRequestIsNull()
     {
         $this->widgetConfigs->setRequest(null);
 
-        $this->assertEmpty($this->widgetConfigs->getCurrentWidgetOptions()->all());
+        $this->assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
-    public function testGetCurrentWidgetOptionsShouldReturnEmptyArrayIfThereIsNoWidgetIdInRequestQuery()
+    public function testGetWidgetOptionsShouldReturnEmptyArrayIfThereIsNoWidgetIdInRequestQuery()
     {
         $request = new Request();
         $this->widgetConfigs->setRequest($request);
 
-        $this->assertEmpty($this->widgetConfigs->getCurrentWidgetOptions()->all());
+        $this->assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
-    public function testGetCurrentWidgetOptionsShouldReturnOptionsOfWidget()
+    public function testGetWidgetOptionsShouldReturnOptionsOfWidget()
     {
         $request = new Request([
             '_widgetId' => 1,
@@ -95,6 +95,32 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->with($widget)
             ->will($this->returnValue($widgetState));
 
-        $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getCurrentWidgetOptions());
+        $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+    }
+
+    public function testGetWidgetOptionsShouldReturnOptionsOfWidgetSpecifiedAsArgument()
+    {
+        $request = new Request([
+            '_widgetId' => 1,
+        ]);
+        $this->widgetConfigs->setRequest($request);
+
+        $widget = new Widget();
+        $this->widgetRepository
+            ->expects($this->once())
+            ->method('find')
+            ->with(2)
+            ->will($this->returnValue($widget));
+
+        $options = ['k' => 'v', 'k2' => 'v2'];
+        $widgetState = new WidgetState();
+        $widgetState->setOptions($options);
+        $this->stateManager
+            ->expects($this->once())
+            ->method('getWidgetState')
+            ->with($widget)
+            ->will($this->returnValue($widgetState));
+
+        $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions(2));
     }
 }
