@@ -28,8 +28,8 @@ class FormatterExtension extends \Twig_Extension
      */
     public function formatFilename($filename)
     {
-        if (strlen($filename) > 15) {
-            $filename = substr($filename, 0, 7) . '..' . substr($filename, strlen($filename) - 7);
+        if (mb_strlen($filename) > 15) {
+            $filename = mb_substr($filename, 0, 7) . '..' . mb_substr($filename, mb_strlen($filename) - 7);
         }
 
         return $filename;
