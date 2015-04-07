@@ -166,7 +166,7 @@ class SegmentFilter extends EntityFilter
         }
 
         if (!$this->isExpressionBuilderSupported($ds->expr())) {
-            throw new UnsupportedExpressionBuilderException('You should use OrmExpressionBuilder.');
+            throw new UnsupportedExpressionBuilderException();
         }
 
         /** @var Segment $segment */
