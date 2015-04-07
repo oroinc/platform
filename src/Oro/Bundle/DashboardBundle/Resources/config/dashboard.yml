@@ -1,5 +1,5 @@
 oro_dashboard_config:
-    default_configuration:
+    widgets_configuration:
         title:
             type: oro_type_widget_title
             options:

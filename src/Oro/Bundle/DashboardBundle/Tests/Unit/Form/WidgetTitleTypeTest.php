@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 
-
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType;
 
 class WidgetTitleTypeTest extends \PHPUnit_Framework_TestCase

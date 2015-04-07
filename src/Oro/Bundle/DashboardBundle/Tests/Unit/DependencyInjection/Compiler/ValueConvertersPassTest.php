@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Definition;
 
 use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\ValueConvertersPass;
-use Symfony\Component\DependencyInjection\Definition;
 
 class ValueConvertersPassTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ValueConvertersPass */
     protected $compiler;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
     public function setUp()
