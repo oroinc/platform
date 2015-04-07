@@ -56,15 +56,15 @@ class OroTranslationResetCustomCommand extends ContainerAwareCommand
         $force              = $input->getOption('force');
 
         if (!$force) {
-            $output->writeln('<fg=red>Your custom translations will be reset to default values.</fg=red>');
-            $output->writeln('To reset your custom values to default - run command with <info>--force</info> option:');
-            $output->writeln(sprintf('<info>%s --force</info>', $this->getName()));
+            $output->writeln('<fg=red>ATTENTION</fg=red>: Your custom translations will be reset to default values.');
+            $output->writeln('To force execution run command with <info>--force</info> option:');
+            $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
 
             $updated = $this->countCustomTranslations($customTranslations, $translations);
-            $message = sprintf('<info>Will be updated %d values</info>', $updated);
+            $message = sprintf('    <info>Will be updated %d values</info>', $updated);
         } else {
             $updated = $this->doResetCustomTranslations($customTranslations, $translations);
-            $message = sprintf('<info>Updated %d values</info>', $updated);
+            $message = sprintf('    <info>Updated %d values</info>', $updated);
         }
 
         $output->writeln($message);
