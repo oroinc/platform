@@ -83,6 +83,7 @@ class FileController extends Controller
             [
                 'filters' => [
                     'thumbnail' => [
+                        'mode' => 'inset',
                         'size' => [$width, $height]
                     ]
                 ]
