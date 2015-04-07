@@ -453,6 +453,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_email.email.thread.manager
+            - @service_container
 
     oro_email.twig.extension.email:
         class: %oro_email.twig.extension.email.class%

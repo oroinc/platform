@@ -147,3 +147,23 @@
     line-height: 12px;
     border-radius: 2px;
 }
+
+.context-item {
+    list-style: none;
+    cursor: pointer;
+}
+
+.context-item.active {
+    background-color: #ebebeb;
+}
+
+#context-items-dropdown {
+    margin: -1px 0 0 0;
+    min-width: 0;
+    width: auto;
+    border: 1px solid #ccc;
+}
+
+#email-context-current-block {
+    cursor: pointer;
+}

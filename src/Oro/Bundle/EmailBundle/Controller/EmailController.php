@@ -251,6 +251,19 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/context/{id}", name="oro_email_context", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_view")
+     * @Template("OroEmailBundle:Email:context.html.twig")
+     * @param Email $emailEntity
+     * @return array
+     */
+    public function contextAction(Email $emailEntity)
+    {
+        $entityTargets = $this->get('oro_email.email.manager')->getSupportedTargets();
+        return ['emailEntity' => $emailEntity, 'entityTargets' => $entityTargets, 'options' => []];
+    }
+
+    /**
      * Get email cache manager
      *
      * @return EmailCacheManager

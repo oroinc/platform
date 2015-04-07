@@ -1,0 +1,38 @@
+{#
+    Available variables:
+    * entity       - Oro\Bundle\EmailBundle\Model\Email
+#}
+
+{% block page_container %}
+    <div class="widget-content">
+
+        {% set itemsArray = [] %}
+        {% for item in entityTargets %}
+            {% set itemArray = {
+            'id': item.id,
+            'label': item.label,
+            'first': item.first
+            } %}
+            {% set itemsArray = itemsArray|merge([itemArray]) %}
+        {% endfor %}
+
+        {# container: id, inputName: full_name, #}
+
+        {% set options = options|merge({items: itemsArray}) %}
+
+        <script type="text/template" id="email-context-item">
+            <li id="<%= entity.get('id') %>" class="context-item" data-cid="<%= entity.cid %>">
+                <%= entity.get('label') %>
+            </li>
+        </script>
+
+        <div data-page-component-module="oroemail/js/app/components/email-context-component"
+             data-page-component-options="{{ options|json_encode }}">
+            <button id="email-context-current-block">
+                <span id="email-context-current-item"></span>
+                <span id="email-context-arrow" class="icon-caret-down"></span>
+            </button>
+            <ul id="context-items-dropdown" style="display: none"></ul>
+        </div>
+    </div>
+{% endblock %}
