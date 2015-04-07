@@ -21,8 +21,8 @@ define([
          */
         resetWidgets: function() {
             _.each(this.widgets, function (widget) {
-                // if widget is not valid any more -- remove it
-                if (!widget.isValid()) {
+                // if widget is not actual any more -- remove it
+                if (!widget.isActual()) {
                     widget.remove();
                 }
             });

@@ -114,11 +114,11 @@ define(function (require) {
         /**
          * Check if widget is actual. To be actual, widget should:
          *  - not to be disposed
-         *  - the element is in DOM or it has loading flag
+         *  - have the element is in the DOM or have loading flag
          *
          * @returns {boolean}
          */
-        isValid: function () {
+        isActual: function () {
             return !this.disposed &&
                 (this.loading || $.contains(document.documentElement, this.el));
         },
