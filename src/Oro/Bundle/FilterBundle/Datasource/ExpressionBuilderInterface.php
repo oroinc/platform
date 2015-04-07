@@ -184,13 +184,4 @@ interface ExpressionBuilderInterface
      * @return mixed
      */
     public function coalesce(array $x);
-
-    /**
-     * Creates an instance of EXISTS() function, with the given DQL Subquery.
-     *
-     * @param mixed $subquery DQL Subquery to be used in EXISTS() function.
-     *
-     * @return mixed
-     */
-    public function exists($subquery);
 }

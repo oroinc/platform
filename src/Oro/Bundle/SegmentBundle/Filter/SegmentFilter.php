@@ -20,6 +20,9 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
+use Oro\Bundle\FilterBundle\Datasource\Exception\UnsupportedExpressionBuilderException;
 
 class SegmentFilter extends EntityFilter
 {
@@ -142,12 +145,26 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
+     * @param ExpressionBuilderInterface $expression
+     *
+     * @return bool
+     */
+    public function isExpressionBuilderSupported(ExpressionBuilderInterface $expression)
+    {
+        return $expression instanceof OrmExpressionBuilder;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!(isset($data['value']) && $data['value'] instanceof Segment)) {
             return false;
+        }
+
+        if (!$this->isExpressionBuilderSupported($ds->expr())) {
+            throw new UnsupportedExpressionBuilderException('You should use OrmExpressionBuilder.');
         }
 
         /** @var Segment $segment */
