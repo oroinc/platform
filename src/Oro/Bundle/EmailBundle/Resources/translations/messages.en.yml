@@ -90,7 +90,7 @@ oro:
             copy_to_record: Copy to Record
             alredy_copied: Already Copied
             copy_dont_allow: Copy don't Allow
-            cant_copy: Can\'t Copy
+            cant_copy: Can't Copy
 
         menu:
             emailtemplate_list.description: List of email templates
