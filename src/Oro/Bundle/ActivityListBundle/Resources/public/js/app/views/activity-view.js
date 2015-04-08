@@ -114,6 +114,7 @@ define([
 
         _onContentChange: function () {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+            mediator.execute('layout:init', this.$el, this);
         },
 
         _onCommentCountChange: function () {
