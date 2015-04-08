@@ -51,71 +51,28 @@ define([
         },
 
         reset: function (models, options) {
-            var iPrev, iNew,
-                modelCurrent, modelNew,
-                correspondingModel,
-                newAttributes;
-            // to keep collection-view in actual state
-            // need to make dirty check
-
-            options || (options = {});
-            options.previousModels = this.models;
-
-            if (options.parse) {
-                models = this.parse(models, options);
-            }
-
-            // dirty check
-            iPrev = 0;
-            iNew = 0;
-            while (iPrev < this.models.length || iNew < models.length) {
-                modelCurrent = this.models[iPrev];
-                modelNew = models[iNew];
-
-                if (!modelCurrent) {
-                    // all current models are processed
-                    // just add last new models
-                    this.add(models.slice(iNew));
-                    // mark everything is processed
-                    iPrev = this.models.length;
-                    iNew = models.length;
-                } else if (!modelNew) {
-                    // all new models are processed
-                    // just remove last old models
-                    this.remove(this.models.slice(iPrev));
-                } else if (correspondingModel = this.find(function (item) {return item.id === modelNew.id; })) {
-                    // if model has corresponding current models
-                    // if updatedAt attribute was changed - replace model
-                    newAttributes = modelNew instanceof this.model ? modelNew.toJSON() : modelNew;
-                    if (correspondingModel.get('updatedAt') !== newAttributes.updatedAt) {
-                        this.remove(correspondingModel);
-                        modelNew = this._prepareModel(modelNew, options);
-                        this.add(modelNew, {at: iPrev});
-                    } else {
-                        // remove all models before found
-                        while (this.models.indexOf(correspondingModel) !== iPrev) {
-                            this.remove(this.models[iPrev]);
+            var i, newModel, oldModel;
+            if (models && !(models[0] instanceof this.model)) {
+                for (i = 0; i < models.length; i++) {
+                    newModel = models[i];
+                    oldModel = this.get(newModel.id);
+                    // have this model in collection
+                    if (oldModel) {
+                        if (oldModel.get('updatedAt') === newModel.updatedAt) {
+                            // if the models are equal
+                            models[i] = oldModel;
                         }
                     }
-
-                    iPrev++;
-                    iNew++;
-                } else {
-                    // model is new
-                    this.add(this._prepareModel(modelNew, options), {at: iPrev});
-                    iPrev++;
-                    iNew++;
                 }
             }
 
-            this.trigger('reset', this, options);
-
-            return models;
+            return ActivityCollection.__super__.reset.call(this, models, options);
         },
 
         getCount: function () {
             return parseInt(this.pager.count);
         },
+
         setCount: function (count) {
             this.pager.count = count;
             this.pager.total = count == 0 ? 1 : Math.ceil(count/this.pager.pagesize);
@@ -123,7 +80,7 @@ define([
             this.count = count;
         },
 
-        parse: function(response) {
+        parse: function (response) {
             this.setCount(parseInt(response.count));
 
             return response.data;

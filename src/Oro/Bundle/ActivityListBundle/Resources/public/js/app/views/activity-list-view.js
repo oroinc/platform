@@ -231,7 +231,7 @@ define(function (require) {
         },
 
         _reload: function () {
-            var viewsState;
+            var itemViews, cid, view;
             this._showLoading();
             if (this.options.doNotFetch) {
                 this._hideLoading();
@@ -239,33 +239,20 @@ define(function (require) {
             }
             try {
                 // store views state
-                viewsState = _.map(this.getItemViews(), function (view) {
-                    return {
-                        id: view.model.id,
-                        collapsed: view.isCollapsed()
-                    };
-                });
+                this.oldViewStates = {};
+                itemViews = this.getItemViews();
+                for (cid in itemViews) {
+                    if (itemViews.hasOwnProperty(cid)) {
+                        view = itemViews[cid];
+                        this.oldViewStates[view.model.getUid()] = {
+                            collapsed: view.isCollapsed()
+                        };
+                    }
+                }
 
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(function () {
-                        // restore state
-                        var itemViews = this.getItemViews(),
-                            viewsToggleRequested = false;
-                        _.each(viewsState, _.bind(function (item) {
-                            // find corresponding view
-                            var view = _.find(itemViews, function (view) {return view.model.id === item.id;});
-                            if (view && !item.collapsed && view.isCollapsed()) {
-                                view.toggle();
-                                view.$('.accordion-body').addClass('in');
-                                viewsToggleRequested = true;
-                            }
-                        }, this));
-                        if (!viewsToggleRequested) {
-                            this._hideLoading();
-                        }
-                        this._initPager();
-                    }, this),
+                    success: _.bind(this._initPager, this),
                     error: _.bind(function (collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
                     }, this)
@@ -273,6 +260,37 @@ define(function (require) {
             } catch (err) {
                 this._showLoadItemsError(err);
             }
+        },
+
+        renderAllItems: function () {
+            var result, cid, itemViews, viewsToggleRequested, view, oldViewState;
+
+            result = ActivityListView.__super__.renderAllItems.apply(this, arguments);
+
+            viewsToggleRequested = false;
+
+            if (this.oldViewStates) {
+                // restore state
+                itemViews = this.getItemViews();
+                for (cid in itemViews) {
+                    if (itemViews.hasOwnProperty(cid)) {
+                        view = itemViews[cid];
+                        oldViewState = this.oldViewStates[view.model.getUid()];
+                        if (oldViewState && !oldViewState.collapsed && view.isCollapsed()) {
+                            view.toggle();
+                            view.$('.accordion-body').addClass('in');
+                            viewsToggleRequested = true;
+                        }
+                    }
+                }
+                delete this.oldViewStates;
+            }
+
+            if (!viewsToggleRequested) {
+                this._hideLoading();
+            }
+
+            return result;
         },
 
         _viewItem: function (model) {
