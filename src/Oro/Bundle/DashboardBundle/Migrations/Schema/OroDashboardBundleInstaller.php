@@ -17,7 +17,7 @@ class OroDashboardBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_5';
     }
 
     /**
@@ -90,6 +90,7 @@ class OroDashboardBundleInstaller implements Installation
         $table->addColumn('dashboard_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('layout_position', 'simple_array', ['comment' => '(DC2Type:simple_array)']);
+        $table->addColumn('options', 'array', ['comment' => '(DC2Type:array)', 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['dashboard_id'], 'idx_4b6c43acb9d04d2b', []);
     }

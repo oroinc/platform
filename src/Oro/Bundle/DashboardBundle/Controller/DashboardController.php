@@ -5,17 +5,23 @@ namespace Oro\Bundle\DashboardBundle\Controller;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\DashboardBundle\Model\StateManager;
+use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 
 /**
  * @Route("/dashboard")
@@ -79,12 +85,42 @@ class DashboardController extends Controller
 
         return $this->render(
             $currentDashboard->getTemplate(),
-            array(
+            [
                 'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
                 'dashboard'  => $currentDashboard,
-                'widgets'    => $this->get('oro_dashboard.widget_configs')->getWidgetConfigs(),
-            )
+                'widgets'    => $this->get('oro_dashboard.widget_configs')->getWidgetConfigs()
+            ]
         );
+    }
+
+    /**
+     * @Route("/configure/{id}", name="oro_dashboard_configure", requirements={"id"="\d+"})
+     * @Method({"GET", "POST"})
+     * @Template("OroDashboardBundle:Dashboard:dialog/configure.html.twig")
+     */
+    public function configureAction(Request $request, Widget $widget)
+    {
+        if (!$this->getSecurityFacade()->isGranted('EDIT', $widget->getDashboard())) {
+            throw new AccessDeniedException();
+        }
+
+        $form  = $this->getFormProvider()->getForm($widget->getName());
+        $saved = false;
+
+        $form->setData($widget->getOptions());
+
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $widget->setOptions($form->getData());
+            $this->getEntityManager()->flush();
+            $saved = true;
+        }
+
+        return [
+            'form'       => $form->createView(),
+            'formAction' => $request->getRequestUri(),
+            'saved'      => $saved
+        ];
     }
 
     /**
@@ -101,6 +137,7 @@ class DashboardController extends Controller
     public function updateAction(Dashboard $dashboard)
     {
         $dashboardModel = $this->getDashboardManager()->getDashboardModel($dashboard);
+
         return $this->update($dashboardModel);
     }
 
@@ -117,6 +154,7 @@ class DashboardController extends Controller
     public function createAction()
     {
         $dashboardModel = $this->getDashboardManager()->createDashboardModel();
+
         return $this->update($dashboardModel);
     }
 
@@ -129,9 +167,9 @@ class DashboardController extends Controller
         $form = $this->createForm(
             $this->container->get('oro_dashboard.form.type.edit'),
             $dashboardModel->getEntity(),
-            array(
+            [
                 'create_new' => !$dashboardModel->getId()
-            )
+            ]
         );
 
         $request = $this->getRequest();
@@ -144,26 +182,26 @@ class DashboardController extends Controller
                 );
 
                 return $this->get('oro_ui.router')->redirectAfterSave(
-                    array(
+                    [
                         'route'      => 'oro_dashboard_update',
-                        'parameters' => array(
-                            'id' => $dashboardModel->getId(),
+                        'parameters' => [
+                            'id'                      => $dashboardModel->getId(),
                             '_enableContentProviders' => 'mainMenu'
-                        ),
-                    ),
-                    array(
+                        ]
+                    ],
+                    [
                         'route'      => 'oro_dashboard_view',
-                        'parameters' => array(
-                            'id' => $dashboardModel->getId(),
-                            'change_dashboard' => true,
+                        'parameters' => [
+                            'id'                      => $dashboardModel->getId(),
+                            'change_dashboard'        => true,
                             '_enableContentProviders' => 'mainMenu'
-                        ),
-                    )
+                        ]
+                    ]
                 );
             }
         }
 
-        return array('entity' => $dashboardModel, 'form' => $form->createView());
+        return ['entity' => $dashboardModel, 'form' => $form->createView()];
     }
 
     /**
@@ -243,6 +281,22 @@ class DashboardController extends Controller
         }
 
         return $dashboard;
+    }
+
+    /**
+     * @return WidgetConfigurationFormProvider
+     */
+    protected function getFormProvider()
+    {
+        return $this->get('oro_dashboard.provider.widget_configuration_form_provider');
+    }
+
+    /**
+     * @return StateManager
+     */
+    protected function getStateManager()
+    {
+        return $this->get('oro_dashboard.manager.state');
     }
 
     /**

@@ -6,6 +6,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\MessageCatalogue;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
@@ -75,7 +76,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 array(
                     'validators' => array(
                         'other choice' =>
-                        '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
+                            '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
                         'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
                     ),
                     'jsmessages' => array(
@@ -251,5 +252,70 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($translator->hasTrans('foo'));
 
         $this->assertFalse($translator->hasTrans('foo11111'));
+    }
+
+    public function testEnsureDatabaseLoaderAddedWithNoDatabaseTranslationMetadataCache()
+    {
+        $locale     = 'en';
+        $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+                ->setConstructorArgs([$container, new MessageSelector()])
+                ->setMethods(['addResource'])
+                ->getMock();
+        $translator->setLocale($locale);
+
+        $translator->expects($this->never())->method('addResource');
+        $translator->hasTrans('foo');
+    }
+
+    public function testEnsureDatabaseLoaderAddedWithNoLoadedResources()
+    {
+        $locale        = 'en';
+        $domains       = ['domain1', 'domain2', 'domain3'];
+        $container     = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $em            = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $repository    = $this
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $databaseCache = $this
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator    = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+            ->setConstructorArgs([$container, new MessageSelector()])
+            ->setMethods(['addResource'])
+            ->getMock();
+
+        $translator->setLocale($locale);
+        $translator->setDatabaseMetadataCache($databaseCache);
+
+        $container
+            ->expects($this->any())
+            ->method('hasParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $container
+            ->expects($this->any())
+            ->method('getParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $container
+            ->expects($this->any())
+            ->method('get')
+            ->with('doctrine')
+            ->willReturn($em);
+        $em
+            ->expects($this->any())
+            ->method('getRepository')
+            ->with(Translation::ENTITY_NAME)
+            ->willReturn($repository);
+        $repository
+            ->expects($this->any())
+            ->method('findAvailableDomains')
+            ->willReturn($domains);
+
+        $translator->expects($this->exactly(count($domains)))->method('addResource');
+        $translator->hasTrans('foo');
     }
 }
