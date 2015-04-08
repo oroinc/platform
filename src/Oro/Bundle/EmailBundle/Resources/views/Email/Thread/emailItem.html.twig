@@ -42,9 +42,12 @@
                     {% endif %}
                     {{ EA.date_smart_format(email.sentAt) }}<br />
                 </div>
+                {% set actionParameters = routeParameters is defined ? {
+                    routeParameters: routeParameters
+                } : {} %}
                 {% set buttonsHtml %}
-                    {{ Actions.replyButton(email) }}
-                    {{ Actions.forwardButton(email) }}
+                    {{ Actions.replyButton(email, actionParameters) }}
+                    {{ Actions.forwardButton(email, actionParameters ) }}
                 {% endset %}
                 {{ UI.pinnedDropdownButton({
                     'html': buttonsHtml
