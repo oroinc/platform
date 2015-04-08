@@ -1,7 +1,0 @@
-{% set thread = record.getValue('thread') %}
-
-{%- if thread is not null and oro_config_value('oro_email.use_threads_in_emails') -%}
-    <i class="icon-email-thread"></i>
-{% else %}
-    <i class="icon-envelope"></i>
-{% endif %}

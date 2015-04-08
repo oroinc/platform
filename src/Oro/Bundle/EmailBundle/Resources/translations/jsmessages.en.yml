@@ -10,6 +10,12 @@ oro:
         thread:
             load_error: Sorry, email thread was not loaded correctly.
             no_signature: You haven't created a signature yet. Please set it in System -> Configuration -> Email Configuration.
+            collapse_all:
+                label: Collapse All
+                tooltip: Collapse all emails in the thread
+            expand_all:
+                label: Expand All
+                tooltip: Expand all emails in the thread
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"

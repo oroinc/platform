@@ -5,6 +5,7 @@ parameters:
     oro_ui.twig.mobile.class:            Oro\Bundle\UIBundle\Twig\MobileExtension
     oro_ui.twig.widget.class:            Oro\Bundle\UIBundle\Twig\WidgetExtension
     oro_ui.twig.date.class:              Oro\Bundle\UIBundle\Twig\DateExtension
+    oro_ui.twig.regex.class:             Oro\Bundle\UIBundle\Twig\RegexExtension
     oro_ui.twig.skype_button.class:      Oro\Bundle\UIBundle\Twig\SkypeButtonExtension
     oro_ui.twig.form.class:              Oro\Bundle\UIBundle\Twig\FormExtension
     oro_ui.twig.placeholder.class:       Oro\Bundle\UIBundle\Twig\PlaceholderExtension
@@ -60,6 +61,11 @@ services:
         class: %oro_ui.twig.date.class%
         arguments:
             - @translator
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.regex_extension:
+        class: %oro_ui.twig.regex.class%
         tags:
             - { name: twig.extension }
 
