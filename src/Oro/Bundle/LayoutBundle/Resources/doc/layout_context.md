@@ -1,16 +1,19 @@
 Layout context
 ==============
 
-Basically, as any other context, the **layout context** is an object that is responsible for transferring configuration
-to different components of the **layout** (such as extensions, block types etc).
+The **layout context** is an object that holds data shared between different components of the **layout** (such as layout updates, extensions, block types etc). It is important to understand that data you are put in the layout context is some kind of configuration (or static) data, it means that two layouts built on the same context are same as well. Let's consider this on an example. Imagine that you need to build a layout for Product Details page. All the product pages shall be similar (e.g. have the same menu placement, form fields, etc.) except for the specific product name and description. Also imagine that you have an option that ask that a menu should be rendered either on the top or on the left of the page. In this case, it is reasonable to put the menu position option in the layout context, but it is not very good idea to put the product object in the layout context, because in this case it will not be possible to reuse the same layout for different products and you have to build new layout for each product. How to share dynamic data, like the product object, you can read in [Layout Data](./layout_data.md) topic. On the other hand, if there are several types of products and their details pages (e.g. groceries, stationary and toys) shall differ significantly, it is reasonable to put the product type in the layout context.
 
-The context should be instantiated directly in the code that triggers layout building mechanism.
 
 ```php
 $layoutContext = new LayoutContext();
 $layoutBuilder = $layoutManager->getLayoutBuilder();
 $layoutBuilder->getLayout($layoutContext);
 ```
+
+Types of data in the context
+----------------------------
+
+The layout context can hold any types of data, including scalars, arrays and objects. But any object you want to put in the context must implement [ContextItemInterface](../../../../Component/Layout/ContextItemInterface.php). 
 
 Accessing context
 -----------------
