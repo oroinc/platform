@@ -121,3 +121,46 @@
     display: block;
   }
 }
+
+.load-more-items(@borderColor: #e5e5e5, @backgroundColor: #fff, @color: #888) {
+  background-color: @backgroundColor;
+  position: relative;
+  text-align: center;
+  cursor: pointer;
+  .load-more-label {
+    position: relative;
+    z-index: 1;
+    display: inline;
+    color: @color;
+    background-color: @backgroundColor;
+    padding: 0 5px;
+  }
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    display: block;
+    border-bottom: 1px solid @borderColor;
+    width: 100%;
+  }
+  &:before {
+    top: calc(~"25% + 1px");
+  }
+  &:after {
+    bottom: calc(~"25% + 1px");
+  }
+}
+
+.process(@loadingImagePath: '../../img/loader-16.gif') {
+  position: relative;
+  &:after {
+    content: '';
+    background: transparent url(@loadingImagePath) no-repeat center left;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-size: 12px 12px;
+    right: -20px;
+    top: 50%;
+    margin-top: -6px;
+  }
+}

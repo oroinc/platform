@@ -36,7 +36,7 @@ class OroDashboardExtension extends Extension
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $dashboardConfigs);
-        $this->prepareWidgets($config['widgets']);
+        $this->prepareWidgets($config['widgets'], $config['widgets_configuration']);
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
@@ -47,10 +47,12 @@ class OroDashboardExtension extends Extension
      * Sets "widget" parameter for all widget routes and sort widget items
      *
      * @param array $widgets
+     * @param array $defaultConfiguration
      */
-    protected function prepareWidgets(array &$widgets)
+    protected function prepareWidgets(array &$widgets, array $defaultConfiguration)
     {
         foreach ($widgets as $widgetName => &$widget) {
+            $widget['configuration'] = array_merge_recursive($defaultConfiguration, $widget['configuration']);
             $widget['route_parameters']['widget'] = $widgetName;
             if (!empty($widget['items'])) {
                 $this->sortItemsByPosition($widget['items']);
