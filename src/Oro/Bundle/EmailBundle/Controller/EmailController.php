@@ -4,8 +4,6 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +20,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * Class EmailController
@@ -431,7 +429,7 @@ class EmailController extends Controller
             } elseif ($emailAttachmentManager->isAttached($attachment, $this->getTargetEntity())) {
                 $attach = [
                     'entity' => $attachment,
-                    'title' => 'oro.email.attachment.alredy_copied',
+                    'title' => 'oro.email.attachment.already_copied',
                     'can_reattach' => false
                 ];
             }

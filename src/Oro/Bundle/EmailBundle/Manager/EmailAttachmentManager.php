@@ -9,7 +9,6 @@ use Gaufrette\Filesystem;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
@@ -19,6 +18,7 @@ use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Class EmailAttachmentManager
@@ -63,6 +63,8 @@ class EmailAttachmentManager
     }
 
     /**
+     * Link attachment to scope
+     *
      * @param EmailAttachment $emailAttachment
      * @param object $entity
      */
@@ -105,6 +107,8 @@ class EmailAttachmentManager
     }
 
     /**
+     * Check is attached file to target entity
+     *
      * @param EmailAttachment $attachment
      * @param object $target
      *
@@ -182,15 +186,7 @@ class EmailAttachmentManager
         }
         $attachment->setFile($emailAttachment->getFile());
         $attachment->setTarget($entity);
-        $file = $attachment->getFile();
-//        $fileViolations = $this->configFileValidator->validate($entityClass, $file);
-//        if ($fileViolations->count() > 0) {
-//            $this->filesystem->get($file->getFilename())->delete();
-//            $emailAttachment->setFile(null);
-//            $this->em->persist($emailAttachment);
-//        } else {
         $this->em->persist($attachment);
-//        }
         $this->em->flush();
     }
 
