@@ -271,7 +271,7 @@ define(function (require) {
                 // restore state
                 for (i = 0; i < this.oldViewStates.length; i++) {
                     oldViewState = this.oldViewStates[i];
-                    model = this.collection.findSame(oldViewState.attrs);
+                    model = this.collection.findSameActivity(oldViewState.attrs);
                     if (model) {
                         view = this.getItemView(model);
                         if (view && !oldViewState.collapsed && view.isCollapsed()) {

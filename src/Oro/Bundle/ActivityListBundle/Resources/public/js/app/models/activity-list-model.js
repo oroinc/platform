@@ -56,7 +56,7 @@ define([
          *
          * @param model {Object|ActivityModel} attributes or model to compare
          */
-        isSame: function (model) {
+        isSameActivity: function (model) {
             var attrsToCompare;
             attrsToCompare = model instanceof ActivityModel ? model.toJSON(): model;
 
@@ -68,6 +68,7 @@ define([
                 if (attrsToCompare.relatedActivityId === this.get('relatedActivityId')) {
                     return true;
                 }
+                // @TODO: move to descendant
                 if (attrsToCompare.relatedActivityClass === 'Oro\\Bundle\\EmailBundle\\Entity\\Email') {
                     // if tread is same
                     if (attrsToCompare.data.treadId === this.get('data').treadId) {

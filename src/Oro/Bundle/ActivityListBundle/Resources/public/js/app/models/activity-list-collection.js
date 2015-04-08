@@ -57,7 +57,7 @@ define([
                     newModel = models.data[i];
                     oldModel = this.get(newModel.id);
                     // if model is in collection
-                    if (oldModel && oldModel.isSame(newModel)) {
+                    if (oldModel && oldModel.isSameActivity(newModel)) {
                         // and if there was no updates
                         if (oldModel.get('updatedAt') === newModel.updatedAt) {
                             // use old model
@@ -75,9 +75,9 @@ define([
          *
          * @param model {Object|ActivityModel} attributes or model to compare
          */
-        findSame: function (model) {
+        findSameActivity: function (model) {
             return this.find(function (item) {
-                return item.isSame(model);
+                return item.isSameActivity(model);
             });
         },
 
