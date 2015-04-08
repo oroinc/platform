@@ -49,6 +49,39 @@ define([
 
         getRelatedActivityClass: function () {
             return this.get('relatedActivityClass').replace(/\\/g, '_');
+        },
+
+        /**
+         * Compares current model to attributes. Returns true if models are same
+         *
+         * @param model {Object|ActivityModel} attributes or model to compare
+         */
+        isSame: function (model) {
+            var attrsToCompare;
+            attrsToCompare = model instanceof ActivityModel ? model.toJSON(): model;
+
+            if (attrsToCompare.id === this.get('id')) {
+                return true;
+            }
+
+            if (attrsToCompare.relatedActivityClass === this.get('relatedActivityClass')) {
+                if (attrsToCompare.relatedActivityId === this.get('relatedActivityId')) {
+                    return true;
+                }
+                if (attrsToCompare.relatedActivityClass === 'Oro\\Bundle\\EmailBundle\\Entity\\Email') {
+                    // if tread is same
+                    if (attrsToCompare.data.treadId === this.get('data').treadId) {
+                        return true;
+                    }
+                    // if compared model is not in tread and if tread was just created (it contains replayedEmailId)
+                    // models are same
+                    if (attrsToCompare.data.treadId === null &&
+                        this.get('data').replayedEmailId === attrsToCompare.relatedActivityId) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     });
 

@@ -52,22 +52,33 @@ define([
 
         reset: function (models, options) {
             var i, newModel, oldModel;
-            if (models && !(models[0] instanceof this.model)) {
-                for (i = 0; i < models.length; i++) {
-                    newModel = models[i];
+            if (options.parse) {
+                for (i = 0; i < models.data.length; i++) {
+                    newModel = models.data[i];
                     oldModel = this.get(newModel.id);
                     // if model is in collection
-                    if (oldModel) {
-                        // and if the models are equal
+                    if (oldModel && oldModel.isSame(newModel)) {
+                        // and if there was no updates
                         if (oldModel.get('updatedAt') === newModel.updatedAt) {
                             // use old model
-                            models[i] = oldModel;
+                            models.data[i] = oldModel;
                         }
                     }
                 }
             }
 
             return ActivityCollection.__super__.reset.call(this, models, options);
+        },
+
+        /**
+         * Finds the same model in collection
+         *
+         * @param model {Object|ActivityModel} attributes or model to compare
+         */
+        findSame: function (model) {
+            return this.find(function (item) {
+                return item.isSame(model);
+            });
         },
 
         getCount: function () {
