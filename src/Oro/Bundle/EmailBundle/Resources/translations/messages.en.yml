@@ -86,6 +86,12 @@ oro:
             current_time:        Current time
             siganture:           Signature (oro_html_filter should be applied to this variable to allow usage of it's html view)
 
+        attachment:
+            copy_to_record: Copy to Record
+            already_copied: Already Copied
+            copy_dont_allow: Copy don't Allow
+            cant_copy: Can't Copy
+
         menu:
             emailtemplate_list.description: List of email templates
             user_emails: My Emails

@@ -20,9 +20,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * Class EmailController
@@ -45,20 +45,20 @@ class EmailController extends Controller
      */
     public function viewAction(Email $entity)
     {
-        $templateVars = [
-            'entity' => $entity,
-            'noBodyFound' => false,
-            'canLinkAttachment' => $this->canLinkAttachment(),
-            'targetEntityData' => $this->getTargetEntityConfig()
-        ];
         try {
             $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
+            $noBodyFound = false;
         } catch (LoadEmailBodyException $e) {
-            $templateVars['noBodyFound'] = true;
+            $noBodyFound = true;
         }
         $this->getEmailManager()->setEmailSeen($entity);
 
-        return $templateVars;
+        return [
+            'entity' => $entity,
+            'noBodyFound' => $noBodyFound,
+            'attachments' => $this->getAttachments($entity),
+            'targetEntityData' => $this->getTargetEntityConfig()
+        ];
     }
 
     /**
@@ -321,38 +321,39 @@ class EmailController extends Controller
     /**
      * Check possibility link attachment to target entity
      *
-     * @return bool
+     * @param Email $entity
+     *
+     * @return array
      */
-    protected function canLinkAttachment()
+    protected function getAttachments($entity)
     {
-        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
-        if (null === $entityClassName) {
-            return false;
+        $result = [];
+        if ($entity->getEmailBody()->getHasAttachments()) {
+            $result = $result = $this->prepareAttachments($entity);
         }
-
-        /** @var ConfigProvider $targetConfigProvider */
-        $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
-        $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
-
-        return $enabledAttachment;
+        return $result;
     }
 
     /**
      * Get target entity parameters
      *
+     * @param bool $encode
+     *
      * @return array
      */
-    protected function getTargetEntityConfig()
+    protected function getTargetEntityConfig($encode = true)
     {
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
         $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
+        if ($encode) {
+            $targetEntityClass = $entityRoutingHelper->encodeClassName($targetEntityClass);
+        }
         if (null === $targetEntityClass || null === $targetEntityId) {
             return [];
         }
         return [
-            'targetEntityClass' => $entityRoutingHelper->encodeClassName($targetEntityClass),
+            'targetEntityClass' => $targetEntityClass,
             'targetEntityId' => $targetEntityId
         ];
     }
@@ -370,5 +371,71 @@ class EmailController extends Controller
         $entity = $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
 
         return $entity;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function checkAttachCreateGrant()
+    {
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
+        if (null !== $entityClassName) {
+            /** @var ConfigProvider $targetConfigProvider */
+            $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
+            $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
+        } else {
+            $enabledAttachment = false;
+        }
+        $createGrant = $this->get('oro_security.security_facade')
+            ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
+
+        return $enabledAttachment && $createGrant;
+    }
+
+    /**
+     * @param Email $entity
+     *
+     * @return array
+     */
+    protected function prepareAttachments($entity)
+    {
+        $result = [];
+        $emailAttachmentManager = $this->get('oro_email.manager.email_attachment_manager');
+        $target = $this->getTargetEntityConfig(false);
+        $allowed = $this->checkAttachCreateGrant();
+
+        foreach ($entity->getEmailBody()->getAttachments() as $attachment) {
+            $attach = [
+                'entity' => $attachment,
+                'title' => 'oro.email.attachment.copy_to_record',
+                'can_reattach' => true
+            ];
+            if (!$allowed) {
+                $attach = [
+                    'entity' => $attachment,
+                    'title' => 'oro.email.attachment.copy_dont_allow',
+                    'can_reattach' => false
+                ];
+            } elseif ($emailAttachmentManager
+                    ->validateEmailAttachmentForTargetClass($attachment, $target['targetEntityClass'])
+                    ->count() > 0
+            ) {
+                $attach = [
+                    'entity' => $attachment,
+                    'title' => 'oro.email.attachment.cant_copy',
+                    'can_reattach' => false
+                ];
+            } elseif ($emailAttachmentManager->isAttached($attachment, $this->getTargetEntity())) {
+                $attach = [
+                    'entity' => $attachment,
+                    'title' => 'oro.email.attachment.already_copied',
+                    'can_reattach' => false
+                ];
+            }
+            $result[] = $attach;
+        }
+
+        return $result;
     }
 }
