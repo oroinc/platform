@@ -102,7 +102,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->filesystem = $this->getMockBuilder('Gaufrette\Filesystem')
-            ->setMethods(['delete'])
+            ->setMethods(['delete', 'write', 'has'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -178,11 +178,6 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
     {
         $emailAttachment = $this->getEmailAttachment();
 
-        $this->attachment->expects($this->once())
-            ->method('supportTarget')
-            ->withAnyParameters()
-            ->will($this->returnValue(true));
-
         $this->emailAttachmentManager
             ->method('buildAttachmentInstance')
             ->withAnyParameters()
@@ -219,30 +214,14 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
         $emailAttachment = $this->getEmailAttachment();
 
-        $this->attachment->expects($this->once())
-            ->method('supportTarget')
-            ->withAnyParameters()
-            ->will($this->returnValue(true));
-
         $this->emailAttachmentManager
             ->method('buildAttachmentInstance')
             ->withAnyParameters()
             ->will($this->returnValue($this->attachment));
 
-        $emailAttachment->expects($this->once())
-            ->method('setFile')
-            ->withAnyParameters();
         $emailAttachment->expects($this->any())
             ->method('getFile')
             ->will($this->returnValue($file));
-
-        $this->attachment->expects($this->once())
-            ->method('setFile')
-            ->withAnyParameters();
-
-        $this->attachment->expects($this->once())
-            ->method('getFile')
-            ->willReturn($file);
 
         $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
     }
