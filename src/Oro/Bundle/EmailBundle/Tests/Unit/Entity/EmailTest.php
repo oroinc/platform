@@ -123,6 +123,18 @@ class EmailTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider refsDataProvider
+     * @param string $set
+     * @param array $get
+     */
+    public function testRefsGetterAndSetter($set, $get)
+    {
+        $entity = new Email();
+        $entity->setRefs($set);
+        $this->assertEquals($get, $entity->getRefs());
+    }
+
+    /**
      * @dataProvider propertiesDataProvider
      * @param string $property
      * @param mixed  $value
@@ -153,6 +165,19 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['seen', ''],
             ['seen', 0],
             ['seen', 1],
+        ];
+    }
+
+    public function refsDataProvider()
+    {
+        return [
+            [null, []],
+            ['', []],
+            ['ref', []],
+            ['<ref>', ['<ref>']],
+            ['<ref1><ref2>', ['<ref1>', '<ref2>']],
+            ['<ref1> <ref2>', ['<ref1>', '<ref2>']],
+            ['<ref1> ref2', ['<ref1>']],
         ];
     }
 }
