@@ -68,12 +68,54 @@ class RestSearchApiTest extends WebTestCase
     }
 
     /**
+     * @param array $request
+     * @param array $response
+     *
+     * @dataProvider searchDataAutocompleteProvider
+     */
+    public function testSearchAutocomplete(array $request, array $response)
+    {
+        if (array_key_exists('supported_engines', $request)) {
+            $engine = $this->getContainer()->getParameter('oro_search.engine');
+            if (!in_array($engine, $request['supported_engines'])) {
+                $this->markTestIncomplete(sprintf('Test should not be executed on "%s" engine', $engine));
+            }
+            unset($request['supported_engines']);
+        }
+
+        $request = array_filter($request);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_search_autocomplete'),
+            $request
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $result = json_decode($result->getContent(), true);
+
+        $this->assertEquals($response['rest']['results'][0]['text'], $result['results'][0]['text']);
+    }
+
+    /**
      * @return array
      */
     public function searchDataProvider()
     {
         return $this->getApiRequestsData(
             __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'requests'
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function searchDataAutocompleteProvider()
+    {
+        return $this->getApiRequestsData(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'requests_autocomplete'
         );
     }
 

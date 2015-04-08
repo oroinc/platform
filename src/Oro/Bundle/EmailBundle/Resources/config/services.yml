@@ -164,6 +164,7 @@ services:
           - @request
           - @doctrine.orm.entity_manager
           - @oro_config.user
+          - @oro_email.activity_list.provider
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%

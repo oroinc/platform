@@ -9,6 +9,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -52,5 +54,49 @@ class SearchController extends FOSRestController
                 Codes::HTTP_OK
             )
         );
+    }
+
+    /**
+     * @ApiDoc(
+     *      description="Get search result for autocomplete",
+     *      resource=true,
+     *      filters={
+     *          {"name"="query", "dataType"="string"},
+     *          {"name"="offset", "dataType"="integer"},
+     *          {"name"="max_results", "dataType"="integer"},
+     *          {"name"="from", "dataType"="string"}
+     *      }
+     * )
+     *
+     * @AclAncestor("oro_search")
+     */
+    public function getAutocompleteAction()
+    {
+        $searchResults = $this->get('oro_search.index')->simpleSearch(
+            $this->getRequest()->get('query'),
+            (int) $this->getRequest()->get('offset'),
+            (int) $this->getRequest()->get('max_results'),
+            $this->getRequest()->get('from')
+        );
+
+        $configExtension = $this->get('oro_entity_config.twig.extension.config');
+        $result = [];
+        foreach ($searchResults->getElements() as $item) {
+            $className = $item->getEntityName();
+            $text = $item->getRecordTitle();
+            if ($label = $configExtension->getClassConfigValue($className, 'label')) {
+                $label = $this->get('translator')->trans($label);
+                $text .= ' (' . $label . ')';
+            }
+            $result[] = [
+                'text' => $text,
+                'id'   => json_encode([
+                    'entityClass' => $className,
+                    'entityId'    => $item->getRecordId(),
+                ]),
+            ];
+        }
+
+        return new Response(json_encode(['results' => $result]), Codes::HTTP_OK);
     }
 }

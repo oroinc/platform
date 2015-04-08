@@ -130,6 +130,8 @@ oro:
         refs.label:               References Header
         seen.label:               Is Seen
         thread_id.label:          Thread ID
+        contexts.label:           Contexts
+        contexts.placeholder:     Choose a value...
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.

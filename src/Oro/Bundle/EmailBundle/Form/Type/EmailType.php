@@ -92,7 +92,16 @@ class EmailType extends AbstractType
             )
             ->add('bodyFooter', 'hidden')
             ->add('parentEmailId', 'hidden')
-            ->add('signature', 'hidden');
+            ->add('signature', 'hidden')
+            ->add(
+                'contexts',
+                'oro_email_contexts_select',
+                [
+                    'label'    => 'oro.email.contexts.label',
+                    'tooltip'  => 'oro.email.contexts.tooltip',
+                    'required' => false,
+                ]
+            );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
