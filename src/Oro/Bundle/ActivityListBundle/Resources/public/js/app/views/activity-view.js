@@ -12,6 +12,7 @@ define([
     'use strict';
 
     var ActivityView;
+    
     ActivityView = BaseView.extend({
         options: {
             configuration: {
