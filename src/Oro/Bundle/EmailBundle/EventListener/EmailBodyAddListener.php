@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
@@ -14,7 +15,6 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 class EmailBodyAddListener
 {
     const LINK_ATTACHMENT_CONFIG_OPTION = 'auto_link_attachments';
-    const ATTACHMENT_CLASS = 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
 
     /** @var ConfigProvider */
     protected $configProvider;
@@ -51,7 +51,7 @@ class EmailBodyAddListener
      */
     public function linkToScopeEvent(EmailBodyAdded $event)
     {
-        if (!$this->securityFacade->isGranted('CREATE', 'entity:' . self::ATTACHMENT_CLASS)) {
+        if (!$this->securityFacade->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)) {
             return;
         }
         $email = $event->getEmail();

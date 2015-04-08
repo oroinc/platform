@@ -60,7 +60,7 @@
             {% set attributes = attributes |
                 merge([UI.attibuteRow(
                     'Attachments'|trans,
-                    EA.attachments(entity.emailBody.attachments, canLinkAttachment, targetEntityData)
+                    EA.attachments(attachments, targetEntityData)
                 )]) %}
         {% endif %}
         {% if entity.emailBody.bodyContent is empty %}

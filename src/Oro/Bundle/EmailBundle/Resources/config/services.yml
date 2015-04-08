@@ -501,5 +501,6 @@ services:
             - @oro_email.manager.email_attachment_manager
             - @oro_entity_config.provider.attachment
             - @oro_email.activity_list.provider
+            - @oro_security.security_facade.link
         tags:
             - { name: kernel.event_listener, event: oro_email.email_attachment_manager.email_body_added, method: linkToScopeEvent, priority: 10 }

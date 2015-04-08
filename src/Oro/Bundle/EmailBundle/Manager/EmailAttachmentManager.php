@@ -9,6 +9,7 @@ use Gaufrette\Filesystem;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
@@ -67,43 +68,73 @@ class EmailAttachmentManager
      */
     public function linkEmailAttachmentToTargetEntity(EmailAttachment $emailAttachment, $entity)
     {
-        $this->copyEmailAttachmentToFileSystem($emailAttachment);
+        if (null === $emailAttachment->getFile()) {
+            $file = $this->copyEmailAttachmentToFileSystem($emailAttachment);
+        } else {
+            $file = $emailAttachment->getFile();
+        }
+        $errors = $this->configFileValidator->validate(ClassUtils::getClass($entity), $file);
+        if ($errors->count() > 0) {
+            $this->filesystem->get($file->getFilename())->delete();
+            return;
+        }
+        $emailAttachment->setFile($file);
         $this->linkAttachmentsToEntities($emailAttachment, $entity);
     }
 
     /**
+     * Validate file by target entity without saving.
+     *
      * @param EmailAttachment $emailAttachment
-     * @param object $entity
+     * @param string $className
+     *
+     * @return \Symfony\Component\Validator\ConstraintViolationListInterface
      */
-    protected function linkAttachmentsToEntities(EmailAttachment $emailAttachment, $entity)
+    public function validateEmailAttachmentForTargetClass(EmailAttachment $emailAttachment, $className)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        if (!$emailAttachment->getFile()) {
-            return;
-        }
-        $attachment = $this->buildAttachmentInstance();
-        if (!$attachment->supportTarget($entityClass)) {
-            return;
-        }
-        $attachment->setFile($emailAttachment->getFile());
-        $attachment->setTarget($entity);
-        $file = $attachment->getFile();
-        $fileViolations = $this->configFileValidator->validate($entityClass, $file);
-        if ($fileViolations->count() > 0) {
+        if (null === $emailAttachment->getFile()) {
+            $file = $this->copyEmailAttachmentToFileSystem($emailAttachment);
+            $fileViolations = $this->configFileValidator->validate($className, $file);
             $this->filesystem->get($file->getFilename())->delete();
-            $emailAttachment->setFile(null);
-            $this->em->persist($emailAttachment);
         } else {
-            $this->em->persist($attachment);
+            $file = $emailAttachment->getFile();
+            $fileViolations = $this->configFileValidator->validate($className, $file);
         }
-        $this->em->flush();
+
+        return $fileViolations;
+    }
+
+    /**
+     * @param EmailAttachment $attachment
+     * @param object $target
+     *
+     * @return bool
+     */
+    public function isAttached($attachment, $target)
+    {
+        $targetEntityClass = ClassUtils::getClass($target);
+        if ($this->buildAttachmentInstance()->supportTarget($targetEntityClass)) {
+            $attached = $this->em->getRepository('OroAttachmentBundle:Attachment')->findOneBy(
+                [
+                    ExtendHelper::buildAssociationName($targetEntityClass) => $target,
+                    'file' => $attachment->getFile()
+                ]
+            );
+            return null !== $attached;
+        }
+        return false;
     }
 
     /**
      * @param EmailAttachment $emailAttachment
+     *
+     * @return File
      */
     protected function copyEmailAttachmentToFileSystem(EmailAttachment $emailAttachment)
     {
+        if (null !== $emailAttachment->getFile()) {
+            return null;
+        }
         $file = new File();
         $file->setExtension($emailAttachment->getExtension());
         $file->setOriginalFilename($emailAttachment->getFileName());
@@ -124,7 +155,43 @@ class EmailAttachmentManager
 
         $file->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
 
-        $emailAttachment->setFile($file);
+        return $file;
+    }
+
+    /**
+     * @return Attachment
+     */
+    public function buildAttachmentInstance()
+    {
+        return new Attachment();
+    }
+
+    /**
+     * @param EmailAttachment $emailAttachment
+     * @param object $entity
+     */
+    protected function linkAttachmentsToEntities(EmailAttachment $emailAttachment, $entity)
+    {
+        $entityClass = ClassUtils::getClass($entity);
+        if (!$emailAttachment->getFile()) {
+            return;
+        }
+        $attachment = $this->buildAttachmentInstance();
+        if (!$attachment->supportTarget($entityClass)) {
+            return;
+        }
+        $attachment->setFile($emailAttachment->getFile());
+        $attachment->setTarget($entity);
+        $file = $attachment->getFile();
+//        $fileViolations = $this->configFileValidator->validate($entityClass, $file);
+//        if ($fileViolations->count() > 0) {
+//            $this->filesystem->get($file->getFilename())->delete();
+//            $emailAttachment->setFile(null);
+//            $this->em->persist($emailAttachment);
+//        } else {
+        $this->em->persist($attachment);
+//        }
+        $this->em->flush();
     }
 
     /**
@@ -135,13 +202,5 @@ class EmailAttachmentManager
     protected function getAttachmentFullPath($path)
     {
         return $this->attachmentDir . '/' . $path;
-    }
-
-    /**
-     * @return Attachment
-     */
-    public function buildAttachmentInstance()
-    {
-        return new Attachment();
     }
 }

@@ -178,3 +178,26 @@ a.attachment .icon .icon-link {
 .control-group .email-body-action {
     margin-right: 15px;
 }
+
+.dropdown.link-to-record {
+    display: inline-block;
+    padding-right: 4px;
+}
+.dropdown.link-to-record .dropdown-menu {
+    margin-top: 5px;
+    line-height: 24px;
+    text-align: center;
+}
+.dropdown.link-to-record .dropdown-menu a {
+    padding-right: 7px;
+}
+.dropdown.link-to-record .dropdown-menu:after {
+    border-bottom: 6px solid #fff;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 10px;
+    position: absolute;
+    top: -6px;
+}
