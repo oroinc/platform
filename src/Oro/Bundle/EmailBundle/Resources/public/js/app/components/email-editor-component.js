@@ -20,7 +20,10 @@ define(function (require) {
                 hideField(fieldName);
             }
         });
+
         $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__('oro.email.to'));
+        addForgedAsterisk();
+
     }
 
     function hideField(fieldName) {
@@ -33,6 +36,17 @@ define(function (require) {
             $(target).remove();
             showField(fieldName);
         });
+    }
+
+    function addForgedAsterisk() {
+        var label_tab = $('.forged-required').find('label'),
+            em_tag = label_tab.find('em');
+
+        if (em_tag.length <= 0) {
+            label_tab.append('<em>*</em>')
+        } else {
+            em_tag.html('*');
+        }
     }
 
     EmailEditorComponent = BaseComponent.extend({
@@ -137,7 +151,7 @@ define(function (require) {
                 }
             });
 
-            this.addForgedAsterisk();
+            addForgedAsterisk();
             this.bindFieldEvents();
         },
 
