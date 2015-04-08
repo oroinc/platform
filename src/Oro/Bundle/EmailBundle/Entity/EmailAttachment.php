@@ -10,7 +10,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * Email Attachment
  *
  * @ORM\Table(name="oro_email_attachment")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository")
  */
 class EmailAttachment
 {
