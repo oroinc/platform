@@ -109,7 +109,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
      * @param array $searchContext
      * @return null|object
      */
-    protected function findExistingEntity($entity, array $searchContext = array())
+    protected function findExistingEntity($entity, array $searchContext = [])
     {
         $entityName = ClassUtils::getClass($entity);
         $identifier = $this->databaseHelper->getIdentifier($entity);
@@ -127,6 +127,12 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
             $identityValues = $searchContext;
             $identityValues += $this->fieldHelper->getIdentityValues($entity);
             $existingEntity = $this->findEntityByIdentityValues($entityName, $identityValues);
+        }
+
+        if ($existingEntity && !$identifier) {
+            $identifier = $this->databaseHelper->getIdentifier($existingEntity);
+            $identifierName = $this->databaseHelper->getIdentifierFieldName($entity);
+            $this->fieldHelper->setObjectValue($entity, $identifierName, $identifier);
         }
 
         return $existingEntity;

@@ -6,6 +6,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 
@@ -120,6 +121,7 @@ class EntityToIdTransformer implements DataTransformerInterface
      * @param mixed $id
      * @return object
      * @throws UnexpectedTypeException if query builder callback returns invalid type
+     * @throws TransformationFailedException if value not matched given $id
      */
     protected function loadEntityById($id)
     {
@@ -130,9 +132,18 @@ class EntityToIdTransformer implements DataTransformerInterface
             if (!$qb instanceof QueryBuilder) {
                 throw new UnexpectedTypeException($qb, 'Doctrine\ORM\QueryBuilder');
             }
-            return $qb->getQuery()->execute();
+            $result = $qb->getQuery()->execute();
         } else {
-            return $repository->find($id);
+            $result = $repository->find($id);
+            if ($result) {
+                $result = [$result];
+            }
         }
+
+        if (count($result) !== 1) {
+            throw new TransformationFailedException(sprintf('The value "%s" does not exist or not unique.', $id));
+        }
+
+        return $result ? reset($result) : null;
     }
 }

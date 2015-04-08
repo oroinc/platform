@@ -18,6 +18,9 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $resolver;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $valueProvider;
+
     protected function setUp()
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
@@ -30,7 +33,19 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
 
-        $this->target = new WidgetConfigs($this->configProvider, $this->securityFacade, $this->resolver);
+        $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+
+        $this->valueProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->target = new WidgetConfigs(
+            $this->configProvider,
+            $this->securityFacade,
+            $this->resolver,
+            $em,
+            $this->valueProvider
+        );
     }
 
     public function testGetWidgetAttributesForTwig()
@@ -41,9 +56,14 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             'route_parameters' => 'sample params',
             'acl'              => 'view_acl',
             'items'            => [],
-            'test-param'       => 'param'
+            'test-param'       => 'param',
+            'configuration'    => []
         ];
-        $expected           = ['widgetName' => $expectedWidgetName, 'widgetTestParam' => 'param'];
+        $expected           = [
+            'widgetName'          => $expectedWidgetName,
+            'widgetTestParam'     => 'param',
+            'widgetConfiguration' => []
+        ];
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfig')
             ->with($expectedWidgetName)
@@ -64,29 +84,29 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
         $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
         $applicableItem     = 'applicable_item';
         $applicable         = [
-            'label' => 'applicable is set and resolved to true',
+            'label'      => 'applicable is set and resolved to true',
             'applicable' => '@true',
-            'enabled' => true
+            'enabled'    => true
         ];
         $notApplicableItem  = 'not_applicable_item';
         $notApplicable      = [
-            'label' => 'applicable is set and resolved to false',
+            'label'      => 'applicable is set and resolved to false',
             'applicable' => '@false',
-            'enabled' => true
+            'enabled'    => true
         ];
-        $disabledItem  = 'not_applicable_item';
-        $disabled      = [
-            'label' => 'applicable is set and resolved to false',
-            'acl' => $allowedAcl,
+        $disabledItem       = 'not_applicable_item';
+        $disabled           = [
+            'label'   => 'applicable is set and resolved to false',
+            'acl'     => $allowedAcl,
             'enabled' => false
         ];
 
-        $configs            = [
-            $expectedItem       => $expectedValue,
-            $notGrantedItem     => $notGrantedValue,
-            $applicableItem     => $applicable,
-            $notApplicableItem  => $notApplicable,
-            $disabledItem       => $disabled
+        $configs = [
+            $expectedItem      => $expectedValue,
+            $notGrantedItem    => $notGrantedValue,
+            $applicableItem    => $applicable,
+            $notApplicableItem => $notApplicable,
+            $disabledItem      => $disabled
         ];
 
         $this->configProvider->expects($this->once())
@@ -123,25 +143,25 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWidgetConfigs()
     {
-        $notAllowedAcl      = 'invalid_acl';
-        $allowedAcl         = 'valid_acl';
-        $expectedItem       = 'expected_item';
-        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
-        $notGrantedItem     = 'not_granted_item';
-        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
-        $applicableItem     = 'applicable_item';
-        $applicable         = [
-            'label' => 'applicable is set and resolved to true',
+        $notAllowedAcl     = 'invalid_acl';
+        $allowedAcl        = 'valid_acl';
+        $expectedItem      = 'expected_item';
+        $expectedValue     = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
+        $notGrantedItem    = 'not_granted_item';
+        $notGrantedValue   = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
+        $applicableItem    = 'applicable_item';
+        $applicable        = [
+            'label'      => 'applicable is set and resolved to true',
             'applicable' => '@true',
-            'enabled' => true
+            'enabled'    => true
         ];
-        $notApplicableItem  = 'not_applicable_item';
-        $notApplicable      = [
-            'label' => 'applicable is set and resolved to false',
+        $notApplicableItem = 'not_applicable_item';
+        $notApplicable     = [
+            'label'      => 'applicable is set and resolved to false',
             'applicable' => '@false',
-            'enabled' => true
+            'enabled'    => true
         ];
-        $configs            = [
+        $configs           = [
             $expectedItem      => $expectedValue,
             $notGrantedItem    => $notGrantedValue,
             $applicableItem    => $applicable,

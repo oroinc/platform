@@ -7,9 +7,7 @@ use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
 
 class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var OroDashboardExtension
-     */
+    /** @var OroDashboardExtension */
     protected $target;
 
     protected $bundlesState;
@@ -17,8 +15,7 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->bundlesState = CumulativeResourceManager::getInstance()->getBundles();
-
-        $this->target = new OroDashboardExtension();
+        $this->target       = new OroDashboardExtension();
     }
 
     protected function tearDown()
@@ -42,6 +39,7 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                 //not use equalTo because it is not check items position
                 function ($actualConfiguration) use ($expectedConfiguration) {
                     $this->assertSame($expectedConfiguration, $actualConfiguration);
+
                     return true;
                 }
             )
@@ -54,75 +52,78 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function loadDataProvider()
     {
-        $firstBundle = 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle';
+        $firstBundle  = 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle';
         $secondBundle = 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle';
 
-        return array(
-            array(
-                'bundles' => array($firstBundle, $secondBundle),
-                'configs' => array(array()),
-                'expectedConfiguration' => array(
-                    'widgets' => array(
-                        'quick_launchpad' => array(
-                            'route' => 'alternative_quick_lanchpad_route',
-                            'route_parameters' => array(
+        return [
+            [
+                'bundles'               => [$firstBundle, $secondBundle],
+                'configs'               => [[]],
+                'expectedConfiguration' => [
+                    'widgets'               => [
+                        'quick_launchpad'        => [
+                            'route'            => 'alternative_quick_lanchpad_route',
+                            'route_parameters' => [
                                 'bundle' => 'TestBundle',
-                                'name' => 'quickLaunchpad',
+                                'name'   => 'quickLaunchpad',
                                 'widget' => 'quick_launchpad'
-                            ),
-                            'items' => array(
-                                'test1' => array(
-                                    'label' => 'Test1',
-                                    'route' => 'test1',
-                                    'route_parameters' => array(),
-                                    'enabled' => true
-                                ),
-                                'index'  => array(
-                                    'label' => 'List',
-                                    'route' => 'orocrm_sales_opportunity_index',
-                                    'acl' => 'orocrm_sales_opportunity_view',
-                                    'route_parameters' => array(),
-                                    'enabled' => true
-                                ),
-                                'create' => array(
-                                    'label' => 'Create opportunity',
-                                    'route' => 'orocrm_sales_opportunity_create',
-                                    'acl' => 'orocrm_sales_opportunity_create',
-                                    'route_parameters' => array(),
-                                    'enabled' => true
-                                ),
-                                'test2' => array(
-                                    'label' => 'Test2',
-                                    'route' => 'test2',
-                                    'route_parameters' => array(),
-                                    'enabled' => true
-                                ),
-                            ),
-                            'enabled' => true
-                        ),
-                        'second_quick_launchpad' => array(
-                            'route' => 'second_quick_launchpad_test_route',
-                            'route_parameters' => array(
+                            ],
+                            'items'            => [
+                                'test1'  => [
+                                    'label'            => 'Test1',
+                                    'route'            => 'test1',
+                                    'route_parameters' => [],
+                                    'enabled'          => true
+                                ],
+                                'index'  => [
+                                    'label'            => 'List',
+                                    'route'            => 'orocrm_sales_opportunity_index',
+                                    'acl'              => 'orocrm_sales_opportunity_view',
+                                    'route_parameters' => [],
+                                    'enabled'          => true
+                                ],
+                                'create' => [
+                                    'label'            => 'Create opportunity',
+                                    'route'            => 'orocrm_sales_opportunity_create',
+                                    'acl'              => 'orocrm_sales_opportunity_create',
+                                    'route_parameters' => [],
+                                    'enabled'          => true
+                                ],
+                                'test2'  => [
+                                    'label'            => 'Test2',
+                                    'route'            => 'test2',
+                                    'route_parameters' => [],
+                                    'enabled'          => true
+                                ]
+                            ],
+                            'enabled'          => true,
+                            'configuration'    => []
+                        ],
+                        'second_quick_launchpad' => [
+                            'route'            => 'second_quick_launchpad_test_route',
+                            'route_parameters' => [
                                 'bundle' => 'SecondTestBundle',
                                 'name'   => 'secondQuickLaunchpad',
                                 'widget' => 'second_quick_launchpad'
-                            ),
-                            'enabled' => true
-                        )
-                    ),
-                    'dashboards' => array(
-                        'main' => array(
+                            ],
+                            'enabled'          => true,
+                            'configuration'    => [],
+                        ]
+                    ],
+                    'dashboards'            => [
+                        'main'                  => [
                             'twig' => 'OroDashboardBundle:Index:default.html.twig'
-                        ),
-                        'alternative_dashboard' => array(
+                        ],
+                        'alternative_dashboard' => [
                             'twig' => 'OroDashboardBundle:Index:default.html.twig'
-                        ),
-                        'empty_board' => array(
+                        ],
+                        'empty_board'           => [
                             'twig' => 'OroDashboardBundle:Index:default.html.twig'
-                        )
-                    )
-                ),
-            ),
-        );
+                        ]
+                    ],
+                    'widgets_configuration' => []
+                ]
+            ]
+        ];
     }
 }

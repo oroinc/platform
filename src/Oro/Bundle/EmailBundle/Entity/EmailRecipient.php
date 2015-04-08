@@ -10,7 +10,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * Email Recipient
  *
  * @ORM\Table(name="oro_email_recipient")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository")
  */
 class EmailRecipient
 {
@@ -56,7 +56,7 @@ class EmailRecipient
     protected $emailAddress;
 
     /**
-     * @var EmailOrigin
+     * @var Email
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="recipients")
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id")

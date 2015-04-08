@@ -41,26 +41,40 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTemplateByEntityName()
     {
-        $persister = $this->getMockBuilder('Doctrine\ORM\Persisters\BasicEntityPersister')
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $persister->expects($this->once())
-            ->method('loadAll');
-
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $uow->expects($this->once())
-            ->method('getEntityPersister')
-            ->with('Oro\Bundle\EmailBundle\Entity\EmailTemplate')
-            ->will($this->returnValue($persister));
+        $qb->expects($this->once())
+            ->method('select')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('from')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('where')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('orWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('andWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('orderBy')
+            ->will($this->returnSelf());
+        $qb->expects($this->exactly(2))
+            ->method('setParameter')
+            ->will($this->returnSelf());
 
         $this->entityManager->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb));
 
-        $this->repository->getTemplateByEntityName('Oro\Bundle\UserBundle\Entity\User', new Organization());
+        $this->repository->getEntityTemplatesQueryBuilder(
+            'Oro\Bundle\UserBundle\Entity\User',
+            new Organization(),
+            true
+        );
     }
 
     public function testGetEntityQueryBuilderWithSystemTemplates()

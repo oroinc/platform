@@ -9,16 +9,18 @@
 
     <div data-content="{{ name }}">
         <div class="row-oro oro-multiselect-holder">
-            {{ form_errors(form) }}
-            {% if form.children|length  %}
-                {% for child in form %}
-                    {{ form_errors(child) }}
-                    {{ form_widget(child) }}
-                {% endfor %}
-            {% else %}
-                {{ form_widget(form) }}
-            {% endif %}
-            {{ form_rest(form) }}
+            <div class="float-holder ">
+                {{ form_errors(form) }}
+                {% if form.children|length  %}
+                    {% for child in form %}
+                        {{ form_errors(child) }}
+                        {{ form_widget(child) }}
+                    {% endfor %}
+                {% else %}
+                    {{ form_widget(form) }}
+                {% endif %}
+                {{ form_rest(form) }}
+            </div>
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
         </div>
     </div>
@@ -259,11 +261,16 @@
 #}
 {% macro pinnedDropdownButton(parameters) %}
     {% if isDesktopVersion() %}
-        {% set options = parameters.options|default({})|merge({
+        {% set options = parameters.options|default({}) %}
+        {% set options = options|merge({
+            widgetModule: options.widgetModule|default('oroui/js/content-processor/pinned-dropdown-button'),
+            widgetName: options.widgetName|default('pinnedDropdownButtonProcessor'),
             groupKey: parameters.groupKey is defined ? parameters.groupKey : '',
             useMainButtonsClone: true
         }) %}
-        <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
+        <div class="pull-right"
+             data-page-component-module="oroui/js/app/components/jquery-widget-component"
+             data-page-component-options="{{ options|json_encode }}">
             {{ parameters.html|raw }}
         </div>
     {% else %}
