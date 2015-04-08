@@ -1,4 +1,4 @@
-{% extends 'OroActivityBundle:js:activityItemTemplate.js.twig' %}
+{% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.js.twig' %}
 {% set entityClass = 'Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent' %}
 {% set entityName  = oro_entity_config_value(entityClass, 'label')|trans %}
 
@@ -17,24 +17,21 @@
 {% endblock %}
 
 {% block activityActions %}
-<div class="more-bar-holder">
-    <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle activity-item" href="javascript:void(0);">...</a>
-        <ul class="dropdown-menu activity-item pull-right launchers-dropdown-menu">
-            <li>
-                <ul class="nav nav-pills icons-holder launchers-list">
-                    <li class="launcher-item">
-                        <a href="javascript:void(0);" class="action item-edit-button" title="{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}">
-                            <i class="icon-edit hide-text">{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}</i>
-                        </a>
-                    </li>
-                    <li class="launcher-item">
-                        <a href="javascript:void(0);" class="action item-remove-button" title="{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}">
-                            <i class="icon-trash hide-text">{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}</i>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-</div>
+    {% set action %}
+    <a href="#" class="action item-edit-button"
+       title="{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}">
+        <i class="icon-edit hide-text">{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}</i>
+    </a>
+    {% endset %}
+    {% set actions = [action] %}
+
+    {% set action %}
+    <a href="#" class="action item-remove-button"
+       title="{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}">
+        <i class="icon-trash hide-text">{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}</i>
+    </a>
+    {% endset %}
+    {% set actions = actions|merge([action]) %}
+
+    {{ parent() }}
 {% endblock %}
