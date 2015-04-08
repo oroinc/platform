@@ -67,7 +67,6 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getTargetEntities')
             ->willReturn([new SomeEntity()]);
 
-
         $this->listener->linkToScopeEvent($event);
     }
 
@@ -140,7 +139,7 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
                 'config' => false,
                 'managerCalls' => 0,
                 'attachmentCalls' => 0
-            ],
+            ]
         ];
     }
 }
