@@ -56,10 +56,11 @@ define([
                 for (i = 0; i < models.length; i++) {
                     newModel = models[i];
                     oldModel = this.get(newModel.id);
-                    // have this model in collection
+                    // if model is in collection
                     if (oldModel) {
+                        // and if the models are equal
                         if (oldModel.get('updatedAt') === newModel.updatedAt) {
-                            // if the models are equal
+                            // use old model
                             models[i] = oldModel;
                         }
                     }

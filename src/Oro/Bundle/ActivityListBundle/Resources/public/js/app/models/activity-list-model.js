@@ -49,10 +49,6 @@ define([
 
         getRelatedActivityClass: function () {
             return this.get('relatedActivityClass').replace(/\\/g, '_');
-        },
-
-        getUid: function () {
-            return this.get('relatedActivityClass') + ':' + this.get('relatedActivityId');
         }
     });
 

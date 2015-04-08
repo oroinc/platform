@@ -244,7 +244,7 @@ define(function (require) {
                 for (cid in itemViews) {
                     if (itemViews.hasOwnProperty(cid)) {
                         view = itemViews[cid];
-                        this.oldViewStates[view.model.getUid()] = {
+                        this.oldViewStates[view.model.id] = {
                             collapsed: view.isCollapsed()
                         };
                     }
@@ -275,7 +275,7 @@ define(function (require) {
                 for (cid in itemViews) {
                     if (itemViews.hasOwnProperty(cid)) {
                         view = itemViews[cid];
-                        oldViewState = this.oldViewStates[view.model.getUid()];
+                        oldViewState = this.oldViewStates[view.model.id];
                         if (oldViewState && !oldViewState.collapsed && view.isCollapsed()) {
                             view.toggle();
                             view.$('.accordion-body').addClass('in');
