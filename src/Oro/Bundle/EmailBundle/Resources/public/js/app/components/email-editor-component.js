@@ -20,7 +20,7 @@ define(function (require) {
                 hideField(fieldName);
             }
         });
-        $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__("To"));
+        $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__('oro.email.to'));
     }
 
     function hideField(fieldName) {
@@ -137,6 +137,7 @@ define(function (require) {
                 }
             });
 
+            this.addForgedAsterisk();
             this.bindFieldEvents();
         },
 
@@ -179,6 +180,10 @@ define(function (require) {
             if (!this.options.bcc.length) {
                 hideField('Bcc');
             }
+        },
+
+        addForgedAsterisk: function() {
+            $('.forged-required').find('label em').html('*');
         }
     });
 

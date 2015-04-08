@@ -10,6 +10,7 @@ oro:
         thread:
             load_error: Sorry, email thread was not loaded correctly.
             no_signature: You haven't created a signature yet. Please set it in System -> Configuration -> Email Configuration.
+        to: To
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"
