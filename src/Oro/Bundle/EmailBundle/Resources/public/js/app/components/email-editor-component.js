@@ -194,10 +194,6 @@ define(function (require) {
             if (!this.options.bcc.length) {
                 hideField('Bcc');
             }
-        },
-
-        addForgedAsterisk: function() {
-            $('.forged-required').find('label em').html('*');
         }
     });
 
