@@ -38,14 +38,16 @@
     }) -}}
 {% endmacro -%}
 
-{% macro replyButton(emailEntity, parameters) -%}
+{% macro replyButton(emailEntity, parameters = {}) -%}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {%- set routeParameters = {
+        id: emailEntity.id
+    } -%}
+    {%- if parameters.routeParameters is defined %}
+        {%- set routeParameters = routeParameters|merge(parameters.routeParameters) -%}
+    {% endif -%}
     {{- UI.clientButton({
-        'dataUrl': path(
-            'oro_email_email_reply', {
-                id: emailEntity.id
-            }
-        ),
+        'dataUrl': path('oro_email_email_reply', routeParameters),
         'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
         'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply' : 'icon-reply',
         'label': 'oro.email.reply'|trans,
@@ -69,14 +71,16 @@
     }) -}}
 {% endmacro -%}
 
-{% macro forwardButton(emailEntity, parameters) -%}
+{% macro forwardButton(emailEntity, parameters = {}) -%}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {%- set routeParameters = {
+        id: emailEntity.id
+    } -%}
+    {%- if parameters.routeParameters is defined %}
+        {%- set routeParameters = routeParameters|merge(parameters.routeParameters) -%}
+    {% endif -%}
     {{- UI.clientButton({
-        'dataUrl': path(
-            'oro_email_email_forward', {
-                id: emailEntity.id
-            }
-        ),
+        'dataUrl': path('oro_email_email_forward', routeParameters),
         'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
         'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-mail-forward' : 'icon-mail-forward',
         'label': 'oro.email.forward'|trans,

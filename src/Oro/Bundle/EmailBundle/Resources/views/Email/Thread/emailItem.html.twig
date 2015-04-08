@@ -36,9 +36,12 @@
     <div class="email-full">
         <div class="email-view-toggle">
             <div class="pull-right">
+                {% set actionParameters = routeParameters is defined ? {
+                    routeParameters: routeParameters
+                } : {} %}
                 {% set buttonsHtml %}
-                    {{ Actions.replyButton(email) }}
-                    {{ Actions.forwardButton(email) }}
+                    {{ Actions.replyButton(email, actionParameters) }}
+                    {{ Actions.forwardButton(email, actionParameters ) }}
                 {% endset %}
                 {{ UI.pinnedDropdownButton({
                     'html': buttonsHtml
