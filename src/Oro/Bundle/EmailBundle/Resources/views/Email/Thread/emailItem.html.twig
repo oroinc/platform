@@ -36,12 +36,6 @@
     <div class="email-full">
         <div class="email-view-toggle">
             <div class="pull-right">
-                <div class="email-sent-date">
-                    {% if email.emailBody.hasAttachments %}
-                        <i class="icon-paper-clip email-has-attachment"></i>
-                    {% endif %}
-                    {{ EA.date_smart_format(email.sentAt) }}<br />
-                </div>
                 {% set buttonsHtml %}
                     {{ Actions.replyButton(email) }}
                     {{ Actions.forwardButton(email) }}
@@ -49,6 +43,12 @@
                 {{ UI.pinnedDropdownButton({
                     'html': buttonsHtml
                 }) }}
+                <div class="email-sent-date">
+                    {% if email.emailBody.hasAttachments %}
+                        <i class="icon-paper-clip email-has-attachment"></i>
+                    {% endif %}
+                    {{ EA.date_smart_format(email.sentAt) }}<br />
+                </div>
             </div>
             <div class="email-participants">
                 <div class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</div>
