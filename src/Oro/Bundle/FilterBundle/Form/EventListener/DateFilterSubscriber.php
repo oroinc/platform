@@ -33,13 +33,15 @@ class DateFilterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SUBMIT => 'preSubmit',
+            FormEvents::PRE_SUBMIT => 'preSubmit'
         ];
     }
 
     /**
      * Parses date expressions
      * If date part given, then replace value fields by choice fields with specific to that value choices
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity) many cases in switch - have no sense to refactor this.
      */
     public function preSubmit(FormEvent $event)
     {
@@ -117,6 +119,9 @@ class DateFilterSubscriber implements EventSubscriberInterface
                 $this->mapValues($children, $data, $this->getDatePartAccessorClosure('Y'));
                 $this->replaceValueFields($form->get('value'), array_flip(range(date('Y') - 50, date('Y') + 50)));
                 break;
+            // in case we do not need any value to be mapped(converted), in other words - use as is
+            case DateModifierInterface::PART_SOURCE:
+                return;
             case DateModifierInterface::PART_VALUE:
             default:
                 $this->mapValues(
