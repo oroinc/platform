@@ -22,9 +22,7 @@ use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
-use Oro\Bundle\FilterBundle\Datasource\Exception\UnsupportedExpressionBuilderException;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 class SegmentFilter extends EntityFilter
 {
@@ -169,7 +167,7 @@ class SegmentFilter extends EntityFilter
             throw new \LogicException('The SegmentFilter supports ORM data source only.');
         }
 
-        $queryBuilder = $this->getQueryBuilder($data);
+        $queryBuilder = $this->getSegmentQueryBuilder($data);
         $query        = $queryBuilder->getQuery();
 
         /**@var OrmExpressionBuilder $expressionBuilder */
@@ -188,14 +186,11 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
-     * Returns QueryBuilder for static or dynamic segment
-     * And adds where condition based on parameter FilterUtility::DATA_NAME_KEY
-     *
      * @param mixed $data
      *
      * @return QueryBuilder
      */
-    protected function getQueryBuilder($data)
+    protected function getSegmentQueryBuilder($data)
     {
         /** @var Segment $segment */
         $segment = $data['value'];
