@@ -55,6 +55,22 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testLinkToScopeEventIsNotGranted()
+    {
+        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->willReturn(false);
+        $this->activityListProvider->expects($this->never())
+            ->method('getTargetEntities')
+            ->willReturn([new SomeEntity()]);
+
+
+        $this->listener->linkToScopeEvent($event);
+    }
+
     /**
      * @dataProvider getTestData
      */
