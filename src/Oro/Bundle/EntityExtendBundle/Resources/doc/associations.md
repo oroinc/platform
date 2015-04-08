@@ -77,12 +77,17 @@ Pros and cons of both approaches:
      - An entity which is the target side of an association must be configurable (or extendable since extendable entities are already configurable).
      - Associations use unidirectional Doctrine relations only. It is not possible to use bidirectional relations.
 
-Supported association types:
- - Many-to-one associations: e.g. entity can be associated with either one with Account or Contact
+Supported association types
+---------------------------
 
- - Multiple many-to-one associations: e.g. entity can be associated with one Account and one Contact
+1. Many-to-one associations
+This is association type is used to associate an entity with a single target entity of the same association kind: e.g. an Email can be associated with either one Account or one Contact
 
- - Many-to-many associations: e.g. entity can be associated with many Accounts and many Contacts
+2. Multiple many-to-one associations
+This is association type is used to associate an entity with one of each possible target entity types of the same association kind: e.g. an Email can be associated with one Account and one Contact
+
+3. Many-to-many associations
+This is association type is used to associate an entity with many target entities of the same association kind: e.g. an Email can be associated with many Accounts and many Contacts
 
 
 Configure many-to-one associations

@@ -19,7 +19,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to checks if an entity can be associated with another entity
+     * Generates method name to checks if an entity can be associated with another entity
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -31,7 +31,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to get associated entity
+     * Generates method name to get associated entity
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -43,7 +43,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to get associated entities
+     * Generates method name to get associated entities
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -55,7 +55,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to set association to another entity
+     * Generates method name to set association to another entity
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -67,7 +67,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to reset associations
+     * Generates method name to reset associations
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -79,7 +79,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to get all associated entities
+     * Generates method name to get all associated entities
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -91,7 +91,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to add association to another entity
+     * Generates method name to add association to another entity
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -103,7 +103,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to check if entity is associated with another entity
+     * Generates method name to check if entity is associated with another entity
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
@@ -115,7 +115,7 @@ class AssociationNameGenerator
     }
 
     /**
-     * Generate method method name to remove association
+     * Generates method name to remove association
      *
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
