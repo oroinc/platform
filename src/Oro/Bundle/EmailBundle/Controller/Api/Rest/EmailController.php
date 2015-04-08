@@ -7,6 +7,7 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\Annotations\Delete;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -25,7 +26,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use FOS\RestBundle\Controller\Annotations\Delete;
 
 /**
  * @RouteResource("email")
