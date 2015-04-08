@@ -4,6 +4,7 @@ define(function (require) {
 
     var BaseComponent = require('oroui/js/app/components/base/component'),
         $ = require('jquery'),
+        EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view'),
         EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection'),
         EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
 
@@ -13,6 +14,7 @@ define(function (require) {
     return BaseComponent.extend({
         collection: null,
         collectionView: null,
+        popupView: null,
 
         initialize: function(options) {
             this.collection = new EmailAttachmentCollection();
@@ -36,8 +38,24 @@ define(function (require) {
 
             var $dialogButton = $('#' + dialogButton);
             $dialogButton.click(function() {
-                self.collection.add({});
+                var popupView = self.getPopupView(this);
+                if (popupView.isShowed) {
+                    popupView.hide();
+                } else {
+                    popupView.show();
+                }
             });
+        },
+
+        getPopupView: function(label) {
+            if (!this.popupView) {
+                this.popupView = new EmailAttachmentSelectView({
+                    label: label,
+                    collection: new EmailAttachmentCollection()
+                });
+            }
+
+            return this.popupView;
         }
     });
 });

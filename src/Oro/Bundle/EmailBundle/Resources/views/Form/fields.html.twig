@@ -41,6 +41,35 @@
         </div>
     </script>
 
+    <script type="text/template" id="email-attachment-select-view">
+        <div class="attachment-list-content">
+            <label>{{ 'oro.email.attachment.select_file'|trans }}</label>
+            <input type="text" class="filter"/>
+            <select multiple>
+                <optgroup label="Record Attachments">
+                    <option>Filename.jpg</option>
+                    <option>Filename1.jpg</option>
+                    <option>Filename2.jpg</option>
+                </optgroup>
+                <optgroup label="Thread Attachments">
+                    <option>Filename.jpg</option>
+                    <option>Filename1.jpg</option>
+                    <option>Filename2.jpg</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="clear"></div>
+        <div class="attachment-actions">
+            <div class="pull-left">
+                <a class="upload-new" href="javascript:void(0);">Upload New File</a>
+            </div>
+            <div class="pull-right">
+                <a class="btn cancel">Cancel</a>
+                <a class="btn btn-primary attach">Attach</a>
+            </div>
+        </div>
+    </script>
+
     {% set itemsArray = [] %}
     {% for item in options.items %}
         {% set itemArray = {

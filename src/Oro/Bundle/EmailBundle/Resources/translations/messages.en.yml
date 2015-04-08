@@ -158,6 +158,9 @@ oro:
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
 
+        attachment:
+            select_file:          Select file
+
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
 "Sent": "Sent"

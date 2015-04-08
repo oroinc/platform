@@ -178,3 +178,36 @@ a.attachment .icon .icon-link {
 .control-group .email-body-action {
     margin-right: 15px;
 }
+.attachment-list-popup {
+    position: absolute;
+    max-height: 500px;
+    z-index: 1010;
+    background: #FFF;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0 1px 11px 0;
+}
+
+.attachment-list-popup select {
+    width: 97% !important;
+    max-width: 97% !important;
+    height: 150px;
+    margin-top: 10px;
+    border: none;
+}
+
+.attachment-list-popup .attachment-list-content {
+    padding: 10px 10px 0 10px;
+}
+
+.attachment-list-popup .attachment-actions {
+    overflow: hidden;
+    margin-top: 6px;
+    padding: 10px;
+    background-color: rgb(250, 250, 250);
+    border-top: 1px solid rgb(229, 229, 229);
+}
+
+.attachment-list-popup .attachment-actions .pull-left {
+    margin-top: 4px;
+}
