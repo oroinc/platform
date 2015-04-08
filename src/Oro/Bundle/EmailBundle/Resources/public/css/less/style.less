@@ -126,53 +126,18 @@
     }
   }
 }
-.accordion-group {
-  .accordion-heading {
-    .title-item {
-      span.icon.head {
-        position: relative;
-        left: 2px;
-      }
-      span.icon {
-        i.icon-envelope {
-          background: white;
-        }
-        i.icon-envelope-alt {
-          position: absolute;
-          top: 6px;
-          left: -32px;
-          background: white;
-          line-height: 16px;
-          border-radius: 2px;
-        }
-      }
-      span.icon.head-alt {
-        position: absolute;
-      }
+.activity-list-widget {
+  .accordion-body > .message {
+    .email-info {
+      margin: 0 20px 0 0;
     }
   }
 }
-.thread-icon {
-  span.icon.head {
-    position: relative;
-    left: 2px;
-  }
-  span.icon {
-    i.icon-envelope {
-      background: white;
-    }
-    i.icon-envelope-alt {
-      position: absolute;
-      top: 6px;
-      left: -20px;
-      background: white;
-      line-height: 12px;
-      border-radius: 2px;
-    }
-  }
-  span.icon.head-alt {
-    position: absolute;
-  }
+.icon-email-thread {
+  background: url('../../img/icon-email-thread.png');
+  width: 21px;
+  height: 18px;
+  display: inline-block;
 }
 span.icon.grid {
   color: #999;
@@ -264,6 +229,14 @@ span.icon.grid .icon-paperclip {
     box-sizing: border-box;
     .email-body {
       padding: 0;
+    }
+  }
+  &:only-child {
+    .email-view-toggle {
+      padding: 5px 0 10px;
+    }
+    .email-body {
+      padding: 0 0 10px;
     }
   }
   .email-short {
