@@ -7,7 +7,7 @@ use CG\Generator\PhpClass;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
 
 /**
  * This class provides PHP code generation logic for entities with associations.
@@ -75,7 +75,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         return
             $fieldConfigId instanceof FieldConfigId
             && ($fieldConfigId->getFieldType() === $this->getAssociationType()
-                || ($this->getAssociationType() === 'multipleManyToOne'
+                || ($this->getAssociationType() === RelationType::MULTIPLE_MANY_TO_ONE
                     && RelationType::MANY_TO_ONE === $fieldConfigId->getFieldType()
                 )
             )
@@ -100,7 +100,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             case RelationType::MANY_TO_MANY:
                 $this->generateManyToManyAssociationMethods($schema, $class);
                 break;
-            case 'multipleManyToOne':
+            case RelationType::MULTIPLE_MANY_TO_ONE:
                 $this->generateMultipleManyToOneAssociationMethods($schema, $class);
                 break;
             default:
@@ -118,12 +118,12 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
      */
     protected function generateMultipleManyToOneAssociationMethods(array $schema, PhpClass $class)
     {
-        $associationType = $this->getAssociationKind();
+        $associationKind = $this->getAssociationKind();
 
-        $supportMethodName = AssociationHelper::getMultipleManyToOneSupportMethodName($associationType);
-        $getMethodName     = AssociationHelper::getMultipleManyToOneGetterMethodName($associationType);
-        $setMethodName     = AssociationHelper::getMultipleManyToOneSetterMethodName($associationType);
-        $resetMethodName   = AssociationHelper::getMultipleManyToOneResetMethodName($associationType);
+        $supportMethodName = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
+        $getMethodName     = AssociationNameGenerator::generateGetTargetsMethodName($associationKind);
+        $setMethodName     = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
+        $resetMethodName   = AssociationNameGenerator::generateResetTargetsMethodName($associationKind);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
@@ -225,13 +225,13 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
      */
     protected function generateManyToOneAssociationMethods(array $schema, PhpClass $class)
     {
-        $associationType = $this->getAssociationKind();
+        $associationKind = $this->getAssociationKind();
 
-        $supportMethodName   = AssociationHelper::getManyToOneSupportMethodName($associationType);
-        $getMethodName       = AssociationHelper::getManyToOneGetterMethodName($associationType);
-        $setMethodName       = AssociationHelper::getManyToOneSetterMethodName($associationType);
-        $resetMethodName     = AssociationHelper::getManyToOneResetMethodName($associationType);
-        $getAssociationsName = AssociationHelper::getManyToOneGetTargetEntitiesMethodName($associationType);
+        $supportMethodName   = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
+        $getMethodName       = AssociationNameGenerator::generateGetTargetMethodName($associationKind);
+        $setMethodName       = AssociationNameGenerator::generateSetTargetMethodName($associationKind);
+        $resetMethodName     = AssociationNameGenerator::generateResetTargetsMethodName($associationKind);
+        $getAssociationsName = AssociationNameGenerator::generateGetTargetEntitiesMethodName($associationKind);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
@@ -351,14 +351,14 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
      */
     public function generateManyToManyAssociationMethods(array $schema, PhpClass $class)
     {
-        $associationType = $this->getAssociationKind();
+        $associationKind = $this->getAssociationKind();
 
-        $supportMethodName   = AssociationHelper::getManyToManySupportMethodName($associationType);
-        $getMethodName       = AssociationHelper::getManyToManyGetterMethodName($associationType);
-        $hasMethodName       = AssociationHelper::getManyToManyHasMethodName($associationType);
-        $addMethodName       = AssociationHelper::getManyToManySetterMethodName($associationType);
-        $removeMethodName    = AssociationHelper::getManyToManyRemoveMethodName($associationType);
-        $getAssociationsName = AssociationHelper::getManyToManyGetTargetEntitiesMethodName($associationType);
+        $supportMethodName   = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
+        $getMethodName       = AssociationNameGenerator::generateGetTargetsMethodName($associationKind);
+        $hasMethodName       = AssociationNameGenerator::generateHasTargetMethodName($associationKind);
+        $addMethodName       = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
+        $removeMethodName    = AssociationNameGenerator::generateRemoveTargetMethodName($associationKind);
+        $getAssociationsName = AssociationNameGenerator::generateGetTargetEntitiesMethodName($associationKind);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
