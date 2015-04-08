@@ -190,8 +190,7 @@ define(function (require) {
          */
         onEmailExtraBodyToggle: function (e) {
             this.$(e.currentTarget)
-                .closest(this.selectors.emailBody)
-                .find('.email-extra-body:first')
+                .next()
                 .toggleClass('in');
         },
 
