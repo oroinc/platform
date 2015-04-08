@@ -62,3 +62,10 @@ Oro\Bundle\UserBundle\Entity\Group:
 #            - Count:
 #                min:        1
 #                minMessage: "You must select at least {{ limit }} role"
+
+Oro\Bundle\UserBundle\Entity\Email:
+    properties:
+        user:
+            - NotBlank: ~
+        email:
+            - Email: ~
