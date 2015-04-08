@@ -12,6 +12,7 @@ define([
     'use strict';
 
     var ActivityView;
+    
     ActivityView = BaseView.extend({
         options: {
             configuration: {
@@ -23,9 +24,9 @@ define([
                 updateItem: null,
                 deleteItem: null
             },
-            infoBlock: '.accordion-body .message .info',
-            commentsBlock: '.accordion-body .message .comment',
-            commentsCountBlock: '.comment-count .count',
+            infoBlock: '> .accordion-group > .accordion-body .message .info',
+            commentsBlock: '> .accordion-group > .accordion-body .message .comment',
+            commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },
         attributes: {
@@ -112,12 +113,21 @@ define([
             }
         },
 
+        getAccorditionToggle: function () {
+            return this.$('> .accordion-group > .accordion-heading .accordion-toggle');
+        },
+
+        getAccorditionBody: function () {
+            return this.$('> .accordion-group > .accordion-body');
+        },
+
         isCollapsed: function () {
-            return this.$('.accordion-toggle').hasClass('collapsed');
+            return this.getAccorditionToggle().hasClass('collapsed');
         },
 
         _onContentChange: function () {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+            mediator.execute('layout:init', this.$el, this);
         },
 
         _onCommentCountChange: function () {

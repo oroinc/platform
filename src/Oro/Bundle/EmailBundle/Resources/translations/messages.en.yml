@@ -124,7 +124,7 @@ oro:
         recipients.label:         Recipients
         send_email:               Send email
         sent_at.label:            Sent at
-        sent_by.label:            sent by {{ user }} on {{ date }}
+        sent_by.label:            sent by {{ user }}
         subject.label:            Subject
         to.label:                 To
         cc_bcc.label:             Cc/Bcc

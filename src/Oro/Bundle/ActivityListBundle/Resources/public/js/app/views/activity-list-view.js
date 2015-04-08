@@ -241,14 +241,12 @@ define(function (require) {
                 // store views state
                 this.oldViewStates = {};
                 itemViews = this.getItemViews();
-                for (cid in itemViews) {
-                    if (itemViews.hasOwnProperty(cid)) {
-                        view = itemViews[cid];
-                        this.oldViewStates[view.model.id] = {
-                            collapsed: view.isCollapsed()
-                        };
-                    }
-                }
+                this.oldViewStates = _.map(itemViews, function (view) {
+                    return {
+                        attrs: view.model.toJSON(),
+                        collapsed: view.isCollapsed()
+                    };
+                });
 
                 this.collection.fetch({
                     reset: true,
@@ -263,7 +261,7 @@ define(function (require) {
         },
 
         renderAllItems: function () {
-            var result, cid, itemViews, viewsToggleRequested, view, oldViewState;
+            var result, i, viewsToggleRequested, view, model, oldViewState;
 
             result = ActivityListView.__super__.renderAllItems.apply(this, arguments);
 
@@ -271,14 +269,15 @@ define(function (require) {
 
             if (this.oldViewStates) {
                 // restore state
-                itemViews = this.getItemViews();
-                for (cid in itemViews) {
-                    if (itemViews.hasOwnProperty(cid)) {
-                        view = itemViews[cid];
-                        oldViewState = this.oldViewStates[view.model.id];
-                        if (oldViewState && !oldViewState.collapsed && view.isCollapsed()) {
+                for (i = 0; i < this.oldViewStates.length; i++) {
+                    oldViewState = this.oldViewStates[i];
+                    model = this.collection.findSameActivity(oldViewState.attrs);
+                    if (model) {
+                        view = this.getItemView(model);
+                        if (view && !oldViewState.collapsed && view.isCollapsed()) {
                             view.toggle();
-                            view.$('.accordion-body').addClass('in');
+                            view.getAccorditionBody().addClass('in');
+                            view.getAccorditionToggle().removeClass('collapsed');
                             viewsToggleRequested = true;
                         }
                     }
