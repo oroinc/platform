@@ -36,19 +36,22 @@
     <div class="email-full">
         <div class="email-view-toggle">
             <div class="pull-right">
+                {% set actionParameters = routeParameters is defined ? {
+                    routeParameters: routeParameters
+                } : {} %}
+                {% set buttonsHtml %}
+                    {{ Actions.replyButton(email, actionParameters) }}
+                    {{ Actions.forwardButton(email, actionParameters ) }}
+                {% endset %}
+                {{ UI.pinnedDropdownButton({
+                    'html': buttonsHtml
+                }) }}
                 <div class="email-sent-date">
                     {% if email.emailBody.hasAttachments %}
                         <i class="icon-paper-clip email-has-attachment"></i>
                     {% endif %}
                     {{ EA.date_smart_format(email.sentAt) }}<br />
                 </div>
-                {% set buttonsHtml %}
-                    {{ Actions.replyButton(email) }}
-                    {{ Actions.forwardButton(email) }}
-                {% endset %}
-                {{ UI.pinnedDropdownButton({
-                    'html': buttonsHtml
-                }) }}
             </div>
             <div class="email-participants">
                 <div class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</div>

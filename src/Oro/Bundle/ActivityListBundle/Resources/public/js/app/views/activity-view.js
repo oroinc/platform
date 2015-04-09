@@ -24,9 +24,9 @@ define([
                 updateItem: null,
                 deleteItem: null
             },
-            infoBlock: '.accordion-body .message .info',
-            commentsBlock: '.accordion-body .message .comment',
-            commentsCountBlock: '.comment-count .count',
+            infoBlock: '> .accordion-group > .accordion-body .message .info',
+            commentsBlock: '> .accordion-group > .accordion-body .message .comment',
+            commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },
         attributes: {
@@ -71,7 +71,7 @@ define([
             }
             if (data.editor_id) {
                 data.editor_url = routing.generate('oro_user_view', {'id': data.editor_id});
-            }else {
+            } else {
                 data.editor_url = '';
             }
             data.routing = routing;
@@ -102,6 +102,10 @@ define([
 
         onToggle: function (e) {
             e.preventDefault();
+            this.toggle();
+        },
+
+        toggle: function () {
             if (!this.options.ignoreHead && this.model.get('is_head')) {
                 this.model.collection.trigger('toViewGroup', this.model);
             } else {
@@ -109,8 +113,16 @@ define([
             }
         },
 
+        getAccorditionToggle: function () {
+            return this.$('> .accordion-group > .accordion-heading .accordion-toggle');
+        },
+
+        getAccorditionBody: function () {
+            return this.$('> .accordion-group > .accordion-body');
+        },
+
         isCollapsed: function () {
-            return this.$('.accordion-toggle').hasClass('collapsed');
+            return this.getAccorditionToggle().hasClass('collapsed');
         },
 
         _onContentChange: function () {
