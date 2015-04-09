@@ -8,7 +8,7 @@
     <% if (state.totalItemsQuantity == 0) { %>
         <div class="no-data"><span><%= _.__('oro.comment.noData') %></span></div>
     <% } else if (state.totalItemsQuantity !== items.length && state.totalItemsQuantity !== 0) { %>
-    <a class="load-more"><span>
+    <a class="load-more"><span class="load-more-label">
         <%= _.__(
             state.totalItemsQuantity - items.length > state.loadMoreItemsQuantity ?
                 'oro.comment.loadMoreWithTotals' :
@@ -21,5 +21,5 @@
     </span></a>
     <% } %>
 <% } else { %>
-    <div class="load-more"><span class="loading-indicator"></span></div>
+    <div class="load-more process"><span class="load-more-label"></span></div>
 <% } %>
