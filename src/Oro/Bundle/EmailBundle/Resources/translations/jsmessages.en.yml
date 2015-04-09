@@ -11,14 +11,13 @@ oro:
             load_error: Sorry, email thread was not loaded correctly.
             no_signature: You don't have a signature yet. Please add it in <a href="{{ url }}">My Profile</a>.
             no_signature_no_permission: You don't have a signature yet. Contact your administrator to add it.
-        to: To
             collapse_all:
                 label: Collapse All
                 tooltip: Collapse all emails in the thread
             expand_all:
                 label: Expand All
                 tooltip: Expand all emails in the thread
-
+        to: To
 "The email was sent": "The email was sent"
 "Preview": "Preview"
 "Yes, Proceed": "Yes, Proceed"
