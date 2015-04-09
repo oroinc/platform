@@ -46,7 +46,7 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $content = $result->getContent();
-        $this->assertEquals("\n", $content);
+        $this->assertEquals("", $content);
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
