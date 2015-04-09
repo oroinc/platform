@@ -322,7 +322,7 @@
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
             'data-validation': dateValidation,
-            class: 'datepicker-input ' ~ attrClass,
+            class: 'datepicker-input ' ~ (attribute(attr, 'class') is defined ? attr['class'] : ''),
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
