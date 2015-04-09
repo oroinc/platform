@@ -83,7 +83,12 @@ define(function (require) {
                         $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig, "") + body.substring(caretPos));
                     }
                 } else {
-                    mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature'));
+                    var url = routing.generate('oro_user_profile_update');
+                    if (self.options.isSignatureEditable) {
+                        mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature', {url: url}));
+                    } else {
+                        mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature_no_permission'));
+                    }
                 }
             });
 
