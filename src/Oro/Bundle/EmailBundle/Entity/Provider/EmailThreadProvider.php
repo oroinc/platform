@@ -113,10 +113,6 @@ class EmailThreadProvider
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
-            // todo temporary workaround
-            if (!$result) {
-                $result = [$entity];
-            }
         } else {
             $result = [$entity];
         }

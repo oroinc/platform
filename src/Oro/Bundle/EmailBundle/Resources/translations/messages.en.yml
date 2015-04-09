@@ -30,11 +30,6 @@ oro:
 
             email_threads:
                 label: Email Threads
-                use_threads_in_emails:
-                    label: Display My Emails as
-                    choices:
-                        non_threaded.label: Non-Threaded
-                        threaded.label: Threaded
 
             attachment_configuration:
                 label: Attachments
@@ -109,11 +104,17 @@ oro:
                 page_size:
                     all: "All"
                 view:
-                    system_templates: "System only"
+                    system_templates: System only
+                    all_templates: All
             emails:
                 action:
                     view: "View"
 
+            emailfolder:
+                view:
+                    inbox: Inbox
+                    sent: Sent Mail
+                    all: All Mail
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -122,6 +123,9 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        contact.label:            Contact
+        date.label:               Date
+        date_time.label:          Date/Time
         from_email_address.label: From
         from_name.label:          From
         email_body.label:         Body
@@ -138,6 +142,8 @@ oro:
         sent_at.label:            Sent at
         sent_by.label:            sent by {{ user }} on {{ date }}
         subject.label:            Subject
+        to.label:                 To
+        cc_bcc.label:             Cc/Bcc
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
         template.label:           Apply template
@@ -146,6 +152,7 @@ oro:
         refs.label:               References Header
         seen.label:               Is Seen
         thread_id.label:          Thread ID
+        show_details.tooltip:     Show details
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
@@ -161,6 +168,7 @@ oro:
         forward:                  Forward
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
+        load_more_emails:         "%quantity% older messages"
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
@@ -176,3 +184,6 @@ oro:
 "Content": "Content"
 "Cc/Bcc": "Cc/Bcc"
 "Thread view": "Thread view"
+"Date": "Date"
+"Me": "me"
+yesterday: yesterday

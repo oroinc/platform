@@ -32,15 +32,6 @@ oro_system_configuration:
                     1: oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label
                     0: oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label
 
-        oro_email.use_threads_in_emails:
-            data_type: boolean
-            type: choice
-            options:
-                label: oro.email.system_configuration.email_threads.use_threads_in_emails.label
-                choices:
-                    - oro.email.system_configuration.email_threads.use_threads_in_emails.choices.non_threaded.label
-                    - oro.email.system_configuration.email_threads.use_threads_in_emails.choices.threaded.label
-
     tree:
         system_configuration:
             platform:
@@ -53,12 +44,8 @@ oro_system_configuration:
                                         children:
                                             - oro_email.signature
                                             - oro_email.append_signature
-                                    email_threads:
-                                        children:
-                                            - oro_email.use_threads_in_emails
+
     api_tree:
         signature_configuration:
             oro_email.signature: ~
             oro_email.append_signature: ~
-        email_threads:
-            oro_email.use_threads_in_emails: ~

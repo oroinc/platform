@@ -194,7 +194,7 @@
 {% endmacro %}
 
 {#
-    Remders email address owner name as text
+    Renders email address owner name as text
     Parameters:
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
@@ -210,7 +210,7 @@
 {% macro email_address_link(emailAddress, label) -%}
     {% set label = label|default(_self.email_address_text(emailAddress)) %}
     <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
-        {{ _self.email_address_text(emailAddress) }}</a>
+        {{ label }}</a>
 {%- endmacro -%}
 
 {#
@@ -389,3 +389,123 @@
     {%- endif %}
 {%- endmacro %}
 
+{#
+    Render email participant name or "me" if it is current user,
+        owner name or a link to owner view page can be rendered depends on given parameters
+    Parameters:
+        emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
+        emailAddressName - a string contains an email address. It is used if the email address has no owner
+        noLink - determines whether the rendering of a link to the owner view page is forbidden or not. Default value is false
+        knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
+#}
+{% macro email_participant_name_or_me(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% if emailAddress.owner is not null and emailAddress.owner.id == app.user.id -%}
+        {% if noLink|default(false) -%}
+            {{ 'Me'|trans|lower }}
+        {%- else -%}
+            {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
+        {%- endif %}
+    {%- else -%}
+        {%- set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName)) -%}
+        {{ _self.email_address(emailAddress, name, noLink, knownOnly) }}
+    {%- endif %}
+{%- endmacro %}
+
+{#
+    Render list of participants using email_participant_name_or_me macros
+    Parameters:
+        recipients - an array of Oro\Bundle\EmailBundle\Entity\EmailRecipients
+        noLink - determines whether the rendering of a link to the owner view page is forbidden or not. Default value is false
+        knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
+#}
+{% macro email_participants_name(recipients, noLink, knownOnly) -%}
+    {% set recipientHtmlCollection = [] %}
+    {% for recipient in recipients %}
+        {% set recipientHtml -%}
+            <span class="email-recipient">{{ _self.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) }}</span>
+        {%- endset %}
+        {% set recipientHtmlCollection = recipientHtmlCollection|merge([recipientHtml]) %}
+    {% endfor %}
+    {{ recipientHtmlCollection|join(', ')|raw }}
+{%- endmacro %}
+
+{#
+    Render date in proper format
+    Parameters:
+        date - DateTime
+#}
+{% macro date_smart_format(date) -%}
+    {% if date(date)|oro_format_date == date()|oro_format_date -%}
+        {# same day -- show only time #}
+        {{ date|oro_format_time }}
+    {%- elseif date(date)|oro_format_date == date('-1days')|oro_format_date -%}
+        {{ 'yesterday'|trans|capitalize }}
+    {%- elseif date(date).format('Y') == date().format('Y') -%}
+        {# same year -- month and daty #}
+        {{ date|oro_format_day }}
+    {%- else -%}
+        {{ date|oro_format_date }}
+    {%- endif %}
+{%- endmacro %}
+
+{#
+    Render table with detailed information about all participants, send date and subject
+    Parameters:
+        email - email entity Oro\Bundle\EmailBundle\Entity\Email
+#}
+{% macro email_detailed_info_table(email) %}
+    {% set recipientsTo = [] %}
+    {% set recipientsCc = [] %}
+    {% set recipientsBcc = [] %}
+    {% for recipient in email.recipients %}
+        {% if recipient.type == 'to' %}
+            {% set recipientsTo = recipientsTo|merge([recipient.name|e])%}
+        {% elseif recipient.type == 'cc' %}
+            {% set recipientsCc = recipientsCc|merge([recipient.name|e])%}
+        {% elseif recipient.type == 'bcc' %}
+            {% set recipientsBcc = recipientsBcc|merge([recipient.name|e])%}
+        {% endif %}
+    {% endfor %}
+    {% set fromUserName = oro_get_email_address_name(email.fromName) %}
+    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName) ~ '&gt;' %}
+    {% set data = [{
+            label: 'From'|trans,
+            value: fromUserName ? '<b>' ~ fromUserName|e ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
+            cssClass: 'autor'
+        }, {
+            label: 'To'|trans,
+            value: recipientsTo|join(',<br/>')
+        }, {
+            label: 'Cc'|trans,
+            value: recipientsCc|join(',<br/>')
+        }, {
+            label: 'Bcc'|trans,
+            value: recipientsBcc|join(',<br/>')
+        }, {
+            label: 'Date'|trans,
+            value: email.sentAt|oro_format_datetime|e
+        }, {
+            label: 'Subject'|trans,
+            value: email.subject|e
+    }] %}
+    <ul class="form-horizontal">
+    {% for item in data %}
+        {% if item.value is not empty %}
+        <li class="control-group">
+            <label class="control-label">{{ item.label|raw }}:</label>
+            <div class="controls {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% endmacro %}
+
+{#
+    Strips email body from HTML-tags, removes sequence of '-' chars and cuts to fit the length
+    Parameters:
+        emailBody - email body entity Oro\Bundle\EmailBundle\Entity\EmailBody
+#}
+{% macro email_short_body(emailBody, length) %}
+    {%- set length = length|default(150) -%}
+    {{ emailBody.bodyContent|striptags|oro_preg_replace('/\-{2,}/', '--')[:length]|replace({'--': '&mdash;'})|raw }}
+{% endmacro %}
