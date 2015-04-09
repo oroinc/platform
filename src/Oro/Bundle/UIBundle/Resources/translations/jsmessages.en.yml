@@ -50,6 +50,7 @@ oro:
         widget_loading_filed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
         unexpected_error: Unexpected error occurred. Please contact system administrator.
+        leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
         page_header:
             button:
                 more: "More"
