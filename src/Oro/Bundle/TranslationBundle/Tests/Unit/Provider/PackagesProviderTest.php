@@ -41,7 +41,7 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetInstalledPackages($packages = [], $bundles = [], $expectedResult = [])
     {
-        $provider = new PackagesProvider($this->pml, $bundles, 'rootDir');
+        $provider = new PackagesProvider($this->pml, $bundles, 'rootDir', 'rootDir/cache/composer');
         $this->pm->expects($this->once())->method('getInstalled')
             ->will($this->returnValue($packages));
 
