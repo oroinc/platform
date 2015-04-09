@@ -79,6 +79,7 @@ define(function (require) {
         processOptions: function (options) {
             options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
+            options.gridId = options.gridId || options.metadata.options.gridId;
             options.builders = options.builders || [];
             options.builders.push('orodatagrid/js/grid-views-builder');
             options.gridPromise = this.built.promise();
@@ -93,6 +94,7 @@ define(function (require) {
             this.$el = $('<div>');
             $(options.el).append(this.$el);
             this.gridName = options.gridName;
+            this.gridId = options.gridId;
             this.data = options.data;
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
@@ -138,7 +140,7 @@ define(function (require) {
         build: function () {
             var options, collectionOptions, collection, collectionName, grid;
 
-            collectionName = this.gridName;
+            collectionName = this.gridId;
             collection = gridContentManager.get(collectionName);
             if (!collection) {
                 // otherwise, create collection from metadata
