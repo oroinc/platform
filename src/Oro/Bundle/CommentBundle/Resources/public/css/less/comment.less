@@ -108,6 +108,9 @@
   .comment-content {
     vertical-align: middle;
     padding: 14px;
+    .comment-author-info .date{
+      font-size: smaller;
+    }
   }
   .comment-item:first-child {
     .comment-title, .comment-content, .comment-actions {
@@ -130,28 +133,11 @@
       background: url(../../../oroui/img/info-user.png);
       background-size: 29px 29px;
     }
-    .comment-title-info {
-      display: none;
-    }
-    &:hover {
-      .comment-title-info {
-        border: 1px solid rgba(0,0,0,0.2);
-        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-        display: block;
-        position: absolute;
-        background: white;
-        max-width: 260px;
-        z-index: 1;
-        top: 44px;
-        left: 10px;
-        border-radius: 3px;
-        padding: 0.5em;
-      }
-    }
   }
 
   .comment-body{
     display: block;
+    color: #444;
   }
   .comment-attachments {
     margin: 0.5em 0 0 0;

@@ -4,23 +4,21 @@
     <% } else { %>
         <div class="comment-title-avatar no-avatar" />
     <% } %>
-    <div class="comment-title-info">
+</div>
+
+<div class="comment-content">
+    <div class="comment-author-info">
         <% if (owner_id) {  %>
             <%= _.__('oro.comment.item.added',{
                 user: '<a class="user nowrap" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
                 time: '<i class="date nowrap">' + createdTime + '</i>'
-            }) %>
-        <% } %>
-        <% if (editor_id) { %>,
+            }) %><% } %><% if (editor_id) { %>,
             <%= _.__('oro.comment.item.update',{
                 user: '<a class="user nowrap" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
                 time: '<i class="date nowrap">' + updatedTime + '</i>'
             }) %>
         <% } %>
     </div>
-</div>
-
-<div class="comment-content">
     <div class="comment-body"><%= message %></div>
     <% if (attachmentURL) { %>
     <div class="comment-attachments">
