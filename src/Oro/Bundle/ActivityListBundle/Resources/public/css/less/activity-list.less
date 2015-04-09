@@ -13,13 +13,18 @@
     .no-data {
       margin: 20px;
     }
-    .comments-view-header > .no-data {
-      margin: 0px;
+    .comments-view-header {
+      &, & > h5 {
+        margin-top: 0;
+      }
+      & > .no-data{
+        margin: 0;
+      }
     }
     .filter-box {
       float: left;
-      margin: 0px;
-      padding: 0px;
+      margin: 0;
+      padding: 0;
       background: none;
       border: none;
       box-shadow: none;
@@ -32,6 +37,11 @@
         .items.list-box.list-shaped {
           border: none;
         }
+    }
+    .info.responsive-cell {
+      .box-content {
+        padding: 0;
+      }
     }
   }
   .list-box {
