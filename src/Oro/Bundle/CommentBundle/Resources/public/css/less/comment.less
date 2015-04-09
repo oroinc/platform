@@ -1,3 +1,5 @@
+@import "../../../oroui/css/less/mixins";
+
 .comments-view-header, .comments-view-body, .comments-view-footer {
   margin: 13px 0;
   &:empty {
@@ -9,31 +11,19 @@
     margin: 0px;
   }
   .load-more{
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAWCAIAAACOpGH9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAApSURBVBhXY7h79y7D////mRgYGJiANJwNwvfu3UPhI2N0OWS99+7dAwCo4x9xTwLH4wAAAABJRU5ErkJggg==);
-    background-repeat: repeat;
-    height: 22px;
-    display: block;
-    text-align: center;
-    color: #888;
-    > span {
-      display: inline-block;
-      background: white;
-      margin: 5px auto;
-      line-height: 1em;
-      padding: 0 0.5em;
-      font-size: 13px;
-      text-decoration: none;
-    }
-    > span.loading-indicator {
-      padding: 0 0 0 4px;
-      margin: 3px auto;
-
-    }
-  }
-  a.load-more{
-    &:hover {
-      color: #08c;
-      cursor: pointer;
+    display: inline-block;
+    width: 100%;
+    .load-more-items(#e5e5e5, #fff, #888);
+    border-top: solid 1px #e5e5e5;
+    border-bottom: solid 1px #e5e5e5;
+    &.process {
+      .load-more-label {
+        padding: 0 10px;
+        .process('../../../oroui/img/loader-16.gif');
+        &:after {
+          right: 4px;
+        }
+      }
     }
   }
 }
