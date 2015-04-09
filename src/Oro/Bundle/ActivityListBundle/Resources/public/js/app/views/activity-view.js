@@ -35,7 +35,8 @@ define([
         events: {
             'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
-            'click .accordion-toggle': 'onToggle'
+            'click .accordion-toggle': 'onToggle',
+            'click .accordion-heading': 'onAccordionHeaderClick'
         },
         listen: {
             'change:contentHTML model': '_onContentChange',
@@ -98,6 +99,15 @@ define([
 
         onDelete: function () {
             this.model.collection.trigger('toDelete', this.model);
+        },
+
+        onAccordionHeaderClick: function (e) {
+            var ignoreItems = 'a, button, .accordition-toggle';
+            if ($(e.target).is(ignoreItems) || $(e.target).parents(ignoreItems).length) {
+                // ignore clicks on links, buttons and accordition-toggle
+                return;
+            }
+            this.getAccorditionToggle().trigger('click');
         },
 
         onToggle: function (e) {
