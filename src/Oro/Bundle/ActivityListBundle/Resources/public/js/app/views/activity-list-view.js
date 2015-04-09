@@ -293,74 +293,11 @@ define(function (require) {
         },
 
         _viewItem: function (model) {
-            var that = this,
-                currentModel = model,
-                options = {
-                    url: this._getUrl('itemView', model),
-                    type: 'get',
-                    dataType: 'html',
-                    data: {
-                        _widgetContainer: 'dialog',
-                        targetActivityClass: model.get('targetEntityData').class,
-                        targetActivityId: model.get('targetEntityData').id
-                    }
-                };
-
-            if (currentModel.get('is_loaded') !== true) {
-                this._showLoading();
-                Backbone.$.ajax(options)
-                    .done(function (data) {
-                        var response = $('<html />').html(data);
-                        currentModel.set('contentHTML', $(response).find('.widget-content').html());
-                        that._hideLoading();
-                    })
-                    .fail(
-                        _.bind(function (response) {
-                            if (!_.isUndefined(response.status) && response.status === 403) {
-                                this._showForbiddenActivityDataError(response.responseJSON || {});
-                                currentModel.set('is_loaded', true);
-                            } else {
-                                this._showLoadItemsError(response.responseJSON || {});
-                            }
-                            this._hideLoading();
-                        }, this)
-                    );
-            }
+            model.loadContentHTML(this._getUrl('itemView', model));
         },
 
         _viewGroup: function (model) {
-            var that = this,
-                currentModel = model,
-                options = {
-                    url: this._getUrl('groupView', model),
-                    type: 'get',
-                    dataType: 'html',
-                    data: {
-                        _widgetContainer: 'dialog',
-                        targetActivityClass: model.get('targetEntityData').class,
-                        targetActivityId: model.get('targetEntityData').id
-                    }
-                };
-
-            if (currentModel.get('is_loaded') !== true) {
-                this._showLoading();
-                Backbone.$.ajax(options)
-                    .done(function (data) {
-                        currentModel.set('contentHTML', data);
-                        that._hideLoading();
-                    })
-                    .fail(
-                    _.bind(function (response) {
-                        if (!_.isUndefined(response.status) && response.status === 403) {
-                            this._showForbiddenActivityDataError(response.responseJSON || {});
-                            currentModel.set('is_loaded', true);
-                        } else {
-                            this._showLoadItemsError(response.responseJSON || {});
-                        }
-                        this._hideLoading();
-                    }, this)
-                );
-            }
+            model.loadContentHTML(this._getUrl('groupView', model));
         },
 
         _editItem: function (model) {

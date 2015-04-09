@@ -7,8 +7,9 @@ define([
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
     'routing',
-    'orolocale/js/formatter/datetime'
-], function ($, _, Backbone, mediator, BaseView, routing, dateTimeFormatter) {
+    'orolocale/js/formatter/datetime',
+    'oroui/js/app/views/loading-mask-view'
+], function ($, _, Backbone, mediator, BaseView, routing, dateTimeFormatter, LoadingMaskView) {
     'use strict';
 
     var ActivityView;
@@ -39,7 +40,8 @@ define([
         },
         listen: {
             'change:contentHTML model': '_onContentChange',
-            'change:commentCount model': '_onCommentCountChange'
+            'change:commentCount model': '_onCommentCountChange',
+            'change:isContentLoading model': '_onContentLoadingStatusChange'
         },
 
         initialize: function (options) {
@@ -135,6 +137,17 @@ define([
                 $elem = this.$(this.options.commentsCountBlock);
             $elem.html(quantity);
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
+        },
+
+        _onContentLoadingStatusChange: function () {
+            if (this.model.get('isContentLoading')) {
+                this.subview('loading', new LoadingMaskView({
+                    container: this.$el
+                }));
+                this.subview('loading').show();
+            } else {
+                this.removeSubview('loading');
+            }
         },
 
         getCommentsBlock: function () {

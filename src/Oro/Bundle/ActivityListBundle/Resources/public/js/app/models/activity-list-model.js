@@ -83,6 +83,43 @@ define([
                 }
             }
             return false;
+        },
+
+        loadContentHTML: function (url) {
+            var options = {
+                    url: url,
+                    type: 'get',
+                    dataType: 'html',
+                    data: {
+                        _widgetContainer: 'dialog',
+                        targetActivityClass: this.get('targetEntityData').class,
+                        targetActivityId: this.get('targetEntityData').id
+                    }
+                };
+
+            if (this.get('is_loaded') !== true) {
+                this.set('isContentLoading', true);
+                Backbone.$.ajax(options)
+                    .done(
+                        _.bind(function (data) {
+                            this.set('isContentLoading', false);
+                            this.set('is_loaded', true);
+                            this.set('contentHTML', data);
+                        }, this)
+                    )
+                    .fail(
+                        _.bind(function (response) {
+                            if (!_.isUndefined(response.status) && response.status === 403) {
+                                this.set('isContentLoading', false);
+                                this.set('is_loaded', true);
+                                this._showForbiddenActivityDataError(response.responseJSON || {});
+                            } else {
+                                this._showLoadItemsError(response.responseJSON || {});
+                            }
+                            this._hideLoading();
+                        }, this)
+                    );
+            }
         }
     });
 
