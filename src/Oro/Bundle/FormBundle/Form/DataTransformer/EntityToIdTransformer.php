@@ -134,7 +134,10 @@ class EntityToIdTransformer implements DataTransformerInterface
             }
             $result = $qb->getQuery()->execute();
         } else {
-            $result = [$repository->find($id)];
+            $result = $repository->find($id);
+            if ($result) {
+                $result = [$result];
+            }
         }
 
         if (count($result) !== 1) {

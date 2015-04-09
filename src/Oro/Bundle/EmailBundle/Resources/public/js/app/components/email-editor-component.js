@@ -8,7 +8,6 @@ define(function (require) {
         select2 = require('jquery.select2'),
         routing = require('routing'),
         __ = require('orotranslation/js/translator'),
-        messenger = require('oroui/js/messenger'),
         mediator = require('oroui/js/mediator'),
         ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
@@ -21,7 +20,10 @@ define(function (require) {
                 hideField(fieldName);
             }
         });
-        $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__("To"));
+
+        $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__('oro.email.to'));
+        addForgedAsterisk();
+
     }
 
     function hideField(fieldName) {
@@ -34,6 +36,17 @@ define(function (require) {
             $(target).remove();
             showField(fieldName);
         });
+    }
+
+    function addForgedAsterisk() {
+        var label_tab = $('.forged-required').find('label'),
+            em_tag = label_tab.find('em');
+
+        if (em_tag.length <= 0) {
+            label_tab.append('<em>*</em>')
+        } else {
+            em_tag.html('*');
+        }
     }
 
     EmailEditorComponent = BaseComponent.extend({
@@ -58,15 +71,24 @@ define(function (require) {
                 $addSignatureButton = this.options._sourceElement.find('#addSignatureButton');
 
             $addSignatureButton.on('click', function() {
-                var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
-                if (bodyEditorComponent.view.tinymceConnected) {
-                    var tinyMCE= bodyEditorComponent.view.tinymceInstance;
-                    tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                if ($signature.val()) {
+                    var bodyEditorComponent = self.parent.pageComponent('bodyEditor');
+                    if (bodyEditorComponent.view.tinymceConnected) {
+                        var tinyMCE = bodyEditorComponent.view.tinymceInstance;
+                        tinyMCE.execCommand('mceInsertContent', false, $signature.val());
+                    } else {
+                        $body.focus();
+                        var caretPos = $body.getCursorPosition();
+                        var body = $body.val();
+                        $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig, "") + body.substring(caretPos));
+                    }
                 } else {
-                    $body.focus();
-                    var caretPos = $body.getCursorPosition();
-                    var body = $body.val();
-                    $body.val(body.substring(0, caretPos) + $signature.val().replace(/(<([^>]+)>)/ig,"") + body.substring(caretPos));
+                    var url = routing.generate('oro_user_profile_update');
+                    if (self.options.isSignatureEditable) {
+                        mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature', {url: url}));
+                    } else {
+                        mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature_no_permission'));
+                    }
                 }
             });
 
@@ -115,7 +137,7 @@ define(function (require) {
                                 .trigger('change');
                         },
                         error: function () {
-                            messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
+                            mediator.execute('notificationMessage', 'error', __('oro.email.emailtemplate.load_failed'));
                         },
                         dataType: 'json'
                     }).always(function () {
@@ -134,6 +156,7 @@ define(function (require) {
                 }
             });
 
+            addForgedAsterisk();
             this.bindFieldEvents();
         },
 

@@ -107,6 +107,7 @@ class DateModifierProvider implements DateModifierInterface
     public function getDateParts()
     {
         return [
+            self::PART_SOURCE  => 'oro.filter.form.label_date_part.' . self::PART_SOURCE,
             self::PART_VALUE   => 'oro.filter.form.label_date_part.' . self::PART_VALUE,
             self::PART_DOW     => 'oro.filter.form.label_date_part.' . self::PART_DOW,
             self::PART_WEEK    => 'oro.filter.form.label_date_part.' . self::PART_WEEK,
@@ -114,7 +115,7 @@ class DateModifierProvider implements DateModifierInterface
             self::PART_MONTH   => 'oro.filter.form.label_date_part.' . self::PART_MONTH,
             self::PART_QUARTER => 'oro.filter.form.label_date_part.' . self::PART_QUARTER,
             self::PART_DOY     => 'oro.filter.form.label_date_part.' . self::PART_DOY,
-            self::PART_YEAR    => 'oro.filter.form.label_date_part.' . self::PART_YEAR,
+            self::PART_YEAR    => 'oro.filter.form.label_date_part.' . self::PART_YEAR
         ];
     }
 }

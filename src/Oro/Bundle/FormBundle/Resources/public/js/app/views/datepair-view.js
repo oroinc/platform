@@ -35,8 +35,8 @@ define([
         options: {
             startClass: 'start',
             endClass: 'end',
-            timeClass: 'time',
-            dateClass: 'date',
+            timeClass: 'timepicker-input',
+            dateClass: 'datepicker-input',
             defaultDateDelta: 0,
             defaultTimeDelta: 3600000
         },
@@ -52,6 +52,7 @@ define([
          */
         initialize: function (options) {
             _.extend(this, _.pick(options, ['nativeMode']));
+            this.options = _.defaults(_.pick(options, _.keys(this.options)), this.options);
             DatepairView.__super__.initialize.apply(this, arguments);
             this.initDatepair();
         },
