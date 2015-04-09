@@ -31,8 +31,8 @@ class EmailExtension extends \Twig_Extension
     public function __construct(
         EmailHolderHelper $emailHolderHelper,
         EmailAddressHelper $emailAddressHelper,
-        EntityManager $em)
-    {
+        EntityManager $em
+    ) {
         $this->emailHolderHelper = $emailHolderHelper;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->em = $em;
