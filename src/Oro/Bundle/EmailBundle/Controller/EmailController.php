@@ -56,7 +56,7 @@ class EmailController extends Controller
         return [
             'entity' => $entity,
             'noBodyFound' => $noBodyFound,
-            'attachments' => $this->getAttachments($entity),
+            'attachments' => $this->prepareAttachments($entity),
             'targetEntityData' => $this->getTargetEntityConfig()
         ];
     }
@@ -364,22 +364,6 @@ class EmailController extends Controller
     }
 
     /**
-     * Check possibility link attachment to target entity
-     *
-     * @param Email $entity
-     *
-     * @return array
-     */
-    protected function getAttachments($entity)
-    {
-        $result = [];
-        if ($entity->getEmailBody()->getHasAttachments()) {
-            $result = $this->prepareAttachments($entity);
-        }
-        return $result;
-    }
-
-    /**
      * Get target entity parameters
      *
      * @param bool $encode
@@ -447,25 +431,27 @@ class EmailController extends Controller
     protected function prepareAttachments($entity)
     {
         $result = [];
-        $emailAttachmentManager = $this->get('oro_email.manager.email_attachment_manager');
-        $target = $this->getTargetEntityConfig(false);
-        $allowed = $this->isAttachmentCreationGranted();
+        if ($entity->getEmailBody()->getHasAttachments()) {
+            $emailAttachmentManager = $this->get('oro_email.manager.email_attachment_manager');
+            $target = $this->getTargetEntityConfig(false);
+            $allowed = $this->isAttachmentCreationGranted();
+            $emailAttachments = $entity->getEmailBody()->getAttachments();
 
-        foreach ($entity->getEmailBody()->getAttachments() as $attachment) {
-            $attach = [
-                'entity' => $attachment,
-                'can_reattach' => true
-            ];
-            if (
-                !$allowed
-                || $emailAttachmentManager
-                    ->validateEmailAttachmentForTargetClass($attachment, $target['targetEntityClass'])
-                    ->count() > 0
-                || $emailAttachmentManager->isAttached($attachment, $this->getTargetEntity())
-            ) {
-                $attach['can_reattach'] = false;
+            foreach ($emailAttachments as $attachment) {
+                $attach = [
+                    'entity' => $attachment,
+                    'can_reattach' => true
+                ];
+                if (
+                    !$allowed
+                    || $emailAttachmentManager
+                        ->validateEmailAttachmentForTargetClass($attachment, $target['targetEntityClass'])->count() > 0
+                    || $emailAttachmentManager->isAttached($attachment, $this->getTargetEntity())
+                ) {
+                    $attach['can_reattach'] = false;
+                }
+                $result[] = $attach;
             }
-            $result[] = $attach;
         }
 
         return $result;
