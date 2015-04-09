@@ -1,0 +1,8 @@
+placeholders:
+    scripts_before:
+        items:
+            widget_filter_templates:
+                order: 10
+items:
+   widget_filter_templates:
+        template: OroDashboardBundle:Js:default_templates.js.twig

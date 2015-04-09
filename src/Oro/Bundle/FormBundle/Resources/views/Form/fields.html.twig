@@ -322,6 +322,7 @@
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
             'data-validation': dateValidation,
+            class: 'datepicker-input ' ~ (attribute(attr, 'class') is defined ? attr['class'] : ''),
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -362,7 +363,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            class: 'input-small date ' ~ attrClass,
+            class: 'input-small datepicker-input ' ~ attrClass,
             'data-validation': dateValidation|json_encode
         },
         datePickerOptions: {
@@ -376,7 +377,7 @@
             placeholder: 'oro.form.choose_time'|trans,
             id: 'time_selector_' ~ id,
             name: 'time_selector_' ~ id,
-            class: 'input-small time ' ~ attrClass,
+            class: 'input-small timepicker-input ' ~ attrClass,
             'data-validation': timeValidation|json_encode
         },
         timePickerOptions: {
