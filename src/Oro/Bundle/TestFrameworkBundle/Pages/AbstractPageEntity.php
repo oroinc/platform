@@ -246,7 +246,8 @@ abstract class AbstractPageEntity extends AbstractPage
             "//*[@class='container-fluid accordion']".
             "//*[@class='message-item message'][contains(., '{$activityName}')]".
             "/parent::*".
-            "/*[@class='details'][contains(., '{$activityType}')]"
+            "/*[@class='details'][contains(., '{$activityType}')]",
+            "{$activityType} '{$activityName}' not found"
         );
 
         return $this;
