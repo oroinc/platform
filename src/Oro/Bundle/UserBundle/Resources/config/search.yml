@@ -16,6 +16,10 @@ Oro\Bundle\UserBundle\Entity\User:
             target_type:            text
             target_fields:          [email]
         -
+            name:                   phone
+            target_type:            text
+            target_fields:          [phone]
+        -
             name:                   namePrefix
             target_type:            text
             target_fields:          [namePrefix]
