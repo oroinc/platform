@@ -11,7 +11,6 @@ oro:
             load_error: Sorry, email thread was not loaded correctly.
         attachment:
             added: Attachment added
-            already_copied: Already Copied
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"

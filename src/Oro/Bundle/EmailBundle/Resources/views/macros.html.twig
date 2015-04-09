@@ -341,9 +341,11 @@
                     {% endif %}
                 </span>
             </a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.entity.id}) }}">Open</a>
-                {% if attachment.can_reattach and targetEntityData.targetEntityClass is defined %}
+            {% if attachment.can_reattach and targetEntityData.targetEntityClass is defined %}
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.entity.id}) }}">
+                        {{ 'oro.email.attachment.open'|trans }}
+                    </a>
                     {% set options = {
                         'view': 'oroemail/js/app/views/email-attachment-link-view',
                         'url': path(
@@ -359,12 +361,16 @@
                             data-page-component-options="{{ options|json_encode }}"
                             class="attachment"
                             href="{{ options.url }}">
-                            {{ attachment.title|trans }}
+                            {{ 'oro.email.attachment.copy_to_record'|trans }}
                         </a>
-                {% else %}
-                    <span>{{ attachment.title|trans }}</span>
-                {% endif %}
+                </ul>
+            {% else %}
+            <ul class="dropdown-menu one" role="menu" aria-labelledby="dropdownMenu">
+                <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.entity.id}) }}">
+                    {{ 'oro.email.attachment.open'|trans }}
+                </a>
             </ul>
+            {% endif %}
         </div>
     {%- endfor -%}
 {%- endmacro %}

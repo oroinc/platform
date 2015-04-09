@@ -408,30 +408,16 @@ class EmailController extends Controller
         foreach ($entity->getEmailBody()->getAttachments() as $attachment) {
             $attach = [
                 'entity' => $attachment,
-                'title' => 'oro.email.attachment.copy_to_record',
                 'can_reattach' => true
             ];
-            if (!$allowed) {
-                $attach = [
-                    'entity' => $attachment,
-                    'title' => 'oro.email.attachment.copy_dont_allow',
-                    'can_reattach' => false
-                ];
-            } elseif ($emailAttachmentManager
+            if (
+                !$allowed
+                || $emailAttachmentManager
                     ->validateEmailAttachmentForTargetClass($attachment, $target['targetEntityClass'])
                     ->count() > 0
+                || $emailAttachmentManager->isAttached($attachment, $this->getTargetEntity())
             ) {
-                $attach = [
-                    'entity' => $attachment,
-                    'title' => 'oro.email.attachment.cant_copy',
-                    'can_reattach' => false
-                ];
-            } elseif ($emailAttachmentManager->isAttached($attachment, $this->getTargetEntity())) {
-                $attach = [
-                    'entity' => $attachment,
-                    'title' => 'oro.email.attachment.already_copied',
-                    'can_reattach' => false
-                ];
+                $attach['can_reattach'] = false;
             }
             $result[] = $attach;
         }

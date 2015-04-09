@@ -44,7 +44,7 @@ define([
                 function (response) {
                     if (_.isUndefined(response.error)) {
                         messenger.notificationFlashMessage('success', __('oro.email.attachment.added'));
-                        self.$el.parent().append(__('oro.email.attachment.already_copied'));
+                        self.$el.parent().addClass('one');
                         self.$el.remove();
                         self.reloadAttachmentGrid();
                     } else {
