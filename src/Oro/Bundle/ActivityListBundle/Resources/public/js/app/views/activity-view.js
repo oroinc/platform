@@ -143,7 +143,7 @@ define([
 
         setCommentComponent: function (comments) {
             this.subview('comments', comments);
-            this.listenTo(comments.collection, 'sync', this.updateCommentsQuantity, this);
+            this.listenTo(comments.collection, 'stateChange', this.updateCommentsQuantity, this);
         },
 
         hasCommentComponent: function () {
@@ -152,7 +152,7 @@ define([
 
         updateCommentsQuantity: function (collection) {
             if (collection instanceof Backbone.Collection) {
-                this.model.set('commentCount', collection.getRecordsQuantity());
+                this.model.set('commentCount', collection.getState().totalItemsQuantity);
             }
         }
     });

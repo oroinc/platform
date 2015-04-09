@@ -1,70 +1,61 @@
-<div class="accordion-group oro-item-collection list-item">
-    <div class="accordion-heading">
-        <div class="title-item">
-            <% if (isCollapsible) {  %>
-            <a href="#<%= accordionTargetId %>" data-parent="#<%- accordionId %>"
-               data-toggle="collapse" class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<%}%>"></a>
-            <% } %>
-            <% if (owner_id) {  %>
-                <%= _.__('oro.comment.item.added',{
-                    user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
-                    time: '<i class="date">' + createdTime + '</i>'
-                }) %><% } %><% if (editor_id) { %>,
-                <%= _.__('oro.comment.item.update',{
-                    user: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
-                    time: '<i class="date">' + updatedTime + '</i>'
-                }) %>
-            <% } %>
-            <% if (attachmentURL) { %>
-            <span data-target="#<%= accordionTargetId %>" data-parent="#<%- accordionId %>"
-               data-toggle="collapse" class="attachment-icon accordion-toggle<% if (collapsed) { %> collapsed<%}%>"
-               title="<%= _.__('oro.comment.attachment.tooltip', {filename: attachmentFileName}) %>"><i class="icon-paper-clip"></i></span>
-            <% } %>
-        </div>
-        <% if (hasActions) { %>
-        <div class="actions">
-            <div class="more-bar-holder">
-                <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">...</a>
-                    <ul class="dropdown-menu pull-right launchers-dropdown-menu">
-                        <li>
-                            <ul class="nav nav-pills icons-holder launchers-list">
-                                <% if (editable) { %>
-                                <li class="launcher-item">
-                                    <a href="#" class="action item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
-                                        <i class="icon-edit hide-text"><%= _.__('oro.comment.action.update') %></i>
-                                    </a>
-                                </li>
-                                <% } %>
-                                <% if (removable) { %>
-                                <li class="launcher-item">
-                                    <a href="#" class="action item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
-                                        <i class="icon-trash hide-text"><%= _.__('oro.comment.action.delete') %></i>
-                                    </a>
-                                </li>
-                                <% } %>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+<div class="comment-title">
+    <% if (avatarUrl) { %>
+        <img class="comment-title-avatar" src="<%= avatarUrl %>" />
+    <% } else { %>
+        <div class="comment-title-avatar no-avatar" />
+    <% } %>
+    <div class="comment-title-info">
+        <% if (owner_id) {  %>
+            <%= _.__('oro.comment.item.added',{
+                user: '<a class="user nowrap" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
+                time: '<i class="date nowrap">' + createdTime + '</i>'
+            }) %>
         <% } %>
-        <div data-target="#<%= accordionTargetId %>" data-parent="#<%- accordionId %>"
-             data-toggle="collapse" class="short-comment accordion-toggle<% if (collapsed || !isCollapsible) { %> collapsed<%}%>">
-            <%= shortMessage %>
+        <% if (editor_id) { %>,
+            <%= _.__('oro.comment.item.update',{
+                user: '<a class="user nowrap" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
+                time: '<i class="date nowrap">' + updatedTime + '</i>'
+            }) %>
+        <% } %>
+    </div>
+</div>
+
+<div class="comment-content">
+    <div class="comment-body"><%= message %></div>
+    <% if (attachmentURL) { %>
+    <div class="comment-attachments">
+        <div class="attachment-item">
+            <i class="icon-paper-clip"></i> <a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %></a> (<%= attachmentSize %>)
         </div>
     </div>
-    <div class="accordion-body collapse<% if (!collapsed|| !isCollapsible) { %> in<%}%>" id="<%= accordionTargetId %>">
-        <div class="accordion-inner">
-            <div<% if (editable) { %> class="form-container"<% } %>>
-                <%= message %>
-                <% if (attachmentURL) { %>
-                <div class="attachment-item">
-                    <i class="icon-paper-clip"></i>
-                    <a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %></a> (<%= attachmentSize %>)
-                </div>
-                <% } %>
-            </div>
+    <% } %>
+</div>
+
+<div class="comment-actions">
+    <% if (hasActions) { %>
+    <div class="more-bar-holder">
+        <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">...</a>
+            <ul class="dropdown-menu pull-right launchers-dropdown-menu">
+                <li>
+                    <ul class="nav nav-pills icons-holder launchers-list">
+                        <% if (editable) { %>
+                        <li class="launcher-item">
+                            <a href="#" class="action item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
+                                <i class="icon-edit hide-text"><%= _.__('oro.comment.action.update') %></i>
+                            </a>
+                        </li>
+                        <% } %>
+                        <% if (removable) { %>
+                        <li class="launcher-item">
+                            <a href="#" class="action item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
+                                <i class="icon-trash hide-text"><%= _.__('oro.comment.action.delete') %></i>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
+    <% } %>
 </div>
