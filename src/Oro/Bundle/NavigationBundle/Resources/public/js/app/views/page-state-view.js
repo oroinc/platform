@@ -431,7 +431,7 @@ define([
          */
         _isStateChanged: function (state) {
             state = state || this._collectFormsData();
-            return this._initialState !== null && this._isDifferentFromInitialSate(state);
+            return this._initialState !== null && this._isDifferentFromInitialState(state);
         },
 
         /**
@@ -443,14 +443,13 @@ define([
          * @returns {boolean}
          * @protected
          */
-        _isDifferentFromInitialSate: function (state) {
+        _isDifferentFromInitialState: function (state) {
             var isSame,
                 initialState = this._initialState;
-            isSame = initialState && _.every(state, function (form, i) {
-                return _.isArray(initialState[i]) && _.every(form, function (field, j) {
-                    return _.isObject(initialState[i][j]) &&
-                        initialState[i][j].name === field.name &&
-                            initialState[i][j].value === field.value;
+            isSame = initialState && _.every(initialState, function (form, i) {
+                return _.isArray(state[i]) && _.every(form, function (field, j) {
+                    return _.isObject(state[i][j]) &&
+                        state[i][j].name === field.name && state[i][j].value === field.value;
                 });
             });
             return !isSame;
