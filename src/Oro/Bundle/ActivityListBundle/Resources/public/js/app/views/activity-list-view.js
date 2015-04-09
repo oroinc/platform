@@ -293,11 +293,26 @@ define(function (require) {
         },
 
         _viewItem: function (model) {
-            model.loadContentHTML(this._getUrl('itemView', model));
+            this._loadModelContentHTML(model, 'itemView');
         },
 
         _viewGroup: function (model) {
-            model.loadContentHTML(this._getUrl('groupView', model));
+            this._loadModelContentHTML(model, 'groupView');
+        },
+
+        _loadModelContentHTML: function (model, actionKey) {
+            var url = this._getUrl(actionKey, model);
+            if (model.get('is_loaded') === true) {
+                return;
+            }
+            model.loadContentHTML(url)
+                .fail(_.bind(function (response) {
+                    if (response.status === 403) {
+                        this._showForbiddenActivityDataError(response.responseJSON || {});
+                    } else {
+                        this._showLoadItemsError(response.responseJSON || {});
+                    }
+                }, this));
         },
 
         _editItem: function (model) {

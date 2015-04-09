@@ -1,7 +1,9 @@
 /*global define*/
 define([
+    'jquery',
+    'underscore',
     'oroui/js/app/models/base/model'
-], function (BaseModel) {
+], function ($, _, BaseModel) {
     'use strict';
 
     var ActivityModel;
@@ -97,28 +99,20 @@ define([
                     }
                 };
 
-            if (this.get('is_loaded') !== true) {
-                this.set('isContentLoading', true);
-                Backbone.$.ajax(options)
-                    .done(
-                        _.bind(function (data) {
-                            this.set('isContentLoading', false);
-                            this.set('is_loaded', true);
-                            this.set('contentHTML', data);
-                        }, this)
-                    )
-                    .fail(
-                        _.bind(function (response) {
-                            if (!_.isUndefined(response.status) && response.status === 403) {
-                                this.set('isContentLoading', false);
-                                this.set('is_loaded', true);
-                                this._showForbiddenActivityDataError(response.responseJSON || {});
-                            } else {
-                                this._showLoadItemsError(response.responseJSON || {});
-                            }
-                        }, this)
-                    );
-            }
+            this.set('isContentLoading', true);
+            return $.ajax(options)
+                .always(_.bind(function () {
+                    this.set('isContentLoading', false);
+                }, this))
+                .done(_.bind(function (data) {
+                    this.set('is_loaded', true);
+                    this.set('contentHTML', data);
+                }, this))
+                .fail(_.bind(function (response) {
+                    if (response.status === 403) {
+                        this.set('is_loaded', true);
+                    }
+                }, this));
         }
     });
 
