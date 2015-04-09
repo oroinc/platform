@@ -116,7 +116,6 @@ define([
                             } else {
                                 this._showLoadItemsError(response.responseJSON || {});
                             }
-                            this._hideLoading();
                         }, this)
                     );
             }
