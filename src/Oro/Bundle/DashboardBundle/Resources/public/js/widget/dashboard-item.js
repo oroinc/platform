@@ -1,7 +1,12 @@
 /*global define*/
 define([
-    'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oro/block-widget'
-], function (_, Backbone, __, mediator, BlockWidget) {
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oro/block-widget',
+    'oroui/js/delete-confirmation'
+], function (_, Backbone, __, mediator, BlockWidget, DeleteConfirmation) {
     'use strict';
 
     var DashboardItemWidget,
@@ -261,8 +266,16 @@ define([
          * Trigger remove action
          */
         onRemoveFromDashboard: function() {
-            this.trigger('removeFromDashboard', this.$el, this);
-            mediator.trigger('widget:dashboard:removeFromDashboard:' + this.getWid(), this.$el, this);
+            var that = this,
+                confirm = new DeleteConfirmation({
+                content: __('oro.dashboard.widget.delete_confirmation')
+            });
+            
+            confirm.on('ok', function () {
+                that.trigger('removeFromDashboard', that.$el, that);
+                mediator.trigger('widget:dashboard:removeFromDashboard:' + that.getWid(), that.$el, that);
+            });
+            confirm.open();
         },
 
         /**
