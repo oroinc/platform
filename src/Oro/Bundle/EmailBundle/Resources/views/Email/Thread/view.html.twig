@@ -21,6 +21,38 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
+
+    <script type="text/template" id="email-context-list">
+        <div class="attachment-item" style="border: none" data-cid="<%= entity.cid %>">
+            <span data-id="<%= entity.get('id') %>" class="filename">
+                <span class="filename-label"><%= entity.get('title') %></span>
+                <i class="icon-remove"></i>
+            </span>
+        </div>
+    </script>
+
+    {% set itemsArray = [] %}
+
+
+
+    {% for item in entity.getActivityTargetEntities() %}
+        {% set itemArray = {
+            'entityId': entity.id,
+            'id': item.id,
+            "className": oro_class_name(item),
+            'title': item.getFirstName()
+        } %}
+        {% set itemsArray = itemsArray|merge([itemArray]) %}
+    {% endfor %}
+
+    {% set options = {
+        items: itemsArray
+    } %}
+
+    <div id="test" data-page-component-module="oroemail/js/app/components/email-context-component"
+         data-page-component-options="{{ options|json_encode }}">
+    </div>
+
 {% endblock stats %}
 
 {% block content_data %}
