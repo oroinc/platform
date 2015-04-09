@@ -243,9 +243,10 @@ abstract class AbstractPageEntity extends AbstractPage
     public function verifyActivity($activityType, $activityName)
     {
         $this->assertElementPresent(
-            "//div[@class='container-fluid accordion']//span[@class='message-item message']".
-            "//a[starts-with(@href,'#accordion-item')][contains(., '{$activityName}')]/parent::span".
-            "/preceding-sibling::span[contains(., '{$activityType}')]"
+            "//*[@class='container-fluid accordion']".
+            "//*[@class='message-item message'][contains(., '{$activityName}')]".
+            "/parent::*".
+            "/*[@class='details'][contains(., '{$activityType}')]"
         );
 
         return $this;
