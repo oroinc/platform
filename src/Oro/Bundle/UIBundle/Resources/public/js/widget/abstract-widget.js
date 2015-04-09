@@ -100,6 +100,7 @@ define(function (require) {
             // if there's loading process -- stop it
             if (this.loading) {
                 this.loading.abort();
+                delete this.loading;
             }
 
             // call before dom will be removed
@@ -689,10 +690,11 @@ define(function (require) {
         _onContentLoadFail: function(jqxhr) {
             if (jqxhr.statusText === 'abort') {
                 // content load was aborted
+                delete this.loading;
                 return;
             }
 
-            var message = __('oro.ui.widget_loading_filed');
+            var message = __('oro.ui.widget_loading_failed');
 
             if (jqxhr.status === 403) {
                 message = __('oro.ui.forbidden_error');
@@ -712,7 +714,7 @@ define(function (require) {
          * @private
          */
         _onContentLoad: function(content) {
-            this.loading = null;
+            delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
             if (this.renderDeferred) {
