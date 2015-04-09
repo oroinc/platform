@@ -29,7 +29,7 @@ define([
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'loadingContainerSelector',
-                'itemSelector', 'listSelector']));
+                'itemSelector', 'listSelector', 'animationDuration']));
             BaseCollectionView.__super__.initialize.apply(this, arguments);
         },
 

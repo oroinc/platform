@@ -19,11 +19,21 @@ class PackagesProvider
     /** @var  string */
     protected $kernelRootDir;
 
-    public function __construct(ServiceLink $pmLink, array $bundles, $kernelRootDir)
+    /** @var  string */
+    protected $composerCacheHome;
+
+    /**
+     * @param ServiceLink $pmLink
+     * @param array $bundles
+     * @param string $kernelRootDir
+     * @param string $composerCacheHome
+     */
+    public function __construct(ServiceLink $pmLink, array $bundles, $kernelRootDir, $composerCacheHome)
     {
-        $this->pmLink        = $pmLink;
-        $this->bundles       = $bundles;
-        $this->kernelRootDir = $kernelRootDir;
+        $this->pmLink            = $pmLink;
+        $this->bundles           = $bundles;
+        $this->kernelRootDir     = $kernelRootDir;
+        $this->composerCacheHome = $composerCacheHome;
     }
 
     /**
@@ -35,7 +45,7 @@ class PackagesProvider
     {
         // avoid exception in Composer\Factory for creation service oro_distribution.composer
         if (!getenv('COMPOSER_HOME') && !getenv('HOME')) {
-            putenv(sprintf('COMPOSER_HOME=%s/cache/composer', $this->kernelRootDir));
+            putenv(sprintf('COMPOSER_HOME=%s', $this->composerCacheHome));
 
             // avoid change of current directory, just give correct vendor dir
             $rootPath                            = realpath($this->kernelRootDir . '/../') . DIRECTORY_SEPARATOR;

@@ -145,3 +145,4 @@ services:
             - @oro_translation.distribution.package_manager.link
             - %kernel.bundles%
             - %kernel.root_dir%
+            - %oro_distribution.composer_cache_home%

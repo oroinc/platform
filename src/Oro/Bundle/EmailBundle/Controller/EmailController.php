@@ -84,9 +84,20 @@ class EmailController extends Controller
         );
         $this->loadEmailBody($emails);
 
+        $routeParameters = [];
+        $entityClass = $this->getRequest()->get('targetActivityClass');
+        if ($entityClass) {
+            $routeParameters['entityClass'] = $entityClass;
+        }
+        $entityId = $this->getRequest()->get('targetActivityId');
+        if ($entityId) {
+            $routeParameters['entityId'] = $entityId;
+        }
+
         return [
             'entity' => $entity,
             'thread' => $emails,
+            'routeParameters' => $routeParameters
         ];
     }
 
