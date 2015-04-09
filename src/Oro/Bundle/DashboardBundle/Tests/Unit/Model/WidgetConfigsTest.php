@@ -12,16 +12,24 @@ use Symfony\Component\HttpFoundation\Request;
 
 class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $widgetRepository;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $em;
-    private $stateManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $valueProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
+
+    /** @var WidgetConfigs */
     private $widgetConfigs;
 
     public function setUp()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -33,22 +41,29 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
         $this->em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
 
-        $this->stateManager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\StateManager')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->valueProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $this->valueProvider->expects($this->any())
+            ->method('getConvertedValue')
+            ->willReturnCallback(
+                function ($widgetConfig, $type, $value) {
+                    return $value;
+                }
+            );
 
         $this->widgetConfigs = new WidgetConfigs(
-            $configProvider,
+            $this->configProvider,
             $securityFacade,
             $resolver,
             $this->em,
-            $this->stateManager
+            $this->valueProvider
         );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->em
             ->expects($this->any())
@@ -87,13 +102,18 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($widget));
 
         $options = ['k' => 'v', 'k2' => 'v2'];
-        $widgetState = new WidgetState();
-        $widgetState->setOptions($options);
-        $this->stateManager
-            ->expects($this->once())
-            ->method('getWidgetState')
-            ->with($widget)
-            ->will($this->returnValue($widgetState));
+        $widget->setOptions($options);
+
+        $this->configProvider->expects($this->once())
+            ->method('getWidgetConfig')
+            ->willReturn(
+                [
+                    'configuration' => [
+                        'k'  => ['type' => 'test'],
+                        'k2' => ['type' => 'test'],
+                    ]
+                ]
+            );
 
         $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
     }
@@ -113,13 +133,18 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($widget));
 
         $options = ['k' => 'v', 'k2' => 'v2'];
-        $widgetState = new WidgetState();
-        $widgetState->setOptions($options);
-        $this->stateManager
-            ->expects($this->once())
-            ->method('getWidgetState')
-            ->with($widget)
-            ->will($this->returnValue($widgetState));
+        $widget->setOptions($options);
+
+        $this->configProvider->expects($this->once())
+            ->method('getWidgetConfig')
+            ->willReturn(
+                [
+                    'configuration' => [
+                        'k'  => ['type' => 'test'],
+                        'k2' => ['type' => 'test'],
+                    ]
+                ]
+            );
 
         $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions(2));
     }
