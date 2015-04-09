@@ -17,6 +17,7 @@ oro:
             expand_all:
                 label: Expand All
                 tooltip: Expand all emails in the thread
+        to: To
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"
