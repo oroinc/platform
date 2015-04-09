@@ -1,7 +1,9 @@
 /*global define*/
 define([
+    'jquery',
+    'underscore',
     'oroui/js/app/models/base/model'
-], function (BaseModel) {
+], function ($, _, BaseModel) {
     'use strict';
 
     var ActivityModel;
@@ -83,6 +85,34 @@ define([
                 }
             }
             return false;
+        },
+
+        loadContentHTML: function (url) {
+            var options = {
+                    url: url,
+                    type: 'get',
+                    dataType: 'html',
+                    data: {
+                        _widgetContainer: 'dialog',
+                        targetActivityClass: this.get('targetEntityData').class,
+                        targetActivityId: this.get('targetEntityData').id
+                    }
+                };
+
+            this.set('isContentLoading', true);
+            return $.ajax(options)
+                .always(_.bind(function () {
+                    this.set('isContentLoading', false);
+                }, this))
+                .done(_.bind(function (data) {
+                    this.set('is_loaded', true);
+                    this.set('contentHTML', data);
+                }, this))
+                .fail(_.bind(function (response) {
+                    if (response.status === 403) {
+                        this.set('is_loaded', true);
+                    }
+                }, this));
         }
     });
 
