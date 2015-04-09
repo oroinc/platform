@@ -374,7 +374,7 @@ class EmailController extends Controller
     {
         $result = [];
         if ($entity->getEmailBody()->getHasAttachments()) {
-            $result = $result = $this->prepareAttachments($entity);
+            $result = $this->prepareAttachments($entity);
         }
         return $result;
     }
@@ -421,16 +421,17 @@ class EmailController extends Controller
     /**
      * @return bool
      */
-    protected function checkAttachCreateGrant()
+    protected function isAttachmentCreationGranted()
     {
+        $enabledAttachment = false;
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
         if (null !== $entityClassName) {
             /** @var ConfigProvider $targetConfigProvider */
             $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
-            $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
-        } else {
-            $enabledAttachment = false;
+            if ($targetConfigProvider->hasConfig($entityClassName)) {
+                $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
+            }
         }
         $createGrant = $this->get('oro_security.security_facade')
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
@@ -448,7 +449,7 @@ class EmailController extends Controller
         $result = [];
         $emailAttachmentManager = $this->get('oro_email.manager.email_attachment_manager');
         $target = $this->getTargetEntityConfig(false);
-        $allowed = $this->checkAttachCreateGrant();
+        $allowed = $this->isAttachmentCreationGranted();
 
         foreach ($entity->getEmailBody()->getAttachments() as $attachment) {
             $attach = [

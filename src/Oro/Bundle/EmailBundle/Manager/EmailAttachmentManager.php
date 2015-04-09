@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -132,12 +132,12 @@ class EmailAttachmentManager
     /**
      * @param EmailAttachment $emailAttachment
      *
-     * @return File
+     * @return File|null
      */
     protected function copyEmailAttachmentToFileSystem(EmailAttachment $emailAttachment)
     {
         if (null !== $emailAttachment->getFile()) {
-            return null;
+            return;
         }
         $file = new File();
         $file->setExtension($emailAttachment->getExtension());
