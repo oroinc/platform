@@ -430,7 +430,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 'language' => 'en_US',
             ],
             [
-                'expected' => '2 февр.',
+                'expected' => '02 февр.',
                 'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::MEDIUM,
                 'locale' => null,

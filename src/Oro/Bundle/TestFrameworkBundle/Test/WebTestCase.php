@@ -665,8 +665,7 @@ abstract class WebTestCase extends BaseWebTestCase
     {
         \PHPUnit_Framework_TestCase::assertEquals(
             $statusCode,
-            $response->getStatusCode(),
-            $response->getContent()
+            $response->getStatusCode()
         );
     }
 
