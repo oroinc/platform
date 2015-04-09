@@ -147,6 +147,12 @@
     line-height: 12px;
     border-radius: 2px;
 }
+
+.forged-required label em {
+    color: #c30b25;
+    font-size: 15px;
+    line-height: 1px;
+}
 .attachment-item {
     display: inline-block;
     float: left;
