@@ -101,23 +101,23 @@ define([
             if (this.nativeMode) {
                 var momentInstance = moment(dateObj);
                 $(input).val(momentInstance.format(this.nativeTimeFormat));
-                $(input).trigger('change');
             } else {
                 $(input).timepicker('setTime', dateObj);
             }
+            // triggers event to update backend field
+            $(input).trigger('change');
         },
 
         _updateDate: function (input, dateObj) {
             if (this.nativeMode) {
                 var momentInstance = moment(dateObj);
                 $(input).val(momentInstance.format(this.nativeDateFormat));
-                $(input).trigger('change');
             } else {
                 // calls 'setDate' method instead of native 'update'
                 $(input).datepicker('setDate', dateObj);
-                // triggers event to update backend field
-                $(input).trigger('change');
             }
+            // triggers event to update backend field
+            $(input).trigger('change');
         },
 
         handleRangeError: function () {
