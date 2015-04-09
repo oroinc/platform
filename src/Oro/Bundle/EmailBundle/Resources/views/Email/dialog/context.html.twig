@@ -9,19 +9,17 @@
         {% set itemsArray = [] %}
         {% for item in entityTargets %}
             {% set itemArray = {
-            'id': item.id,
+            'entityAlias': item.entityAlias,
             'label': item.label,
             'first': item.first
             } %}
             {% set itemsArray = itemsArray|merge([itemArray]) %}
         {% endfor %}
 
-        {# container: id, inputName: full_name, #}
-
-        {% set options = options|merge({items: itemsArray}) %}
+        {% set options = params|merge({items: itemsArray, params: params}) %}
 
         <script type="text/template" id="email-context-item">
-            <li id="<%= entity.get('id') %>" class="context-item" data-cid="<%= entity.cid %>">
+            <li id="<%= entity.get('entityAlias') %>" class="context-item" data-cid="<%= entity.cid %>">
                 <%= entity.get('label') %>
             </li>
         </script>
@@ -33,6 +31,47 @@
                 <span id="email-context-arrow" class="icon-caret-down"></span>
             </button>
             <ul id="context-items-dropdown" style="display: none"></ul>
+            <input type="hidden" id="context-current-entity-alias"/>
         </div>
+
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_email_context_grid'),
+            'alias': 'email-context-grid'
+        }) }}
+
+        <script type="text/javascript">
+            require(['oroui/js/widget-manager', 'oroui/js/messenger'],
+                    function(widgetManager, messenger) {
+                        widgetManager.getWidgetInstanceByAlias('email-context-grid', function(widget) {
+                            widget.on('grid-row-select', function(data) {
+
+                                var id = data.model.get('id');
+                                var contextAlias = $('#context-current-entity-alias').data('value');
+                                widget._showLoading();
+
+                                $.ajax({
+                                    url: '{{ path('oro_email_context_add') }}',
+                                    type: 'POST',
+                                    data: {id: id, contextAlias: contextAlias},
+                                    dataType: 'json',
+                                    success: function (res) {
+                                        if (res.success) {
+                                            messenger.notificationFlashMessage('success', res.message);
+                                        } else {
+                                            messenger.notificationFlashMessage('error', res.message);
+                                        }
+                                    }
+                                })
+                                .always(function () {
+                                    widget._hideLoading();
+                                    widgetManager.getWidgetInstanceByAlias('email-context-dialog', function(widget) {
+                                        widget.remove();
+                                    });
+                                });
+                            });
+                        });
+                    });
+        </script>
     </div>
 {% endblock %}

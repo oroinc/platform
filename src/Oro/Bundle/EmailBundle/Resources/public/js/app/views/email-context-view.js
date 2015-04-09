@@ -5,18 +5,13 @@ define(function (require) {
     var EmailContextView,
         $ = require('jquery'),
         EmailContextCollection = require('oroemail/js/app/models/email-context-collection'),
-        BaseView= require('oroui/js/app/views/base/view');
+        BaseView = require('oroui/js/app/views/base/view'),
+        WidgetManager = require('oroui/js/widget-manager');
 
     EmailContextView = BaseView.extend({
         initialize: function(options) {
             this.options = options;
-
             this.template = _.template($('#email-context-item').html());
-            //this.inputName = options.inputName;
-            //this.$container = options.$container;
-            //
-            //this.$container.html('');
-
             this.collection = new EmailContextCollection();
             this.initEvents();
 
@@ -45,11 +40,11 @@ define(function (require) {
 
             dropdownButton.bind('click', function()
             {
-                dropdown.toggle('show');
+                dropdown.toggle(0);
             });
 
             this.collection.on('add', function(model) {
-
+                var gridUrl = self.options.params.grid_path + '/' + model.attributes.entityAlias;
                 var view = self.template({
                     entity: model
                 });
@@ -57,41 +52,24 @@ define(function (require) {
 
                 if (model.attributes.first) {
                     firstItem.html(model.attributes.label);
+                    $('#context-current-entity-alias').data('value', model.attributes.entityAlias);
                 }
 
                 dropdown.append($view);
+                dropdown.find('.context-item:last').click(function() {
+                    $('#context-current-entity-alias').data('value', model.attributes.entityAlias);
+                    dropdown.find('> .context-item').each(function() {$(this).removeClass('active')})
+                    dropdown.hide(0);
+                    var item = $(this);
+                    firstItem.html(item.html());
+                    item.addClass('active');
 
-                //$view.find('i.icon-remove').click(function() {
-                //    self.collection.remove(model.cid);
-                //});
-                //var $input = $view.find('input[type="file"]');
-                //
-                //if (!model.get('id')) {
-                //    $view.hide();
-                //
-                //    $input.change(function() {
-                //        var value = $input.val().replace(/^.*[\\\/]/, ''); // extracting file basename
-                //
-                //        if (value) {
-                //            model.set('fileName', value);
-                //            $view.find('span.filename span.filename-label').html(value);
-                //            $view.show();
-                //
-                //            self.render();
-                //        } else {
-                //            self.collection.remove(model.cid);
-                //        }
-                //    });
-                //
-                //    $input.click();
-                //}
+                    WidgetManager.getWidgetInstanceByAlias('email-context-grid', function(widget) {
+                        widget.setUrl(gridUrl);
+                        widget.render();
+                    });
+                });
             });
-
-            //this.collection.on('remove', function(model) {
-            //    var $view = self.$container.find('[data-cid="' + model.cid + '"]');
-            //    $view.remove();
-            //    self.render();
-            //});
         }
     });
 

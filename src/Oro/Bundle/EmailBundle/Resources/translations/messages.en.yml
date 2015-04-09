@@ -130,7 +130,10 @@ oro:
         refs.label:               References Header
         seen.label:               Is Seen
         thread_id.label:          Thread ID
-        add_context.label:        Add Context Entity
+        add_context.label:        Add Context
+        add_context_entity.label: Add Context Entity
+        context_added:            Context has been added
+        unexpected_error:         Unexpected error
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.

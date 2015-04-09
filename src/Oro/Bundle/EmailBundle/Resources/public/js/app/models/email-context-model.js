@@ -10,7 +10,7 @@ define(function (require) {
      */
     EmailContextModel = BaseModel.extend({
         defaults: {
-            id: '',
+            entityAlias: '',
             label: '',
             first: ''
         }

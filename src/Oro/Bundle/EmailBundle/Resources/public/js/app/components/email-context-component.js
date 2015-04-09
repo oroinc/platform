@@ -18,30 +18,17 @@ define(function (require) {
         },
 
         init: function() {
-            //if (this.options.dialogButton) {
-            //    this.initDialogButton(this.options.dialogButton);
-            //}
             this.initView();
             this.contextView.render();
         },
 
-        //initDialogButton: function(dialogButton) {
-        //    var self = this;
-        //
-        //    var $dialogButton = $('#' + dialogButton);
-        //    $dialogButton.click(function() {
-        //        self.attachmentsView.add({});
-        //    });
-        //},
-
         initView: function() {
-            //var $container = this.options._sourceElement.find('#' + this.options.container);
             var items = typeof this.options.items == 'undefined' ? [] : this.options.items;
+            var params = typeof this.options.params == 'undefined' ? [] : this.options.params;
             this.contextView = new EmailContextView({
                 items: items,
-                el: this.options._sourceElement
-                //$container: $container,
-                //inputName: this.options.inputName
+                el: this.options._sourceElement,
+                params: params
             });
         }
     });

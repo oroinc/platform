@@ -114,14 +114,16 @@
             'multiple' : true,
             'refresh-widget-alias': 'activity-list-widget',
             'options' : {
-                'alias': 'email-dialog',
+                'alias': 'email-context-dialog',
                 'dialogOptions' : {
-                    'title' : 'oro.email.add_context.label'|trans,
+                    'title' : 'oro.email.add_context_entity.label'|trans,
                     'allowMaximize': true,
                     'allowMinimize': true,
+                    'modal': true,
                     'dblclick': 'maximize',
                     'maximizedHeightDecreaseBy': 'minimize-bar',
-                    'width': 1000
+                    'width': 1000,
+                    'height': 600
                 }
             }
         }
