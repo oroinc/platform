@@ -194,6 +194,9 @@ a.attachment .icon .icon-link {
     line-height: 24px;
     text-align: center;
 }
+.dropdown.link-to-record .dropdown-menu.one {
+    min-width: 100px;
+}
 .dropdown.link-to-record .dropdown-menu a {
     padding-right: 7px;
 }

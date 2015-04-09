@@ -81,7 +81,7 @@ class EmailAttachmentManager
             return;
         }
         $emailAttachment->setFile($file);
-        $this->linkAttachmentsToEntities($emailAttachment, $entity);
+        $this->linkAttachmentToEntitie($emailAttachment, $entity);
     }
 
     /**
@@ -174,7 +174,7 @@ class EmailAttachmentManager
      * @param EmailAttachment $emailAttachment
      * @param object $entity
      */
-    protected function linkAttachmentsToEntities(EmailAttachment $emailAttachment, $entity)
+    protected function linkAttachmentToEntitie(EmailAttachment $emailAttachment, $entity)
     {
         $entityClass = ClassUtils::getClass($entity);
         if (!$emailAttachment->getFile()) {
