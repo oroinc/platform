@@ -98,6 +98,7 @@ define(function (require) {
                 columns: [],
                 options: {},
                 state: {},
+                initialState: {},
                 rowActions: {},
                 massActions: {}
             });
@@ -179,7 +180,7 @@ define(function (require) {
                     filters: {},
                     sorters: {}
                 }, this.metadata.state),
-                initialState: this.metadata.initialState || {}
+                initialState: this.metadata.initialState
             }, this.metadata.options);
         },
 

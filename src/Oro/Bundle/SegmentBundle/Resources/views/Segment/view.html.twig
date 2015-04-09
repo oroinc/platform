@@ -37,7 +37,8 @@
 
 {% block content_data %}
     {% if gridName is defined and gridName %}
-        {{ dataGrid.renderGrid(gridName, {enableFullScreenLayout: 1}) }}
+        {% set renderParams = renderParams|default({})|merge({enableFullScreenLayout: true}) %}
+        {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
     {% else %}
         <div class="container-fluid">
             <div class="grid-container">
