@@ -27,12 +27,57 @@ class RestApiTest extends WebTestCase
                 'oro_api_comment_get_items',
                 [
                     'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
-                    'relationId'    => 1
+                    'relationId'    => $this->getReference('default_activity')->getId()
                 ]
             )
         );
 
-        $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals(3, $result['count']);
+        $this->assertCount(3, $result['data']);
+    }
+
+    public function testCgetCreatedDateFiltering()
+    {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_api_comment_get_items',
+                [
+                    'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
+                    'relationId'    => $this->getReference('default_activity')->getId()
+                ]
+            ) . '?createdAt<'.$date->format('c')
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals(2, $result['count']);
+        $this->assertCount(2, $result['data']);
+    }
+
+    public function testCgetUpdatedDateFiltering()
+    {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_api_comment_get_items',
+                [
+                    'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
+                    'relationId'    => $this->getReference('default_activity')->getId()
+                ]
+            ) . '?updatedAt>'.$date->format('c')
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals(1, $result['count']);
+        $this->assertCount(1, $result['data']);
     }
 
     public function testPost()
