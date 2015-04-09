@@ -173,10 +173,8 @@ define([
             return Boolean(this.subview('comments'));
         },
 
-        updateCommentsQuantity: function (collection) {
-            if (collection instanceof Backbone.Collection) {
-                this.model.set('commentCount', collection.getState().totalItemsQuantity);
-            }
+        updateCommentsQuantity: function () {
+            this.model.set('commentCount', this.subview('comments').collection.getState().totalItemsQuantity);
         }
     });
 
