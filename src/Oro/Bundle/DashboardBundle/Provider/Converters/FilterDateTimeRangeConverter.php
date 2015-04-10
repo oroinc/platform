@@ -23,24 +23,23 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
      */
     public function __construct(DateTimeFormatter $formatter, Compiler $dateCompiler)
     {
-        $this->formatter = $formatter;
+        $this->formatter    = $formatter;
         $this->dateCompiler = $dateCompiler;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getConvertedValue(array $widgetConfig, $value = null, $converterAttributes = [], $options = [])
-    {
+    public function getConvertedValue( array $widgetConfig, $value = null, array $config = [], array $options = []) {
         if (is_null($value)
             || ($value['value']['start'] === null && $value['value']['end'] === null)
         ) {
-            $end = new DateTime('now', new \DateTimeZone('UTC'));
+            $end   = new DateTime('now', new \DateTimeZone('UTC'));
             $start = clone $end;
             $start = $start->sub(new \DateInterval('P1M'));
         } else {
             $startValue = $value['value']['start'];
-            $endValue = $value['value']['end'];
+            $endValue   = $value['value']['end'];
 
             if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
                 || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
@@ -55,17 +54,17 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
             }
 
             $start = $startValue instanceof DateTime ? $startValue : $this->dateCompiler->compile($startValue);
-            $end = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
+            $end   = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
         }
 
         return [
             'start' => $start,
-            'end' => $end
+            'end'   => $end
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getViewValue($value)
     {

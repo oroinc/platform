@@ -108,7 +108,7 @@ class DashboardController extends Controller
         $form  = $this->getFormProvider()->getForm($widget->getName());
         $saved = false;
 
-        $form->setData($widget->getOptions());
+        $form->setData($this->get('oro_dashboard.widget_configs')->getFormValues($widget));
 
         $form->handleRequest($request);
         if ($form->isValid()) {

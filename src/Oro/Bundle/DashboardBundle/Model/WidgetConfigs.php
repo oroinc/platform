@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -51,6 +52,14 @@ class WidgetConfigs
         $this->resolver       = $resolver;
         $this->entityManager  = $entityManager;
         $this->valueProvider  = $valueProvider;
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -119,13 +128,18 @@ class WidgetConfigs
         return $items;
     }
 
+    /**
+     * @param $widgetName
+     * @param $widgetId
+     * @return array
+     */
     public function getWidgetItemsData($widgetName, $widgetId)
     {
-        $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
+        $widgetConfig  = $this->configProvider->getWidgetConfig($widgetName);
         $widgetOptions = $this->getWidgetOptions($widgetId);
 
         $items = isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [];
-        $items = $this->filterWidgets($items, $widgetOptions->get('subWidgets', []));
+        $items = $this->filterWidgets($items, true, $widgetOptions->get('subWidgets', []));
 
         foreach ($items as $itemName => $config) {
             $items[$itemName]['value'] = $this->resolver->resolve(
@@ -164,30 +178,54 @@ class WidgetConfigs
 
         foreach ($widgetConfig['configuration'] as $name => $config) {
             $value          = isset($options[$name]) ? $options[$name] : null;
-            $converterAttributes = isset($config['converter_attributes']) ? $config['converter_attributes'] : [];
-            $options[$name] = $this->valueProvider->getConvertedValue($widgetConfig, $config['type'], $value, $converterAttributes, $options);
+            $options[$name] = $this->valueProvider->getConvertedValue(
+                $widgetConfig,
+                $config['type'],
+                $value,
+                $config,
+                $options
+            );
         }
 
         return new WidgetOptionBag($options);
     }
 
     /**
-     * Filter widget configs based on acl enabled and applicable flag
+     * @param Widget $widget
+     * @return array
+     */
+    public function getFormValues(Widget $widget)
+    {
+        $options      = $widget->getOptions();
+        $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
+
+        foreach ($widgetConfig['configuration'] as $name => $config) {
+            $value          = isset($options[$name]) ? $options[$name] : null;
+            $options[$name] = $this->valueProvider->getFormValue($config['type'], $config, $value);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Filter widget configs based on acl enabled, applicable flag and selected items
      *
-     * @param array $items
+     * @param array   $items
+     * @param boolean $applyVisible
+     * @param array   $visibleItems
      *
      * @return array filtered items
      */
-    protected function filterWidgets(array $items, $visibleWidgets = [])
+    protected function filterWidgets(array $items, $applyVisible = false, array $visibleItems = [])
     {
         $securityFacade = $this->securityFacade;
         $resolver       = $this->resolver;
 
         return array_filter(
             $items,
-            function (&$item) use ($securityFacade, $resolver, $visibleWidgets, &$items) {
+            function (&$item) use ($securityFacade, $resolver, $applyVisible, $visibleItems, &$items) {
                 $visible = true;
-                if (count($visibleWidgets) && !in_array(key($items), $visibleWidgets) ) {
+                if ($applyVisible && !in_array(key($items), $visibleItems)) {
                     $visible = false;
                 }
                 next($items);
@@ -217,10 +255,20 @@ class WidgetConfigs
     }
 
     /**
-     * @param Request $request
+     * @param array           $widgetConfig
+     * @param WidgetOptionBag $widgetOptions
+     * @return array|mixed
      */
-    public function setRequest(Request $request = null)
+    protected function getEnabledItems(array $widgetConfig, WidgetOptionBag $widgetOptions)
     {
-        $this->request = $request;
+        if (isset($widgetConfig['configuration'])) {
+            foreach ($widgetConfig['configuration'] as $parameterName => $config) {
+                if ($config['type'] === WidgetItemsChoiceType::NAME) {
+                    return $widgetOptions->get($parameterName, []);
+                }
+            }
+        }
+
+        return [];
     }
 }

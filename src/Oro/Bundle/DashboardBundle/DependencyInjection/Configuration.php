@@ -95,7 +95,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->arrayNode('data_items')
-                                 ->info('A list of additional items for "data items" widgets')
+                                ->info('A list of additional items for "data items" widgets')
                                 ->useAttributeAsKey('name')
                                 ->prototype('array')
                                     ->ignoreExtraKeys()

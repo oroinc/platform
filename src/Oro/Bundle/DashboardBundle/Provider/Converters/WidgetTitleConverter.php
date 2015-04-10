@@ -9,7 +9,7 @@ class WidgetTitleConverter extends ConfigValueConverterAbstract
     /**
      * {@inheritdoc}
      */
-    public function getConvertedValue(array $widgetConfig, $value = null, $converterAttributes = [], $options = [])
+    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if (!empty($value) && !$value['useDefault']) {
             return $value['title'];
