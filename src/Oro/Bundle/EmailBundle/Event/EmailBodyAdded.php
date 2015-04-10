@@ -27,5 +27,4 @@ class EmailBodyAdded extends Event
     {
         return $this->email;
     }
-
 }
