@@ -20,6 +20,9 @@ oro:
         to: To
         attachment:
             added: Attachment added
+        contexts:
+            added: Context has been added
+
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"

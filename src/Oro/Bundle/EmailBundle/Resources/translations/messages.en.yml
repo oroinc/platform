@@ -155,8 +155,6 @@ oro:
         show_details.tooltip:     Show details
         add_context.label:        Add Context
         add_context_entity.label: Add Context Entity
-        context_added:            Context has been added
-        unexpected_error:         Unexpected error
         contexts:
               label:              Contexts
               placeholder:        Add Context

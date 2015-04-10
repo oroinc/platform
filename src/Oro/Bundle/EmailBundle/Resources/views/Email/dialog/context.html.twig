@@ -42,8 +42,8 @@
         }) }}
 
         <script type="text/javascript">
-            require(['oroui/js/widget-manager', 'oroui/js/messenger'],
-                    function(widgetManager, messenger) {
+            require(['orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator'],
+                    function(__, widgetManager, messenger, mediator) {
                         widgetManager.getWidgetInstanceByAlias('email-context-grid', function(widget) {
                             widget.on('grid-row-select', function(data) {
 
@@ -57,12 +57,10 @@
                                     data: {entityId: {{ sourceEntity.id }}, targetClassName: contextTargetClass, targetId: id},
                                     dataType: 'json',
                                     success: function (res) {
-
-                                        console.log(res);
-                                        //res.code = 500
-
+                                        //TODO: add success check
 //                                        if (res.success) {
-//                                            messenger.notificationFlashMessage('success', res.message);
+                                            messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
+                                            mediator.trigger('widget_success:activity_list:item:update');
 //                                        } else {
 //                                            messenger.notificationFlashMessage('error', res.message);
 //                                        }
