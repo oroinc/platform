@@ -73,7 +73,12 @@ define([
          */
         beforePageRefresh: function (queue) {
             var deferred, confirmModal, self,
-                preservedState = JSON.parse(this.model.get('data'));
+                preservedState;
+            if (!this.model.get('data')) {
+                // data is not set, nothing to compare with
+                return;
+            }
+            preservedState = JSON.parse(this.model.get('data'));
             if (this._isStateChanged(preservedState)) {
                 self = this;
                 confirmModal = this.subview('confirmModal');
