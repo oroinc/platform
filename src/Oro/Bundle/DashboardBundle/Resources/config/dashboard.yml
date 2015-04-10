@@ -1,4 +1,10 @@
 oro_dashboard_config:
+    widgets_configuration:
+        title:
+            type: oro_type_widget_title
+            options:
+               label: oro.dashboard.title.label
+               required: false
     widgets:
         quick_launchpad:
             label:      oro.dashboard.title.quick_launchpad

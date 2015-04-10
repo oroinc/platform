@@ -29,7 +29,7 @@ class FileListener
     {
         /** @var $entity File */
         $entity = $args->getEntity();
-        if ($entity instanceof File) {
+        if ($entity instanceof File && $entity->isUploaded()) {
             $this->manager->preUpload($entity);
         }
     }
@@ -49,7 +49,7 @@ class FileListener
     {
         /** @var $entity File */
         $entity = $args->getEntity();
-        if ($entity instanceof File) {
+        if ($entity instanceof File && $entity->isUploaded()) {
             $this->manager->upload($entity);
             $this->manager->checkOnDelete($entity, $args->getEntityManager());
         }
