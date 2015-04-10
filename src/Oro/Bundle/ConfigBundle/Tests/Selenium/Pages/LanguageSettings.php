@@ -22,8 +22,10 @@ class LanguageSettings extends AbstractPage
     public function download($language)
     {
         $element = $this->test
-            ->byXPath("//tr/td[normalize-space(.)='{$language}']" .
-            "/following-sibling::td/button[normalize-space(.)='Download']");
+            ->byXPath(
+                "//tr/td[normalize-space(.)='{$language}']" .
+                "/following-sibling::td/button[normalize-space(.)='Download']"
+            );
         $this->test->moveto($element);
         $element->click();
         $this->waitPageToLoad();
@@ -39,8 +41,10 @@ class LanguageSettings extends AbstractPage
     public function enable($language)
     {
         $element = $this->test
-            ->byXPath("//tr/td[normalize-space(.)='{$language}']" .
-                "/following-sibling::td/button[normalize-space(.)='Enable']");
+            ->byXPath(
+                "//tr/td[normalize-space(.)='{$language}']" .
+                "/following-sibling::td/button[normalize-space(.)='Enable']"
+            );
         $this->test->moveto($element);
         $element->click();
         $this->waitPageToLoad();
@@ -56,8 +60,10 @@ class LanguageSettings extends AbstractPage
     public function disable($language)
     {
         $element = $this->test
-            ->byXPath("//tr/td[normalize-space(.)='{$language}']" .
-                "/following-sibling::td/button[normalize-space(.)='Disable']");
+            ->byXPath(
+                "//tr/td[normalize-space(.)='{$language}']" .
+                "/following-sibling::td/button[normalize-space(.)='Disable']"
+            );
         $this->test->moveto($element);
         $element->click();
         $this->waitPageToLoad();
@@ -89,8 +95,6 @@ class LanguageSettings extends AbstractPage
      */
     public function setDefault($language)
     {
-
         return $this;
     }
-
 }

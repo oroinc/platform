@@ -12,6 +12,10 @@ oro_system_configuration:
             title: oro.email.system_configuration.email_threads.label
             priority: 90
 
+        attachment_configuration:
+            title: oro.email.system_configuration.attachment_configuration.label
+            priority: 110
+
     fields:
         oro_email.signature:
             data_type: string

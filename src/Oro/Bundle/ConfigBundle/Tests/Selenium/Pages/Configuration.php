@@ -26,7 +26,8 @@ class Configuration extends AbstractPage
             $treeElements = $this->test->elements(
                 $this->test
                     ->using('xpath')
-                    ->value("//a[normalize-space(.)='Language settings']" .
+                    ->value(
+                        "//a[normalize-space(.)='Language settings']" .
                         "/ancestor::div//a[contains(@class,'accordion-toggle collapsed')]"
                     )
             );

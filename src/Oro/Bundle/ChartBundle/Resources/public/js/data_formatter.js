@@ -24,6 +24,10 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                         return numberFormatter.formatDecimal(data);
                     case 'boolean':
                         return numberFormatter.formatInteger(data);
+                    case 'year':
+                        var date = new Date();
+                        date.setTime(data);
+                        return dateTimeFormatter.getMomentForBackendDate(date).format('YYYY');
                     case 'month':
                         var date = new Date();
                         date.setTime(data);
@@ -75,6 +79,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                         }
                         return parseFloat(data);
                     case 'date':
+                    case 'year':
                     case 'month':
                     case 'day':
                         return Date.parse(data); //add convert to date

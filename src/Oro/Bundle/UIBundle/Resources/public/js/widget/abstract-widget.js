@@ -97,6 +97,12 @@ define(function (require) {
             // (to prevent recursion from remove method)
             this.disposing = true;
 
+            // if there's loading process -- stop it
+            if (this.loading) {
+                this.loading.abort();
+                delete this.loading;
+            }
+
             // call before dom will be removed
             this.disposePageComponents();
 
@@ -341,7 +347,6 @@ define(function (require) {
             }
             if (form.find('[type="file"]').length) {
                 this.trigger('beforeContentLoad', this);
-                this.loading = true;
                 form.ajaxSubmit({
                     data: {
                         '_widgetContainer': this.options.type,
@@ -350,6 +355,7 @@ define(function (require) {
                     success: _.bind(this._onContentLoad, this),
                     error: _.bind(this._onContentLoadFail, this)
                 });
+                this.loading = form.data('jqxhr');
             } else {
                 var formAction = this.form.attr('action');
                 formAction = formAction.length > 0 && formAction[0] !== '#' ? formAction : null;
@@ -654,7 +660,6 @@ define(function (require) {
          * @param {string=} url
          */
         loadContent: function(data, method, url) {
-            this.loading = true;
             url = url || this.options.url;
             if (url === undefined || !url) {
                 url = window.location.href;
@@ -673,10 +678,9 @@ define(function (require) {
                 '_widgetContainer=' + this.options.type + '&_wid=' + this.getWid();
 
             this.trigger('beforeContentLoad', this);
-            $.ajax(options)
+            this.loading = $.ajax(options)
                 .done(_.bind(this._onContentLoad, this))
-                .fail(_.bind(this._onContentLoadFail, this))
-            ;
+                .fail(_.bind(this._onContentLoadFail, this));
         },
 
         /**
@@ -684,8 +688,13 @@ define(function (require) {
          * @private
          */
         _onContentLoadFail: function(jqxhr) {
+            if (jqxhr.statusText === 'abort') {
+                // content load was aborted
+                delete this.loading;
+                return;
+            }
 
-            var message = __('oro.ui.widget_loading_filed');
+            var message = __('oro.ui.widget_loading_failed');
 
             if (jqxhr.status === 403) {
                 message = __('oro.ui.forbidden_error');
@@ -705,7 +714,7 @@ define(function (require) {
          * @private
          */
         _onContentLoad: function(content) {
-            this.loading = false;
+            delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
             if (this.renderDeferred) {
