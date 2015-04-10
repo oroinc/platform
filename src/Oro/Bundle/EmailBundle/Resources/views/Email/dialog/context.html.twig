@@ -9,13 +9,14 @@
         {% set itemsArray = [] %}
         {% for item in entityTargets %}
             {% set itemArray = {
-            'entityAlias': item.entityAlias,
             'label': item.label,
-            'first': item.first
+            'first': item.first,
+            'className': item.className
             } %}
             {% set itemsArray = itemsArray|merge([itemArray]) %}
         {% endfor %}
 
+        {% set firstContext = itemsArray[0] %}
         {% set options = params|merge({items: itemsArray, params: params}) %}
 
         <script type="text/template" id="email-context-item">
@@ -31,12 +32,12 @@
                 <span id="email-context-arrow" class="icon-caret-down"></span>
             </button>
             <ul id="context-items-dropdown" style="display: none"></ul>
-            <input type="hidden" id="context-current-entity-alias"/>
+            <input type="hidden" id="context-current-target-class"/>
         </div>
 
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_email_context_grid'),
+            'url': path('oro_email_context_grid', {entityClass: firstContext.className}),
             'alias': 'email-context-grid'
         }) }}
 
@@ -47,20 +48,24 @@
                             widget.on('grid-row-select', function(data) {
 
                                 var id = data.model.get('id');
-                                var contextAlias = $('#context-current-entity-alias').data('value');
+                                var contextTargetClass = $('#context-current-target-class').data('value');
                                 widget._showLoading();
 
                                 $.ajax({
-                                    url: '{{ path('oro_email_context_add') }}',
+                                    url: '{{ path('oro_api_post_email_associations') }}',
                                     type: 'POST',
-                                    data: {sourceId: {{ sourceEntity.id }}, targetId: id, targetContextAlias: contextAlias},
+                                    data: {entityId: {{ sourceEntity.id }}, targetClassName: contextTargetClass, targetId: id},
                                     dataType: 'json',
                                     success: function (res) {
-                                        if (res.success) {
-                                            messenger.notificationFlashMessage('success', res.message);
-                                        } else {
-                                            messenger.notificationFlashMessage('error', res.message);
-                                        }
+
+                                        console.log(res);
+                                        //res.code = 500
+
+//                                        if (res.success) {
+//                                            messenger.notificationFlashMessage('success', res.message);
+//                                        } else {
+//                                            messenger.notificationFlashMessage('error', res.message);
+//                                        }
                                     }
                                 })
                                 .always(function () {

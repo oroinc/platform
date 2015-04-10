@@ -10,9 +10,9 @@ define(function (require) {
      */
     EmailContextModel = BaseModel.extend({
         defaults: {
-            entityAlias: '',
             label: '',
-            first: ''
+            first: '',
+            className: ''
         }
     });
 

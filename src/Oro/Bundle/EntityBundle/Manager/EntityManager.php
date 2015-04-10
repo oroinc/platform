@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class EntityManager
 {
@@ -14,21 +15,25 @@ class EntityManager
      */
     protected $container;
 
+    /** @var EntityRoutingHelper */
+    protected $routingHelper;
+
     /**
      * @param ContainerInterface $container
+     * @param EntityRoutingHelper $routingHelper
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, EntityRoutingHelper $routingHelper)
     {
         $this->container = $container;
+        $this->routingHelper  = $routingHelper;
     }
 
     /**
      * @param EntityProvider $entityProvider
      * @param object $entity
-     * @param string/null $filterByAlias
      * @return array
      */
-    public function getSupportedTargets(EntityProvider $entityProvider, $entity, $filterByAlias = null)
+    public function getSupportedTargets(EntityProvider $entityProvider, $entity)
     {
         $targetEntities = $entityProvider->getEntities();
         $entityTargets = [];
@@ -41,17 +46,11 @@ class EntityManager
         foreach ($targetEntities as $targetEntity) {
             $className = $targetEntity['name'];
             if (!empty($className) && $entity->supportActivityTarget($className)) {
-                $alias = 'context-item-'.md5($targetEntity['name'].$i);
-                $entityTargets[$alias] = [
+                $entityTargets[] = [
                     'label' => $targetEntity['label'],
-                    'name' => $targetEntity['name'],
-                    'entityAlias' => $alias,
+                    'className' => $this->routingHelper->encodeClassName($targetEntity['name']),
                     'first' => ($i == 1 ? true : false)
                 ];
-
-                if ($filterByAlias == $alias) {
-                    return $entityTargets[$alias];
-                }
 
                 $i++;
             }
@@ -61,27 +60,16 @@ class EntityManager
     }
 
     /**
-     * @param EntityProvider $entityProvider
      * @param ConfigProvider $entityConfigProvider
-     * @param object $entity
-     * @param string $entityAlias
+     * @param string $entityClass
      * @return string|null
      */
     public function getContextGridByEntity(
-        EntityProvider $entityProvider,
         ConfigProvider $entityConfigProvider,
-        $entity,
-        $entityAlias
+        $entityClass
     ) {
-        $entityTargets = $this->getSupportedTargets($entityProvider, $entity);
-
-        if (!$entityAlias) {
-            reset($entityTargets);
-            $entityAlias = key($entityTargets);
-        }
-
-        if (isset($entityTargets[$entityAlias])) {
-            $entityClass = $entityTargets[$entityAlias]['name'];
+        if (!empty($entityClass)) {
+            $entityClass = $this->routingHelper->decodeClassName($entityClass);
             $config = $entityConfigProvider->getConfig($entityClass);
             $gridName = $config->get('context-grid');
             if ($gridName) {

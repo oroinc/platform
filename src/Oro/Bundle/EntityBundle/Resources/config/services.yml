@@ -205,3 +205,4 @@ services:
         class: %oro_entity.entity.manager.class%
         arguments:
             - @service_container
+            - @oro_entity.routing_helper
