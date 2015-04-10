@@ -29,7 +29,7 @@ define(function (require) {
             /**
              * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
              */
-            mediator.setHandler('widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this );
+            mediator.on('widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this );
         },
 
         add: function(model) {
