@@ -23,14 +23,14 @@ class DashboardController extends Controller
      *
      * @param string $gridName
      *
-     * @return Response
+     * @return array
      */
     public function gridAction($widget, $gridName)
     {
         $params = $this->getRequest()->get('params', []);
         $renderParams = $this->getRequest()->get('renderParams', []);
 
-        $viewId = $this->getWidgetConfigs()->getCurrentWidgetOptions()->get('gridView');
+        $viewId = $this->getWidgetConfigs()->getWidgetOptions()->get('gridView');
         if ($viewId && null !== $view = $this->findView($viewId)) {
             $params = array_merge($params, [
                 ParameterBag::ADDITIONAL_PARAMETERS => [
@@ -41,11 +41,14 @@ class DashboardController extends Controller
             ]);
         }
 
-        return array_merge([
-            'gridName'     => $gridName,
-            'params'       => $params,
-            'renderParams' => $renderParams,
-        ], $this->getWidgetConfigs()->getWidgetAttributesForTwig($widget));
+        return array_merge(
+            [
+                'gridName'     => $gridName,
+                'params'       => $params,
+                'renderParams' => $renderParams,
+            ],
+            $this->getWidgetConfigs()->getWidgetAttributesForTwig($widget)
+        );
     }
 
     /**

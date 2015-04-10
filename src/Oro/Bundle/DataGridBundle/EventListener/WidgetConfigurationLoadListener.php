@@ -9,14 +9,10 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class WidgetConfigurationLoadListener
 {
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $datagridManagerLink;
 
-    /**
-     * @var Builder
-     */
+    /** @var Builder */
     protected $datagridBuilder;
 
     /**
@@ -58,15 +54,19 @@ class WidgetConfigurationLoadListener
             $configuration['fields'] = [];
         }
 
-        $configuration['fields'] = array_merge($configuration['fields'], [
-            'gridView' => [
-                'type' => 'choice',
-                'options' => [
-                    'label' => 'oro.datagrid.dashboard.fields.grid_view.label',
-                    'choices' => $viewChoices,
-                ],
+        $configuration['configuration'] = array_merge(
+            $configuration['configuration'],
+            [
+                'gridView' => [
+                    'type' => 'choice',
+                    'options' => [
+                        'label' => 'oro.datagrid.dashboard.fields.grid_view.label',
+                        'choices' => $viewChoices,
+                    ],
+                    'show_on_widget' => false,
+                ]
             ]
-        ]);
+        );
 
         $event->setConfiguration($configuration);
     }

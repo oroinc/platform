@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller\Api\Rest;
 
-use Doctrine\ORM\EntityManager;
-
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
@@ -15,8 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
@@ -25,8 +23,6 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 class GridViewController extends RestController
 {
     /**
-     * @param int $id
-     *
      * @return Response
      * @Post("/gridviews")
      * @ApiDoc(
@@ -121,8 +117,6 @@ class GridViewController extends RestController
     }
 
     /**
-     * @param GridView $gridView
-     *
      * @throws AccessDeniedException
      */
     protected function checkCreatePublicAccess()

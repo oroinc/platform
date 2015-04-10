@@ -2,34 +2,35 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsLoadListener
 {
-    /**
-     * @var ObjectManager
-     */
-    public $om;
+    /** @var Registry */
+    protected $registry;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var AclHelper */
+    protected $aclHelper;
 
     /**
-     * @var SecurityContextInterface
+     * @param Registry $registry
+     * @param SecurityFacade $securityFacade
+     * @param AclHelper $aclHelper
      */
-    protected $securityContext;
-
-    /**
-     * @param ObjectManager $om
-     * @param SecurityContextInterface $securityContext
-     */
-    public function __construct(ObjectManager $om, SecurityContextInterface $securityContext)
+    public function __construct(Registry $registry, SecurityFacade $securityFacade, AclHelper $aclHelper)
     {
-        $this->om = $om;
-        $this->securityContext = $securityContext;
+        $this->registry = $registry;
+        $this->securityFacade = $securityFacade;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -43,7 +44,7 @@ class GridViewsLoadListener
             return;
         }
 
-        $gridViews = $this->getGridViewRepository()->findGridViews($currentUser, $gridName);
+        $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $gridName);
         if (!$gridViews) {
             return;
         }
@@ -70,11 +71,9 @@ class GridViewsLoadListener
      */
     protected function getCurrentUser()
     {
-        if ($token = $this->securityContext->getToken()) {
-            $user = $token->getUser();
-            if ($user instanceof User) {
-                return $user;
-            }
+        $user = $this->securityFacade->getLoggedUser();
+        if ($user instanceof User) {
+            return $user;
         }
 
         return null;
@@ -85,6 +84,6 @@ class GridViewsLoadListener
      */
     protected function getGridViewRepository()
     {
-        return $this->om->getRepository('OroDataGridBundle:GridView');
+        return $this->registry->getRepository('OroDataGridBundle:GridView');
     }
 }

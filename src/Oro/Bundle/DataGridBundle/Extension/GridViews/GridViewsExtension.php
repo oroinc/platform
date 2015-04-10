@@ -18,14 +18,10 @@ class GridViewsExtension extends AbstractExtension
     const VIEWS_PARAM_KEY          = 'view';
     const MINIFIED_VIEWS_PARAM_KEY = 'v';
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
     /**

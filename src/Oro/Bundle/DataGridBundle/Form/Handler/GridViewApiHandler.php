@@ -11,19 +11,13 @@ use Oro\Bundle\DataGridBundle\Entity\GridView;
 
 class GridViewApiHandler
 {
-    /**
-     * @var FormInterface
-     */
+    /** @var FormInterface */
     protected $form;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     protected $request;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $om;
 
     /**
