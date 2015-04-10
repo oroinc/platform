@@ -2,14 +2,3 @@
 <script type="text/html" id="{{ (id ~ '-form')|e('html_attr')|raw }}">
     {{ render(path('oro_comment_form'))|oro_js_template_content|raw }}
 </script>
-
-{# comments list template #}
-<script type="text/html" id="{{ id|e('html_attr')|raw }}">
-    <fieldset class="form-horizontal form-horizontal-large comments-block">
-        <div class="comments-block-inner">
-            <div class="form-container"></div>
-            <div class="grid-toolbar"></div>
-            <ul class="unstyled accordion comments-list list-box" id="<%= accordionId %>"></ul>
-        </div>
-    </fieldset>
-</script>

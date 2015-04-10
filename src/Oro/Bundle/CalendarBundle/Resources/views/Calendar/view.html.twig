@@ -18,7 +18,7 @@
 {% endblock navButtons %}
 
 {% block breadcrumb %}
-    {% set breadcrumbs = [{'label': name }] %}
+    {% set breadcrumbs = [] %}
     {% if not entity.name is empty %}
         {% set breadcrumbs = breadcrumbs|merge([{'label': 'oro.calendar.entity_label'|trans }, {'label': entity.name}]) %}
     {% else %}

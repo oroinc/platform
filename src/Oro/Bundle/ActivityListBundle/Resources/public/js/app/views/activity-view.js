@@ -7,11 +7,13 @@ define([
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
     'routing',
-    'orolocale/js/formatter/datetime'
-], function ($, _, Backbone, mediator, BaseView, routing, dateTimeFormatter) {
+    'orolocale/js/formatter/datetime',
+    'oroui/js/app/views/loading-mask-view'
+], function ($, _, Backbone, mediator, BaseView, routing, dateTimeFormatter, LoadingMaskView) {
     'use strict';
 
     var ActivityView;
+    
     ActivityView = BaseView.extend({
         options: {
             configuration: {
@@ -23,9 +25,9 @@ define([
                 updateItem: null,
                 deleteItem: null
             },
-            infoBlock: '.accordion-body .message .info',
-            commentsBlock: '.accordion-body .message .comment',
-            commentsCountBlock: '.comment-count .count',
+            infoBlock: '> .accordion-group > .accordion-body .message .info',
+            commentsBlock: '> .accordion-group > .accordion-body .message .comment',
+            commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },
         attributes: {
@@ -34,11 +36,13 @@ define([
         events: {
             'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
-            'click .accordion-toggle': 'onToggle'
+            'click .accordion-toggle': 'onToggle',
+            'click .accordion-heading': 'onAccordionHeaderClick'
         },
         listen: {
             'change:contentHTML model': '_onContentChange',
-            'change:commentCount model': '_onCommentCountChange'
+            'change:commentCount model': '_onCommentCountChange',
+            'change:isContentLoading model': '_onContentLoadingStatusChange'
         },
 
         initialize: function (options) {
@@ -70,7 +74,7 @@ define([
             }
             if (data.editor_id) {
                 data.editor_url = routing.generate('oro_user_view', {'id': data.editor_id});
-            }else {
+            } else {
                 data.editor_url = '';
             }
             data.routing = routing;
@@ -99,8 +103,21 @@ define([
             this.model.collection.trigger('toDelete', this.model);
         },
 
+        onAccordionHeaderClick: function (e) {
+            var ignoreItems = 'a, button, .accordition-toggle';
+            if ($(e.target).is(ignoreItems) || $(e.target).parents(ignoreItems).length) {
+                // ignore clicks on links, buttons and accordition-toggle
+                return;
+            }
+            this.getAccorditionToggle().trigger('click');
+        },
+
         onToggle: function (e) {
             e.preventDefault();
+            this.toggle();
+        },
+
+        toggle: function () {
             if (!this.options.ignoreHead && this.model.get('is_head')) {
                 this.model.collection.trigger('toViewGroup', this.model);
             } else {
@@ -108,12 +125,21 @@ define([
             }
         },
 
+        getAccorditionToggle: function () {
+            return this.$('> .accordion-group > .accordion-heading .accordion-toggle');
+        },
+
+        getAccorditionBody: function () {
+            return this.$('> .accordion-group > .accordion-body');
+        },
+
         isCollapsed: function () {
-            return this.$('.accordion-toggle').hasClass('collapsed');
+            return this.getAccorditionToggle().hasClass('collapsed');
         },
 
         _onContentChange: function () {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+            mediator.execute('layout:init', this.$el, this);
         },
 
         _onCommentCountChange: function () {
@@ -123,23 +149,32 @@ define([
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
         },
 
+        _onContentLoadingStatusChange: function () {
+            if (this.model.get('isContentLoading')) {
+                this.subview('loading', new LoadingMaskView({
+                    container: this.$el
+                }));
+                this.subview('loading').show();
+            } else {
+                this.removeSubview('loading');
+            }
+        },
+
         getCommentsBlock: function () {
             return this.$(this.options.commentsBlock);
         },
 
         setCommentComponent: function (comments) {
             this.subview('comments', comments);
-            this.listenTo(comments.collection, 'sync', this.updateCommentsQuantity, this);
+            this.listenTo(comments.collection, 'stateChange', this.updateCommentsQuantity, this);
         },
 
         hasCommentComponent: function () {
             return Boolean(this.subview('comments'));
         },
 
-        updateCommentsQuantity: function (collection) {
-            if (collection instanceof Backbone.Collection) {
-                this.model.set('commentCount', collection.getRecordsQuantity());
-            }
+        updateCommentsQuantity: function () {
+            this.model.set('commentCount', this.subview('comments').collection.getState().totalItemsQuantity);
         }
     });
 

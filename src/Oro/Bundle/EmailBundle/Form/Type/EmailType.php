@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -50,7 +52,11 @@ class EmailType extends AbstractType
             ->add(
                 'to',
                 'oro_email_email_address',
-                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+                [
+                    'required' => false,
+                    'multiple' => true,
+                    'attr' => ['class' => 'taggable-field forged-required']
+                ]
             )
             ->add(
                 'cc',
@@ -90,9 +96,27 @@ class EmailType extends AbstractType
                     'expanded'   => true
                 ]
             )
+            ->add('attachments', 'oro_email_attachments', [
+                'type' => 'oro_email_attachment',
+                'required' => false,
+                'allow_add' => true,
+                'prototype' => false,
+                'options' => [
+                    'required' => false,
+                ],
+            ])
             ->add('bodyFooter', 'hidden')
             ->add('parentEmailId', 'hidden')
-            ->add('signature', 'hidden');
+            ->add('signature', 'hidden')
+            ->add(
+                'contexts',
+                'oro_email_contexts_select',
+                [
+                    'label'    => 'oro.email.contexts.label',
+                    'tooltip'  => 'oro.email.contexts.tooltip',
+                    'required' => false,
+                ]
+            );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);

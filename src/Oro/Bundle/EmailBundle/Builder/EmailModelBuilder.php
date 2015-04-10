@@ -12,6 +12,7 @@ use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 
 /**
  * Class EmailModelBuilder
@@ -43,21 +44,29 @@ class EmailModelBuilder
     protected $configManager;
 
     /**
-     * @param EmailModelBuilderHelper $emailModelBuilderHelper
-     * @param Request                 $request
-     * @param EntityManager           $entityManager
-     * @param ConfigManager           $configManager
+     * @var EmailActivityListProvider
+     */
+    protected $activityListProvider;
+
+    /**
+     * @param EmailModelBuilderHelper   $emailModelBuilderHelper
+     * @param Request                   $request
+     * @param EntityManager             $entityManager
+     * @param ConfigManager             $configManager
+     * @param EmailActivityListProvider $activityListProvider
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         Request $request,
         EntityManager $entityManager,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        EmailActivityListProvider $activityListProvider
     ) {
-        $this->helper              = $emailModelBuilderHelper;
-        $this->request             = $request;
-        $this->entityManager       = $entityManager;
-        $this->configManager       = $configManager;
+        $this->helper               = $emailModelBuilderHelper;
+        $this->request              = $request;
+        $this->entityManager        = $entityManager;
+        $this->configManager        = $configManager;
+        $this->activityListProvider = $activityListProvider;
     }
 
     /**
@@ -103,6 +112,7 @@ class EmailModelBuilder
 
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
+        $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
 
         return $this->createEmailModel($emailModel);
     }
@@ -139,11 +149,11 @@ class EmailModelBuilder
     {
         $emailModel = new EmailModel();
 
-        $emailModel->setParentEmailId($parentEmailEntity->getId());
-
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
+        // link attachments of forwarded email to current email instance
+        $this->applyAttachments($emailModel, $parentEmailEntity);
 
         return $this->createEmailModel($emailModel);
     }
@@ -272,6 +282,23 @@ class EmailModelBuilder
         $signature = $this->configManager->get('oro_email.signature');
         if ($signature) {
             $emailModel->setSignature($signature);
+        }
+    }
+
+    /**
+     * @param EmailModel  $emailModel
+     * @param EmailEntity $emailEntity
+     */
+    protected function applyAttachments(EmailModel $emailModel, EmailEntity $emailEntity)
+    {
+        try {
+            $this->helper->ensureEmailBodyCached($emailEntity);
+
+            foreach ($emailEntity->getEmailBody()->getAttachments() as $attachment) {
+                $emailModel->addAttachment($attachment);
+            }
+        } catch (\Exception $e) {
+            // maybe show notice to a user that attachments could not be loaded
         }
     }
 }

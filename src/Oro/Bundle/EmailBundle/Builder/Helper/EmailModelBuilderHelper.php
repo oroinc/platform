@@ -150,6 +150,14 @@ class EmailModelBuilderHelper
     }
 
     /**
+     * @param EmailEntity $emailEntity
+     */
+    public function ensureEmailBodyCached(EmailEntity $emailEntity)
+    {
+        $this->emailCacheManager->ensureEmailBodyCached($emailEntity);
+    }
+
+    /**
      * @param string $className
      *
      * @return string
@@ -202,6 +210,16 @@ class EmailModelBuilderHelper
             return $prefix . $subject;
         }
         return $subject;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $entityId
+     * @return object
+     */
+    public function getTargetEntity($entityClass, $entityId)
+    {
+        return $this->entityRoutingHelper->getEntity($entityClass, $entityId);
     }
 
     /**

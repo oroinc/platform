@@ -60,7 +60,7 @@ define(function (require) {
             /**
              * on adding activity item listen to "widget:doRefresh:activity-list-widget"
              */
-            mediator.on('widget:doRefresh:activity-list-widget', this._reload, this );
+            mediator.on('widget:doRefresh:activity-list-widget', this._reload, this);
 
             /**
              * on editing activity item listen to "widget_success:activity_list:item:update"
@@ -90,7 +90,7 @@ define(function (require) {
             ActivityListView.__super__.dispose.call(this);
         },
 
-        initItemView: function(model) {
+        initItemView: function (model) {
             var className = model.getRelatedActivityClass(),
                 configuration = this.options.configuration[className];
             if (this.itemView) {
@@ -231,18 +231,28 @@ define(function (require) {
         },
 
         _reload: function () {
+            var itemViews;
+            // please note that _hideLoading will be called in renderAllItems() function
             this._showLoading();
             if (this.options.doNotFetch) {
                 this._hideLoading();
                 return;
             }
             try {
+                // store views state
+                this.oldViewStates = {};
+                itemViews = this.getItemViews();
+                this.oldViewStates = _.map(itemViews, function (view) {
+                    return {
+                        attrs: view.model.toJSON(),
+                        collapsed: view.isCollapsed(),
+                        height: view.$el.height()
+                    };
+                });
+
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(function () {
-                        this._hideLoading();
-                        this._initPager();
-                    }, this),
+                    success: _.bind(this._initPager, this),
                     error: _.bind(function (collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
                     }, this)
@@ -252,73 +262,73 @@ define(function (require) {
             }
         },
 
-        _viewItem: function (model) {
-            var that = this,
-                currentModel = model,
-                options = {
-                    url: this._getUrl('itemView', model),
-                    type: 'get',
-                    dataType: 'html',
-                    data: {
-                        _widgetContainer: 'dialog'
-                    }
-                };
+        renderAllItems: function () {
+            var result, i, view, model, oldViewState, contentLoadedPromises, deferredContentLoading;
 
-            if (currentModel.get('is_loaded') !== true) {
-                this._showLoading();
-                Backbone.$.ajax(options)
-                    .done(function (data) {
-                        var response = $('<html />').html(data);
-                        currentModel.set('contentHTML', $(response).find('.widget-content').html());
-                        that._hideLoading();
-                    })
-                    .fail(
-                        _.bind(function (response) {
-                            if (!_.isUndefined(response.status) && response.status === 403) {
-                                this._showForbiddenActivityDataError(response.responseJSON || {});
-                                currentModel.set('is_loaded', true);
-                            } else {
-                                this._showLoadItemsError(response.responseJSON || {});
+            result = ActivityListView.__super__.renderAllItems.apply(this, arguments);
+
+            contentLoadedPromises = [];
+
+            if (this.oldViewStates) {
+                // restore state
+                for (i = 0; i < this.oldViewStates.length; i++) {
+                    oldViewState = this.oldViewStates[i];
+                    model = this.collection.findSameActivity(oldViewState.attrs);
+                    if (model) {
+                        view = this.getItemView(model);
+                        if (view && !oldViewState.collapsed && view.isCollapsed()) {
+                            view.toggle();
+                            view.getAccorditionBody().addClass('in');
+                            view.getAccorditionToggle().removeClass('collapsed');
+                            if (view.model.get('isContentLoading')) {
+                                // if model is loading - need to wait until content will be loaded before _hideLoading()
+                                // also preserve height during loading
+                                view.$el.height(oldViewState.height);
+                                deferredContentLoading = $.Deferred();
+                                contentLoadedPromises.push(deferredContentLoading);
+                                view.model.once(
+                                    'change:isContentLoading',
+                                    _.bind(function (view, deferredContentLoading) {
+                                        // reset height
+                                        view.$el.height('');
+                                        deferredContentLoading.resolve();
+                                    }, this, view, deferredContentLoading)
+                                );
                             }
-                            this._hideLoading();
-                        }, this)
-                    );
+                        }
+                    }
+                }
+                delete this.oldViewStates;
             }
+
+            $.when.apply($, contentLoadedPromises).done(_.bind(function () {
+                this._hideLoading();
+            }, this));
+
+            return result;
+        },
+
+        _viewItem: function (model) {
+            this._loadModelContentHTML(model, 'itemView');
         },
 
         _viewGroup: function (model) {
-            var that = this,
-                currentModel = model,
-                options = {
-                    url: this._getUrl('groupView', model),
-                    type: 'get',
-                    dataType: 'html',
-                    data: {
-                        _widgetContainer: 'dialog',
-                        targetActivityClass: model.get('targetEntityData').class,
-                        targetActivityId: model.get('targetEntityData').id
-                    }
-                };
+            this._loadModelContentHTML(model, 'groupView');
+        },
 
-            if (currentModel.get('is_loaded') !== true) {
-                this._showLoading();
-                Backbone.$.ajax(options)
-                    .done(function (data) {
-                        currentModel.set('contentHTML', data);
-                        that._hideLoading();
-                    })
-                    .fail(
-                    _.bind(function (response) {
-                        if (!_.isUndefined(response.status) && response.status === 403) {
-                            this._showForbiddenActivityDataError(response.responseJSON || {});
-                            currentModel.set('is_loaded', true);
-                        } else {
-                            this._showLoadItemsError(response.responseJSON || {});
-                        }
-                        this._hideLoading();
-                    }, this)
-                );
+        _loadModelContentHTML: function (model, actionKey) {
+            var url = this._getUrl(actionKey, model);
+            if (model.get('is_loaded') === true) {
+                return;
             }
+            model.loadContentHTML(url)
+                .fail(_.bind(function (response) {
+                    if (response.status === 403) {
+                        this._showForbiddenActivityDataError(response.responseJSON || {});
+                    } else {
+                        this._showLoadItemsError(response.responseJSON || {});
+                    }
+                }, this));
         },
 
         _editItem: function (model) {

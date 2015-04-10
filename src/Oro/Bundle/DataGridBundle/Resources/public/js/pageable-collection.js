@@ -17,7 +17,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         sorters: 's',
         filters: 'f',
         gridView: 'v',
-        gridParams: 'g'
+        urlParams: 'g'
     };
 
     /**
@@ -604,22 +604,30 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          *  - this value is used to preserve collection state in URL
          *
          * @param {boolean=} purge If true, clears value from initial state
-         * @param {Object|null} gridParams
          * @returns {string|null}
          */
-        stateHashValue: function (purge, gridParams) {
+        stateHashValue: function (purge) {
             var hash;
-            hash = PageableCollection.encodeStateData(this.state);
-            if (purge && hash === PageableCollection.encodeStateData(this.initialState)) {
+
+            hash = this._encodeStateData(this.state);
+            if (purge && hash === this._encodeStateData(this.initialState)) {
                 // if the state is the same as initial, remove URL param for grid state
                 hash = null;
             }
-            if (gridParams) {
-                this.state.gridParams = gridParams;
-                hash = PageableCollection.encodeStateData(this.state);
-            }
-
             return hash;
+        },
+
+        /**
+         * Encodes passed state taking in account url parameters of the collection
+         *
+         * @param {Object} state
+         * @returns {string}
+         * @protected
+         */
+        _encodeStateData: function (state) {
+            var stateData = {urlParams: this.urlParams};
+            stateData = _.extend(stateData, state);
+            return PageableCollection.encodeStateData(stateData);
         },
 
         /**
