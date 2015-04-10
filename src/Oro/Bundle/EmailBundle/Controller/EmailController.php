@@ -8,6 +8,7 @@ use Doctrine\ORM\Query;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -248,6 +249,80 @@ class EmailController extends Controller
     public function userEmailsAction()
     {
         return [];
+    }
+
+    /**
+     * @Route("/context/{id}", name="oro_email_context", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_view")
+     * @Template("OroEmailBundle:Email:context.html.twig")
+     * @param Email $emailEntity
+     * @return array
+     */
+    public function contextAction(Email $emailEntity)
+    {
+        $entityProvider = $this->get('oro_entity.entity_provider');
+        $entityTargets = $this->get('oro_entity.entity.manager')->getSupportedTargets($entityProvider, $emailEntity);
+        return [
+            'sourceEntity' => $emailEntity,
+            'entityTargets' => $entityTargets,
+            'params' => [
+                'grid_path' => $this->generateUrl(
+                    'oro_email_context_grid',
+                    array(),
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                )
+            ]
+        ];
+    }
+
+    /**
+     * @Route("/context/grid/{entityAlias}", name="oro_email_context_grid")
+     * @AclAncestor("oro_email_view")
+     * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
+     * @param Email $emailEntity
+     * @return array
+     */
+    public function contextGridAction($entityAlias = null)
+    {
+        $entityProvider = $this->get('oro_entity.entity_provider');
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        $gridName = $this
+            ->get('oro_entity.entity.manager')
+            ->getContextGridByEntity($entityProvider, $entityConfigProvider, new Email, $entityAlias);
+        return ['gridName' => $gridName, 'multiselect' => false, 'params' => [], 'renderParams' => []];
+    }
+
+    /**
+     * @Route("/context/add", name="oro_email_context_add")
+     * @AclAncestor("oro_email_create")
+     */
+    public function addContextAction()
+    {
+        $entityProvider = $this->get('oro_entity.entity_provider');
+        $trans = $this->get('translator');
+        $response = new Response();
+        $responseContent = [];
+
+        try {
+            $sourceId = $this->getRequest()->get('sourceId');
+            $targetId = $this->getRequest()->get('targetId');
+            $targetContextAlias = $this->getRequest()->get('targetContextAlias');
+            $entityTarget = $this->get('oro_entity.entity.manager')->getSupportedTargets(
+                $entityProvider,
+                new Email(),
+                $targetContextAlias
+            );
+
+            $responseContent['success'] = true;
+            $responseContent['message'] = $trans->trans('oro.email.context_added');
+        } catch (\Exception $e) {
+            $responseContent['success'] = false;
+            $responseContent['message'] = $trans->trans('oro.email.unexpected_error');
+        }
+
+        $response->setContent(json_encode($responseContent));
+
+        return $response;
     }
 
     /**

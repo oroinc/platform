@@ -63,6 +63,26 @@
                             <li>
                                 <ul class="nav nav-pills icons-holder launchers-list">
                                     <li class="launcher-item">
+                                        <a title="{{ 'oro.email.add_context_entity.label'|trans|raw }}" data-url="<%= routing.generate('oro_email_context', {'id': relatedActivityId}) %>" {{ UI.renderWidgetDataAttributes({
+                                            'type' : 'dialog',
+                                            'multiple' : true,
+                                            'refresh-widget-alias': 'activity-list-widget',
+                                            'options' : {
+                                                'alias': 'email-context-dialog',
+                                                'dialogOptions' : {
+                                                    'title' : 'oro.email.add_context_entity.label'|trans,
+                                                    'allowMaximize': true,
+                                                    'allowMinimize': true,
+                                                    'modal': true,
+                                                    'dblclick': 'maximize',
+                                                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                                                    'width': 1000,
+                                                    'height': 600
+                                                }
+                                            }
+                                        }) }}><i class="icon-context hide-text">{{ 'oro.email.add_context_entity.label'|trans|raw }}</i></a>
+                                    </li>
+                                    <li class="launcher-item">
                                         <a title="{{ 'oro.email.reply'|trans }}" data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>" {{ UI.renderWidgetDataAttributes({
                                             'type' : 'dialog',
                                             'multiple' : true,

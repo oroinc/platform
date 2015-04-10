@@ -97,3 +97,35 @@
         }
     }) -}}
 {% endmacro -%}
+
+{% macro addContextButton(emailEntity, parameters) -%}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {{ UI.clientButton({
+        'dataUrl': path(
+            'oro_email_context', {
+                id: emailEntity.id
+        }),
+        'aCss': 'no-hash',
+        'iCss': 'icon-context hide-text',
+        'dataId': emailEntity.id,
+        'label' : 'oro.email.add_context.label'|trans,
+        'widget' : {
+            'type' : 'dialog',
+            'multiple' : true,
+            'refresh-widget-alias': 'activity-list-widget',
+            'options' : {
+                'alias': 'email-context-dialog',
+                'dialogOptions' : {
+                    'title' : 'oro.email.add_context_entity.label'|trans,
+                    'allowMaximize': true,
+                    'allowMinimize': true,
+                    'modal': true,
+                    'dblclick': 'maximize',
+                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                    'width': 1000,
+                    'height': 600
+                }
+            }
+        }
+    }) }}
+{% endmacro %}

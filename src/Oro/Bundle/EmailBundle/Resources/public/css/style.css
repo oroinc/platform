@@ -147,3 +147,38 @@
     line-height: 12px;
     border-radius: 2px;
 }
+
+.context-item {
+    list-style: none;
+    cursor: pointer;
+    padding: 0 7px 0 7px;
+}
+
+.context-item.active {
+    background-color: #ebebeb;
+}
+
+#context-items-dropdown {
+    margin: -1px 0 0 0;
+    min-width: 0;
+    position: absolute;
+    width: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1000;
+    top: 35px;
+    left: 15px;
+}
+
+#email-context-current-block {
+    cursor: pointer;
+    background-color:#FFFFFF;
+    border: none;
+    outline:none;
+    margin: 10px 10px 15px 10px;
+}
+
+#email-context-current-item {
+    font-size: 18px;
+    font-weight: bold;
+}

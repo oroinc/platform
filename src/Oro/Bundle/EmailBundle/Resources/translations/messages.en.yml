@@ -130,6 +130,10 @@ oro:
         refs.label:               References Header
         seen.label:               Is Seen
         thread_id.label:          Thread ID
+        add_context.label:        Add Context
+        add_context_entity.label: Add Context Entity
+        context_added:            Context has been added
+        unexpected_error:         Unexpected error
         contexts:
               label:              Contexts
               placeholder:        Add Context

@@ -1,4 +1,5 @@
 {% extends "OroUIBundle:actions:view.html.twig" %}
+{% import "OroEmailBundle::actions.html.twig" as Actions %}
 
 {% oro_title_set({params : {"%subject%": entity.subject} }) %}
 
@@ -11,6 +12,10 @@
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
+
+{% block navButtons %}
+    {{ Actions.addContextButton(entity) }}
+{% endblock navButtons %}
 
 {% block breadcrumb %}
     {% set breadcrumbs = [
