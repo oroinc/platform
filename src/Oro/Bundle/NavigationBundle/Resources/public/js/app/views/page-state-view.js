@@ -8,7 +8,7 @@ define([
     'oroui/js/modal',
     'oroui/js/app/views/base/view',
     'base64'
-], function ($, _, routing, __, mediator, Modal, BaseView, base64) {
+], function ($, _, routing, __, mediator, Modal, BaseView) {
     'use strict';
 
     var PageStateView;
@@ -73,7 +73,12 @@ define([
          */
         beforePageRefresh: function (queue) {
             var deferred, confirmModal, self,
-                preservedState = JSON.parse(this.model.get('data'));
+                preservedState;
+            if (!this.model.get('data')) {
+                // data is not set, nothing to compare with
+                return;
+            }
+            preservedState = JSON.parse(this.model.get('data'));
             if (this._isStateChanged(preservedState)) {
                 self = this;
                 confirmModal = this.subview('confirmModal');
@@ -100,8 +105,15 @@ define([
          * (excludes cancel action)
          */
         beforePageChange: function (e) {
-            var action = $(e.target).data('action');
-            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
+            var action = $(e.target).data('action'),
+                href = $(e.target).attr('href');
+            if (
+                action !== 'cancel' &&
+                    !this._isStateTraceRequired() &&
+                    this._isStateChanged() &&
+                    !mediator.execute('compareUrl', href) && // link to same page
+                    href.substr(0, 11) !== 'javascript:' // javascript code link
+            ) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
@@ -395,7 +407,7 @@ define([
         _combinePageId: function () {
             var route;
             route = this._parseCurrentURL();
-            return base64.encode(route.path);
+            return base64_encode(route.path);
         },
 
         /**
