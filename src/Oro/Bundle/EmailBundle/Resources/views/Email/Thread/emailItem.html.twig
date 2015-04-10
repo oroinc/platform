@@ -76,15 +76,9 @@
             {% else %}
                 {{ 'oro.email.body_is_unavailable'|trans }}
             {% endif %}
-            {% if email.emailBody.hasAttachments %}
             <ul class="email-attachments-list">
-                {%- for attachment in email.emailBody.attachments -%}
-                <li class="email-attachments-list-item"><a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                    <i class="icon icon-file-alt"></i> {{ attachment.fileName }}
-                </a></li>
-                {%- endfor -%}
+                {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
             </ul>
-            {% endif %}
         </div>
     </div>
 </div>

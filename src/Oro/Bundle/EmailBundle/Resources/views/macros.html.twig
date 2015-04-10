@@ -326,47 +326,49 @@
 {#
     Render the given email attachments
     Parameters:
-        attachments - an array of Oro\Bundle\EmailBundle\Entity\EmailAttachment
-        canLinkAttachment - bool
-        targetEntityData - target entity class and id
+        attachments - an array
+        target - an object
+        hasGrantReattach - has grants for create attachment entity
 #}
-{% macro attachments(attachments, canLinkAttachment, targetEntityData) -%}
+{% macro attachments(attachments, target, hasGrantReattach) -%}
     {%- for attachment in attachments -%}
-    <a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-        <span class="label label-info">
-            {% if attachment.fileName|length > 15 %}
-                {{ attachment.fileName[:7]}}..{{attachment.fileName[-7:7] }}
-            {% else %}
-                {{ attachment.fileName }}
-            {% endif %}
-        </span>
-    </a>
-    {#{% if canLinkAttachment and targetEntityData.targetEntityClass is defined %}#}
-        {#{% set options = {#}
-            {#'view': 'oroemail/js/app/views/email-attachment-link-view',#}
-            {#'url': path(#}
-                    {#'oro_email_attachment_link',#}
-                    {#{#}
-                        {#id: attachment.id,#}
-                        {#targetEntityClass: targetEntityData.targetEntityClass,#}
-                        {#targetEntityId: targetEntityData.targetEntityId#}
-                    {#}#}
-                {#)#}
-        {#} %}#}
-        {#<a data-page-component-module="oroui/js/app/components/view-component"#}
-           {#data-page-component-options="{{ options|json_encode }}" class="attachment" href="{{#}
-                {#path(#}
-                    {#'oro_email_attachment_link',#}
-                    {#{#}
-                        {#id: attachment.id,#}
-                        {#targetEntityClass: targetEntityData.targetEntityClass,#}
-                        {#targetEntityId: targetEntityData.targetEntityId#}
-                    {#}#}
-                {#)#}
-            {#}}">#}
-            {#<span class="icon"><i class="icon-link"></i></span>#}
-        {#</a>#}
-    {#{% endif %}#}
+        <li class="email-attachments-list-item">
+            <div class="dropdown link-to-record">
+                <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
+                    <i class="icon icon-file-alt"></i> {{ attachment.fileName|oro_format_filename }}
+                </a>
+                {% if hasGrantReattach and target is defined and oro_can_attache(attachment, target) %}
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+                        {{ 'oro.email.attachment.open'|trans }}
+                    </a>
+                    {% set options = {
+                        'view': 'oroemail/js/app/views/email-attachment-link-view',
+                        'url': path(
+                            'oro_email_attachment_link',
+                                {
+                                    id: attachment.id,
+                                    targetActivityClass: oro_class_name(target),
+                                    targetActivityId: target.id
+                                }
+                            )
+                    } %}
+                        <a tabindex="-1" data-page-component-module="oroui/js/app/components/view-component"
+                            data-page-component-options="{{ options|json_encode }}"
+                            class="attachment"
+                            href="{{ options.url }}">
+                            {{ 'oro.email.attachment.copy_to_record'|trans }}
+                        </a>
+                </ul>
+                {% else %}
+                <ul class="dropdown-menu one" role="menu" aria-labelledby="dropdownMenu">
+                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+                        {{ 'oro.email.attachment.open'|trans }}
+                    </a>
+                </ul>
+                {% endif %}
+            </div>
+        </li>
     {%- endfor -%}
 {%- endmacro %}
 

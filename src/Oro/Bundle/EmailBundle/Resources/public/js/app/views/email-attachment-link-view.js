@@ -19,7 +19,7 @@ define([
     EmailAttachmentLink = BaseView.extend({
         options: {},
         events: {
-            'click .icon-link': 'linkAttachment'
+            'click': 'linkAttachment'
         },
 
         /**
@@ -44,6 +44,8 @@ define([
                 function (response) {
                     if (_.isUndefined(response.error)) {
                         messenger.notificationFlashMessage('success', __('oro.email.attachment.added'));
+                        self.$el.parent().addClass('one');
+                        self.$el.remove();
                         self.reloadAttachmentGrid();
                     } else {
                         messenger.notificationFlashMessage('error', __(response.error));

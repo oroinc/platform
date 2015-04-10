@@ -20,9 +20,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * Class EmailController
@@ -45,20 +45,21 @@ class EmailController extends Controller
      */
     public function viewAction(Email $entity)
     {
-        $templateVars = [
-            'entity' => $entity,
-            'noBodyFound' => false,
-            'canLinkAttachment' => $this->canLinkAttachment(),
-            'targetEntityData' => $this->getTargetEntityConfig()
-        ];
         try {
             $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
+            $noBodyFound = false;
         } catch (LoadEmailBodyException $e) {
-            $templateVars['noBodyFound'] = true;
+            $noBodyFound = true;
         }
         $this->getEmailManager()->setEmailSeen($entity);
 
-        return $templateVars;
+        return [
+            'entity' => $entity,
+            'noBodyFound' => $noBodyFound,
+            'target' => $this->getTargetEntity($entity),
+            'hasGrantReattach' => $this->isAttachmentCreationGranted(),
+            'targetEntityData' => $this->getTargetEntityConfig()
+        ];
     }
 
     /**
@@ -84,20 +85,12 @@ class EmailController extends Controller
         );
         $this->loadEmailBody($emails);
 
-        $routeParameters = [];
-        $entityClass = $this->getRequest()->get('targetActivityClass');
-        if ($entityClass) {
-            $routeParameters['entityClass'] = $entityClass;
-        }
-        $entityId = $this->getRequest()->get('targetActivityId');
-        if ($entityId) {
-            $routeParameters['entityId'] = $entityId;
-        }
-
         return [
             'entity' => $entity,
             'thread' => $emails,
-            'routeParameters' => $routeParameters
+            'target' => $this->getTargetEntity($entity),
+            'hasGrantReattach' => $this->isAttachmentCreationGranted(),
+            'routeParameters' => $this->getTargetEntityConfig()
         ];
     }
 
@@ -375,56 +368,63 @@ class EmailController extends Controller
     }
 
     /**
-     * Check possibility link attachment to target entity
-     *
-     * @return bool
-     */
-    protected function canLinkAttachment()
-    {
-        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
-        if (null === $entityClassName) {
-            return false;
-        }
-
-        /** @var ConfigProvider $targetConfigProvider */
-        $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
-        $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
-
-        return $enabledAttachment;
-    }
-
-    /**
      * Get target entity parameters
+     *
+     * @param bool $encode
      *
      * @return array
      */
-    protected function getTargetEntityConfig()
+    protected function getTargetEntityConfig($encode = true)
     {
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
-        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
+        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
+        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
+        if ($encode) {
+            $targetEntityClass = $entityRoutingHelper->encodeClassName($targetEntityClass);
+        }
         if (null === $targetEntityClass || null === $targetEntityId) {
             return [];
         }
         return [
-            'targetEntityClass' => $entityRoutingHelper->encodeClassName($targetEntityClass),
-            'targetEntityId' => $targetEntityId
+            'entityClass' => $targetEntityClass,
+            'entityId' => $targetEntityId
         ];
     }
 
     /**
      * Get target entity
      *
-     * @return object
+     * @return object|null
      */
     protected function getTargetEntity()
     {
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
-        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
-        $entity = $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
+        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
+        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
+        if (!$targetEntityClass || !$targetEntityId) {
+            return null;
+        }
+        return $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
+    }
 
-        return $entity;
+    /**
+     * @return bool
+     */
+    protected function isAttachmentCreationGranted()
+    {
+        $enabledAttachment = false;
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
+        if (null !== $entityClassName) {
+            /** @var ConfigProvider $targetConfigProvider */
+            $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
+            if ($targetConfigProvider->hasConfig($entityClassName)) {
+                $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
+            }
+        }
+        $createGrant = $this->get('oro_security.security_facade')
+            ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
+
+        return $enabledAttachment && $createGrant;
     }
 }

@@ -2,26 +2,48 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Doctrine\Common\Util\ClassUtils;
+
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailBodyAddListener
 {
-    const LINK_ATTACHMENT_CONFIG_OPTION = 'oro_email.link_email_attachments_to_scope_entity';
+    const LINK_ATTACHMENT_CONFIG_OPTION = 'auto_link_attachments';
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var ConfigProvider */
+    protected $configProvider;
 
     /** @var EmailAttachmentManager */
     protected $attachmentManager;
 
+    /** @var EmailActivityListProvider */
+    protected $activityListProvider;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /**
+     * @param EmailAttachmentManager $attachmentManager
+     * @param ConfigProvider $configProvider
+     * @param EmailActivityListProvider $activityListProvider
+     * @param ServiceLink $securityFacadeLink
+     */
     public function __construct(
         EmailAttachmentManager $attachmentManager,
-        ConfigManager $configManager
+        ConfigProvider $configProvider,
+        EmailActivityListProvider $activityListProvider,
+        ServiceLink $securityFacadeLink
     ) {
         $this->attachmentManager = $attachmentManager;
-        $this->configManager = $configManager;
+        $this->configProvider = $configProvider;
+        $this->activityListProvider = $activityListProvider;
+        $this->securityFacade = $securityFacadeLink->getService();
     }
 
     /**
@@ -29,9 +51,17 @@ class EmailBodyAddListener
      */
     public function linkToScopeEvent(EmailBodyAdded $event)
     {
+        if (!$this->securityFacade->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)) {
+            return;
+        }
         $email = $event->getEmail();
-        if ((bool)$this->configManager->get(self::LINK_ATTACHMENT_CONFIG_OPTION)) {
-            $this->attachmentManager->linkEmailAttachmentsToTargetEntities($email);
+        $entities = $this->activityListProvider->getTargetEntities($email);
+        foreach ($entities as $entity) {
+            if ((bool)$this->configProvider->getConfig(ClassUtils::getClass($entity))->get('auto_link_attachments')) {
+                foreach ($email->getEmailBody()->getAttachments() as $attachment) {
+                    $this->attachmentManager->linkEmailAttachmentToTargetEntity($attachment, $entity);
+                }
+            }
         }
     }
 }
