@@ -12,9 +12,10 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 
 /**
- * fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
+ * Fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
  * http://www.doctrine-project.org/jira/browse/DDC-2798
- * TODO remove this file when doctrine version >= 2.5 in scope of BAP-5577
+ * Fix to use alias, if present in the comparison field, instead of $this->rootAlias
+ * TODO revise this file when doctrine version >= 2.5 in scope of BAP-5577
  */
 class QueryExpressionVisitor extends ExpressionVisitor
 {
