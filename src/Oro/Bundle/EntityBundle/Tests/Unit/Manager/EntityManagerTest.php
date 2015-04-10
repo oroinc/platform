@@ -24,6 +24,11 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $routingHelper;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $mockEntity;
 
     /**
@@ -31,16 +36,20 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $manager;
 
-    protected $entityAlias = "context-item-66d4d60cf6b25ebb7373af805846c334";
+    protected $entityClass = "Oro\\Bundle\\UserBundle\\Entity\\User";
 
     protected function setUp()
     {
         $entities = [
-            $this->entityAlias => [
-                'name' => 'abc1',
+            [
+                'name' => $this->entityClass,
                 'label' => 'label1',
             ]
         ];
+
+        $this->routingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->mockEntity = $this
             ->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
@@ -49,7 +58,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->mockEntity->expects($this->any())
             ->method('supportActivityTarget')
-            ->with('abc1')
+            ->with($this->entityClass)
             ->will($this->returnValue(true));
 
         $this->entityProvider = $this
@@ -72,7 +81,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         $this->mockContainer = $this
             ->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $this->manager = new EntityManager($this->mockContainer);
+        $this->manager = new EntityManager($this->mockContainer, $this->routingHelper);
     }
 
     public function testGetSupportedTargets()
@@ -88,7 +97,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->configProvider->expects($this->any())
             ->method('getConfig')
-            ->with('abc1')
+            ->with($this->routingHelper->encodeClassName($this->entityClass))
             ->will($this->returnValue($this->configProvider));
 
         $this->configProvider->expects($this->any())
@@ -97,10 +106,8 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($expectedGridName));
 
         $gridName = $this->manager->getContextGridByEntity(
-            $this->entityProvider,
             $this->configProvider,
-            $this->mockEntity,
-            $this->entityAlias
+            $this->entityClass
         );
 
         $this->assertEquals($expectedGridName, $gridName);

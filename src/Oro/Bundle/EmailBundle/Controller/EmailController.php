@@ -313,53 +313,19 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/context/grid/{entityAlias}", name="oro_email_context_grid")
+     * @Route("/context/grid/{entityClass}", name="oro_email_context_grid")
      * @AclAncestor("oro_email_view")
      * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
-     * @param Email $emailEntity
+     * @param string $entityClass
      * @return array
      */
-    public function contextGridAction($entityAlias = null)
+    public function contextGridAction($entityClass = null)
     {
-        $entityProvider = $this->get('oro_entity.entity_provider');
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $gridName = $this
             ->get('oro_entity.entity.manager')
-            ->getContextGridByEntity($entityProvider, $entityConfigProvider, new Email, $entityAlias);
+            ->getContextGridByEntity($entityConfigProvider, $entityClass);
         return ['gridName' => $gridName, 'multiselect' => false, 'params' => [], 'renderParams' => []];
-    }
-
-    /**
-     * @Route("/context/add", name="oro_email_context_add")
-     * @AclAncestor("oro_email_create")
-     */
-    public function addContextAction()
-    {
-        $entityProvider = $this->get('oro_entity.entity_provider');
-        $trans = $this->get('translator');
-        $response = new Response();
-        $responseContent = [];
-
-        try {
-            $sourceId = $this->getRequest()->get('sourceId');
-            $targetId = $this->getRequest()->get('targetId');
-            $targetContextAlias = $this->getRequest()->get('targetContextAlias');
-            $entityTarget = $this->get('oro_entity.entity.manager')->getSupportedTargets(
-                $entityProvider,
-                new Email(),
-                $targetContextAlias
-            );
-
-            $responseContent['success'] = true;
-            $responseContent['message'] = $trans->trans('oro.email.context_added');
-        } catch (\Exception $e) {
-            $responseContent['success'] = false;
-            $responseContent['message'] = $trans->trans('oro.email.unexpected_error');
-        }
-
-        $response->setContent(json_encode($responseContent));
-
-        return $response;
     }
 
     /**

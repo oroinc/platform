@@ -44,7 +44,7 @@ define(function (require) {
             });
 
             this.collection.on('add', function(model) {
-                var gridUrl = self.options.params.grid_path + '/' + model.attributes.entityAlias;
+                var gridUrl = self.options.params.grid_path + '/' + model.attributes.className;
                 var view = self.template({
                     entity: model
                 });
@@ -52,12 +52,12 @@ define(function (require) {
 
                 if (model.attributes.first) {
                     firstItem.html(model.attributes.label);
-                    $('#context-current-entity-alias').data('value', model.attributes.entityAlias);
+                    $('#context-current-target-class').data('value', model.attributes.className);
                 }
 
                 dropdown.append($view);
                 dropdown.find('.context-item:last').click(function() {
-                    $('#context-current-entity-alias').data('value', model.attributes.entityAlias);
+                    $('#context-current-target-class').data('value', model.attributes.className);
                     dropdown.find('> .context-item').each(function() {$(this).removeClass('active')})
                     dropdown.hide(0);
                     var item = $(this);

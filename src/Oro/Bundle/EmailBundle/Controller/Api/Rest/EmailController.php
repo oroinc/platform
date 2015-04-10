@@ -132,6 +132,7 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
+        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
