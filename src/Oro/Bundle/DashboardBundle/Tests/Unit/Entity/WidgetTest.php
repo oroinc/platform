@@ -32,7 +32,7 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
     public function testLayoutPosition()
     {
         $this->assertNull($this->widget->getLayoutPosition());
-        $value = array(1, 100);
+        $value = [1, 100];
         $this->assertEquals($this->widget, $this->widget->setLayoutPosition($value));
         $this->assertEquals($value, $this->widget->getLayoutPosition());
     }
@@ -43,5 +43,13 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->widget->getDashboard());
         $this->assertEquals($this->widget, $this->widget->setDashboard($dashboard));
         $this->assertEquals($dashboard, $this->widget->getDashboard());
+    }
+
+    public function testOptions()
+    {
+        $this->assertEquals([], $this->widget->getOptions());
+        $options['foo'] = 'bar';
+        $this->widget->setOptions($options);
+        $this->assertSame($options, $this->widget->getOptions());
     }
 }

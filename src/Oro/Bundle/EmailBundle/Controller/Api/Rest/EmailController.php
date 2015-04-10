@@ -189,9 +189,11 @@ class EmailController extends RestGetController
             $em->persist($entity);
             $em->flush();
 
-            $view = $this->view($entity->getActivityTargetEntities(), Codes::HTTP_OK);
+            $view = $this->view(['message' => 'Successfully removed'], Codes::HTTP_OK);
         } catch (\RuntimeException $e) {
             $view = $this->view([], Codes::HTTP_BAD_REQUEST);
+        } catch (\Exception $e) {
+            $view = $this->view(['status'=> 'NOT_FOUND', 'message' => $e->getMessage() ], Codes::HTTP_OK);
         }
 
         return $this->buildResponse($view, Codes::HTTP_LOOP_DETECTED, ['id' => $entityId, 'entity' => $entity]);

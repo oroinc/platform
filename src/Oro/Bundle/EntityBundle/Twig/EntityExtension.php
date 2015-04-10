@@ -34,7 +34,8 @@ class EntityExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_class_name', [$this, 'getClassName']),
-            new \Twig_SimpleFunction('oro_action_params', [$this, 'getActionParams'])
+            new \Twig_SimpleFunction('oro_action_params', [$this, 'getActionParams']),
+            new \Twig_SimpleFunction('oro_entity_instance_of_interface', [$this, 'instanceOfInterface'])
         ];
     }
 
@@ -71,6 +72,15 @@ class EntityExtension extends \Twig_Extension
             $this->entityIdAccessor->getIdentifier($object),
             $action
         );
+    }
+
+    public function instanceOfInterface($object, $interfaceName)
+    {
+        if (!is_object($object)) {
+            return false;
+        }
+
+        return in_array($interfaceName, class_implements($object), true);
     }
 
     /**

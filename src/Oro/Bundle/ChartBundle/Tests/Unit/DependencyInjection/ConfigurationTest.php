@@ -116,6 +116,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'data_transformer' => 'foo_data_transformer_service',
                         'template' => 'FooTemplate.html.twig',
                         'default_settings' => array(),
+                        'xaxis' => array(
+                            'mode' => 'normal',
+                            'noTicks' => 5
+                        )
                     ),
                     'bar_chart' => array(
                         'label' => 'Bar',
@@ -123,6 +127,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'settings_schema' => array(),
                         'default_settings' => array(),
                         'template' => 'BarTemplate.html.twig',
+                        'xaxis' => array(
+                            'mode' => 'normal',
+                            'noTicks' => 5
+                        )
+
                     ),
                 )
             ),
@@ -207,6 +216,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'data_transformer' => 'foo_data_transformer_service',
                         'template' => 'FooTemplate.html.twig',
                         'default_settings' => array(),
+                        'xaxis' => array(
+                            'mode' => 'normal',
+                            'noTicks' => 5
+                        )
+
                     )
                 )
             )
