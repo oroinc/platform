@@ -106,6 +106,34 @@ abstract class AbstractPage
             intval(MAX_EXECUTION_TIME)
         );
 
+        // writes javascript errors to screenshots
+        $jsCode = <<<JS
+            if (!window.onerror) {
+                window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
+                    $('body').append(
+                        '<div style="background: #fff; color: #000; position: absolute; top: 15px; left: 15px;' +
+                            ' z-index: 999999; padding: 10px; right: 15px; border: 3px solid red;  border-radius: 5px;' +
+                            'box-shadow: 10px 10px 40px; white-space: pre">' +
+                            '<h5>Js error occured</h5>' +
+                            errorMsg + '\\n' +
+                            'at ' + url + ':' + lineNumber + ':' + column +
+                            '<h5>Stack trace:</h5>' +
+                            errorObj.stack +
+                        '</div>'
+                    );
+
+                    // Tell browser to run its own error handler as well
+                    return false;
+                }
+            }
+JS;
+
+        $this->test->execute(array(
+            'script' =>$jsCode,
+            'args' =>
+                array()
+        ));
+
         $this->test->timeouts()->implicitWait(intval(TIME_OUT));
     }
 
@@ -114,19 +142,22 @@ abstract class AbstractPage
      */
     public function waitForAjax()
     {
+
         $this->test->waitUntil(
             function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
+                $jsAppActiveCheck = <<<JS
+                    var isAppActive = false;
+                    try {
+                        if (!window.mediatorCachedForSelenium) {
+                            window.mediatorCachedForSelenium = require('oroui/js/mediator');
+                        }
+                        isAppActive = window.mediatorCachedForSelenium.execute('isInAction');
+                    } catch(e) {};
+                    return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
+JS;
                 $status = $testCase->execute(
                     array(
-                        'script' => "var isAppActive = false; " .
-                            "try {" .
-                                "if (!window.mediatorCachedForSelenium) {" .
-                                    "window.mediatorCachedForSelenium = require('oroui/js/mediator');" .
-                                "}" .
-                                "isAppActive = window.mediatorCachedForSelenium.execute('isInAction');" .
-                            "} catch(e) {};" .
-                            "return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) " .
-                            "&& !isAppActive;",
+                        'script' => $jsAppActiveCheck,
                         'args' => array()
                     )
                 );
