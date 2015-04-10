@@ -493,7 +493,7 @@ define([
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
-                    enabled: typeof currentView !== 'undefined' && this.permissions.EDIT &&
+                    enabled: this.viewDirty && typeof currentView !== 'undefined' && this.permissions.EDIT &&
                              (currentView.get('type') === 'private' ||
                                 (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
                 },
