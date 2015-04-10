@@ -31,7 +31,7 @@ define(function (require) {
                 this.initPopup(options);
             }
 
-            var models = options.items == 'undefined' ? [] : options.items;
+            var models = options.entityAttachments == 'undefined' ? [] : options.entityAttachments;
             this.collection.add(models);
         },
 
@@ -51,13 +51,7 @@ define(function (require) {
 
         getPopupView: function(options) {
             if (!this.popupView) {
-                // todo change to real data
-                this.popupCollection = new EmailAttachmentCollection([
-                    {'id': 1, 'fileName': 'file1.jpg'},
-                    {'id': 2, 'fileName': 'file2.jpg'},
-                    {'id': 3, 'fileName': 'file3.jpg'},
-                    {'id': 4, 'fileName': 'file4.jpg'}
-                ]);
+                this.popupCollection = new EmailAttachmentCollection();
 
                 this.popupView = new EmailAttachmentSelectView({
                     popupTriggerButton: options.popupTriggerButton,
@@ -66,12 +60,13 @@ define(function (require) {
                     collection: this.popupCollection
                 });
 
+                var models = typeof options.attachmentsAvailable == 'undefined' ? [] : options.attachmentsAvailable;
+                this.popupCollection.add(models);
+
                 var self = this;
                 this.popupCollection.on('attach', function() {
                     self.popupCollection.each(function(model) {
                         if (model.get('checked')) {
-                            model.set('attached', true);
-
                             var newModel = model.clone();
                             self.collection.add(newModel);
                         }

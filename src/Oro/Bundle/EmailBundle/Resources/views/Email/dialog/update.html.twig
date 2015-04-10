@@ -71,7 +71,8 @@
                         popupTriggerButton: '#attach-file',
                         popupContentEl: '.attachment-list-popup',
                         popupAttachmentList: '.attachment-list',
-                        items: entity.attachments.toArray
+                        entityAttachments: entity.attachments.toArray,
+                        attachmentsAvailable: entity.attachmentsAvailable
                     } %}
                     {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
 

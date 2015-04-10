@@ -117,7 +117,7 @@ class EmailAttachmentType extends AbstractType
 
         $emailAttachmentContent = new EmailAttachmentContent();
         $emailAttachmentContent->setContent(
-            base64_encode(file_get_contents($oroAttachment->getFile()->getFilename()))
+            base64_encode($this->filesystem->get($oroAttachment->getFile()->getFilename())->getContent())
         );
 
         $emailAttachmentContent->setContentTransferEncoding('base64');
@@ -126,7 +126,7 @@ class EmailAttachmentType extends AbstractType
         $emailAttachmentEntity->setContent($emailAttachmentContent);
         $emailAttachmentEntity->setContentType($oroAttachment->getFile()->getMimeType());
         $emailAttachmentEntity->setFileName(
-            $this->filesystem->get($oroAttachment->getFile()->getFilename())->getContent()
+            $oroAttachment->getFile()->getOriginalFilename()
         );
 
         return $emailAttachmentEntity;

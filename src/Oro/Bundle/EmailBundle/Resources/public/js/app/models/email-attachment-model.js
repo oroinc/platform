@@ -14,7 +14,7 @@ define(function (require) {
             type: '',
             fileName: '',
             checked: false, // whether file is checked for attaching to an email
-            attached: false // whether file is already attached to an email
+            visible: true
         },
 
         toggleChecked: function() {

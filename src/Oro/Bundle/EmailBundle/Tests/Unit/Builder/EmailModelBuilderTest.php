@@ -92,7 +92,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
         $helperBuildFullEmailAddress
     ) {
         $emailModel = new EmailModel();
-        $emailModel->setParentEmailId($parentEmailId);
+        $emailModel->setParentEmail($parentEmailId); // todo change to entity mock instance
 
         $this->request = new Request();
         $this->request->setMethod('GET');

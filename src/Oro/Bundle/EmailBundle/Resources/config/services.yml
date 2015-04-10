@@ -75,6 +75,7 @@ parameters:
     oro_email.validator.email_recipients_validator.class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
 
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
+    oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
 
 services:
     oro_email.entity.cache.warmer:
@@ -168,6 +169,7 @@ services:
           - @request
           - @doctrine.orm.entity_manager
           - @oro_config.user
+          - @oro_email.provider.email_attachment_provider
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
@@ -504,3 +506,10 @@ services:
             - @oro_config.user
         tags:
             - { name: kernel.event_listener, event: oro_email.email_attachment_manager.email_body_added, method: linkToScopeEvent, priority: 10 }
+
+    oro_email.provider.email_attachment_provider:
+        class: %oro_email.provider.email_attachment_provider.class%
+        arguments:
+            - @oro_email.email.thread.provider
+            - @doctrine.orm.entity_manager
+            - @oro_attachment.provider.attachment

@@ -14,6 +14,10 @@ define(function (require) {
             'click input[type="checkbox"]': 'checkboxClick'
         },
 
+        listen: {
+            'change:visible model':         'visibilityChange'
+        },
+
         getTemplateFunction: function() {
             if (!this.template) {
                 this.template = $('#email-attachment-list-row-view').html();
@@ -22,8 +26,12 @@ define(function (require) {
             return EmailAttachmentListRowView.__super__.getTemplateFunction.call(this);
         },
 
-        checkboxClick: function() {
-            this.model.toggleChecked();
+        checkboxClick: function(event) {
+            this.model.set('checked', $(event.target).prop('checked'));
+        },
+
+        visibilityChange: function() {
+            this.render();
         }
     });
 

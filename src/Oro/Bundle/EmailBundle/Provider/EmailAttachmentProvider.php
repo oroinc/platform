@@ -4,14 +4,16 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-
 
 class EmailAttachmentProvider
 {
     /**
-     * @var EmailthreadProvider
+     * @var EmailThreadProvider
      */
     protected $emailThreadProvider;
 
@@ -21,29 +23,31 @@ class EmailAttachmentProvider
     protected $em;
 
     /**
+     * @var AttachmentProvider
+     */
+    protected $attachmentProvider;
+
+    /**
      * @param EmailThreadProvider $emailThreadProvider
      * @param EntityManager       $entityManager
+     * @param AttachmentProvider  $attachmentProvider
      */
-    public function __construct(EmailThreadProvider $emailThreadProvider, EntityManager $entityManager)
-    {
+    public function __construct(
+        EmailThreadProvider $emailThreadProvider,
+        EntityManager $entityManager,
+        AttachmentProvider $attachmentProvider
+    ) {
         $this->emailThreadProvider = $emailThreadProvider;
         $this->em                  = $entityManager;
+        $this->attachmentProvider  = $attachmentProvider;
     }
 
     /**
-     * Retrieves list of attachments available for attaching to Email
+     * @param Email $emailEntity
+     *
+     * @return array
      */
-    public function getAvailableAttachmentList(Email $emailEntity)
-    {
-        // todo should return EmailAttachmentModel list
-        return array_merge(
-            $this->getFreeAttachments(),
-            $this->getThreadAttachments($emailEntity),
-            $this->getFreeAttachments()
-        );
-    }
-
-    protected function getThreadAttachments(Email $emailEntity)
+    public function getThreadAttachments(Email $emailEntity)
     {
         $attachments = [];
         $threadEmails = $this->emailThreadProvider->getThreadEmails($this->em, $emailEntity);
@@ -51,20 +55,69 @@ class EmailAttachmentProvider
         /** @var Email $threadEmail */
         foreach ($threadEmails as $threadEmail) {
             if ($threadEmail->getEmailBody()->getHasAttachments()) {
-                $attachments = array_merge($emailEntity->getEmailBody()->getAttachments()->toArray());
+                $emailAttachments = $emailEntity->getEmailBody()->getAttachments();
+
+                foreach ($emailAttachments as $emailAttachment) {
+                    $attachments[] = $this->emailAttachmentToAttachmentModel($emailAttachment);
+                }
             }
         }
 
         return $attachments;
     }
 
-    protected function getScopeEntityAttachments()
+    /**
+     * @param $entity
+     *
+     * @return array
+     */
+    public function getScopeEntityAttachments($entity)
     {
-        return [];
+        $attachments = [];
+        $oroAttachments = $this->attachmentProvider->getEntityAttachments($entity);
+
+        foreach ($oroAttachments as $oroAttachment) {
+            $attachmentModel = new AttachmentModel();
+            $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
+            $attachmentModel->setId($oroAttachment->getId());
+            $attachmentModel->setFileName($oroAttachment->getFile()->getOriginalFilename());
+
+            $attachments[] = $attachmentModel;
+        }
+
+        return $attachments;
     }
 
-    protected function getFreeAttachments()
+    /**
+     * @return array
+     */
+    public function getFreeAttachments()
     {
-        return [];
+        $attachments = [];
+        $repo = $this->em->getRepository('OroEmailBundle:EmailAttachment');
+
+        $emailAttachments = $repo->findBy([
+            'emailBody' => null,
+        ]);
+        foreach ($emailAttachments as $emailAttachment) {
+            $attachments[] = $this->emailAttachmentToAttachmentModel($emailAttachment);
+        }
+
+        return $attachments;
+    }
+
+    /**
+     * @param EmailAttachment $emailAttachment
+     *
+     * @return AttachmentModel
+     */
+    protected function emailAttachmentToAttachmentModel(EmailAttachment $emailAttachment)
+    {
+        $attachmentModel = new AttachmentModel();
+        $attachmentModel->setEmailAttachment($emailAttachment);
+        $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
+        $attachmentModel->setId($emailAttachment->getId());
+
+        return $attachmentModel;
     }
 }

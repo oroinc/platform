@@ -6,8 +6,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
 
 class EmailAttachment
 {
-    const TYPE_ATTACHMENT       = 1;
-    const TYPE_EMAIL_ATTACHMENT = 2;
+    const TYPE_ATTACHMENT       = 1; // oro attachment (OroAttachmentBundle)
+    const TYPE_EMAIL_ATTACHMENT = 2; // email attachment
 
     /**
      * @var int
@@ -18,6 +18,11 @@ class EmailAttachment
      * @var int
      */
     protected $type;
+
+    /**
+     * @var string
+     */
+    protected $fileName;
 
     /**
      * @var EmailAttachment
@@ -80,6 +85,19 @@ class EmailAttachment
     public function setEmailAttachment($emailAttachment)
     {
         $this->emailAttachment = $emailAttachment;
+        $this->setFileName($this->emailAttachment->getFileName());
+
+        return $this;
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return $this
+     */
+    public function setFileName($fileName)
+    {
+        $this->fileName = $fileName;
 
         return $this;
     }
@@ -89,10 +107,6 @@ class EmailAttachment
      */
     public function getFileName()
     {
-        if ($this->getEmailAttachment()) {
-            return $this->getEmailAttachment()->getFileName();
-        }
-
-        return '';
+        return (string) $this->fileName;
     }
 }

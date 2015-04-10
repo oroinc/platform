@@ -44,14 +44,14 @@
     <script type="text/template" id="email-attachment-select-view">
         <div class="attachment-list-content">
             <label>{{ 'oro.email.attachment.select_file'|trans }}</label>
-            <input id="filter" type="text" class="filter"/>
-            <div class="attachment-list">
-            </div>
+            <input type="text" class="filter"/>
+            <div class="attachment-list"></div>
         </div>
         <div class="clear"></div>
         <div class="attachment-actions">
             <div class="pull-left">
                 <a class="upload-new" href="javascript:void(0);">Upload New File</a>
+                <input class="input-upload-new" type="file"/>
             </div>
             <div class="pull-right">
                 <a class="btn cancel">Cancel</a>
@@ -61,23 +61,46 @@
     </script>
 
     <script type="text/template" id="email-attachment-list-row-view">
-        <span>
-            <input type="checkbox" style="display: inline-block">
-            <%= fileName %>
-        </span>
+        <% if (visible) { %>
+            <div>
+        <% } else { %>
+            <div style="display: none">
+        <% } %>
+        <% if (checked) { %>
+            <input type="checkbox" style="display: inline-block; width: 24px" checked>
+        <% } else { %>
+            <input type="checkbox" style="display: inline-block; width: 24px">
+        <% } %>
+            <span style="padding-top: 1px"><%= fileName %></span>
+        </div>
     </script>
 
-    {% set itemsArray = [] %}
-    {% for item in options.items %}
-        {% set itemArray = {
-            'id': item.id,
-            'type': item.type,
-            'fileName': item.fileName
+    {% set entityAttachmentsArray = [] %}
+    {% for attachment in options.entityAttachments %}
+        {% set entityAttachmentArray = {
+            'id': attachment.id,
+            'type': attachment.type,
+            'fileName': attachment.fileName
         } %}
-        {% set itemsArray = itemsArray|merge([itemArray]) %}
+        {% set entityAttachmentsArray = entityAttachmentsArray|merge([entityAttachmentArray]) %}
     {% endfor %}
 
-    {% set options = options|merge({container: id, inputName: full_name, items: itemsArray}) %}
+    {% set attachmentsAvailableArray = [] %}
+    {% for attachment in options.attachmentsAvailable %}
+        {% set attachmentAvailableArray = {
+            'id': attachment.id,
+            'type': attachment.type,
+            'fileName': attachment.fileName
+        } %}
+        {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
+    {% endfor %}
+
+    {% set options = options|merge({
+        container: id,
+        inputName: full_name,
+        entityAttachments: entityAttachmentsArray,
+        attachmentsAvailable: attachmentsAvailableArray
+    }) %}
 
     <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
          data-page-component-options="{{ options|json_encode }}">
