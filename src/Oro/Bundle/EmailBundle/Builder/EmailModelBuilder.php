@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Builder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -143,7 +144,9 @@ class EmailModelBuilder
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         // link attachments of forwarded email to current email instance
-        $this->applyAttachments($emailModel, $parentEmailEntity);
+        if ($this->request->isMethod('GET')) {
+            $this->applyAttachments($emailModel, $parentEmailEntity);
+        }
 
         return $this->createEmailModel($emailModel);
     }
@@ -285,7 +288,12 @@ class EmailModelBuilder
             $this->helper->ensureEmailBodyCached($emailEntity);
 
             foreach ($emailEntity->getEmailBody()->getAttachments() as $attachment) {
-                $emailModel->addAttachment($attachment);
+                $attachmentModel = new EmailAttachment();
+                $attachmentModel->setId($attachment->getId());
+                $attachmentModel->setType(EmailAttachment::TYPE_EMAIL_ATTACHMENT);
+                $attachmentModel->setEmailAttachment($attachment);
+
+                $emailModel->addAttachment($attachmentModel);
             }
         } catch (\Exception $e) {
             // maybe show notice to a user that attachments could not be loaded

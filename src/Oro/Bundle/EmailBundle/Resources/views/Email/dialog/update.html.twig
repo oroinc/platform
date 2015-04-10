@@ -55,15 +55,22 @@
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
-                    <div class="control-group">
+                    <div class="control-group email-body-actions">
                         <div class="controls">
                             <span class="email-body-action"><a id="add-signature" href="javascript:void(0);">{{ 'oro.email.form.add_signature'|trans }}</a></span>
-                            <span class="email-body-action"><a id="attach-file" href="javascript:void(0);">{{ 'oro.email.form.attach_file'|trans }}</a></span>
+
+                            <div class="dropup" style="display: inline-block">
+                                <a id="attach-file" class="dropdown-toggle" href="javascript:void(0);" aria-expanded="true">{{ 'oro.email.form.attach_file'|trans }}</a>
+
+                                <div class="dropdown-menu attachment-list-popup" role="menu" aria-labelledby="attach-file"></div>
+                            </div>
                         </div>
                     </div>
 
                     {% set emailAttachmentOptions = {
-                        dialogButton: 'attach-file',
+                        popupTriggerButton: '#attach-file',
+                        popupContentEl: '.attachment-list-popup',
+                        popupAttachmentList: '.attachment-list',
                         items: entity.attachments.toArray
                     } %}
                     {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}

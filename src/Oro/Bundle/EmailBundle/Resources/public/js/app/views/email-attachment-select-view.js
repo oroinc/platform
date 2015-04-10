@@ -3,11 +3,11 @@ define(function (require) {
     'use strict';
 
     var EmailAttachmentSelectView,
+        EmailAttachmentListRowView = require('oroemail/js/app/views/email-attachment-list-row-view'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     EmailAttachmentSelectView = BaseCollectionView.extend({
-        // popup will be attached related to this label
-        label: null,
+        itemView: EmailAttachmentListRowView,
         isShowed: false,
 
         events: {
@@ -16,43 +16,12 @@ define(function (require) {
             'click .attach':     'attachClick'
         },
 
-        initialize: function(options) {
-            EmailAttachmentSelectView.__super__.initialize.call(this, options);
-            this.label = options.label;
-        },
-
-        render: function() {
-            var templateFunc = this.getTemplateFunction();
-            var html = templateFunc(this.getTemplateData());
-            this.$el.html(html);
-            this.$el.addClass('attachment-list-popup');
-
-            var $label = $(this.label);
-            var position= $label.position();
-
-            this.$el.css('bottom', $label.height() * 2);
-            this.$el.css('left', position.left);
-
-            this.initSelect();
-
-            $label.after(this.$el);
-
-            return this;
-        },
-
-        initSelect: function() {
-            this.$('select').multiselect({
-                header: false,
-                autoOpen: true
-            });
-        },
-
         cancelClick: function() {
             this.hide();
         },
 
         attachClick: function() {
-            console.log('For implementation');
+            this.collection.trigger('attach');
         },
 
         uploadNewClick: function() {

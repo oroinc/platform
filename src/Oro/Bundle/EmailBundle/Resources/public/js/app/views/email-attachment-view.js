@@ -36,10 +36,11 @@ define(function (require) {
         },
 
         removeClick: function() {
-            this.model.destroy();
+            this.model.trigger('destroy', this.model);
+            // todo add it back to list
         },
 
-        fileSelect: function() {
+/*        fileSelect: function() {
             var self = this;
             var $fileInput = this.$('input[type="file"]');
             this.$el.hide();
@@ -56,7 +57,7 @@ define(function (require) {
                 }
             });
             $fileInput.click();
-        },
+        },*/
 
         fileNameChange: function() {
             this.$('span.filename-label').html(this.model.get('fileName'));

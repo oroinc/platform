@@ -18,9 +18,10 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 
 /**
  * Class Processor
@@ -169,8 +170,9 @@ class Processor
      */
     protected function addAttachments(\Swift_Message $message, EmailModel $model)
     {
-        /** @var EmailAttachment $attachment */
-        foreach ($model->getAttachments() as $attachment) {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
             $swiftAttachment = new \Swift_Attachment(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
@@ -189,8 +191,10 @@ class Processor
      */
     protected function persistAttachments(EmailModel $model, Email $email)
     {
-        /** @var EmailAttachment $attachment */
-        foreach ($model->getAttachments() as $attachment) {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
+
             if (!$attachment->getId()) {
                 $this->getEntityManager()->persist($attachment);
             } else {

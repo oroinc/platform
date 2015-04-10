@@ -11,7 +11,14 @@ define(function (require) {
     EmailAttachmentModel = BaseModel.extend({
         defaults: {
             id: null,
-            fileName: ''
+            type: '',
+            fileName: '',
+            checked: false, // whether file is checked for attaching to an email
+            attached: false // whether file is already attached to an email
+        },
+
+        toggleChecked: function() {
+            this.set('checked', !this.get('checked'));
         },
 
         set: function(key, value, options) {

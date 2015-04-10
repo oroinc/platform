@@ -37,26 +37,16 @@
                 <i class="icon-remove"></i>
             </span>
             <input name="<%= inputName %>[<%= cid %>][id]" type="text" value="<%= id %>"/>
-            <input name="<%= inputName %>[<%= cid %>][uploaded_file]" type="file"/>
+            <input name="<%= inputName %>[<%= cid %>][type]" type="text" value="<%= type %>"/>
         </div>
     </script>
 
     <script type="text/template" id="email-attachment-select-view">
         <div class="attachment-list-content">
             <label>{{ 'oro.email.attachment.select_file'|trans }}</label>
-            <input type="text" class="filter"/>
-            <select multiple>
-                <optgroup label="Record Attachments">
-                    <option>Filename.jpg</option>
-                    <option>Filename1.jpg</option>
-                    <option>Filename2.jpg</option>
-                </optgroup>
-                <optgroup label="Thread Attachments">
-                    <option>Filename.jpg</option>
-                    <option>Filename1.jpg</option>
-                    <option>Filename2.jpg</option>
-                </optgroup>
-            </select>
+            <input id="filter" type="text" class="filter"/>
+            <div class="attachment-list">
+            </div>
         </div>
         <div class="clear"></div>
         <div class="attachment-actions">
@@ -70,10 +60,18 @@
         </div>
     </script>
 
+    <script type="text/template" id="email-attachment-list-row-view">
+        <span>
+            <input type="checkbox" style="display: inline-block">
+            <%= fileName %>
+        </span>
+    </script>
+
     {% set itemsArray = [] %}
     {% for item in options.items %}
         {% set itemArray = {
             'id': item.id,
+            'type': item.type,
             'fileName': item.fileName
         } %}
         {% set itemsArray = itemsArray|merge([itemArray]) %}

@@ -14,7 +14,9 @@ define(function (require) {
     return BaseComponent.extend({
         collection: null,
         collectionView: null,
+
         popupView: null,
+        popupCollection: null,
 
         initialize: function(options) {
             this.collection = new EmailAttachmentCollection();
@@ -25,20 +27,20 @@ define(function (require) {
                 inputName: options.inputName
             });
 
-            if (options.dialogButton) {
-                this.initDialogButton(options.dialogButton);
+            if (options.popupTriggerButton && options.popupContentEl) {
+                this.initPopup(options);
             }
 
             var models = options.items == 'undefined' ? [] : options.items;
             this.collection.add(models);
         },
 
-        initDialogButton: function(dialogButton) {
+        initPopup: function(options) {
             var self = this;
 
-            var $dialogButton = $('#' + dialogButton);
+            var $dialogButton = $(options.popupTriggerButton);
             $dialogButton.click(function() {
-                var popupView = self.getPopupView(this);
+                var popupView = self.getPopupView(options);
                 if (popupView.isShowed) {
                     popupView.hide();
                 } else {
@@ -47,11 +49,35 @@ define(function (require) {
             });
         },
 
-        getPopupView: function(label) {
+        getPopupView: function(options) {
             if (!this.popupView) {
+                // todo change to real data
+                this.popupCollection = new EmailAttachmentCollection([
+                    {'id': 1, 'fileName': 'file1.jpg'},
+                    {'id': 2, 'fileName': 'file2.jpg'},
+                    {'id': 3, 'fileName': 'file3.jpg'},
+                    {'id': 4, 'fileName': 'file4.jpg'}
+                ]);
+
                 this.popupView = new EmailAttachmentSelectView({
-                    label: label,
-                    collection: new EmailAttachmentCollection()
+                    popupTriggerButton: options.popupTriggerButton,
+                    el: options.popupContentEl,
+                    listSelector: options.popupAttachmentList,
+                    collection: this.popupCollection
+                });
+
+                var self = this;
+                this.popupCollection.on('attach', function() {
+                    self.popupCollection.each(function(model) {
+                        if (model.get('checked')) {
+                            model.set('attached', true);
+
+                            var newModel = model.clone();
+                            self.collection.add(newModel);
+                        }
+                    });
+
+                    self.popupView.hide();
                 });
             }
 
