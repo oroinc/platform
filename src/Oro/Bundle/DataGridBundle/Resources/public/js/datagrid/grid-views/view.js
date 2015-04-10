@@ -271,7 +271,9 @@ define([
                     type: 'private',
                     grid_name: self.gridName,
                     filters: self.collection.state.filters,
-                    sorters: self.collection.state.sorters
+                    sorters: self.collection.state.sorters,
+                    editable: self.permissions.EDIT,
+                    deletable: self.permissions.DELETE
                 });
                 model.save(null, {
                     wait: true
@@ -493,7 +495,7 @@ define([
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
-                    enabled: this.viewDirty && typeof currentView !== 'undefined' && this.permissions.EDIT &&
+                    enabled: this.viewDirty && typeof currentView !== 'undefined' && currentView.get('editable') &&
                              (currentView.get('type') === 'private' ||
                                 (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
                 },
@@ -505,7 +507,7 @@ define([
                 {
                     label: __('oro.datagrid.action.rename_grid_view'),
                     name: 'rename',
-                    enabled: typeof currentView !== 'undefined' && this.permissions.EDIT &&
+                    enabled: typeof currentView !== 'undefined' && currentView.get('editable') &&
                              (currentView.get('type') === 'private' ||
                                 (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
                 },
@@ -518,7 +520,7 @@ define([
                 {
                     label: __('oro.datagrid.action.unshare_grid_view'),
                     name: 'unshare',
-                    enabled: typeof currentView !== 'undefined' &&
+                    enabled: typeof currentView !== 'undefined' && currentView.get('editable') &&
                             currentView.get('type') === 'public' && this.permissions.EDIT_SHARED
                 },
                 {
@@ -529,8 +531,7 @@ define([
                 {
                     label: __('oro.datagrid.action.delete_grid_view'),
                     name: 'delete',
-                    enabled: typeof currentView !== 'undefined' && currentView.get('type') !== 'system' &&
-                             this.permissions.DELETE
+                    enabled: typeof currentView !== 'undefined' && currentView.get('deletable')
                 }
             ];
         },

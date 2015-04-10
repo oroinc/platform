@@ -52,7 +52,15 @@ class GridViewsLoadListener
         $choices = [];
         $views = [];
         foreach ($gridViews as $gridView) {
-            $views[] = $gridView->createView()->getMetadata();
+            $view = $gridView->createView();
+            if ($this->securityFacade->isGranted('EDIT', $gridView)) {
+                $view->setEditable();
+            }
+            if ($this->securityFacade->isGranted('DELETE', $gridView)) {
+                $view->setDeletable();
+            }
+
+            $views[] = $view->getMetadata();
             $choices[] = [
                 'label' => $gridView->getName(),
                 'value' => $gridView->getId(),

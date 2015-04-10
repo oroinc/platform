@@ -19,7 +19,9 @@ define([
         /** @property */
         defaults: {
             filters: [],
-            sorters: []
+            sorters: [],
+            deletable: false,
+            editable:  false
         },
 
         /** @property */
@@ -69,6 +71,13 @@ define([
                 sorters:  this.get('sorters'),
                 gridView: this.get('name')
             };
+        },
+
+        /**
+         * @returns {Array}
+         */
+        toJSON: function () {
+            return _.omit(this.attributes, ['editable', 'deletable']);
         }
     });
 

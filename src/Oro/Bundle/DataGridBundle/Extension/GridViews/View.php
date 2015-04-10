@@ -16,6 +16,12 @@ class View
     /** @var string */
     protected $type = 'system';
 
+    /** @var bool */
+    protected $editable = false;
+
+    /** @var bool */
+    protected $deletable = false;
+
     /**
      * @param string $name
      * @param array $filtersData
@@ -97,6 +103,22 @@ class View
     }
 
     /**
+     * Sets view as editable
+     */
+    public function setEditable()
+    {
+        $this->editable = true;
+    }
+
+    /**
+     * Sets view as deletable
+     */
+    public function setDeletable()
+    {
+        $this->deletable = true;
+    }
+
+    /**
      * Convert to view data
      *
      * @return array
@@ -104,10 +126,12 @@ class View
     public function getMetadata()
     {
         return [
-            'name'    => $this->getName(),
-            'type'    => $this->getType(),
-            'filters' => $this->getFiltersData(),
-            'sorters' => $this->getSortersData()
+            'name'      => $this->getName(),
+            'type'      => $this->getType(),
+            'filters'   => $this->getFiltersData(),
+            'sorters'   => $this->getSortersData(),
+            'editable'  => $this->editable,
+            'deletable' => $this->deletable,
         ];
     }
 }
