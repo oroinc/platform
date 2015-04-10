@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -134,12 +135,24 @@ class Processor
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
 
+        $contexts = $model->getContexts();
         // associate the email with the target entity if exist
         if ($model->hasEntity()) {
             $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
             if ($targetEntity) {
                 $this->emailActivityManager->addAssociation($email, $targetEntity);
+
+                foreach ($contexts as $key => $context) {
+                    if (ClassUtils::getClass($context) === ClassUtils::getClass($targetEntity)
+                        && $context->getId() === $targetEntity->getId()) {
+                        unset($contexts[$key]);
+                    }
+                }
             }
+        }
+
+        foreach ($contexts as $context) {
+            $this->emailActivityManager->addAssociation($email, $context);
         }
 
         // flush all changes to the database

@@ -35,9 +35,15 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /**
+     * @var EmailActivityListProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $activityListProvider;
+
+    /**
      * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $entityManager;
+
 
     protected function setUp()
     {
@@ -55,11 +61,16 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->activityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
             $this->request,
             $this->entityManager,
-            $this->configManager
+            $this->configManager,
+            $this->activityListProvider
         );
     }
 
@@ -114,7 +125,8 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             $this->helper,
             $this->request,
             $this->entityManager,
-            $this->configManager
+            $this->configManager,
+            $this->activityListProvider
         );
 
         $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
@@ -164,7 +176,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
                 'helperDecodeClassNameCalls' => 1,
                 'emGetRepositoryCalls' => 0,
                 'helperPreciseFullEmailAddressCalls' => 1,
-                'helperGetUserCalls' => 0,
+                'helperGetUserCalls' => 1,
                 'helperBuildFullEmailAddress' => 0,
             ],
             [
@@ -176,7 +188,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
                 'helperDecodeClassNameCalls' => 0,
                 'emGetRepositoryCalls' => 0,
                 'helperPreciseFullEmailAddressCalls' => 0,
-                'helperGetUserCalls' => 2,
+                'helperGetUserCalls' => 3,
                 'helperBuildFullEmailAddress' => 2,
             ],
         ];
@@ -239,6 +251,9 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->helper->expects($this->once())
             ->method('getEmailBody');
+        $this->activityListProvider->expects($this->once())
+            ->method('getTargetEntities')
+            ->willReturn([]);
 
         $result = $this->emailModelBuilder->createReplyEmailModel($parentEmailEntity);
         $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
