@@ -70,8 +70,10 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
         $fileContent = "test attachment\n";
         $attachment = new EmailAttachment();
 
-        $uploadedFile = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->disableOriginalConstructor()
+        $uploadedFile = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+            ->enableOriginalConstructor()
+            ->setConstructorArgs([tempnam(sys_get_temp_dir(), ''), 'dummy'])
             ->getMock();
 
         $uploadedFile->expects($this->once())
