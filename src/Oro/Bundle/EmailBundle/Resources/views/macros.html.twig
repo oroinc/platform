@@ -327,19 +327,19 @@
     Render the given email attachments
     Parameters:
         attachments - an array
-        targetEntityData - target entity class and id
+        target - an object
+        hasGrantReattach - has grants for create attachment entity
 #}
-{% macro attachments(attachments, targetEntityData) -%}
+{% macro attachments(attachments, target, hasGrantReattach) -%}
     {%- for attachment in attachments -%}
-        <div class="dropdown link-to-record">
-            <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                <span class="label label-info">
-                    {{ attachment.entity.fileName|oro_format_filename }}
-                </span>
-            </a>
-            {% if attachment.can_reattach and targetEntityData.targetEntityClass is defined %}
+        <li class="email-attachments-list-item">
+            <div class="dropdown link-to-record">
+                <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
+                    <i class="icon icon-file-alt"></i> {{ attachment.fileName|oro_format_filename }}
+                </a>
+                {% if hasGrantReattach and target is defined and oro_can_attache(attachment, target) %}
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.entity.id}) }}">
+                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
                         {{ 'oro.email.attachment.open'|trans }}
                     </a>
                     {% set options = {
@@ -347,9 +347,9 @@
                         'url': path(
                             'oro_email_attachment_link',
                                 {
-                                    id: attachment.entity.id,
-                                    targetEntityClass: targetEntityData.targetEntityClass,
-                                    targetEntityId: targetEntityData.targetEntityId
+                                    id: attachment.id,
+                                    targetActivityClass: oro_class_name(target),
+                                    targetActivityId: target.id
                                 }
                             )
                     } %}
@@ -360,14 +360,15 @@
                             {{ 'oro.email.attachment.copy_to_record'|trans }}
                         </a>
                 </ul>
-            {% else %}
-            <ul class="dropdown-menu one" role="menu" aria-labelledby="dropdownMenu">
-                <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.entity.id}) }}">
-                    {{ 'oro.email.attachment.open'|trans }}
-                </a>
-            </ul>
-            {% endif %}
-        </div>
+                {% else %}
+                <ul class="dropdown-menu one" role="menu" aria-labelledby="dropdownMenu">
+                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+                        {{ 'oro.email.attachment.open'|trans }}
+                    </a>
+                </ul>
+                {% endif %}
+            </div>
+        </li>
     {%- endfor -%}
 {%- endmacro %}
 

@@ -461,7 +461,9 @@ services:
         arguments:
             - @oro_email.email_holder_helper
             - @oro_email.email.address.helper
+            - @oro_email.manager.email_attachment_manager
             - @doctrine.orm.entity_manager
+            - @oro_entity.routing_helper
         tags:
             - { name: twig.extension }
 

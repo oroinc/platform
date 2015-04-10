@@ -56,7 +56,8 @@ class EmailController extends Controller
         return [
             'entity' => $entity,
             'noBodyFound' => $noBodyFound,
-            'attachments' => $this->prepareAttachments($entity),
+            'target' => $this->getTargetEntity($entity),
+            'hasGrantReattach' => $this->isAttachmentCreationGranted(),
             'targetEntityData' => $this->getTargetEntityConfig()
         ];
     }
@@ -84,20 +85,12 @@ class EmailController extends Controller
         );
         $this->loadEmailBody($emails);
 
-        $routeParameters = [];
-        $entityClass = $this->getRequest()->get('targetActivityClass');
-        if ($entityClass) {
-            $routeParameters['entityClass'] = $entityClass;
-        }
-        $entityId = $this->getRequest()->get('targetActivityId');
-        if ($entityId) {
-            $routeParameters['entityId'] = $entityId;
-        }
-
         return [
             'entity' => $entity,
             'thread' => $emails,
-            'routeParameters' => $routeParameters
+            'target' => $this->getTargetEntity($entity),
+            'hasGrantReattach' => $this->isAttachmentCreationGranted(),
+            'routeParameters' => $this->getTargetEntityConfig()
         ];
     }
 
@@ -384,8 +377,8 @@ class EmailController extends Controller
     protected function getTargetEntityConfig($encode = true)
     {
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
-        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
+        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
+        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
         if ($encode) {
             $targetEntityClass = $entityRoutingHelper->encodeClassName($targetEntityClass);
         }
@@ -393,8 +386,8 @@ class EmailController extends Controller
             return [];
         }
         return [
-            'targetEntityClass' => $targetEntityClass,
-            'targetEntityId' => $targetEntityId
+            'entityClass' => $targetEntityClass,
+            'entityId' => $targetEntityId
         ];
     }
 
@@ -406,8 +399,8 @@ class EmailController extends Controller
     protected function getTargetEntity()
     {
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
-        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetEntityId');
+        $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
+        $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
         $entity = $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
 
         return $entity;
@@ -420,7 +413,7 @@ class EmailController extends Controller
     {
         $enabledAttachment = false;
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetEntityClass');
+        $entityClassName = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
         if (null !== $entityClassName) {
             /** @var ConfigProvider $targetConfigProvider */
             $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
@@ -432,39 +425,5 @@ class EmailController extends Controller
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
-    }
-
-    /**
-     * @param Email $entity
-     *
-     * @return array
-     */
-    protected function prepareAttachments($entity)
-    {
-        $result = [];
-        if ($entity->getEmailBody()->getHasAttachments()) {
-            $emailAttachmentManager = $this->get('oro_email.manager.email_attachment_manager');
-            $target = $this->getTargetEntityConfig(false);
-            $allowed = $this->isAttachmentCreationGranted();
-            $emailAttachments = $entity->getEmailBody()->getAttachments();
-
-            foreach ($emailAttachments as $attachment) {
-                $attach = [
-                    'entity' => $attachment,
-                    'can_reattach' => true
-                ];
-                if (
-                    !$allowed
-                    || $emailAttachmentManager
-                        ->validateEmailAttachmentForTargetClass($attachment, $target['targetEntityClass'])->count() > 0
-                    || $emailAttachmentManager->isAttached($attachment, $this->getTargetEntity())
-                ) {
-                    $attach['can_reattach'] = false;
-                }
-                $result[] = $attach;
-            }
-        }
-
-        return $result;
     }
 }

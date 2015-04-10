@@ -4,9 +4,12 @@ namespace Oro\Bundle\EmailBundle\Twig;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 
@@ -20,21 +23,27 @@ class EmailExtension extends \Twig_Extension
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
+    /** @var EmailAttachmentManager */
+    protected $emailAttachmentManager;
+
     /** @var EntityManager */
     protected $em;
 
     /**
      * @param EmailHolderHelper $emailHolderHelper
      * @param EmailAddressHelper $emailAddressHelper
+     * @param EmailAttachmentManager $emailAttachmentManager
      * @param EntityManager $em
      */
     public function __construct(
         EmailHolderHelper $emailHolderHelper,
         EmailAddressHelper $emailAddressHelper,
+        EmailAttachmentManager $emailAttachmentManager,
         EntityManager $em
     ) {
         $this->emailHolderHelper = $emailHolderHelper;
         $this->emailAddressHelper = $emailAddressHelper;
+        $this->emailAttachmentManager = $emailAttachmentManager;
         $this->em = $em;
     }
 
@@ -48,7 +57,8 @@ class EmailExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_get_email_address_name', [$this, 'getEmailAddressName']),
             new \Twig_SimpleFunction('oro_get_email_address', [$this, 'getEmailAddress']),
             new \Twig_SimpleFunction('oro_get_email_thread_recipients', [$this, 'getEmailThreadRecipients']),
-            new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments'])
+            new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
+            new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach'])
         ];
     }
 
@@ -121,6 +131,29 @@ class EmailExtension extends \Twig_Extension
         return null !== $result
             ? $result
             : '';
+    }
+
+    /**
+     * Check possibility of reattach
+     *
+     * @param EmailAttachment $emailAttachment
+     * @param object $targetEntity
+     * @param string $targetClass
+     *
+     * @return bool
+     */
+    public function canReAttach($emailAttachment, $targetEntity)
+    {
+        if ($this->emailAttachmentManager
+                ->validateEmailAttachmentForTargetClass(
+                    $emailAttachment,
+                    ClassUtils::getRealClass($targetEntity)
+                )->count() > 0
+            || $this->emailAttachmentManager->isAttached($emailAttachment, $targetEntity)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
