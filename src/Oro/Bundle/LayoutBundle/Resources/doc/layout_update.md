@@ -126,7 +126,7 @@ Special grouping conditions (such as `@or`, `@and`) could be utilized in order t
 
 **Example**
 
-```yml
+```yaml
 layout:
     actions:
         ....

@@ -22,6 +22,7 @@ There are few ways how context could be accessed. Most common ways are the follo
  
  - Access context from the `BlockInterface` instance. For example when need to get values from context during view building.
    Example:
+
    ```php
     /**
      * {@inheritdoc}
@@ -35,7 +36,8 @@ There are few ways how context could be accessed. Most common ways are the follo
  - Access context using [ConfigExpression component](../../../../Component/ConfigExpression/README.md) by providing 
    expression as an option for some block.
    Example:
-   ```yml
+
+   ```yaml
     actions:
         ...
         - @add:
@@ -52,7 +54,7 @@ Context configurators
 
 It might be required to configure the context based on current application state, client setting or just define 
 default values and so on. In order to prevent copy paste of boilerplate code **context configurators** have been introduced.
-Each configurator should implement `\Oro\Component\Layout\ContextConfiguratorInterface` and be registered as a service 
+Each configurator should implement [ContextConfiguratorInterface](../../../../Component/Layout/ContextConfiguratorInterface.php) and be registered as a service 
 in DI container with the tag `layout.context_configurator`. 
 
 For debugging purposes `oro:layout:debug --context` command has been added, it allows to see how the context data-resolver will
