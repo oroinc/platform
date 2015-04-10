@@ -105,12 +105,14 @@ define([
          * (excludes cancel action)
          */
         beforePageChange: function (e) {
-            var action = $(e.target).data('action');
+            var action = $(e.target).data('action'),
+                href = $(e.target).attr('href');
             if (
                 action !== 'cancel' &&
                     !this._isStateTraceRequired() &&
                     this._isStateChanged() &&
-                    mediator.execute('compareUrl', $(e.target).attr('href'))
+                    !mediator.execute('compareUrl', href) && // link to same page
+                    href.substr(0, 11) !== 'javascript:' // javascript code link
             ) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
