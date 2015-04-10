@@ -53,7 +53,7 @@
                                 $.ajax({
                                     url: '{{ path('oro_email_context_add') }}',
                                     type: 'POST',
-                                    data: {id: id, contextAlias: contextAlias},
+                                    data: {sourceId: {{ sourceEntity.id }}, targetId: id, targetContextAlias: contextAlias},
                                     dataType: 'json',
                                     success: function (res) {
                                         if (res.success) {

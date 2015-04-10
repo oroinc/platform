@@ -263,7 +263,7 @@ class EmailController extends Controller
         $entityProvider = $this->get('oro_entity.entity_provider');
         $entityTargets = $this->get('oro_entity.entity.manager')->getSupportedTargets($entityProvider, $emailEntity);
         return [
-            'emailEntity' => $emailEntity,
+            'sourceEntity' => $emailEntity,
             'entityTargets' => $entityTargets,
             'params' => [
                 'grid_path' => $this->generateUrl(
@@ -304,12 +304,13 @@ class EmailController extends Controller
         $responseContent = [];
 
         try {
-            $id = $this->getRequest()->get('id');
-            $contextAlias = $this->getRequest()->get('contextAlias');
+            $sourceId = $this->getRequest()->get('sourceId');
+            $targetId = $this->getRequest()->get('targetId');
+            $targetContextAlias = $this->getRequest()->get('targetContextAlias');
             $entityTarget = $this->get('oro_entity.entity.manager')->getSupportedTargets(
                 $entityProvider,
                 new Email(),
-                $contextAlias
+                $targetContextAlias
             );
 
             $responseContent['success'] = true;

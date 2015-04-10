@@ -17,3 +17,7 @@
 .fa-google:before {
   content: "\f1a0";
 }
+
+.icon-context:before {
+    content: "\f185";
+}
