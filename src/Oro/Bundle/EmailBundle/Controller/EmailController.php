@@ -394,16 +394,17 @@ class EmailController extends Controller
     /**
      * Get target entity
      *
-     * @return object
+     * @return object|null
      */
     protected function getTargetEntity()
     {
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
         $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
-        $entity = $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
-
-        return $entity;
+        if (!$targetEntityClass || !$targetEntityId) {
+            return null;
+        }
+        return $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
     }
 
     /**
