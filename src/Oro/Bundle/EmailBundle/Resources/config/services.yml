@@ -513,3 +513,4 @@ services:
             - @oro_email.email.thread.provider
             - @doctrine.orm.entity_manager
             - @oro_attachment.provider.attachment
+            - @oro_locale.formatter.date_time

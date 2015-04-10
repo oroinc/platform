@@ -51,7 +51,7 @@
         <div class="attachment-actions">
             <div class="pull-left">
                 <a class="upload-new" href="javascript:void(0);">Upload New File</a>
-                <input class="input-upload-new" type="file"/>
+                <input class="input-upload-new" type="file" multiple/>
             </div>
             <div class="pull-right">
                 <a class="btn cancel">Cancel</a>
@@ -62,16 +62,16 @@
 
     <script type="text/template" id="email-attachment-list-row-view">
         <% if (visible) { %>
-            <div>
+            <div style="line-height: 26px; font-size: 11px">
         <% } else { %>
-            <div style="display: none">
+            <div style="line-height: 26px; display: none; font-size: 11px">
         <% } %>
         <% if (checked) { %>
             <input type="checkbox" style="display: inline-block; width: 24px" checked>
         <% } else { %>
             <input type="checkbox" style="display: inline-block; width: 24px">
         <% } %>
-            <span style="padding-top: 1px"><%= fileName %></span>
+            <span style="padding-top: 1px"><%= fileName %> (<%= info %>)</span>
         </div>
     </script>
 
@@ -90,7 +90,8 @@
         {% set attachmentAvailableArray = {
             'id': attachment.id,
             'type': attachment.type,
-            'fileName': attachment.fileName
+            'fileName': attachment.fileName,
+            'info': attachment.info
         } %}
         {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
     {% endfor %}

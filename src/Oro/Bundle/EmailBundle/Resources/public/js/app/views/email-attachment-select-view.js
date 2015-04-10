@@ -12,7 +12,6 @@ define(function (require) {
         itemView: EmailAttachmentListRowView,
         isShowed: false,
         fileNameFilter: '',
-        collectionOriginal: null,
 
         events: {
             'click .cancel':                 'cancelClick',
@@ -20,12 +19,6 @@ define(function (require) {
             'click .attach':                 'attachClick',
             'change input.input-upload-new': 'fileSelected',
             'input input.filter':            'filterChange'
-        },
-
-        initialize: function(options) {
-            EmailAttachmentSelectView.__super__.initialize.call(this, options);
-
-            this.collectionOriginal = this.collection;
         },
 
         cancelClick: function() {
@@ -48,6 +41,8 @@ define(function (require) {
                     data.append(key, value);
                 });
 
+                var self = this;
+
                 $.ajax({
                     url: routing.generate('oro_email_attachment_upload'),
                     type: 'POST',
@@ -57,14 +52,10 @@ define(function (require) {
                     processData: false,
                     contentType: false,
                     success: function (data, textStatus, jqXHR) {
-                        console.log(data);
-                        console.log(textStatus);
-                        console.log(jqXHR);
+                        self.collection.add(data.attachments)
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(jqXHR);
-                        console.log(textStatus);
-                        console.log(errorThrown);
+                        alert('error');
                     }
                 });
             }
@@ -73,7 +64,7 @@ define(function (require) {
         filterChange: function(event) {
             var value = $(event.target).val();
 
-            this.collectionOriginal.each(function(model) {
+            this.collection.each(function(model) {
                 if (model.get('fileName').indexOf(value) === 0) {
                     model.set('visible', true)
                 } else {

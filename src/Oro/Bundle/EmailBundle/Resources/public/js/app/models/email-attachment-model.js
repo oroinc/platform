@@ -13,6 +13,7 @@ define(function (require) {
             id: null,
             type: '',
             fileName: '',
+            info: '',
             checked: false, // whether file is checked for attaching to an email
             visible: true
         },

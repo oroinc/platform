@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class EmailAttachment
 {
@@ -23,6 +24,16 @@ class EmailAttachment
      * @var string
      */
     protected $fileName;
+
+    /**
+     * @var int
+     */
+    protected $fileSize;
+
+    /**
+     * @var string
+     */
+    protected $modified;
 
     /**
      * @var EmailAttachment
@@ -108,5 +119,78 @@ class EmailAttachment
     public function getFileName()
     {
         return (string) $this->fileName;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFileSize()
+    {
+        return $this->fileSize;
+    }
+
+    /**
+     * @param int $fileSize
+     *
+     * @return $this
+     */
+    public function setFileSize($fileSize)
+    {
+        $this->fileSize = $fileSize;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModified()
+    {
+        return $this->modified;
+    }
+
+    /**
+     * @param string $modified
+     *
+     * @return $this
+     */
+    public function setModified($modified)
+    {
+        $this->modified = $modified;
+
+        return $this;
+    }
+
+    /**
+     * get string info
+     * @return string
+     */
+    public function getInfo()
+    {
+        $info = '';
+        if ($this->fileSize) {
+            $info .= $this->humanFilesize($this->fileSize, 1);
+        }
+        if ($this->modified) {
+            $info .= ', ' . $this->modified;
+        }
+
+        return $info;
+    }
+
+    /**
+     * todo move to formatter
+     *
+     * @param     $bytes
+     * @param int $dec
+     *
+     * @return string
+     */
+    protected function humanFilesize($bytes, $dec = 2)
+    {
+        $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $factor = floor((strlen($bytes) - 1) / 3);
+
+        return sprintf("%.{$dec}f", $bytes / pow(1024, $factor)) . @$size[$factor];
     }
 }

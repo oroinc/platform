@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class EmailAttachmentProvider
 {
@@ -28,18 +29,26 @@ class EmailAttachmentProvider
     protected $attachmentProvider;
 
     /**
+     * @var DateTimeFormatter
+     */
+    protected $dateTimeFormatter;
+
+    /**
      * @param EmailThreadProvider $emailThreadProvider
      * @param EntityManager       $entityManager
      * @param AttachmentProvider  $attachmentProvider
+     * @param DateTimeFormatter   $dateTimeFormatter
      */
     public function __construct(
         EmailThreadProvider $emailThreadProvider,
         EntityManager $entityManager,
-        AttachmentProvider $attachmentProvider
+        AttachmentProvider $attachmentProvider,
+        DateTimeFormatter $dateTimeFormatter
     ) {
         $this->emailThreadProvider = $emailThreadProvider;
         $this->em                  = $entityManager;
         $this->attachmentProvider  = $attachmentProvider;
+        $this->dateTimeFormatter   = $dateTimeFormatter;
     }
 
     /**
@@ -81,6 +90,10 @@ class EmailAttachmentProvider
             $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
             $attachmentModel->setId($oroAttachment->getId());
             $attachmentModel->setFileName($oroAttachment->getFile()->getOriginalFilename());
+            $attachmentModel->setFileSize($oroAttachment->getFile()->getFileSize());
+            $attachmentModel->setModified($this->dateTimeFormatter->format(
+                $oroAttachment->getCreatedAt()
+            ));
 
             $attachments[] = $attachmentModel;
         }
@@ -117,6 +130,8 @@ class EmailAttachmentProvider
         $attachmentModel->setEmailAttachment($emailAttachment);
         $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
         $attachmentModel->setId($emailAttachment->getId());
+        $attachmentModel->setFileSize(strlen($emailAttachment->getContent()->getContent()));
+        $attachmentModel->setModified($this->dateTimeFormatter->format(new \DateTime('now'))); // todo now?
 
         return $attachmentModel;
     }

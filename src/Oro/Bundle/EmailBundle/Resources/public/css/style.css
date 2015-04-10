@@ -186,6 +186,7 @@ a.attachment .icon .icon-link {
 .attachment-list {
     height: 200px;
     padding: 10px 0;
+    overflow-y: scroll;
 }
 
 .email-body-actions #attach-file {
