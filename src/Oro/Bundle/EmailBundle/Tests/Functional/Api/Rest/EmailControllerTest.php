@@ -58,6 +58,15 @@ class EmailControllerTest extends WebTestCase
         $this->assertCount(2, $result);
     }
 
+    public function testGetAssociatioData()
+    {
+        $id = $this->getReference('email_1')->getId();
+        $result = $this->getAssosiactionData($id);
+
+//        $this->assertNotEmpty($result);
+//        $this->assertCount(2, $result);
+    }
+
     public function testDeleteAssociation()
     {
         $id = $this->getReference('email_1')->getId();
@@ -89,6 +98,19 @@ class EmailControllerTest extends WebTestCase
         $result = $this->getAssosiaction($id);
         $this->assertNotEmpty($result);
         $this->assertCount(1, $result);
+    }
+
+
+    protected function getAssosiactionData($id)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_email_associations_data', ['entityId' => $id])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        return $result;
     }
 
 

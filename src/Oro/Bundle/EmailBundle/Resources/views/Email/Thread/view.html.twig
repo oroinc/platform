@@ -77,12 +77,20 @@
     {% endfor %}
 
     {% set options = {
-        items: itemsArray
+        items: itemsArray,
+        entityId: entity.id
     } %}
 
-    <div id="test" data-page-component-module="oroemail/js/app/components/email-context-activity-component"
-         data-page-component-options="{{ options|json_encode }}">
+
+    <div class="email-context-activity">
+        <div class="email-context-activity-label" style="float: left">
+                Contexts
+            </div>
+        <div id="test" data-page-component-module="oroemail/js/app/components/email-context-activity-component"
+             data-page-component-options="{{ options|json_encode }}">
+        </div>
     </div>
+
 {% endblock stats %}
 
 {% block content_data %}

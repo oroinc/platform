@@ -27,7 +27,7 @@ define(function (require) {
             }
 
             /**
-             * on adding activity item listen to "widget:doRefresh:activity-list-widget"
+             * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
              */
             mediator.setHandler('widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this );
         },
@@ -37,7 +37,16 @@ define(function (require) {
         },
 
         doRefresh: function() {
-            console.log("1");
+            var self = this;
+            var  url = routing.generate('oro_api_get_email_associations_data', {entityId: this.options.entityId });
+            $.ajax({
+                method: "GET",
+                url: url,
+                success:function(r) {
+                    self.collection.reset();
+                    self.collection.add(r);
+                }
+            });
         },
 
         render: function() {
@@ -50,6 +59,11 @@ define(function (require) {
 
         initEvents: function() {
             var self = this;
+
+
+            this.collection.on('reset', function(model) {
+                $(self.$container.context).html('');
+            });
 
             this.collection.on('add', function(model) {
                 var view = self.template({

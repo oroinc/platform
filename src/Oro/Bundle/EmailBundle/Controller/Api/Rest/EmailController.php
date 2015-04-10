@@ -11,6 +11,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,6 +27,12 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * @RouteResource("email")
@@ -91,6 +98,78 @@ class EmailController extends RestGetController
     }
 
     /**
+     * @param integer $entityId Entity id
+     *
+     * @ApiDoc(
+     *      description="Returns an AssociationList object",
+     *      resource=true,
+     *      statusCodes={
+     *          200="Returned when successful",
+     *          404="Activity association was not found",
+     *      }
+     * )
+     * @AclAncestor("oro_email_view")
+     * @return Response
+     */
+    public function getAssociationsDataAction($entityId)
+    {
+        /**
+         * @var $entity Email
+         */
+        $entity = $this->getManager()->find($entityId);
+        $associations = $entity->getActivityTargetEntities();
+        $itemsArray = array();
+        foreach ($associations as $association) {
+            $className = ClassUtils::getClass($association);
+            /**
+             * @var $configManager ConfigManager
+             */
+            $configManager = $this->container->get('oro_entity_config.config_manager');
+
+            if ($association instanceof FullNameInterface) {
+                $title = $association->getFirstName();
+                $route1 = $configManager->getEntityMetadata($className)->getRoute('view', false);
+
+              $link  = $this->container->get('router')->generate(
+                  $route1,
+                  array('id' => $association->getId())
+              );
+            } elseif ($association instanceof EmailHolderInterface) {
+                $title = $association->getEmail();
+                $route1 = $configManager->getEntityMetadata($className)->getRoute('view', false);
+              $link  = $this->container->get('router')->generate(
+                  $route1,
+                  array('id' => $association->getId())
+              );
+            } else {
+                $title = false;
+                $link = false;
+            }
+
+
+            $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+            $config = $entityConfigProvider->getConfig($className);
+
+
+
+            if ($title) {
+                $itemsArray[] = array(
+                    'entityId'=> $entity->getId(),
+                    'targetId'=> $association->getId(),
+                    "targetClassName"=> $className,
+                    'title'=> $title,
+                    'icon'=> $config->get('icon'),
+                    'link'=> $link
+                );
+            }
+        }
+
+        return $this->handleView(
+            $this->view($itemsArray, is_array($associations) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
+        );
+    }
+
+    /**
      * Add new association
      *
      * @QueryParam(
@@ -143,7 +222,7 @@ class EmailController extends RestGetController
                     $em->persist($entity);
                     $em->flush();
 
-                    $view = $this->view($entity, Codes::HTTP_OK);
+                    $view = $this->view(['status' => Codes::HTTP_OK], Codes::HTTP_OK);
                 } else {
                     $view = $this->view([], Codes::HTTP_ALREADY_REPORTED);
                 }
