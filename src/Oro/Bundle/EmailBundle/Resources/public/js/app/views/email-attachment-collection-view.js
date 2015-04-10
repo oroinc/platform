@@ -35,6 +35,7 @@ define(function (require) {
             if (!model.get('id')) {
                 this.getItemView(model).fileSelect();
             }
+            this.showHideAttachmentRow();
         },
 
         collectionRemove: function() {
@@ -48,11 +49,6 @@ define(function (require) {
                 this.$el.show();
             }
         },
-
-        collectionChange: function() {
-            this.sanitizeCollection();
-            this.showHideAttachmentRow();
-        }
     });
 
     return EmailAttachmentCollectionView;
