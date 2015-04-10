@@ -69,7 +69,8 @@
     {% endfor %}
 
     {% set options = {
-        items: itemsArray
+        items: itemsArray,
+        entityId: entity.id
     } %}
 
     <div id="test" data-page-component-module="oroemail/js/app/components/email-context-activity-component"
