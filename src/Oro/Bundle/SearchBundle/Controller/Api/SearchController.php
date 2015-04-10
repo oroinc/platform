@@ -72,31 +72,16 @@ class SearchController extends FOSRestController
      */
     public function getAutocompleteAction()
     {
-        $searchResults = $this->get('oro_search.index')->simpleSearch(
-            $this->getRequest()->get('query'),
-            (int) $this->getRequest()->get('offset'),
-            (int) $this->getRequest()->get('max_results'),
-            $this->getRequest()->get('from')
-        );
-
-        $configExtension = $this->get('oro_entity_config.twig.extension.config');
-        $result = [];
-        foreach ($searchResults->getElements() as $item) {
-            $className = $item->getEntityName();
-            $text = $item->getRecordTitle();
-            if ($label = $configExtension->getClassConfigValue($className, 'label')) {
-                $label = $this->get('translator')->trans($label);
-                $text .= ' (' . $label . ')';
-            }
-            $result[] = [
-                'text' => $text,
-                'id'   => json_encode([
-                    'entityClass' => $className,
-                    'entityId'    => $item->getRecordId(),
-                ]),
-            ];
+        if ($this->getRequest()->get('search_by_id')) {
+            $results = $this->get('oro_search.index')->autocompleteSearchById($this->getRequest()->get('query'));
+        } else {
+            $results = $this->get('oro_search.index')->autocompleteSearch(
+                $this->getRequest()->get('query'),
+                (int) $this->getRequest()->get('offset'),
+                (int) $this->getRequest()->get('max_results')
+            );
         }
 
-        return new Response(json_encode(['results' => $result]), Codes::HTTP_OK);
+        return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
     }
 }

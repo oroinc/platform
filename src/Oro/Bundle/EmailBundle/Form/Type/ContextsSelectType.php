@@ -8,7 +8,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EmailBundle\Form\DataTransformer\ContextsTransformer;
+use Oro\Bundle\EmailBundle\Form\DataTransformer\ContextsToModelTransformer;
+use Oro\Bundle\EmailBundle\Form\DataTransformer\ContextsToViewTransformer;
 
 class ContextsSelectType extends AbstractType
 {
@@ -30,7 +31,11 @@ class ContextsSelectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer(
-            new ContextsTransformer($this->entityManager)
+            new ContextsToModelTransformer($this->entityManager)
+        );
+        $builder->resetViewTransformers();
+        $builder->addViewTransformer(
+            new ContextsToViewTransformer($this->entityManager)
         );
     }
 
@@ -43,11 +48,12 @@ class ContextsSelectType extends AbstractType
             [
                 'tooltip' => false,
                 'configs' => [
-                    'placeholder'   => 'oro.email.contexts.placeholder',
-                    'allowClear'    => true,
-                    'multiple'      => true,
-                    'route_name'    => 'oro_api_get_search_autocomplete',
-                    'separator'     => ';',
+                    'placeholder'       => 'oro.email.contexts.placeholder',
+                    'allowClear'        => true,
+                    'multiple'          => true,
+                    'route_name'        => 'oro_api_get_search_autocomplete',
+                    'separator'         => ';',
+                    'containerCssClass' => 'taggable-email',
                 ]
             ]
         );

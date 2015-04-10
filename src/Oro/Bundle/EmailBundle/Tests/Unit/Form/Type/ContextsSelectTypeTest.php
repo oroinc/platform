@@ -54,11 +54,12 @@ class ContextsSelectTypeTest extends TypeTestCase
                 [
                     'tooltip' => false,
                     'configs' => [
-                        'placeholder'   => 'oro.email.contexts.placeholder',
-                        'allowClear'    => true,
-                        'multiple'      => true,
-                        'route_name'    => 'oro_api_get_search_autocomplete',
-                        'separator'     => ';',
+                        'placeholder'       => 'oro.email.contexts.placeholder',
+                        'allowClear'        => true,
+                        'multiple'          => true,
+                        'route_name'        => 'oro_api_get_search_autocomplete',
+                        'separator'         => ';',
+                        'containerCssClass' => 'taggable-email',
                     ]
                 ]
             );

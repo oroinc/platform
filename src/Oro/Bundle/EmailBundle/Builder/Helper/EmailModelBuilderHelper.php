@@ -205,6 +205,16 @@ class EmailModelBuilderHelper
     }
 
     /**
+     * @param string $entityClass
+     * @param string $entityId
+     * @return object
+     */
+    public function getTargetEntity($entityClass, $entityId)
+    {
+        return $this->entityRoutingHelper->getEntity($entityClass, $entityId);
+    }
+
+    /**
      * @param $entity
      *
      * @return bool

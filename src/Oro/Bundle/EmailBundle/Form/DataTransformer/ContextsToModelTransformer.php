@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Doctrine\ORM\EntityManager;
 
-class ContextsTransformer implements DataTransformerInterface
+use Symfony\Component\Form\DataTransformerInterface;
+
+class ContextsToModelTransformer implements DataTransformerInterface
 {
     /**
      * @var EntityManager
@@ -35,8 +35,7 @@ class ContextsTransformer implements DataTransformerInterface
             return [];
         }
 
-        $data = implode(',', $value);
-        $targets = explode(';', $data);
+        $targets = explode(';', $value);
         $result = [];
         foreach ($targets as $target) {
             $target = json_decode($target, true);

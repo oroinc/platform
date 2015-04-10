@@ -176,7 +176,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
                 'helperDecodeClassNameCalls' => 1,
                 'emGetRepositoryCalls' => 0,
                 'helperPreciseFullEmailAddressCalls' => 1,
-                'helperGetUserCalls' => 0,
+                'helperGetUserCalls' => 1,
                 'helperBuildFullEmailAddress' => 0,
             ],
             [
@@ -188,7 +188,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
                 'helperDecodeClassNameCalls' => 0,
                 'emGetRepositoryCalls' => 0,
                 'helperPreciseFullEmailAddressCalls' => 0,
-                'helperGetUserCalls' => 2,
+                'helperGetUserCalls' => 3,
                 'helperBuildFullEmailAddress' => 2,
             ],
         ];
