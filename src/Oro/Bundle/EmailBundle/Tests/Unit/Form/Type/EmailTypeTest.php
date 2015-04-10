@@ -15,7 +15,6 @@ use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
-use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;

@@ -446,3 +446,40 @@ a.attachment .icon .icon-link {
     left: 9px;
   }
 }
+
+.context-item {
+  list-style: none;
+  cursor: pointer;
+  padding: 0 7px 0 7px;
+  .active {
+    background-color: #ebebeb;
+  }
+}
+#context-items-dropdown {
+  margin: -1px 0 0 0;
+  min-width: 0;
+  position: absolute;
+  width: auto;
+  border: 1px solid #ccc;
+  background-color: white;
+  z-index: 1000;
+  top: 35px;
+  left: 15px;
+}
+#email-context-current-block {
+  cursor: pointer;
+  background-color:#FFFFFF;
+  border: none;
+  outline:none;
+  margin: 10px 10px 15px 10px;
+}
+#email-context-current-item {
+  font-size: 18px;
+  font-weight: bold;
+}
+.customer-content .context-item {
+  display: inline-block;
+  float: left;
+  position: relative;
+  margin-right: 8px;
+}
