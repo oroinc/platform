@@ -61,6 +61,7 @@
 //                                        if (res.success) {
                                             messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
                                             mediator.trigger('widget_success:activity_list:item:update');
+                                            mediator.execute('widget:doRefresh:email-context-activity-list-widget');
 //                                        } else {
 //                                            messenger.notificationFlashMessage('error', res.message);
 //                                        }
