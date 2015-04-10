@@ -153,3 +153,6 @@
     position: relative;
     margin-right: 8px;
 }
+.customer-content .context-item .icon-remove {
+    cursor: pointer;
+}
