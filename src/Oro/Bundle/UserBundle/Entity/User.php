@@ -49,7 +49,7 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *      routeName="oro_user_index",
  *      routeView="oro_user_view",
  *      defaultValues={
- *          "entity"={"icon"="icon-user"},
+ *          "entity"={"icon"="icon-user","context-grid"="users-for-context-grid"},
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
