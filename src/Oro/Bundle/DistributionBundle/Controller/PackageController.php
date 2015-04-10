@@ -20,7 +20,7 @@ class PackageController extends Controller
     protected function setUpEnvironment()
     {
         $kernelRootDir = $this->container->getParameter('kernel.root_dir');
-        putenv(sprintf('COMPOSER_HOME=%s/cache/composer', $kernelRootDir));
+        putenv(sprintf('COMPOSER_HOME=%s', $this->container->getParameter('oro_distribution.composer_cache_home')));
         chdir(realpath($kernelRootDir . '/../'));
         set_time_limit(0);
     }
@@ -103,7 +103,6 @@ class PackageController extends Controller
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
-        $responseContent = [];
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 

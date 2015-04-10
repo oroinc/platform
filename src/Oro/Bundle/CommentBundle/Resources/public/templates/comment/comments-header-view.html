@@ -1,0 +1,25 @@
+<h5>
+    <%= _.__('oro.comment.entity_plural_label') %>
+    <% if (state.totalItemsQuantity !== 0) { %>
+        (<%= state.totalItemsQuantity %>)
+    <% } %>
+</h5>
+<% if (syncState === 'synced') { %>
+    <% if (state.totalItemsQuantity == 0) { %>
+        <div class="no-data"><span><%= _.__('oro.comment.noData') %></span></div>
+    <% } else if (state.totalItemsQuantity !== items.length && state.totalItemsQuantity !== 0) { %>
+    <a class="load-more"><span class="load-more-label">
+        <%= _.__(
+            state.totalItemsQuantity - items.length > state.loadMoreItemsQuantity ?
+                'oro.comment.loadMoreWithTotals' :
+                'oro.comment.loadMore',
+            {
+                count: Math.min(state.loadMoreItemsQuantity, state.totalItemsQuantity - items.length),
+                total: state.totalItemsQuantity - items.length
+            }
+        ) %>
+    </span></a>
+    <% } %>
+<% } else { %>
+    <div class="load-more process"><span class="load-more-label"></span></div>
+<% } %>

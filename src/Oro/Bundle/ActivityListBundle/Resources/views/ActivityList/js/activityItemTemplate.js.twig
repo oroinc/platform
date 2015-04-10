@@ -1,0 +1,15 @@
+{% extends 'OroActivityListBundle:ActivityList/js:view.js.twig' %}
+
+{% block activityIcon %}
+    <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
+{% endblock %}
+
+{% block activityActionsList %}
+<ul class="nav nav-pills icons-holder launchers-list">
+    {% for action in actions %}
+        <li class="launcher-item">
+            {{ action|raw }}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

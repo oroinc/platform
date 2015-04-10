@@ -292,6 +292,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->expects($this->any())
+            ->method('hasParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $container
+            ->expects($this->any())
+            ->method('getParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $container
+            ->expects($this->any())
             ->method('get')
             ->with('doctrine')
             ->willReturn($em);

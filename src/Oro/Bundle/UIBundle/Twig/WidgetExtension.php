@@ -90,8 +90,7 @@ class WidgetExtension extends \Twig_Extension
         $options['url'] = $this->getUrlWithContainer(
             $options['url'],
             $widgetType,
-            $options['wid'],
-            $options['state']['id']
+            $options['wid']
         );
 
         if ($this->request) {
@@ -114,7 +113,7 @@ class WidgetExtension extends \Twig_Extension
      * @param string $wid
      * @return string
      */
-    protected function getUrlWithContainer($url, $widgetType, $wid, $id)
+    protected function getUrlWithContainer($url, $widgetType, $wid)
     {
         if (strpos($url, '_widgetContainer=') === false) {
             $parts      = parse_url($url);
@@ -127,13 +126,6 @@ class WidgetExtension extends \Twig_Extension
                 $url .= '?' . $widgetPart;
             }
         }
-
-        if (strpos($url, '?') === false) {
-            $url .= '?';
-        } else {
-            $url .= '&';
-        }
-        $url .= '_widgetId=' . $id;
 
         return $url;
     }

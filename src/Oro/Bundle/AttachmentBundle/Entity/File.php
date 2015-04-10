@@ -127,6 +127,13 @@ class File extends ExtendFile
     protected $emptyFile;
 
     /**
+     * Indicates whether file is uploaded or created from other source (from email attachment for example)
+     *
+     * @var boolean
+     */
+    protected $uploaded = true;
+
+    /**
      * Get id
      *
      * @return integer
@@ -364,5 +371,21 @@ class File extends ExtendFile
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * @param bool $uploaded
+     */
+    public function setUploaded($uploaded)
+    {
+        $this->uploaded = $uploaded;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUploaded()
+    {
+        return $this->uploaded;
     }
 }

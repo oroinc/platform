@@ -79,12 +79,16 @@ class Dashboards extends AbstractPageFilteredGrid
         return $result;
     }
 
-    public function removeWidget($name)
+    public function removeWidget($name, $confirmation = true)
     {
         $this->test->byXPath(
             "//div[contains(@id, 'widget-container-dashboard-widget') and " .
             "//div[contains(@class, 'title') and contains(., '{$name}')]]//a[@title = 'Delete']"
         )->click();
+        if ($confirmation) {
+            $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[contains(., 'Yes')]")->click();
+        }
+
         $this->waitForAjax();
         return $this;
     }

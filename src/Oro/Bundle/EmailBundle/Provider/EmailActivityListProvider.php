@@ -167,8 +167,17 @@ class EmailActivityListProvider implements
             'headOwnerName' => $headEmail->getFromName(),
             'headSubject'   => $headEmail->getSubject(),
             'headSentAt'    => $headEmail->getSentAt()->format('c'),
-            'isHead'        => $email->isHead() && $email->getThread()
+            'isHead'        => $email->isHead() && $email->getThread(),
+            'treadId'       => $email->getThread() ? $email->getThread()->getId() : null
         ];
+
+        if ($email->getThread()) {
+            $emails = $email->getThread()->getEmails();
+            // if there are just two email - add replayedEmailId to use on client side
+            if (count($emails) == 2) {
+                $data['replayedEmailId'] = $emails[0]->getId();
+            }
+        }
 
         if ($email->getFromEmailAddress()->hasOwner()) {
             $owner             = $email->getFromEmailAddress()->getOwner();
