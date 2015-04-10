@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -13,7 +15,9 @@ use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 
 class EmailTypeTest extends TypeTestCase
@@ -42,6 +46,7 @@ class EmailTypeTest extends TypeTestCase
 
         $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
         $emailTemplateList = new EmailTemplateSelectType();
+        $attachmentsType   = new EmailAttachmentsType();
 
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -80,8 +85,9 @@ class EmailTypeTest extends TypeTestCase
                     $emailTemplateList->getName() => $emailTemplateList,
                     $emailAddressType->getName()  => $emailAddressType,
                     $richTextType->getName()      => $richTextType,
+                    $attachmentsType->getName()   => $attachmentsType,
                     ContextsSelectType::NAME      => $contextsSelectType,
-                    'genemu_jqueryselect2_hidden' => new Select2Type('hidden')
+                    'genemu_jqueryselect2_hidden' => new Select2Type('hidden'),
                 ],
                 []
             )
@@ -143,7 +149,6 @@ class EmailTypeTest extends TypeTestCase
         $this->assertEquals('oro_email_email', $type->getName());
     }
 
-
     public function messageDataProvider()
     {
         return [
@@ -154,6 +159,7 @@ class EmailTypeTest extends TypeTestCase
                     'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
                     'subject' => 'Test subject',
                     'type' => 'text',
+                    'attachments' => new ArrayCollection(),
                     'template' => new EmailTemplate(),
                 ],
                 ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],

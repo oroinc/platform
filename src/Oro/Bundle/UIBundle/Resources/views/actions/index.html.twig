@@ -32,13 +32,9 @@
             {% if gridScope is defined %}
                 {% set gridName = oro_datagrid_build_fullname(gridName, gridScope) %}
             {% endif %}
+            {% set renderParams = renderParams|default({})|merge({'enableFullScreenLayout': true}) %}
 
-            {% if params is defined %}
-                {% set params = params|merge({'enableFullScreenLayout': true }) %}
-            {% else %}
-                {% set params = {'enableFullScreenLayout': true } %}
-            {% endif %}
-            {{ dataGrid.renderGrid(gridName, params) }}
+            {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
 
             {# Only grids on index pages will be tagged #}
             <script type="text/javascript">

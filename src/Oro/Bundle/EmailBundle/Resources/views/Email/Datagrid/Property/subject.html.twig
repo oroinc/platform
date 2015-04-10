@@ -1,24 +1,7 @@
+{% import 'OroEmailBundle::macros.html.twig' as EA %}
+{% set emailBody = record.getValue('emailBody') %}
 
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-
-{% set emailId = record.getValue('id') %}
-{{ UI.clientLink({
-    'dataUrl': path('oro_email_view', {id: emailId}),
-    'aCss': 'no-hash',
-    'label' : value|default('oro.ui.empty'|trans),
-    'widget' : {
-        'type' : 'dialog',
-        'multiple' : false,
-        'options' : {
-            'alias': 'email_info_widget_' ~ emailId,
-            'dialogOptions' : {
-                'title' : value,
-                'allowMaximize': true,
-                'allowMinimize': true,
-                'dblclick': 'maximize',
-                'maximizedHeightDecreaseBy': 'minimize-bar',
-                'width': 600
-            }
-        }
-    },
-}) }}
+<strong>{{ value }}</strong>
+{% if emailBody.bodyContent is defined %}
+    - {{ EA.email_short_body(emailBody) }}
+{% endif %}

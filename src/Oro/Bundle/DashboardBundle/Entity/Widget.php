@@ -44,6 +44,13 @@ class Widget
     protected $dashboard;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="options", type="array", nullable=true)
+     */
+    protected $options = [];
+
+    /**
      * @return int
      */
     public function getId()
@@ -103,5 +110,25 @@ class Widget
     public function getDashboard()
     {
         return $this->dashboard;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        if ($this->options === null) {
+            $this->options = [];
+        }
+
+        return $this->options;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions(array $options = [])
+    {
+        $this->options = $options;
     }
 }

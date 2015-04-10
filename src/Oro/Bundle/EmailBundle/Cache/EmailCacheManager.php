@@ -7,7 +7,10 @@ use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
@@ -22,16 +25,24 @@ class EmailCacheManager implements LoggerAwareInterface
     /** @var EntityManager */
     protected $em;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * Constructor.
      *
-     * @param EmailBodyLoaderSelector $selector
-     * @param EntityManager           $em
+     * @param EmailBodyLoaderSelector  $selector
+     * @param EntityManager            $em
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(EmailBodyLoaderSelector $selector, EntityManager $em)
-    {
-        $this->selector = $selector;
-        $this->em       = $em;
+    public function __construct(
+        EmailBodyLoaderSelector $selector,
+        EntityManager $em,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        $this->selector          = $selector;
+        $this->em                = $em;
+        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
@@ -74,5 +85,8 @@ class EmailCacheManager implements LoggerAwareInterface
 
         $this->em->persist($email);
         $this->em->flush();
+
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
     }
 }

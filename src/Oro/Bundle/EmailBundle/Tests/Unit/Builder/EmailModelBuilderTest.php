@@ -276,14 +276,17 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $parentEmailEntity = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
 
-        $parentEmailEntity->expects($this->once())
-            ->method('getId');
-
         $this->helper->expects($this->once())
             ->method('prependWith');
 
-        $this->helper->expects($this->once())
-            ->method('getEmailBody');
+        $emailBody = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $emailBody->expects($this->exactly(1))
+            ->method('getAttachments')
+            ->willReturn([]);
+
+        $parentEmailEntity->expects($this->once())
+            ->method('getEmailBody')
+            ->willReturn($emailBody);
 
         $result = $this->emailModelBuilder->createForwardEmailModel($parentEmailEntity);
         $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);

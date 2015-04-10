@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
@@ -34,29 +35,48 @@ class CommentController extends RestController
      * @QueryParam(
      *      name="page",
      *      requirements="\d+",
-     *      default=1,
-     *      nullable=true, description="Page number, starting from 1. Default is 1."
+     *      nullable=true,
+     *      description="Page number, starting from 1. Default is 1."
      * )
      * @QueryParam(
-     *      name="filter", nullable=true,
-     *      description="Array with Activity type and Date range filters values"
+     *      name="limit",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Number of items per page. defaults to 10."
+     * )
+     * @QueryParam(
+     *     name="createdAt",
+     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
+     *     nullable=true,
+     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
+     * )
+     * @QueryParam(
+     *     name="updatedAt",
+     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
+     *     nullable=true,
+     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
      * )
      *
-     * @AclAncestor("oro_comment_view")
-     *
      * @ApiDoc(
-     *      description="Returns an array with collection of CommentList objects and count of all records",
+     *      description="Get filtered comment for given entity class name and id",
      *      resource=true,
      *      statusCodes={
      *          200="Returned when successful",
      *      }
      * )
+     * @AclAncestor("oro_comment_view")
+     *
      * @return JsonResponse
      */
     public function cgetAction($relationClass, $relationId)
     {
-        $page   = $this->getRequest()->get('page', 1);
-        $result = $this->getManager()->getCommentList($relationClass, $relationId, $page);
+        $page             = $this->getRequest()->get('page', 1);
+        $limit            = $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $dateParamFilter  = new HttpDateTimeParameterFilter();
+        $filterParameters = ['createdAt' => $dateParamFilter, 'updatedAt' => $dateParamFilter];
+        $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
+
+        $result = $this->getManager()->getCommentList($relationClass, $relationId, $page, $limit, $filterCriteria);
 
         return new JsonResponse($result);
     }

@@ -23,6 +23,8 @@ services:
             - "@router"
             - %installed%
             - %kernel.debug%
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }
 
     oro_installer.script_manager:
         class: %oro_installer.script_manager.class%

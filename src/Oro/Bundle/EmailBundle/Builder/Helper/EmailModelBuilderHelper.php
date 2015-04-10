@@ -150,6 +150,14 @@ class EmailModelBuilderHelper
     }
 
     /**
+     * @param EmailEntity $emailEntity
+     */
+    public function ensureEmailBodyCached(EmailEntity $emailEntity)
+    {
+        $this->emailCacheManager->ensureEmailBodyCached($emailEntity);
+    }
+
+    /**
      * @param string $className
      *
      * @return string
