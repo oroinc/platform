@@ -111,8 +111,8 @@ abstract class AbstractPage
             if (!window.onerror) {
                 window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
                     $('body').append(
-                        '<div style="background: #fff; color: #000; position: absolute; top: 15px; left: 15px;' +
-                            ' z-index: 999999; padding: 10px; right: 15px; border: 3px solid red;  border-radius: 5px;' +
+                        '<div style="background: #fff; color: #000; position: absolute; top: 15px; left: 15px; ' +
+                            'z-index: 999999; padding: 10px; right: 15px; border: 3px solid red;  border-radius: 5px;' +
                             'box-shadow: 10px 10px 40px; white-space: pre">' +
                             '<h5>Js error occured</h5>' +
                             errorMsg + '\\n' +
