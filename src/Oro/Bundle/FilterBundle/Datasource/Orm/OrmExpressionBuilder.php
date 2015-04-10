@@ -205,4 +205,12 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     {
         return new Coalesce($x);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function exists($x)
+    {
+        return $this->expr->exists($x);
+    }
 }

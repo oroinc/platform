@@ -1,0 +1,4 @@
+{% set emailCollapsed = true %}
+{% for email in items|reverse %}
+    {% include 'OroEmailBundle:Email/Thread:emailItem.html.twig' %}
+{% endfor %}

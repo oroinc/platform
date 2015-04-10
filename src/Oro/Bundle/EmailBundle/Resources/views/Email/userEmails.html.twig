@@ -7,11 +7,9 @@
 {% set gridName = 'user-email-grid' %}
 {# grid params #}
 {% set params = {'userId': app.user.id} %}
-{% oro_title_set({params : {"%username%": app.user.username} }) %}
 
 {% block breadcrumb %}
     {% set breadcrumbs = [
-        {'label': name },
         {'label': 'oro.email.menu.user_emails'|trans }
     ] %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
