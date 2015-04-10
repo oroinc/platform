@@ -110,8 +110,8 @@ oro:
             invitation_status.label: Invitation status
 
             no_color:             Use calendar color
-            updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}
-            added_by:             added by {{ user }} at {{ date }}
+            updated_by:           added by {{ user }}, updated by {{ editor }}
+            added_by:             added by {{ user }}
             update_event:         Update {{ entity }}
             delete_event:         Delete {{ entity }}
 
