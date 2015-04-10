@@ -44,8 +44,8 @@ oro:
             update: Edit
             delete: Delete
             clone: Clone
-            gridview_create_public: Create public named filter
-            gridview_edit_public: Edit public named filter
+            gridview_create_public: Share grid view
+            gridview_edit_public: Unshare grid view
 
         system_configuration:
             groups:
