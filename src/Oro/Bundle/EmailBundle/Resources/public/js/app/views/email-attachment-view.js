@@ -36,7 +36,7 @@ define(function (require) {
         },
 
         removeClick: function() {
-            this.model.destroy();
+            this.model.trigger('destroy', this.model);
         },
 
         fileSelect: function() {
