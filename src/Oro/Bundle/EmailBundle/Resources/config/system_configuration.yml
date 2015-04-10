@@ -12,6 +12,10 @@ oro_system_configuration:
             title: oro.email.system_configuration.email_threads.label
             priority: 90
 
+        attachment_configuration:
+            title: oro.email.system_configuration.attachment_configuration.label
+            priority: 110
+
     fields:
         oro_email.signature:
             data_type: string
@@ -28,6 +32,15 @@ oro_system_configuration:
                     1: oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label
                     0: oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label
 
+        oro_email.link_email_attachments_to_scope_entity:
+            data_type: boolean
+            type: choice
+            options:
+                label: oro.email.system_configuration.attachment_configuration.link_to_scope.label
+                choices:
+                    0: oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label
+                    1: oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label
+
     tree:
         system_configuration:
             platform:
@@ -40,8 +53,13 @@ oro_system_configuration:
                                         children:
                                             - oro_email.signature
                                             - oro_email.append_signature
+                                    attachment_configuration:
+                                        children:
+                                            - oro_email.link_email_attachments_to_scope_entity
 
     api_tree:
         signature_configuration:
             oro_email.signature: ~
             oro_email.append_signature: ~
+        attachment_configuration:
+            oro_email.link_email_attachments_to_scope_entity: ~

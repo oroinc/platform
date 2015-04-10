@@ -38,7 +38,9 @@ class Configuration implements ConfigurationInterface
             $rootNode,
             [
                 'signature' => ['value' => ''],
-                'append_signature' => ['value' => true]
+                'append_signature' => ['value' => true],
+                'use_threads_in_emails' => ['value' => true],
+                'link_email_attachments_to_scope_entity' => ['value' => false],
             ]
         );
 

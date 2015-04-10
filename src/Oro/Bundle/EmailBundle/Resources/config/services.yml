@@ -67,11 +67,14 @@ parameters:
     oro_email.workflow.action.send_email_template.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate
 
     oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
+    oro_email.listener.email_body_add_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener
 
     # Validators
     oro_email.validator.email_template_syntax_validator.class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
     oro_email.validator.email_address_validator.class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
     oro_email.validator.email_recipients_validator.class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
+
+    oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
 
 services:
     oro_email.entity.cache.warmer:
@@ -98,6 +101,7 @@ services:
         arguments:
             - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
+            - @event_dispatcher
         calls:
             - [setLogger, [@logger]]
 
@@ -344,6 +348,7 @@ services:
             - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
+            - @event_dispatcher
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
@@ -481,3 +486,21 @@ services:
     oro_email.link.formatter.name:
         tags:
             - { name: oro_service_link,  service: oro_locale.formatter.name }
+
+    oro_email.manager.email_attachment_manager:
+        class: %oro_email.manager.email_attachment_manager.class%
+        arguments:
+            - @knp_gaufrette.filesystem_map
+            - @doctrine.orm.entity_manager
+            - @kernel
+            - @oro_security.security_facade.link
+            - @oro_email.activity_list.provider
+            - @oro_attachment.validator.file_config_validator
+
+    oro_email.listener.email_body_add_listener:
+        class: %oro_email.listener.email_body_add_listener.class%
+        arguments:
+            - @oro_email.manager.email_attachment_manager
+            - @oro_config.user
+        tags:
+            - { name: kernel.event_listener, event: oro_email.email_attachment_manager.email_body_added, method: linkToScopeEvent, priority: 10 }
