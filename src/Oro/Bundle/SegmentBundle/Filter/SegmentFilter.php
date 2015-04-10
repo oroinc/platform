@@ -239,6 +239,6 @@ class SegmentFilter extends EntityFilter
             return $tableAliases[0] . '.' . $primaryKey[0];
         }
 
-        return $tableAliases[0] . '.' . SegmentSnapshot::ENTITY_REF_FIELD;
+        return 'CAST(' . $tableAliases[0] . '.' . SegmentSnapshot::ENTITY_REF_FIELD . ' as int)';
     }
 }
