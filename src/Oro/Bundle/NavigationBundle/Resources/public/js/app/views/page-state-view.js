@@ -8,7 +8,7 @@ define([
     'oroui/js/modal',
     'oroui/js/app/views/base/view',
     'base64'
-], function ($, _, routing, __, mediator, Modal, BaseView, base64) {
+], function ($, _, routing, __, mediator, Modal, BaseView) {
     'use strict';
 
     var PageStateView;
@@ -101,7 +101,12 @@ define([
          */
         beforePageChange: function (e) {
             var action = $(e.target).data('action');
-            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
+            if (
+                action !== 'cancel' &&
+                    !this._isStateTraceRequired() &&
+                    this._isStateChanged() &&
+                    mediator.execute('compareUrl', $(e.target).attr('href'))
+            ) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
@@ -395,7 +400,7 @@ define([
         _combinePageId: function () {
             var route;
             route = this._parseCurrentURL();
-            return base64.encode(route.path);
+            return base64_encode(route.path);
         },
 
         /**
