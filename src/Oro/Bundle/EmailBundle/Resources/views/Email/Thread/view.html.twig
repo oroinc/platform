@@ -21,9 +21,9 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
-    <script type="text/template" id="email-context-list">
+    <script type="text/template" id="email-context-activity-list">
         <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
-            <span data-id="<%= entity.get('id') %>">
+            <span data-id="<%= entity.get('targetId') %>">
                 <span class="<%= entity.get('icon') %>"></span>
 
                 <% if (entity.get('link')) { %>
@@ -58,8 +58,8 @@
         {% if title %}
             {% set itemArray = {
                 'entityId': entity.id,
-                'id': item.id,
-                "className": itemClassName ,
+                'targetId': item.id,
+                "targetClassName": itemClassName ,
                 'title': title,
                 'icon': icon,
                 'link': link
@@ -72,7 +72,7 @@
         items: itemsArray
     } %}
 
-    <div id="test" data-page-component-module="oroemail/js/app/components/email-context-component"
+    <div id="test" data-page-component-module="oroemail/js/app/components/email-context-activity-component"
          data-page-component-options="{{ options|json_encode }}">
     </div>
 {% endblock stats %}

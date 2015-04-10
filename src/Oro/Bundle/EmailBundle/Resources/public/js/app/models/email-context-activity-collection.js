@@ -2,20 +2,20 @@
 define(function (require) {
     'use strict';
 
-    var EmailContextCollection,
-        EmailContextModel = require('./email-context-model'),
+    var EmailContextActivityCollection,
+        EmailContextActivityModel = require('./email-context-activity-model'),
         BaseCollection = require('oroui/js/app/models/base/collection');
 
     /**
      * @export  oroemail/js/app/models/email-context-collection
      */
-    EmailContextCollection = BaseCollection.extend({
+    EmailContextActivityCollection = BaseCollection.extend({
         route: null,
         routeId: null,
         includeSystem: false,
         url: null,
-        model: EmailContextModel
+        model: EmailContextActivityModel
     });
 
-    return EmailContextCollection;
+    return EmailContextActivityCollection;
 });

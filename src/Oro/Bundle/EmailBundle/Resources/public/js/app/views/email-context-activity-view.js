@@ -7,16 +7,17 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         routing = require('routing'),
         Messenger = require('oroui/js/messenger'),
-        EmailContextCollection = require('oroemail/js/app/models/email-context-collection'),
+        mediator = require('oroui/js/mediator'),
+        EmailContextActivityCollection = require('oroemail/js/app/models/email-context-activity-collection'),
         BaseView= require('oroui/js/app/views/base/view');
 
     EmailContextView = BaseView.extend({
         initialize: function(options) {
             this.options = options;
 
-            this.template = _.template($('#email-context-list').html());
+            this.template = _.template($('#email-context-activity-list').html());
             this.$container = options.$container;
-            this.collection = new EmailContextCollection('oro_api_delete_email_association');
+            this.collection = new EmailContextActivityCollection('oro_api_delete_email_association');
             this.initEvents();
 
             if (this.options.items) {
@@ -24,10 +25,19 @@ define(function (require) {
                     this.collection.add(this.options.items[i]);
                 }
             }
+
+            /**
+             * on adding activity item listen to "widget:doRefresh:activity-list-widget"
+             */
+            mediator.setHandler('widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this );
         },
 
         add: function(model) {
             this.collection.add(model);
+        },
+
+        doRefresh: function() {
+            console.log("1");
         },
 
         render: function() {
