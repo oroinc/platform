@@ -349,6 +349,7 @@ services:
             - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
             - @event_dispatcher
+            - @oro_email.activity_list.provider
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%

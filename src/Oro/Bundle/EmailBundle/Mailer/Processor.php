@@ -14,6 +14,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
@@ -56,6 +57,9 @@ class Processor
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var EmailActivityListProvider */
+    protected $activityListProvider;
+
     /** @var array */
     protected $origins = array();
 
@@ -67,6 +71,7 @@ class Processor
      * @param EmailOwnerProvider $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
      * @param EventDispatcherInterface $eventDispatcher
+     * @param EmailActivityListProvider $activityListProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -75,7 +80,8 @@ class Processor
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        EmailActivityListProvider $activityListProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->mailer = $mailer;
@@ -84,6 +90,7 @@ class Processor
         $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->activityListProvider = $activityListProvider;
     }
 
     /**
@@ -149,24 +156,37 @@ class Processor
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
         $this->persistAttachments($model, $email);
 
-        $contexts = $model->getContexts();
         // associate the email with the target entity if exist
         if ($model->hasEntity()) {
             $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
             if ($targetEntity) {
                 $this->emailActivityManager->addAssociation($email, $targetEntity);
-
-                foreach ($contexts as $key => $context) {
-                    if (ClassUtils::getClass($context) === ClassUtils::getClass($targetEntity)
-                        && $context->getId() === $targetEntity->getId()) {
-                        unset($contexts[$key]);
-                    }
-                }
             }
         }
 
+        $contexts = $model->getContexts();
         foreach ($contexts as $context) {
             $this->emailActivityManager->addAssociation($email, $context);
+        }
+
+        if ($parentMessageId) {
+            /** @var Email $parentEmail */
+            $parentEmail = $this->em->getRepository(Email::ENTITY_CLASS)->find($model->getParentEmailId());
+            $thread = $parentEmail->getThread();
+            if ($thread) {
+                $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+            } else {
+                $relatedEmails = [$parentEmail];
+            }
+            foreach ($relatedEmails as $relatedEmail) {
+                $oldContexts = $this->activityListProvider->getTargetEntities($relatedEmail);
+                foreach ($oldContexts as $context) {
+                    $this->emailActivityManager->removeActivityTarget($relatedEmail, $context);
+                }
+                foreach ($contexts as $context) {
+                    $this->emailActivityManager->addAssociation($relatedEmail, $context);
+                }
+            }
         }
 
         // flush all changes to the database

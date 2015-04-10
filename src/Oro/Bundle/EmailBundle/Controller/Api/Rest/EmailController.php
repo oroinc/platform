@@ -216,16 +216,21 @@ class EmailController extends RestGetController
             if ($entity->supportActivityTarget($targetClassName)) {
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
 
-                if (!$entity->hasActivityTarget($target)) {
-                    $entity->addActivityTarget($target);
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($entity);
-                    $em->flush();
-
-                    $view = $this->view(['status' => Codes::HTTP_OK], Codes::HTTP_OK);
+                $em = $this->getDoctrine()->getManager();
+                $thread = $entity->getThread();
+                if ($thread) {
+                    $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
                 } else {
-                    $view = $this->view([], Codes::HTTP_ALREADY_REPORTED);
+                    $relatedEmails = [$entity];
                 }
+                foreach ($relatedEmails as $relatedEmail) {
+                    $relatedEmail->addActivityTarget($target);
+                }
+                $entity->addActivityTarget($target);
+                $em->persist($entity);
+                $em->flush();
+
+                $view = $this->view(['status' => Codes::HTTP_OK], Codes::HTTP_OK);
             } else {
                 $view = $this->view([], Codes::HTTP_NOT_ACCEPTABLE);
             }

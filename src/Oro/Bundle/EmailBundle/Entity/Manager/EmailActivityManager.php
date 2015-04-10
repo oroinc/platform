@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
 class EmailActivityManager
@@ -108,5 +109,13 @@ class EmailActivityManager
         if (!$alreadyExists) {
             $targets[] = $target;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeActivityTarget(ActivityInterface $activityEntity, $targetEntity)
+    {
+        return $this->activityManager->removeActivityTarget($activityEntity, $targetEntity);
     }
 }

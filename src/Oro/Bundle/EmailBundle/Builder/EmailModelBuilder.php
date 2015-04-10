@@ -82,6 +82,12 @@ class EmailModelBuilder
 
         if ($this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
+            if (!$emailModel->getContexts()) {
+                $emailModel->setContexts([
+                    $this->helper->getTargetEntity($this->request->get('entityClass'), $this->request->get('entityId')),
+                    $this->helper->getUser()
+                ]);
+            }
         }
         $this->applySignature($emailModel);
 
