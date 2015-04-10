@@ -156,3 +156,10 @@
 .customer-content .context-item .icon-remove {
     cursor: pointer;
 }
+.email-context-activity-label{
+    float: left;
+    margin-right: 10px;
+}
+.email-context-activity{
+    margin-top: 5px;
+}
