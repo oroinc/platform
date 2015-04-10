@@ -4,11 +4,11 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\UserBundle\Entity\User;
-
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class GridViewsLoadListener
 {

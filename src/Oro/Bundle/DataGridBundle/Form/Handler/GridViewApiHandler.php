@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Handler;
 
-use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Doctrine\Common\Persistence\ObjectManager;
+
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 
 class GridViewApiHandler
 {

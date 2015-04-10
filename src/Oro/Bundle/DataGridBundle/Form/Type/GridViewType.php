@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Type;
 
-use Oro\Bundle\DataGridBundle\Entity\GridView;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 
 class GridViewType extends AbstractType
 {

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
-
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class Manager
