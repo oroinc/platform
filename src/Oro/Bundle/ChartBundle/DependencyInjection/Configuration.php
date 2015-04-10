@@ -9,6 +9,8 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
