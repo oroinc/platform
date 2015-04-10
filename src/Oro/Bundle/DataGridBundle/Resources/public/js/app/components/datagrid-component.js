@@ -270,7 +270,7 @@ define(function (require) {
                 state.filters = {};
             }
 
-            if (_.isArray(state.sorters) && _.isempty(state.sorters)) {
+            if (_.isArray(state.sorters) && _.isEmpty(state.sorters)) {
                 state.sorters = {};
             }
         },
