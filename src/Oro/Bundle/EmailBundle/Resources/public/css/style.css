@@ -147,3 +147,9 @@
     line-height: 12px;
     border-radius: 2px;
 }
+.customer-content .context-item {
+    display: inline-block;
+    float: left;
+    position: relative;
+    margin-right: 8px;
+}

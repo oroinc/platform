@@ -4,6 +4,9 @@ define(function (require) {
 
     var EmailContextView,
         $ = require('jquery'),
+        __ = require('orotranslation/js/translator'),
+        routing = require('routing'),
+        Messenger = require('oroui/js/messenger'),
         EmailContextCollection = require('oroemail/js/app/models/email-context-collection'),
         BaseView= require('oroui/js/app/views/base/view');
 
@@ -13,8 +16,7 @@ define(function (require) {
 
             this.template = _.template($('#email-context-list').html());
             this.$container = options.$container;
-            this.$container.html('');
-            this.collection = new EmailContextCollection();
+            this.collection = new EmailContextCollection('oro_api_delete_email_association');
             this.initEvents();
 
             if (this.options.items) {
@@ -40,7 +42,6 @@ define(function (require) {
             var self = this;
 
             this.collection.on('add', function(model) {
-                console.log(model);
                 var view = self.template({
                     entity: model,
                     inputName: self.inputName
@@ -50,14 +51,22 @@ define(function (require) {
                 $(self.$container.context).append($view);
 
                 $view.find('i.icon-remove').click(function() {
-                    self.collection.remove(model.cid);
-                });
-            });
+                    model.destroy({
+                        success: function(model, response) {
+                            var statusNotFound = 'NOT_FOUND';
+                            if (response.status != statusNotFound) {
+                                var $view = $(self.$container.context).find('[data-cid="' + model.cid + '"]');
+                                $view.remove();
+                                self.render();
+                            }
 
-            this.collection.on('remove', function(model) {
-                var $view = $(self.$container.context).find('[data-cid="' + model.cid + '"]');
-                $view.remove();
-                self.render();
+                            Messenger.notificationFlashMessage(response.status != statusNotFound ? 'success': 'error', __(response.message));
+                        },
+                        error: function(model, response) {
+                            Messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
+                        }
+                    });
+                });
             });
         }
     });

@@ -1,10 +1,8 @@
-
 /*global define*/
 define(function (require) {
     'use strict';
 
     var BaseComponent = require('oroui/js/app/components/base/component'),
-        $ = require('jquery'),
         EmailContextView = require('oroemail/js/app/views/email-context-view');
 
     /**
