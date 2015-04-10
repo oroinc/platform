@@ -73,6 +73,35 @@ abstract class AbstractPage
      */
     public function waitPageToLoad()
     {
+        // writes javascript errors to screenshots
+        $jsCode = <<<JS
+            if (!window.onerror) {
+                window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
+                    $('body').append(
+                        '<div style="background: rgba(255,255,200,0.7); color: rgb(0,0,255); ' +
+                            'position: absolute; top: 15px; left: 15px; right: 15px; ' +
+                            'z-index: 999999; padding: 10px; border: 1px solid red;  border-radius: 5px;' +
+                            'box-shadow: 0 0 40px rgba(0,0,0,0.5); white-space: pre">' +
+                            '<h5>Js error occured</h5>' +
+                            errorMsg + '\\n' +
+                            'at ' + url + ':' + lineNumber + ':' + column +
+                            '<h5>Stack trace:</h5>' +
+                            errorObj.stack +
+                        '</div>'
+                    );
+
+                    // Tell browser to run its own error handler as well
+                    return false;
+                }
+            }
+JS;
+
+        $this->test->execute(array(
+            'script' =>$jsCode,
+            'args' =>
+                array()
+        ));
+
         $this->test->waitUntil(
             function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
                 $status = $testCase->execute(
@@ -105,34 +134,6 @@ abstract class AbstractPage
             },
             intval(MAX_EXECUTION_TIME)
         );
-
-        // writes javascript errors to screenshots
-        $jsCode = <<<JS
-            if (!window.onerror) {
-                window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
-                    $('body').append(
-                        '<div style="background: #fff; color: #000; position: absolute; top: 15px; left: 15px; ' +
-                            'z-index: 999999; padding: 10px; right: 15px; border: 3px solid red;  border-radius: 5px;' +
-                            'box-shadow: 10px 10px 40px; white-space: pre">' +
-                            '<h5>Js error occured</h5>' +
-                            errorMsg + '\\n' +
-                            'at ' + url + ':' + lineNumber + ':' + column +
-                            '<h5>Stack trace:</h5>' +
-                            errorObj.stack +
-                        '</div>'
-                    );
-
-                    // Tell browser to run its own error handler as well
-                    return false;
-                }
-            }
-JS;
-
-        $this->test->execute(array(
-            'script' =>$jsCode,
-            'args' =>
-                array()
-        ));
 
         $this->test->timeouts()->implicitWait(intval(TIME_OUT));
     }
