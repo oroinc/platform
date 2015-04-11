@@ -49,7 +49,8 @@
 
 {% set options = {
     items: itemsArray,
-    entityId: entity.id
+    entityId: entity.id,
+    view: 'oroemail/js/app/views/email-context-activity-view',
 } %}
 
 <div class="email-context-activity">
@@ -57,11 +58,10 @@
         Contexts
     </div>
     <div class="email-context-activity-items"
-         data-page-component-module="oroemail/js/app/components/email-context-activity-component"
+         data-page-component-module="oroui/js/app/components/view-component"
          data-page-component-options="{{ options|json_encode }}">
     </div>
 </div>
-
 
 {% if shortEmailThread is not defined and thread|length >= 7 %}
     {# if shortEmailThread is not turned off and length of thread over 6 emails -- render short thread #}

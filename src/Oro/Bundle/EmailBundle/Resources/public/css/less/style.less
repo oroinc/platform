@@ -491,9 +491,20 @@ a.attachment .icon .icon-link {
   float: left;
   margin-right: 10px;
 }
-.email-context-activity{
-  margin-top: 5px;
+.email-context-activity-items {
+  margin-left: 55px;
+  height: 29px;
+  overflow: scroll;
 }
-.email-context-activity-items{
-  float: left;
+.email-context-activity {
+  margin-top: 5px;
+  width: calc(~"100% - 160px");
+}
+.email-context-activity-block {
+  position: absolute;
+}
+
+.customer-info ul.inline li {
+  .email-context-activity {
+  }
 }

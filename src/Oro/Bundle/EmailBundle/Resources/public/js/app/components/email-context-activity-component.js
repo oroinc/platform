@@ -6,15 +6,15 @@ define(function (require) {
         EmailContextActivityView = require('oroemail/js/app/views/email-context-activity-view');
 
     /**
-     * @exports EmailContextComponent
+     * @exports EmailContextActivityComponent
      */
     return BaseComponent.extend({
         contextsView: null,
 
         initialize: function(options) {
+            //debugger;
             this.options = options;
             this.init();
-            debugger;
         },
 
         init: function() {

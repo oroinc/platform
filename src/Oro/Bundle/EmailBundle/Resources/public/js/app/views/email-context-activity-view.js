@@ -1,18 +1,24 @@
 /*global define*/
-define(function (require) {
+define([
+        'jquery',
+        'orotranslation/js/translator',
+        'routing',
+        'oroui/js/messenger',
+        'oroui/js/app/views/base/view',
+        'oroui/js/mediator',
+        'oroemail/js/app/models/email-context-activity-collection'
+    ], function ($, __, routing, messenger, BaseView, mediator, EmailContextActivityCollection) {
     'use strict';
+    //debugger;
 
-    var EmailContextView,
-        $ = require('jquery'),
-        __ = require('orotranslation/js/translator'),
-        routing = require('routing'),
-        Messenger = require('oroui/js/messenger'),
-        mediator = require('oroui/js/mediator'),
-        EmailContextActivityCollection = require('oroemail/js/app/models/email-context-activity-collection'),
-        BaseView= require('oroui/js/app/views/base/view');
+    var EmailContextActivityView;
 
-    EmailContextView = BaseView.extend({
+    /**
+     * @export oroemail/js/app/views/email-context-activisty-view
+     */
+    EmailContextActivityView = BaseView.extend({
         initialize: function(options) {
+            //debugger;
             this.options = options;
 
             this.template = _.template($('#email-context-activity-list').html());
@@ -26,12 +32,11 @@ define(function (require) {
                 }
             }
 
-            debugger;
-
             /**
-             * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
-             */
+            * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
+            */
             mediator.on('widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this );
+            EmailContextActivityView.__super__.initialize.apply(this, arguments);
         },
 
         add: function(model) {
@@ -97,5 +102,5 @@ define(function (require) {
         }
     });
 
-    return EmailContextView;
+    return EmailContextActivityView;
 });
