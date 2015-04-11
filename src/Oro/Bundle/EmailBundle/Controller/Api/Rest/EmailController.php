@@ -113,50 +113,32 @@ class EmailController extends RestGetController
      */
     public function getAssociationsDataAction($entityId)
     {
-        /**
-         * @var $entity Email
-         */
+        /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
         $associations = $entity->getActivityTargetEntities();
         $itemsArray = array();
         foreach ($associations as $association) {
             $className = ClassUtils::getClass($association);
-            /**
-             * @var $configManager ConfigManager
-             */
+            /** @var $configManager ConfigManager */
             $configManager = $this->container->get('oro_entity_config.config_manager');
-
-            if ($association instanceof FullNameInterface) {
-                $title = $association->getFirstName();
-                $route1 = $configManager->getEntityMetadata($className)->getRoute('view', false);
-
-              $link  = $this->container->get('router')->generate(
-                  $route1,
-                  array('id' => $association->getId())
-              );
-            } elseif ($association instanceof EmailHolderInterface) {
+            $nameFormater = $this->get('oro_locale.formatter.name');
+            $title = $nameFormater->format($association);
+            if ($title === '') {
                 $title = $association->getEmail();
-                $route1 = $configManager->getEntityMetadata($className)->getRoute('view', false);
-              $link  = $this->container->get('router')->generate(
-                  $route1,
-                  array('id' => $association->getId())
-              );
-            } else {
-                $title = false;
-                $link = false;
+            } elseif ($title === null) {
+                $title = $association->getId();
             }
-
+            $route = $configManager->getEntityMetadata($className)->getRoute('view', false);
+            $link = $this->container->get('router')->generate($route, ['id' => $association->getId()]);
 
             $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
             $config = $entityConfigProvider->getConfig($className);
-
-
 
             if ($title) {
                 $itemsArray[] = array(
                     'entityId'=> $entity->getId(),
                     'targetId'=> $association->getId(),
-                    "targetClassName"=> $className,
+                    'targetClassName'=> $className,
                     'title'=> $title,
                     'icon'=> $config->get('icon'),
                     'link'=> $link
