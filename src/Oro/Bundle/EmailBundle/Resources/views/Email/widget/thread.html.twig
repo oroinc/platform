@@ -1,67 +1,70 @@
+{% if renderContexts is defined and renderContexts %}
+<div>
+    <script type="text/template" id="email-context-activity-list">
+        <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
+                <span data-id="<%= entity.get('targetId') %>">
+                    <span class="<%= entity.get('icon') %>"></span>
 
-<script type="text/template" id="email-context-activity-list">
-    <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
-            <span data-id="<%= entity.get('targetId') %>">
-                <span class="<%= entity.get('icon') %>"></span>
-
-                <% if (entity.get('link')) { %>
-                    <a href="<%= entity.get('link') %>">
+                    <% if (entity.get('link')) { %>
+                        <a href="<%= entity.get('link') %>">
+                            <span class="context-label"><%= entity.get('title') %></span>
+                        </a>
+                    <% } else { %>
                         <span class="context-label"><%= entity.get('title') %></span>
-                    </a>
-                <% } else { %>
-                    <span class="context-label"><%= entity.get('title') %></span>
-                <% }  %>
+                    <% }  %>
 
-                <i class="icon-remove"></i>
-            </span>
-    </div>
-</script>
+                    <i class="icon-remove"></i>
+                </span>
+        </div>
+    </script>
 
-{% set entity = thread[0] %}
-{% set itemsArray = [] %}
-    {% for item in entity.getActivityTargetEntities() %}
-        {% set itemClassName = oro_class_name(item) %}
-        {% set icon = oro_entity_config_value(itemClassName, 'icon' ) %}
+    {% set entity = thread[0] %}
+    {% set itemsArray = [] %}
+        {% for item in entity.getActivityTargetEntities() %}
+            {% set itemClassName = oro_class_name(item) %}
+            {% set icon = oro_entity_config_value(itemClassName, 'icon' ) %}
 
-        {% if oro_entity_instance_of_interface(item, "Oro\\Bundle\\LocaleBundle\\Model\\FullNameInterface") %}
-            {% set title = item.getFirstName() %}
-            {% set link = path(oro_entity_route(itemClassName), {id:item.id} ) %}
-        {% elseif oro_entity_instance_of_interface(item, "Oro\\Bundle\\EmailBundle\\Model\\EmailHolderInterface") %}
-            {% set title = item.getEmail() %}
-            {% set link = path(oro_entity_route(itemClassName), {id:item.id} ) %}
-        {% else %}
-            {% set title = false %}
-            {% set link = false %}
-        {% endif %}
+            {% if oro_entity_instance_of_interface(item, "Oro\\Bundle\\LocaleBundle\\Model\\FullNameInterface") %}
+                {% set title = item.getFirstName() %}
+                {% set link = path(oro_entity_route(itemClassName), {id:item.id} ) %}
+            {% elseif oro_entity_instance_of_interface(item, "Oro\\Bundle\\EmailBundle\\Model\\EmailHolderInterface") %}
+                {% set title = item.getEmail() %}
+                {% set link = path(oro_entity_route(itemClassName), {id:item.id} ) %}
+            {% else %}
+                {% set title = false %}
+                {% set link = false %}
+            {% endif %}
 
-        {% if title %}
-            {% set itemArray = {
-            'entityId': entity.id,
-            'targetId': item.id,
-            "targetClassName": itemClassName ,
-            'title': title,
-            'icon': icon,
-            'link': link
-            } %}
-            {% set itemsArray = itemsArray|merge([itemArray]) %}
-        {% endif %}
-    {% endfor %}
+            {% if title %}
+                {% set itemArray = {
+                'entityId': entity.id,
+                'targetId': item.id,
+                "targetClassName": itemClassName ,
+                'title': title,
+                'icon': icon,
+                'link': link
+                } %}
+                {% set itemsArray = itemsArray|merge([itemArray]) %}
+            {% endif %}
+        {% endfor %}
 
-{% set options = {
-    items: itemsArray,
-    entityId: entity.id,
-    view: 'oroemail/js/app/views/email-context-activity-view',
-} %}
+    {% set options = {
+        items: itemsArray,
+        entityId: entity.id,
+    } %}
 
-<div class="email-context-activity">
-    <div class="email-context-activity-label">
-        Contexts
-    </div>
-    <div class="email-context-activity-items"
-         data-page-component-module="oroui/js/app/components/view-component"
-         data-page-component-options="{{ options|json_encode }}">
+    <div class="email-context-activity-list">
+        <div class="email-context-activity-label">
+            Contexts
+        </div>
+        <div class="email-context-activity-items"
+             data-page-component-module="oroemail/js/app/components/email-context-activity-component"
+             data-page-component-options="{{ options|json_encode }}"
+             data-layout="separate">
+        </div>
     </div>
 </div>
+{% endif %}
 
 {% if shortEmailThread is not defined and thread|length >= 7 %}
     {# if shortEmailThread is not turned off and length of thread over 6 emails -- render short thread #}

@@ -9,17 +9,18 @@ define([
         'oroemail/js/app/models/email-context-activity-collection'
     ], function ($, __, routing, messenger, BaseView, mediator, EmailContextActivityCollection) {
     'use strict';
-    //debugger;
 
     var EmailContextActivityView;
 
     /**
-     * @export oroemail/js/app/views/email-context-activisty-view
+     * @export oroemail/js/app/views/email-context-activity-view
      */
     EmailContextActivityView = BaseView.extend({
+        options: {},
+        events: {},
+
         initialize: function(options) {
-            //debugger;
-            this.options = options;
+            this.options = _.defaults(options || {}, this.options);
 
             this.template = _.template($('#email-context-activity-list').html());
             this.$container = options.$container;

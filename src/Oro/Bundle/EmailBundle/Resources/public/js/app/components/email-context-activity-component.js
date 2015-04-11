@@ -12,7 +12,6 @@ define(function (require) {
         contextsView: null,
 
         initialize: function(options) {
-            //debugger;
             this.options = options;
             this.init();
         },

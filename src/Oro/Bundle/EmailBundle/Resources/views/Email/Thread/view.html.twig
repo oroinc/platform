@@ -86,7 +86,8 @@
             <div class="email-context-activity-label">
                 Contexts
             </div>
-            <div class="email-context-activity-items" data-page-component-module="oroemail/js/app/components/email-context-activity-component"
+            <div class="email-context-activity-items"
+                 data-page-component-module="oroemail/js/app/components/email-context-activity-component"
                  data-page-component-options="{{ options|json_encode }}">
             </div>
         </div>
@@ -98,8 +99,9 @@
         {{ oro_widget_render({
             'widgetType': 'block',
             'wid': 'thread-view',
-            'url': path('oro_email_thread_widget', {'id': entity.id}),
-            'alias': 'thread-view'
+            'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false}),
+            'alias': 'thread-view',
+            'contextsRendered': true
         }) }}
     </div>
 {% endblock content_data %}

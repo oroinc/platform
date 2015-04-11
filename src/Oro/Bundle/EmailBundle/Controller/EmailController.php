@@ -91,7 +91,8 @@ class EmailController extends Controller
             'thread' => $emails,
             'target' => $this->getTargetEntity($entity),
             'hasGrantReattach' => $this->isAttachmentCreationGranted(),
-            'routeParameters' => $this->getTargetEntityConfig()
+            'routeParameters' => $this->getTargetEntityConfig(),
+            'renderContexts' => $this->getRequest()->get('renderContexts', true)
         ];
     }
 

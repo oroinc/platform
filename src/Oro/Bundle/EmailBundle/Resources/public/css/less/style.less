@@ -448,11 +448,12 @@ a.attachment .icon .icon-link {
 }
 
 
-.customer-content .context-item {
+.email-context-activity-items .context-item {
   display: inline-block;
   float: left;
   position: relative;
   margin-right: 8px;
+  font-size: 11px;
 }
 .context-item {
   list-style: none;
@@ -462,6 +463,30 @@ a.attachment .icon .icon-link {
     background-color: #ebebeb;
   }
 }
+.customer-content .context-item .icon-remove {
+  cursor: pointer;
+}
+.email-context-activity-label {
+  float: left;
+  margin-right: 10px;
+  font-size: 11px;
+  line-height: 14px;
+}
+.email-context-activity-items {
+  margin-left: 55px;
+  height: 28px;
+  overflow: auto;
+  font-size: 11px;
+  line-height: 14px;
+}
+.email-context-activity {
+  margin-top: 5px;
+  width: calc(~"100% - 160px");
+}
+.email-context-activity-block {
+  position: absolute;
+}
+
 #context-items-dropdown {
   margin: -1px 0 0 0;
   min-width: 0;
@@ -483,28 +508,4 @@ a.attachment .icon .icon-link {
 #email-context-current-item {
   font-size: 18px;
   font-weight: bold;
-}
-.customer-content .context-item .icon-remove {
-  cursor: pointer;
-}
-.email-context-activity-label {
-  float: left;
-  margin-right: 10px;
-}
-.email-context-activity-items {
-  margin-left: 55px;
-  height: 29px;
-  overflow: scroll;
-}
-.email-context-activity {
-  margin-top: 5px;
-  width: calc(~"100% - 160px");
-}
-.email-context-activity-block {
-  position: absolute;
-}
-
-.customer-info ul.inline li {
-  .email-context-activity {
-  }
 }
