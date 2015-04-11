@@ -506,3 +506,57 @@
     {%- set length = length|default(150) -%}
     {{ emailBody.bodyContent|striptags|oro_preg_replace('/\-{2,}/', '--')[:length]|replace({'--': '&mdash;'})|raw }}
 {% endmacro %}
+
+{#
+    Render email contexts
+    Parameters:
+        email - email body entity Oro\Bundle\EmailBundle\Entity\Email
+#}
+{% macro email_contexts(entity) %}
+    <script type="text/template" id="email-context-activity-list">
+        <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
+                <span data-id="<%= entity.get('targetId') %>">
+                    <span class="<%= entity.get('icon') %>"></span>
+
+                    <% if (entity.get('link')) { %>
+                        <a href="<%= entity.get('link') %>">
+                            <span class="context-label"><%= entity.get('title') %></span>
+                        </a>
+                    <% } else { %>
+                        <span class="context-label"><%= entity.get('title') %></span>
+                    <% }  %>
+
+                    <i class="icon-remove"></i>
+                </span>
+        </div>
+    </script>
+
+    {% set itemsArray = [] %}
+    {% for item in entity.getActivityTargetEntities() %}
+        {% set itemClassName = oro_class_name(item) %}
+        {% set itemArray = {
+        'entityId': entity.id,
+        'targetId': item.id,
+        "targetClassName": itemClassName ,
+        'title': item|oro_format_name|default(item.email)|default(item.id),
+        'icon': oro_entity_config_value(itemClassName, 'icon' ),
+        'link': path(oro_entity_route(itemClassName), {id:item.id} )
+        } %}
+        {% set itemsArray = itemsArray|merge([itemArray]) %}
+    {% endfor %}
+    {% set options = {
+    items: itemsArray,
+    entityId: entity.id
+    } %}
+
+    <div class="email-context-activity">
+        <div class="email-context-activity-label">
+            Contexts
+        </div>
+        <div class="email-context-activity-items"
+             data-page-component-module="oroemail/js/app/components/email-context-activity-component"
+             data-page-component-options="{{ options|json_encode }}"
+             data-layout="separate">
+        </div>
+    </div>
+{% endmacro %}
