@@ -51,32 +51,16 @@
         {% set itemsArray = [] %}
         {% for item in entity.getActivityTargetEntities() %}
             {% set itemClassName = oro_class_name(item) %}
-            {% set icon = oro_entity_config_value(itemClassName, 'icon' ) %}
-
-            {% if oro_entity_instance_of_interface(item, "Oro\\Bundle\\LocaleBundle\\Model\\FullNameInterface") %}
-                {% set title = item.getFirstName() %}
-                {% set link = path(oro_entity_route(itemClassName), {id:item.id} ) %}
-            {% elseif oro_entity_instance_of_interface(item, "Oro\\Bundle\\EmailBundle\\Model\\EmailHolderInterface") %}
-                {% set title = item.getEmail() %}
-                {% set link = path(oro_entity_route(itemClassName), {id:item.id} ) %}
-            {% else %}
-                {% set title = false %}
-                {% set link = false %}
-            {% endif %}
-
-            {% if title %}
-                {% set itemArray = {
+            {% set itemArray = {
                 'entityId': entity.id,
                 'targetId': item.id,
                 "targetClassName": itemClassName ,
-                'title': title,
-                'icon': icon,
-                'link': link
-                } %}
-                {% set itemsArray = itemsArray|merge([itemArray]) %}
-            {% endif %}
+                'title': item|oro_format_name|default(item.email)|default(item.id),
+                'icon': oro_entity_config_value(itemClassName, 'icon' ),
+                'link': path(oro_entity_route(itemClassName), {id:item.id} )
+            } %}
+            {% set itemsArray = itemsArray|merge([itemArray]) %}
         {% endfor %}
-
         {% set options = {
             items: itemsArray,
             entityId: entity.id
