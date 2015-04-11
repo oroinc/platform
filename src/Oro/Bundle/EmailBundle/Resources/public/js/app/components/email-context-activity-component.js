@@ -14,6 +14,7 @@ define(function (require) {
         initialize: function(options) {
             this.options = options;
             this.init();
+            debugger;
         },
 
         init: function() {

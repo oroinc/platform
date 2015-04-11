@@ -558,6 +558,9 @@ datagrid:
         options:
             entityHint: user
             entity_pagination: true
+            toolbarOptions:
+                pageSize:
+                    default_per_page: 10
         source:
             acl_resource: oro_user_user_view
             type: orm

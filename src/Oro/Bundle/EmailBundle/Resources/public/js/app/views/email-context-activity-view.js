@@ -26,6 +26,8 @@ define(function (require) {
                 }
             }
 
+            debugger;
+
             /**
              * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
              */
