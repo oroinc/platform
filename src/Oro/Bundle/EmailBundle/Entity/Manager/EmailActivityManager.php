@@ -45,36 +45,6 @@ class EmailActivityManager
         $this->emailThreadProvider = $emailThreadProvider;
     }
 
-//    /**
-//     * Handle onFlush event
-//     *
-//     * @param OnFlushEventArgs $event
-//     */
-//    public function handleOnFlush(OnFlushEventArgs $event)
-//    {
-//        $em  = $event->getEntityManager();
-//        $uow = $em->getUnitOfWork();
-//
-//        $newEntities = $uow->getScheduledEntityInsertions();
-//        foreach ($newEntities as $entity) {
-//            if ($entity instanceof Email) {
-//                // prepare the list of association targets
-//                $targets = [];
-//                $this->addSenderOwner($targets, $entity);
-//                $this->addRecipientOwners($targets, $entity);
-//                // add associations
-//                $hasChanges = $this->activityManager->addActivityTargets($entity, $targets);
-//                // recompute change set if needed
-//                if ($hasChanges) {
-//                    $uow->computeChangeSet(
-//                        $em->getClassMetadata(ClassUtils::getClass($entity)),
-//                        $entity
-//                    );
-//                }
-//            }
-//        }
-//    }
-
     /**
      * Handles onFlush event
      *
