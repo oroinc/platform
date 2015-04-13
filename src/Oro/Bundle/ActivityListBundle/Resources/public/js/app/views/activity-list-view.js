@@ -231,7 +231,8 @@ define(function (require) {
         },
 
         _reload: function () {
-            var itemViews, cid, view;
+            var itemViews;
+            // please note that _hideLoading will be called in renderAllItems() function
             this._showLoading();
             if (this.options.doNotFetch) {
                 this._hideLoading();
@@ -244,7 +245,8 @@ define(function (require) {
                 this.oldViewStates = _.map(itemViews, function (view) {
                     return {
                         attrs: view.model.toJSON(),
-                        collapsed: view.isCollapsed()
+                        collapsed: view.isCollapsed(),
+                        height: view.$el.height()
                     };
                 });
 
@@ -261,11 +263,11 @@ define(function (require) {
         },
 
         renderAllItems: function () {
-            var result, i, viewsToggleRequested, view, model, oldViewState;
+            var result, i, view, model, oldViewState, contentLoadedPromises, deferredContentLoading;
 
             result = ActivityListView.__super__.renderAllItems.apply(this, arguments);
 
-            viewsToggleRequested = false;
+            contentLoadedPromises = [];
 
             if (this.oldViewStates) {
                 // restore state
@@ -278,16 +280,30 @@ define(function (require) {
                             view.toggle();
                             view.getAccorditionBody().addClass('in');
                             view.getAccorditionToggle().removeClass('collapsed');
-                            viewsToggleRequested = true;
+                            if (view.model.get('isContentLoading')) {
+                                // if model is loading - need to wait until content will be loaded before _hideLoading()
+                                // also preserve height during loading
+                                view.$el.height(oldViewState.height);
+                                deferredContentLoading = $.Deferred();
+                                contentLoadedPromises.push(deferredContentLoading);
+                                view.model.once(
+                                    'change:isContentLoading',
+                                    _.bind(function (view, deferredContentLoading) {
+                                        // reset height
+                                        view.$el.height('');
+                                        deferredContentLoading.resolve();
+                                    }, this, view, deferredContentLoading)
+                                );
+                            }
                         }
                     }
                 }
                 delete this.oldViewStates;
             }
 
-            if (!viewsToggleRequested) {
+            $.when.apply($, contentLoadedPromises).done(_.bind(function () {
                 this._hideLoading();
-            }
+            }, this));
 
             return result;
         },

@@ -9,7 +9,11 @@ oro:
 
     email:
         controller.emailtemplate.saved.message: "Template saved"
-        form.choose_template:                   ""
+        form:
+            choose_template:                     ""
+            add_signature:                       Add Signature
+            attach_file:                         Attach File
+
         variable.not.found:                     N/A
 
         system_configuration:
@@ -26,6 +30,14 @@ oro:
 
             email_threads:
                 label: Email Threads
+
+            attachment_configuration:
+                label: Attachments
+                link_to_scope:
+                    label: Link Attachments To Context Entity
+                    choices:
+                        auto.label: Auto
+                        manual.label: Manual
 
         emailtemplate:
             entity_label:        Template
@@ -68,6 +80,10 @@ oro:
             current_date:        Current date
             current_time:        Current time
             siganture:           Signature (oro_html_filter should be applied to this variable to allow usage of it's html view)
+
+        attachment:
+            copy_to_record: Copy to Record
+            open: Open
 
         menu:
             emailtemplate_list.description: List of email templates
@@ -168,7 +184,6 @@ oro:
 "Content": "Content"
 "Cc/Bcc": "Cc/Bcc"
 "Thread view": "Thread view"
-"Add signature": "Add signature"
 "Date": "Date"
 "Me": "me"
 yesterday: yesterday

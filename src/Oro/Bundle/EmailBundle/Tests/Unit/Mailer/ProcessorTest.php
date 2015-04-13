@@ -41,6 +41,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $emailActivityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $dispatcher;
+
     /** @var Processor */
     protected $emailProcessor;
 
@@ -61,6 +64,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->emailActivityManager =
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager')
                 ->disableOriginalConstructor()
@@ -77,7 +83,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             new EmailAddressHelper(),
             $this->emailEntityBuilder,
             $this->emailOwnerProvider,
-            $this->emailActivityManager
+            $this->emailActivityManager,
+            $this->dispatcher
         );
     }
 
@@ -123,7 +130,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessSendFailException()
     {
-        $message = $this->getMockForAbstractClass('\Swift_Mime_Message');
+        $message = $this->getMockForAbstractClass('\Swift_Message');
         $this->mailer->expects($this->once())
             ->method('createMessage')
             ->will($this->returnValue($message));
@@ -149,7 +156,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessAddressException()
     {
-        $message = $this->getMockForAbstractClass('\Swift_Mime_Message');
+        $message = $this->getMockForAbstractClass('\Swift_Message');
         $this->mailer->expects($this->once())
             ->method('createMessage')
             ->will($this->returnValue($message));
@@ -174,7 +181,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess($data, $expectedMessageData)
     {
-        $message = $this->getMockBuilder('\Swift_Mime_Message')
+        $message = $this->getMockBuilder('\Swift_Message')
             ->setMethods(['setDate', 'setFrom', 'setTo',  'setCc',  'setBcc', 'setSubject', 'setBody'])
             ->getMockForAbstractClass();
         $message->expects($this->once())
@@ -405,7 +412,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function processWithOwner($user, $withOrigin = false)
     {
-        $message = $this->getMockForAbstractClass('\Swift_Mime_Message');
+        $message = $this->getMockForAbstractClass('\Swift_Message');
 
         $this->mailer->expects($this->once())
             ->method('createMessage')
@@ -454,7 +461,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                         new EmailAddressHelper(),
                         $this->emailEntityBuilder,
                         $this->emailOwnerProvider,
-                        $this->emailActivityManager
+                        $this->emailActivityManager,
+                        $this->dispatcher
                     ]
                 )
                 ->setMethods(['createUserInternalOrigin'])

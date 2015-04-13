@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInte
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -156,6 +157,17 @@ class OroUserBundleInstaller implements
         $table->addColumn('status_id', 'integer', ['notnull' => false]);
         $table->addColumn('username', 'string', ['length' => 255, 'precision' => 0]);
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
+        $table->addColumn(
+            'phone',
+            'string',
+            [
+                'length'      => 255,
+                'oro_options' => [
+                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM],
+                    'dataaudit' => ['auditable' => true]
+                ]
+            ]
+        );
         $table->addColumn('name_prefix', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
         $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
         $table->addColumn('middle_name', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
@@ -173,6 +185,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
+        $table->addUniqueIndex(['phone'], 'uniq_user_phone');
         $table->addIndex(['business_unit_owner_id'], 'IDX_F82840BC59294170', []);
         $table->addUniqueIndex(['status_id'], 'UNIQ_F82840BC6BF700BD');
         $table->setPrimaryKey(['id']);

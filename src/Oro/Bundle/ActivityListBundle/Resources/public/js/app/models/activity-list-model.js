@@ -39,7 +39,7 @@ define([
             removable: true,
             commentable: false,
 
-            targetEntityData: ''
+            targetEntityData: {}
         },
 
         initialize: function () {

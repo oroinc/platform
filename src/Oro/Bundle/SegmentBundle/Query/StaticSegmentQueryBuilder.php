@@ -26,8 +26,19 @@ class StaticSegmentQueryBuilder implements QueryBuilderInterface
      */
     public function build(Segment $segment)
     {
-        $repo = $this->em->getRepository('OroSegmentBundle:SegmentSnapshot');
+        $qb = $this->getQueryBuilder($segment);
 
-        return $repo->getIdentifiersSelectQueryBuilder($segment)->getQuery();
+        return $qb->getQuery();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryBuilder(Segment $segment)
+    {
+        $repo = $this->em->getRepository('OroSegmentBundle:SegmentSnapshot');
+        $qb   = $repo->getIdentifiersSelectQueryBuilder($segment);
+
+        return $qb;
     }
 }
