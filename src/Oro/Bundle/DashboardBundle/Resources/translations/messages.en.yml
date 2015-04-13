@@ -67,3 +67,4 @@ oro:
             day.label: Day
             time.label: Hour
         date_range.label: Date range
+        previous_date_range.label: Compare with previous period
