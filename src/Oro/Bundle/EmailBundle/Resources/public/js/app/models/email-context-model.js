@@ -6,7 +6,7 @@ define(function (require) {
         BaseModel = require('oroui/js/app/models/base/model');
 
     /**
-     * @export  oroemail/js/app/models/email-template-model
+     * @export  oroemail/js/app/models/email-context-model
      */
     EmailContextModel = BaseModel.extend({
         defaults: {
