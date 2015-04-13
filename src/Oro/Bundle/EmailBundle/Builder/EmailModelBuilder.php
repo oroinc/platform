@@ -84,8 +84,7 @@ class EmailModelBuilder
             $this->applyRequest($emailModel);
             if (!$emailModel->getContexts()) {
                 $emailModel->setContexts([
-                    $this->helper->getTargetEntity($this->request->get('entityClass'), $this->request->get('entityId')),
-                    $this->helper->getUser()
+                    $this->helper->getTargetEntity($this->request->get('entityClass'), $this->request->get('entityId'))
                 ]);
             }
         }

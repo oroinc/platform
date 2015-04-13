@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -15,6 +16,7 @@ use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class Indexer
 {
@@ -148,12 +150,13 @@ class Indexer
     }
 
     /**
-     * @param $searchString
+     * @param User $user
+     * @param string $searchString
      * @param int $offset
      * @param int $maxResults
      * @return array
      */
-    public function autocompleteSearch($searchString, $offset = 0, $maxResults = 0)
+    public function autocompleteSearch(User $user, $searchString, $offset = 0, $maxResults = 0)
     {
         $entityDescriptions = $this->entityProvider->getEntities();
         $classNames = [];
@@ -182,6 +185,9 @@ class Indexer
         $searchResults = $this->simpleSearch($searchString, $offset, $maxResults, $tables);
         foreach ($searchResults->getElements() as $item) {
             $className = $item->getEntityName();
+            if (ClassUtils::getClass($user) === $className && $user->getId() === $item->getRecordId()) {
+                continue;
+            }
             $text = $item->getRecordTitle();
             if ($label = $this->getClassLabel($className)) {
                 $text .= ' (' . $label . ')';
@@ -199,10 +205,11 @@ class Indexer
     }
 
     /**
-     * @param $searchString
+     * @param User $user
+     * @param string $searchString
      * @return array
      */
-    public function autocompleteSearchById($searchString)
+    public function autocompleteSearchById(User $user, $searchString)
     {
         $results = [];
         if ($searchString) {
@@ -214,6 +221,9 @@ class Indexer
                 $target = json_decode($target, true);
                 if (!isset($target['entityClass']) || !$target['entityClass']
                     || !isset($target['entityId']) || !$target['entityId']) {
+                    continue;
+                }
+                if (ClassUtils::getClass($user) === $target['entityClass'] && $user->getId() === $target['entityId']) {
                     continue;
                 }
                 $entity = $this->em->getRepository($target['entityClass'])->find($target['entityId']);

@@ -72,10 +72,15 @@ class SearchController extends FOSRestController
      */
     public function getAutocompleteAction()
     {
+        $user = $this->get('security.context')->getToken()->getUser();
         if ($this->getRequest()->get('search_by_id')) {
-            $results = $this->get('oro_search.index')->autocompleteSearchById($this->getRequest()->get('query'));
+            $results = $this->get('oro_search.index')->autocompleteSearchById(
+                $user,
+                $this->getRequest()->get('query')
+            );
         } else {
             $results = $this->get('oro_search.index')->autocompleteSearch(
+                $user,
                 $this->getRequest()->get('query'),
                 (int) $this->getRequest()->get('offset'),
                 (int) $this->getRequest()->get('max_results')
