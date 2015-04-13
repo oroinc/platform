@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use Doctrine\Common\Util\ClassUtils;
-
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -26,6 +24,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+
+use Doctrine\Common\Util\ClassUtils;
 
 /**
  * @RouteResource("email")
@@ -83,6 +83,11 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $associations = $entity->getActivityTargetEntities();
 
         return $this->handleView(
@@ -106,17 +111,17 @@ class EmailController extends RestGetController
      */
     public function getAssociationsDataAction($entityId)
     {
-        $user = $this->get('security.context')->getToken()->getUser();
         /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $associations = $entity->getActivityTargetEntities();
         $itemsArray = array();
         foreach ($associations as $association) {
             $className = ClassUtils::getClass($association);
-            if (ClassUtils::getClass($user) === $className && $user->getId() === $association->getId()) {
-                continue;
-            }
-
             /** @var $configManager ConfigManager */
             $configManager = $this->container->get('oro_entity_config.config_manager');
             $nameFormater = $this->get('oro_locale.formatter.name');
@@ -174,7 +179,7 @@ class EmailController extends RestGetController
      *      description="Add new association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_create")
      */
     public function postAssociationsAction()
     {
@@ -191,6 +196,11 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
@@ -232,7 +242,7 @@ class EmailController extends RestGetController
      *      description="Delete Association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_delete")
      *
      * @Delete("/emails/{entityId}/associations/{targetClassName}/{targetId}")
      *
@@ -244,6 +254,11 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $em = $this->getDoctrine()->getManager();
 
@@ -261,43 +276,6 @@ class EmailController extends RestGetController
         }
 
         return $this->buildResponse($view, Codes::HTTP_LOOP_DETECTED, ['id' => $entityId, 'entity' => $entity]);
-    }
-
-
-    /**
-     * REST DELETE
-     *
-     * @param int $entityId
-     *
-     * @ApiDoc(
-     *      description="Delete Associations",
-     *      resource=true
-     * )
-     * @return Response
-     * @AclAncestor("oro_email_edit")
-     *
-     */
-    public function deleteAssociationsAction($entityId)
-    {
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($entityId);
-        $associations = $entity->getActivityTargetEntities();
-        $em = $this->getDoctrine()->getManager();
-        try {
-            foreach ($associations as $association) {
-                $entity->removeActivityTarget(($association));
-            }
-            $em->persist($entity);
-            $em->flush();
-
-            $view = $this->view($entity->getActivityTargetEntities(), Codes::HTTP_OK);
-        } catch (\RuntimeException $e) {
-            $view = $this->view([], Codes::HTTP_BAD_REQUEST);
-        }
-
-        return $this->buildResponse($view, Codes::HTTP_LOOP_DETECTED, []);
     }
 
     /**

@@ -120,38 +120,6 @@ class EmailController extends SoapGetController
     }
 
     /**
-     * @Soap\Method("deleteAssociations")
-     * @Soap\Param("id", phpType = "int")
-     * @Soap\Param("targetClassName", phpType = "string")
-     * @Soap\Param("tergetId", phpType = "int")
-     * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_edit")
-     */
-    public function deleteAssociationsAction($id)
-    {
-        try {
-            /**
-             * @var $entity Email
-             */
-            $entity = $this->getManager()->find($id);
-            $associations = $entity->getActivityTargetEntities();
-
-            $om = $this->getManager()->getObjectManager();
-            foreach ($associations as $association) {
-                $entity->removeActivityTarget(($association));
-            }
-            $om->persist($entity);
-            $om->flush();
-
-            $response = true;
-        } catch (\RuntimeException $e) {
-            $response = false;
-        }
-
-        return $response;
-    }
-
-    /**
      * @Soap\Method("deleteAssociation")
      * @Soap\Param("id", phpType = "int")
      * @Soap\Param("targetClassName", phpType = "string")
