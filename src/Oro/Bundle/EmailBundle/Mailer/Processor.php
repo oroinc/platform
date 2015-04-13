@@ -19,7 +19,6 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
-use Oro\Bundle\EmailBundle\Event\EmailCreated;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -150,12 +149,12 @@ class Processor
         $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
-        if ($model->hasEntity()) {
-            $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
-            if ($targetEntity) {
-                $this->emailActivityManager->addAssociation($email, $targetEntity);
-            }
-        }
+//        if ($model->hasEntity()) {
+//            $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
+//            if ($targetEntity) {
+//                $this->emailActivityManager->addAssociation($email, $targetEntity);
+//            }
+//        }
 
         $contexts = $model->getContexts();
         foreach ($contexts as $context) {
@@ -165,8 +164,6 @@ class Processor
         // flush all changes to the database
         $this->getEntityManager()->flush();
 
-        $event = new EmailCreated($email);
-        $this->eventDispatcher->dispatch(EmailCreated::NAME, $event);
         $event = new EmailBodyAdded($email);
         $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 

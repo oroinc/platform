@@ -542,13 +542,6 @@
             'title': item|oro_format_name|default(item.email)|default(item.id),
             'icon': oro_entity_config_value(itemClassName, 'icon' ),
             'link': path(oro_entity_route(itemClassName), {id:item.id} ),
-            'part1': (app.user.id == item.id),
-            'part2': (not (app.user.id == item.id)),
-            'part3': oro_class_name(app.user),
-            'part4': itemClassName,
-            'part5': (oro_class_name(app.user) == itemClassName),
-            'part6': (not (oro_class_name(app.user) == itemClassName)),
-            'flag': (not (app.user.id == item.id) and not (oro_class_name(app.user) == itemClassName))
         } %}
         {% if not ((app.user.id == item.id) and (oro_class_name(app.user) == itemClassName)) %}
             {% set itemsArray = itemsArray|merge([itemArray]) %}
@@ -561,7 +554,7 @@
     {% if itemsArray|length > 0 %}
         <div class="email-context-activity">
             <div class="email-context-activity-label">
-                Contexts
+                {{ 'oro.email.contexts.label'|trans }}
             </div>
             <div class="email-context-activity-items"
                  data-page-component-module="oroemail/js/app/components/email-context-activity-component"

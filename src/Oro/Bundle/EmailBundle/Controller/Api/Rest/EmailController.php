@@ -13,10 +13,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
-
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -24,7 +23,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Doctrine\Common\Util\ClassUtils;
@@ -85,11 +83,6 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
         $associations = $entity->getActivityTargetEntities();
 
         return $this->handleView(
@@ -115,11 +108,6 @@ class EmailController extends RestGetController
     {
         /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
         $associations = $entity->getActivityTargetEntities();
         $itemsArray = array();
         foreach ($associations as $association) {
@@ -198,11 +186,6 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
         $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
@@ -224,10 +207,10 @@ class EmailController extends RestGetController
 
                 $view = $this->view(['status' => Codes::HTTP_OK], Codes::HTTP_OK);
             } else {
-                $view = $this->view('', Codes::HTTP_NOT_ACCEPTABLE);
+                $view = $this->view([], Codes::HTTP_NOT_ACCEPTABLE);
             }
         } catch (Exception $e) {
-            $view = $this->view('', Codes::HTTP_BAD_REQUEST);
+            $view = $this->view([], Codes::HTTP_BAD_REQUEST);
         }
 
         return $this->buildResponse($view, Codes::HTTP_CREATED, ['entity' => $entity]);
@@ -256,11 +239,6 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $em = $this->getDoctrine()->getManager();
 
@@ -279,7 +257,6 @@ class EmailController extends RestGetController
 
         return $this->buildResponse($view, Codes::HTTP_LOOP_DETECTED, ['id' => $entityId, 'entity' => $entity]);
     }
-
 
     /**
      * REST GET item

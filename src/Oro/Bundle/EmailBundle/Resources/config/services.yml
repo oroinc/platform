@@ -444,6 +444,8 @@ services:
         class: %oro_email.email.activity.manager.class%
         arguments:
             - @oro_activity.manager
+            - @oro_email.activity_list.provider
+            - @oro_email.email.thread.provider
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%
@@ -503,9 +505,9 @@ services:
     oro_email.manager.email_context_manager:
         class: %oro_email.manager.email_context_manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
             - @oro_email.activity_list.provider
             - @oro_email.email.activity.manager
+            - @oro_email.email.thread.provider
 
     oro_email.listener.email_body_add_listener:
         class: %oro_email.listener.email_body_add_listener.class%
@@ -516,11 +518,3 @@ services:
             - @oro_security.security_facade.link
         tags:
             - { name: kernel.event_listener, event: oro_email.email_body_added, method: linkToScopeEvent, priority: 10 }
-
-    oro_email.listener.email_create_listener:
-        class: %oro_email.listener.email_create_listener.class%
-        arguments:
-            - @oro_email.manager.email_context_manager
-            - @oro_security.security_facade.link
-        tags:
-            - { name: kernel.event_listener, event: oro_email.email_created, method: processContextEvent, priority: 100 }

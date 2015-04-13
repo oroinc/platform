@@ -11,9 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
 class EmailThreadManager
 {
-    /**
-     * @var EmailThreadProvider
-     */
+    /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
     /**
@@ -30,6 +28,9 @@ class EmailThreadManager
      */
     protected $queueHeadUpdate;
 
+    /**
+     * @param EmailThreadProvider $emailThreadProvider
+     */
     public function __construct(EmailThreadProvider $emailThreadProvider)
     {
         $this->emailThreadProvider = $emailThreadProvider;

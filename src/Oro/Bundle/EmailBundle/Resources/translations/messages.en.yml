@@ -156,7 +156,7 @@ oro:
         add_context.label:        Add Context
         add_context_entity.label: Add Context Entity
         contexts:
-              label:              Contexts
+              label:              Context
               placeholder:        Add Context
 
         empty_body:               Empty body
