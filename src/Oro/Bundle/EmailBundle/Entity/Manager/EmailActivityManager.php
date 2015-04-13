@@ -186,16 +186,17 @@ class EmailActivityManager
      */
     protected function addContextsToThread(EntityManager $em, Email $email, $contexts)
     {
+
         $thread = $email->getThread();
         if ($thread) {
             $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-            if (count($contexts) > 0) {
-                foreach ($relatedEmails as $relatedEmail) {
-                    if ($email->getId() !== $relatedEmail->getId()) {
-                        foreach ($contexts as $context) {
-                            $this->addAssociation($email, $context);
-                        }
-                    }
+        } else {
+            $relatedEmails = [$email];
+        }
+        if (count($contexts) > 0) {
+            foreach ($relatedEmails as $relatedEmail) {
+                foreach ($contexts as $context) {
+                    $this->addAssociation($email, $context);
                 }
             }
         }
