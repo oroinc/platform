@@ -142,11 +142,6 @@ services:
         tags:
             - { name: form.type, alias: oro_datagrid_grid_view }
 
-    oro_datagrid.form.type.filter_type:
-        class: %oro_datagrid.form.type.filter_type.class%
-        tags:
-            - { name: form.type, alias: oro_datagrid_filter }
-
     oro_datagrid.form.type.sorting_type:
         class: %oro_datagrid.form.type.sorting_type.class%
         tags:

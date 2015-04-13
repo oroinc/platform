@@ -25,15 +25,8 @@ class GridViewType extends AbstractType
             ->add('grid_name', 'text', [
                 'property_path' => 'gridName',
             ])
-            ->add('filters', 'collection', [
+            ->add('filters', null, [
                 'property_path' => 'filtersData',
-                'error_bubbling' => false,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'type' => 'oro_datagrid_filter',
-                'options' => [
-                    'operator_type' => 'text',
-                ],
             ])
             ->add('sorters', 'collection', [
                 'property_path' => 'sorters_data',
