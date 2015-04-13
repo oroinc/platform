@@ -110,6 +110,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             );
 
             $email->addFolder($origin->getFolder(FolderType::SENT));
+            $email->addActivityTarget($owner);
             $email->addActivityTarget($simple_user2);
 
             $emailBody = $this->emailEntityBuilder->body(
