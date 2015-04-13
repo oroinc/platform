@@ -149,13 +149,6 @@ class Processor
         $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
-//        if ($model->hasEntity()) {
-//            $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
-//            if ($targetEntity) {
-//                $this->emailActivityManager->addAssociation($email, $targetEntity);
-//            }
-//        }
-
         $contexts = $model->getContexts();
         foreach ($contexts as $context) {
             $this->emailActivityManager->addAssociation($email, $context);
