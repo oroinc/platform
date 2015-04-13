@@ -58,13 +58,9 @@
                                     dataType: 'json',
                                     success: function (res) {
                                         //TODO: add success check
-//                                        if (res.success) {
-                                            messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
-                                            mediator.trigger('widget_success:activity_list:item:update');
-                                            mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
-//                                        } else {
-//                                            messenger.notificationFlashMessage('error', res.message);
-//                                        }
+                                        messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
+                                        mediator.trigger('widget_success:activity_list:item:update');
+                                        mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                                     }
                                 })
                                 .always(function () {
