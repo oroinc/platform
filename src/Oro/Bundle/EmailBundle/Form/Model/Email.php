@@ -5,11 +5,16 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 
 class Email
 {
+    const MAIL_TYPE_DIRECT  = 'direct';
+    const MAIL_TYPE_REPLY   = 'reply';
+    const MAIL_TYPE_FORWARD = 'forward';
+
     /** @var string */
     protected $gridName;
 
@@ -19,8 +24,8 @@ class Email
     /** @var mixed */
     protected $entityId;
 
-    /** @var int */
-    protected $parentEmailId;
+    /** @var EmailEntity */
+    protected $parentEmail;
 
     /** @var string */
     protected $from;
@@ -56,6 +61,53 @@ class Email
      * @var Collection
      */
     protected $attachments;
+
+    /** @var  string */
+    protected $mailType;
+
+    /**
+     * @var array
+     */
+    protected $attachmentsAvailable;
+
+    /**
+     * @return Email
+     */
+    public static function createDirectEmail()
+    {
+        $email = new self();
+        $email->setMailType(self::MAIL_TYPE_DIRECT);
+
+        return $email;
+    }
+
+    /**
+     * @param EmailEntity $emailEntity
+     *
+     * @return Email
+     */
+    public static function createReplyEmail(EmailEntity $emailEntity)
+    {
+        $email = new self();
+        $email->setMailType(self::MAIL_TYPE_REPLY);
+        $email->setParentEmail($emailEntity);
+
+        return $email;
+    }
+
+    /**
+     * @param EmailEntity $emailEntity
+     *
+     * @return Email
+     */
+    public static function createForwardEmail(EmailEntity $emailEntity)
+    {
+        $email = new self();
+        $email->setMailType(self::MAIL_TYPE_FORWARD);
+        $email->setParentEmail($emailEntity);
+
+        return $email;
+    }
 
     /**
      * Constructor
@@ -138,25 +190,43 @@ class Email
     }
 
     /**
-     * Get parent email id
+     * Get parent email
      *
-     * @return int
+     * @return EmailEntity
      */
-    public function getParentEmailId()
+    public function getParentEmail()
     {
-        return $this->parentEmailId;
+        return $this->parentEmail;
     }
 
     /**
-     * Set parent email id
-     *
      * @param $parentEmailId
      *
      * @return $this
      */
     public function setParentEmailId($parentEmailId)
     {
-        $this->parentEmailId = $parentEmailId;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getParentEmailId()
+    {
+        return $this->parentEmail ? $this->parentEmail->getId() : null;
+    }
+
+    /**
+     * Set parent email
+     *
+     * @param EmailEntity $parentEmail
+     *
+     * @return $this
+     */
+    public function setParentEmail($parentEmail)
+    {
+        $this->parentEmail = $parentEmail;
 
         return $this;
     }
@@ -433,6 +503,46 @@ class Email
     public function setAttachments(array $attachments)
     {
         $this->attachments = $attachments;
+
+        return $this;
+    }
+
+    /**
+     * @return EmailAttachment[]
+     */
+    public function getAttachmentsAvailable()
+    {
+        return $this->attachmentsAvailable;
+    }
+
+    /**
+     * @param EmailAttachment[] $attachmentsAvailable
+     *
+     * @return $this
+     */
+    public function setAttachmentsAvailable($attachmentsAvailable)
+    {
+        $this->attachmentsAvailable = $attachmentsAvailable;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMailType()
+    {
+        return $this->mailType;
+    }
+
+    /**
+     * @param string $mailType
+     *
+     * @return $this
+     */
+    public function setMailType($mailType)
+    {
+        $this->mailType = $mailType;
 
         return $this;
     }
