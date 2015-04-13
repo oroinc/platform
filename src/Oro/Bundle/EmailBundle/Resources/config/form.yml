@@ -10,6 +10,7 @@ parameters:
     oro_email.form.type.email_address.class:              Oro\Bundle\EmailBundle\Form\Type\EmailAddressType
     oro_email.form.type.attachment.class:                 Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType
     oro_email.form.type.attachments.class:                Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType
+    oro_email.form.type.contexts_select.class:            Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType
 
 services:
     oro_email.form.subscriber.emailtemplate:
@@ -90,3 +91,10 @@ services:
         class: %oro_email.form.type.attachments.class%
         tags:
             - { name: form.type, alias: oro_email_attachments }
+
+    oro_email.form.type.contexts_select:
+        class: %oro_email.form.type.contexts_select.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: oro_email_contexts_select }
