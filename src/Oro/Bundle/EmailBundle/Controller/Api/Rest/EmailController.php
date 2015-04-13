@@ -83,6 +83,11 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $associations = $entity->getActivityTargetEntities();
 
         return $this->handleView(
@@ -108,6 +113,11 @@ class EmailController extends RestGetController
     {
         /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $associations = $entity->getActivityTargetEntities();
         $itemsArray = array();
         foreach ($associations as $association) {
@@ -186,6 +196,11 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
@@ -239,6 +254,11 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
+
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $em = $this->getDoctrine()->getManager();
 
