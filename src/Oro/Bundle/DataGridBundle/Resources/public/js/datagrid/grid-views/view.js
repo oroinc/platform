@@ -188,7 +188,7 @@ define([
                 this.render();
             }, this);
 
-            $(document).prop('title', this._createTitle());
+            this._updateTitle();
 
             GridViewsView.__super__.initialize.call(this, options);
         },
@@ -238,7 +238,7 @@ define([
             e.preventDefault();
             var value = $(e.target).data('value');
             this.changeView(value);
-            $(document).prop('title', this._createTitle());
+            this._updateTitle();
 
             this.prevState = this._getCurrentState();
             this.viewDirty = !this._isCurrentStateSynchronized();
@@ -290,6 +290,7 @@ define([
                     this.changeView(model.get('name'));
                     this.collection.state.gridView = model.get('name');
                     this.viewDirty = !this._isCurrentStateSynchronized();
+                    this._updateTitle();
                     this._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                     mediator.trigger('datagrid:' + this.gridName + ':views:add', model);
                 }, self);
@@ -676,6 +677,17 @@ define([
             }
 
             mediator.execute('showFlashMessage', type, message, opts);
+        },
+
+        /**
+         * @private
+         */
+        _updateTitle: function() {
+            if (!this.title) {
+                return;
+            }
+
+            $(document).prop('title', this._createTitle());
         }
     });
 
