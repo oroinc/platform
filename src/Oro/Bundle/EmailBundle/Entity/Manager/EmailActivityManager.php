@@ -43,6 +43,7 @@ class EmailActivityManager
         $this->activityManager = $activityManager;
         $this->emailActivityListProvider = $activityListProvider;
         $this->emailThreadProvider = $emailThreadProvider;
+        $this->resetQueue();
     }
 
     /**
