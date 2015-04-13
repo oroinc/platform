@@ -74,4 +74,28 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
             $this->formatter->formatDate($value['end'])
         );
     }
+
+    /**
+     * @param array $value
+     * @return array
+     */
+    protected function getPeriodValues($value)
+    {
+        $startValue = $value['value']['start'];
+        $endValue = $value['value']['end'];
+
+        if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
+            || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
+        ) {
+            $startValue = new DateTime('2000-01-01', new \DateTimeZone('UTC'));
+        }
+
+        if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
+            || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
+        ) {
+            $endValue = new DateTime('now', new \DateTimeZone('UTC'));
+        }
+
+        return [$startValue, $endValue];
+    }
 }

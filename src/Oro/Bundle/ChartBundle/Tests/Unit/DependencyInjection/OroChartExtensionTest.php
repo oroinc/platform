@@ -103,7 +103,11 @@ class OroChartExtensionTest extends \PHPUnit_Framework_TestCase
                             'chartHighlightColor' => '#FF5E5E',
                         ),
                         'data_transformer' => 'some_service_id',
-                        'template' => 'FirstTestBundle:Chart:lineChart.html.twig'
+                        'template' => 'FirstTestBundle:Chart:lineChart.html.twig',
+                        'xaxis' => array(
+                            'mode' => 'normal',
+                            'noTicks' => 5
+                        )
                     ),
                     'advanced_chart' => array(
                         'label' => 'Advanced Chart (overridden)',
@@ -111,6 +115,10 @@ class OroChartExtensionTest extends \PHPUnit_Framework_TestCase
                         'data_schema' => array(),
                         'settings_schema' => array(),
                         'default_settings' => array('foo' => 'bar', 'chartColors' => 'testColor'),
+                        'xaxis' => array(
+                            'mode' => 'normal',
+                            'noTicks' => 5
+                        )
                     )
                 )
             )

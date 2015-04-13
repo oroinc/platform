@@ -84,7 +84,10 @@ define(function (require) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
             _.extend(options, {
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
-                timezoneShift: 0
+                timezoneShift: 0,
+                timeInputAttrs: {
+                    'class': 'timepicker-input'
+                }
             });
             return options;
         },

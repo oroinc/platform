@@ -63,6 +63,30 @@ class DateTimeFormatter
     }
 
     /**
+     * Formats day without time and year
+     *
+     * @param \DateTime|string|int $date
+     * @param string|int|null $dateType
+     * @param string|null $locale
+     * @param string|null $timeZone
+     * @return string
+     */
+    public function formatDay($date, $dateType = null, $locale = null, $timeZone = null)
+    {
+        $formatter = new \IntlDateFormatter(
+            $this->localeSettings->getLanguage(),
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::NONE,
+            $timeZone,
+            \IntlDateFormatter::GREGORIAN
+        );
+        $pattern = $formatter->getPattern();
+        $pattern = preg_replace(['/y/', "/'.*'/", '/\./', '/,/'], '', $pattern);
+
+        return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, trim($pattern));
+    }
+
+    /**
      * Formats time without date
      *
      * @param \DateTime|string|int $date

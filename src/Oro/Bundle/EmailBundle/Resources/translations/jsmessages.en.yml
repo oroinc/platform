@@ -9,7 +9,17 @@ oro:
             apply_template_confirmation_content: Body content will be replaced by an other template. Are you sure you want to proceed?
         thread:
             load_error: Sorry, email thread was not loaded correctly.
-            no_signature: You haven't created a signature yet. Please set it in System -> Configuration -> Email Configuration.
+            no_signature: You don't have a signature yet. Please add it in <a href="{{ url }}">My Profile</a>.
+            no_signature_no_permission: You don't have a signature yet. Contact your administrator to add it.
+            collapse_all:
+                label: Collapse All
+                tooltip: Collapse all emails in the thread
+            expand_all:
+                label: Expand All
+                tooltip: Expand all emails in the thread
+        to: To
+        attachment:
+            added: Attachment added
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"

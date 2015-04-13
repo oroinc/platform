@@ -27,6 +27,7 @@ parameters:
     oro_email.email.manager.class:                Oro\Bundle\EmailBundle\Entity\Manager\EmailManager
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
+    oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -54,19 +55,20 @@ parameters:
     oro_email.datagrid_query_factory.class:           Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
+    oro_email.emailfolder.datagrid_view_list.class:   Oro\Bundle\EmailBundle\Datagrid\EmailFolderViewList
 
     # Datagrid event listeners
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
     oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
-    oro_email.listener.datagrid.grouping.class:           Oro\Bundle\EmailBundle\EventListener\Datagrid\GroupingGridListener
 
     # Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
     oro_email.workflow.action.send_email_template.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate
 
     oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
+    oro_email.listener.email_body_add_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener
 
     # Validators
     oro_email.validator.email_template_syntax_validator.class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
@@ -98,6 +100,7 @@ services:
         arguments:
             - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
+            - @event_dispatcher
         calls:
             - [setLogger, [@logger]]
 
@@ -324,6 +327,11 @@ services:
         arguments:
             - @translator
 
+    oro_email.emailfolder.datagrid_view_list:
+        class: %oro_email.emailfolder.datagrid_view_list.class%
+        arguments:
+            - @translator
+
     oro_email.emailtemplate.datagrid_helper:
         class: %oro_email.emailtemplate.datagrid_helper.class%
         arguments:
@@ -339,6 +347,7 @@ services:
             - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
+            - @event_dispatcher
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
@@ -379,13 +388,6 @@ services:
         class: %oro_email.listener.datagrid.email.class%
         arguments:
             - @oro_email.datagrid_query_factory
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
-
-    oro_email.listener.datagrid.grouping:
-        class: %oro_email.listener.datagrid.grouping.class%
-        arguments:
-            - @oro_config.global
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
@@ -458,6 +460,10 @@ services:
         class: %oro_email.twig.extension.email.class%
         arguments:
             - @oro_email.email_holder_helper
+            - @oro_email.email.address.helper
+            - @oro_email.manager.email_attachment_manager
+            - @doctrine.orm.entity_manager
+            - @oro_entity.routing_helper
         tags:
             - { name: twig.extension }
 
@@ -481,3 +487,22 @@ services:
     oro_email.link.formatter.name:
         tags:
             - { name: oro_service_link,  service: oro_locale.formatter.name }
+
+    oro_email.manager.email_attachment_manager:
+        class: %oro_email.manager.email_attachment_manager.class%
+        arguments:
+            - @knp_gaufrette.filesystem_map
+            - @doctrine.orm.entity_manager
+            - @kernel
+            - @oro_security.security_facade.link
+            - @oro_attachment.validator.file_config_validator
+
+    oro_email.listener.email_body_add_listener:
+        class: %oro_email.listener.email_body_add_listener.class%
+        arguments:
+            - @oro_email.manager.email_attachment_manager
+            - @oro_entity_config.provider.attachment
+            - @oro_email.activity_list.provider
+            - @oro_security.security_facade.link
+        tags:
+            - { name: kernel.event_listener, event: oro_email.email_attachment_manager.email_body_added, method: linkToScopeEvent, priority: 10 }
