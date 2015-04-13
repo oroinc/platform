@@ -89,18 +89,6 @@ class EmailControllerTest extends WebTestCase
         $this->assertCount(1, $result);
     }
 
-    public function testDeleteAssociations()
-    {
-        $this->deleteAssociations(self::INCORRECT_ID);
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
-
-        $id = $this->getReference('email_1')->getId();
-        $this->deleteAssociations($id);
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertEmpty($result);
-    }
-
     public function testPostAssociation()
     {
         $userId = $this->getReference('simple_user2')->getId();
@@ -113,7 +101,7 @@ class EmailControllerTest extends WebTestCase
         $this->getAssosiaction($id);
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(0, $result);
+        $this->assertCount(1, $result);
 
         $this->postAssociation($id, 'Oro\Bundle\UserBundle\Entity\User', $userId);
         $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -121,7 +109,7 @@ class EmailControllerTest extends WebTestCase
         $this->getAssosiaction($id);
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertNotEmpty($result);
-        $this->assertCount(1, $result);
+        $this->assertCount(2, $result);
     }
 
 
@@ -157,14 +145,6 @@ class EmailControllerTest extends WebTestCase
         $this->client->request(
             'DELETE',
             $this->getUrl('oro_api_delete_email_association', $param)
-        );
-    }
-
-    protected function deleteAssociations($id)
-    {
-        $this->client->request(
-            'DELETE',
-            $this->getUrl('oro_api_delete_email_associations', ['entityId' => $id])
         );
     }
 

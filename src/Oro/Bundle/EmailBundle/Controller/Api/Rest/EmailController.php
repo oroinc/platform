@@ -282,47 +282,6 @@ class EmailController extends RestGetController
 
 
     /**
-     * REST DELETE
-     *
-     * @param int $entityId
-     *
-     * @ApiDoc(
-     *      description="Delete Associations",
-     *      resource=true
-     * )
-     * @return Response
-     * @AclAncestor("oro_email_delete")
-     *
-     */
-    public function deleteAssociationsAction($entityId)
-    {
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
-        $associations = $entity->getActivityTargetEntities();
-        $em = $this->getDoctrine()->getManager();
-        try {
-            foreach ($associations as $association) {
-                $entity->removeActivityTarget(($association));
-            }
-            $em->persist($entity);
-            $em->flush();
-
-            $view = $this->view($entity->getActivityTargetEntities(), Codes::HTTP_OK);
-        } catch (\RuntimeException $e) {
-            $view = $this->view([], Codes::HTTP_BAD_REQUEST);
-        }
-
-        return $this->buildResponse($view, Codes::HTTP_LOOP_DETECTED, []);
-    }
-
-    /**
      * REST GET item
      *
      * @param string $id
