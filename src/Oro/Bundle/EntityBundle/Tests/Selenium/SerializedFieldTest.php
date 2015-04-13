@@ -72,6 +72,7 @@ class SerializedFieldTest extends Selenium2TestCase
      */
     public function testEntityFieldDataSave()
     {
+        $this->markTestIncomplete('Due to BAP-7904');
         $login = $this->login();
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle')

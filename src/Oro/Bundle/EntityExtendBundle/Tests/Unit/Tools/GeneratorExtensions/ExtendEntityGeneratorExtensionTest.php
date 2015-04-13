@@ -112,18 +112,6 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertGeneration('properties.txt', $schema);
     }
 
-    public function testRelations()
-    {
-        $schema = [
-            'type'      => 'Extend',
-            'property'  => [],
-            'relation'  => ['rel1' => 'rel1', 'rel_2' => 'rel_2'],
-            'default'   => [],
-            'addremove' => []
-        ];
-        $this->assertGeneration('relations.txt', $schema);
-    }
-
     public function testDefaults()
     {
         $schema = [
@@ -157,6 +145,24 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
         $this->assertGeneration('collections.txt', $schema);
+    }
+
+    public function testRelations()
+    {
+        $schema = [
+            'type'      => 'Extend',
+            'property'  => [],
+            'relation'  => ['rel1' => 'rel1', 'rel_2' => 'rel_2'],
+            'default'   => [],
+            'addremove' => [
+                'rel1'  => [
+                    'self'                => 'rel1',
+                    'is_target_addremove' => false,
+                    'target'              => 'target1',
+                ],
+            ]
+        ];
+        $this->assertGeneration('relations.txt', $schema);
     }
 
     public function testCollectionsWithoutTarget()
@@ -195,6 +201,16 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         }
         $expectedBody = file_get_contents(__DIR__ . '/../Fixtures/' . $expectedFile);
 
-        $this->assertEquals(trim($expectedBody), $classBody);
+        /**
+         * Support different line endings. On windows we have \r\n line endings and but
+         * \CG\Generator\Writer::write use only \n and add extra spaces only to empty lines
+         * because of this we need to remove spaces in generated and expected code.
+         */
+        $expectedBody = str_replace(["\r\n", ' '], ["\n", ''], $expectedBody);
+        $classBody = str_replace(["\r\n", ' '], ["\n", ''], $classBody);
+        $expectedBody = trim($expectedBody);
+        $classBody = trim($classBody);
+
+        $this->assertEquals($expectedBody, $classBody);
     }
 }
