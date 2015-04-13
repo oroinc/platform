@@ -12,6 +12,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
@@ -65,8 +66,9 @@ class EmailAttachmentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('id', 'text', ['required' => true]);
+        $builder->add('id', 'text');
         $builder->add('type', 'text', ['required' => true]);
+        $builder->add('file', 'file');
 
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'initAttachmentEntity']);
     }
@@ -92,6 +94,10 @@ class EmailAttachmentType extends AbstractType
                 case AttachmentModel::TYPE_EMAIL_ATTACHMENT:
                     $repo = $this->em->getRepository('OroEmailBundle:EmailAttachment');
                     $emailAttachment = $repo->find($attachment->getId());
+
+                    break;
+                case AttachmentModel::TYPE_UPLOADED:
+                    $emailAttachment = $this->createEmailAttachmentFromOroAttachment($attachment->getFile());
 
                     break;
                 default:
@@ -130,5 +136,28 @@ class EmailAttachmentType extends AbstractType
         );
 
         return $emailAttachmentEntity;
+    }
+
+    /**
+     * @param UploadedFile $uploadedFile
+     *
+     * @return EmailAttachmentEntity
+     */
+    protected function createEmailAttachmentFromUploadedFile(UploadedFile $uploadedFile)
+    {
+        $emailAttachment = new EmailAttachmentEntity();
+
+        $attachmentContent = new EmailAttachmentContent();
+        $attachmentContent->setContent(
+            base64_encode(file_get_contents($uploadedFile->getRealPath()))
+        );
+        $attachmentContent->setContentTransferEncoding('base64');
+        $attachmentContent->setEmailAttachment($emailAttachment);
+
+        $emailAttachment->setContent($attachmentContent);
+        $emailAttachment->setContentType($uploadedFile->getMimeType());
+        $emailAttachment->setFileName($uploadedFile->getClientOriginalName());
+
+        return $emailAttachment;
     }
 }

@@ -45,33 +45,25 @@
         <div class="attachment-list-content">
             <label>{{ 'oro.email.attachment.select_file'|trans }}</label>
             <input type="text" class="filter"/>
-            <div class="attachment-list"></div>
+            <div class="attachment-list">
+                <div class="no-items">
+                    <p class="text-center">{{ 'oro.email.form.no_attachments'|trans }}</p>
+                </div>
+            </div>
         </div>
         <div class="clear"></div>
         <div class="attachment-actions">
-            <div class="pull-left">
-                <a class="upload-new" href="javascript:void(0);">Upload New File</a>
-                <input class="input-upload-new" type="file" multiple/>
-            </div>
             <div class="pull-right">
-                <a class="btn cancel">Cancel</a>
-                <a class="btn btn-primary attach">Attach</a>
+                <a class="btn cancel">{{ 'Cancel'|trans }}</a>
+                <a class="btn btn-primary attach">{{ 'oro.email.form.attach'|trans }}</a>
             </div>
         </div>
     </script>
 
     <script type="text/template" id="email-attachment-list-row-view">
-        <% if (visible) { %>
-            <div style="line-height: 26px; font-size: 11px">
-        <% } else { %>
-            <div style="line-height: 26px; display: none; font-size: 11px">
-        <% } %>
-        <% if (checked) { %>
-            <input type="checkbox" style="display: inline-block; width: 24px" checked>
-        <% } else { %>
-            <input type="checkbox" style="display: inline-block; width: 24px">
-        <% } %>
-            <span style="padding-top: 1px"><%= fileName %> (<%= info %>)</span>
+        <div class="attachment-list-row <% if (!visible) { %>hide<% } %>">
+            <input type="checkbox" class="checkbox" <% if (checked) { %>checked<% } %>>
+            <span><%= fileName %> (<%= info %>)</span>
         </div>
     </script>
 

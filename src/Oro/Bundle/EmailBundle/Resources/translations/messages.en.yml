@@ -12,7 +12,11 @@ oro:
         form:
             choose_template:                     ""
             add_signature:                       Add Signature
-            attach_file:                         Attach File
+            attach_file:                         Attach file
+            from_record:                         From record
+            upload:                              Upload
+            attach:                              Attach
+            no_attachments:                      No available attachments
 
         variable.not.found:                     N/A
 

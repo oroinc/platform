@@ -330,10 +330,6 @@ class EmailModelBuilder
                 );
             }
         }
-        $attachments = array_merge(
-            $attachments,
-            $this->emailAttachmentProvider->getFreeAttachments()
-        );
 
         $emailModel->setAttachmentsAvailable($attachments);
     }

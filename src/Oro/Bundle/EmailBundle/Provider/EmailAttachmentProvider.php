@@ -102,24 +102,6 @@ class EmailAttachmentProvider
     }
 
     /**
-     * @return array
-     */
-    public function getFreeAttachments()
-    {
-        $attachments = [];
-        $repo = $this->em->getRepository('OroEmailBundle:EmailAttachment');
-
-        $emailAttachments = $repo->findBy([
-            'emailBody' => null,
-        ]);
-        foreach ($emailAttachments as $emailAttachment) {
-            $attachments[] = $this->emailAttachmentToAttachmentModel($emailAttachment);
-        }
-
-        return $attachments;
-    }
-
-    /**
      * @param EmailAttachment $emailAttachment
      *
      * @return AttachmentModel

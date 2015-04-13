@@ -56,7 +56,6 @@ define(function (require) {
                 this.popupView = new EmailAttachmentSelectView({
                     popupTriggerButton: options.popupTriggerButton,
                     el: options.popupContentEl,
-                    listSelector: options.popupAttachmentList,
                     collection: this.popupCollection
                 });
 

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
@@ -9,6 +11,7 @@ class EmailAttachment
 {
     const TYPE_ATTACHMENT       = 1; // oro attachment (OroAttachmentBundle)
     const TYPE_EMAIL_ATTACHMENT = 2; // email attachment
+    const TYPE_UPLOADED         = 3; // new uploaded file
 
     /**
      * @var int
@@ -39,6 +42,11 @@ class EmailAttachment
      * @var EmailAttachment
      */
     protected $emailAttachment;
+
+    /**
+     * @var UploadedFile
+     */
+    protected $file;
 
     /**
      * @return int
@@ -157,6 +165,26 @@ class EmailAttachment
     public function setModified($modified)
     {
         $this->modified = $modified;
+
+        return $this;
+    }
+
+    /**
+     * @return UploadedFile
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param UploadedFile $uploadedFile
+     *
+     * @return $this
+     */
+    public function setFile($uploadedFile)
+    {
+        $this->file = $uploadedFile;
 
         return $this;
     }

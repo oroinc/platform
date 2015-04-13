@@ -10,6 +10,8 @@ define(function (require) {
 
     EmailAttachmentSelectView = BaseCollectionView.extend({
         itemView: EmailAttachmentListRowView,
+        listSelector: '.attachment-list',
+        fallbackSelector: '.no-items',
         isShowed: false,
         fileNameFilter: '',
 
@@ -17,7 +19,6 @@ define(function (require) {
             'click .cancel':                 'cancelClick',
             'click .upload-new':             'uploadNewClick',
             'click .attach':                 'attachClick',
-            'change input.input-upload-new': 'fileSelected',
             'input input.filter':            'filterChange'
         },
 
@@ -33,40 +34,12 @@ define(function (require) {
             this.$('input.input-upload-new').click();
         },
 
-        fileSelected: function(event) {
-            if ($(event.target).val()) {
-                var files = event.target.files;
-                var data = new FormData();
-                $.each(files, function (key, value) {
-                    data.append(key, value);
-                });
-
-                var self = this;
-
-                $.ajax({
-                    url: routing.generate('oro_email_attachment_upload'),
-                    type: 'POST',
-                    data: data,
-                    cache: false,
-                    dataType: 'json',
-                    processData: false,
-                    contentType: false,
-                    success: function (data, textStatus, jqXHR) {
-                        self.collection.add(data.attachments)
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert('error');
-                    }
-                });
-            }
-        },
-
         filterChange: function(event) {
             var value = $(event.target).val();
 
             this.collection.each(function(model) {
                 if (model.get('fileName').indexOf(value) === 0) {
-                    model.set('visible', true)
+                    model.set('visible', true);
                 } else {
                     model.set('visible', false);
                 }
