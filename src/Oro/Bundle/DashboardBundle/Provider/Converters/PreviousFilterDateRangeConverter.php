@@ -13,7 +13,9 @@ class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
 
         if (($value === null && $config['converter_attributes']['default_checked'] === true) || $value) {
             if (!isset($config['converter_attributes']['dateRangeField'])) {
-                throw new \Exception('Previous date range configuration parameter should have dateRangeField attribute');
+                throw new \Exception(
+                    'Previous date range configuration parameter should have dateRangeField attribute'
+                );
             }
             $prevDateRange = $options[$config['converter_attributes']['dateRangeField']];
             if (isset($prevDateRange['type'])) {
