@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -14,13 +13,13 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Event\EmailCreated;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -57,9 +56,6 @@ class Processor
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var EmailActivityListProvider */
-    protected $activityListProvider;
-
     /** @var array */
     protected $origins = array();
 
@@ -71,7 +67,6 @@ class Processor
      * @param EmailOwnerProvider $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
      * @param EventDispatcherInterface $eventDispatcher
-     * @param EmailActivityListProvider $activityListProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -80,8 +75,7 @@ class Processor
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
-        EventDispatcherInterface $eventDispatcher,
-        EmailActivityListProvider $activityListProvider
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->mailer = $mailer;
@@ -90,7 +84,6 @@ class Processor
         $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
         $this->eventDispatcher = $eventDispatcher;
-        $this->activityListProvider = $activityListProvider;
     }
 
     /**
@@ -169,29 +162,13 @@ class Processor
             $this->emailActivityManager->addAssociation($email, $context);
         }
 
-        if ($parentMessageId) {
-            /** @var Email $parentEmail */
-            $parentEmail = $this->em->getRepository(Email::ENTITY_CLASS)->find($model->getParentEmailId());
-            $thread = $parentEmail->getThread();
-            if ($thread) {
-                $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-            } else {
-                $relatedEmails = [$parentEmail];
-            }
-            foreach ($relatedEmails as $relatedEmail) {
-                $oldContexts = $this->activityListProvider->getTargetEntities($relatedEmail);
-                foreach ($oldContexts as $context) {
-                    $this->emailActivityManager->removeActivityTarget($relatedEmail, $context);
-                }
-                foreach ($contexts as $context) {
-                    $this->emailActivityManager->addAssociation($relatedEmail, $context);
-                }
-            }
-        }
-
         // flush all changes to the database
         $this->getEntityManager()->flush();
-        $this->eventEmailBody($email);
+
+        $event = new EmailCreated($email);
+        $this->eventDispatcher->dispatch(EmailCreated::NAME, $event);
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
         return $email;
     }
@@ -378,14 +355,5 @@ class Processor
         }
 
         return $this->em;
-    }
-
-    /**
-     * @param $email
-     */
-    protected function eventEmailBody($email)
-    {
-        $event = new EmailBodyAdded($email);
-        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
     }
 }

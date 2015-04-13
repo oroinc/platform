@@ -2,24 +2,20 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use Doctrine\ORM\Tools\Export\ExportException;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
-
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -27,6 +23,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Doctrine\Common\Util\ClassUtils;
 

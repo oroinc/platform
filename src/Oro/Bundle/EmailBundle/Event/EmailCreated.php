@@ -5,9 +5,9 @@ namespace Oro\Bundle\EmailBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
-class EmailBodyAdded extends Event
+class EmailCreated extends Event
 {
-    const NAME = 'oro_email.email_body_added';
+    const NAME = 'oro_email.email_created';
 
     /** @var Email */
     protected $email;

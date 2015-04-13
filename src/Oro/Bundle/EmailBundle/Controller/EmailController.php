@@ -299,14 +299,15 @@ class EmailController extends Controller
     public function contextAction(Email $emailEntity)
     {
         $entityProvider = $this->get('oro_entity.entity_provider');
-        $entityTargets = $this->get('oro_entity.entity.manager')->getSupportedTargets($entityProvider, $emailEntity);
+        $entityTargets = $this->get('oro_entity.entity.manager')
+            ->getSupportedTargets($entityProvider, $emailEntity);
         return [
             'sourceEntity' => $emailEntity,
             'entityTargets' => $entityTargets,
             'params' => [
                 'grid_path' => $this->generateUrl(
                     'oro_email_context_grid',
-                    array(),
+                    [],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 )
             ]
