@@ -11,7 +11,8 @@ abstract class ConfigValueConverterAbstract
      * @param mixed $value
      * @param array $config
      * @param array $options
-     * @return null
+     *
+     * @return null|mixed
      */
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
@@ -22,6 +23,7 @@ abstract class ConfigValueConverterAbstract
      * Returns string representation of converted value
      *
      * @param mixed $value
+     *
      * @return string
      */
     public function getViewValue($value)
@@ -34,6 +36,7 @@ abstract class ConfigValueConverterAbstract
      *
      * @param array $converterAttributes
      * @param mixed $value
+     *
      * @return mixed
      */
     public function getFormValue(array $converterAttributes, $value)

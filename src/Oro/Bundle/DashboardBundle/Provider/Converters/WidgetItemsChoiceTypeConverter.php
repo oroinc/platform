@@ -42,6 +42,7 @@ class WidgetItemsChoiceTypeConverter extends ConfigValueConverterAbstract
 
     /**
      * @param array $config
+     *
      * @return array
      */
     protected function getDefaultChoices(array $config)

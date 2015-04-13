@@ -17,9 +17,13 @@ class ConfigValueProvider
     }
 
     /**
-     * @param string $formType
-     * @param mixed  $value
-     * @return mixed
+     * @param       $widgetConfig
+     * @param       $formType
+     * @param null  $value
+     * @param array $config
+     * @param array $options
+     *
+     * @return string
      */
     public function getConvertedValue($widgetConfig, $formType, $value = null, $config = [], $options = [])
     {
@@ -33,6 +37,7 @@ class ConfigValueProvider
     /**
      * @param $formType
      * @param $value
+     *
      * @return string
      */
     public function getViewValue($formType, $value)
@@ -44,6 +49,13 @@ class ConfigValueProvider
         return $value;
     }
 
+    /**
+     * @param $formType
+     * @param $config
+     * @param $value
+     *
+     * @return mixed
+     */
     public function getFormValue($formType, $config, $value)
     {
         if (in_array($formType, array_keys($this->converters))) {
