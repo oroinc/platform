@@ -27,6 +27,6 @@ class AddPhone implements Migration
                 ]
             ]
         );
-        $table->addUniqueIndex(['phone'], 'oro_idx_user_phone');
+        $table->addIndex(['phone'], 'oro_idx_user_phone');
     }
 }
