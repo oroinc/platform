@@ -95,7 +95,7 @@ oro_entity_config:
                 origin:
                     options:
                         auditable:          false
-                        default_value:      'Code'
+                        default_value:      'System'
 
                 relation:
                     options:
@@ -269,7 +269,7 @@ oro_entity_config:
                 origin:
                     options:
                         auditable:          false
-                        default_value:      'Code'
+                        default_value:      'System'
 
                 #
                 # Relations form type fields
