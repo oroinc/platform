@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -24,8 +26,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Doctrine\Common\Util\ClassUtils;
 
 /**
  * @RouteResource("email")
@@ -106,12 +106,17 @@ class EmailController extends RestGetController
      */
     public function getAssociationsDataAction($entityId)
     {
+        $user = $this->get('security.context')->getToken()->getUser();
         /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
         $associations = $entity->getActivityTargetEntities();
         $itemsArray = array();
         foreach ($associations as $association) {
             $className = ClassUtils::getClass($association);
+            if (ClassUtils::getClass($user) === $className && $user->getId() === $association->getId()) {
+                continue;
+            }
+
             /** @var $configManager ConfigManager */
             $configManager = $this->container->get('oro_entity_config.config_manager');
             $nameFormater = $this->get('oro_locale.formatter.name');
@@ -169,7 +174,7 @@ class EmailController extends RestGetController
      *      description="Add new association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_create")
+     * @AclAncestor("oro_email_edit")
      */
     public function postAssociationsAction()
     {
@@ -227,7 +232,7 @@ class EmailController extends RestGetController
      *      description="Delete Association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_delete")
+     * @AclAncestor("oro_email_edit")
      *
      * @Delete("/emails/{entityId}/associations/{targetClassName}/{targetId}")
      *
@@ -269,7 +274,7 @@ class EmailController extends RestGetController
      *      resource=true
      * )
      * @return Response
-     * @AclAncestor("oro_email_delete")
+     * @AclAncestor("oro_email_edit")
      *
      */
     public function deleteAssociationsAction($entityId)

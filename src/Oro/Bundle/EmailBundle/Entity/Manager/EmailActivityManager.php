@@ -38,7 +38,7 @@ class EmailActivityManager
                 // prepare the list of association targets
                 $targets = [];
                 $this->addSenderOwner($targets, $entity);
-                $this->addRecipientOwners($targets, $entity);
+//                $this->addRecipientOwners($targets, $entity);
                 // add associations
                 $hasChanges = $this->activityManager->addActivityTargets($entity, $targets);
                 // recompute change set if needed

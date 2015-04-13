@@ -91,11 +91,11 @@ define([
                                 $view.remove();
                                 self.render();
                             }
-
-                            Messenger.notificationFlashMessage(response.status != statusNotFound ? 'success': 'error', __(response.message));
+                            messenger.notificationFlashMessage(response.status != statusNotFound ? 'success': 'error', __(response.message));
+                            mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                         },
                         error: function(model, response) {
-                            Messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
+                            messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
                         }
                     });
                 });
