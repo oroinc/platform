@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query;
+
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 interface QueryBuilderInterface
@@ -12,8 +15,21 @@ interface QueryBuilderInterface
      *
      * @param Segment $segment
      *
-     * @return \Doctrine\ORM\Query
+     * @return Query
+     *
      * @throws \LogicException
      */
     public function build(Segment $segment);
+
+    /**
+     * Builds QueryBuilder based on segment definition
+     * Returns QueryBuilder that could be used for filtering by segment conditions
+     *
+     * @param Segment $segment
+     *
+     * @return QueryBuilder
+     *
+     * @throws \LogicException
+     */
+    public function getQueryBuilder(Segment $segment);
 }

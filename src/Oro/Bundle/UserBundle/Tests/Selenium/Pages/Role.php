@@ -33,7 +33,7 @@ class Role extends AbstractPageEntity
     /**
      * @param $entityName string of ACL resource name
      * @param $aclAction array of actions such as create, edit, delete, view, assign
-     * @param $accessLevel
+     * @param $accessLevel string
      *
      * @return $this
      */
@@ -47,6 +47,7 @@ class Role extends AbstractPageEntity
             );
             $this->test->moveto($xpath);
             $xpath->click();
+            $this->waitPageToLoad();
             $this->waitForAjax();
             $this->accessLevel = $this->test->select(
                 $this->test->byXpath(

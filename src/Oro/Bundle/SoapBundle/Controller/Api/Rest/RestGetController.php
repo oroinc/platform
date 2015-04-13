@@ -29,10 +29,10 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     /**
      * {@inheritdoc}
      */
-    public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [])
+    public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [], $joins = [])
     {
         $manager = $this->getManager();
-        $qb      = $manager->getListQueryBuilder($limit, $page, $filters);
+        $qb      = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
 
         if ($manager instanceof EntitySerializerManagerInterface) {
             $result = $manager->serialize($qb);

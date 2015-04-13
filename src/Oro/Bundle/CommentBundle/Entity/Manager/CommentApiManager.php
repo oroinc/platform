@@ -3,7 +3,9 @@
 namespace Oro\Bundle\CommentBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 
@@ -21,10 +23,12 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class CommentApiManager extends ApiEntityManager
 {
-    const ITEMS_PER_PAGE = 10;
+    const AVATAR_FIELD_NAME = 'avatar';
 
     /** @var ObjectManager */
     protected $em;
@@ -44,6 +48,9 @@ class CommentApiManager extends ApiEntityManager
     /** @var aclHelper */
     protected $aclHelper;
 
+    /** @var aclHelper */
+    protected $configManager;
+
     /**
      * @param Registry          $doctrine
      * @param SecurityFacade    $securityFacade
@@ -52,6 +59,7 @@ class CommentApiManager extends ApiEntityManager
      * @param EventDispatcher   $eventDispatcher
      * @param AttachmentManager $attachmentManager
      * @param AclHelper         $aclHelper
+     * @param ConfigManager     $configManager
      */
     public function __construct(
         Registry $doctrine,
@@ -60,7 +68,8 @@ class CommentApiManager extends ApiEntityManager
         Pager $pager,
         EventDispatcher $eventDispatcher,
         AttachmentManager $attachmentManager,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        ConfigManager $configManager
     ) {
         $this->em                = $doctrine->getManager();
         $this->securityFacade    = $securityFacade;
@@ -68,6 +77,7 @@ class CommentApiManager extends ApiEntityManager
         $this->pager             = $pager;
         $this->attachmentManager = $attachmentManager;
         $this->aclHelper         = $aclHelper;
+        $this->configManager     = $configManager;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -78,10 +88,12 @@ class CommentApiManager extends ApiEntityManager
      * @param string $entityClass
      * @param int    $entityId
      * @param int    $page
+     * @param int    $limit
+     * @param array  $filters
      *
      * @return array
      */
-    public function getCommentList($entityClass, $entityId, $page = 1)
+    public function getCommentList($entityClass, $entityId, $page = 1, $limit = 10, $filters = [])
     {
         $entityName = $this->convertRelationEntityClassName($entityClass);
         $result     = [
@@ -98,11 +110,12 @@ class CommentApiManager extends ApiEntityManager
             /** @var QueryBuilder $qb */
             $qb = $repository->getBaseQueryBuilder($fieldName, $entityId);
             $qb->orderBy('c.createdAt', 'DESC');
+            $this->addFilters($qb, $filters);
 
             $pager = $this->pager;
             $pager->setQueryBuilder($qb);
             $pager->setPage($page);
-            $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
+            $pager->setMaxPerPage($limit);
             $pager->init();
 
             $result['data']  = $this->getEntityViewModels($pager->getAppliedResult(), $entityClass, $entityId);
@@ -193,6 +206,7 @@ class CommentApiManager extends ApiEntityManager
             'removable'     => $this->securityFacade->isGranted('DELETE', $entity),
         ];
         $result = array_merge($result, $this->getAttachmentInfo($entity));
+        $result = array_merge($result, $this->getCommentAvatarImageUrl($entity->getOwner()));
 
         return $result;
     }
@@ -203,6 +217,55 @@ class CommentApiManager extends ApiEntityManager
     public function isCommentable()
     {
         return $this->securityFacade->isGranted('oro_comment_view');
+    }
+
+    /**
+     * Get resized avatar
+     *
+     * @param User $user
+     *
+     * @return string
+     */
+    protected function getCommentAvatarImageUrl($user)
+    {
+        $attachment = PropertyAccess::createPropertyAccessor()->getValue($user, self::AVATAR_FIELD_NAME);
+        if ($attachment && $attachment->getFilename()) {
+            $entityClass = ClassUtils::getRealClass($user);
+            $config = $this->configManager
+                ->getProvider('attachment')
+                ->getConfig($entityClass, self::AVATAR_FIELD_NAME);
+            return [
+                'avatarUrl' => $this->attachmentManager
+                    ->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'))
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * Adds filters to a query builder
+     *
+     * @param QueryBuilder   $qb
+     * @param array|Criteria $filters Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                or \Doctrine\Common\Collections\Criteria
+     */
+    protected function addFilters(QueryBuilder $qb, $filters)
+    {
+        if ($filters) {
+            if (is_array($filters)) {
+                $newCriteria = new Criteria();
+                foreach ($filters as $fieldName => $value) {
+                    $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+                }
+
+                $filters = $newCriteria;
+            }
+
+            if ($filters instanceof Criteria) {
+                $qb->addCriteria($filters);
+            }
+        }
     }
 
     /**

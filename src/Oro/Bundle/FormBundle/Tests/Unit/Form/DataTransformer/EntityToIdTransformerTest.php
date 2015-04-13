@@ -85,6 +85,32 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($entity, $transformer->reverseTransform(1));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The value "1" does not exist or not unique.
+     */
+    public function testReverseTransformFailsNotFindEntity()
+    {
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->will($this->returnValue(null));
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with('TestClass')
+            ->will($this->returnValue($repository));
+
+        $transformer = new EntityToIdTransformer($em, 'TestClass', 'id', null);
+        $transformer->reverseTransform(1);
+    }
+
     public function testReverseTransformQueryBuilder()
     {
         $entity = $this->createMockEntity('id', 1);

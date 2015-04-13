@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TrackingBundle\Tools;
 
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
@@ -31,6 +32,6 @@ class VisitEventAssociationGeneratorExtension extends AbstractAssociationEntityG
      */
     protected function getAssociationType()
     {
-        return 'multipleManyToOne';
+        return RelationType::MULTIPLE_MANY_TO_ONE;
     }
 }

@@ -22,6 +22,7 @@ interface DateModifierInterface
     const VAR_FDQ          = 15; // first day of quarter
     const VAR_FMQ          = 16; // first month of quarter
 
+    const PART_SOURCE  = 'source';
     const PART_VALUE   = 'value';
     const PART_DOW     = 'dayofweek';
     const PART_WEEK    = 'week';
