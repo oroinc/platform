@@ -51,6 +51,14 @@ class FormatterExtensionTest extends \PHPUnit_Framework_TestCase
                 'filename' => 'somename1234.jpg',
                 'result' => 'somenam..234.jpg',
             ],
+            [
+                'filename' => 'тратата.jpg',
+                'result' => 'тратата.jpg',
+            ],
+            [
+                'filename' => 'тратататратататратата.jpg',
+                'result' => 'тратата..ата.jpg',
+            ],
         ];
     }
 }

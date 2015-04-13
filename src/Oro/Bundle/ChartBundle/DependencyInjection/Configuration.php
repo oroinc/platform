@@ -9,6 +9,8 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
@@ -100,6 +102,20 @@ class Configuration implements ConfigurationInterface
                         ->info('Template of chart')
                         ->cannotBeEmpty()
                         ->isRequired()
+                    ->end()
+                    ->arrayNode('xaxis')
+                        ->info('Flotr2 xaxis options. See http://www.humblesoftware.com/flotr2/documentation')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->variableNode('mode')
+                                ->info('can be "time" or "normal"')
+                                ->defaultValue('normal')
+                            ->end()
+                            ->integerNode('noTicks')
+                                ->info('number of ticks for automatically generated ticks')
+                                ->defaultValue(5)
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end();

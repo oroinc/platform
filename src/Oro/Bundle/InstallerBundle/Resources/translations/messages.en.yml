@@ -83,6 +83,8 @@ process:
         next:              Next
         install:           Install
         finish:            Launch application
+        launch_admin_application: Launch admin application
+        launch_frontend_application: Launch frontend application
     operation:             Operation
     status:                Status
 

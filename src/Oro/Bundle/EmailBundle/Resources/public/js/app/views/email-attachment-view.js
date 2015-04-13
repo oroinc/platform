@@ -37,27 +37,7 @@ define(function (require) {
 
         removeClick: function() {
             this.model.trigger('destroy', this.model);
-            // todo add it back to list
         },
-
-/*        fileSelect: function() {
-            var self = this;
-            var $fileInput = this.$('input[type="file"]');
-            this.$el.hide();
-
-            $fileInput.on('change', function() {
-                var value = $fileInput.val().replace(/^.*[\\\/]/, '');
-
-                if (value) {
-                    self.model.set('fileName', value);
-                    self.$el.show();
-
-                    // temporary
-                    self.collectionView.$el.show();
-                }
-            });
-            $fileInput.click();
-        },*/
 
         fileNameChange: function() {
             this.$('span.filename-label').html(this.model.get('fileName'));

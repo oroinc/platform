@@ -1,9 +1,10 @@
-/* jshint devel:true*/
-/*global define, require*/
+/*jshint devel:true*/
+/*global define*/
 define(function (require) {
     'use strict';
 
     var AbstractWidget,
+        document = window.document,
         $ = require('jquery'),
         _ = require('underscore'),
         BaseView = require('oroui/js/app/views/base/view'),
@@ -96,6 +97,12 @@ define(function (require) {
             // (to prevent recursion from remove method)
             this.disposing = true;
 
+            // if there's loading process -- stop it
+            if (this.loading) {
+                this.loading.abort();
+                delete this.loading;
+            }
+
             // call before dom will be removed
             this.disposePageComponents();
 
@@ -108,6 +115,18 @@ define(function (require) {
             this.trigger('widgetRemoved');
 
             AbstractWidget.__super__.dispose.call(this);
+        },
+
+        /**
+         * Check if widget is actual. To be actual, widget should:
+         *  - not to be disposed
+         *  - have the element is in the DOM or have loading flag
+         *
+         * @returns {boolean}
+         */
+        isActual: function () {
+            return !this.disposed &&
+                (this.loading || $.contains(document.documentElement, this.el));
         },
 
         /**
@@ -242,7 +261,7 @@ define(function (require) {
                     widget.actions[sectionName][actionName] = $actionEl;
                     widget.trigger('widget:add:action:' + sectionName + ':' + actionName, $actionEl);
                 });
-            })
+            });
         },
 
         /**
@@ -251,7 +270,7 @@ define(function (require) {
          *  @private
          */
         _adoptWidgetActions: function() {
-            this.actions['adopted'] = {};
+            this.actions.adopted = {};
             this.form = null;
             var adoptedActionsContainer = this._getAdoptedActionsContainer();
             if (adoptedActionsContainer.length > 0) {
@@ -328,7 +347,6 @@ define(function (require) {
             }
             if (form.find('[type="file"]').length) {
                 this.trigger('beforeContentLoad', this);
-                this.loading = true;
                 form.ajaxSubmit({
                     data: {
                         '_widgetContainer': this.options.type,
@@ -337,6 +355,7 @@ define(function (require) {
                     success: _.bind(this._onContentLoad, this),
                     error: _.bind(this._onContentLoadFail, this)
                 });
+                this.loading = form.data('jqxhr');
             } else {
                 var formAction = this.form.attr('action');
                 formAction = formAction.length > 0 && formAction[0] !== '#' ? formAction : null;
@@ -602,9 +621,9 @@ define(function (require) {
          * Render widget
          */
         render: function() {
-            var loadAllowed = !this.options.elementFirst
-                || (this.options.elementFirst && !this.firstRun)
-                || (this.$el && this.$el.length && this.$el.html().length == 0);
+            var loadAllowed = !this.options.elementFirst ||
+                    (this.options.elementFirst && !this.firstRun) ||
+                        (this.$el && this.$el.length && this.$el.html().length === 0);
             if (loadAllowed && this.options.url !== false) {
                 this.loadContent();
             } else {
@@ -626,7 +645,7 @@ define(function (require) {
 
             // creating of jqUI dialog could throw exception
             if (widgetContent.length === 0) {
-                throw new Error("Invalid server response: " + content);
+                throw new Error('Invalid server response: ' + content);
             }
             this.disposePageComponents();
             this.setElement(widgetContent);
@@ -637,11 +656,11 @@ define(function (require) {
          * Load content
          *
          * @param {Object=} data
-         * @param {String=} method
+         * @param {string=} method
+         * @param {string=} url
          */
         loadContent: function(data, method, url) {
-            this.loading = true;
-            var url = url || this.options.url;
+            url = url || this.options.url;
             if (url === undefined || !url) {
                 url = window.location.href;
             }
@@ -659,10 +678,9 @@ define(function (require) {
                 '_widgetContainer=' + this.options.type + '&_wid=' + this.getWid();
 
             this.trigger('beforeContentLoad', this);
-            Backbone.$.ajax(options)
+            this.loading = $.ajax(options)
                 .done(_.bind(this._onContentLoad, this))
-                .fail(_.bind(this._onContentLoadFail, this))
-            ;
+                .fail(_.bind(this._onContentLoadFail, this));
         },
 
         /**
@@ -670,10 +688,15 @@ define(function (require) {
          * @private
          */
         _onContentLoadFail: function(jqxhr) {
+            if (jqxhr.statusText === 'abort') {
+                // content load was aborted
+                delete this.loading;
+                return;
+            }
 
-            var message = __('oro.ui.widget_loading_filed');
+            var message = __('oro.ui.widget_loading_failed');
 
-            if (jqxhr.status == 403) {
+            if (jqxhr.status === 403) {
                 message = __('oro.ui.forbidden_error');
             }
 
@@ -691,14 +714,14 @@ define(function (require) {
          * @private
          */
         _onContentLoad: function(content) {
-            this.loading = false;
+            delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
             if (this.renderDeferred) {
                 this.renderDeferred
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
                     .fail(function () {
-                        throw new Error("Widget rendering failed");
+                        throw new Error('Widget rendering failed');
                     });
             } else {
                 this._triggerContentLoadEvents();

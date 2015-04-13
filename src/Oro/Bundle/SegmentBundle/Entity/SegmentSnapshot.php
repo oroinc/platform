@@ -15,6 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class SegmentSnapshot
 {
+    const ENTITY_REF_FIELD = 'entityId';
+
     /**
      * @var int
      *

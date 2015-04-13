@@ -102,6 +102,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->filesystem = $this->getMockBuilder('Gaufrette\Filesystem')
+            ->setMethods(['delete', 'write', 'has'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -146,38 +147,27 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getService')
             ->will($this->returnValue($this->securityFacade));
 
-        $this->activityListProvider = $this
-            ->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
-            ->setMethods(['getTargetEntities'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->attachment = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Entity\Attachment')
-            ->setMethods(['supportTarget', 'setFile'])
+            ->setMethods(['supportTarget'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->emailAttachmentManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager')
-            ->setMethods(['getAttachmentFullPath', 'getNewAttachment'])
+            ->setMethods(['getAttachmentFullPath', 'buildAttachmentInstance'])
             ->setConstructorArgs(
                 [
                     $filesystemMap,
                     $this->em,
                     $this->kernel,
                     $this->securityFacadeLink,
-                    $this->activityListProvider,
                     $this->configFileValidator
                 ]
             )
             ->getMock();
-
-        $this->configFileValidator->expects($this->any())
-            ->method('validate')
-            ->willReturn($this->getMock('Countable'));
 
         $this->emailAttachmentManager->expects($this->any())
             ->method('getAttachmentFullPath')
@@ -188,56 +178,52 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
     {
         $emailAttachment = $this->getEmailAttachment();
 
-        $this->attachment->expects($this->any())
-            ->method('supportTarget')
-            ->withAnyParameters()
-            ->will($this->returnValue(true));
-
         $this->emailAttachmentManager
-            ->method('getNewAttachment')
+            ->method('buildAttachmentInstance')
             ->withAnyParameters()
             ->will($this->returnValue($this->attachment));
 
-        $emailAttachment->expects($this->exactly(1))
+        $emailAttachment->expects($this->once())
             ->method('setFile')
             ->withAnyParameters();
 
-        $this->attachment->expects($this->exactly(1))
+        $this->attachment->expects($this->never())
             ->method('setFile')
             ->withAnyParameters();
+
+        $this->configFileValidator->expects($this->any())
+            ->method('validate')
+            ->willReturn($this->getMock('Countable'));
 
         $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
     }
 
-    public function testLinkEmailAttachmentsToTargetEntities()
+    public function testLinkEmailAttachmentToTargetEntityNotValid()
     {
-        $emailAttachment = $this->getEmailAttachment();
-        $email = $this->getEmailMock($emailAttachment);
+        $file = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Entity\File')
+            ->setMethods(['getFilename'])
+            ->getMock();
+        $countable = $this->getMockBuilder('Countable')->getMock();
+        $countable->expects($this->once())
+            ->method('count')
+            ->will($this->returnValue(2));
 
-        $this->attachment->expects($this->any())
-            ->method('supportTarget')
-            ->withAnyParameters()
-            ->will($this->returnValue(true));
+        $this->configFileValidator->expects($this->exactly(1))
+            ->method('validate')
+            ->will($this->returnValue($countable));
+
+        $emailAttachment = $this->getEmailAttachment();
 
         $this->emailAttachmentManager
-            ->method('getNewAttachment')
+            ->method('buildAttachmentInstance')
             ->withAnyParameters()
             ->will($this->returnValue($this->attachment));
 
-        $this->activityListProvider
-            ->method('getTargetEntities')
-            ->withAnyParameters()
-            ->will($this->returnValue([new SomeEntity()]));
+        $emailAttachment->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue($file));
 
-        $emailAttachment->expects($this->exactly(1))
-            ->method('setFile')
-            ->withAnyParameters();
-
-        $this->attachment->expects($this->exactly(1))
-            ->method('setFile')
-            ->withAnyParameters();
-
-        $this->emailAttachmentManager->linkEmailAttachmentsToTargetEntities($email);
+        $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
     }
 
     protected function getContentMock()
@@ -264,9 +250,6 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $emailAttachment->expects($this->any())
             ->method('getContent')
             ->will($this->returnValue($this->getContentMock()));
-        $emailAttachment->expects($this->any())
-            ->method('getFile')
-            ->will($this->returnValue(true));
 
         return $emailAttachment;
     }

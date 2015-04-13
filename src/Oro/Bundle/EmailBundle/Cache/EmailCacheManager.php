@@ -10,10 +10,10 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
-use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 
 class EmailCacheManager implements LoggerAwareInterface
 {

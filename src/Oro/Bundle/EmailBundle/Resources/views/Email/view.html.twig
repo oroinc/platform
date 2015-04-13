@@ -20,7 +20,6 @@
 
 {% block breadcrumb %}
     {% set breadcrumbs = [
-        {'label': name },
         {'label': 'oro.email.menu.user_emails'|trans }
     ] %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
@@ -60,7 +59,7 @@
             {% set attributes = attributes |
                 merge([UI.attibuteRow(
                     'Attachments'|trans,
-                    EA.attachments(entity.emailBody.attachments, canLinkAttachment, targetEntityData)
+                    EA.attachments(attachments, targetEntityData)
                 )]) %}
         {% endif %}
         {% if entity.emailBody.bodyContent is empty %}

@@ -18,7 +18,7 @@ class DateModifierProviderTest extends \PHPUnit_Framework_TestCase
     {
         $parts = $this->dateModifierProvider->getDateParts();
         $this->assertNotEmpty($parts);
-        $this->assertCount(8, $parts);
+        $this->assertCount(9, $parts);
     }
 
     public function testDateVariables()

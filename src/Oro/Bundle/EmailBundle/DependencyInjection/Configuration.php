@@ -40,7 +40,6 @@ class Configuration implements ConfigurationInterface
                 'signature' => ['value' => ''],
                 'append_signature' => ['value' => true],
                 'use_threads_in_emails' => ['value' => true],
-                'link_email_attachments_to_scope_entity' => ['value' => false],
             ]
         );
 
