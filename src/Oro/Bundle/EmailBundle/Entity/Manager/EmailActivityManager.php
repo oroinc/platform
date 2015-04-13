@@ -2,53 +2,115 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 
 class EmailActivityManager
 {
     /** @var ActivityManager */
     protected $activityManager;
 
-    /**
-     * @param ActivityManager $activityManager
-     */
-    public function __construct(ActivityManager $activityManager)
-    {
-        $this->activityManager = $activityManager;
-    }
+    /** @var EmailActivityListProvider */
+    protected $activityListProvider;
+
+    /** @var EmailThreadProvider */
+    protected $emailThreadProvider;
 
     /**
-     * Handle onFlush event
+     * Emails for updates after flush
+     *
+     * @var Email[]
+     */
+    protected $queueUpdate;
+
+    /**
+     * @param ActivityManager $activityManager
+     * @param EmailActivityListProvider $activityListProvider
+     * @param EmailThreadProvider $emailThreadProvider
+     */
+    public function __construct(
+        ActivityManager $activityManager,
+        EmailActivityListProvider $activityListProvider,
+        EmailThreadProvider $emailThreadProvider
+    ) {
+        $this->activityManager = $activityManager;
+        $this->emailActivityListProvider = $activityListProvider;
+        $this->emailThreadProvider = $emailThreadProvider;
+    }
+
+//    /**
+//     * Handle onFlush event
+//     *
+//     * @param OnFlushEventArgs $event
+//     */
+//    public function handleOnFlush(OnFlushEventArgs $event)
+//    {
+//        $em  = $event->getEntityManager();
+//        $uow = $em->getUnitOfWork();
+//
+//        $newEntities = $uow->getScheduledEntityInsertions();
+//        foreach ($newEntities as $entity) {
+//            if ($entity instanceof Email) {
+//                // prepare the list of association targets
+//                $targets = [];
+//                $this->addSenderOwner($targets, $entity);
+//                $this->addRecipientOwners($targets, $entity);
+//                // add associations
+//                $hasChanges = $this->activityManager->addActivityTargets($entity, $targets);
+//                // recompute change set if needed
+//                if ($hasChanges) {
+//                    $uow->computeChangeSet(
+//                        $em->getClassMetadata(ClassUtils::getClass($entity)),
+//                        $entity
+//                    );
+//                }
+//            }
+//        }
+//    }
+
+    /**
+     * Handles onFlush event
      *
      * @param OnFlushEventArgs $event
      */
     public function handleOnFlush(OnFlushEventArgs $event)
     {
-        $em  = $event->getEntityManager();
+        $em = $event->getEntityManager();
         $uow = $em->getUnitOfWork();
-
-        $newEntities = $uow->getScheduledEntityInsertions();
-        foreach ($newEntities as $entity) {
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof Email) {
+                $this->addEmailToQueue($entity);
+            }
+        }
+    }
+
+    /**
+     * Handles postFlush event
+     *
+     * @param PostFlushEventArgs $event
+     */
+    public function handlePostFlush(PostFlushEventArgs $event)
+    {
+        $em = $event->getEntityManager();
+        if ($this->getQueue()) {
+            foreach ($this->getQueue() as $email) {
+                $this->copyContexts($em, $email);
                 // prepare the list of association targets
                 $targets = [];
-                $this->addSenderOwner($targets, $entity);
-                $this->addRecipientOwners($targets, $entity);
+                $this->addSenderOwner($targets, $email);
+//                $this->addRecipientOwners($targets, $email);
                 // add associations
-                $hasChanges = $this->activityManager->addActivityTargets($entity, $targets);
-                // recompute change set if needed
-                if ($hasChanges) {
-                    $uow->computeChangeSet(
-                        $em->getClassMetadata(ClassUtils::getClass($entity)),
-                        $entity
-                    );
-                }
+                $this->activityManager->addActivityTargets($email, $targets);
             }
+            $this->resetQueue();
+            $em->flush();
         }
     }
 
@@ -117,5 +179,77 @@ class EmailActivityManager
     public function removeActivityTarget(ActivityInterface $activityEntity, $targetEntity)
     {
         return $this->activityManager->removeActivityTarget($activityEntity, $targetEntity);
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param Email $email
+     */
+    public function copyContexts(EntityManager $em, Email $email)
+    {
+        $thread = $email->getThread();
+        if ($thread) {
+            $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+            $contexts = $this->emailActivityListProvider->getTargetEntities($email);
+            if (count($contexts) > 0) {
+                foreach ($relatedEmails as $relatedEmail) {
+                    if ($email->getId() !== $relatedEmail->getId()) {
+                        $this->changeContexts($em, $relatedEmail, $contexts);
+                    }
+                }
+            } else {
+                $relatedEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
+                if (count($relatedEmails) > 0) {
+                    $parentEmail = $relatedEmails[0];
+                    $contexts = $this->emailActivityListProvider->getTargetEntities($parentEmail);
+                    $this->changeContexts($em, $email, $contexts);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param Email $email
+     * @param [] $contexts
+     */
+    protected function changeContexts(EntityManager $em, Email $email, $contexts)
+    {
+        $oldContexts = $this->emailActivityListProvider->getTargetEntities($email);
+        foreach ($oldContexts as $context) {
+            $this->removeActivityTarget($email, $context);
+        }
+        foreach ($contexts as $context) {
+            $this->addAssociation($email, $context);
+        }
+        $em->persist($email);
+    }
+
+    /**
+     * Reset thread update queue
+     */
+    public function resetQueue()
+    {
+        $this->queueUpdate = [];
+    }
+
+    /**
+     * Get tread update queue
+     *
+     * @return Email[]
+     */
+    public function getQueue()
+    {
+        return $this->queueUpdate;
+    }
+
+    /**
+     * Add email to thread update queue
+     *
+     * @param Email $email
+     */
+    public function addEmailToQueue(Email $email)
+    {
+        $this->queueUpdate[] = $email;
     }
 }
