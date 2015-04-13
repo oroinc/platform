@@ -3,16 +3,6 @@
     {%- set userName = app.security.getToken().getUser().getUserName() -%}
 {%- endif -%}
 require({
-    shim: {
-        base64: {
-            init: function() {
-                return {
-                    encode: base64_encode,
-                    decode: base64_decode
-                };
-            }
-        }
-    },
     config: {
         'oroui/js/app': {
             baseUrl: {{ app.request.getSchemeAndHttpHost()|json_encode|raw }},
