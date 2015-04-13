@@ -28,10 +28,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-
 use Doctrine\Common\Util\ClassUtils;
 
 /**
