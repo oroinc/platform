@@ -65,15 +65,6 @@ class EmailControllerTest extends WebTestCase
         $this->assertCount(1, $result);
     }
 
-    public function testGetAssociatioData()
-    {
-        $id = $this->getReference('email_1')->getId();
-        $this->getAssosiactionData($id);
-
-//        $this->assertNotEmpty($result);
-//        $this->assertCount(2, $result);
-    }
-
     public function testDeleteAssociation()
     {
         $userId = $this->getReference('simple_user2')->getId();
