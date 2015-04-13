@@ -189,4 +189,11 @@ class TestContext implements ContextInterface
     {
 
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeOption($name)
+    {
+    }
 }
