@@ -15,10 +15,6 @@ placeholders:
                 order: 100
     head_style: ~
     head_script: ~
-    scripts_after:
-        items:
-            init_pinned_dropdown_button:
-                order: 100
     requirejs_config_extend:
         items:
             ui_requirejs_config:
@@ -45,8 +41,6 @@ items:
         template: OroUIBundle:Default:user_dots_menu.html.twig
     add_update_delete:
         template: OroUIBundle:Form:buttons.html.twig
-    init_pinned_dropdown_button:
-        template: OroUIBundle:Js:init_pinned_dropdown_button.js.twig
     ui_requirejs_config:
         template: OroUIBundle::requirejs.config.js.twig
     navbar:

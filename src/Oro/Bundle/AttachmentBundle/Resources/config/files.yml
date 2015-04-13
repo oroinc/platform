@@ -1,6 +1,6 @@
 file-icons:
-    default: icon-file
-    doc: icon-file
-    docx: icon-file
-    xls: icon-file
-    xlsx: icon-file
+    default: icon-file-alt
+    doc: icon-file-alt
+    docx: icon-file-alt
+    xls: icon-file-alt
+    xlsx: icon-file-alt

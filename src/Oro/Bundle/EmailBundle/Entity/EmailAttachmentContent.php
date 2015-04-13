@@ -129,4 +129,12 @@ class EmailAttachmentContent
 
         return $this;
     }
+
+    /**
+     * Clone record as new one
+     */
+    public function __clone()
+    {
+        $this->id = null;
+    }
 }

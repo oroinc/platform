@@ -1,0 +1,28 @@
+definitions:
+    sync_email_body_after_email_synchronize:
+        label:   Sync Email Body After Email Sync
+        enabled: true
+        order:   100
+        entity:  Oro\Bundle\EmailBundle\Entity\Email
+        actions_configuration:
+            - @tree:
+                conditions:
+                    @blank: [$emailBody]
+                actions:
+                    - @format_string:
+                        attribute: $.arguments
+                        string: '--id=%id%'
+                        arguments:
+                            id: $id
+                    - @create_entity:
+                        class: JMS\JobQueueBundle\Entity\Job
+                        attribute: $.syncJob
+                        flush: true
+                        arguments:
+                            - 'oro:email:body-sync'
+                            - [$.arguments]
+
+triggers:
+    sync_email_body_after_email_synchronize:
+        -
+            event: create

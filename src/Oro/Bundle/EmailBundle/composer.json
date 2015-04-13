@@ -9,6 +9,7 @@
         "symfony/symfony": "2.3.*",
         "doctrine/orm": ">=2.3,<2.4-dev",
         "a2lix/translation-form-bundle" : "1.*@dev",
+        "oro/attachment-bundle": "dev-master",
         "oro/user-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/workflow-bundle": "dev-master"

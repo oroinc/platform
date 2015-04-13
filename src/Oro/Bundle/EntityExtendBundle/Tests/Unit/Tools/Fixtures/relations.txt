@@ -12,7 +12,27 @@ class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterf
 
     public function setRel1($value)
     {
-        $this->rel1 = $value; return $this;
+        if ((!$value instanceof \Traversable && !is_array($value) && !$value instanceof \ArrayAccess) ||
+            !$this->rel1 instanceof \Doctrine\Common\Collections\Collection) {
+            $this->rel1 = $value;
+
+            return $this;
+        }
+
+        $this->rel1->clear();
+        foreach ($value as $item) {
+            $this->addRel1($item);
+        }
+
+        return $this;
+    }
+
+    public function removeRel1($value)
+    {
+        if ($this->rel1 && $this->rel1->contains($value)) {
+            $this->rel1->removeElement($value);
+            $value->setTarget1(null);
+        }
     }
 
     public function getRel2()
@@ -25,7 +45,16 @@ class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterf
         return $this->rel1;
     }
 
+    public function addRel1($value)
+    {
+        if (!$this->rel1->contains($value)) {
+            $this->rel1->add($value);
+            $value->setTarget1($this);
+        }
+    }
+
     public function __construct()
     {
+        $this->rel1 = new \Doctrine\Common\Collections\ArrayCollection();
     }
 }
