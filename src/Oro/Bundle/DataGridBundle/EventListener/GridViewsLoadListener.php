@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -45,13 +46,17 @@ class GridViewsLoadListener
         }
 
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $gridName);
-        if (!$gridViews) {
+        $allowedGridViews = array_filter($gridViews, function (GridView $gridView) {
+            return $this->securityFacade->isGranted('VIEW', $gridView);
+        });
+
+        if (!$allowedGridViews) {
             return;
         }
 
         $choices = [];
         $views = [];
-        foreach ($gridViews as $gridView) {
+        foreach ($allowedGridViews as $gridView) {
             $view = $gridView->createView();
             if ($this->securityFacade->isGranted('EDIT', $gridView)) {
                 $view->setEditable();

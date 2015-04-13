@@ -1,3 +1,9 @@
+oro_datagrid_gridview_view:
+    type: entity
+    class: OroDataGridBundle:GridView
+    permission: VIEW
+    group_name: ""
+
 oro_datagrid_gridview_create_public:
     label: oro.grid.action.gridview_create_public
     type: action

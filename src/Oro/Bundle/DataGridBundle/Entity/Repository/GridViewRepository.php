@@ -22,16 +22,8 @@ class GridViewRepository extends EntityRepository
         $qb = $this->createQueryBuilder('gv');
         $qb
             ->andWhere('gv.gridName = :gridName')
-            ->andWhere($qb->expr()->orx(
-                'gv.type = :publicType',
-                $qb->expr()->andX(
-                    'gv.type = :privateType'
-                )
-            ))
             ->setParameters([
                 'gridName' => $gridName,
-                'publicType' => GridView::TYPE_PUBLIC,
-                'privateType' => GridView::TYPE_PRIVATE,
             ])
             ->orderBy('gv.gridName');
 

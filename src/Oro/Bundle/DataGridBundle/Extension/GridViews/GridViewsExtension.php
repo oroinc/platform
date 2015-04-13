@@ -89,6 +89,7 @@ class GridViewsExtension extends AbstractExtension
     private function getPermissions()
     {
         return [
+            'VIEW' => $this->securityFacade->isGranted('oro_datagrid_gridview_view'),
             'CREATE' => $this->securityFacade->isGranted('oro_datagrid_gridview_create'),
             'EDIT' => $this->securityFacade->isGranted('oro_datagrid_gridview_update'),
             'DELETE' => $this->securityFacade->isGranted('oro_datagrid_gridview_delete'),

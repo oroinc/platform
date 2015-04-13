@@ -71,7 +71,7 @@ define(function (require) {
         build: function (collection) {
             var options, gridViews;
             options = gridViewsBuilder.combineGridViewsOptions.call(this);
-            if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews) {
+            if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
                 var gridViewsOptions = _.extend({collection: collection}, options);
 
                 if (this.showInNavbar) {
