@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
     'use strict';
 
     var MultilineChartComponent,
@@ -19,8 +19,7 @@ define(function(require) {
          */
         draw: function() {
             var options = this.options;
-
-            var $chart = this.$chart;
+            var $chart  = this.$chart;
             var xFormat = options.data_schema.label.type;
             var yFormat = options.data_schema.value.type;
             if (!$chart.get(0).clientWidth) {
@@ -122,12 +121,12 @@ define(function(require) {
                     colors: colors,
                     fontColor: options.settings.chartFontColor,
                     fontSize: options.settings.chartFontSize,
-                    lines : {
-                        show : connectDots
+                    lines: {
+                        show: connectDots
                     },
-                    mouse : {
-                        track : true,
-                        relative : true,
+                    mouse: {
+                        track: true,
+                        relative: true,
                         trackFormatter: function (pointData) {
                             return pointData.series.label
                                 + ', ' + getXLabel(pointData.x)
@@ -148,11 +147,13 @@ define(function(require) {
                         tickFormatter: function (x) {
                             return getXLabel(x);
                         },
-                        title: options.data_schema.label.label
+                        title:   options.data_schema.label.label,
+                        mode:    options.xaxis.mode,
+                        noTicks: options.xaxis.noTicks
                     },
-                    HtmlText : false,
+                    HtmlText: false,
                     grid: {
-                        verticalLines : false
+                        verticalLines: false
                     },
                     legend: {
                         show: true,

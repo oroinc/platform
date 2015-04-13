@@ -216,6 +216,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $parameters = array(
             array('username', 'text'),
             array('email', 'email'),
+            array('phone', 'text'),
             array('namePrefix', 'text'),
             array('firstName', 'text'),
             array('middleName', 'text'),

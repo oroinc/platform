@@ -5,7 +5,7 @@ require({
             init: function(routing) {
                 {% if not app.debug %}
                     {# processed correctly only in case when routing comes via controller #}
-                    {% set data = {'base_url': asset('')[:-1], 'scheme': app.request.scheme, 'host': app.request.host } %}
+                    {% set data = {'base_url': app.request.baseUrl, 'scheme': app.request.scheme, 'host': app.request.host } %}
                     var data = {{ data|json_encode|raw }};
                     data.routes = routing.getRoutes();
                     fos.Router.setData(data);

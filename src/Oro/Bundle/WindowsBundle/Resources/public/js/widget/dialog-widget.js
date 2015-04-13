@@ -85,7 +85,7 @@ define(function (require) {
         },
 
         setTitle: function(title) {
-            this.widget.dialog("option", "title", title);
+            this.widget.dialog('option', 'title', title);
         },
 
         _initModel: function() {
@@ -131,7 +131,7 @@ define(function (require) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
                         // Suppress error if it's 404 response and not debug mode
-                        if (xhr.status != 404 || tools.debug) {
+                        if (xhr.status !== 404 || tools.debug) {
                             error.handle({}, xhr, {enforce: true});
                         }
                     }, this)
@@ -172,7 +172,7 @@ define(function (require) {
          */
         _onContentLoadFail: function(jqxhr) {
             this.options.stateEnabled = false;
-            if (jqxhr.status == 403) {
+            if (jqxhr.status === 403) {
                 messenger.notificationFlashMessage('error', __('oro.ui.forbidden_error'));
                 this.remove();
             } else {
@@ -284,16 +284,16 @@ define(function (require) {
             this.widget.dialog('adjustContentSize');
 
             this._fixDialogMinHeight(true);
-            this.widget.on("dialogmaximize dialogrestore", _.bind(function() {
+            this.widget.on('dialogmaximize dialogrestore', _.bind(function() {
                 this._fixDialogMinHeight(true);
                 this.widget.trigger('resize');
             }, this));
-            this.widget.on("dialogminimize", _.bind(function() {
+            this.widget.on('dialogminimize', _.bind(function() {
                 this._fixDialogMinHeight(false);
                 this.widget.trigger('resize');
             }, this));
 
-            this.widget.on("dialogresizestop", _.bind(this._fixBorderShifting, this));
+            this.widget.on('dialogresizestop', _.bind(this._fixBorderShifting, this));
         },
 
         _afterLayoutInit: function () {
@@ -303,11 +303,11 @@ define(function (require) {
         },
 
         _initAdjustHeight: function(content) {
-            this.widget.off("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
+            this.widget.off('dialogresize dialogmaximize dialogrestore', _.bind(this._fixScrollableHeight, this));
             var scrollableContent = content.find('.scrollable-container');
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                this.widget.on("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
+                this.widget.on('dialogresize dialogmaximize dialogrestore', _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
         },
@@ -353,28 +353,29 @@ define(function (require) {
          * @private
          */
         _getWindowPlacement: function() {
+            var prototype = DialogWidget.prototype;
             if (!this.options.incrementalPosition) {
                 return {
                     my: 'center center',
-                    at: DialogWidget.prototype.defaultPos
+                    at: prototype.defaultPos
                 };
             }
-            var offset = 'center+' + DialogWidget.prototype.windowX + ' center+' + DialogWidget.prototype.windowY;
+            var offset = 'center+' + prototype.windowX + ' center+' + prototype.windowY;
 
-            DialogWidget.prototype.openedWindows++;
-            if (DialogWidget.prototype.openedWindows % DialogWidget.prototype.windowsPerRow === 0) {
-                var rowNum = DialogWidget.prototype.openedWindows / DialogWidget.prototype.windowsPerRow;
-                DialogWidget.prototype.windowX = rowNum * DialogWidget.prototype.windowsPerRow * DialogWidget.prototype.windowOffsetX;
-                DialogWidget.prototype.windowY = 0;
+            prototype.openedWindows++;
+            if (prototype.openedWindows % prototype.windowsPerRow === 0) {
+                var rowNum = prototype.openedWindows / prototype.windowsPerRow;
+                prototype.windowX = rowNum * prototype.windowsPerRow * prototype.windowOffsetX;
+                prototype.windowY = 0;
 
             } else {
-                DialogWidget.prototype.windowX += DialogWidget.prototype.windowOffsetX;
-                DialogWidget.prototype.windowY += DialogWidget.prototype.windowOffsetY;
+                prototype.windowX += prototype.windowOffsetX;
+                prototype.windowY += prototype.windowOffsetY;
             }
 
             return {
                 my: offset,
-                at: DialogWidget.prototype.defaultPos
+                at: prototype.defaultPos
             };
         },
 

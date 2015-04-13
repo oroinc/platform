@@ -21,6 +21,9 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $dispatcher;
+
     /** @var EmailCacheManager */
     protected $manager;
 
@@ -33,10 +36,14 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->manager = new EmailCacheManager(
             $this->selector,
-            $this->em
+            $this->em,
+            $this->dispatcher
         );
         $this->manager->setLogger($this->logger);
     }

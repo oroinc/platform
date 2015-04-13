@@ -3,6 +3,7 @@ config:
         'oroemail/js/app/models/email-template-collection': 'bundles/oroemail/js/app/models/email-template-collection.js'
         'oroemail/js/app/models/email-template-model': 'bundles/oroemail/js/app/models/email-template-model.js'
         'oroemail/js/app/views/email-template-view': 'bundles/oroemail/js/app/views/email-template-view.js'
+        'oroemail/js/app/views/email-attachment-link-view': 'bundles/oroemail/js/app/views/email-attachment-link-view.js'
 
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'

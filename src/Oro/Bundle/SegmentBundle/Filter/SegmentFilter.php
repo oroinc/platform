@@ -3,8 +3,10 @@
 namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -18,6 +20,9 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
 class SegmentFilter extends EntityFilter
 {
@@ -140,6 +145,16 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
+     * @param ExpressionBuilderInterface $expression
+     *
+     * @return bool
+     */
+    public function isExpressionBuilderSupported(ExpressionBuilderInterface $expression)
+    {
+        return $expression instanceof OrmExpressionBuilder;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
@@ -148,16 +163,17 @@ class SegmentFilter extends EntityFilter
             return false;
         }
 
-        /** @var Segment $segment */
-        $segment = $data['value'];
-        /** @var Query $query */
-        if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
-            $query = $this->dynamicSegmentQueryBuilderLink->getService()->build($segment);
-        } else {
-            $query = $this->staticSegmentQueryBuilderLink->getService()->build($segment);
+        if (!$this->isExpressionBuilderSupported($ds->expr())) {
+            throw new \LogicException('The SegmentFilter supports ORM data source only.');
         }
-        $field = $this->get(FilterUtility::DATA_NAME_KEY);
-        $expr  = $ds->expr()->in($field, $query->getDQL());
+
+        $queryBuilder = $this->getSegmentQueryBuilder($data);
+        $query        = $queryBuilder->getQuery();
+
+        /**@var OrmExpressionBuilder $expressionBuilder */
+        $expressionBuilder = $ds->expr();
+        $expr              = $expressionBuilder->exists($query->getDQL());
+
         $this->applyFilterToClause($ds, $expr);
 
         $params = $query->getParameters();
@@ -167,5 +183,62 @@ class SegmentFilter extends EntityFilter
         }
 
         return true;
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return QueryBuilder
+     */
+    protected function getSegmentQueryBuilder($data)
+    {
+        /** @var Segment $segment */
+        $segment = $data['value'];
+
+        /** @var QueryBuilder $queryBuilder */
+        if ($this->isDynamic($segment)) {
+            $queryBuilder = $this->dynamicSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
+        } else {
+            $queryBuilder = $this->staticSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
+        }
+        $field = $this->get(FilterUtility::DATA_NAME_KEY);
+
+        $queryBuilder->andWhere($this->getIdentityFieldWithAlias($queryBuilder, $segment) . ' = ' . $field);
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param Segment $segment
+     *
+     * @return bool
+     */
+    protected function isDynamic(Segment $segment)
+    {
+        return $segment->getType()->getName() === SegmentType::TYPE_DYNAMIC;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param Segment      $segment
+     *
+     * @return string
+     */
+    protected function getIdentityFieldWithAlias(QueryBuilder $queryBuilder, Segment $segment)
+    {
+        $tableAliases = $queryBuilder->getRootAliases();
+        $em           = $queryBuilder->getEntityManager();
+        $entities     = $queryBuilder->getRootEntities();
+
+        if ($this->isDynamic($segment)) {
+            /** @var ClassMetaData $metaData */
+            $metaData = $em->getClassMetadata($entities[0]);
+            /** @var array $primaryKey */
+            $primaryKey = $metaData->getIdentifierFieldNames();
+
+            return $tableAliases[0] . '.' . $primaryKey[0];
+        }
+
+        return 'CAST(' . $tableAliases[0] . '.' . SegmentSnapshot::ENTITY_REF_FIELD . ' as int)';
     }
 }
