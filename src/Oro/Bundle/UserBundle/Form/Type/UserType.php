@@ -208,6 +208,7 @@ class UserType extends AbstractType
         $builder
             ->add('username', 'text', ['label' => 'oro.user.username.label', 'required' => true])
             ->add('email', 'email', ['label' => 'oro.user.email.label', 'required' => true])
+            ->add('phone', 'text', ['label' => 'oro.user.phone.label', 'required' => false])
             ->add('namePrefix', 'text', ['label' => 'oro.user.name_prefix.label', 'required' => false])
             ->add('firstName', 'text', ['label' => 'oro.user.first_name.label', 'required' => true])
             ->add('middleName', 'text', ['label' => 'oro.user.middle_name.label', 'required' => false])
