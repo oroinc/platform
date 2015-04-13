@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 
-class WidgetItemsChoiceType  extends AbstractType
+class WidgetItemsChoiceType extends AbstractType
 {
     const NAME = 'oro_type_widget_items_choice';
 
