@@ -62,7 +62,7 @@ class EmailControllerTest extends WebTestCase
 
 
         $this->assertNotEmpty($result);
-        $this->assertCount(2, $result);
+        $this->assertCount(1, $result);
     }
 
     public function testGetAssociatioData()
@@ -101,7 +101,7 @@ class EmailControllerTest extends WebTestCase
         $this->getAssosiaction($id);
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(1, $result);
+        $this->assertCount(0, $result);
 
         $this->postAssociation($id, 'Oro\Bundle\UserBundle\Entity\User', $userId);
         $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -109,7 +109,7 @@ class EmailControllerTest extends WebTestCase
         $this->getAssosiaction($id);
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertNotEmpty($result);
-        $this->assertCount(2, $result);
+        $this->assertCount(1, $result);
     }
 
 
