@@ -115,12 +115,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/view-group/{id}", name="oro_email_view_group", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_email_view",
-     *      type="entity",
-     *      class="OroEmailBundle:Email",
-     *      permission="VIEW"
-     * )
+     * @AclAncestor("oro_email_view")
      * @Template
      */
     public function viewGroupAction(Email $email)
@@ -231,7 +226,12 @@ class EmailController extends Controller
      * Link attachment to entity
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
+     * @Acl(
+     *      id="oro_email_edit",
+     *      type="entity",
+     *      class="OroEmailBundle:Email",
+     *      permission="EDIT"
+     * )
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {

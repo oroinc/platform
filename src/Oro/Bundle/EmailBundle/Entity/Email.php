@@ -33,7 +33,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE",
+ *              "permissions"="VIEW;CREATE;EDIT",
  *              "group_name"=""
  *          },
  *          "grouping"={

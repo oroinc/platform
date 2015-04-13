@@ -525,8 +525,9 @@
                     <% } else { %>
                         <span class="context-label"><%= entity.get('title') %></span>
                     <% }  %>
-
-                    <i class="icon-remove"></i>
+                    {% if  resource_granted('EDIT', entity) %}
+                        <i class="icon-remove"></i>
+                    {% endif %}
                 </span>
         </div>
     </script>
@@ -535,28 +536,38 @@
     {% for item in entity.getActivityTargetEntities() %}
         {% set itemClassName = oro_class_name(item) %}
         {% set itemArray = {
-        'entityId': entity.id,
-        'targetId': item.id,
-        "targetClassName": itemClassName ,
-        'title': item|oro_format_name|default(item.email)|default(item.id),
-        'icon': oro_entity_config_value(itemClassName, 'icon' ),
-        'link': path(oro_entity_route(itemClassName), {id:item.id} )
+            'entityId': entity.id,
+            'targetId': item.id,
+            "targetClassName": itemClassName ,
+            'title': item|oro_format_name|default(item.email)|default(item.id),
+            'icon': oro_entity_config_value(itemClassName, 'icon' ),
+            'link': path(oro_entity_route(itemClassName), {id:item.id} ),
+            'part1': (app.user.id == item.id),
+            'part2': (not (app.user.id == item.id)),
+            'part3': oro_class_name(app.user),
+            'part4': itemClassName,
+            'part5': (oro_class_name(app.user) == itemClassName),
+            'part6': (not (oro_class_name(app.user) == itemClassName)),
+            'flag': (not (app.user.id == item.id) and not (oro_class_name(app.user) == itemClassName))
         } %}
-        {% set itemsArray = itemsArray|merge([itemArray]) %}
+        {% if not ((app.user.id == item.id) and (oro_class_name(app.user) == itemClassName)) %}
+            {% set itemsArray = itemsArray|merge([itemArray]) %}
+        {% endif %}
     {% endfor %}
     {% set options = {
-    items: itemsArray,
-    entityId: entity.id
+        items: itemsArray,
+        entityId: entity.id
     } %}
-
-    <div class="email-context-activity">
-        <div class="email-context-activity-label">
-            Contexts
+    {% if itemsArray|length > 0 %}
+        <div class="email-context-activity">
+            <div class="email-context-activity-label">
+                Contexts
+            </div>
+            <div class="email-context-activity-items"
+                 data-page-component-module="oroemail/js/app/components/email-context-activity-component"
+                 data-page-component-options="{{ options|json_encode }}"
+                 data-layout="separate">
+            </div>
         </div>
-        <div class="email-context-activity-items"
-             data-page-component-module="oroemail/js/app/components/email-context-activity-component"
-             data-page-component-options="{{ options|json_encode }}"
-             data-layout="separate">
-        </div>
-    </div>
+    {% endif %}
 {% endmacro %}
