@@ -131,7 +131,7 @@ The option set is a special type of a field which allows to choose one or more o
  - `enum` (named `Select` on UI) - only one option can be selected
  - `multiEnum` (named `Multi-Select` on UI) - several options can be selected
 
-The option sets are quite complex types, but to understand how they work you need to know that both `enum` and `multiEnum` types are based on [relations](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html), the main difference between them is that `enum` type is based on [many-to-one relation](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html#many-to-one-unidirectional) however `multiEnum` type is based on [many-to-many relation](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html#many-to-many-unidirectional). To add option set field to some entity you can use [ExtendExtension](Migration/Extension/ExtendExtension.php). The following example shows how it can be done:
+The option sets are quite complex types, but to understand how they work you need to know that both `enum` and `multiEnum` types are based on [relations](http://docs.doctrine-project.org/en/latest/reference/association-mapping.html), the main difference between them is that `enum` type is based on [many-to-one relation](http://docs.doctrine-project.org/en/latest/reference/association-mapping.html#many-to-one-unidirectional) however `multiEnum` type is based on [many-to-many relation](http://docs.doctrine-project.org/en/latest/reference/association-mapping.html#many-to-many-unidirectional). To add option set field to some entity you can use [ExtendExtension](Migration/Extension/ExtendExtension.php). The following example shows how it can be done:
 
 ``` php
 <?php

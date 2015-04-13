@@ -84,6 +84,7 @@
                     form_row(form.email),
                     UI.collectionField(form.emails, 'oro.user.emails.label'|trans, 'Add another email'|trans),
                     form.signature is defined ? form_row(form.signature) : '',
+                    form_row(form.phone),
                     form_row(form.tags)
                 ]
             }

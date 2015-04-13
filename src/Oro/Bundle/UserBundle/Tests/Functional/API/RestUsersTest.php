@@ -24,6 +24,7 @@ class RestUsersTest extends WebTestCase
             "user" => array(
                 "username"      => 'user_' . mt_rand(),
                 "email"         => 'test_' . mt_rand() . '@test.com',
+                "phone"         => '123-123',
                 "enabled"       => '1',
                 "plainPassword" => '1231231q',
                 "firstName"     => "firstName",
@@ -41,6 +42,37 @@ class RestUsersTest extends WebTestCase
         $this->assertJsonResponseStatusCodeEquals($result, 201);
 
         return $request;
+    }
+
+    /**
+     * @depends testCreateUser
+     */
+    public function testGetUsers()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_users')
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertCount(2, $result);
+    }
+
+    /**
+     * @depends testCreateUser
+     */
+    public function testGetUsersFilteredByPhone()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_users', ['phone' => '123-123'])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('123-123', $result[0]['phone']);
     }
 
     /**
