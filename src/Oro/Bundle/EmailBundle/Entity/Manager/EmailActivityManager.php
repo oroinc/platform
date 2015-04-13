@@ -105,9 +105,9 @@ class EmailActivityManager
                 // prepare the list of association targets
                 $targets = [];
                 $this->addSenderOwner($targets, $email);
-//                $this->addRecipientOwners($targets, $email);
+                $this->addRecipientOwners($targets, $email);
                 // add associations
-                $this->activityManager->addActivityTargets($email, $targets);
+                $this->addContextsToThread($em, $email, $targets);
             }
             $this->resetQueue();
             $em->flush();
@@ -185,7 +185,7 @@ class EmailActivityManager
      * @param EntityManager $em
      * @param Email $email
      */
-    public function copyContexts(EntityManager $em, Email $email)
+    protected function copyContexts(EntityManager $em, Email $email)
     {
         $thread = $email->getThread();
         if ($thread) {
@@ -203,6 +203,28 @@ class EmailActivityManager
                     $parentEmail = $relatedEmails[0];
                     $contexts = $this->emailActivityListProvider->getTargetEntities($parentEmail);
                     $this->changeContexts($em, $email, $contexts);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param Email $email
+     * @param [] $contexts
+     */
+    protected function addContextsToThread(EntityManager $em, Email $email, $contexts)
+    {
+        $thread = $email->getThread();
+        if ($thread) {
+            $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+            if (count($contexts) > 0) {
+                foreach ($relatedEmails as $relatedEmail) {
+                    if ($email->getId() !== $relatedEmail->getId()) {
+                        foreach ($contexts as $context) {
+                            $this->addAssociation($email, $context);
+                        }
+                    }
                 }
             }
         }

@@ -89,7 +89,7 @@ class EmailController extends Controller
         return [
             'entity' => $entity,
             'thread' => $emails,
-            'target' => $this->getTargetEntity($entity),
+            'target' => $this->getTargetEntity(),
             'hasGrantReattach' => $this->isAttachmentCreationGranted(),
             'routeParameters' => $this->getTargetEntityConfig(),
             'renderContexts' => $this->getRequest()->get('renderContexts', true)
@@ -110,7 +110,12 @@ class EmailController extends Controller
         }
         $this->loadEmailBody($emails);
 
-        return ['items' => $emails];
+        return [
+            'items' => $emails,
+            'target' => $this->getTargetEntity(),
+            'hasGrantReattach' => $this->isAttachmentCreationGranted(),
+            'routeParameters' => $this->getTargetEntityConfig()
+        ];
     }
 
     /**
