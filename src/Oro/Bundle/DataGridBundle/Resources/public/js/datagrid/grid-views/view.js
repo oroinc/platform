@@ -145,6 +145,11 @@ define([
             this.collection = options.collection;
             this.enabled = options.enable != false;
 
+            this.listenTo(this.collection, "updateState", function (collection) {
+                if (!collection.state.gridView) {
+                    collection.state.gridView = '__all__';
+                }
+            });
             this.listenTo(this.collection, "updateState", this.render);
             this.listenTo(this.collection, "beforeFetch", this.render);
             this.listenTo(this.collection, "reset", this._onCollectionReset);
