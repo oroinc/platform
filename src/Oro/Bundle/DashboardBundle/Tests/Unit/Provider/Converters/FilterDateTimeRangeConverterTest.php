@@ -96,7 +96,7 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertEquals('2000-01-01', $result['start']->format('Y-m-d'));
+        $this->assertEquals(FilterDateTimeRangeConverter::MIN_DATE, $result['start']->format('Y-m-d'));
         $this->assertEquals($value, $result['end']);
     }
 
