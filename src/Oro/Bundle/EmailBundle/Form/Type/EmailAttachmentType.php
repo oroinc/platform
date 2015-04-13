@@ -83,6 +83,11 @@ class EmailAttachmentType extends AbstractType
         /** @var AttachmentModel $attachment */
         $attachment = $event->getData();
 
+        // this check is necessary due to inability to capture file input dialog cancel event
+        if (!$attachment) {
+            return;
+        }
+
         if (!$attachment->getEmailAttachment()) {
             switch ($attachment->getType()) {
                 case AttachmentModel::TYPE_ATTACHMENT:
@@ -97,7 +102,7 @@ class EmailAttachmentType extends AbstractType
 
                     break;
                 case AttachmentModel::TYPE_UPLOADED:
-                    $emailAttachment = $this->createEmailAttachmentFromOroAttachment($attachment->getFile());
+                    $emailAttachment = $this->createEmailAttachmentFromUploadedFile($attachment->getFile());
 
                     break;
                 default:

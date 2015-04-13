@@ -22,6 +22,48 @@ define(function (require) {
             'input input.filter':            'filterChange'
         },
 
+        resolveListSelector: function(model) {
+            if (model.get('type') == 1) {
+                return '.entity-attachments-list';
+            } else {
+                return '.thread-attachments-list';
+            }
+        },
+
+        insertView: function(item) {
+            this.list = this.resolveListSelector(item);
+            this.$list = $(this.list);
+            EmailAttachmentSelectView.__super__.insertView.apply(this, arguments);
+        },
+
+        showHideGroups: function() {
+            var $entityAttachments = this.$('.entity-attachments'); // 1
+            var $threadAttachments = this.$('.thread-attachments'); // 2
+
+            var entityCollection = this.collection.where({type: 1, visible: true});
+            if (entityCollection.length > 0) {
+                $entityAttachments.show();
+            } else {
+                $entityAttachments.hide();
+            }
+
+            var threadCollection = this.collection.where({type: 2, visible: true});
+            if (threadCollection.length > 0) {
+                $threadAttachments.show();
+            } else {
+                $threadAttachments.hide();
+            }
+        },
+
+        showHideFilter: function() {
+            var $filter = this.$('.filter-block');
+            if (this.collection.length > 5) {
+                $filter.show();
+            } else {
+                $filter.hide();
+            }
+        },
+
         cancelClick: function() {
             this.hide();
         },
@@ -44,6 +86,8 @@ define(function (require) {
                     model.set('visible', false);
                 }
             });
+
+            this.showHideGroups();
         },
 
         getTemplateFunction: function() {

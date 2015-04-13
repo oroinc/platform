@@ -17,6 +17,8 @@ oro:
             upload:                              Upload
             attach:                              Attach
             no_attachments:                      No available attachments
+            thread_attachments:                  Thread Attachments
+            record_attachments:                  Record Attachments
 
         variable.not.found:                     N/A
 

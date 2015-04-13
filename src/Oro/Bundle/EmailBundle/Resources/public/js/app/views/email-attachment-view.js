@@ -16,7 +16,8 @@ define(function (require) {
         },
 
         listen: {
-            'change:fileName model': 'fileNameChange'
+            'change:fileName model': 'fileNameChange',
+            'change:type model':     'typeChange'
         },
 
         getTemplateFunction: function() {
@@ -39,8 +40,31 @@ define(function (require) {
             this.model.trigger('destroy', this.model);
         },
 
+        fileSelect: function() {
+            var self = this;
+            var $fileInput = this.$('input[type="file"]');
+            this.$el.hide();
+
+            $fileInput.on('change', function() {
+                var value = $fileInput.val().replace(/^.*[\\\/]/, '');
+
+                if (value) {
+                    self.model.set('fileName', value);
+                    self.model.set('type', 3);
+                    self.$el.show();
+
+                    self.collectionView.show();
+                }
+            });
+            $fileInput.click();
+        },
+
         fileNameChange: function() {
             this.$('span.filename-label').html(this.model.get('fileName'));
+        },
+
+        typeChange: function() {
+            this.$('input.attachment-type').val(this.model.get('type'));
         }
     });
 

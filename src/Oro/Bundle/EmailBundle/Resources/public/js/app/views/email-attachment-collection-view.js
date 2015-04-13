@@ -21,8 +21,8 @@ define(function (require) {
         initialize: function(options) {
             BaseCollectionView.__super__.initialize.apply(this, options);
             this.itemView = this.itemView.extend({
-                inputName: options.inputName
-                /*collectionView: this*/
+                inputName: options.inputName,
+                collectionView: this
             });
 
             this.listSelector = options.listSelector;
@@ -33,19 +33,37 @@ define(function (require) {
         },
 
         collectionAdd: function(model) {
-            this.showHideAttachmentRow();
+            if (!model.get('id')) {
+                this.getItemView(model).fileSelect();
+            } else {
+                this.showHideAttachmentRow();
+            }
         },
 
         collectionRemove: function() {
+            var self = this;
+            this.collection.each(function(model) {
+                if (model && !model.get('type') && !model.get('id')) {
+                    self.collection.remove(model);
+                }
+            });
             this.showHideAttachmentRow();
         },
 
         showHideAttachmentRow: function() {
             if (this.collection.isEmpty()) {
-                this.$el.hide();
+                this.hide();
             } else {
-                this.$el.show();
+                this.show();
             }
+        },
+
+        show: function() {
+            this.$el.show();
+        },
+
+        hide: function() {
+            this.$el.hide();
         }
     });
 

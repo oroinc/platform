@@ -37,17 +37,28 @@
                 <i class="icon-remove"></i>
             </span>
             <input name="<%= inputName %>[<%= cid %>][id]" type="text" value="<%= id %>"/>
-            <input name="<%= inputName %>[<%= cid %>][type]" type="text" value="<%= type %>"/>
+            <input name="<%= inputName %>[<%= cid %>][type]" type="text" value="<%= type %>" class="attachment-type"/>
+            <input name="<%= inputName %>[<%= cid %>][file]" type="file"/>
         </div>
     </script>
 
     <script type="text/template" id="email-attachment-select-view">
         <div class="attachment-list-content">
-            <label>{{ 'oro.email.attachment.select_file'|trans }}</label>
-            <input type="text" class="filter"/>
+            <div class="filter-block">
+                <label>{{ 'oro.email.attachment.select_file'|trans }}</label>
+                <input type="text" class="filter"/>
+            </div>
             <div class="attachment-list">
                 <div class="no-items">
                     <p class="text-center">{{ 'oro.email.form.no_attachments'|trans }}</p>
+                </div>
+                <div class="group-block entity-attachments">
+                    <b>{{ 'oro.email.form.record_attachments'|trans }}</b>
+                    <div class="entity-attachments-list"></div>
+                </div>
+                <div class="group-block thread-attachments">
+                    <b>{{ 'oro.email.form.thread_attachments'|trans }}</b>
+                    <div class="thread-attachments-list"></div>
                 </div>
             </div>
         </div>

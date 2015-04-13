@@ -12,6 +12,7 @@ define(function (require) {
         defaults: {
             id: null,
             type: '',
+            title: '',
             fileName: '',
             info: '',
             checked: false, // whether file is checked for attaching to an email

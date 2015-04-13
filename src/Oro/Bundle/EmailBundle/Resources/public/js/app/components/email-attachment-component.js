@@ -38,14 +38,19 @@ define(function (require) {
         initPopup: function(options) {
             var self = this;
 
-            var $dialogButton = $(options.popupTriggerButton);
-            $dialogButton.click(function() {
+            var $popupSelectButton = $(options.popupTriggerButton);
+            $popupSelectButton.click(function() {
                 var popupView = self.getPopupView(options);
                 if (popupView.isShowed) {
                     popupView.hide();
                 } else {
                     popupView.show();
                 }
+            });
+
+            var $uploadNewButton = $(options.uploadNewButton);
+            $uploadNewButton.click(function() {
+                self.collection.add({});
             });
         },
 
@@ -61,6 +66,8 @@ define(function (require) {
 
                 var models = typeof options.attachmentsAvailable == 'undefined' ? [] : options.attachmentsAvailable;
                 this.popupCollection.add(models);
+                this.popupView.showHideFilter();
+                this.popupView.showHideGroups();
 
                 var self = this;
                 this.popupCollection.on('attach', function() {

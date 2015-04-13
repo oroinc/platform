@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
@@ -331,6 +332,31 @@ class EmailModelBuilder
             }
         }
 
+        $attachments = $this->filterAttachmentsByName($attachments);
         $emailModel->setAttachmentsAvailable($attachments);
+    }
+
+    /**
+     * @param array $attachments
+     *
+     * @return array
+     */
+    protected function filterAttachmentsByName($attachments)
+    {
+        $collection = new ArrayCollection($attachments);
+        $fileNames = [];
+
+        $filtered = $collection->filter(function($entry) use (&$fileNames) {
+            /** @var EmailAttachment $entry */
+            if (in_array($entry->getFileName(), $fileNames)) {
+                return false;
+            } else {
+                $fileNames[] = $entry->getFileName();
+
+                return true;
+            }
+        });
+
+        return $filtered->toArray();
     }
 }

@@ -18,6 +18,12 @@ define(function (require) {
             'change:visible model':         'visibilityChange'
         },
 
+        render: function() {
+            EmailAttachmentListRowView.__super__.render.call(this);
+
+            this.$el.attr('data-type', this.model.get('type'));
+        },
+
         getTemplateFunction: function() {
             if (!this.template) {
                 this.template = $('#email-attachment-list-row-view').html();

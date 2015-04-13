@@ -452,8 +452,7 @@ a.attachment .icon .icon-link {
 
 .attachment-list {
   height: 200px;
-  padding: 10px 0;
-  overflow-y: scroll;
+  overflow: auto;
 }
 
 .email-body-actions #attach-file {
@@ -481,16 +480,25 @@ a.attachment .icon .icon-link {
   width: 96%;
 }
 
-.attachment-list-row {
+.attachment-list-popup .group-block {
+  margin-bottom: 10px;
+}
+
+.attachment-list-popup .filter-block {
+  margin-bottom: 15px;
+}
+
+.attachment-list-popup .attachment-list-row {
   line-height: 26px;
   font-size: 11px;
 }
 
-.attachment-list-row input.checkbox {
+.attachment-list-popup .attachment-list-row input.checkbox {
   display: inline-block;
   width: 14px;
+  margin: 0;
 }
 
-.attachment-list-row span {
+.attachment-list-popup .attachment-list-row span {
   padding-top: 1px;
 }
