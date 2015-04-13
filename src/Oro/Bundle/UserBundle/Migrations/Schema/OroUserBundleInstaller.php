@@ -185,7 +185,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
-        $table->addUniqueIndex(['phone'], 'uniq_user_phone');
+        $table->addUniqueIndex(['phone'], 'oro_idx_user_phone');
         $table->addIndex(['business_unit_owner_id'], 'IDX_F82840BC59294170', []);
         $table->addUniqueIndex(['status_id'], 'UNIQ_F82840BC6BF700BD');
         $table->setPrimaryKey(['id']);
