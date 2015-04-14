@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 
 class Email
 {
@@ -60,17 +59,13 @@ class Email
     /** @var object[] */
     protected $contexts = [];
 
-    /**
-     * @var Collection
-     */
+    /** @var Collection */
     protected $attachments;
 
     /** @var  string */
     protected $mailType;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $attachmentsAvailable;
 
     /**
