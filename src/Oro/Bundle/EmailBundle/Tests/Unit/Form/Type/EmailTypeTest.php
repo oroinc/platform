@@ -12,8 +12,9 @@ use Symfony\Component\Form\PreloadedExtension;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
@@ -54,6 +55,26 @@ class EmailTypeTest extends TypeTestCase
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
         $richTextType = new OroRichTextType($configManager, $htmlTagProvider);
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadata->expects($this->any())
+            ->method('getName');
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
+        $repo = $this->getMockBuilder('\Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo->expects($this->any())
+            ->method('find');
+        $em->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repo);
+        $contextsSelectType = new ContextsSelectType($em);
 
         return [
             new PreloadedExtension(
@@ -64,6 +85,8 @@ class EmailTypeTest extends TypeTestCase
                     $emailAddressType->getName()  => $emailAddressType,
                     $richTextType->getName()      => $richTextType,
                     $attachmentsType->getName()   => $attachmentsType,
+                    ContextsSelectType::NAME      => $contextsSelectType,
+                    'genemu_jqueryselect2_hidden' => new Select2Type('hidden'),
                 ],
                 []
             )

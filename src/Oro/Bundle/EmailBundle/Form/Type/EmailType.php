@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -12,8 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class EmailType extends AbstractType
@@ -107,7 +106,17 @@ class EmailType extends AbstractType
             ])
             ->add('bodyFooter', 'hidden')
             ->add('parentEmailId', 'hidden')
-            ->add('signature', 'hidden');
+            ->add('signature', 'hidden')
+            ->add(
+                'contexts',
+                'oro_email_contexts_select',
+                [
+                    'label'    => 'oro.email.contexts.label',
+                    'tooltip'  => 'oro.email.contexts.tooltip',
+                    'required' => false,
+                    'read_only' => true,
+                ]
+            );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
@@ -148,6 +157,16 @@ class EmailType extends AbstractType
             ],
             ['choice_list', 'choices']
         );
+
+        if ($this->securityContext->isGranted('EDIT', 'entity:' . EmailEntity::ENTITY_CLASS)) {
+            FormUtils::replaceField(
+                $form,
+                'contexts',
+                [
+                    'read_only' => false,
+                ]
+            );
+        }
     }
 
     /**

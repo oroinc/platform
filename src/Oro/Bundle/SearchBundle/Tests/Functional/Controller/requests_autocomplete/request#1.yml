@@ -1,0 +1,11 @@
+# common test case
+request:
+    supported_engines: [orm]
+    query: \"item9@mail.com\"
+    offset: ~
+    max_results: ~
+response:
+    rest:
+        results:
+            -
+                text: 'item9@mail.com'

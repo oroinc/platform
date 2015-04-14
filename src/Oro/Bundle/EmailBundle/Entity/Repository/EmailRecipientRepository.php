@@ -22,7 +22,6 @@ class EmailRecipientRepository extends EntityRepository
             ->select('er')
             ->leftJoin('er.email', 'e')
             ->andWhere('e.thread = :thread')
-            ->groupBy('er.emailAddress')
             ->setParameter('thread', $thread);
         $result = $queryBuilder->getQuery()->getResult();
 
