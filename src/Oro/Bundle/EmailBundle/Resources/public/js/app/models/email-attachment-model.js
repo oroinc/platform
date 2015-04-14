@@ -40,9 +40,13 @@ define(function (require) {
                 if (attr == 'fileName') {
                     attrs['fileName'] = this.formatFileName(attrs['fileName']);
                 } else if (attr == 'fileSize') {
-                    attrs['fileSize'] = numeral(attrs['fileSize']).format('b');
+                    if (attrs['fileSize']) {
+                        attrs['fileSize'] = numeral(attrs['fileSize']).format('b');
+                    }
                 } else if (attr == 'modified') {
-                    attrs['modified'] = datetime.formatDateTime(attrs['modified']);
+                    if (attrs['modified']) {
+                        attrs['modified'] = datetime.formatDateTime(attrs['modified']);
+                    }
                 }
             }
 

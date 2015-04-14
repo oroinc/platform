@@ -337,24 +337,21 @@ class EmailModelBuilder
         $attachments = [];
 
         if ($emailModel->getParentEmail()) {
-            $attachments = array_merge(
-                $attachments,
-                $this->emailAttachmentProvider->getThreadAttachments($emailModel->getParentEmail())
-            );
+            $threadAttachments = $this->emailAttachmentProvider->getThreadAttachments($emailModel->getParentEmail());
+            $threadAttachments = $this->filterAttachmentsByName($threadAttachments);
+            $attachments = array_merge($attachments, $threadAttachments);
         }
         if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
             $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
                 ->find($emailModel->getEntityId());
 
             if ($scopeEntity) {
-                $attachments = array_merge(
-                    $attachments,
-                    $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity)
-                );
+                $scopeEntityAttachments = $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity);
+                $scopeEntityAttachments = $this->filterAttachmentsByName($scopeEntityAttachments);
+                $attachments = array_merge($attachments, $scopeEntityAttachments);
             }
         }
 
-        $attachments = $this->filterAttachmentsByName($attachments);
         $emailModel->setAttachmentsAvailable($attachments);
     }
 

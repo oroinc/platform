@@ -2,10 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
+use Gaufrette\Filesystem;
+
+use Knp\Bundle\GaufretteBundle\FilesystemMap;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 use Oro\Bundle\AttachmentBundle\Entity\Attachment as AttachmentOro;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as AttachmentEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 /**
  * Class EmailAttachmentTransformer
@@ -15,16 +21,16 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 class EmailAttachmentTransformer
 {
     /**
-     * @var DateTimeFormatter
+     * @var Filesystem
      */
-    protected $dateTimeFormatter;
+    protected $filesystem;
 
     /**
-     * @param DateTimeFormatter $dateTimeFormatter
+     * @param FilesystemMap $filesystemMap
      */
-    public function __construct(DateTimeFormatter $dateTimeFormatter)
+    public function __construct(FilesystemMap $filesystemMap)
     {
-        $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->filesystem = $filesystemMap->get('attachments');
     }
 
     /**
@@ -32,7 +38,7 @@ class EmailAttachmentTransformer
      *
      * @return AttachmentModel
      */
-    protected function entityToModel(AttachmentEntity $attachmentEntity)
+    public function entityToModel(AttachmentEntity $attachmentEntity)
     {
         $attachmentModel = new AttachmentModel();
 
@@ -40,8 +46,77 @@ class EmailAttachmentTransformer
         $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
         $attachmentModel->setId($attachmentEntity->getId());
         $attachmentModel->setFileSize(strlen($attachmentEntity->getContent()->getContent()));
-        $attachmentModel->setModified($this->dateTimeFormatter->format(new \DateTime('now'))); // todo what value here?
+        $attachmentModel->setModified($attachmentEntity->getEmailBody()->getCreated());
 
         return $attachmentModel;
+    }
+
+    /**
+     * @param AttachmentOro $attachmentOro
+     *
+     * @return AttachmentModel
+     */
+    public function oroToModel(AttachmentOro $attachmentOro)
+    {
+        $attachmentModel = new AttachmentModel();
+
+        $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
+        $attachmentModel->setId($attachmentOro->getId());
+        $attachmentModel->setFileName($attachmentOro->getFile()->getOriginalFilename());
+        $attachmentModel->setFileSize($attachmentOro->getFile()->getFileSize());
+        $attachmentModel->setModified($attachmentOro->getCreatedAt());
+
+        return $attachmentModel;
+    }
+
+    /**
+     * @param AttachmentOro $attachmentOro
+     *
+     * @return AttachmentEntity
+     */
+    public function oroToEntity(AttachmentOro $attachmentOro)
+    {
+        $emailAttachmentEntity = new AttachmentEntity();
+
+        $emailAttachmentEntity->setFileName($attachmentOro->getFile()->getFilename());
+
+        $emailAttachmentContent = new EmailAttachmentContent();
+        $emailAttachmentContent->setContent(
+            base64_encode($this->filesystem->get($attachmentOro->getFile()->getFilename())->getContent())
+        );
+
+        $emailAttachmentContent->setContentTransferEncoding('base64');
+        $emailAttachmentContent->setEmailAttachment($emailAttachmentEntity);
+
+        $emailAttachmentEntity->setContent($emailAttachmentContent);
+        $emailAttachmentEntity->setContentType($attachmentOro->getFile()->getMimeType());
+        $emailAttachmentEntity->setFileName(
+            $attachmentOro->getFile()->getOriginalFilename()
+        );
+
+        return $emailAttachmentEntity;
+    }
+
+    /**
+     * @param UploadedFile $uploadedFile
+     *
+     * @return AttachmentEntity
+     */
+    public function entityFromUploadedFile(UploadedFile $uploadedFile)
+    {
+        $emailAttachment = new AttachmentEntity();
+
+        $attachmentContent = new EmailAttachmentContent();
+        $attachmentContent->setContent(
+            base64_encode(file_get_contents($uploadedFile->getRealPath()))
+        );
+        $attachmentContent->setContentTransferEncoding('base64');
+        $attachmentContent->setEmailAttachment($emailAttachment);
+
+        $emailAttachment->setContent($attachmentContent);
+        $emailAttachment->setContentType($uploadedFile->getMimeType());
+        $emailAttachment->setFileName($uploadedFile->getClientOriginalName());
+
+        return $emailAttachment;
     }
 }
