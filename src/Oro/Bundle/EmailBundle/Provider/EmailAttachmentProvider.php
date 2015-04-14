@@ -113,7 +113,7 @@ class EmailAttachmentProvider
         $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
         $attachmentModel->setId($emailAttachment->getId());
         $attachmentModel->setFileSize(strlen($emailAttachment->getContent()->getContent()));
-        $attachmentModel->setModified($this->dateTimeFormatter->format(new \DateTime('now'))); // todo now?
+        $attachmentModel->setModified($this->dateTimeFormatter->format(new \DateTime('now')));
 
         return $attachmentModel;
     }

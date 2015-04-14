@@ -66,6 +66,7 @@ define(function (require) {
 
                 var models = typeof options.attachmentsAvailable == 'undefined' ? [] : options.attachmentsAvailable;
                 this.popupCollection.add(models);
+                console.log(models);
                 this.popupView.showHideFilter();
                 this.popupView.showHideGroups();
 
