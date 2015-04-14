@@ -127,4 +127,12 @@ interface ContextInterface
      * @return mixed
      */
     public function getOption($name, $default = null);
+
+    /**
+     * Remove configuration option.
+     *
+     * @param mixed $name
+     * @return mixed
+     */
+    public function removeOption($name);
 }
