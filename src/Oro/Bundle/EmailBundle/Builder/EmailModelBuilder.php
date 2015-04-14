@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 
 /**
  * Class EmailModelBuilder
@@ -51,23 +52,31 @@ class EmailModelBuilder
     protected $emailAttachmentProvider;
 
     /**
-     * @param EmailModelBuilderHelper $emailModelBuilderHelper
-     * @param Request                 $request
-     * @param EntityManager           $entityManager
-     * @param ConfigManager           $configManager
-     * @param EmailAttachmentProvider $emailAttachmentProvider
+     * @var EmailActivityListProvider
+     */
+    protected $activityListProvider;
+
+    /**
+     * @param EmailModelBuilderHelper   $emailModelBuilderHelper
+     * @param Request                   $request
+     * @param EntityManager             $entityManager
+     * @param ConfigManager             $configManager
+     * @param EmailActivityListProvider $activityListProvider
+     * @param EmailAttachmentProvider   $emailAttachmentProvider
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         Request $request,
         EntityManager $entityManager,
         ConfigManager $configManager,
+        EmailActivityListProvider $activityListProvider,
         EmailAttachmentProvider $emailAttachmentProvider
     ) {
-        $this->helper                  = $emailModelBuilderHelper;
-        $this->request                 = $request;
-        $this->entityManager           = $entityManager;
-        $this->configManager           = $configManager;
+        $this->helper               = $emailModelBuilderHelper;
+        $this->request              = $request;
+        $this->entityManager        = $entityManager;
+        $this->configManager        = $configManager;
+        $this->activityListProvider = $activityListProvider;
         $this->emailAttachmentProvider = $emailAttachmentProvider;
     }
 
@@ -84,6 +93,18 @@ class EmailModelBuilder
 
         if ($this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
+            if (!$emailModel->getContexts()) {
+                $entityClass = $this->request->get('entityClass');
+                $entityId = $this->request->get('entityId');
+                if ($entityClass && $entityId) {
+                    $emailModel->setContexts([
+                        $this->helper->getTargetEntity(
+                            $this->request->get('entityClass'),
+                            $this->request->get('entityId')
+                        )
+                    ]);
+                }
+            }
         }
         $this->applySignature($emailModel);
         $this->initAvailableAttachments($emailModel);
@@ -113,6 +134,7 @@ class EmailModelBuilder
 
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
+        $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
 
         return $this->createEmailModel($emailModel);
     }

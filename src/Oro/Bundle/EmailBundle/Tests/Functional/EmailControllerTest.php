@@ -52,7 +52,9 @@ class EmailControllerTest extends WebTestCase
 
     public function testCreateViewForm()
     {
-        $url = $this->getUrl('oro_email_email_create', ['_widgetContainer' => 'dialog']);
+        $url = $this->getUrl('oro_email_email_create', [
+            '_widgetContainer' => 'dialog'
+        ]);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);

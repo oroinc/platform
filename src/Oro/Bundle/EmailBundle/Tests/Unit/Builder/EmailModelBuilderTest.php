@@ -38,10 +38,15 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /**
+     * @var EmailActivityListProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $activityListProvider;
+
+    /**
      * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $entityManager;
-
+    
     /**
      * @var EmailAttachmentProvider|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -73,6 +78,10 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->activityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailAttachmentProvider = $this
             ->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider')
             ->disableOriginalConstructor()
@@ -99,6 +108,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             $this->request,
             $this->entityManager,
             $this->configManager,
+            $this->activityListProvider,
             $this->emailAttachmentProvider
         );
     }
@@ -157,6 +167,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             $this->request,
             $this->entityManager,
             $this->configManager,
+            $this->activityListProvider,
             $this->emailAttachmentProvider
         );
 
@@ -277,6 +288,9 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->helper->expects($this->once())
             ->method('getEmailBody');
+        $this->activityListProvider->expects($this->once())
+            ->method('getTargetEntities')
+            ->willReturn([]);
 
         $result = $this->emailModelBuilder->createReplyEmailModel($this->email);
         $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
