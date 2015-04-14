@@ -1,3 +1,11 @@
+{% import "OroEmailBundle::macros.html.twig" as EA %}
+
+{% if renderContexts is defined and renderContexts %}
+<div class="email-context-activity-list">
+    {{ EA.email_contexts(thread[0]) }}
+</div>
+{% endif %}
+
 {% if shortEmailThread is not defined and thread|length >= 7 %}
     {# if shortEmailThread is not turned off and length of thread over 6 emails -- render short thread #}
     {% set shortEmailThread = true %}

@@ -11,21 +11,20 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 
 class EntityListener
 {
-    /**
-     * @var EmailOwnerManager
-     */
+    /** @var EmailOwnerManager */
     protected $emailOwnerManager;
 
-    /**
-     * @var EmailActivityManager
-     */
+    /** @var EmailActivityManager */
     protected $emailActivityManager;
 
-    /**
-     * @var EmailThreadManager
-     */
+    /** @var EmailThreadManager */
     protected $emailThreadManager;
 
+    /**
+     * @param EmailOwnerManager $emailOwnerManager
+     * @param EmailActivityManager $emailActivityManager
+     * @param EmailThreadManager $emailThreadManager
+     */
     public function __construct(
         EmailOwnerManager    $emailOwnerManager,
         EmailActivityManager $emailActivityManager,
@@ -42,8 +41,8 @@ class EntityListener
     public function onFlush(OnFlushEventArgs $event)
     {
         $this->emailOwnerManager->handleOnFlush($event);
-        $this->emailActivityManager->handleOnFlush($event);
         $this->emailThreadManager->handleOnFlush($event);
+        $this->emailActivityManager->handleOnFlush($event);
     }
 
     /**
@@ -52,5 +51,6 @@ class EntityListener
     public function postFlush(PostFlushEventArgs $event)
     {
         $this->emailThreadManager->handlePostFlush($event);
+        $this->emailActivityManager->handlePostFlush($event);
     }
 }

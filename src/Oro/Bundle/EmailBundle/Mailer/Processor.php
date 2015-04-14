@@ -149,16 +149,16 @@ class Processor
         $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
-        if ($model->hasEntity()) {
-            $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
-            if ($targetEntity) {
-                $this->emailActivityManager->addAssociation($email, $targetEntity);
-            }
+        $contexts = $model->getContexts();
+        foreach ($contexts as $context) {
+            $this->emailActivityManager->addAssociation($email, $context);
         }
 
         // flush all changes to the database
         $this->getEntityManager()->flush();
-        $this->eventEmailBody($email);
+
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
         return $email;
     }
@@ -345,14 +345,5 @@ class Processor
         }
 
         return $this->em;
-    }
-
-    /**
-     * @param $email
-     */
-    protected function eventEmailBody($email)
-    {
-        $event = new EmailBodyAdded($email);
-        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
     }
 }

@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 
 class EmailBodyAdded extends Event
 {
-    const NAME = 'oro_email.email_attachment_manager.email_body_added';
+    const NAME = 'oro_email.email_body_added';
 
     /** @var Email */
     protected $email;

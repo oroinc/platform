@@ -52,6 +52,9 @@ class Email
     /** @var string */
     protected $bodyFooter = '';
 
+    /** @var object[] */
+    protected $contexts = [];
+
     /**
      * @var Collection
      */
@@ -433,6 +436,30 @@ class Email
     public function setAttachments(array $attachments)
     {
         $this->attachments = $attachments;
+
+        return $this;
+    }
+
+    /**
+     * Get contexts
+     *
+     * @return object[]
+     */
+    public function getContexts()
+    {
+        return $this->contexts;
+    }
+
+    /**
+     * Set contexts
+     *
+     * @param object[] $contexts
+     *
+     * @return $this
+     */
+    public function setContexts(array $contexts)
+    {
+        $this->contexts = $contexts;
 
         return $this;
     }
