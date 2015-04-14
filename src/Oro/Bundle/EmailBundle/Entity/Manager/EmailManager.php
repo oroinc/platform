@@ -16,6 +16,10 @@ class EmailManager
     /** @var EntityManager */
     protected $em;
 
+    /**
+     * @param EntityManager $em
+     * @param EmailThreadManager $emailThreadManager
+     */
     public function __construct(EntityManager $em, EmailThreadManager $emailThreadManager)
     {
         $this->em = $em;
@@ -31,7 +35,6 @@ class EmailManager
     {
         if (!$entity->isSeen()) {
             $entity->setSeen(true);
-            $this->emailThreadManager->addEmailToQueue($entity);
             $this->em->persist($entity);
             $this->em->flush();
         }

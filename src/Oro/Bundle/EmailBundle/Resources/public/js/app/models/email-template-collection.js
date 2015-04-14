@@ -13,6 +13,7 @@ define(function (require) {
     EmailTemplateCollection = BaseCollection.extend({
         route: null,
         routeId: null,
+        includeSystem: false,
         url: null,
         model: EmailTemplateModel,
 
@@ -21,10 +22,12 @@ define(function (require) {
          *
          * @param route {String}
          * @param routeId {String}
+         * @param includeSystem {bool}
          */
-        initialize: function (route, routeId) {
+        initialize: function (route, routeId, includeSystem) {
             this.route = route;
             this.routeId = routeId;
+            this.includeSystem = includeSystem;
             var routeParams = {};
             routeParams[routeId] = null;
             this.url = routing.generate(this.route, routeParams);
@@ -38,6 +41,7 @@ define(function (require) {
         setEntityId: function (id) {
             var routeParams = {};
             routeParams[this.routeId] = id;
+            routeParams['includeSystem'] = this.includeSystem ? '1' : '0';
             this.url = routing.generate(this.route, routeParams);
         }
     });

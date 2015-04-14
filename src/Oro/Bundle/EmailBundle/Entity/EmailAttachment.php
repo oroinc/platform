@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Doctrine\ORM\Mapping as ORM;
+
+use JMS\Serializer\Annotation as JMS;
+
+use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
  * Email Attachment
  *
  * @ORM\Table(name="oro_email_attachment")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository")
  */
 class EmailAttachment
 {
@@ -60,6 +64,15 @@ class EmailAttachment
      * @JMS\Exclude
      */
     protected $emailBody;
+
+    /**
+     * @var File
+     *
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
+     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @JMS\Exclude
+     */
+    protected $file;
 
     /**
      * Get id
@@ -163,5 +176,47 @@ class EmailAttachment
         $this->emailBody = $emailBody;
 
         return $this;
+    }
+
+    /**
+     * Get attachment file
+     *
+     * @return File
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set email attachment
+     *
+     * @param File $file
+     *
+     * @return $this
+     */
+    public function setFile(File $file = null)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
+     * Get file extension
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return pathinfo($this->fileName, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Clone record as new one
+     */
+    public function __clone()
+    {
+        $this->id = null;
     }
 }

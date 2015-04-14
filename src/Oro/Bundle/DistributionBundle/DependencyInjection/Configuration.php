@@ -25,6 +25,9 @@ class Configuration implements ConfigurationInterface
                         )
                     ->end()
                 ->end()
+                ->scalarNode('composer_cache_home')
+                    ->defaultValue('%kernel.root_dir%/cache/composer')
+                ->end()
             ->end();
 
         return $treeBuilder;

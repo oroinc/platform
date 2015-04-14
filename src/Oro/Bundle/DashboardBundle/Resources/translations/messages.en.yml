@@ -4,6 +4,8 @@ oro:
             main:            Dashboard
             quick_launchpad: Quick Launchpad
             chose_dashboard: Choose dashboard
+            label: Widget title
+            use_default.label: Use default setting
 
         entity_label:        Dashboard
         entity_plural_label: Dashboards
@@ -15,6 +17,7 @@ oro:
         owner.label:         Owner
         widgets.label:       Widgets
         organization.label:  Organization
+        options.label:       Options
 
         start_dashboard: Clone from
         start_dashboard.empty_value: Blank Dashboard
@@ -57,3 +60,11 @@ oro:
         delete_dashboard_link:
             title: Remove current dashboard
             text:  Delete dashboard
+        chart:
+            year.label: Year
+            month.label: Month
+            date.label: Week
+            day.label: Day
+            time.label: Hour
+        date_range.label: Date range
+        previous_date_range.label: Compare with previous period

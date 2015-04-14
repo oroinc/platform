@@ -19,7 +19,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getRefs')
-            ->will($this->returnValue('testMessageId'));
+            ->will($this->returnValue(['testMessageId']));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -63,7 +63,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getRefs')
-            ->will($this->returnValue('testMessageId'));
+            ->will($this->returnValue(['testMessageId']));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -107,7 +107,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getRefs')
-            ->will($this->returnValue('testMessageId'));
+            ->will($this->returnValue(['testMessageId']));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();

@@ -11,6 +11,19 @@ parameters:
     oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
     oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
+    oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
+    oro_dashboard.datetime.hepler.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
+
+    oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
+    oro_dashboard.widget_config_value.previous_date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
+    oro_dashboard.widget_config_value.widget_title.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter
+    oro_dashboard.widget_config_value.widget_items_choice.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter
+
+    oro_dashboard.form.type.widget_date_range.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType
+    oro_dashboard.form.type.date_range_value.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeValueType
+    oro_dashboard.form.type.widget_widget_title.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
+    oro_dashboard.form.type.widget_previous_date_rang.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType
+    oro_dashboard.form.type.widget_items_choice.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType
 
 services:
     oro_dashboard.config_resolver:
@@ -25,7 +38,7 @@ services:
             - @oro_security.security_facade
             - @oro_dashboard.config_resolver
             - @doctrine.orm.entity_manager
-            - @oro_dashboard.manager.state
+            - @oro_dashboard.widget_config_value.provider
         calls:
             - [setRequest, ["@?request="]]
 
@@ -81,3 +94,64 @@ services:
             - @oro_dashboard.config_provider
             - @form.factory
             - @oro_form.validator.constraint_factory
+
+    oro_dashboard.datetime.hepler:
+        class: %oro_dashboard.datetime.hepler.class%
+        arguments:
+            - @oro_locale.settings
+
+    oro_dashboard.form.type.widget_date_range:
+        class: %oro_dashboard.form.type.widget_date_range.class%
+        arguments:
+            - @translator
+        tags:
+            - { name: form.type, alias: "oro_type_widget_date_range" }
+
+    oro_dashboard.form.type.widget_date_range_value:
+        class: %oro_dashboard.form.type.date_range_value.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_date_range_value" }
+
+    oro_dashboard.form.type.widget_previous_date_range:
+        class: %oro_dashboard.form.type.widget_previous_date_rang.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_previous_date_range" }
+
+    oro_dashboard.form.type.widget_widget_title:
+        class: %oro_dashboard.form.type.widget_widget_title.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_title" }
+
+    oro_dashboard.form.type.widget_items_choice:
+        class: %oro_dashboard.form.type.widget_items_choice.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_items_choice" }
+
+    oro_dashboard.widget_config_value.provider:
+        class: %oro_dashboard.widget_config_value.provider.class%
+
+    oro_dashboard.widget_config_value.date_range.converter:
+        class: %oro_dashboard.widget_config_value.date_range.converter.class%
+        arguments:
+            - @oro_locale.formatter.date_time
+            - @oro_filter.expression.date.compiler
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_date_range" }
+
+    oro_dashboard.widget_config_value.previous_date_range.converter:
+          class: %oro_dashboard.widget_config_value.previous_date_range.converter.class%
+          arguments:
+              - @oro_locale.formatter.date_time
+              - @oro_filter.expression.date.compiler
+          tags:
+              - { name: oro_dashboard.value.converter, alias: "oro_type_widget_previous_date_range" }
+
+    oro_dashboard.widget_config_value.widget_title.converter:
+        class: %oro_dashboard.widget_config_value.widget_title.converter.class%
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_title" }
+
+    oro_dashboard.widget_config_value.widget_items_choice.converter:
+        class: %oro_dashboard.widget_config_value.widget_items_choice.converter.class%
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }

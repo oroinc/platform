@@ -55,11 +55,10 @@ define([
          * @param {Event} e
          */
         onClick: function (e) {
-            var targetElement, targetParentElement;
-            targetElement = e.target;
-            targetParentElement = $(e.target).parent().get(0);
-
-            if (this.el !== targetElement && this.el !== targetParentElement) {
+            var exclude = 'a, .dropdown',
+                $target = this.$(e.target);
+            // if the target is an action element, skip toggling the email
+            if ($target.is(exclude) || $target.parents(exclude).length) {
                 return;
             }
 

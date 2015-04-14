@@ -3,8 +3,9 @@
 define([
     'jquery',
     'underscore',
-    'chaplin'
-], function ($, _, Chaplin) {
+    'chaplin',
+    '../../models/base/collection'
+], function ($, _, Chaplin, BaseCollection) {
     'use strict';
 
     var BaseView;
@@ -15,7 +16,6 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend({
-
         getTemplateFunction: function () {
             var template, templateFunc;
             template = this.template;
@@ -30,6 +30,15 @@ define([
             }
 
             return templateFunc;
+        },
+
+        getTemplateData: function () {
+            var data;
+            data = BaseView.__super__.getTemplateData.apply(this, arguments);
+            if (!this.model && this.collection && this.collection instanceof BaseCollection) {
+                _.extend(data, this.collection.serializeExtraData());
+            }
+            return data;
         },
 
         /**

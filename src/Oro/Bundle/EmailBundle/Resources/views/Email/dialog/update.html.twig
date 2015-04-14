@@ -4,7 +4,7 @@
     * form         - Oro\Bundle\EmailBundle\Form\type\EmailType
     * saved        - bool
 #}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroEmailBundle:Form:fields.html.twig'] %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block page_container %}
@@ -17,6 +17,7 @@
                     messenger.notificationFlashMessage('success', __('The email was sent'));
                     mediator.trigger('widget_success:' + widget.getAlias());
                     mediator.trigger('widget_success:' + widget.getWid());
+                    mediator.trigger('datagrid:doRefresh:attachment-grid');
                     widget.remove(true);
                 });
             });
@@ -30,14 +31,15 @@
             </div>
         {% endif %}
         <div class="form-container">
-            <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post">
+            <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post" enctype="multipart/form-data">
                 {%
                     set emailEditorOptions = {
                         entityId: entity.entityId,
                         to: entity.to,
                         cc: entity.cc,
                         bcc: entity.bcc,
-                        appendSignature: appendSignature
+                        appendSignature: appendSignature,
+                        isSignatureEditable: resource_granted('oro_user_user_update')
                     }
                 %}
                 <fieldset class="form-horizontal"
@@ -50,15 +52,34 @@
                     {{ form_row(form.cc) }}
                     {{ form_row(form.bcc) }}
                     {{ form_row(form.subject) }}
-                    {{ form_row(form.template) }}
+                    {{ form_row(form.template, {'includeSystem': true}) }}
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
-                    <div class="control-group">
+                    <div class="control-group email-body-actions">
                         <div class="controls">
-                            <a class="btn" id="addSignatureButton" href="javascript:void(0);">{{ 'Add signature'|trans }}</a>
+                            <span class="email-body-action"><a id="add-signature" href="javascript:void(0);">{{ 'oro.email.form.add_signature'|trans }}</a></span>
+
+                            <span>{{ 'oro.email.form.attach_file'|trans }}: </span>
+                            <div class="dropup" style="display: inline-block">
+                                <a id="attach-file" class="dropdown-toggle" href="javascript:void(0);" aria-expanded="true">{{ 'oro.email.form.from_record'|trans }}</a>
+                                <div class="dropdown-menu attachment-list-popup" role="menu" aria-labelledby="attach-file"></div>
+                            </div>
+                            |
+                            <span>
+                                <a id="upload-new" href="javascript:void(0);">{{ 'oro.email.form.upload'|trans }}</a>
+                            </span>
                         </div>
                     </div>
+
+                    {% set emailAttachmentOptions = {
+                        popupTriggerButton: '#attach-file',
+                        uploadNewButton: '#upload-new',
+                        popupContentEl: '.attachment-list-popup',
+                        entityAttachments: entity.attachments.toArray,
+                        attachmentsAvailable: entity.attachmentsAvailable
+                    } %}
+                    {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
 
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">

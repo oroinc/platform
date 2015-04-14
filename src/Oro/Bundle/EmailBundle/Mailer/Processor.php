@@ -4,7 +4,11 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -14,6 +18,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -47,16 +53,20 @@ class Processor
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var array */
     protected $origins = array();
 
     /**
-     * @param DoctrineHelper       $doctrineHelper
-     * @param \Swift_Mailer        $mailer
-     * @param EmailAddressHelper   $emailAddressHelper
-     * @param EmailEntityBuilder   $emailEntityBuilder
-     * @param EmailOwnerProvider   $emailOwnerProvider
+     * @param DoctrineHelper $doctrineHelper
+     * @param \Swift_Mailer $mailer
+     * @param EmailAddressHelper $emailAddressHelper
+     * @param EmailEntityBuilder $emailEntityBuilder
+     * @param EmailOwnerProvider $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -64,14 +74,16 @@ class Processor
         EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
-        EmailActivityManager $emailActivityManager
+        EmailActivityManager $emailActivityManager,
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->doctrineHelper       = $doctrineHelper;
-        $this->mailer               = $mailer;
-        $this->emailAddressHelper   = $emailAddressHelper;
-        $this->emailEntityBuilder   = $emailEntityBuilder;
-        $this->emailOwnerProvider   = $emailOwnerProvider;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->mailer = $mailer;
+        $this->emailAddressHelper = $emailAddressHelper;
+        $this->emailEntityBuilder = $emailEntityBuilder;
+        $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -102,6 +114,8 @@ class Processor
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
+        $this->addAttachments($message, $model);
+
         $messageId = '<' . $message->generateId() . '>';
 
         if (!$this->mailer->send($message)) {
@@ -127,25 +141,74 @@ class Processor
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
         $email->setSeen(true);
-        if ($parentMessageId) {
+        if ($parentMessageId
+            && in_array($model->getMailType(), [EmailModel::MAIL_TYPE_DIRECT, EmailModel::MAIL_TYPE_REPLY])
+        ) {
             $email->setRefs($parentMessageId);
         }
 
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
+        $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
-        if ($model->hasEntity()) {
-            $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
-            if ($targetEntity) {
-                $this->emailActivityManager->addAssociation($email, $targetEntity);
-            }
+        $contexts = $model->getContexts();
+        foreach ($contexts as $context) {
+            $this->emailActivityManager->addAssociation($email, $context);
         }
 
         // flush all changes to the database
         $this->getEntityManager()->flush();
 
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+
         return $email;
+    }
+
+    /**
+     * @param \Swift_Message $message
+     * @param EmailModel     $model
+     */
+    protected function addAttachments(\Swift_Message $message, EmailModel $model)
+    {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
+            $swiftAttachment = new \Swift_Attachment(
+                ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                ),
+                $attachment->getFileName(),
+                $attachment->getContentType()
+            );
+            $message->attach($swiftAttachment);
+        }
+    }
+
+    /**
+     * @param EmailModel $model
+     * @param Email      $email
+     */
+    protected function persistAttachments(EmailModel $model, Email $email)
+    {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
+
+            if (!$attachment->getId()) {
+                $this->getEntityManager()->persist($attachment);
+            } else {
+                $attachmentContent = clone $attachment->getContent();
+                $attachment = clone $attachment;
+                $attachment->setContent($attachmentContent);
+                $this->getEntityManager()->persist($attachment);
+            }
+
+            $email->getEmailBody()->addAttachment($attachment);
+            $attachment->setEmailBody($email->getEmailBody());
+        }
     }
 
     /**
@@ -267,15 +330,11 @@ class Processor
      */
     protected function getParentMessageId(EmailModel $model)
     {
-        $messageId = '';
-        $parentEmailId = $model->getParentEmailId();
-        if ($parentEmailId) {
-            $parentEmail = $this->getEntityManager()
-                ->getRepository('OroEmailBundle:Email')
-                ->find($parentEmailId);
-            $messageId = $parentEmail->getMessageId();
+        if ($model->getParentEmail()) {
+            return $model->getParentEmail()->getMessageId();
         }
-        return $messageId;
+
+        return '';
     }
 
     /**

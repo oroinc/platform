@@ -21,8 +21,8 @@ define([
          */
         resetWidgets: function() {
             _.each(this.widgets, function (widget) {
-                // if widget is detached from DOM, remove this widget
-                if (!$.contains(document.documentElement, widget.el)) {
+                // if widget is not actual any more -- remove it
+                if (!widget.isActual()) {
                     widget.remove();
                 }
             });

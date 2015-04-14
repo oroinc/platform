@@ -25,14 +25,16 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Load templates by entity name
      *
-     * @param              $entityName
+     * @param string       $entityName
      * @param Organization $organization
+     * @param bool         $includeSystem
      *
      * @return EmailTemplate[]
      */
-    public function getTemplateByEntityName($entityName, Organization $organization)
+    public function getTemplateByEntityName($entityName, Organization $organization, $includeSystem = false)
     {
-        return $this->findBy(array('entityName' => $entityName, 'organization' => $organization));
+        return $this->getEntityTemplatesQueryBuilder($entityName, $organization, $includeSystem)
+            ->getQuery()->getResult();
     }
 
     /**

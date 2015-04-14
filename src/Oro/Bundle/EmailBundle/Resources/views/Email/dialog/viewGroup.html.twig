@@ -1,23 +1,6 @@
-<div class="activity-list sub-list"></div>
-<script type="text/javascript">
-    require([
-        'jquery',
-        'orotranslation/js/translator',
-        'oroui/js/mediator',
-        'oroactivitylist/js/app/components/activity-list-component'
-    ],
-    function($, __, mediator, ActivityListComponent) {
-        $(function() {
-            var opt = $.extend(true, {}, {{ results|json_encode|raw }});
-            if (!$('#grouped-entity-' + opt.entityId).length) {
-                mediator.execute('showErrorMessage', __('oro.email.thread.load_error'), {
-                    'objectId': '#grouped-entity-' + opt.entityId,
-                    'object': $('#grouped-entity-' + opt.entityId)
-                });
-            }
-            opt._sourceElement = $('#grouped-entity-' + opt.entityId);
-            opt.doNotFetch = true;
-            new ActivityListComponent(opt);
-        });
-    });
-</script>
+{{ oro_widget_render({
+    'widgetType': 'block',
+    'wid': 'thread-view',
+    'url': path('oro_email_thread_widget', {'id': results.entityId}),
+    'alias': 'thread-view'
+}) }}

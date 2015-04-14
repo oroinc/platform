@@ -12,9 +12,10 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 
 /**
- * fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
+ * Fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
  * http://www.doctrine-project.org/jira/browse/DDC-2798
- * TODO remove this file when doctrine version >= 2.5 in scope of BAP-5577
+ * Fix to use alias, if present in the comparison field, instead of $this->rootAlias
+ * TODO revise this file when doctrine version >= 2.5 in scope of BAP-5577
  */
 class QueryExpressionVisitor extends ExpressionVisitor
 {
@@ -117,6 +118,11 @@ class QueryExpressionVisitor extends ExpressionVisitor
     {
         $parameterName = str_replace('.', '_', $comparison->getField());
 
+        $field = $comparison->getField();
+        if (strpos($field, '.') === false) {
+            $field = $this->rootAlias . '.' . $field;
+        }
+
         foreach ($this->parameters as $parameter) {
             if ($parameter->getName() === $parameterName) {
                 $parameterName .= '_' . count($this->parameters);
@@ -130,36 +136,32 @@ class QueryExpressionVisitor extends ExpressionVisitor
         switch ($comparison->getOperator()) {
             case Comparison::IN:
                 $this->parameters[] = $parameter;
-                return $this->expr->in($this->rootAlias . '.' . $comparison->getField(), $placeholder);
+                return $this->expr->in($field, $placeholder);
 
             case Comparison::NIN:
                 $this->parameters[] = $parameter;
-                return $this->expr->notIn($this->rootAlias . '.' . $comparison->getField(), $placeholder);
+                return $this->expr->notIn($field, $placeholder);
 
             case Comparison::EQ:
             case Comparison::IS:
                 if ($this->walkValue($comparison->getValue()) === null) {
-                    return $this->expr->isNull($this->rootAlias . '.' . $comparison->getField());
+                    return $this->expr->isNull($field);
                 }
                 $this->parameters[] = $parameter;
-                return $this->expr->eq($this->rootAlias . '.' . $comparison->getField(), $placeholder);
+                return $this->expr->eq($field, $placeholder);
 
             case Comparison::NEQ:
                 if ($this->walkValue($comparison->getValue()) === null) {
-                    return $this->expr->isNotNull($this->rootAlias . '.' . $comparison->getField());
+                    return $this->expr->isNotNull($field);
                 }
                 $this->parameters[] = $parameter;
-                return $this->expr->neq($this->rootAlias . '.' . $comparison->getField(), $placeholder);
+                return $this->expr->neq($field, $placeholder);
 
             default:
                 $operator = self::convertComparisonOperator($comparison->getOperator());
                 if ($operator) {
                     $this->parameters[] = $parameter;
-                    return new Expr\Comparison(
-                        $this->rootAlias . '.' . $comparison->getField(),
-                        $operator,
-                        $placeholder
-                    );
+                    return new Expr\Comparison($field, $operator, $placeholder);
                 }
 
                 throw new \RuntimeException("Unknown comparison operator: " . $comparison->getOperator());

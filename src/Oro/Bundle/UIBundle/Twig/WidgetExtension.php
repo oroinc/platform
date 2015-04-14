@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Twig_Environment;
 
@@ -88,12 +87,10 @@ class WidgetExtension extends \Twig_Extension
             $options['container'] = '#' . $elementId;
         }
 
-        $accessor = PropertyAccess::createPropertyAccessor();
         $options['url'] = $this->getUrlWithContainer(
             $options['url'],
             $widgetType,
-            $options['wid'],
-            $accessor->getValue($options, '[state][id]')
+            $options['wid']
         );
 
         if ($this->request) {
@@ -116,7 +113,7 @@ class WidgetExtension extends \Twig_Extension
      * @param string $wid
      * @return string
      */
-    protected function getUrlWithContainer($url, $widgetType, $wid, $id)
+    protected function getUrlWithContainer($url, $widgetType, $wid)
     {
         if (strpos($url, '_widgetContainer=') === false) {
             $parts      = parse_url($url);
@@ -129,13 +126,6 @@ class WidgetExtension extends \Twig_Extension
                 $url .= '?' . $widgetPart;
             }
         }
-
-        if (strpos($url, '?') === false) {
-            $url .= '?';
-        } else {
-            $url .= '&';
-        }
-        $url .= '_widgetId=' . $id;
 
         return $url;
     }

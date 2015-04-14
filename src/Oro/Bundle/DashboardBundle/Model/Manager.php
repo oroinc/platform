@@ -333,6 +333,7 @@ class Manager
 
         $widget->setLayoutPosition($sourceWidget->getLayoutPosition());
         $widget->setName($sourceWidget->getName());
+        $widget->setOptions($sourceWidget->getOptions());
 
         return $this->getWidgetModel($widget);
     }
