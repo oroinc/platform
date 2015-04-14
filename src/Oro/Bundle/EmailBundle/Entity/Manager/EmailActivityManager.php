@@ -75,8 +75,10 @@ class EmailActivityManager
                 $this->copyContexts($em, $email);
                 // prepare the list of association targets
                 $targets = [];
+                if (count($this->emailActivityListProvider->getTargetEntities($email)) === 0) {
+                    $this->addRecipientOwners($targets, $email);
+                }
                 $this->addSenderOwner($targets, $email);
-                $this->addRecipientOwners($targets, $email);
                 // add associations
                 $this->addContextsToThread($em, $email, $targets);
             }
@@ -94,6 +96,14 @@ class EmailActivityManager
     public function addAssociation(Email $email, $target)
     {
         return $this->activityManager->addActivityTarget($email, $target);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeActivityTarget(ActivityInterface $activityEntity, $targetEntity)
+    {
+        return $this->activityManager->removeActivityTarget($activityEntity, $targetEntity);
     }
 
     /**
@@ -145,14 +155,6 @@ class EmailActivityManager
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function removeActivityTarget(ActivityInterface $activityEntity, $targetEntity)
-    {
-        return $this->activityManager->removeActivityTarget($activityEntity, $targetEntity);
-    }
-
-    /**
      * @param EntityManager $em
      * @param Email $email
      */
@@ -162,13 +164,14 @@ class EmailActivityManager
         if ($thread) {
             $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
             $contexts = $this->emailActivityListProvider->getTargetEntities($email);
+            // from email to thread emails
             if (count($contexts) > 0) {
                 foreach ($relatedEmails as $relatedEmail) {
                     if ($email->getId() !== $relatedEmail->getId()) {
                         $this->changeContexts($em, $relatedEmail, $contexts);
                     }
                 }
-            } else {
+            } else { // from thread to email
                 $relatedEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
                 if (count($relatedEmails) > 0) {
                     $parentEmail = $relatedEmails[0];
@@ -196,7 +199,7 @@ class EmailActivityManager
         if (count($contexts) > 0) {
             foreach ($relatedEmails as $relatedEmail) {
                 foreach ($contexts as $context) {
-                    $this->addAssociation($email, $context);
+                    $this->addAssociation($relatedEmail, $context);
                 }
             }
         }
