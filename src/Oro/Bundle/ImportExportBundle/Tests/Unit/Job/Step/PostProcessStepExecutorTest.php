@@ -23,6 +23,21 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
      */
     protected $jobExecutor;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ItemReaderInterface
+     */
+    protected $reader;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ItemProcessorInterface
+     */
+    protected $processor;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ItemWriterInterface
+     */
+    protected $writer;
+
     protected function setUp()
     {
         $this->executor = new PostProcessStepExecutor();
@@ -32,17 +47,16 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->executor->setJobExecutor($this->jobExecutor);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ItemReaderInterface $reader */
-        $reader = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
-        $this->executor->setReader($reader);
+        $this->reader = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
+        $this->executor->setReader($this->reader);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ItemProcessorInterface $processor */
-        $processor = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
-        $this->executor->setProcessor($processor);
+        $this->processor = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
+        $this->executor->setProcessor($this->processor);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ItemWriterInterface $writer */
-        $writer = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
-        $this->executor->setWriter($writer);
+        $this->writer = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
+        $this->executor->setWriter($this->writer);
+
+        $this->executor->setBatchSize(2);
     }
 
     /**
@@ -50,11 +64,17 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
      * @param array $context
      * @param array $job
      * @param bool $isJobSuccess
+     * @param int $jobExecutions
      *
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $contextSharedKeys, array $context, array $job, $isJobSuccess = true)
-    {
+    public function testExecute(
+        array $contextSharedKeys,
+        array $context,
+        array $job,
+        $isJobSuccess = true,
+        $jobExecutions = 0
+    ) {
         if ($job) {
             list($jobType, $jobName) = $job;
 
@@ -105,9 +125,13 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException('Oro\Bundle\ImportExportBundle\Exception\RuntimeException');
         }
 
-        $this->jobExecutor->expects($this->any())
+        $this->jobExecutor->expects($this->exactly($jobExecutions))
             ->method('executeJob')
             ->willReturn($jobResult);
+
+        $this->processor->expects($this->any())->method('process')->willReturnArgument(0);
+        $this->reader->expects($this->atLeastOnce())->method('read')
+            ->willReturnOnConsecutiveCalls(new \stdClass(), new \stdClass(), new \stdClass(), null);
 
         $this->executor->execute();
     }
@@ -123,14 +147,17 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
             'defined key' => [['some-key'], ['some-key' => 'value'], []],
             'defined key with post process job' => [
                 ['some-key'],
-                ['some-key' => 'value', 'another-key' => 'next-value'],
-                ['jobType', 'jobName']
+                ['some-key' => ['value', 'value1'], 'another-key' => ['next-value']],
+                ['jobType', 'jobName'],
+                true,
+                5
             ],
             'defined key with post process job but its failed' => [
                 ['some-key'],
-                ['some-key' => 'value', 'another-key' => 'next-value'],
+                ['some-key' => ['value', 'value1'], 'another-key' => ['next-value']],
                 ['jobType', 'jobName'],
-                false
+                false,
+                1
             ]
         ];
     }

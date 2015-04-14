@@ -136,17 +136,13 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
                     }
                 }
 
-                if (0 === count($this->getSharedData()) % $this->batchSize) {
+                if ($this->runPostProcessingJobsRequired()) {
                     $this->runPostProcessingJobs();
                 }
             }
 
             if (count($itemsToWrite) > 0) {
                 $this->write($itemsToWrite, $warningHandler);
-            }
-
-            if ((bool)$this->getSharedData()) {
-                $this->runPostProcessingJobs();
             }
 
             $this->ensureResourcesReleased($warningHandler);
@@ -159,17 +155,20 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
     /**
      * @return array
      */
-    public function getSharedData()
+    public function runPostProcessingJobsRequired()
     {
-        $sharedData = [];
         foreach ($this->contextSharedKeys as $key) {
             $value = $this->getJobContext()->get($key);
-            if ($value) {
-                $sharedData = array_merge($sharedData, $value);
+            if (!$value) {
+                continue;
+            }
+
+            if (0 === (count($value) % $this->batchSize)) {
+                return true;
             }
         }
 
-        return $sharedData;
+        return false;
     }
 
     /**
