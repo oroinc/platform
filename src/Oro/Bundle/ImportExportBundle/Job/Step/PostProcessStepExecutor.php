@@ -136,13 +136,17 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
                     }
                 }
 
-                if ($this->runPostProcessingJobsRequired()) {
+                if ($this->checkPostProcessingJobsBatch()) {
                     $this->runPostProcessingJobs();
                 }
             }
 
             if (count($itemsToWrite) > 0) {
                 $this->write($itemsToWrite, $warningHandler);
+            }
+
+            if ($this->checkPostProcessingJobsNotEmpty()) {
+                $this->runPostProcessingJobs();
             }
 
             $this->ensureResourcesReleased($warningHandler);
@@ -153,9 +157,9 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
     }
 
     /**
-     * @return array
+     * @return bool
      */
-    public function runPostProcessingJobsRequired()
+    public function checkPostProcessingJobsBatch()
     {
         foreach ($this->contextSharedKeys as $key) {
             $value = $this->getJobContext()->get($key);
@@ -164,6 +168,21 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
             }
 
             if (0 === (count($value) % $this->batchSize)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkPostProcessingJobsNotEmpty()
+    {
+        foreach ($this->contextSharedKeys as $key) {
+            $value = $this->getJobContext()->get($key);
+            if ($value) {
                 return true;
             }
         }
