@@ -6,7 +6,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Event\ReminderEvents;
+use Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EmailSendProcessor implements SendProcessorInterface
 {
@@ -33,15 +36,23 @@ class EmailSendProcessor implements SendProcessorInterface
     protected $reminders = array();
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * @param EmailNotificationProcessor $emailNotificationProcessor
      * @param EmailNotification          $emailNotification
+     * @param EventDispatcher            $eventDispatcher
      */
     public function __construct(
         EmailNotificationProcessor $emailNotificationProcessor,
-        EmailNotification $emailNotification
+        EmailNotification $emailNotification,
+        EventDispatcher $eventDispatcher
     ) {
         $this->emailNotificationProcessor = $emailNotificationProcessor;
         $this->emailNotification = $emailNotification;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -70,6 +81,11 @@ class EmailSendProcessor implements SendProcessorInterface
      */
     public function sendReminderEmail(Reminder $reminder)
     {
+        $event = new SendReminderEmailEvent($reminder);
+        $this->eventDispatcher->dispatch(
+            ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
+            $event
+        );
         $this->emailNotification->setReminder($reminder);
 
         try {
