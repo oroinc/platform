@@ -90,6 +90,7 @@ oro:
         attachment:
             copy_to_record: Copy to Record
             open: Open
+            select_file: Select file
 
         menu:
             emailtemplate_list.description: List of email templates
@@ -180,9 +181,6 @@ oro:
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
-
-        attachment:
-            select_file:          Select file
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
