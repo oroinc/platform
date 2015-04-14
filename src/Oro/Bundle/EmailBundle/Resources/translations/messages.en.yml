@@ -12,7 +12,13 @@ oro:
         form:
             choose_template:                     ""
             add_signature:                       Add Signature
-            attach_file:                         Attach File
+            attach_file:                         Attach file
+            from_record:                         From record
+            upload:                              Upload
+            attach:                              Attach
+            no_attachments:                      No available attachments
+            thread_attachments:                  Thread Attachments
+            record_attachments:                  Record Attachments
 
         variable.not.found:                     N/A
 
@@ -153,6 +159,11 @@ oro:
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
+        add_context.label:        Add Context
+        add_context_entity.label: Add Context Entity
+        contexts:
+              label:              Context
+              placeholder:        Add Context
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
@@ -169,6 +180,9 @@ oro:
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
+
+        attachment:
+            select_file:          Select file
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

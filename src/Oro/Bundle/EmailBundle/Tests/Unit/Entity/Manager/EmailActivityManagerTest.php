@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
@@ -15,6 +16,12 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $activityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $emailActivityListProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $emailThreadProvider;
+
     /** @var EmailActivityManager */
     private $manager;
 
@@ -25,8 +32,19 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->emailActivityListProvider = $this
+            ->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailThreadProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->manager = new EmailActivityManager($this->activityManager);
+        $this->manager = new EmailActivityManager(
+            $this->activityManager,
+            $this->emailActivityListProvider,
+            $this->emailThreadProvider
+        );
 
         $this->owners = [
             new TestUser('1'),
@@ -53,58 +71,84 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleOnFlush()
     {
-        $email      = $this->getEmailEntity();
-        $emailClass = get_class($email);
-
-        $em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow           = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
-        $uow->expects($this->once())
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue([$email, new \stdClass()]));
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($emailClass)
-            ->will($this->returnValue($classMetaData));
-        $uow->expects($this->once())
-            ->method('computeChangeSet')
-            ->with($this->identicalTo($classMetaData), $this->identicalTo($email));
-
-        $this->activityManager->expects($this->at(0))
-            ->method('addActivityTargets')
-            ->with($this->identicalTo($email), $this->identicalTo($this->owners))
-            ->will($this->returnValue(true));
-
-        $this->manager->handleOnFlush(new OnFlushEventArgs($em));
-    }
-
-    public function testHandleOnFlushWithoutNewEmails()
-    {
-        $em  = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
-        $em->expects($this->once())
+        $entityManager->expects($this->exactly(1))
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
+
+        $uow->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->will($this->returnValue([$email, new \stdClass()]));
+
+        $this->manager->handleOnFlush(new OnFlushEventArgs($entityManager));
+
+        $this->assertCount(1, $this->manager->getQueue());
+    }
+
+    public function testHandlePostFlush()
+    {
+        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email->expects($this->exactly(2))
+            ->method('getThread')
+            ->will($this->returnValue($thread));
+        $email->expects($this->exactly(0))
+            ->method('getId')
+            ->will($this->returnValue(1));
+        $email->expects($this->exactly(1))
+            ->method('getRecipients')
+            ->will($this->returnValue([]));
+
+        $this->manager->addEmailToQueue($email);
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->exactly(2))
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+        $repository->expects($this->never())
+            ->method('findByThread')
+            ->will($this->returnValue([$email]));
+
+        $this->emailThreadProvider->expects($this->never())
+            ->method('getThreadEmails')
+            ->will($this->returnValue([$email]));
+
+        $this->emailActivityListProvider->expects($this->once())
+            ->method('getTargetEntities')
+            ->will($this->returnValue([]));
+
+        $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
+    }
+
+    public function testHandleOnFlushWithoutNewEmails()
+    {
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->exactly(1))
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
         $uow->expects($this->once())
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue([new \stdClass()]));
-        $uow->expects($this->never())
-            ->method('computeChangeSet');
 
-        $this->manager->handleOnFlush(new OnFlushEventArgs($em));
+        $this->manager->handleOnFlush(new OnFlushEventArgs($entityManager));
+
+        $this->assertCount(0, $this->manager->getQueue());
     }
 
     /**

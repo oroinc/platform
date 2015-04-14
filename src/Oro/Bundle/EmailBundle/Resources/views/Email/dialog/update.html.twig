@@ -56,21 +56,33 @@
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
-                    <div class="control-group">
+                    <div class="control-group email-body-actions">
                         <div class="controls">
                             <span class="email-body-action"><a id="add-signature" href="javascript:void(0);">{{ 'oro.email.form.add_signature'|trans }}</a></span>
-                            <span class="email-body-action"><a id="attach-file" href="javascript:void(0);">{{ 'oro.email.form.attach_file'|trans }}</a></span>
+
+                            <span>{{ 'oro.email.form.attach_file'|trans }}: </span>
+                            <div class="dropup" style="display: inline-block">
+                                <a id="attach-file" class="dropdown-toggle" href="javascript:void(0);" aria-expanded="true">{{ 'oro.email.form.from_record'|trans }}</a>
+                                <div class="dropdown-menu attachment-list-popup" role="menu" aria-labelledby="attach-file"></div>
+                            </div>
+                            |
+                            <span>
+                                <a id="upload-new" href="javascript:void(0);">{{ 'oro.email.form.upload'|trans }}</a>
+                            </span>
                         </div>
                     </div>
 
                     {% set emailAttachmentOptions = {
-                        dialogButton: 'attach-file',
-                        items: entity.attachments.toArray
+                        popupTriggerButton: '#attach-file',
+                        uploadNewButton: '#upload-new',
+                        popupContentEl: '.attachment-list-popup',
+                        entityAttachments: entity.attachments.toArray,
+                        attachmentsAvailable: entity.attachmentsAvailable
                     } %}
                     {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
 
                     {{ form_rest(form) }}
-                    <div class="widget-actions form-actoins" style="display: none;">
+                    <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
                         <button class="btn btn-primary" type="submit">{{ 'Send'|trans }}</button>
                     </div>

@@ -16,6 +16,10 @@ class EmailManager
     /** @var EntityManager */
     protected $em;
 
+    /**
+     * @param EntityManager $em
+     * @param EmailThreadManager $emailThreadManager
+     */
     public function __construct(EntityManager $em, EmailThreadManager $emailThreadManager)
     {
         $this->em = $em;

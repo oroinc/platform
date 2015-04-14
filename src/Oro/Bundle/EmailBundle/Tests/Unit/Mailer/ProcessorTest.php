@@ -284,11 +284,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
         if (!empty($data['entityClass']) && !empty($data['entityClass'])) {
             $targetEntity = new TestUser();
-            $this->doctrineHelper->expects($this->once())
+            $this->doctrineHelper->expects($this->exactly(0))
                 ->method('getEntity')
                 ->with($data['entityClass'], $data['entityId'])
                 ->will($this->returnValue($targetEntity));
-            $this->emailActivityManager->expects($this->once())
+            $this->emailActivityManager->expects($this->exactly(0))
                 ->method('addAssociation')
                 ->with($this->identicalTo($email), $this->identicalTo($targetEntity));
         } else {
