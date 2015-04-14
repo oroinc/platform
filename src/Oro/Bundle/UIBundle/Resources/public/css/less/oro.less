@@ -49,6 +49,12 @@ a {
 form {
   margin: 0;
 }
+h1, h2, h3, h4, h5, h6 {
+  // supress bootstrap's optimizeLegibility text-rendering
+  // it gives bad results on small size fonts
+  // that could be applied only for fonts larger than 20px
+  text-rendering: auto;
+}
 #main {
   background-color: #fff;
 }
@@ -80,7 +86,9 @@ form {
 .dark {
   background-color: #f6f5f5;
 }
-
+.nowrap {
+  white-space: nowrap;
+}
 label.disabled {
   cursor: default;
 }
@@ -2699,7 +2707,7 @@ label.radio.error {
   .box-content {
     padding: 20px 15px;
     background: url("../../img/vertical-separator.png") repeat-y 50% 0;
-    .responsive-small & {
+    .responsive-small &, .responsive-big & {
       background: none;
     }
   }

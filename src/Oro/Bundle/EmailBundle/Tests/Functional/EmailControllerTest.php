@@ -27,6 +27,29 @@ class EmailControllerTest extends WebTestCase
         $this->assertContains('Thank you for signing up to My Web Store!', $content);
     }
 
+    public function testItems()
+    {
+        $ids = implode(',', [
+            $this->getReference('email_1')->getId(),
+            $this->getReference('email_2')->getId(),
+            $this->getReference('email_3')->getId()
+        ]);
+        $url = $this->getUrl('oro_email_items_view', ['ids' => $ids]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+    }
+
+    public function testItemsBlank()
+    {
+        $url = $this->getUrl('oro_email_items_view');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $content = $result->getContent();
+        $this->assertEquals("", $content);
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+    }
+
     public function testCreateViewForm()
     {
         $url = $this->getUrl('oro_email_email_create', ['_widgetContainer' => 'dialog']);

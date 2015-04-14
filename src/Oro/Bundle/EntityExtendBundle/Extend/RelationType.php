@@ -15,6 +15,11 @@ class RelationType
     const MANY_TO_ONE = 'manyToOne';
 
     /**
+     * Identifies a multiple many-to-one association.
+     */
+    const MULTIPLE_MANY_TO_ONE = 'multipleManyToOne';
+
+    /**
      * Identifies a one-to-many association.
      */
     const ONE_TO_MANY = 'oneToMany';

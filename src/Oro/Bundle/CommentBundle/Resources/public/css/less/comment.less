@@ -1,5 +1,37 @@
-.comments-block {
-  min-width: initial;
+@import "../../../oroui/css/less/mixins";
+
+.comments-view-header, .comments-view-body, .comments-view-footer {
+  clear: both;
+  margin: 13px 0;
+  &:empty {
+    display: none;
+  }
+}
+.comments-view-header {
+  > .no-data {
+    margin: 0px;
+  }
+  .load-more{
+    display: inline-block;
+    width: 100%;
+    .load-more-items(#e5e5e5, #fff, #888);
+    border-top: solid 1px #e5e5e5;
+    border-bottom: solid 1px #e5e5e5;
+    &.process {
+      .load-more-label {
+        padding: 0 10px;
+        .process('../../../oroui/img/loader-16.gif');
+        &:after {
+          right: 4px;
+        }
+      }
+    }
+  }
+}
+.comments-view-footer {
+  margin-top: 10px;
+}
+.comment-form-container {
   .comment-form {
     .comment-text-field {
       width: 100%;
@@ -12,60 +44,100 @@
       width: 160px;
     }
   }
+  .attachment-item {
+    .remove-attachment {
+      text-decoration: none;
+      border: none;
+      background: transparent;
+      font-family: FontAwesome !important;
+    }
+  }
+}
+.add-comment-dialog{
+  .ui-dialog-content {
+    margin: 25px 25px 8px;
+  }
+  .comment-text-field {
+    height: 165px;
+  }
+  label {
+    margin-bottom: 8px;
+  }
+}
+.comments-block {
+  color: #888;
+  margin: 0;
+  display: table;
+  width: 100%;
+  min-width: initial;
   .comment-item {
-    border-bottom: 1px solid #f0f0f0;
-    min-height: 57px;
-    position: relative;
-    &:last-child {
-      border-bottom: none;
-    }
-    .title-item{
-      margin-left: 20px;
-      .accordion-icon {
-        margin-left: -20px;
-      }
-    }
+    display: table-row !important;
   }
-  .short-comment {
-    padding-top: 2px;
-    padding-left: 20px;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    height: 22px;
-  }
-  .accordion-icon:before {
+  .comment-title, .comment-content, .comment-actions {
+    display: table-cell;
+    line-height: 1.3em;
+    padding: 13px 0 14px 0;
+    border-bottom: 1px solid #e5e5e5;
     vertical-align: top;
   }
-  .accordion-heading {
-    padding: 5px 10px 9px 10px;
+  .comment-title {
+    width: 30px;
+    position: relative;
+  }
+  .comment-actions {
+    width: 23px;
+    /** .horizontal-icon-menu; */
+    .dropdown-menu{
+      padding: 0;
+      top: -8px;
+      right: 23px;
+    }
+    .nav-pills {
+      padding: 0 0 0 2px;
+    }
+  }
+  .comment-content {
+    vertical-align: middle;
+    padding: 14px;
+    .comment-author-info .date{
+      font-size: smaller;
+    }
+  }
+  .comment-item:first-child {
+    .comment-title, .comment-content, .comment-actions {
+      padding-top: 0px;
+    }
+  }
+  .comment-item:last-child {
+    .comment-title, .comment-content, .comment-actions {
+      border-bottom: none;
+      padding-bottom: 0px;
+    }
+  }
+
+  .comment-title {
+    .comment-title-avatar{
+      width: 29px;
+      height: 29px;
+    }
+    .no-avatar {
+      background: url(../../../oroui/img/info-user.png);
+      background-size: 29px 29px;
+    }
+  }
+
+  .comment-body{
     display: block;
-    > div {
-      display: block;
-    }
-    &:hover {
-      background-color: transparent;
-    }
+    color: #444;
   }
-  .accordion-body {
-    margin-top: -29px;
+  .comment-attachments {
+    margin: 0.5em 0 0 0;
   }
-  .accordion-inner {
-    border-top: none;
-    padding-top: 0;
-    padding-left: 30px;
-    background-color: #fff;
-  }
+
   .attachment-icon.accordion-toggle {
     display: none;
     &.collapsed {
       display: inline-block;
-    }
-  }
-  .attachment-item {
-    .item-remove-attachment {
-      text-decoration: none;
     }
   }
 }

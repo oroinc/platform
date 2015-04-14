@@ -166,11 +166,15 @@ class ApiEntityManager
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null)
+    public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
         $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
 
         $qb = $this->getRepository()->createQueryBuilder('e');
+
+        foreach ($joins as $join) {
+            $qb->join('e.' . $join, $join);
+        }
         // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
         // http://www.doctrine-project.org/jira/browse/DDC-2798
         // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577

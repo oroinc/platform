@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_1\OroEmailBundle as OroEmailBund
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_3\OroEmailBundle as OroEmailBundle13;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_4\OroEmailBundle as OroEmailBundle14;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_7\OroEmailBundle as OroEmailBundle17;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_8\OroEmailBundle as OroEmailBundle18;
 
 class OroEmailBundleInstaller implements Installation
 {
@@ -19,7 +20,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -56,5 +57,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle17::addTable($schema);
         OroEmailBundle17::addColumns($schema);
         OroEmailBundle17::addForeignKeys($schema);
+
+        OroEmailBundle18::addAttachmentRelation($schema);
     }
 }

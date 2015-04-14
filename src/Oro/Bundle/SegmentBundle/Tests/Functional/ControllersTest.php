@@ -45,8 +45,8 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Segment saved", $crawler->html());
+        static::assertHtmlResponseStatusCodeEquals($result, 200);
+        static::assertContains('Segment saved', $crawler->html());
     }
 
     /**
