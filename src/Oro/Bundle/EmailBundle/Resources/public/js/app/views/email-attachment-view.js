@@ -16,7 +16,8 @@ define(function (require) {
         },
 
         listen: {
-            'change:fileName model': 'fileNameChange'
+            'change:fileName model': 'fileNameChange',
+            'change:type model':     'typeChange'
         },
 
         getTemplateFunction: function() {
@@ -49,10 +50,10 @@ define(function (require) {
 
                 if (value) {
                     self.model.set('fileName', value);
+                    self.model.set('type', 3);
                     self.$el.show();
 
-                    // temporary
-                    self.collectionView.$el.show();
+                    self.collectionView.show();
                 }
             });
             $fileInput.click();
@@ -60,6 +61,10 @@ define(function (require) {
 
         fileNameChange: function() {
             this.$('span.filename-label').html(this.model.get('fileName'));
+        },
+
+        typeChange: function() {
+            this.$('input.attachment-type').val(this.model.get('type'));
         }
     });
 

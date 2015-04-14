@@ -19,6 +19,7 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -140,7 +141,9 @@ class Processor
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
         $email->setSeen(true);
-        if ($parentMessageId) {
+        if ($parentMessageId
+            && in_array($model->getMailType(), [EmailModel::MAIL_TYPE_DIRECT, EmailModel::MAIL_TYPE_REPLY])
+        ) {
             $email->setRefs($parentMessageId);
         }
 
@@ -169,8 +172,9 @@ class Processor
      */
     protected function addAttachments(\Swift_Message $message, EmailModel $model)
     {
-        /** @var EmailAttachment $attachment */
-        foreach ($model->getAttachments() as $attachment) {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
             $swiftAttachment = new \Swift_Attachment(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
@@ -189,8 +193,10 @@ class Processor
      */
     protected function persistAttachments(EmailModel $model, Email $email)
     {
-        /** @var EmailAttachment $attachment */
-        foreach ($model->getAttachments() as $attachment) {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
+
             if (!$attachment->getId()) {
                 $this->getEntityManager()->persist($attachment);
             } else {
@@ -324,15 +330,11 @@ class Processor
      */
     protected function getParentMessageId(EmailModel $model)
     {
-        $messageId = '';
-        $parentEmailId = $model->getParentEmailId();
-        if ($parentEmailId) {
-            $parentEmail = $this->getEntityManager()
-                ->getRepository('OroEmailBundle:Email')
-                ->find($parentEmailId);
-            $messageId = $parentEmail->getMessageId();
+        if ($model->getParentEmail()) {
+            return $model->getParentEmail()->getMessageId();
         }
-        return $messageId;
+
+        return '';
     }
 
     /**
