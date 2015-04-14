@@ -68,7 +68,7 @@ class EmailAttachment
     /**
      * @var File
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
      * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @JMS\Exclude
      */
