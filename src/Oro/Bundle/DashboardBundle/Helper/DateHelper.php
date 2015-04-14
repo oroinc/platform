@@ -52,7 +52,6 @@ class DateHelper
     /**
      * @param DateTime $from
      * @param DateTime $to
-     * @param int $diff
      * @param array $data
      * @param string $rowKey
      * @param string $dataKey
