@@ -96,7 +96,6 @@ class Group
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
-     *              "identity"=true,
      *              "short"=true
      *          }
      *      }
