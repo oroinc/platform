@@ -279,13 +279,16 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
                 this._resizeTries = 0;
                 var newHeight = this._getContainerHeight();
                 var newWidth = this._limitTo().width();
-                var parentOffset = this._limitTo().offset();
                 this._setOptions({
                     resizable: false,
                     draggable : false,
                     height: newHeight,
                     width: newWidth,
-                    position: [parentOffset.left, parentOffset.top]
+                    position: {
+                        my: 'left top',
+                        at: 'left top',
+                        of: this._limitTo()
+                    }
                 });
                 this.widget().css('position', 'fixed'); // remove scroll when maximized
                 if ($.isFunction(onResizeCallback)) {
