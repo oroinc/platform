@@ -95,16 +95,6 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
     /**
      * {@inheritdoc}
      */
-    protected function write($processedItems, StepExecutionWarningHandlerInterface $warningHandler = null)
-    {
-        parent::write($processedItems, $warningHandler);
-
-        $this->runPostProcessingJobs();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
     {
         $itemsToWrite = [];
@@ -240,9 +230,10 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
             if (!$jobResult->isSuccessful()) {
                 throw new RuntimeException(
                     sprintf(
-                        'Post processing job "%s" failed. Job id "%s"',
-                        $jobData[self::JOB_NAME_KEY],
-                        $jobResult->getJobId()
+                        'Post processing job "%s" failed. Job id "%s". Errors: %s',
+                        $jobResult->getJobCode(),
+                        $jobResult->getJobId(),
+                        implode(PHP_EOL, $jobResult->getFailureExceptions())
                     )
                 );
             }
