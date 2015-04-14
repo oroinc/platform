@@ -8,6 +8,14 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 
+/**
+ * Class Email
+ *
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ *
+ * @package Oro\Bundle\EmailBundle\Form\Model
+ */
 class Email
 {
     const MAIL_TYPE_DIRECT  = 'direct';
