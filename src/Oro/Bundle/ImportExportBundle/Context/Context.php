@@ -247,4 +247,14 @@ class Context implements ContextInterface
 
         return $default;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeOption($name)
+    {
+        if ($this->hasOption($name)) {
+            unset($this->configuration[$name]);
+        }
+    }
 }
