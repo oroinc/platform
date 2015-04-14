@@ -18,6 +18,14 @@ use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Class Indexer
+ * @package Oro\Bundle\SearchBundle\Engine
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class Indexer
 {
     const TEXT_ALL_DATA_FIELD   = 'all_text';
