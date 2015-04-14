@@ -4,11 +4,14 @@ namespace Oro\Bundle\EmailBundle\Controller\Api\Soap;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
+
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
+
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class EmailController extends SoapGetController
@@ -86,6 +89,7 @@ class EmailController extends SoapGetController
          */
         $entity = $this->getManager()->find($id);
 
+        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         if ($entity->supportActivityTarget($targetClassName)) {
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
 
@@ -101,7 +105,7 @@ class EmailController extends SoapGetController
             throw new \SoapFault('BAD_REQUEST', 'Does not support');
         }
 
-        return $entity;
+        return $this->getManager()->getEntityId($entity);
     }
 
     /**
@@ -121,6 +125,7 @@ class EmailController extends SoapGetController
             $entity = $this->getManager()->find($id);
             $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
             $om = $this->getManager()->getObjectManager();
+            $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
             $entity->removeActivityTarget($target);
             $om->persist($entity);
