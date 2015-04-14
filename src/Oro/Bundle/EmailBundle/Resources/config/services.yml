@@ -173,6 +173,7 @@ services:
           - @oro_config.user
           - @oro_email.activity_list.provider
           - @oro_email.provider.email_attachment_provider
+          - @oro_email.form.factory
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
@@ -522,8 +523,3 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_attachment.provider.attachment
             - @oro_email.email_attachment_transformer
-
-    oro_email.email_attachment_transformer:
-        class: %oro_email.email_attachment_transformer.class%
-        arguments:
-            - @knp_gaufrette.filesystem_map

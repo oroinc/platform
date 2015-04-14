@@ -6,6 +6,7 @@ use Gaufrette\Filesystem;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 
 class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
@@ -19,6 +20,11 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
      * @var FilesystemMap|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $filesystemMap;
+
+    /**
+     * @var Factory
+     */
+    protected $factory;
 
     /**
      * @var EmailAttachmentTransformer
@@ -41,7 +47,9 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
             ->with('attachments')
             ->will($this->returnValue($this->filesystem));
 
-        $this->emailAttachmentTransformer = new EmailAttachmentTransformer($this->filesystemMap);
+        $this->factory = new Factory();
+
+        $this->emailAttachmentTransformer = new EmailAttachmentTransformer($this->filesystemMap, $this->factory);
     }
 
     public function testEntityToModel()

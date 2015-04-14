@@ -12,6 +12,7 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment as AttachmentOro;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as AttachmentEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
 
 /**
  * Class EmailAttachmentTransformer
@@ -26,11 +27,18 @@ class EmailAttachmentTransformer
     protected $filesystem;
 
     /**
-     * @param FilesystemMap $filesystemMap
+     * @var Factory
      */
-    public function __construct(FilesystemMap $filesystemMap)
+    protected $factory;
+
+    /**
+     * @param FilesystemMap $filesystemMap
+     * @param Factory       $factory
+     */
+    public function __construct(FilesystemMap $filesystemMap, Factory $factory)
     {
         $this->filesystem = $filesystemMap->get('attachments');
+        $this->factory    = $factory;
     }
 
     /**
@@ -40,7 +48,7 @@ class EmailAttachmentTransformer
      */
     public function entityToModel(AttachmentEntity $attachmentEntity)
     {
-        $attachmentModel = new AttachmentModel();
+        $attachmentModel = $this->factory->getEmailAttachment();
 
         $attachmentModel->setEmailAttachment($attachmentEntity);
         $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
@@ -58,7 +66,7 @@ class EmailAttachmentTransformer
      */
     public function oroToModel(AttachmentOro $attachmentOro)
     {
-        $attachmentModel = new AttachmentModel();
+        $attachmentModel = $this->factory->getEmailAttachment();
 
         $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
         $attachmentModel->setId($attachmentOro->getId());

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 
@@ -30,6 +31,11 @@ class EmailAttachmentProvider
      * @var EmailAttachmentTransformer
      */
     protected $emailAttachmentTransformer;
+
+    /**
+     * @var Factory
+     */
+    protected $factory;
 
     /**
      * @param EmailThreadProvider        $emailThreadProvider

@@ -11,6 +11,7 @@ parameters:
     oro_email.form.type.attachment.class:                 Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType
     oro_email.form.type.attachments.class:                Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType
     oro_email.form.type.contexts_select.class:            Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType
+    oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
 
 services:
     oro_email.form.subscriber.emailtemplate:
@@ -99,3 +100,6 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: form.type, alias: oro_email_contexts_select }
+
+    oro_email.form.factory:
+        class: %oro_email.form.factory.class%
