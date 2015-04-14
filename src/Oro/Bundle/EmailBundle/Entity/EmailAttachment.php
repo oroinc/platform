@@ -8,8 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
@@ -75,11 +73,6 @@ class EmailAttachment
      * @JMS\Exclude
      */
     protected $file;
-
-    /**
-     * @var UploadedFile
-     */
-    protected $uploadedFile;
 
     /**
      * Get id
@@ -217,26 +210,6 @@ class EmailAttachment
     public function getExtension()
     {
         return pathinfo($this->fileName, PATHINFO_EXTENSION);
-    }
-
-    /**
-     * @return UploadedFile
-     */
-    public function getUploadedFile()
-    {
-        return $this->uploadedFile;
-    }
-
-    /**
-     * @param UploadedFile $file
-     *
-     * @return $this
-     */
-    public function setUploadedFile($file)
-    {
-        $this->uploadedFile = $file;
-
-        return $this;
     }
 
     /**
