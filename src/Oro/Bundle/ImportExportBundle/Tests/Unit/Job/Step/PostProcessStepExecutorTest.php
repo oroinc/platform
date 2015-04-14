@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job\Step;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
@@ -65,6 +66,7 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
      * @param array $job
      * @param bool $isJobSuccess
      * @param int $jobExecutions
+     * @param array $expectedContext
      *
      * @dataProvider executeDataProvider
      */
@@ -73,7 +75,8 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
         array $context,
         array $job,
         $isJobSuccess = true,
-        $jobExecutions = 0
+        $jobExecutions = 0,
+        $expectedContext = []
     ) {
         if ($job) {
             list($jobType, $jobName) = $job;
@@ -88,23 +91,11 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $executionContext = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
-        $executionContext->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnCallback(
-                    function ($key) use ($context) {
-                        if (array_key_exists($key, $context)) {
-                            return $context[$key];
-                        }
+        $executionContext = new ExecutionContext();
+        foreach ($context as $key => $value) {
+            $executionContext->put($key, $value);
+        }
 
-                        return null;
-                    }
-                )
-            );
-        $executionContext->expects($this->any())
-            ->method('getKeys')
-            ->willReturn(array_keys($context));
         $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
         $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
         $jobExecution->expects($this->any())
@@ -134,6 +125,8 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
             ->willReturnOnConsecutiveCalls(new \stdClass(), new \stdClass(), new \stdClass(), null);
 
         $this->executor->execute();
+
+        $this->assertEquals($expectedContext, $executionContext->getKeys());
     }
 
     /**
@@ -150,14 +143,16 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
                 ['some-key' => ['value', 'value1'], 'another-key' => ['next-value']],
                 ['jobType', 'jobName'],
                 true,
-                5
+                3,
+                ['another-key']
             ],
             'defined key with post process job but its failed' => [
                 ['some-key'],
                 ['some-key' => ['value', 'value1'], 'another-key' => ['next-value']],
                 ['jobType', 'jobName'],
                 false,
-                1
+                1,
+                ['another-key']
             ]
         ];
     }
