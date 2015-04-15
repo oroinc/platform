@@ -18,6 +18,8 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
@@ -27,7 +29,7 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->will($this->returnValue(true));
 
-        $this->gridViewsExtension = new GridViewsExtension($this->eventDispatcher, $securityFacade);
+        $this->gridViewsExtension = new GridViewsExtension($this->eventDispatcher, $securityFacade, $translator);
     }
 
     public function testVisitMetadataShouldAddGridViewsFromEvent()
