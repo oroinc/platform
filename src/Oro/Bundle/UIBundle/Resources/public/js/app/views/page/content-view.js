@@ -37,6 +37,7 @@ define([
             // should not be applied before layouting (see init-layout.js)
             // that will give issues on extra small screens
             _.defer(_.bind(this.focusFirstInput, this));
+            this.$(".page-title:first").hide().show(0);
         },
 
         /**
