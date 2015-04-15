@@ -7,27 +7,20 @@ define([
     'use strict';
 
     var ViewNameModal = Modal.extend({
-        contentTemplate: _.template(
-            '<div class="form-horizontal">' +
-                '<div class="control-group">' +
-                    '<label class="control-label" for="gridViewName">' + __('oro.datagrid.gridView.name') + ':</label>' +
-                    '<div class="controls">' +
-                        '<input id="gridViewName" name="name" type="text" value="<%= value %>">' +
-                    '</div>' +
-                '</div>' +
-            '</div>'
-        ),
+        contentTemplate: null,
 
-        nameErrorTemplate: _.template(
-            '<span for="gridViewName" class="validation-failed"><%= error %></span>'
-        ),
+        nameErrorTemplate: null,
 
         initialize: function(options) {
             options = options || {};
 
+            this.contentTemplate = _.template($('#template-datagrid-view-name-modal').html());
+            this.nameErrorTemplate = _.template($('#template-datagrid-view-name-error-modal').html());
+
             options.title = options.title || __('oro.datagrid.name_modal.title');
             options.content = options.content || this.contentTemplate({
-                value: options.defaultValue || ''
+                value: options.defaultValue || '',
+                label: __('oro.datagrid.gridView.name')
             });
             options.okText =  __('oro.datagrid.gridView.save_name');
 

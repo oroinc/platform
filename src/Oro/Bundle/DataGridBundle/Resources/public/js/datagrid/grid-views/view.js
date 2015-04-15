@@ -37,48 +37,10 @@ define([
         },
 
         /** @property */
-        template: _.template(
-            '<div class="btn-toolbar">' +
-                '<% if (choices.length) { %>' +
-                    '<div class="btn-group views-group">' +
-                        '<button data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                            '<%= title %>' +
-                        '</button>' +
-                        '<ul class="dropdown-menu">' +
-                            '<% _.each(choices, function (choice) { %>' +
-                                '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
-                            '<% }); %>' +
-                        '</ul>' +
-                    '</div>' +
-                '<% } %>' +
-                '<% if (showActions) { %>' +
-                    '<div class="btn-group actions-group">' +
-                        '<button class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">' +
-                            '<%= actionsLabel %>' +
-                        '</button>' +
-                        '<ul class="dropdown-menu">' +
-                            '<% _.each(actions, function(action) { %>' +
-                                '<% if (action.enabled) { %>' +
-                                    '<li><a href="#" class="<%= action.name %>"><%= action.label %></a></li>' +
-                                '<% } %>' +
-                            '<% }); %>' +
-                        '</ul>' +
-                    '</div>' +
-                    '<% if (dirty) { %>' +
-                        '<div class="edited-label">&nbsp;-&nbsp;<%= editedLabel %></div>' +
-                    '<% } %>' +
-                '<% } %>' +
-            '</div>'
-        ),
+        template:null,
 
         /** @property */
-        titleTemplate: _.template(
-            '<% if (navbar) { %>' +
-                '<h1 class="oro-subtitle"><%= title %><span class="caret"></span></h1>' +
-            '<% } else { %>' +
-                '<%= title %><span class="caret"></span>' +
-            '<% } %>'
-        ),
+        titleTemplate: null,
 
         /** @property */
         title: null,
@@ -125,6 +87,9 @@ define([
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
             }
+
+            this.template = _.template($('#template-datagrid-grid-view').html());
+            this.titleTemplate = _.template($('#template-datagrid-grid-view-label').html());
 
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
