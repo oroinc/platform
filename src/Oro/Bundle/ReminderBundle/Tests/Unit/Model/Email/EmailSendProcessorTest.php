@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\Email;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Event\ReminderEvents;
+use Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent;
 use Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor;
 
 class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
@@ -24,6 +26,11 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $emailNotification;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $eventDispatcher;
+
     protected function setUp()
     {
         $this->emailNotificationProcessor = $this
@@ -37,9 +44,12 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('setReminder', 'getEntity'))
             ->getMock();
 
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+
         $this->processor = new EmailSendProcessor(
             $this->emailNotificationProcessor,
-            $this->emailNotification
+            $this->emailNotification,
+            $this->eventDispatcher
         );
     }
 
@@ -102,6 +112,32 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
         $barReminder->expects($this->once())
             ->method('setState')
             ->with(Reminder::STATE_SENT);
+
+        $assertEvent = $this->callback(function ($event) use ($fooReminder) {
+            $this->assertInstanceOf('Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent', $event);
+            /** @var SendReminderEmailEvent $event */
+            $this->assertEquals($fooReminder, $event->getReminder());
+            return true;
+        });
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')
+            ->with(
+                ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
+                $assertEvent
+            );
+
+        $assertEvent = $this->callback(function ($event) use ($barReminder) {
+            $this->assertInstanceOf('Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent', $event);
+            /** @var SendReminderEmailEvent $event */
+            $this->assertEquals($barReminder, $event->getReminder());
+            return true;
+        });
+        $this->eventDispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->with(
+                ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
+                $assertEvent
+            );
 
         $this->processor->push($fooReminder);
         $this->processor->push($barReminder);

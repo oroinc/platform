@@ -38,6 +38,7 @@ services:
         arguments:
             - @oro_notification.email_processor
             - @oro_reminder.model.email_notification
+            - @event_dispatcher
         tags:
             - { name: oro_reminder.send_processor }
 
