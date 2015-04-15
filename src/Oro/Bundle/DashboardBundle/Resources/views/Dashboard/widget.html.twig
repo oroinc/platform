@@ -50,7 +50,7 @@
         require(['jquery', 'underscore', 'oroui/js/widget-manager'],
         function($, _, widgetManager){
             widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
-                {% if widgetTitle|length > 0 %}
+                {% if widgetTitle is not empty %}
                 widget.setTitle({{ widgetTitle|json_encode|raw }});
                 {% endif %}
             });
