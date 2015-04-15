@@ -10,7 +10,7 @@
     <div data-content="{{ name }}">
         <div class="row-oro oro-multiselect-holder">
             <div class="float-holder ">
-
+                {{ form_errors(form) }}
                 {% if form.children|length  %}
                     {% for child in form %}
                         {{ form_widget(child) }}
@@ -19,7 +19,6 @@
                 {% else %}
                     {{ form_widget(form) }}
                 {% endif %}
-                {{ form_errors(form) }}
                 {{ form_rest(form) }}
             </div>
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
