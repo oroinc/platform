@@ -239,17 +239,17 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     public function dataHandlePostFlushProvider()
     {
         return [
-            'empty Queue' => $this->config1(),
-            'with Queue without Thread' =>$this->config2(),
-            'with Queue with Thread with getTargetEntities'=> $this->config3(),
-            'with Queue with Thread without getTargetEntities'=> $this->config4()
+            'empty Queue' => $this->providerConfig1(),
+            'with Queue without Thread' =>$this->providerConfig2(),
+            'with Queue with Thread with getTargetEntities'=> $this->providerConfig3(),
+            'with Queue with Thread without getTargetEntities'=> $this->providerConfig4()
         ];
     }
 
     /**
      * @return array
      */
-    protected function config1()
+    protected function providerConfig1()
     {
         return [
             'email' => $this->getEmailEntity(1),
@@ -281,7 +281,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    protected function config3()
+    protected function providerConfig3()
     {
         return [
             'email' => $this->getEmailEntity(1, 1),
@@ -313,7 +313,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    protected function config2()
+    protected function providerConfig2()
     {
         return [
             'email' => $this->getEmailEntity(1),
@@ -345,7 +345,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    protected function config4()
+    protected function providerConfig4()
     {
         return [
             'email' => $this->getEmailEntity(1, 1),
