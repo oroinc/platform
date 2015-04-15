@@ -1,0 +1,77 @@
+{#
+    Available variables:
+    * entity       - Oro\Bundle\EmailBundle\Model\Email
+#}
+
+{% block page_container %}
+    <div class="widget-content">
+
+        {% set itemsArray = [] %}
+        {% for item in entityTargets %}
+            {% set itemArray = {
+            'label': item.label,
+            'first': item.first,
+            'className': item.className
+            } %}
+            {% set itemsArray = itemsArray|merge([itemArray]) %}
+        {% endfor %}
+
+        {% set firstContext = itemsArray[0] %}
+        {% set options = params|merge({items: itemsArray, params: params}) %}
+
+        <script type="text/template" id="email-context-item">
+            <li id="<%= entity.get('entityAlias') %>" class="context-item" data-cid="<%= entity.cid %>">
+                <%= entity.get('label') %>
+            </li>
+        </script>
+
+        <div data-page-component-module="oroemail/js/app/components/email-context-component"
+             data-page-component-options="{{ options|json_encode }}">
+            <button id="email-context-current-block">
+                <span id="email-context-current-item"></span>
+                <span id="email-context-arrow" class="icon-caret-down"></span>
+            </button>
+            <ul id="context-items-dropdown" style="display: none"></ul>
+            <input type="hidden" id="context-current-target-class"/>
+        </div>
+
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_email_context_grid', {entityClass: firstContext.className}),
+            'alias': 'email-context-grid'
+        }) }}
+
+        <script type="text/javascript">
+            require(['orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator'],
+                    function(__, widgetManager, messenger, mediator) {
+                        widgetManager.getWidgetInstanceByAlias('email-context-grid', function(widget) {
+                            widget.on('grid-row-select', function(data) {
+
+                                var id = data.model.get('id');
+                                var contextTargetClass = $('#context-current-target-class').data('value');
+                                widget._showLoading();
+
+                                $.ajax({
+                                    url: '{{ path('oro_api_post_email_associations') }}',
+                                    type: 'POST',
+                                    data: {entityId: {{ sourceEntity.id }}, targetClassName: contextTargetClass, targetId: id},
+                                    dataType: 'json',
+                                    success: function (res) {
+                                        //TODO: add success check
+                                        messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
+                                        mediator.trigger('widget_success:activity_list:item:update');
+                                        mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
+                                    }
+                                })
+                                .always(function () {
+                                    widget._hideLoading();
+                                    widgetManager.getWidgetInstanceByAlias('email-context-dialog', function(widget) {
+                                        widget.remove();
+                                    });
+                                });
+                            });
+                        });
+                    });
+        </script>
+    </div>
+{% endblock %}

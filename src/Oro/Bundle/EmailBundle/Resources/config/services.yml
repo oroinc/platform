@@ -27,7 +27,7 @@ parameters:
     oro_email.email.manager.class:                Oro\Bundle\EmailBundle\Entity\Manager\EmailManager
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
-    oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
+    oro_email.manager.email_context_manager.class: Oro\Bundle\EmailBundle\Manager\EmailContextManager
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -74,6 +74,9 @@ parameters:
     oro_email.validator.email_template_syntax_validator.class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
     oro_email.validator.email_address_validator.class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
     oro_email.validator.email_recipients_validator.class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
+
+    oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
+    oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
 
 services:
     oro_email.entity.cache.warmer:
@@ -167,6 +170,9 @@ services:
           - @request
           - @doctrine.orm.entity_manager
           - @oro_config.user
+          - @oro_email.activity_list.provider
+          - @oro_email.provider.email_attachment_provider
+          - @oro_email.form.factory
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
@@ -441,6 +447,8 @@ services:
         class: %oro_email.email.activity.manager.class%
         arguments:
             - @oro_activity.manager
+            - @oro_email.activity_list.provider
+            - @oro_email.email.thread.provider
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%
@@ -505,4 +513,13 @@ services:
             - @oro_email.activity_list.provider
             - @oro_security.security_facade.link
         tags:
-            - { name: kernel.event_listener, event: oro_email.email_attachment_manager.email_body_added, method: linkToScopeEvent, priority: 10 }
+            - { name: kernel.event_listener, event: oro_email.email_body_added, method: linkToScopeEvent, priority: 10 }
+
+    oro_email.provider.email_attachment_provider:
+        class: %oro_email.provider.email_attachment_provider.class%
+        arguments:
+            - @oro_email.email.thread.provider
+            - @doctrine.orm.entity_manager
+            - @oro_attachment.provider.attachment
+            - @oro_locale.formatter.date_time
+            - @oro_email.form.factory

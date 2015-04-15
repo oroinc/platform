@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
+use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 
 /**
  * Class EmailModelBuilder
@@ -43,21 +48,45 @@ class EmailModelBuilder
     protected $configManager;
 
     /**
-     * @param EmailModelBuilderHelper $emailModelBuilderHelper
-     * @param Request                 $request
-     * @param EntityManager           $entityManager
-     * @param ConfigManager           $configManager
+     * @var EmailAttachmentProvider
+     */
+    protected $emailAttachmentProvider;
+
+    /**
+     * @var EmailActivityListProvider
+     */
+    protected $activityListProvider;
+
+    /**
+     * @var Factory
+     */
+    protected $factory;
+
+    /**
+     * @param EmailModelBuilderHelper   $emailModelBuilderHelper
+     * @param Request                   $request
+     * @param EntityManager             $entityManager
+     * @param ConfigManager             $configManager
+     * @param EmailActivityListProvider $activityListProvider
+     * @param EmailAttachmentProvider   $emailAttachmentProvider
+     * @param Factory                   $factory
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         Request $request,
         EntityManager $entityManager,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        EmailActivityListProvider $activityListProvider,
+        EmailAttachmentProvider $emailAttachmentProvider,
+        Factory $factory
     ) {
-        $this->helper              = $emailModelBuilderHelper;
-        $this->request             = $request;
-        $this->entityManager       = $entityManager;
-        $this->configManager       = $configManager;
+        $this->helper               = $emailModelBuilderHelper;
+        $this->request              = $request;
+        $this->entityManager        = $entityManager;
+        $this->configManager        = $configManager;
+        $this->activityListProvider = $activityListProvider;
+        $this->emailAttachmentProvider = $emailAttachmentProvider;
+        $this->factory = $factory;
     }
 
     /**
@@ -68,13 +97,27 @@ class EmailModelBuilder
     public function createEmailModel(EmailModel $emailModel = null)
     {
         if (!$emailModel) {
-            $emailModel = new EmailModel();
+            $emailModel = $this->factory->getEmail();
+            $emailModel->setMailType(EmailModel::MAIL_TYPE_DIRECT);
         }
 
         if ($this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
+            if (!$emailModel->getContexts()) {
+                $entityClass = $this->request->get('entityClass');
+                $entityId = $this->request->get('entityId');
+                if ($entityClass && $entityId) {
+                    $emailModel->setContexts([
+                        $this->helper->getTargetEntity(
+                            $this->request->get('entityClass'),
+                            $this->request->get('entityId')
+                        )
+                    ]);
+                }
+            }
         }
         $this->applySignature($emailModel);
+        $this->initAvailableAttachments($emailModel);
 
         return $emailModel;
     }
@@ -86,8 +129,8 @@ class EmailModelBuilder
      */
     public function createReplyEmailModel(EmailEntity $parentEmailEntity)
     {
-        $emailModel = new EmailModel();
-
+        $emailModel = $this->factory->getEmail();
+        $emailModel->setMailType(EmailModel::MAIL_TYPE_REPLY);
         $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
@@ -103,6 +146,7 @@ class EmailModelBuilder
 
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
+        $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
 
         return $this->createEmailModel($emailModel);
     }
@@ -137,13 +181,16 @@ class EmailModelBuilder
      */
     public function createForwardEmailModel(EmailEntity $parentEmailEntity)
     {
-        $emailModel = new EmailModel();
+        $emailModel = $this->factory->getEmail();
+        $emailModel->setMailType(EmailModel::MAIL_TYPE_FORWARD);
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         // link attachments of forwarded email to current email instance
-        $this->applyAttachments($emailModel, $parentEmailEntity);
+        if ($this->request->isMethod('GET')) {
+            $this->applyAttachments($emailModel, $parentEmailEntity);
+        }
 
         return $this->createEmailModel($emailModel);
     }
@@ -285,10 +332,70 @@ class EmailModelBuilder
             $this->helper->ensureEmailBodyCached($emailEntity);
 
             foreach ($emailEntity->getEmailBody()->getAttachments() as $attachment) {
-                $emailModel->addAttachment($attachment);
+                $attachmentModel = $this->factory->getEmailAttachment();
+                $attachmentModel->setId($attachment->getId());
+                $attachmentModel->setType(EmailAttachment::TYPE_EMAIL_ATTACHMENT);
+                $attachmentModel->setEmailAttachment($attachment);
+
+                $emailModel->addAttachment($attachmentModel);
             }
         } catch (\Exception $e) {
             // maybe show notice to a user that attachments could not be loaded
         }
+    }
+
+    /**
+     * @param EmailModel $emailModel
+     */
+    protected function initAvailableAttachments(EmailModel $emailModel)
+    {
+        $attachments = [];
+
+        if ($emailModel->getParentEmailId()) {
+            $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
+                ->find($emailModel->getParentEmailId());
+            $attachments = array_merge(
+                $attachments,
+                $this->emailAttachmentProvider->getThreadAttachments($parentEmail)
+            );
+        }
+        if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
+            $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
+                ->find($emailModel->getEntityId());
+
+            if ($scopeEntity) {
+                $attachments = array_merge(
+                    $attachments,
+                    $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity)
+                );
+            }
+        }
+
+        $attachments = $this->filterAttachmentsByName($attachments);
+        $emailModel->setAttachmentsAvailable($attachments);
+    }
+
+    /**
+     * @param array $attachments
+     *
+     * @return array
+     */
+    protected function filterAttachmentsByName($attachments)
+    {
+        $collection = new ArrayCollection($attachments);
+        $fileNames = [];
+
+        $filtered = $collection->filter(function($entry) use (&$fileNames) {
+            /** @var EmailAttachment $entry */
+            if (in_array($entry->getFileName(), $fileNames)) {
+                return false;
+            } else {
+                $fileNames[] = $entry->getFileName();
+
+                return true;
+            }
+        });
+
+        return $filtered->toArray();
     }
 }

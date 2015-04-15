@@ -445,7 +445,9 @@ class ExtendConfigDumper
     protected function createOriginFilterCallback(array $skippedOrigins)
     {
         return function (ConfigInterface $config) use ($skippedOrigins) {
-            return !in_array($config->get('origin'), $skippedOrigins, true);
+            return
+                $config->get('state') === ExtendScope::STATE_ACTIVE
+                || !in_array($config->get('origin'), $skippedOrigins, true);
         };
     }
 }
