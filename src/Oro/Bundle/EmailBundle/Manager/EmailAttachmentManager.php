@@ -46,12 +46,12 @@ class EmailAttachmentManager
     protected $attachmentConfig;
 
     /**
-     * @param FileSystemMap             $filesystemMap
-     * @param EntityManager             $em
-     * @param KernelInterface           $kernel
-     * @param ServiceLink               $securityFacadeLink
-     * @param ConfigFileValidator       $configFileValidator
-     * @param AttachmentConfig       $attachmentConfig
+     * @param FileSystemMap       $filesystemMap
+     * @param EntityManager       $em
+     * @param KernelInterface     $kernel
+     * @param ServiceLink         $securityFacadeLink
+     * @param ConfigFileValidator $configFileValidator
+     * @param AttachmentConfig    $attachmentConfig
      */
     public function __construct(
         FilesystemMap $filesystemMap,
