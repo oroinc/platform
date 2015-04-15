@@ -171,7 +171,8 @@ class EmailActivityManager
                         $this->changeContexts($em, $relatedEmail, $contexts);
                     }
                 }
-            } else { // from thread to email
+            } else {
+            // from thread to email
                 $relatedEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
                 if (count($relatedEmails) > 0) {
                     $parentEmail = $relatedEmails[0];

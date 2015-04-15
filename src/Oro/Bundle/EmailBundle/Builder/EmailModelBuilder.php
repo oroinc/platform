@@ -183,7 +183,6 @@ class EmailModelBuilder
     {
         $emailModel = $this->factory->getEmail();
         $emailModel->setMailType(EmailModel::MAIL_TYPE_FORWARD);
-        $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
