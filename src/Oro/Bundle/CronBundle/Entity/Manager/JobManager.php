@@ -101,4 +101,24 @@ class JobManager
 
         return $statisticData;
     }
+
+    /**
+     * Return count of current running jobs by given name
+     *
+     * @param string $commandName
+     * @return int
+     */
+    public function getRunningJobsCount($commandName)
+    {
+        return (int) $this->em
+            ->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j')
+            ->select('COUNT(j.id)')
+            ->andWhere('j.command=:commandName')
+            ->andWhere('j.state=:stateName')
+            ->setParameter('commandName', $commandName)
+            ->setParameter('stateName', Job::STATE_RUNNING)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
