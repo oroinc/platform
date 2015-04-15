@@ -62,6 +62,7 @@ parameters:
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
     oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
+    oro_email.listener.datagrid.context.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\ContextGridListener
 
     # Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
@@ -425,6 +426,22 @@ services:
             - @oro_email.helper.datagrid.emails
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
+
+    oro_email.listener.datagrid.context:
+        class: %oro_email.listener.datagrid.context.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.contacts-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.accounts-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.magento-customers-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.orocrm-sales-b2bcustomers-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.sales-lead-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.sales-opportunity-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.magento-order-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.cases-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-for-context-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.magento-cart-for-context-grid, method: onBuildAfter }
 
     oro_email.email_synchronization_manager:
         class: %oro_email.email_synchronization_manager.class%

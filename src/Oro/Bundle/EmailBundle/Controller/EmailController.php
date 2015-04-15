@@ -304,15 +304,16 @@ class EmailController extends Controller
     public function contextAction(Email $emailEntity)
     {
         $entityProvider = $this->get('oro_entity.entity_provider');
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $entityTargets = $this->get('oro_entity.entity.manager')
-            ->getSupportedTargets($entityProvider, $emailEntity);
+            ->getSupportedTargets($entityProvider, $entityConfigProvider, $emailEntity);
         return [
             'sourceEntity' => $emailEntity,
             'entityTargets' => $entityTargets,
             'params' => [
                 'grid_path' => $this->generateUrl(
                     'oro_email_context_grid',
-                    [],
+                    ['activityId' => $emailEntity->getId()],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 )
             ]
@@ -320,19 +321,25 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/context/grid/{entityClass}", name="oro_email_context_grid")
+     * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
      * @AclAncestor("oro_email_view")
      * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
      * @param string $entityClass
+     * @param string $activityId
      * @return array
      */
-    public function contextGridAction($entityClass = null)
+    public function contextGridAction($activityId, $entityClass = null)
     {
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $gridName = $this
             ->get('oro_entity.entity.manager')
             ->getContextGridByEntity($entityConfigProvider, $entityClass);
-        return ['gridName' => $gridName, 'multiselect' => false, 'params' => [], 'renderParams' => []];
+        return [
+            'gridName' => $gridName,
+            'multiselect' => false,
+            'params' => ['activityId' => $activityId],
+            'renderParams' => []
+        ];
     }
 
     /**

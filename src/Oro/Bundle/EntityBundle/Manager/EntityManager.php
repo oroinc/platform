@@ -30,10 +30,11 @@ class EntityManager
 
     /**
      * @param EntityProvider $entityProvider
+     * @param ConfigProvider $entityConfigProvider
      * @param object $entity
      * @return array
      */
-    public function getSupportedTargets(EntityProvider $entityProvider, $entity)
+    public function getSupportedTargets(EntityProvider $entityProvider, ConfigProvider $entityConfigProvider, $entity)
     {
         $targetEntities = $entityProvider->getEntities();
         $entityTargets = [];
@@ -49,7 +50,8 @@ class EntityManager
                 $entityTargets[] = [
                     'label' => $targetEntity['label'],
                     'className' => $this->routingHelper->encodeClassName($targetEntity['name']),
-                    'first' => ($i == 1 ? true : false)
+                    'first' => ($i == 1 ? true : false),
+                    'gridName' => $this->getContextGridByEntity($entityConfigProvider, $className)
                 ];
 
                 $i++;
