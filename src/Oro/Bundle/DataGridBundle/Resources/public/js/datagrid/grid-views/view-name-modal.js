@@ -1,8 +1,9 @@
 /*global define*/
 define([
+    'underscore',
     'orotranslation/js/translator',
     'oroui/js/modal'
-], function (__, Modal) {
+], function (_, __, Modal) {
     'use strict';
 
     var ViewNameModal = Modal.extend({
@@ -14,20 +15,34 @@ define([
                         '<input id="gridViewName" name="name" type="text" value="<%= value %>">' +
                     '</div>' +
                 '</div>' +
-             '</div>'
+            '</div>'
         ),
 
-         initialize: function(options) {
-             options = options || {};
+        nameErrorTemplate: _.template(
+            '<span for="gridViewName" class="validation-failed"><%= error %></span>'
+        ),
 
-             options.title = options.title || __('oro.datagrid.name_modal.title');
-             options.content = options.content || this.contentTemplate({
-                 value: options.defaultValue || ''
-             });
-             options.okText =  __('oro.datagrid.gridView.save_name');
+        initialize: function(options) {
+            options = options || {};
 
-             ViewNameModal.__super__.initialize.call(this, options);
-         }
+            options.title = options.title || __('oro.datagrid.name_modal.title');
+            options.content = options.content || this.contentTemplate({
+                value: options.defaultValue || ''
+            });
+            options.okText =  __('oro.datagrid.gridView.save_name');
+
+            ViewNameModal.__super__.initialize.call(this, options);
+        },
+
+        setNameError: function(error) {
+            this.$('.validation-failed').remove();
+            if (error) {
+                var error = this.nameErrorTemplate({
+                    error: error
+                });
+                this.$('#gridViewName').after(error);
+            }
+        }
     });
 
     return ViewNameModal;

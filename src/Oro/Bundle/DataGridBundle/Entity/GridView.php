@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -29,6 +30,10 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *              "group_name"=""
  *          }
  *      }
+ * )
+ * @UniqueEntity(
+ *      fields={"name", "owner"},
+ *      message="oro.datagrid.gridview.unique"
  * )
  */
 class GridView

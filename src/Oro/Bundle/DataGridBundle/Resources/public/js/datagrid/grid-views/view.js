@@ -281,19 +281,29 @@ define([
                     deletable: self.permissions.DELETE
                 });
                 model.save(null, {
-                    wait: true
+                    wait: true,
+                    success: function(model) {
+                        model.set('name', model.get('id'));
+                        model.unset('id');
+                        self.viewsCollection.add(model);
+                        self.changeView(model.get('name'));
+                        self.collection.state.gridView = model.get('name');
+                        self.viewDirty = !self._isCurrentStateSynchronized();
+                        self._updateTitle();
+                        self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
+                        mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
+                    },
+                    error: function(model, response, options) {
+                        modal.open();
+                        if (response.status === 400) {
+                            var jsonResponse = JSON.parse(response.responseText);
+                            var errors = jsonResponse.errors.children.label.errors;
+                            if (errors) {
+                                modal.setNameError(_.first(errors));
+                            }
+                        }
+                    }
                 });
-                model.once('sync', function(model) {
-                    model.set('name', model.get('id'));
-                    model.unset('id');
-                    this.viewsCollection.add(model);
-                    this.changeView(model.get('name'));
-                    this.collection.state.gridView = model.get('name');
-                    this.viewDirty = !this._isCurrentStateSynchronized();
-                    this._updateTitle();
-                    this._showFlashMessage('success', __('oro.datagrid.gridView.created'));
-                    mediator.trigger('datagrid:' + this.gridName + ':views:add', model);
-                }, self);
             });
 
             modal.open();
