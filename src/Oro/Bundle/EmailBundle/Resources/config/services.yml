@@ -505,6 +505,7 @@ services:
             - @kernel
             - @oro_security.security_facade.link
             - @oro_attachment.validator.file_config_validator
+            - @oro_attachment.config
 
     oro_email.listener.email_body_add_listener:
         class: %oro_email.listener.email_body_add_listener.class%
