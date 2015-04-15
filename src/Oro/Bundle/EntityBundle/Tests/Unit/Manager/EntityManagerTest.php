@@ -36,7 +36,15 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $manager;
 
+    /**
+     * @var string
+     */
     protected $entityClass = "Oro\\Bundle\\UserBundle\\Entity\\User";
+
+    /**
+     * @var string
+     */
+    protected $expectedGridName = 'mygrig1';
 
     protected function setUp()
     {
@@ -78,23 +86,6 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getConfig', 'get'])
             ->getMock();
 
-        $this->mockContainer = $this
-            ->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $this->manager = new EntityManager($this->mockContainer, $this->routingHelper);
-    }
-
-    public function testGetSupportedTargets()
-    {
-        $targets = $this->manager->getSupportedTargets($this->entityProvider, $this->mockEntity);
-
-        $this->assertCount(1, $targets);
-    }
-
-    public function testGetContextGridByEntity()
-    {
-        $expectedGridName = 'mygrig1';
-
         $this->configProvider->expects($this->any())
             ->method('getConfig')
             ->with($this->routingHelper->encodeClassName($this->entityClass))
@@ -103,13 +94,28 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->any())
             ->method('get')
             ->with('context-grid')
-            ->will($this->returnValue($expectedGridName));
+            ->will($this->returnValue($this->expectedGridName));
 
+        $this->mockContainer = $this
+            ->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $this->manager = new EntityManager($this->mockContainer, $this->routingHelper);
+    }
+
+    public function testGetSupportedTargets()
+    {
+        $targets = $this->manager->getSupportedTargets($this->entityProvider, $this->configProvider, $this->mockEntity);
+
+        $this->assertCount(1, $targets);
+    }
+
+    public function testGetContextGridByEntity()
+    {
         $gridName = $this->manager->getContextGridByEntity(
             $this->configProvider,
             $this->entityClass
         );
 
-        $this->assertEquals($expectedGridName, $gridName);
+        $this->assertEquals($this->expectedGridName, $gridName);
     }
 }
