@@ -103,7 +103,7 @@ class JobManager
     }
 
     /**
-     * Return count of current running jobs count by given name
+     * Return count of current running jobs by given name
      *
      * @param string $commandName
      * @return int
