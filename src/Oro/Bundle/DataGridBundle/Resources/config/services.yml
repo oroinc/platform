@@ -157,5 +157,5 @@ services:
         arguments:
             - @oro_datagrid.form.grid_view.api
             - @request
-            - @doctrine.orm.entity_manager
+            - @doctrine
         scope: request

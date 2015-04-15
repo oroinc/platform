@@ -41,9 +41,7 @@ class GridView
     const TYPE_PRIVATE = 'private';
     const TYPE_PUBLIC = 'public';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected static $types = [
         self::TYPE_PRIVATE => self::TYPE_PRIVATE,
         self::TYPE_PUBLIC => self::TYPE_PUBLIC,

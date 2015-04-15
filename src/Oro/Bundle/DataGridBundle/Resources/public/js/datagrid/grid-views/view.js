@@ -476,9 +476,16 @@ define([
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
-                    enabled: this.viewDirty && typeof currentView !== 'undefined' && currentView.get('editable') &&
-                             (currentView.get('type') === 'private' ||
-                                (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
+                    enabled: this.viewDirty
+                            && typeof currentView !== 'undefined'
+                            && currentView.get('editable')
+                            && (
+                                currentView.get('type') === 'private'
+                                || (
+                                   currentView.get('type') === 'public'
+                                   && this.permissions.EDIT_SHARED
+                                   )
+                            )
                 },
                 {
                     label: __('oro.datagrid.action.save_grid_view_as'),
@@ -488,21 +495,30 @@ define([
                 {
                     label: __('oro.datagrid.action.rename_grid_view'),
                     name: 'rename',
-                    enabled: typeof currentView !== 'undefined' && currentView.get('editable') &&
-                             (currentView.get('type') === 'private' ||
-                                (currentView.get('type') === 'public' && this.permissions.EDIT_SHARED))
+                    enabled: typeof currentView !== 'undefined'
+                            && currentView.get('editable')
+                            && (
+                                currentView.get('type') === 'private'
+                                || (
+                                    currentView.get('type') === 'public'
+                                    && this.permissions.EDIT_SHARED
+                                    )
+                                )
                 },
                 {
                     label: __('oro.datagrid.action.share_grid_view'),
                     name: 'share',
-                    enabled: typeof currentView !== 'undefined' &&
-                            currentView.get('type') === 'private' && this.permissions.SHARE
+                    enabled: typeof currentView !== 'undefined'
+                            && currentView.get('type') === 'private'
+                            && this.permissions.SHARE
                 },
                 {
                     label: __('oro.datagrid.action.unshare_grid_view'),
                     name: 'unshare',
-                    enabled: typeof currentView !== 'undefined' && currentView.get('editable') &&
-                            currentView.get('type') === 'public' && this.permissions.EDIT_SHARED
+                    enabled: typeof currentView !== 'undefined'
+                            && currentView.get('editable')
+                            && currentView.get('type') === 'public'
+                            && this.permissions.EDIT_SHARED
                 },
                 {
                     label: __('oro.datagrid.action.discard_grid_view_changes'),
@@ -512,7 +528,8 @@ define([
                 {
                     label: __('oro.datagrid.action.delete_grid_view'),
                     name: 'delete',
-                    enabled: typeof currentView !== 'undefined' && currentView.get('deletable')
+                    enabled: typeof currentView !== 'undefined'
+                            && currentView.get('deletable')
                 }
             ];
         },

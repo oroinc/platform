@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,19 +17,19 @@ class GridViewApiHandler
     /** @var Request */
     protected $request;
 
-    /** @var ObjectManager */
-    protected $om;
+    /** @var Registry */
+    protected $registry;
 
     /**
      * @param FormInterface $form
      * @param Request $request
-     * @param ObjectManager $om
+     * @param Registry $registry
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $om)
+    public function __construct(FormInterface $form, Request $request, Registry $registry)
     {
         $this->form = $form;
         $this->request = $request;
-        $this->om = $om;
+        $this->registry = $registry;
     }
 
     /**
@@ -67,8 +67,9 @@ class GridViewApiHandler
     protected function onSuccess(GridView $entity)
     {
         $this->fixFilters($entity);
-        $this->om->persist($entity);
-        $this->om->flush();
+        $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
+        $om->persist($entity);
+        $om->flush();
     }
 
     /**
