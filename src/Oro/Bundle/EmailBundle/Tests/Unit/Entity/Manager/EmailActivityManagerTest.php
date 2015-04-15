@@ -102,14 +102,55 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->manager->getQueue());
     }
 
+    /**
+     * @dataProvider dataHandlePostFlushProvider
+     *
+     * @param $email
+     * @param $email2
+     * @param $params
+     * @param $methods
+     */
+    public function testHandlePostFlushWithoutQueue($email, $email2, $params, $methods)
+    {
+        if (isset($params['createQueue']) && $params['createQueue'] === 1) {
+            $this->manager->addEmailToQueue($email);
+        }
+
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->setMethods(['findByThread'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository->expects($this->exactly($methods['repository,findByThread']['amountCall']))
+            ->method('findByThread')
+            ->withAnyParameters()
+            ->will($this->returnValue([$email2]));
+
+        $this->entityManager->expects($this->exactly($methods['entityManager.getRepository']['amountCall']))
+            ->method('getRepository')
+            ->with(Email::ENTITY_CLASS)
+            ->will($this->returnValue($repository));
+
+        $this->emailActivityListProvider->expects($this->exactly($methods['getTargetEntities']['amountCall']))
+            ->method('getTargetEntities')
+            ->will($this->returnValue($methods['getTargetEntities']['return']));
+
+
+        $this->emailThreadProvider->expects($this->exactly($methods['getEmailReferences']['amountCall']))
+            ->method('getEmailReferences')
+            ->will($this->returnValue([$email2]));
+
+        $this->entityManager->expects($this->exactly($methods['em.flush']['amountCall']))
+         ->method('flush');
+
+        $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
+        $this->assertCount(0, $this->manager->getQueue());
+    }
+
     public function testHandlePostFlushEmptyThread()
     {
         $email = $this->getEmailEntity();
         $this->manager->addEmailToQueue($email);
-
-        $this->emailThreadProvider->expects($this->never())
-            ->method('getThreadEmails')
-            ->will($this->returnValue([$email]));
 
         $this->emailActivityListProvider
             ->method('getTargetEntities')
@@ -117,78 +158,6 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
         $this->assertCount(0, $this->manager->getQueue());
-    }
-
-    public function testHandlePostFlush()
-    {
-        $email = $this->getEmailEntity();
-        $email->setThread(1);
-        $email->expects($this->exactly(1))
-              ->method('getId')
-              ->will($this->returnValue(1));
-
-        $email2 = $this->getEmailEntity();
-        $email2->expects($this->exactly(1))
-            ->method('getId')
-               ->will($this->returnValue(2));
-
-        $this->handlePostFlushPrepareData($email, $email2);
-
-        $this->emailActivityListProvider->expects($this->exactly(2))
-            ->method('getTargetEntities')
-            ->will($this->returnValue([$this->owners[2]]));
-
-
-        $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
-        $this->assertCount(0, $this->manager->getQueue());
-    }
-
-    public function testHandlePostFlushWithOutContexts()
-    {
-        $email = $this->getEmailEntity();
-        $email->setThread(1);
-        $email->method('getId')
-            ->will($this->returnValue(1));
-
-        $email2 = $this->getEmailEntity();
-        $email2->method('getId')
-            ->will($this->returnValue(2));
-
-        $this->handlePostFlushPrepareData($email, $email2);
-
-        $this->emailActivityListProvider->expects($this->exactly(3))
-            ->method('getTargetEntities')
-            ->will($this->returnValue([]));
-
-        $this->emailThreadProvider->expects($this->exactly(1))
-            ->method('getEmailReferences')
-            ->will($this->returnValue([$email2]));
-
-        $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
-    }
-
-    protected function handlePostFlushPrepareData($email, $email2)
-    {
-        $this->manager->addEmailToQueue($email);
-
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->setMethods(['findByThread'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository->expects($this->exactly(2))
-            ->method('findByThread')
-            ->withAnyParameters()
-            ->will($this->returnValue([$email2]));
-
-        $this->entityManager->expects($this->exactly(2))
-            ->method('getRepository')
-            ->with(Email::ENTITY_CLASS)
-            ->will($this->returnValue($repository));
-
-        $this->emailThreadProvider->expects($this->never())
-            ->method('getThreadEmails')
-            ->will($this->returnValue([$email]));
     }
 
     public function testHandleOnFlushWithoutNewEmails()
@@ -213,12 +182,20 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param integer $id
+     * @param integer $thread
+
      * @return Email|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getEmailEntity()
+    protected function getEmailEntity($id = null, $thread = null)
     {
         /** @var Email $email */
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email', ['addActivityTarget','getId']);
+
+        $email->method('getId')
+            ->will($this->returnValue($id));
+
+        $email->setThread($thread);
 
         $this->addEmailSender($email, $this->owners[0]);
 
@@ -257,5 +234,143 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $recipient->setEmailAddress($emailAddr);
 
         $email->addRecipient($recipient);
+    }
+
+    public function dataHandlePostFlushProvider()
+    {
+        return [
+            'empty Queue' => $this->config1(),
+            'with Queue without Thread' =>$this->config2(),
+            'with Queue with Thread with getTargetEntities'=> $this->config3(),
+            'with Queue with Thread without getTargetEntities'=> $this->config4()
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function config1()
+    {
+        return [
+            'email' => $this->getEmailEntity(1),
+            'email2' => $this->getEmailEntity(2),
+            'params' => [
+                'createQueue' => 0
+            ],
+            'methods' => [
+                'em.flush' => [
+                    'amountCall' => 0
+                ],
+                'repository,findByThread' => [
+                    'amountCall' => 0
+                ],
+                'entityManager.getRepository' => [
+                    'amountCall' => 0
+                ],
+                'getEmailReferences' => [
+                    'amountCall' => 0
+                ],
+                'getTargetEntities'=>[
+                    'amountCall' => 0,
+                    'return' => []
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function config3()
+    {
+        return [
+            'email' => $this->getEmailEntity(1, 1),
+            'email2' => $this->getEmailEntity(2, 1),
+            'params' => [
+                'createQueue' => 1
+            ],
+            'methods' => [
+                'em.flush' => [
+                    'amountCall' => 1
+                ],
+                'repository,findByThread' => [
+                    'amountCall' => 2
+                ],
+                'entityManager.getRepository' => [
+                    'amountCall' => 2
+                ],
+                'getTargetEntities' => [
+                    'amountCall' => 3,
+                    'return' => [$this->owners[2]]
+                ],
+                'getEmailReferences' => [
+                    'amountCall' => 0
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function config2()
+    {
+        return [
+            'email' => $this->getEmailEntity(1),
+            'email2' => $this->getEmailEntity(2),
+            'params' => [
+                'createQueue' => 1
+            ],
+            'methods' => [
+                'em.flush' => [
+                    'amountCall' => 1
+                ],
+                'repository,findByThread' => [
+                    'amountCall' => 0
+                ],
+                'entityManager.getRepository' =>[
+                    'amountCall' => 0
+                ],
+                'getTargetEntities'=>[
+                    'amountCall' => 1,
+                    'return' => []
+                ],
+                'getEmailReferences' => [
+                    'amountCall' => 0
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function config4()
+    {
+        return [
+            'email' => $this->getEmailEntity(1, 1),
+            'email2' => $this->getEmailEntity(2, 1),
+            'params' => [
+                'createQueue' => 1
+            ],
+            'methods' => [
+                'em.flush' => [
+                    'amountCall' => 1
+                ],
+                'repository,findByThread' => [
+                    'amountCall' => 2
+                ],
+                'entityManager.getRepository' => [
+                    'amountCall' => 2
+                ],
+                'getTargetEntities' => [
+                    'amountCall' => 4,
+                    'return' => []
+                ],
+                'getEmailReferences' => [
+                    'amountCall' => 1
+                ]
+            ]
+        ];
     }
 }
