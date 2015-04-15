@@ -7,9 +7,6 @@ oro_datagrid:
 
 oro:
     datagrid:
-        dashboard:
-            fields:
-                grid_view.label: Grid view
         gridview:
             entity_label: Grid view
             entity_plural_label: Grid views
@@ -22,6 +19,7 @@ oro:
             sorters_data.label: Sorters
             type.label: Type
             shared_by: %name% (Shared by %owner%)
+            all: All
     grid:
         mass_action:
             label: Mass Actions

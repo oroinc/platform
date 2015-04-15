@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\EventListener;
+namespace Oro\Bundle\DashboardBundle\EventListener;
 
 use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
@@ -31,11 +31,11 @@ class WidgetConfigurationLoadListener
     public function onWidgetConfigurationLoad(WidgetConfigurationLoadEvent $event)
     {
         $configuration = $event->getConfiguration();
-        if (
-            !isset($configuration['route']) ||
-            !isset($configuration['route_parameters']) ||
-            !isset($configuration['route_parameters']['gridName']) ||
-            $configuration['route'] !== 'oro_datagrid_dashboard_grid'
+        if (!isset(
+                $configuration['route'],
+                $configuration['route_parameters'],
+                $configuration['route_parameters']['gridName'])
+                || $configuration['route'] !== 'oro_dashboard_grid'
         ) {
             return;
         }
@@ -60,7 +60,7 @@ class WidgetConfigurationLoadListener
                 'gridView' => [
                     'type' => 'choice',
                     'options' => [
-                        'label' => 'oro.datagrid.dashboard.fields.grid_view.label',
+                        'label' => 'oro.dashboard.grid.fields.grid_view.label',
                         'choices' => $viewChoices,
                     ],
                     'show_on_widget' => false,

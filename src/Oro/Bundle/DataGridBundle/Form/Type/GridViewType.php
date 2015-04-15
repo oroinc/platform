@@ -40,8 +40,7 @@ class GridViewType extends AbstractType
                         -1 => -1
                     ],
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**

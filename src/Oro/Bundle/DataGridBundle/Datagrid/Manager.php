@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
@@ -28,9 +26,6 @@ class Manager implements ManagerInterface
 
     /** @var NameStrategyInterface */
     protected $nameStrategy;
-
-    /** @var Request */
-    protected $request;
 
     /**
      * Constructor
@@ -81,17 +76,7 @@ class Manager implements ManagerInterface
      */
     public function getDatagridUniqueName($name)
     {
-        $uniqueName = $name;
-        if ($this->request && $widgetId = $this->request->get('_widgetId')) {
-            $uniqueName = sprintf('%s_w%s', $uniqueName, $widgetId);
-        } elseif ($this->request && $this->request->query->count() === 1) {
-            $paramName = array_keys($this->request->query->all())[0];
-            if (strpos($paramName, $name) === 0) {
-                $uniqueName = $paramName;
-            }
-        }
-
-        return $uniqueName;
+        return $this->nameStrategy->getGridUniqueName($name);
     }
 
     /**
@@ -130,13 +115,5 @@ class Manager implements ManagerInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
     }
 }

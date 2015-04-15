@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class SortingType extends AbstractType
+class GridSortingType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -14,8 +14,7 @@ class SortingType extends AbstractType
     {
         $builder
             ->add('field', 'text')
-            ->add('direction', 'oro_sorting_choice')
-        ;
+            ->add('direction', 'oro_sorting_choice');
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -24,14 +25,21 @@ class GridViewsExtension extends AbstractExtension
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param SecurityFacade $securityFacade
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        SecurityFacade $securityFacade,
+        TranslatorInterface $translator
+    ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->securityFacade = $securityFacade;
+        $this->translator = $translator;
     }
 
     /**
@@ -57,7 +65,7 @@ class GridViewsExtension extends AbstractExtension
         $gridViews = [
             'choices' => [
                 [
-                    'label' => 'All',
+                    'label' => $this->translator->trans('oro.datagrid.gridview.all'),
                     'value' => '__all__',
                 ],
             ],

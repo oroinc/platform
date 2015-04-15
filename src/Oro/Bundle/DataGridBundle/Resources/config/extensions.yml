@@ -68,6 +68,7 @@ services:
         arguments:
             - @event_dispatcher
             - @oro_security.security_facade
+            - @translator
         tags:
             - { name: oro_datagrid.extension }
 
