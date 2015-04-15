@@ -123,7 +123,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getThreadEmails')
             ->will($this->returnValue([$email]));
 
-        $this->emailActivityListProvider->expects($this->once())
+        $this->emailActivityListProvider->expects($this->exactly(2))
             ->method('getTargetEntities')
             ->will($this->returnValue([]));
 

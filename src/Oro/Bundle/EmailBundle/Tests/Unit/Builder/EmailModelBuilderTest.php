@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -62,6 +63,11 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected $fromEmailAddress;
 
+    /**
+     * @var Factory|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $factory;
+
     protected function setUp()
     {
         $this->request = new Request();
@@ -103,13 +109,16 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getActivityTargetEntities')
             ->willReturn([]);
 
+        $this->factory = new Factory();
+
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
             $this->request,
             $this->entityManager,
             $this->configManager,
             $this->activityListProvider,
-            $this->emailAttachmentProvider
+            $this->emailAttachmentProvider,
+            $this->factory
         );
     }
 
@@ -142,9 +151,6 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
         $helperBuildFullEmailAddress
     ) {
         $emailModel = new EmailModel();
-        if ($parentEmail) {
-            $emailModel->setParentEmail($parentEmail);
-        }
 
         $this->request = new Request();
         $this->request->setMethod('GET');
@@ -168,7 +174,8 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             $this->entityManager,
             $this->configManager,
             $this->activityListProvider,
-            $this->emailAttachmentProvider
+            $this->emailAttachmentProvider,
+            $this->factory
         );
 
         $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
