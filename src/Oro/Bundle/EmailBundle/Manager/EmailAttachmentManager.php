@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -41,25 +42,31 @@ class EmailAttachmentManager
     /** @var ServiceLink */
     protected $securityFacadeLink;
 
+    /** @var AttachmentConfig */
+    protected $attachmentConfig;
+
     /**
      * @param FileSystemMap             $filesystemMap
      * @param EntityManager             $em
      * @param KernelInterface           $kernel
      * @param ServiceLink               $securityFacadeLink
      * @param ConfigFileValidator       $configFileValidator
+     * @param AttachmentConfig       $attachmentConfig
      */
     public function __construct(
         FilesystemMap $filesystemMap,
         EntityManager $em,
         KernelInterface $kernel,
         ServiceLink $securityFacadeLink,
-        ConfigFileValidator $configFileValidator
+        ConfigFileValidator $configFileValidator,
+        AttachmentConfig $attachmentConfig
     ) {
-        $this->filesystem           = $filesystemMap->get('attachments');
-        $this->em                   = $em;
-        $this->attachmentDir        = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
-        $this->securityFacadeLink   = $securityFacadeLink;
-        $this->configFileValidator  = $configFileValidator;
+        $this->filesystem = $filesystemMap->get('attachments');
+        $this->em = $em;
+        $this->attachmentDir = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
+        $this->securityFacadeLink = $securityFacadeLink;
+        $this->configFileValidator = $configFileValidator;
+        $this->attachmentConfig = $attachmentConfig;
     }
 
     /**
@@ -115,7 +122,7 @@ class EmailAttachmentManager
     public function isAttached($attachment, $target)
     {
         $targetEntityClass = ClassUtils::getClass($target);
-        if ($this->buildAttachmentInstance()->supportTarget($targetEntityClass)) {
+        if ($this->attachmentConfig->isAttachmentAssociationEnabled($target)) {
             $attached = $this->em->getRepository('OroAttachmentBundle:Attachment')->findOneBy(
                 [
                     ExtendHelper::buildAssociationName($targetEntityClass) => $target,
