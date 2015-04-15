@@ -30,9 +30,10 @@ define(function (require) {
             }
         },
 
-        insertView: function(item) {
-            this.list = this.resolveListSelector(item);
+        insertView: function(model, view, position) {
+            this.list = this.resolveListSelector(model);
             this.$list = $(this.list);
+            arguments[2] = this.$list.get(0).children.length; // init position for each block separately
             EmailAttachmentSelectView.__super__.insertView.apply(this, arguments);
         },
 
