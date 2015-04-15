@@ -4,7 +4,7 @@ oro_datagrid_gridview_view:
     permission: VIEW
     group_name: ""
 
-oro_datagrid_gridview_create_public:
+oro_datagrid_gridview_publish:
     label: oro.grid.action.gridview_create_public
     type: action
     group_name: ""

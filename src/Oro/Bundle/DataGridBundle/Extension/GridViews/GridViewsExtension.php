@@ -101,7 +101,7 @@ class GridViewsExtension extends AbstractExtension
             'CREATE' => $this->securityFacade->isGranted('oro_datagrid_gridview_create'),
             'EDIT' => $this->securityFacade->isGranted('oro_datagrid_gridview_update'),
             'DELETE' => $this->securityFacade->isGranted('oro_datagrid_gridview_delete'),
-            'SHARE' => $this->securityFacade->isGranted('oro_datagrid_gridview_create_public'),
+            'SHARE' => $this->securityFacade->isGranted('oro_datagrid_gridview_publish'),
             'EDIT_SHARED' => $this->securityFacade->isGranted('oro_datagrid_gridview_edit_public'),
         ];
     }
