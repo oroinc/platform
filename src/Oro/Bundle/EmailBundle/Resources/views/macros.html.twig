@@ -541,7 +541,7 @@
             "targetClassName": itemClassName ,
             'title': item|oro_format_name|default(item.email)|default(item.id),
             'icon': oro_entity_config_value(itemClassName, 'icon' ),
-            'link': path(oro_entity_route(itemClassName), {id:item.id} ),
+            'link': oro_entity_metadata_value(itemClassName, 'routeView') ? path(oro_entity_route(itemClassName), {id:item.id} ) : false
         } %}
         {% if not ((app.user.id == item.id) and (oro_class_name(app.user) == itemClassName)) %}
             {% set itemsArray = itemsArray|merge([itemArray]) %}

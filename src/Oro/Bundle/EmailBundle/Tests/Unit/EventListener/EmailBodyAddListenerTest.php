@@ -61,6 +61,9 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->securityFacade->expects($this->once())
+            ->method('getToken')
+            ->willReturn(1);
+        $this->securityFacade->expects($this->once())
             ->method('isGranted')
             ->willReturn(false);
         $this->activityListProvider->expects($this->never())
@@ -86,6 +89,9 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
         $configInterface = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
             ->disableOriginalConstructor()->getMock();
 
+        $this->securityFacade->expects($this->once())
+            ->method('getToken')
+            ->willReturn(1);
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
             ->willReturn(true);

@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
@@ -34,21 +35,29 @@ class EmailAttachmentProvider
     protected $dateTimeFormatter;
 
     /**
+     * @var Factory
+     */
+    protected $factory;
+
+    /**
      * @param EmailThreadProvider $emailThreadProvider
      * @param EntityManager       $entityManager
      * @param AttachmentProvider  $attachmentProvider
      * @param DateTimeFormatter   $dateTimeFormatter
+     * @param Factory             $factory
      */
     public function __construct(
         EmailThreadProvider $emailThreadProvider,
         EntityManager $entityManager,
         AttachmentProvider $attachmentProvider,
-        DateTimeFormatter $dateTimeFormatter
+        DateTimeFormatter $dateTimeFormatter,
+        Factory $factory
     ) {
         $this->emailThreadProvider = $emailThreadProvider;
         $this->em                  = $entityManager;
         $this->attachmentProvider  = $attachmentProvider;
         $this->dateTimeFormatter   = $dateTimeFormatter;
+        $this->factory             = $factory;
     }
 
     /**
@@ -86,7 +95,7 @@ class EmailAttachmentProvider
         $oroAttachments = $this->attachmentProvider->getEntityAttachments($entity);
 
         foreach ($oroAttachments as $oroAttachment) {
-            $attachmentModel = new AttachmentModel();
+            $attachmentModel = $this->factory->getEmailAttachment();
             $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
             $attachmentModel->setId($oroAttachment->getId());
             $attachmentModel->setFileName($oroAttachment->getFile()->getOriginalFilename());
@@ -108,7 +117,7 @@ class EmailAttachmentProvider
      */
     protected function emailAttachmentToAttachmentModel(EmailAttachment $emailAttachment)
     {
-        $attachmentModel = new AttachmentModel();
+        $attachmentModel = $this->factory->getEmailAttachment();
         $attachmentModel->setEmailAttachment($emailAttachment);
         $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
         $attachmentModel->setId($emailAttachment->getId());
