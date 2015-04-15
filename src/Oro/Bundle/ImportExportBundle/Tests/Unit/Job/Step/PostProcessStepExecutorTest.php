@@ -143,7 +143,7 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
                 ['some-key' => ['value', 'value1'], 'another-key' => ['next-value']],
                 ['jobType', 'jobName'],
                 true,
-                3,
+                1,
                 ['another-key']
             ],
             'defined key with post process job but its failed' => [

@@ -13,6 +13,7 @@ use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class PostProcessStepExecutor extends StepExecutor implements StepExecutionAwareInterface
 {
@@ -212,6 +213,9 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
         foreach ($this->contextSharedKeys as $key) {
             $configuration[JobExecutor::JOB_CONTEXT_DATA_KEY][$key] = $jobContext->get($key);
         }
+
+        // avoid detached entities after post process jobs, clear will be executed each write after post process jobs
+        $configuration[EntityWriter::SKIP_CLEAR] = true;
 
         return $configuration;
     }
