@@ -27,6 +27,7 @@ class GridViewType extends AbstractType
             ])
             ->add('filters', null, [
                 'property_path' => 'filtersData',
+                'empty_data' => [],
             ])
             ->add('sorters', 'collection', [
                 'property_path' => 'sorters_data',

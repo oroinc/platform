@@ -16,6 +16,7 @@ oro:
             id.label: Id
             name.label: Name
             owner.label: Owner
+            organization.label: Organization
             sorters_data.label: Sorters
             type.label: Type
             shared_by: %name% (Shared by %owner%)
