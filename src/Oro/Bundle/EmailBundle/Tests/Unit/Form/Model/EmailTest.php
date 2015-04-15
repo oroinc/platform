@@ -29,7 +29,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['gridName', 'testGridName'],
             ['entityClass', 'testEntityClass'],
             ['entityId', 123],
-            ['parentEmailId', 321],
             ['from', 'test@example.com'],
             ['to', ['testGridNameTo']],
             ['cc', ['testGridNameCc']],
@@ -38,6 +37,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['body', 'testBody'],
             ['gridName', 'testGridName'],
             ['template', new EmailTemplate('test')],
+            ['contexts', [new \stdClass()]]
         ];
     }
 

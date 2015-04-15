@@ -4,6 +4,7 @@ define(function (require) {
 
     var BaseComponent = require('oroui/js/app/components/base/component'),
         $ = require('jquery'),
+        EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view'),
         EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection'),
         EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
 
@@ -14,6 +15,9 @@ define(function (require) {
         collection: null,
         collectionView: null,
 
+        popupView: null,
+        popupCollection: null,
+
         initialize: function(options) {
             this.collection = new EmailAttachmentCollection();
             this.collectionView = new EmailAttachmentCollectionView({
@@ -23,21 +27,62 @@ define(function (require) {
                 inputName: options.inputName
             });
 
-            if (options.dialogButton) {
-                this.initDialogButton(options.dialogButton);
+            if (options.popupTriggerButton && options.popupContentEl) {
+                this.initPopup(options);
             }
 
-            var models = options.items == 'undefined' ? [] : options.items;
+            var models = options.entityAttachments == 'undefined' ? [] : options.entityAttachments;
             this.collection.add(models);
         },
 
-        initDialogButton: function(dialogButton) {
+        initPopup: function(options) {
             var self = this;
 
-            var $dialogButton = $('#' + dialogButton);
-            $dialogButton.click(function() {
+            var $popupSelectButton = $(options.popupTriggerButton);
+            $popupSelectButton.click(function() {
+                var popupView = self.getPopupView(options);
+                if (popupView.isShowed) {
+                    popupView.hide();
+                } else {
+                    popupView.show();
+                }
+            });
+
+            var $uploadNewButton = $(options.uploadNewButton);
+            $uploadNewButton.click(function() {
                 self.collection.add({});
             });
+        },
+
+        getPopupView: function(options) {
+            if (!this.popupView) {
+                this.popupCollection = new EmailAttachmentCollection();
+
+                this.popupView = new EmailAttachmentSelectView({
+                    popupTriggerButton: options.popupTriggerButton,
+                    el: options.popupContentEl,
+                    collection: this.popupCollection
+                });
+
+                var models = typeof options.attachmentsAvailable == 'undefined' ? [] : options.attachmentsAvailable;
+                this.popupCollection.add(models);
+                this.popupView.showHideFilter();
+                this.popupView.showHideGroups();
+
+                var self = this;
+                this.popupCollection.on('attach', function() {
+                    self.popupCollection.each(function(model) {
+                        if (model.get('checked')) {
+                            var newModel = model.clone();
+                            self.collection.add(newModel);
+                        }
+                    });
+
+                    self.popupView.hide();
+                });
+            }
+
+            return this.popupView;
         }
     });
 });
