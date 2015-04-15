@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
@@ -22,16 +23,25 @@ class GridViewsLoadListener
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param Registry $registry
      * @param SecurityFacade $securityFacade
      * @param AclHelper $aclHelper
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Registry $registry, SecurityFacade $securityFacade, AclHelper $aclHelper)
-    {
+    public function __construct(
+        Registry $registry,
+        SecurityFacade $securityFacade,
+        AclHelper $aclHelper,
+        TranslatorInterface $translator
+    ) {
         $this->registry = $registry;
         $this->securityFacade = $securityFacade;
         $this->aclHelper = $aclHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -67,7 +77,7 @@ class GridViewsLoadListener
 
             $views[] = $view->getMetadata();
             $choices[] = [
-                'label' => $gridView->getName(),
+                'label' => $this->createGridViewLabel($currentUser, $gridView),
                 'value' => $gridView->getId(),
             ];
         }
@@ -77,6 +87,27 @@ class GridViewsLoadListener
         $newGridViews['views'] = array_merge($newGridViews['views'], $views);
 
         $event->setGridViews($newGridViews);
+    }
+
+    /**
+     * @param User $currentUser
+     * @param GridView $gridView
+     *
+     * @return string
+     */
+    protected function createGridViewLabel(User $currentUser, GridView $gridView)
+    {
+        if ($gridView->getOwner() === $currentUser) {
+            return $gridView->getName();
+        }
+
+        return $this->translator->trans(
+            'oro.datagrid.gridview.shared_by',
+            [
+                '%name%'  =>  $gridView->getName(),
+                '%owner%' => $gridView->getOwner()->getUsername(),
+            ]
+        );
     }
 
     /**

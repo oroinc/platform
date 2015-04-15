@@ -21,6 +21,7 @@ oro:
             owner.label: Owner
             sorters_data.label: Sorters
             type.label: Type
+            shared_by: %name% (Shared by %owner%)
     grid:
         mass_action:
             label: Mass Actions

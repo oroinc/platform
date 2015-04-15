@@ -126,6 +126,7 @@ services:
             - @doctrine
             - @oro_security.security_facade
             - @oro_security.acl_helper
+            - @translator
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }
 
