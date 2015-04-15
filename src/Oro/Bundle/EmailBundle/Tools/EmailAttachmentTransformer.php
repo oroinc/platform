@@ -98,6 +98,7 @@ class EmailAttachmentTransformer
 
         $emailAttachmentEntity->setContent($emailAttachmentContent);
         $emailAttachmentEntity->setContentType($attachmentOro->getFile()->getMimeType());
+        $emailAttachmentEntity->setFile($attachmentOro->getFile());
         $emailAttachmentEntity->setFileName(
             $attachmentOro->getFile()->getOriginalFilename()
         );

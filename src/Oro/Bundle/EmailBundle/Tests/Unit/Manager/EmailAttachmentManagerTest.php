@@ -204,11 +204,11 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getFilename'])
             ->getMock();
         $countable = $this->getMockBuilder('Countable')->getMock();
-        $countable->expects($this->once())
+        $countable->expects($this->never())
             ->method('count')
             ->will($this->returnValue(2));
 
-        $this->configFileValidator->expects($this->exactly(1))
+        $this->configFileValidator->expects($this->never())
             ->method('validate')
             ->will($this->returnValue($countable));
 

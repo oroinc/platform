@@ -45,7 +45,7 @@ class EmailAttachmentProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->attachmentProvider = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider')
-            ->setConstructorArgs([$this->em])
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->emailAttachmentTransformer = $this

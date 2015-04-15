@@ -140,7 +140,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
             ->method('getMimeType')
             ->willReturn('text/plain');
 
-        $attachmentOro->expects($this->exactly(4))
+        $attachmentOro->expects($this->exactly(5))
             ->method('getFile')
             ->willReturn($file);
 
