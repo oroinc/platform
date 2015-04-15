@@ -188,7 +188,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->emailThreadProvider->expects($this->never())
             ->method('getThreadEmails')
-            ->will($this->returnValue([$email2]));
+            ->will($this->returnValue([$email]));
     }
 
     public function testHandleOnFlushWithoutNewEmails()
@@ -226,6 +226,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $this->addEmailRecipient($email, $this->owners[2]);
         $this->addEmailRecipient($email, $this->owners[3]);
         $this->addEmailRecipient($email, $this->owners[0]);
+        $this->addEmailRecipient($email, $this->owners[1]);
         $this->addEmailRecipient($email, null);
 
         return $email;

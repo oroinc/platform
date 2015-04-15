@@ -214,4 +214,16 @@ class StepExecutionProxyContext implements ContextInterface
         }
         return $default;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeOption($name)
+    {
+        if ($this->hasOption($name)) {
+            $configuration = $this->getConfiguration();
+            unset($configuration[$name]);
+            $this->stepExecution->getJobExecution()->getJobInstance()->setRawConfiguration($configuration);
+        }
+    }
 }
