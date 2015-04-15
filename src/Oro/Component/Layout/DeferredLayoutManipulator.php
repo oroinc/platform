@@ -33,14 +33,20 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** The action name for add/update an option for the layout item */
     const SET_OPTION = 6;
 
+    /** The action name for add/update an option for the layout item */
+    const APPEND_OPTION = 7;
+
+    /** The action name for add/update an option for the layout item */
+    const SUBTRACT_OPTION = 8;
+
     /** The action name for remove an option for the layout item */
-    const REMOVE_OPTION = 7;
+    const REMOVE_OPTION = 9;
 
     /** The action name for change the block type for the layout item */
-    const CHANGE_BLOCK_TYPE = 8;
+    const CHANGE_BLOCK_TYPE = 10;
 
     /** The action name for add the theme(s) to be used for rendering the layout item and its children */
-    const SET_BLOCK_THEME = 9;
+    const SET_BLOCK_THEME = 11;
 
     /** @var LayoutRegistryInterface */
     protected $registry;
@@ -152,6 +158,26 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function setOption($id, $optionName, $optionValue)
     {
         $this->actions[self::GROUP_ADD][] = [self::SET_OPTION, __FUNCTION__, [$id, $optionName, $optionValue]];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function appendOption($id, $optionName, $optionValue)
+    {
+        $this->actions[self::GROUP_ADD][] = [self::APPEND_OPTION, __FUNCTION__, [$id, $optionName, $optionValue]];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function subtractOption($id, $optionName, $optionValue)
+    {
+        $this->actions[self::GROUP_ADD][] = [self::SUBTRACT_OPTION, __FUNCTION__, [$id, $optionName, $optionValue]];
 
         return $this;
     }

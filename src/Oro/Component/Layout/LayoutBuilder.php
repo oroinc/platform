@@ -109,6 +109,26 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function appendOption($id, $optionName, $optionValue)
+    {
+        $this->layoutManipulator->appendOption($id, $optionName, $optionValue);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function subtractOption($id, $optionName, $optionValue)
+    {
+        $this->layoutManipulator->subtractOption($id, $optionName, $optionValue);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function removeOption($id, $optionName)
     {
         $this->layoutManipulator->removeOption($id, $optionName);

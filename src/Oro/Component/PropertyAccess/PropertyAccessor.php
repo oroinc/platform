@@ -112,6 +112,86 @@ class PropertyAccessor
     }
 
     /**
+     * Sets the value at the end of the property path of the object.
+     *
+     * Example:
+     *
+     * <code>
+     *     use Oro\Component\PropertyAccess;
+     *
+     *     $propertyAccessor = new PropertyAccessor();
+     *
+     *     echo $propertyAccessor->setValue($object, 'child.name', 'John');
+     *     // equals echo $object->getChild()->setName('John');
+     * </code>
+     *
+     * This method first tries to find a public setter for each property in the
+     * path. The name of the setter must be the camel-cased property name
+     * prefixed with "set".
+     *
+     * If the setter does not exist, this method tries to find a public
+     * property. The value of the property is then changed.
+     *
+     * If neither is found, an exception is thrown.
+     *
+     * @param object|array                 $object   The object or array to modify
+     * @param string|PropertyPathInterface $property The property path to modify
+     *
+     * @throws Exception\InvalidArgumentException If an object or a property path has invalid type.
+     * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
+     */
+    public function removeValue(&$object, $property)
+    {
+        if (is_string($property)) {
+            $property = new PropertyPath($property);
+        } elseif (!$property instanceof PropertyPathInterface) {
+            throw new Exception\InvalidArgumentException(
+                sprintf(
+                    'The property path must be a string or an instance of ' .
+                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    'Got: "%s".',
+                    is_object($property) ? get_class($property) : gettype($property)
+                )
+            );
+        }
+
+        $path      = $property->getElements();
+        $values    = &$this->readPropertiesUntil($object, $property, count($path) - 1);
+        $overwrite = true;
+
+        // Add the root object to the list
+        array_unshift(
+            $values,
+            [self::VALUE => &$object, self::IS_REF => true]
+        );
+
+        for ($i = count($values) - 1; $i >= 0; --$i) {
+            $object = &$values[$i][self::VALUE];
+
+            if ($overwrite) {
+                if (!is_object($object) && !is_array($object)) {
+                    throw new Exception\NoSuchPropertyException(
+                        sprintf(
+                            'PropertyAccessor requires a graph of objects or arrays to operate on, ' .
+                            'but it found type "%s" while trying to traverse path "%s" at property "%s".',
+                            gettype($object),
+                            (string)$property,
+                            $path[$i]
+                        )
+                    );
+                }
+
+                $property = $path[$i];
+
+                $this->writeValue($object, $property, $value);
+            }
+
+            $value     = &$object;
+            $overwrite = !$values[$i][self::IS_REF];
+        }
+    }
+
+    /**
      * Returns the value at the end of the property path of the object.
      *
      * Example:
