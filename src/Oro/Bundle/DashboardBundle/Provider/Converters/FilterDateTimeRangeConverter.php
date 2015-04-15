@@ -78,7 +78,6 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
                     $this->translator->trans('oro.filter.form.label_date_type_less_than'),
                     $this->formatter->formatDate($value['end'])
                 );
-
         }
 
         return sprintf(
