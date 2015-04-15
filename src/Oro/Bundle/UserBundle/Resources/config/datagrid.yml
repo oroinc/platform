@@ -574,6 +574,9 @@ datagrid:
                     - u.enabled
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
+                where:
+                    and:
+                        - u.id != @oro_security.security_facade->getLoggedUserId
         columns:
             id:
                 label:         oro.user.id.label
