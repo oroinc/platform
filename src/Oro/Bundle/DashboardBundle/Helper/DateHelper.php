@@ -58,7 +58,7 @@ class DateHelper
      *
      * @return array
      */
-    public function convertToPreviousPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
+    public function combinePreviousDataWithCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
     {
         $items = $this->getDatePeriod($from, $to);
         foreach ($data as $row) {
@@ -74,9 +74,9 @@ class DateHelper
         $currentItems = $this->getDatePeriod($currentFrom, $currentTo);
 
         $mixedItems = array_combine(array_keys($currentItems), array_values($items));
-        foreach ($mixedItems as $k => $v) {
-            $v['date'] = $currentItems[$k]['date'];
-            $currentItems[$k] = $v;
+        foreach ($mixedItems as $currentDate => $previousData) {
+            $previousData['date'] = $currentItems[$currentDate]['date'];
+            $currentItems[$currentDate] = $previousData;
         }
 
         return array_combine(range(0, count($currentItems) - 1), array_values($currentItems));

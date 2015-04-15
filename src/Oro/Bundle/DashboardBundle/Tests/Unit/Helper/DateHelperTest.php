@@ -261,7 +261,7 @@ class DateHelperTest extends OrmTestCase
         $this->assertEquals($expectedData, $actualData);
     }
 
-    public function testConvertToPreviousPeriod()
+    public function testCombinePreviousDataWithCurrentPeriod()
     {
         $previousFrom = new DateTime('2015-05-05');
         $previousTo = new DateTime('2015-05-10');
@@ -282,7 +282,7 @@ class DateHelperTest extends OrmTestCase
             ['date' => '2015-05-14'],
         ];
 
-        $actualData = $this->helper->convertToPreviousPeriod(
+        $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
             $previousFrom,
             $previousTo,
             $data,
