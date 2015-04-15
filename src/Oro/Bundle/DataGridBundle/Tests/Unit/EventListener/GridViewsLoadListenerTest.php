@@ -12,8 +12,8 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $gridViewRepository;
 
-    private $om;
-    private $securityContext;
+    private $registry;
+    private $securityFacade;
 
     private $gridViewsLoadListener;
 
@@ -23,17 +23,33 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-
-        $this->gridViewsLoadListener = new GridViewsLoadListener($this->om, $this->securityContext);
-
-        $this->om
+        $this->registry
             ->expects($this->any())
             ->method('getRepository')
             ->with('OroDataGridBundle:GridView')
             ->will($this->returnValue($this->gridViewRepository));
+        $this->securityFacade
+            ->expects($this->any())
+            ->method('isGranted')
+            ->will($this->returnValue(true));
+
+        $this->gridViewsLoadListener = new GridViewsLoadListener(
+            $this->registry,
+            $this->securityFacade,
+            $aclHelper,
+            $translator
+        );
     }
 
     public function testListenerShouldAddViewsIntoEvent()
@@ -56,24 +72,21 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
         ];
         $event = new GridViewsLoadEvent('grid', $originalViews);
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $currentUser = new User();
 
-        $token
+        $this->securityFacade
             ->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue(new User()));
-
-        $this->securityContext
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
+            ->method('getLoggedUser')
+            ->will($this->returnValue($currentUser));
 
         $view1 = new GridView();
         $view1->setId(1);
+        $view1->setOwner($currentUser);
         $view1->setName('view1');
         $view2 = new GridView();
         $view2->setId(2);
         $view2->setName('view2');
+        $view2->setOwner($currentUser);
         $gridViews = [
             $view1,
             $view2,
@@ -107,16 +120,20 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
                     'type' => 'system',
                 ],
                 [
-                    'name' => 1,
+                    'name'    => 1,
                     'filters' => [],
                     'sorters' => [],
-                    'type' => GridView::TYPE_PRIVATE,
+                    'type'    => GridView::TYPE_PRIVATE,
+                    'deletable' => true,
+                    'editable'  => true,
                 ],
                 [
-                    'name' => 2,
+                    'name'    => 2,
                     'filters' => [],
                     'sorters' => [],
-                    'type' => GridView::TYPE_PRIVATE,
+                    'type'    => GridView::TYPE_PRIVATE,
+                    'deletable' => true,
+                    'editable'  => true,
                 ],
             ]
         ];

@@ -51,6 +51,7 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             'permissions' => [
                 'CREATE' => true,
                 'EDIT' => true,
+                'VIEW' => true,
                 'DELETE' => true,
                 'SHARE' => true,
                 'EDIT_SHARED' => true,
