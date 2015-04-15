@@ -102,42 +102,8 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->manager->getQueue());
     }
 
-    public function testHandlePostFlush()
+    public function testHandlePostFlushEmptyThread()
     {
-        $email = $this->getEmailEntity();
-        $email->setThread(1);
-
-        $this->manager->addEmailToQueue($email);
-
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->setMethods(['findByThread'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository
-            ->method('findByThread')
-            ->withAnyParameters()
-            ->will($this->returnValue([$email]));
-
-        $this->entityManager
-            ->method('getRepository')
-            ->with(Email::ENTITY_CLASS)
-            ->will($this->returnValue($repository));
-
-
-        $this->emailThreadProvider->expects($this->never())
-            ->method('getThreadEmails')
-            ->will($this->returnValue([$email]));
-
-        $this->emailActivityListProvider
-            ->method('getTargetEntities')
-            ->will($this->returnValue([$this->owners[2]]));
-
-
-        $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
-    }
-
-    public function testHandlePostFlushEmptyThread() {
         $email = $this->getEmailEntity();
         $this->manager->addEmailToQueue($email);
 
@@ -149,8 +115,80 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getTargetEntities')
             ->will($this->returnValue([]));
 
+        $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
+        $this->assertCount(0, $this->manager->getQueue());
+    }
+
+    public function testHandlePostFlush()
+    {
+        $email = $this->getEmailEntity();
+        $email->setThread(1);
+        $email->expects($this->exactly(1))
+              ->method('getId')
+              ->will($this->returnValue(1));
+
+        $email2 = $this->getEmailEntity();
+        $email2->expects($this->exactly(1))
+            ->method('getId')
+               ->will($this->returnValue(2));
+
+        $this->handlePostFlushPrepareData($email, $email2);
+
+        $this->emailActivityListProvider->expects($this->exactly(2))
+            ->method('getTargetEntities')
+            ->will($this->returnValue([$this->owners[2]]));
+
 
         $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
+        $this->assertCount(0, $this->manager->getQueue());
+    }
+
+    public function testHandlePostFlushWithOutContexts()
+    {
+        $email = $this->getEmailEntity();
+        $email->setThread(1);
+        $email->method('getId')
+            ->will($this->returnValue(1));
+
+        $email2 = $this->getEmailEntity();
+        $email2->method('getId')
+            ->will($this->returnValue(2));
+
+        $this->handlePostFlushPrepareData($email, $email2);
+
+        $this->emailActivityListProvider->expects($this->exactly(3))
+            ->method('getTargetEntities')
+            ->will($this->returnValue([]));
+
+        $this->emailThreadProvider->expects($this->exactly(1))
+            ->method('getEmailReferences')
+            ->will($this->returnValue([$email2]));
+
+        $this->manager->handlePostFlush(new PostFlushEventArgs($this->entityManager));
+    }
+
+    protected function handlePostFlushPrepareData($email, $email2)
+    {
+        $this->manager->addEmailToQueue($email);
+
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->setMethods(['findByThread'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository->expects($this->exactly(2))
+            ->method('findByThread')
+            ->withAnyParameters()
+            ->will($this->returnValue([$email2]));
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getRepository')
+            ->with(Email::ENTITY_CLASS)
+            ->will($this->returnValue($repository));
+
+        $this->emailThreadProvider->expects($this->never())
+            ->method('getThreadEmails')
+            ->will($this->returnValue([$email2]));
     }
 
     public function testHandleOnFlushWithoutNewEmails()
@@ -180,7 +218,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     protected function getEmailEntity()
     {
         /** @var Email $email */
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email', ['addActivityTarget']);
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email', ['addActivityTarget','getId']);
 
         $this->addEmailSender($email, $this->owners[0]);
 
@@ -188,7 +226,6 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $this->addEmailRecipient($email, $this->owners[2]);
         $this->addEmailRecipient($email, $this->owners[3]);
         $this->addEmailRecipient($email, $this->owners[0]);
-        $this->addEmailRecipient($email, $this->owners[1]);
         $this->addEmailRecipient($email, null);
 
         return $email;
