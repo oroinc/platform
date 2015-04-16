@@ -6,13 +6,19 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\EntityManager;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 
+/**
+ * Class EmailActivityManagerTest
+ * @package Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager
+ *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -83,6 +89,10 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     public function testHandleOnFlush()
     {
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+
+        /**
+         * @var $entityManager EntityManager
+         */
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -239,17 +249,17 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     public function dataHandlePostFlushProvider()
     {
         return [
-            'empty Queue' => $this->providerConfig1(),
-            'with Queue without Thread' =>$this->providerConfig2(),
-            'with Queue with Thread with getTargetEntities'=> $this->providerConfig3(),
-            'with Queue with Thread without getTargetEntities'=> $this->providerConfig4()
+            'empty Queue' => $this->getProviderConfigEmptyQueue(),
+            'with Queue without Thread' =>$this->getProviderConfigEmptyThread(),
+            'with Queue with Thread with getTargetEntities'=> $this->getProviderConfigWithTargetEntities(),
+            'with Queue with Thread without getTargetEntities'=> $this->getProviderConfigWithoutTargetEntities()
         ];
     }
 
     /**
      * @return array
      */
-    protected function providerConfig1()
+    protected function getProviderConfigEmptyQueue()
     {
         return [
             'email' => $this->getEmailEntity(1),
@@ -281,7 +291,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    protected function providerConfig3()
+    protected function getProviderConfigWithTargetEntities()
     {
         return [
             'email' => $this->getEmailEntity(1, 1),
@@ -313,7 +323,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    protected function providerConfig2()
+    protected function getProviderConfigEmptyThread()
     {
         return [
             'email' => $this->getEmailEntity(1),
@@ -345,7 +355,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    protected function providerConfig4()
+    protected function getProviderConfigWithoutTargetEntities()
     {
         return [
             'email' => $this->getEmailEntity(1, 1),
