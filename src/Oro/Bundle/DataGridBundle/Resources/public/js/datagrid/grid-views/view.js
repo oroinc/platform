@@ -214,18 +214,18 @@ define([
          */
         onSave: function(e) {
             var model = this._getCurrentViewModel();
+            var self = this;
 
             model.save({
-                label: this._getCurrentViewLabel(),
+                label: model.get('label'),
                 filters: this.collection.state.filters,
                 sorters: this.collection.state.sorters
             }, {
-                wait: true
+                wait: true,
+                success: function() {
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                }
             });
-
-            model.once('sync', function() {
-                this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-            }, this);
         },
 
         /**
@@ -260,13 +260,7 @@ define([
                     },
                     error: function(model, response, options) {
                         modal.open();
-                        if (response.status === 400) {
-                            var jsonResponse = JSON.parse(response.responseText);
-                            var errors = jsonResponse.errors.children.label.errors;
-                            if (errors) {
-                                modal.setNameError(_.first(errors));
-                            }
-                        }
+                        self._showNameError(modal, response);
                     }
                 });
             });
@@ -279,17 +273,17 @@ define([
          */
         onShare: function(e) {
             var model = this._getCurrentViewModel();
+            var self = this;
 
             model.save({
-                label: this._getCurrentViewLabel(),
+                label: model.get('label'),
                 type: 'public'
             }, {
-                wait: true
+                wait: true,
+                success: function() {
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                }
             });
-
-            model.once('sync', function() {
-                this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-            }, this);
         },
 
         /**
@@ -297,17 +291,17 @@ define([
          */
         onUnshare: function(e) {
             var model = this._getCurrentViewModel();
+            var self = this;
 
             model.save({
-                label: this._getCurrentViewLabel(),
+                label: model.get('label'),
                 type: 'private'
             }, {
-                wait: true
+                wait: true,
+                success: function() {
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                }
             });
-
-            model.once('sync', function() {
-                this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-            }, this);
         },
 
         /**
@@ -345,12 +339,15 @@ define([
                 model.save({
                     label: this.$('input[name=name]').val()
                 }, {
-                    wait: true
+                    wait: true,
+                    success: function () {
+                        self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                    },
+                    error: function (model, response, options) {
+                        modal.open();
+                        self._showNameError(modal, response);
+                    }
                 });
-
-                model.once('sync', function() {
-                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-                }, this);
             });
 
             modal.open();
@@ -669,6 +666,19 @@ define([
             }
 
             mediator.execute('showFlashMessage', type, message, opts);
+        },
+
+        /**
+         * @private
+         */
+        _showNameError: function(modal, response) {
+            if (response.status === 400) {
+                var jsonResponse = JSON.parse(response.responseText);
+                var errors = jsonResponse.errors.children.label.errors;
+                if (errors) {
+                    modal.setNameError(_.first(errors));
+                }
+            }
         },
 
         /**
