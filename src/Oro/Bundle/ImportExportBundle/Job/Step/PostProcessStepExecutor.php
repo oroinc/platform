@@ -128,16 +128,17 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
                 }
 
                 if ($this->checkPostProcessingJobsBatch()) {
+                    $this->writeWithoutClear($itemsToWrite, $warningHandler);
                     $this->runPostProcessingJobs();
                 }
             }
 
             if (count($itemsToWrite) > 0) {
                 $this->write($itemsToWrite, $warningHandler);
-            }
 
-            if ($this->checkPostProcessingJobsNotEmpty()) {
-                $this->runPostProcessingJobs();
+                if ($this->checkPostProcessingJobsNotEmpty()) {
+                    $this->runPostProcessingJobs();
+                }
             }
 
             $this->ensureResourcesReleased($warningHandler);
@@ -145,6 +146,22 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
             $this->ensureResourcesReleased($warningHandler);
             throw $error;
         }
+    }
+
+    /**
+     * @param array                                $itemsToWrite
+     * @param StepExecutionWarningHandlerInterface $warningHandler
+     */
+    protected function writeWithoutClear(array $itemsToWrite, $warningHandler)
+    {
+        if (!$itemsToWrite) {
+            return;
+        }
+
+        $clearSkipped = $this->getJobContext()->get(EntityWriter::SKIP_CLEAR);
+        $this->getJobContext()->put(EntityWriter::SKIP_CLEAR, true);
+        $this->write($itemsToWrite, $warningHandler);
+        $this->getJobContext()->put(EntityWriter::SKIP_CLEAR, $clearSkipped);
     }
 
     /**

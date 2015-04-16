@@ -144,7 +144,7 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
                 ['jobType', 'jobName'],
                 true,
                 1,
-                ['another-key']
+                ['another-key', 'writer_skip_clear']
             ],
             'defined key with post process job but its failed' => [
                 ['some-key'],
@@ -152,7 +152,7 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
                 ['jobType', 'jobName'],
                 false,
                 1,
-                ['another-key']
+                ['another-key', 'writer_skip_clear']
             ]
         ];
     }
