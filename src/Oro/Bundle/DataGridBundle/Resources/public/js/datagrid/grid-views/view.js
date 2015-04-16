@@ -93,7 +93,9 @@ define([
 
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
-                this._getView('__all__').label = __('oro.datagrid.gridView.all') + (options.title || '');
+                if (!this._getView('__all__').label) {
+                    this._getView('__all__').label = __('oro.datagrid.gridView.all') + (options.title || '');
+                }
             }
 
             if (options.permissions) {

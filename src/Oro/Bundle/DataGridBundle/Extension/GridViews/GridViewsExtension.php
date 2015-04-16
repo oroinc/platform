@@ -60,12 +60,17 @@ class GridViewsExtension extends AbstractExtension
         $data->offsetAddToArray('initialState', ['gridView' => null]);
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 
+        $allLabel = null;
+        if (isset($config['options']['gridViews']['allLabel'])) {
+            $allLabel = $this->translator->trans($config['options']['gridViews']['allLabel']);
+        }
+
         /** @var AbstractViewsList $list */
         $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
         $gridViews = [
             'choices' => [
                 [
-                    'label' => $this->translator->trans('oro.datagrid.gridview.all'),
+                    'label' => $allLabel,
                     'value' => '__all__',
                 ],
             ],
