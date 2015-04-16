@@ -17,6 +17,12 @@ class DateHelperTest extends OrmTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $settings;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $aclHelper;
+
     public function setUp()
     {
         $this->settings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
@@ -25,7 +31,13 @@ class DateHelperTest extends OrmTestCase
         $this->settings->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-        $this->helper = new DateHelper($this->settings);
+        $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->helper = new DateHelper($this->settings, $this->doctrine, $this->aclHelper);
     }
 
     /**
