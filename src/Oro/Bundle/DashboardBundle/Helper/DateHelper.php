@@ -40,6 +40,10 @@ class DateHelper
      */
     public function convertToCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
     {
+        if (empty($data)) {
+            return [];
+        }
+
         $items = $this->getDatePeriod($from, $to);
         foreach ($data as $row) {
             $key = $this->getKey($from, $to, $row);
@@ -60,6 +64,10 @@ class DateHelper
      */
     public function combinePreviousDataWithCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
     {
+        if (empty($data)) {
+            return [];
+        }
+
         $items = $this->getDatePeriod($from, $to);
         foreach ($data as $row) {
             $key = $this->getKey($from, $to, $row);

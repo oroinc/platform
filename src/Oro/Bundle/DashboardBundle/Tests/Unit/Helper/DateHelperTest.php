@@ -229,6 +229,19 @@ class DateHelperTest extends OrmTestCase
         ];
     }
 
+    public function testConvertToCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    {
+        $result = $this->helper->convertToCurrentPeriod(
+            new DateTime(),
+            new DateTime(),
+            [],
+            'row',
+            'data'
+        );
+
+        $this->assertSame([], $result);
+    }
+
     public function testConvertToCurrentPeriod()
     {
         $from = new DateTime('2015-05-10');
@@ -259,6 +272,19 @@ class DateHelperTest extends OrmTestCase
         $actualData = $this->helper->convertToCurrentPeriod($from, $to, $data, 'cnt', 'count');
 
         $this->assertEquals($expectedData, $actualData);
+    }
+
+    public function testCombinePreviousDataWithCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    {
+        $result = $this->helper->combinePreviousDataWithCurrentPeriod(
+            new DateTime(),
+            new DateTime(),
+            [],
+            'row',
+            'data'
+        );
+
+        $this->assertSame([], $result);
     }
 
     public function testCombinePreviousDataWithCurrentPeriod()
