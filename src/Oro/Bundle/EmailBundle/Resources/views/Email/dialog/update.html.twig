@@ -18,6 +18,7 @@
                     mediator.trigger('widget_success:' + widget.getAlias());
                     mediator.trigger('widget_success:' + widget.getWid());
                     mediator.trigger('datagrid:doRefresh:attachment-grid');
+                    mediator.trigger('widget:doRefresh:email-thread');
                     widget.remove(true);
                 });
             });

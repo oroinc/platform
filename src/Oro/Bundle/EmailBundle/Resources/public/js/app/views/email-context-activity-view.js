@@ -37,6 +37,7 @@ define([
             * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
             */
             mediator.on('widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this );
+            mediator.on('widget:doRefresh:email-thread-context', this.doRefresh, this );
             EmailContextActivityView.__super__.initialize.apply(this, arguments);
         },
 
