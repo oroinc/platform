@@ -144,17 +144,33 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider getFromParentParamProvider
      */
-    public function testGetFromParentScope($full, $expectedResult)
+    public function testGetFromParentScope($parameterName, $full, $expectedResult)
     {
-        $parameterName = 'oro_test.someValue';
-
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
             ->willReturn(null);
 
         $this->globalScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->willReturn(['scope' => 'global', 'value' => 1]);
+            ->willReturnCallback(function($name, $full) {
+                if ($name === 'oro_test.someArrayValue') {
+                    $value = ['foo' => 'bar'];
+                    if ($full) {
+                        $value = [
+                            'scope' => 'global',
+                            'value' => ['foo' => 'bar'],
+                            'use_parent_scope_value' => false
+                        ];
+                    }
+                } else {
+                    $value = 1;
+                    if ($full) {
+                        $value = ['scope' => 'global', 'value' => 1];
+                    }
+                }
+
+                return $value;
+            });
 
         $this->assertEquals(
             $expectedResult,
@@ -166,13 +182,29 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
+                'parameterName' => 'oro_test.someValue',
                 'full' => false,
-                'expectedResult' => ['scope' => 'global', 'value' => 1],
+                'expectedResult' => 1,
             ],
             [
+                'parameterName' => 'oro_test.someValue',
                 'full' => true,
                 'expectedResult' => ['scope' => 'global', 'value' => 1, 'use_parent_scope_value' => true],
             ],
+            [
+                'parameterName' => 'oro_test.someArrayValue',
+                'full' => true,
+                'expectedResult' => [
+                    'scope' => 'global',
+                    'value' => ['foo' => 'bar'],
+                    'use_parent_scope_value' => true
+                ]
+            ],
+            [
+                'parameterName' => 'oro_test.someArrayValue',
+                'full' => false,
+                'expectedResult' => ['foo' => 'bar']
+            ]
         ];
     }
 
