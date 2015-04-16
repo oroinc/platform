@@ -8,14 +8,14 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
             if (typeof options.widget === 'undefined') {
                 throw new Error('Option "widget" was not specified.');
             }
-            var widgetTitle = options.widget.titleContainer.first().textContent;
+
             this.options.el = '#widget-configuration';
-            this.options.title = widgetTitle;
             this.options.url = routing.generate('oro_dashboard_configure', {
                 id: options.widget.state.id
             });
 
             options.dialogOptions = {
+                title: options.widget.options.title + ' ' + __('oro.dashboard.widget_configuration_label'),
                 modal: true,
                 minWidth: 575,
                 resizable: false
