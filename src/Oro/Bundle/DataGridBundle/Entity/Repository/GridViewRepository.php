@@ -33,10 +33,6 @@ class GridViewRepository extends EntityRepository
             ])
             ->orderBy('gv.gridName');
 
-        $aclHelper->apply($qb);
-
-        return $qb
-            ->getQuery()
-            ->getResult();
+        return $aclHelper->apply($qb)->getResult();
     }
 }

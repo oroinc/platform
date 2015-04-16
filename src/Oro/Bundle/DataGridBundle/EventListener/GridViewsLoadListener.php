@@ -56,24 +56,16 @@ class GridViewsLoadListener
         }
 
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
-        $allowedGridViews = array_filter($gridViews, function (GridView $gridView) {
-            return $this->securityFacade->isGranted('VIEW', $gridView);
-        });
-
-        if (!$allowedGridViews) {
+        if (!$gridViews) {
             return;
         }
 
         $choices = [];
         $views = [];
-        foreach ($allowedGridViews as $gridView) {
+        foreach ($gridViews as $gridView) {
             $view = $gridView->createView();
-            if ($this->securityFacade->isGranted('EDIT', $gridView)) {
-                $view->setEditable();
-            }
-            if ($this->securityFacade->isGranted('DELETE', $gridView)) {
-                $view->setDeletable();
-            }
+            $view->setEditable($this->securityFacade->isGranted('EDIT', $gridView));
+            $view->setDeletable($this->securityFacade->isGranted('DELETE', $gridView));
 
             $views[] = $view->getMetadata();
             $choices[] = [
@@ -97,7 +89,7 @@ class GridViewsLoadListener
      */
     protected function createGridViewLabel(User $currentUser, GridView $gridView)
     {
-        if ($gridView->getOwner() === $currentUser) {
+        if ($gridView->getOwner()->getId() === $currentUser->getId()) {
             return $gridView->getName();
         }
 

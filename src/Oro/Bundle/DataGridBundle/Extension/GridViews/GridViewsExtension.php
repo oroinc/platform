@@ -31,6 +31,7 @@ class GridViewsExtension extends AbstractExtension
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,

@@ -104,18 +104,22 @@ class View
 
     /**
      * Sets view as editable
+     *
+     * @param bool $editable
      */
-    public function setEditable()
+    public function setEditable($editable = true)
     {
-        $this->editable = true;
+        $this->editable = $editable;
     }
 
     /**
      * Sets view as deletable
+     *
+     * @param bool $deletable
      */
-    public function setDeletable()
+    public function setDeletable($deletable = true)
     {
-        $this->deletable = true;
+        $this->deletable = $deletable;
     }
 
     /**
