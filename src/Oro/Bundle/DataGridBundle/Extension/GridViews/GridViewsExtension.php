@@ -62,7 +62,10 @@ class GridViewsExtension extends AbstractExtension
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 
         $allLabel = null;
-        if (isset($config['options']['gridViews']['allLabel'])) {
+        if (isset($config['options'])
+                &&isset($config['options']['gridViews'])
+                && isset($config['options']['gridViews']['allLabel'])
+            ) {
             $allLabel = $this->translator->trans($config['options']['gridViews']['allLabel']);
         }
 
