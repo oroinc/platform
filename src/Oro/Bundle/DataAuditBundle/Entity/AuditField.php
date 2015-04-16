@@ -153,7 +153,7 @@ class AuditField
         $this->audit = $audit;
         $this->field = $field;
 
-        $this->dataType = $this->normalizeDataTypeName($dataType);
+        $this->dataType = static::normalizeDataTypeName($dataType);
         if (is_null($this->dataType)) {
             throw new UnsupportedDataTypeException($dataType);
         }
@@ -247,7 +247,7 @@ class AuditField
      *
      * @return string|null
      */
-    private function normalizeDataTypeName($dataType)
+    public static function normalizeDataTypeName($dataType)
     {
         switch ($dataType) {
             case 'boolean':

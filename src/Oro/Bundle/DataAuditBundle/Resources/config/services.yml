@@ -17,7 +17,18 @@ parameters:
 
     oro_dataaudit.audit.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
+    oro_dataaudit.filter.audit.class:               Oro\Bundle\DataAuditBundle\Filter\AuditFilter
+
 services:
+    oro_dataaudit.filter.audit:
+        class: %oro_dataaudit.filter.audit.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+            - @oro_query_designer.query_designer.manager
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: audit }
+
     oro_dataaudit.loggable.loggable_manager:
         class:                                      %oro_dataaudit.loggable.loggable_manager.class%
         arguments:

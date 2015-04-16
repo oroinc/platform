@@ -16,8 +16,8 @@ define([
             changeStateTpl: _.template(
                 '<div>' +
                     '<select>' +
-                        '<option value="1">changed</option>' +
-                        '<option value="2">changed to value</option>' +
+                        '<option <%= (selected === "changed") ? "selected" : "" %> value="changed">changed</option>' +
+                        '<option <%= (selected === "changed_to_value") ? "selected" : "" %> value="changed_to_value">changed to value</option>' +
                     '</select>' +
                     '<span class="active-filter">' +
                     '</span>' +
@@ -26,6 +26,7 @@ define([
         },
 
         _create: function() {
+            var data = this.element.data('value');
             var auditFields = JSON.parse(this.options.auditFields);
             this.options.fieldChoice.dataFilter = function (entity, fields) {
                 return _.filter(fields, function(field) {
@@ -37,6 +38,13 @@ define([
 
             this._superApply(arguments);
 
+            var data = this.element.data('value');
+            if (data && data.columnName) {
+                this.element.one('changed', _.bind(this._renderChangeStateChoice, this, data));
+            } else {
+                this.element.data('value', data);
+            }
+
             this._on(this.$fieldChoice, {
                 changed: function (e, fieldId) {
                     this._renderChangeStateChoice();
@@ -44,30 +52,30 @@ define([
             });
         },
 
-        _renderChangeStateChoice: function () {
+        _renderChangeStateChoice: function (data) {
             if (this.$changeStateChoice) {
                 return;
             }
 
-            this.$changeStateChoice = $(this.options.changeStateTpl());
+            data = data || $.extend(true, {
+                criterion: {
+                    data: {
+                        auditFilter: {
+                            type: 'change'
+                        }
+                    }
+                }
+            }, this.element.data('value'));
+
+            this.$changeStateChoice = $(this.options.changeStateTpl({
+                selected: data.criterion.data.auditFilter.type
+            }));
             this.$fieldChoice.after(this.$changeStateChoice);
             var $select = this.$changeStateChoice.find('select');
             $select.select2({
                 minimumResultsForSearch: -1
             });
 
-            var onChangeCb = {
-                1: this._renderChangedChoice,
-                2: this._renderChangedToValueChoice
-            };
-            onChangeCb[$select.val()].apply(this);
-
-            $select.on('change', _.bind(function (e) {
-                onChangeCb[e.val].apply(this);
-            }, this));
-        },
-
-        _renderChangedChoice: function () {
             var filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
             });
@@ -76,14 +84,117 @@ define([
                 throw new Error('Cannot find filter "datetime"');
             }
 
-            var filter = new (DateTimeFilter.extend(filterOptions))();
+            this.auditFilter = new (DateTimeFilter.extend(filterOptions))();
+            this.auditFilter.value = data.criterion.data.auditFilter.data;
+            this.auditFilter.on('update', _.bind(this._onUpdate, this));
 
-            this.$changeStateChoice.find('.active-filter').html(filter.render().$el);
+            this.$changeStateChoice.find('.active-filter').html(this.auditFilter.render().$el);
+            this._on(this.$changeStateChoice, {
+                change: function () {
+                    this.auditFilter.applyValue();
+                }
+            });
+
+            var onChangeCb = {
+                'changed': this._renderChangedChoice,
+                'changed_to_value': this._renderChangedToValueChoice
+            };
+            onChangeCb[$select.val()].apply(this);
+
+            $select.on('change', _.bind(function (e) {
+                onChangeCb[e.val].apply(this);
+            }, this));
+
+            this.element.data('value', data);
+        },
+
+        _renderChangedChoice: function () {
             this.$filterContainer.hide();
         },
 
         _renderChangedToValueChoice: function () {
             this.$filterContainer.show();
+        },
+
+        _getFilterCriterion: function () {
+            var filter = {
+                filter: this.filter.name,
+                data: this.filter.getValue()
+            };
+
+            if (this.filter.filterParams) {
+                filter.params = this.filter.filterParams;
+            }
+
+            var auditFilter = {};
+            if (this.auditFilter) {
+                auditFilter.data = this.auditFilter.getValue();
+
+                if (this.auditFilter.filterParams) {
+                    auditFilter.params = this.auditFilter.filterParams;
+                }
+            }
+            if (this.$changeStateChoice) {
+                auditFilter.type = this.$changeStateChoice.find('select').val();
+            }
+
+            return {
+                filter: 'audit',
+                data: {
+                    filter: filter,
+                    auditFilter: auditFilter
+                }
+            };
+        },
+
+        _appendFilter: function() {
+            var data = this.element.data('value');
+
+            if (data.criterion.data.filter) {
+                var fieldConditionData = $.extend(true, {
+                    criterion: {
+                        data: {
+                            filter: {
+                                columnName: data.columnName
+                            }
+                        }
+                    }
+                }, data);
+
+                fieldConditionData.columnName = data.columnName;
+                this.element.data('value', {
+                    columnName: data.columnName,
+                    criterion: fieldConditionData.criterion.data.filter
+                });
+            } else {
+                this.element.data('value', {});
+            }
+
+            this._superApply(arguments);
+
+            this.element.data('value', data);
+        },
+
+        _onUpdate: function () {
+            if (!this.auditFilter || !this.auditFilter.value || this.auditFilter.isEmptyValue()) {
+                return this._superApply(arguments);
+            }
+
+            var value = {
+                columnName: this.element.find('input.select').select2('val'),
+                criterion: this._getFilterCriterion()
+            };
+
+            this.element.data('value', value);
+            this.element.trigger('changed');
+        },
+
+        _destroy: function () {
+            this._superApply(arguments);
+            if (this.auditFilter) {
+                this.auditFilter.dispose();
+                delete this.auditFilter;
+            }
         }
     });
 
