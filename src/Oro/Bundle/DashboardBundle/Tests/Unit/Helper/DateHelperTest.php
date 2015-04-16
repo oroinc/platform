@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Helper;
 
+use DateTime;
+
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
@@ -225,5 +227,69 @@ class DateHelperTest extends OrmTestCase
                     . 'GROUP BY dateCreated, hourCreated'
             ]
         ];
+    }
+
+    public function testConvertToCurrentPeriod()
+    {
+        $from = new DateTime('2015-05-10');
+        $to = new DateTime('2015-05-15');
+
+        $data = [
+            [
+                'yearCreated'  => '2015',
+                'monthCreated' => '05',
+                'dayCreated'   => '12',
+                'cnt'          => 3,
+            ],
+            [
+                'yearCreated'  => '2015',
+                'monthCreated' => '05',
+                'dayCreated'   => '14',
+                'cnt'          => 5,
+            ],
+        ];
+        $expectedData = [
+            ['date' => '2015-05-10'],
+            ['date' => '2015-05-11'],
+            ['date' => '2015-05-12', 'count' => 3],
+            ['date' => '2015-05-13'],
+            ['date' => '2015-05-14', 'count' => 5],
+        ];
+
+        $actualData = $this->helper->convertToCurrentPeriod($from, $to, $data, 'cnt', 'count');
+
+        $this->assertEquals($expectedData, $actualData);
+    }
+
+    public function testCombinePreviousDataWithCurrentPeriod()
+    {
+        $previousFrom = new DateTime('2015-05-05');
+        $previousTo = new DateTime('2015-05-10');
+
+        $data = [
+            [
+                'yearCreated'  => '2015',
+                'monthCreated' => '05',
+                'dayCreated'   => '07',
+                'cnt'          => 5,
+            ],
+        ];
+        $expectedData = [
+            ['date' => '2015-05-10'],
+            ['date' => '2015-05-11'],
+            ['date' => '2015-05-12', 'count' => 5],
+            ['date' => '2015-05-13'],
+            ['date' => '2015-05-14'],
+        ];
+
+        $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
+            $previousFrom,
+            $previousTo,
+            $data,
+            'cnt',
+            'count'
+        );
+
+        $this->assertEquals($expectedData, $actualData);
     }
 }

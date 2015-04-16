@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class AttachmentProvider
@@ -16,11 +17,18 @@ class AttachmentProvider
     protected $em;
 
     /**
-     * @param EntityManager $entityManager
+     * @var AttachmentConfig
      */
-    public function __construct(EntityManager $entityManager)
+    protected $attachmentConfig;
+
+    /**
+     * @param EntityManager $entityManager
+     * @param AttachmentConfig $attachmentConfig
+     */
+    public function __construct(EntityManager $entityManager, AttachmentConfig $attachmentConfig)
     {
         $this->em = $entityManager;
+        $this->attachmentConfig = $attachmentConfig;
     }
 
     /**
@@ -30,19 +38,20 @@ class AttachmentProvider
      */
     public function getEntityAttachments($entity)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        if (!(new Attachment())->supportTarget($entityClass)) {
-            return [];
+        if ($this->attachmentConfig->isAttachmentAssociationEnabled($entity)) {
+            $className = ClassUtils::getClass($entity);
+
+            $fieldName = ExtendHelper::buildAssociationName($className);
+            $repo = $this->em->getRepository('OroAttachmentBundle:Attachment');
+
+            $qb = $repo->createQueryBuilder('a');
+            $qb->leftJoin('a.' . $fieldName, 'entity')
+                ->where('entity.id = :entityId')
+                ->setParameter('entityId', $entity->getId());
+
+            return $qb->getQuery()->getResult();
         }
 
-        $fieldName = ExtendHelper::buildAssociationName($entityClass);
-        $repo = $this->em->getRepository('OroAttachmentBundle:Attachment');
-
-        $qb = $repo->createQueryBuilder('a');
-        $qb->leftJoin('a.' . $fieldName, 'entity')
-            ->where('entity.id = :entityId')
-            ->setParameter('entityId', $entity->getId());
-
-        return $qb->getQuery()->getResult();
+        return [];
     }
 }
