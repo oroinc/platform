@@ -27,7 +27,10 @@ define([
          * @returns {boolean}
          */
         isVisibleView: function (itemView) {
-            return itemView && itemView.el.offsetTop === 0;
+            if(!itemView) {
+                return false;
+            }
+            return this.el.offsetLeft + this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;
         },
 
         /**

@@ -92,12 +92,9 @@ define([
                     return !pinBar.isVisibleItem(item);
                 },
                 position: function () {
-                    var itemView, pos = {};
-                    itemView = pinBar.getLastVisibleView();
-                    if (itemView) {
-                        pos.left = itemView.el.getBoundingClientRect().right;
-                    }
-                    return pos;
+                    return {
+                        left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
+                    };
                 }
             });
 
