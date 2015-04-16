@@ -29,25 +29,6 @@ function ($, _, tools) {
                 _.delay(actions.close, delay);
             }
             return actions;
-        },
-
-        /**
-         * Get flash messages from localStorage or cookie
-         */
-        getStoredMessages = function() {
-            var messages = localStorage ? localStorage.getItem(storageKey) : $.cookie(storageKey);
-            return JSON.parse(messages) || [];
-        },
-
-        /**
-         * Set stored messages to cookie or localStorage
-         */
-        setStoredMessages = function(flashMessages) {
-            var messages = JSON.stringify(flashMessages);
-            localStorage ?
-                localStorage.setItem(storageKey, messages) :
-                $.cookie(storageKey, messages);
-            return true;
         };
 
         /**
@@ -151,12 +132,6 @@ function ($, _, tools) {
             setup: function(options) {
                 _.extend(defaults, options);
 
-                var flashMessages = getStoredMessages();
-                $.each(flashMessages, function(index, message){
-                    queue.push(message);
-                });
-                setStoredMessages([]);
-
                 while (queue.length) {
                     var args = queue.shift();
                     _.extend(args[1], showMessage.apply(null, args[0]));
@@ -168,14 +143,6 @@ function ($, _, tools) {
                 var actions = {close: $.noop};
 
                 queue.push([args, actions]);
-                // since navigation is always enabled, this condition does not make sense
-                /*if (options.hashNavEnabled) {
-                    queue.push([args, actions]);
-                } else { // add message to localStorage or cookie
-                    var flashMessages = getStoredMessages();
-                    flashMessages.push([args, actions]);
-                    setStoredMessages(flashMessages);
-                }*/
             },
 
             /**
