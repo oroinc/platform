@@ -9,6 +9,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroDataAuditBundle implements Migration
 {
+    /**
+     * {@inheritdoc}
+     */
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->createAuditField($schema);
@@ -16,6 +19,9 @@ class OroDataAuditBundle implements Migration
         $queries->addPostQuery('ALTER TABLE oro_audit DROP COLUMN data');
     }
 
+    /**
+     * @param Schema $schema
+     */
     private function createAuditField(Schema $schema)
     {
         $oroAuditFieldTable = $schema->createTable('oro_audit_field');
