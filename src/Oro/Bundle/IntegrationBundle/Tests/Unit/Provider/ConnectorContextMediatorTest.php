@@ -119,4 +119,23 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
         $result = $this->contextMediator->getChannel($context);
         $this->assertEquals($integration, $result);
     }
+
+    public function testGetInitializedTransport()
+    {
+        $testTransport = $this->getMock('Oro\Bundle\IntegrationBundle\Provider\TransportInterface');
+        $transportEntity = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Entity\Transport');
+        $integration = new Integration();
+        $integration->setTransport($transportEntity);
+
+        $this->registry->expects($this->once())->method('getTransportTypeBySettingEntity')
+            ->will($this->returnValue($testTransport));
+
+        $testTransport->expects($this->once())->method('init')->with($transportEntity);
+
+        $result = $this->contextMediator->getInitializedTransport($integration);
+        $this->assertEquals($testTransport, $result);
+
+        // test local cache
+        $this->contextMediator->getInitializedTransport($integration);
+    }
 }
