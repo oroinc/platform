@@ -17,13 +17,19 @@ class GridViewRepository extends EntityRepository
      *
      * @return GridView[]
      */
-    public function findGridViews(AclHelper $aclHelper, $gridName)
+    public function findGridViews(AclHelper $aclHelper, User $user, $gridName)
     {
         $qb = $this->createQueryBuilder('gv');
         $qb
             ->andWhere('gv.gridName = :gridName')
+            ->andWhere($qb->expr()->orX(
+                'gv.owner = :owner',
+                'gv.type = :public'
+            ))
             ->setParameters([
                 'gridName' => $gridName,
+                'owner'    => $user,
+                'public'   => GridView::TYPE_PUBLIC,
             ])
             ->orderBy('gv.gridName');
 

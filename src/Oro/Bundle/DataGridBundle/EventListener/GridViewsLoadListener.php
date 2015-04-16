@@ -55,7 +55,7 @@ class GridViewsLoadListener
             return;
         }
 
-        $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $gridName);
+        $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
         $allowedGridViews = array_filter($gridViews, function (GridView $gridView) {
             return $this->securityFacade->isGranted('VIEW', $gridView);
         });
