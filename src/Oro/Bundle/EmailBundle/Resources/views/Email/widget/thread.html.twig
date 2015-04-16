@@ -15,6 +15,7 @@
     view: 'oroemail/js/app/views/email-thread-view',
     actionPanelSelector: '.email-thread-action-panel'
 } %}
+{% set threadViewOptions = threadViewOptions|merge({isBaseView: not renderContexts}) %}
 <div class="widget-content thread-view"
      data-page-component-module="oroui/js/app/components/view-component"
      data-page-component-options="{{ threadViewOptions|json_encode }}"
