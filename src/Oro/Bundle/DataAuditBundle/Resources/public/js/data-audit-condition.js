@@ -92,6 +92,7 @@ define([
             this._on(this.$changeStateChoice, {
                 change: function () {
                     this.auditFilter.applyValue();
+                    this._onUpdate();
                 }
             });
 
