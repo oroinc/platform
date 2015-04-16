@@ -24,7 +24,17 @@ class BodyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHeaders()
     {
-        $headers = new \stdClass();
+        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+            ->disableOriginalConstructor()->getMock();
+        $headers->expects($this->any())->method('has')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['Content-Type', true],
+                        ['Content-Transfer-Encoding', true]
+                    ]
+                )
+            );
 
         $this->part
             ->expects($this->once())
@@ -38,7 +48,17 @@ class BodyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHeader()
     {
-        $header = new \stdClass();
+        $header = $this->getMockBuilder('Zend\Mail\Headers')
+            ->disableOriginalConstructor()->getMock();
+        $header->expects($this->any())->method('has')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['Content-Type', true],
+                        ['Content-Transfer-Encoding', true]
+                    ]
+                )
+            );
 
         $this->part
             ->expects($this->once())
@@ -68,16 +88,21 @@ class BodyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException
-     */
     public function testGetContentSinglePartHtml()
     {
-        $this->part->expects($this->once())
-            ->method('isMultipart')
+        $contentValue            = '<p>testContent</p>';
+        $contentType             = 'type/testContentType';
+        $contentTransferEncoding = 'testContentTransferEncoding';
+        $contentEncoding         = 'testEncoding';
+
+        $this->part->expects($this->once())->method('isMultipart')
             ->will($this->returnValue(false));
 
-        $this->body->getContent(Body::FORMAT_HTML);
+        $this->preparePartMock($this->part, $contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
+        $result   = $this->body->getContent(Body::FORMAT_HTML);
+        $expected = new Content($contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
+
+        $this->assertEquals($expected, $result);
     }
 
     public function testGetContentMultipartText()
