@@ -132,6 +132,10 @@ define([
             if (!this.collection.state.gridView) {
                 this.collection.state.gridView = '__all__';
             }
+            this.viewsCollection.get('__all__').set({
+                filters: options.collection.initialState.filters,
+                sorters: options.collection.initialState.sorters
+            });
 
             this.viewDirty = !this._isCurrentStateSynchronized();
             this.prevState = this._getCurrentState();
