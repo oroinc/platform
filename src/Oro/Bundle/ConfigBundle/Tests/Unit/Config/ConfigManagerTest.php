@@ -138,7 +138,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->reload();
     }
 
-    public function testGetFromParentScope()
+    /**
+     * @param bool  $full
+     * @param array $expectedResult
+     *
+     * @dataProvider getFromParentParamProvider
+     */
+    public function testGetFromParentScope($full, $expectedResult)
     {
         $parameterName = 'oro_test.someValue';
 
@@ -151,9 +157,23 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['scope' => 'global', 'value' => 1]);
 
         $this->assertEquals(
-            ['scope' => 'global', 'value' => 1, 'use_parent_scope_value' => true],
-            $this->manager->get($parameterName)
+            $expectedResult,
+            $this->manager->get($parameterName, false, $full)
         );
+    }
+
+    public function getFromParentParamProvider()
+    {
+        return [
+            [
+                'full' => false,
+                'expectedResult' => ['scope' => 'global', 'value' => 1],
+            ],
+            [
+                'full' => true,
+                'expectedResult' => ['scope' => 'global', 'value' => 1, 'use_parent_scope_value' => true],
+            ],
+        ];
     }
 
     public function testGet()
