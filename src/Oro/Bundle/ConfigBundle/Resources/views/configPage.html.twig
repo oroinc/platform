@@ -36,8 +36,8 @@
     <script type="text/javascript">
         /* jshint browser:true, devel:true */
         /* global require */
-        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/state', 'oroconfig/js/form/default', 'oroui/js/modal'],
-        function ($, __, Mediator, Messenger, FormState, FormDefault, Modal) {
+        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/default', 'oroui/js/modal'],
+        function ($, __, Mediator, Messenger, FormDefault, Modal) {
             'use strict';
 
             $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
@@ -70,7 +70,6 @@
                 });
             {% endif %}
 
-            new FormState();
             new FormDefault();
         });
     </script>

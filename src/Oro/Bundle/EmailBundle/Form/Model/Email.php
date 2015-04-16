@@ -2,10 +2,24 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
+/**
+ * Class Email
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ *
+ * @package Oro\Bundle\EmailBundle\Form\Model
+ */
 class Email
 {
+    const MAIL_TYPE_DIRECT  = 'direct';
+    const MAIL_TYPE_REPLY   = 'reply';
+    const MAIL_TYPE_FORWARD = 'forward';
+
     /** @var string */
     protected $gridName;
 
@@ -47,6 +61,26 @@ class Email
 
     /** @var string */
     protected $bodyFooter = '';
+
+    /** @var object[] */
+    protected $contexts = [];
+
+    /** @var Collection */
+    protected $attachments;
+
+    /** @var  string */
+    protected $mailType;
+
+    /** @var array */
+    protected $attachmentsAvailable;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->attachments = new ArrayCollection();
+    }
 
     /**
      * Get id of emails datagrid
@@ -372,9 +406,115 @@ class Email
 
     /**
      * @param string $signature
+     *
+     * @return $this
      */
     public function setSignature($signature)
     {
         $this->signature = $signature;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAttachments()
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @param EmailAttachment $attachment
+     */
+    public function addAttachment(EmailAttachment $attachment)
+    {
+        $this->attachments->add($attachment);
+    }
+
+    /**
+     * @param EmailAttachment $attachment
+     */
+    public function removeAttachment(EmailAttachment $attachment)
+    {
+        if ($this->attachments->contains($attachment)) {
+            $this->attachments->remove($attachment);
+        }
+    }
+
+    /**
+     * @param EmailAttachment[] $attachments
+     *
+     * @return $this
+     */
+    public function setAttachments(array $attachments)
+    {
+        $this->attachments = $attachments;
+
+        return $this;
+    }
+
+    /**
+     * @return EmailAttachment[]
+     */
+    public function getAttachmentsAvailable()
+    {
+        return $this->attachmentsAvailable;
+    }
+
+    /**
+     * @param EmailAttachment[] $attachmentsAvailable
+     *
+     * @return $this
+     */
+    public function setAttachmentsAvailable($attachmentsAvailable)
+    {
+        $this->attachmentsAvailable = $attachmentsAvailable;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMailType()
+    {
+        return $this->mailType;
+    }
+
+    /**
+     * @param string $mailType
+     *
+     * @return $this
+     */
+    public function setMailType($mailType)
+    {
+        $this->mailType = $mailType;
+
+        return $this;
+    }
+
+    /**
+     * Get contexts
+     *
+     * @return object[]
+     */
+    public function getContexts()
+    {
+        return $this->contexts;
+    }
+
+    /**
+     * Set contexts
+     *
+     * @param object[] $contexts
+     *
+     * @return $this
+     */
+    public function setContexts(array $contexts)
+    {
+        $this->contexts = $contexts;
+
+        return $this;
     }
 }

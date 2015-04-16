@@ -100,7 +100,7 @@ class Email extends EmailHeader
                 $content    = $a->getContent();
                 $attachment = new EmailAttachment();
                 $attachment
-                    ->setFileName($a->getFileName()->getDecodedValue())
+                    ->setFileName($a->getFileName()->getValue())
                     ->setContent($content->getContent())
                     ->setContentType($content->getContentType())
                     ->setContentTransferEncoding($content->getContentTransferEncoding());

@@ -15,6 +15,7 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 class Serializer extends BaseSerializer implements DenormalizerInterface, NormalizerInterface
 {
     const PROCESSOR_ALIAS_KEY = 'processorAlias';
+    const ENTITY_NAME_KEY     = 'entityName';
 
     /**
      * {@inheritdoc}
@@ -115,19 +116,16 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
      */
     protected function getCacheKey($type, $format, array $context)
     {
-        return md5($type . $format . $this->getProcessorAlias($context));
-    }
+        $cacheKeyFields = [$type, $format];
 
-    /**
-     * @param array $context
-     *
-     * @return string
-     */
-    protected function getProcessorAlias(array $context)
-    {
-        return !empty($context[self::PROCESSOR_ALIAS_KEY])
-            ? $context[self::PROCESSOR_ALIAS_KEY]
-            : '';
+        // Add context fields to cache key
+        $contextFields  = [
+            self::PROCESSOR_ALIAS_KEY,
+            self::ENTITY_NAME_KEY
+        ];
+        $cacheKeyFields = array_merge($cacheKeyFields, array_intersect_key($context, array_flip($contextFields)));
+
+        return md5(implode('', $cacheKeyFields));
     }
 
     /**

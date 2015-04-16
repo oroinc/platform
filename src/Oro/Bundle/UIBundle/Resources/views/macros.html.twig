@@ -13,8 +13,8 @@
                 {{ form_errors(form) }}
                 {% if form.children|length  %}
                     {% for child in form %}
-                        {{ form_errors(child) }}
                         {{ form_widget(child) }}
+                        {{ form_errors(child) }}
                     {% endfor %}
                 {% else %}
                     {{ form_widget(form) }}
@@ -261,11 +261,16 @@
 #}
 {% macro pinnedDropdownButton(parameters) %}
     {% if isDesktopVersion() %}
-        {% set options = parameters.options|default({})|merge({
+        {% set options = parameters.options|default({}) %}
+        {% set options = options|merge({
+            widgetModule: options.widgetModule|default('oroui/js/content-processor/pinned-dropdown-button'),
+            widgetName: options.widgetName|default('pinnedDropdownButtonProcessor'),
             groupKey: parameters.groupKey is defined ? parameters.groupKey : '',
             useMainButtonsClone: true
         }) %}
-        <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
+        <div class="pull-right"
+             data-page-component-module="oroui/js/app/components/jquery-widget-component"
+             data-page-component-options="{{ options|json_encode }}">
             {{ parameters.html|raw }}
         </div>
     {% else %}
@@ -298,7 +303,7 @@
     {% if label is empty %}
         {% set label = 'Cancel'|trans %}
     {% endif %}
-    {{ _self.button({'path' : path, 'title' : label, 'label' : label}) }}
+    {{ _self.button({'path' : path, 'title' : label, 'label' : label, data: {action: 'cancel'} }) }}
 {% endmacro %}
 
 {#

@@ -28,6 +28,91 @@
     {{ form_row(form) }}
 {% endblock %}
 
+{% block oro_email_attachments_row %}
+    <script type="text/template" id="email-attachment-item">
+        <div class="attachment-item" style="border: none">
+            <span data-id="<%= id %>" class="filename">
+                <i class="icon icon-file-alt"></i>
+                <span class="filename-label"><%= fileName %></span>
+                <i class="icon-remove"></i>
+            </span>
+            <input name="<%= inputName %>[<%= cid %>][id]" type="text" value="<%= id %>"/>
+            <input name="<%= inputName %>[<%= cid %>][type]" type="text" value="<%= type %>" class="attachment-type"/>
+            <input name="<%= inputName %>[<%= cid %>][file]" type="file"/>
+        </div>
+    </script>
+
+    <script type="text/template" id="email-attachment-select-view">
+        <div class="attachment-list-content">
+            <div class="filter-block">
+                <label>{{ 'oro.email.attachment.select_file'|trans }}</label>
+                <input type="text" class="filter"/>
+            </div>
+            <div class="attachment-list">
+                <div class="no-items">
+                    <p class="text-center">{{ 'oro.email.form.no_attachments'|trans }}</p>
+                </div>
+                <div class="group-block entity-attachments">
+                    <b>{{ 'oro.email.form.record_attachments'|trans }}</b>
+                    <div class="entity-attachments-list"></div>
+                </div>
+                <div class="group-block thread-attachments">
+                    <b>{{ 'oro.email.form.thread_attachments'|trans }}</b>
+                    <div class="thread-attachments-list"></div>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="attachment-actions">
+            <div class="pull-right">
+                <a class="btn cancel">{{ 'Cancel'|trans }}</a>
+                <a class="btn btn-primary attach">{{ 'oro.email.form.attach'|trans }}</a>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="email-attachment-list-row-view">
+        <div class="attachment-list-row <% if (!visible) { %>hide<% } %>">
+            <input type="checkbox" class="checkbox" <% if (checked) { %>checked<% } %>>
+            <span><%= fileName %> (<%= fileSize %>, <%= modified %>)</span>
+        </div>
+    </script>
+
+    {% set entityAttachmentsArray = [] %}
+    {% for attachment in options.entityAttachments %}
+        {% set entityAttachmentArray = {
+            'id': attachment.id,
+            'type': attachment.type,
+            'fileName': attachment.fileName
+        } %}
+        {% set entityAttachmentsArray = entityAttachmentsArray|merge([entityAttachmentArray]) %}
+    {% endfor %}
+
+    {% set attachmentsAvailableArray = [] %}
+    {% for attachment in options.attachmentsAvailable %}
+        {% set attachmentAvailableArray = {
+            'id': attachment.id,
+            'type': attachment.type,
+            'fileName': attachment.fileName,
+            'fileSize': attachment.fileSize,
+            'modified': attachment.modified
+        } %}
+        {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
+    {% endfor %}
+
+    {% set options = options|merge({
+        container: id,
+        inputName: full_name,
+        entityAttachments: entityAttachmentsArray,
+        attachmentsAvailable: attachmentsAvailableArray
+    }) %}
+
+    <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
+         data-page-component-options="{{ options|json_encode }}">
+        {{ form_row(form) }}
+    </div>
+{% endblock %}
+
 {% block oro_email_emailtemplate_translatation_widget %}
     <div class="emailtemplate-translatation oro-tabs tabbable">
         <ul class="nav nav-tabs">

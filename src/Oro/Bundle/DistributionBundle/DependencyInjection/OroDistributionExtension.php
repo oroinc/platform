@@ -28,7 +28,10 @@ class OroDistributionExtension extends Extension
         $this->mergeTwigResources($container);
 
         if ($config = $this->processConfiguration(new Configuration(), $configs)) {
-            $container->setParameter('oro_distribution.entry_point', $config['entry_point']);
+            if (isset($config['entry_point'])) {
+                $container->setParameter('oro_distribution.entry_point', $config['entry_point']);
+            }
+            $container->setParameter('oro_distribution.composer_cache_home', $config['composer_cache_home']);
         }
     }
 

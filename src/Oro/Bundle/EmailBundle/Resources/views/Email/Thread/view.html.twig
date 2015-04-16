@@ -1,4 +1,6 @@
 {% extends "OroUIBundle:actions:view.html.twig" %}
+{% import "OroEmailBundle::actions.html.twig" as Actions %}
+{% import "OroEmailBundle::macros.html.twig" as EA %}
 
 {% oro_title_set({params : {"%subject%": entity.subject} }) %}
 
@@ -12,24 +14,35 @@
     {{ parent() }}
 {% endblock pageHeader %}
 
+{% block pageActions %}
+    <div class="pull-right email-thread-action-panel"></div>
+{% endblock pageActions %}
+
+{% block navButtons %}
+    {{ Actions.addContextButton(entity) }}
+{% endblock navButtons %}
+
 {% block breadcrumb %}
     {% set breadcrumbs = [
-        {'label': "Thread view"|trans },
-        {'label': entity.subject }
+        {'label': 'oro.email.menu.user_emails'|trans }
     ] %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
 
 {% block stats %}
-{% endblock stats %}
+    <li class="context-data email-context-activity-block">
+        {{ EA.email_contexts(entity) }}
+    </li>
+{% endblock %}
 
 {% block content_data %}
     <div class="container-fluid">
         {{ oro_widget_render({
             'widgetType': 'block',
             'wid': 'thread-view',
-            'url': path('oro_email_thread_widget', {'id': entity.id}),
-            'alias': 'thread-view'
+            'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false}),
+            'alias': 'thread-view',
+            'contextsRendered': true
         }) }}
     </div>
 {% endblock content_data %}

@@ -23,7 +23,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          @ORM\Index(name="oro_email_is_head", columns={"is_head"})
  *      }
  * )
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository")
  * @ORM\HasLifecycleCallbacks
  *
  * @Config(
@@ -33,7 +33,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE",
+ *              "permissions"="VIEW;CREATE;EDIT",
  *              "group_name"=""
  *          },
  *          "grouping"={
@@ -58,6 +58,7 @@ class Email extends ExtendEmail
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
     const HIGH_IMPORTANCE   = 1;
+    const ENTITY_CLASS      = 'Oro\Bundle\EmailBundle\Entity\Email';
 
     /**
      * @var integer
@@ -620,7 +621,7 @@ class Email extends ExtendEmail
     /**
      * Get email references
      *
-     * @return string
+     * @return array
      */
     public function getRefs()
     {
@@ -760,6 +761,9 @@ class Email extends ExtendEmail
         return $this->getRecipients(EmailRecipient::BCC);
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getToCc()
     {
         return new ArrayCollection(
@@ -768,12 +772,38 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @return EmailRecipient[]
+     * @return ArrayCollection
      */
     public function getCcBcc()
     {
         return new ArrayCollection(
             array_merge($this->getCc()->toArray(), $this->getBcc()->toArray())
         );
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getContacts()
+    {
+        return new ArrayCollection(
+            array_merge(
+                $this->getTo()->toArray(),
+                $this->getCcBcc()->toArray()
+            )
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAttachments()
+    {
+        $hasAttachment = false;
+        if (null !== $this->getEmailBody()) {
+            $hasAttachment = $this->getEmailBody()->getHasAttachments();
+        }
+
+        return $hasAttachment;
     }
 }
