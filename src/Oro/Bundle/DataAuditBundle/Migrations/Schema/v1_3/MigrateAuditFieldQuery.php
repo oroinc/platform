@@ -5,19 +5,21 @@ namespace Oro\Bundle\DataAuditBundle\Migrations;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
+
 use LogicException;
+
+use PDO;
+
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use PDO;
-use Psr\Log\LoggerInterface;
 
 class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 {
     const LIMIT = 100;
 
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     private $connection;
 
     /**

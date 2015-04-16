@@ -1,0 +1,5 @@
+oro:
+    dataaudit:
+        data_audit_condition:
+            changed: changed
+            changed_to_value: changed to value

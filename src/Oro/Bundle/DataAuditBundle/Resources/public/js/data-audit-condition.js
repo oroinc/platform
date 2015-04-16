@@ -13,16 +13,7 @@ define([
     $.widget('oroauditquerydesigner.dataAuditCondition', $.oroquerydesigner.fieldCondition, {
         options: {
             auditFields: {},
-            changeStateTpl: _.template(
-                '<div>' +
-                    '<select>' +
-                        '<option <%= (selected === "changed") ? "selected" : "" %> value="changed">changed</option>' +
-                        '<option <%= (selected === "changed_to_value") ? "selected" : "" %> value="changed_to_value">changed to value</option>' +
-                    '</select>' +
-                    '<span class="active-filter">' +
-                    '</span>' +
-                '</div>'
-            )
+            changeStateTpl: _.template($('#template-audit-condition-type-select').html())
         },
 
         _create: function() {
@@ -68,7 +59,9 @@ define([
             }, this.element.data('value'));
 
             this.$changeStateChoice = $(this.options.changeStateTpl({
-                selected: data.criterion.data.auditFilter.type
+                selected: data.criterion.data.auditFilter.type,
+                changedLabel: __('oro.dataaudit.data_audit_condition.changed'),
+                changedToValueLabel: __('oro.dataaudit.data_audit_condition.changed_to_value')
             }));
             this.$fieldChoice.after(this.$changeStateChoice);
             var $select = this.$changeStateChoice.find('select');

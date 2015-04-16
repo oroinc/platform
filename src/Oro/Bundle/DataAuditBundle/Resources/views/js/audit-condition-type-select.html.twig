@@ -1,0 +1,10 @@
+<script type="text-template" id="template-audit-condition-type-select">
+    <div>
+        <select>
+            <option <%= (selected === "changed") ? "selected" : "" %> value="changed"><%= changedLabel %></option>
+            <option <%= (selected === "changed_to_value") ? "selected" : "" %> value="changed_to_value"><%= changedToValueLabel %></option>
+        </select>
+        <span class="active-filter">
+        </span>
+    </div>'
+</script>
