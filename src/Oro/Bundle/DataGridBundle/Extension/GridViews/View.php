@@ -7,6 +7,9 @@ class View
     /** @var string */
     protected $name;
 
+    /** @var string */
+    protected $label;
+
     /** @var array */
     protected $filtersData;
 
@@ -31,9 +34,22 @@ class View
     public function __construct($name, array $filtersData = [], array $sortersData = [], $type = 'system')
     {
         $this->name        = $name;
+        $this->label       = $name;
         $this->filtersData = $filtersData;
         $this->sortersData = $sortersData;
         $this->type        = $type;
+    }
+
+    /**
+     * @param string $label
+     *
+     * @return this
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+
+        return $this;
     }
 
     /**
@@ -106,20 +122,28 @@ class View
      * Sets view as editable
      *
      * @param bool $editable
+     *
+     * @return this
      */
     public function setEditable($editable = true)
     {
         $this->editable = $editable;
+
+        return $this;
     }
 
     /**
      * Sets view as deletable
      *
      * @param bool $deletable
+     *
+     * @return this
      */
     public function setDeletable($deletable = true)
     {
         $this->deletable = $deletable;
+
+        return $this;
     }
 
     /**
@@ -131,6 +155,7 @@ class View
     {
         return [
             'name'      => $this->getName(),
+            'label'     => $this->label,
             'type'      => $this->getType(),
             'filters'   => $this->getFiltersData(),
             'sorters'   => $this->getSortersData(),

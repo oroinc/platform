@@ -257,7 +257,10 @@ class GridView
      */
     public function createView()
     {
-        return new View($this->id, $this->filtersData, $this->sortersData, $this->type);
+        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type);
+        $view->setLabel($this->name);
+
+        return $view;
     }
 
     /**

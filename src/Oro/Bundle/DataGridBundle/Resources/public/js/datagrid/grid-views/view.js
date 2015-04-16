@@ -125,9 +125,6 @@ define([
             options.views = options.views || [];
             _.each(options.views, function(view) {
                 view.grid_name = this.gridName;
-                view.label = _.first(_.filter(this.choices, function (item) {
-                    return view.name == item.value;
-                }, this)).label;
             }, this);
 
             this.viewsCollection = new this.viewsCollection(options.views);
