@@ -88,7 +88,7 @@ oro_chart:
             label: oro.chart.flow_chart.params.value
             required: true
             type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
-            default_type: decimal
+            default_type: currency
           - name: isNozzle
             label: oro.chart.flow_chart.params.is_nozzle
             required: false

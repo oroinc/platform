@@ -120,7 +120,8 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         // replace empty permissions with default ones
-        for ($i = 0; $i < count($attributes); $i++) {
+        $attributesCount = count($attributes);
+        for ($i = 0; $i < $attributesCount; $i++) {
             if (empty($attributes[$i])) {
                 $attributes[$i] = $this->extension->getDefaultPermission();
             }

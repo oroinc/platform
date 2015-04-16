@@ -13,8 +13,8 @@
                 {{ form_errors(form) }}
                 {% if form.children|length  %}
                     {% for child in form %}
-                        {{ form_errors(child) }}
                         {{ form_widget(child) }}
+                        {{ form_errors(child) }}
                     {% endfor %}
                 {% else %}
                     {{ form_widget(form) }}
