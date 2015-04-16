@@ -1,5 +1,3 @@
 css:
     'orodashboard':
         - 'bundles/orodashboard/css/less/dashboard.less'
-    'orodashboardwidget':
-        - 'bundles/orodashboard/css/less/widget-configuration.less'
