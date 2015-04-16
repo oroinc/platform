@@ -13,6 +13,11 @@ require(['oroui/js/mediator'], function (mediator) {
             mediator.trigger('page-rendered');
         }, 50);
     });
+
+    mediator.on('page:afterChange', function () {
+        // set focus on container for scrolling with hotkeys
+        $("#container.scrollable-container").focus();
+    });
 });
 
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
