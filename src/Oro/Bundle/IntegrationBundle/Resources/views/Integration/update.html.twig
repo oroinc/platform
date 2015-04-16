@@ -67,20 +67,25 @@
         {% endif %}
 
         {% if entity.enabled == true %}
-            {{ UI.clientButton({
-                'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
-                'aCss':   'no-hash schedule-button btn-primary',
-                'label' : 'oro.integration.sync'|trans
-            }) }}
+        <div class="btn-group">
+            {% set buttonsHtml %}
+                {{ UI.clientButton({
+                    'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
+                    'aCss':   'no-hash schedule-button',
+                    'label' : 'oro.integration.sync'|trans
+                }) }}
 
-            {{ UI.clientButton({
-                'dataUrl': path('oro_integration_schedule', { 'id': entity.id, 'force': true }) ,
-                'aCss':   'no-hash schedule-button btn-danger',
-                'label' : 'oro.integration.force_sync'|trans,
-                'dataAttributes': {
-                    'force': true
-                }
-            }) }}
+                {{ UI.clientButton({
+                    'dataUrl': path('oro_integration_schedule', { 'id': entity.id, 'force': true }) ,
+                    'aCss':   'no-hash schedule-button',
+                    'label' : 'oro.integration.force_sync'|trans,
+                    'dataAttributes': {
+                        'force': true
+                    }
+                }) }}
+            {% endset %}
+            {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}
+        </div>
         {% endif %}
     {% endif %}
 
