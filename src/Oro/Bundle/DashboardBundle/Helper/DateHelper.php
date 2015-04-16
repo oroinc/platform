@@ -41,15 +41,15 @@ class DateHelper
     {
         $this->doctrine       = $doctrine;
         $this->localeSettings = $localeSettings;
-        $this->aclHelper = $aclHelper;
+        $this->aclHelper      = $aclHelper;
     }
 
     /**
      * @param DateTime $from
      * @param DateTime $to
-     * @param array $data
-     * @param string $rowKey
-     * @param string $dataKey
+     * @param array    $data
+     * @param string   $rowKey
+     * @param string   $dataKey
      *
      * @return array
      */
@@ -57,7 +57,7 @@ class DateHelper
     {
         $items = $this->getDatePeriod($from, $to);
         foreach ($data as $row) {
-            $key = $this->getKey($from, $to, $row);
+            $key                   = $this->getKey($from, $to, $row);
             $items[$key][$dataKey] = $row[$rowKey];
         }
 
@@ -67,9 +67,9 @@ class DateHelper
     /**
      * @param DateTime $from
      * @param DateTime $to
-     * @param array $data
-     * @param string $rowKey
-     * @param string $dataKey
+     * @param array    $data
+     * @param string   $rowKey
+     * @param string   $dataKey
      *
      * @return array
      */
@@ -77,20 +77,20 @@ class DateHelper
     {
         $items = $this->getDatePeriod($from, $to);
         foreach ($data as $row) {
-            $key = $this->getKey($from, $to, $row);
+            $key                   = $this->getKey($from, $to, $row);
             $items[$key][$dataKey] = $row[$rowKey];
         }
 
         $currentFrom = $to;
-        $currentTo = clone $to;
-        $diff = $to->getTimestamp() - $from->getTimestamp();
+        $currentTo   = clone $to;
+        $diff        = $to->getTimestamp() - $from->getTimestamp();
         $currentTo->setTimestamp($currentFrom->getTimestamp() + $diff);
 
         $currentItems = $this->getDatePeriod($currentFrom, $currentTo);
 
         $mixedItems = array_combine(array_keys($currentItems), array_values($items));
         foreach ($mixedItems as $currentDate => $previousData) {
-            $previousData['date'] = $currentItems[$currentDate]['date'];
+            $previousData['date']       = $currentItems[$currentDate]['date'];
             $currentItems[$currentDate] = $previousData;
         }
 
@@ -259,10 +259,11 @@ class DateHelper
         $end   = $dateRange['end'];
 
         if ($dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
-            $qb =  $this->doctrine
+            $qb = $this->doctrine
                 ->getRepository($entity)
                 ->createQueryBuilder('e')
                 ->select(sprintf('MIN(e.%s) as val', $field));
+
             $start = $this->aclHelper->apply($qb)->getSingleScalarResult();
             $start = new \DateTime($start, new \DateTimeZone('UTC'));
         }

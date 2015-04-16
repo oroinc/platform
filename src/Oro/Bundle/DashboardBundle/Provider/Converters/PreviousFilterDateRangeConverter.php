@@ -31,6 +31,10 @@ class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
             }
 
             if ($currentDateRange['type'] !== AbstractDateFilterType::TYPE_LESS_THAN) {
+                /**
+                 * @var \DateTime $from
+                 * @var \DateTime $to
+                 */
                 $from = $currentDateRange['start'];
                 $to   = $currentDateRange['end'];
 
