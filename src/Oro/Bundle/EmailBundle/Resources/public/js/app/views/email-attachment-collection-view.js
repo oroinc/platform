@@ -26,29 +26,45 @@ define(function (require) {
             });
 
             this.listSelector = options.listSelector;
-            $(this.listSelector).css('padding-top', 5);
+            $(this.listSelector).css('padding-top', 5); // todo move to class styles
             $(this.listSelector).html('');
+
             this.$el.hide();
         },
 
         collectionAdd: function(model) {
             if (!model.get('id')) {
                 this.getItemView(model).fileSelect();
+            } else {
+                this.showHideAttachmentRow();
             }
-            this.showHideAttachmentRow();
         },
 
         collectionRemove: function() {
+            var self = this;
+            this.collection.each(function(model) {
+                if (model && !model.get('type') && !model.get('id')) {
+                    self.collection.remove(model);
+                }
+            });
             this.showHideAttachmentRow();
         },
 
         showHideAttachmentRow: function() {
             if (this.collection.isEmpty()) {
-                this.$el.hide();
+                this.hide();
             } else {
-                this.$el.show();
+                this.show();
             }
         },
+
+        show: function() {
+            this.$el.show();
+        },
+
+        hide: function() {
+            this.$el.hide();
+        }
     });
 
     return EmailAttachmentCollectionView;

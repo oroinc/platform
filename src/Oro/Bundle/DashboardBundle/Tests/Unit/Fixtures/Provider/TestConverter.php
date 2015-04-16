@@ -9,7 +9,7 @@ class TestConverter extends ConfigValueConverterAbstract
     /**
      * {@inheritdoc}
      */
-    public function getConvertedValue(array $widgetConfig, $value = null)
+    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         return 'test value';
     }

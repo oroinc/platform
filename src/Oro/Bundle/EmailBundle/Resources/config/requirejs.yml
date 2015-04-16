@@ -2,8 +2,25 @@ config:
     paths:
         'oroemail/js/app/models/email-template-collection': 'bundles/oroemail/js/app/models/email-template-collection.js'
         'oroemail/js/app/models/email-template-model': 'bundles/oroemail/js/app/models/email-template-model.js'
+        'oroemail/js/app/models/email-context-model': 'bundles/oroemail/js/app/models/email-context-model.js'
+        'oroemail/js/app/models/email-context-collection': 'bundles/oroemail/js/app/models/email-context-collection.js'
+        'oroemail/js/app/models/email-context-activity-model': 'bundles/oroemail/js/app/models/email-context-activity-model.js'
+        'oroemail/js/app/models/email-context-activity-collection': 'bundles/oroemail/js/app/models/email-context-activity-collection.js'
+        'oroemail/js/app/models/email-attachment-model': 'bundles/oroemail/js/app/models/email-attachment-model.js'
+        'oroemail/js/app/models/email-attachment-collection': 'bundles/oroemail/js/app/models/email-attachment-collection.js'
+
         'oroemail/js/app/views/email-template-view': 'bundles/oroemail/js/app/views/email-template-view.js'
         'oroemail/js/app/views/email-attachment-link-view': 'bundles/oroemail/js/app/views/email-attachment-link-view.js'
+        'oroemail/js/app/views/email-context-view': 'bundles/oroemail/js/app/views/email-context-view.js'
+        'oroemail/js/app/views/email-context-activity-view': 'bundles/oroemail/js/app/views/email-context-activity-view.js'
+        'oroemail/js/app/views/email-attachment-collection-view': 'bundles/oroemail/js/app/views/email-attachment-collection-view.js'
+        'oroemail/js/app/views/email-attachment-list-row-view': 'bundles/oroemail/js/app/views/email-attachment-list-row-view.js'
+        'oroemail/js/app/views/email-attachment-select-view': 'bundles/oroemail/js/app/views/email-attachment-select-view.js'
+        'oroemail/js/app/views/email-attachment-view': 'bundles/oroemail/js/app/views/email-attachment-view.js'
 
+        'oroemail/js/app/components/email-context-component': 'bundles/oroemail/js/app/components/email-context-component.js'
+        'oroemail/js/app/components/email-context-activity-component': 'bundles/oroemail/js/app/components/email-context-activity-component.js'
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
+        'oroemail/js/app/components/email-attachment-component': 'bundles/oroemail/js/app/components/email-attachment-component.js'
+
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'

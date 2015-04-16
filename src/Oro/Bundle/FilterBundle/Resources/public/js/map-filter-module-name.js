@@ -5,6 +5,7 @@ define(function () {
         types = {
             string:      'choice',
             choice:      'select',
+            single_choice: 'select',
             selectrow:   'select-row',
             multichoice: 'multiselect',
             boolean:     'select'

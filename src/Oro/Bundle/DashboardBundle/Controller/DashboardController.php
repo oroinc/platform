@@ -21,6 +21,7 @@ use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 
 /**
@@ -107,7 +108,7 @@ class DashboardController extends Controller
         $form  = $this->getFormProvider()->getForm($widget->getName());
         $saved = false;
 
-        $form->setData($widget->getOptions());
+        $form->setData($this->get('oro_dashboard.widget_configs')->getFormValues($widget));
 
         $form->handleRequest($request);
         if ($form->isValid()) {
@@ -228,12 +229,37 @@ class DashboardController extends Controller
      */
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
-        /** @var WidgetAttributes $manager */
+        /** @var WidgetConfigs $manager */
         $manager = $this->get('oro_dashboard.widget_configs');
 
         $params = array_merge(
             [
                 'items' => $manager->getWidgetItems($widget)
+            ],
+            $manager->getWidgetAttributesForTwig($widget)
+        );
+
+        return $this->render(
+            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            $params
+        );
+    }
+
+    /**
+     * @Route(
+     *      "/itemized_data_widget/{widget}/{bundle}/{name}",
+     *      name="oro_dashboard_itemized_data_widget",
+     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     * )
+     */
+    public function itemizedDataWidgetAction($widget, $bundle, $name)
+    {
+        /** @var WidgetConfigs $manager */
+        $manager = $this->get('oro_dashboard.widget_configs');
+
+        $params = array_merge(
+            [
+                'items' => $manager->getWidgetItemsData($widget, $this->getRequest()->query->get('_widgetId', null))
             ],
             $manager->getWidgetAttributesForTwig($widget)
         );

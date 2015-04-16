@@ -1,6 +1,6 @@
 oro:
   dashboard:
-    widget_configuration_label: Widget configuration
+    widget_configuration_label: Configuration
     widget_configuration_success: Widget has been successfully configured
     drop_placeholder_label: Drag your widget here.
     add_dashboard_widgets:

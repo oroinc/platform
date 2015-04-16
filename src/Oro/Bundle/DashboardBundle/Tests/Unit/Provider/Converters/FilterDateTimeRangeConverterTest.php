@@ -16,6 +16,9 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dateCompiler;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
+
     public function setUp()
     {
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
@@ -26,7 +29,11 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->converter = new FilterDateTimeRangeConverter($this->formatter, $this->converter);
+        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->converter = new FilterDateTimeRangeConverter($this->formatter, $this->converter, $this->translator);
     }
 
     public function testGetConvertedValueDefaultValues()
@@ -96,7 +103,7 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertEquals('2000-01-01', $result['start']->format('Y-m-d'));
+        $this->assertEquals(FilterDateTimeRangeConverter::MIN_DATE, $result['start']->format('Y-m-d'));
         $this->assertEquals($value, $result['end']);
     }
 
@@ -117,7 +124,8 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
             $this->converter->getViewValue(
                 [
                     'start' => $start,
-                    'end' => $end
+                    'end' => $end,
+                    'type' => AbstractDateFilterType::TYPE_BETWEEN
                 ]
             )
         );
