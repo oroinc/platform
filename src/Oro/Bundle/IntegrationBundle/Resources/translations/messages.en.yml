@@ -69,6 +69,8 @@ oro:
         progress: Check progress.
         activate: Activate
         deactivate: Deactivate
+        force_sync: Force resync
+        sync: Schedule sync
 
         delete_sync_integration:
             content: "Warning: Removing the integration will delete all related data"

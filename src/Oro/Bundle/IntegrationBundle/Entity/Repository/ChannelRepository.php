@@ -58,24 +58,51 @@ class ChannelRepository extends EntityRepository
      */
     public function getLastStatusForConnector(Integration $integration, $connector, $code = null)
     {
+        $queryBuilder = $this->getConnectorStatusesQueryBuilder($integration, $connector, $code);
+        $queryBuilder
+            ->setFirstResult(0)
+            ->setMaxResults(1);
+
+        $statuses = $queryBuilder->getQuery()->execute();
+
+        return $statuses ? reset($statuses) : null;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param string $connector
+     * @param int|null $code
+     * @return Status[]
+     */
+    public function getConnectorStatuses(Integration $integration, $connector, $code = null)
+    {
+        return $this->getConnectorStatusesQueryBuilder($integration, $connector, $code)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @param Integration $integration
+     * @param string $connector
+     * @param int|null $code
+     * @return QueryBuilder
+     */
+    public function getConnectorStatusesQueryBuilder(Integration $integration, $connector, $code = null)
+    {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder()
             ->select('status')
             ->from('OroIntegrationBundle:Status', 'status')
             ->where('status.channel = :integration')
             ->andWhere('status.connector = :connector')
             ->setParameters(['integration' => $integration, 'connector' => (string)$connector])
-            ->orderBy('status.date', 'DESC')
-            ->setFirstResult(0)
-            ->setMaxResults(1);
+            ->orderBy('status.date', 'DESC');
 
         if ($code) {
             $queryBuilder->andWhere('status.code = :code')
                 ->setParameter('code', (string)$code);
         };
 
-        $statuses = $queryBuilder->getQuery()->execute();
-
-        return $statuses ? reset($statuses) : null;
+        return $queryBuilder;
     }
 
     /**
