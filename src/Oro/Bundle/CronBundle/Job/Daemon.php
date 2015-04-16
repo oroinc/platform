@@ -203,7 +203,7 @@ class Daemon
         }
 
         $runCommand = sprintf(
-            '%s %sconsole jms-job-queue:run --max-runtime=999999999 --max-concurrent-jobs=%u --env=%s',
+            '%s %sconsole jms-job-queue:run --max-runtime=3600 --max-concurrent-jobs=%u --env=%s',
             $this->phpExec,
             $this->rootDir . DIRECTORY_SEPARATOR,
             max($this->maxJobs, 1),

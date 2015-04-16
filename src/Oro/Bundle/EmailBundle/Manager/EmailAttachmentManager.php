@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -41,25 +42,31 @@ class EmailAttachmentManager
     /** @var ServiceLink */
     protected $securityFacadeLink;
 
+    /** @var AttachmentConfig */
+    protected $attachmentConfig;
+
     /**
-     * @param FileSystemMap             $filesystemMap
-     * @param EntityManager             $em
-     * @param KernelInterface           $kernel
-     * @param ServiceLink               $securityFacadeLink
-     * @param ConfigFileValidator       $configFileValidator
+     * @param FileSystemMap       $filesystemMap
+     * @param EntityManager       $em
+     * @param KernelInterface     $kernel
+     * @param ServiceLink         $securityFacadeLink
+     * @param ConfigFileValidator $configFileValidator
+     * @param AttachmentConfig    $attachmentConfig
      */
     public function __construct(
         FilesystemMap $filesystemMap,
         EntityManager $em,
         KernelInterface $kernel,
         ServiceLink $securityFacadeLink,
-        ConfigFileValidator $configFileValidator
+        ConfigFileValidator $configFileValidator,
+        AttachmentConfig $attachmentConfig
     ) {
-        $this->filesystem           = $filesystemMap->get('attachments');
-        $this->em                   = $em;
-        $this->attachmentDir        = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
-        $this->securityFacadeLink   = $securityFacadeLink;
-        $this->configFileValidator  = $configFileValidator;
+        $this->filesystem = $filesystemMap->get('attachments');
+        $this->em = $em;
+        $this->attachmentDir = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
+        $this->securityFacadeLink = $securityFacadeLink;
+        $this->configFileValidator = $configFileValidator;
+        $this->attachmentConfig = $attachmentConfig;
     }
 
     /**
@@ -70,18 +77,16 @@ class EmailAttachmentManager
      */
     public function linkEmailAttachmentToTargetEntity(EmailAttachment $emailAttachment, $entity)
     {
-        if (null === $emailAttachment->getFile()) {
+        if (!$emailAttachment->getFile()) {
             $file = $this->copyEmailAttachmentToFileSystem($emailAttachment);
-        } else {
-            $file = $emailAttachment->getFile();
+            $errors = $this->configFileValidator->validate(ClassUtils::getClass($entity), $file);
+            if ($errors->count() > 0) {
+                $this->filesystem->get($file->getFilename())->delete();
+                return;
+            }
+            $emailAttachment->setFile($file);
+            $this->linkAttachmentToEntity($emailAttachment, $entity);
         }
-        $errors = $this->configFileValidator->validate(ClassUtils::getClass($entity), $file);
-        if ($errors->count() > 0) {
-            $this->filesystem->get($file->getFilename())->delete();
-            return;
-        }
-        $emailAttachment->setFile($file);
-        $this->linkAttachmentToEntitie($emailAttachment, $entity);
     }
 
     /**
@@ -117,7 +122,7 @@ class EmailAttachmentManager
     public function isAttached($attachment, $target)
     {
         $targetEntityClass = ClassUtils::getClass($target);
-        if ($this->buildAttachmentInstance()->supportTarget($targetEntityClass)) {
+        if ($this->attachmentConfig->isAttachmentAssociationEnabled($target)) {
             $attached = $this->em->getRepository('OroAttachmentBundle:Attachment')->findOneBy(
                 [
                     ExtendHelper::buildAssociationName($targetEntityClass) => $target,
@@ -136,9 +141,6 @@ class EmailAttachmentManager
      */
     protected function copyEmailAttachmentToFileSystem(EmailAttachment $emailAttachment)
     {
-        if (null !== $emailAttachment->getFile()) {
-            return;
-        }
         $file = new File();
         $file->setExtension($emailAttachment->getExtension());
         $file->setOriginalFilename($emailAttachment->getFileName());
@@ -174,12 +176,10 @@ class EmailAttachmentManager
      * @param EmailAttachment $emailAttachment
      * @param object $entity
      */
-    protected function linkAttachmentToEntitie(EmailAttachment $emailAttachment, $entity)
+    protected function linkAttachmentToEntity(EmailAttachment $emailAttachment, $entity)
     {
         $entityClass = ClassUtils::getClass($entity);
-        if (!$emailAttachment->getFile()) {
-            return;
-        }
+
         $attachment = $this->buildAttachmentInstance();
         if (!$attachment->supportTarget($entityClass)) {
             return;

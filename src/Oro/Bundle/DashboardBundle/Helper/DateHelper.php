@@ -30,6 +30,59 @@ class DateHelper
     }
 
     /**
+     * @param DateTime $from
+     * @param DateTime $to
+     * @param array $data
+     * @param string $rowKey
+     * @param string $dataKey
+     *
+     * @return array
+     */
+    public function convertToCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
+    {
+        $items = $this->getDatePeriod($from, $to);
+        foreach ($data as $row) {
+            $key = $this->getKey($from, $to, $row);
+            $items[$key][$dataKey] = $row[$rowKey];
+        }
+
+        return array_combine(range(0, count($items) - 1), array_values($items));
+    }
+
+    /**
+     * @param DateTime $from
+     * @param DateTime $to
+     * @param array $data
+     * @param string $rowKey
+     * @param string $dataKey
+     *
+     * @return array
+     */
+    public function combinePreviousDataWithCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
+    {
+        $items = $this->getDatePeriod($from, $to);
+        foreach ($data as $row) {
+            $key = $this->getKey($from, $to, $row);
+            $items[$key][$dataKey] = $row[$rowKey];
+        }
+
+        $currentFrom = $to;
+        $currentTo = clone $to;
+        $diff = $to->getTimestamp() - $from->getTimestamp();
+        $currentTo->setTimestamp($currentFrom->getTimestamp() + $diff);
+
+        $currentItems = $this->getDatePeriod($currentFrom, $currentTo);
+
+        $mixedItems = array_combine(array_keys($currentItems), array_values($items));
+        foreach ($mixedItems as $currentDate => $previousData) {
+            $previousData['date'] = $currentItems[$currentDate]['date'];
+            $currentItems[$currentDate] = $previousData;
+        }
+
+        return array_combine(range(0, count($currentItems) - 1), array_values($currentItems));
+    }
+
+    /**
      * @param DateTime $start
      * @param DateTime $end
      * @return array

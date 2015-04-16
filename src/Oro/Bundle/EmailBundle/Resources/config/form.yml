@@ -85,7 +85,7 @@ services:
         class: %oro_email.form.type.attachment.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - @knp_gaufrette.filesystem_map
+            - @oro_email.email_attachment_transformer
         tags:
             - { name: form.type, alias: oro_email_attachment }
 
