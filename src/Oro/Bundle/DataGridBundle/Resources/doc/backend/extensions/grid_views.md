@@ -12,7 +12,7 @@ Configuration
     # ...
      options:
             gridViews:
-                allLabel: oro.datagrid.gridview.all # label of default view
+                allLabel: Custom label # label of default view (default: "All {Entity name}")
 ```
 
 ### dashboard.yml
