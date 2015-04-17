@@ -111,29 +111,25 @@ class EmailController extends RestGetController
      */
     public function getAssociationsDataAction($entityId)
     {
-        /**
-         * @var $entityRoutingHelper EntityRoutingHelper
-         */
+        /** @var $entity Email */
+        $entity = $this->getManager()->find($entityId);
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
+        /** @var $entityRoutingHelper EntityRoutingHelper */
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         /** @var $configManager ConfigManager */
         $configManager = $this->container->get('oro_entity_config.config_manager');
         $nameFormatter = $this->get('oro_locale.formatter.name');
         $router = $this->get('router');
-
-        /** @var $entity Email */
-        $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
         $associations = $entity->getActivityTargetEntities();
         $this->filterUserAssociation($associations);
-        $itemsArray = array();
+        $itemsArray = [];
+
         foreach ($associations as $association) {
             $className = ClassUtils::getClass($association);
-            $classNameEncoded = $entityRoutingHelper->encodeClassName($className);
             $title = $nameFormatter->format($association);
             if ($title === '') {
                 $title = $association->getEmail();
@@ -141,23 +137,22 @@ class EmailController extends RestGetController
                 $title = $association->getId();
             }
             $metadata = $configManager->getEntityMetadata($className);
-            $route = $configManager->getEntityMetadata($className)->getRoute('view', false);
+            $route = $metadata->getRoute('view', false);
+            $link = false;
             if ($metadata->routeView) {
                 $link = $router->generate($route, ['id' => $association->getId()]);
-            } else {
-                $link = false;
             }
             $config = $entityConfigProvider->getConfig($className);
 
             if ($title) {
-                $itemsArray[] = array(
+                $itemsArray[] = [
                     'entityId'=> $entity->getId(),
                     'targetId'=> $association->getId(),
-                    'targetClassName'=> $classNameEncoded,
+                    'targetClassName'=> $entityRoutingHelper->encodeClassName($className),
                     'title'=> $title,
                     'icon'=> $config->get('icon'),
                     'link'=> $link
-                );
+                ];
             }
         }
 
