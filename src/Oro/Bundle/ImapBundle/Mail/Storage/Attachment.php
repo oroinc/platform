@@ -67,6 +67,14 @@ class Attachment
             $encoding = 'ASCII';
         }
 
+        // Extract name from quoted text.
+        // zend mail library bug (incorrect header decode).
+        // Zend\Mail\Headers line 82 ($currentLine .= ' ' . trim($line);)
+        // Fixed in zend-mail 2.4
+        if (preg_match('"([^\\"]+)"', $value, $result)) {
+            $value = $result[0];
+        }
+
         return new Value($value, $encoding);
     }
 
