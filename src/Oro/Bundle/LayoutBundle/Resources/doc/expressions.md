@@ -45,7 +45,7 @@ Examples
 
 Usage of an expression in layout update:
 
-```yml
+```yaml
 layout:
     actions:
         - @add:
