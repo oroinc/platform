@@ -15,7 +15,7 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
             });
 
             options.dialogOptions = {
-                title: options.widget.options.title + ' ' + __('oro.dashboard.widget_configuration_label'),
+                title: __('oro.dashboard.widget_configuration_label') + ' - ' + options.widget.options.title,
                 modal: true,
                 minWidth: 575,
                 resizable: false
