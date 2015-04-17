@@ -114,12 +114,13 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ],
             'views' => [
                 [
-                    'name' => 'first',
+                    'name'    => 'first',
                     'filters' => [],
                     'sorters' => [],
                     'type' => 'system',
                 ],
                 [
+                    'label'   => 'view1',
                     'name'    => 1,
                     'filters' => [],
                     'sorters' => [],
@@ -128,6 +129,7 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
                     'editable'  => true,
                 ],
                 [
+                    'label'   => 'view2',
                     'name'    => 2,
                     'filters' => [],
                     'sorters' => [],
