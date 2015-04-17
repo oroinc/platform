@@ -60,8 +60,8 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
                 'audit_id' => $row['id'],
                 'data_type' => $dataType,
                 'field' => $field,
-                sprintf('old_%s', $dataType) => $values['old'],
-                sprintf('new_%s', $dataType) => $values['new'],
+                sprintf('old_%s', $dataType) => $this->parseValue($values['old']),
+                sprintf('new_%s', $dataType) => $this->parseValue($values['new']),
             ];
 
             $types = [
@@ -74,6 +74,20 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 
             $this->connection->insert('oro_audit_field', $data, $types);
         }
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function parseValue($value)
+    {
+        if (isset($value['value'])) {
+            return $value['value'];
+        }
+
+        return $value;
     }
 
     /**
@@ -149,14 +163,18 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             case 'text':
             case 'string':
             case 'guid':
-            case 'ref-one':
-            case 'ref-many':
+            case 'manyToOne':
+            case 'enum':
+            case 'multiEnum':
                 return 'text';
             case 'smallint':
             case 'integer':
+            case 'bigint':
                 return 'integer';
             case 'decimal':
-            case 'float';
+            case 'float':
+            case 'money':
+            case 'percent':
                 return 'float';
             case 'date':
                 return 'date';
@@ -165,7 +183,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             case 'datetime':
                 return 'datetime';
             default:
-                throw new LogicException('Cannot normalize type "%s".');
+                throw new LogicException(sprintf('Cannot normalize type "%s".', $dataType));
         }
     }
 }

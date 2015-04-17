@@ -35,14 +35,14 @@ class OroDataAuditBundle implements Migration
         $oroAuditFieldTable->addColumn('old_text', 'text', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('old_date', 'date', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('old_time', 'time', ['notnull' => false]);
-        $oroAuditFieldTable->addColumn('old_date_time', 'datetime', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('old_datetime', 'datetime', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_integer', 'bigint', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_float', 'float', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_boolean', 'boolean', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_text', 'text', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_date', 'date', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_time', 'time', ['notnull' => false]);
-        $oroAuditFieldTable->addColumn('new_date_time', 'datetime', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('new_datetime', 'datetime', ['notnull' => false]);
         $oroAuditFieldTable->setPrimaryKey(['id']);
         $oroAuditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 

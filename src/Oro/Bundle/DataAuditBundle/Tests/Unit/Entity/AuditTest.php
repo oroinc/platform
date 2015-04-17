@@ -57,12 +57,24 @@ class AuditTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([
             'field' => [
-                'new' => 1,
-                'old' => 0,
+                'new' => [
+                    'value' => 1,
+                    'type'  => 'integer',
+                ],
+                'old' => [
+                    'value' => 0,
+                    'type'  => 'integer',
+                ],
             ],
             'field2' => [
-                'new' => 'new_',
-                'old' => '_old',
+                'new' => [
+                    'value' => 'new_',
+                    'type'  => 'text',
+                ],
+                'old' => [
+                    'value' => '_old',
+                    'type'  => 'text',
+                ],
             ],
         ], $audit->getData());
     }

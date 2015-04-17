@@ -237,8 +237,14 @@ class Audit extends AbstractLogEntry
         $data = [];
         foreach ($this->getFields() as $field) {
             $data[$field->getField()] = [
-                'old' => $field->getOldValue(),
-                'new' => $field->getNewValue(),
+                'old' => [
+                    'value' => $field->getOldValue(),
+                    'type'  => $field->getDataType(),
+                ],
+                'new' => [
+                    'value' => $field->getNewValue(),
+                    'type'  => $field->getDataType(),
+                ],
             ];
         }
 

@@ -88,7 +88,7 @@ class AuditField
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="old_date_time", type="datetime", nullable=true)
+     * @ORM\Column(name="old_datetime", type="datetime", nullable=true)
      */
     protected $oldDatetime;
 
@@ -137,7 +137,7 @@ class AuditField
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="new_date_time", type="datetime", nullable=true)
+     * @ORM\Column(name="new_datetime", type="datetime", nullable=true)
      */
     protected $newDatetime;
 
@@ -255,12 +255,18 @@ class AuditField
             case 'text':
             case 'string':
             case 'guid':
+            case 'manyToOne':
+            case 'enum':
+            case 'multiEnum':
                 return 'text';
             case 'smallint':
             case 'integer':
+            case 'bigint':
                 return 'integer';
             case 'decimal':
-            case 'float';
+            case 'float':
+            case 'money':
+            case 'percent':
                 return 'float';
             case 'date':
                 return 'date';
