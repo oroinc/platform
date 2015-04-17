@@ -33,7 +33,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE",
+ *              "permissions"="VIEW;CREATE;EDIT",
  *              "group_name"=""
  *          },
  *          "grouping"={
@@ -58,6 +58,7 @@ class Email extends ExtendEmail
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
     const HIGH_IMPORTANCE   = 1;
+    const ENTITY_CLASS      = 'Oro\Bundle\EmailBundle\Entity\Email';
 
     /**
      * @var integer

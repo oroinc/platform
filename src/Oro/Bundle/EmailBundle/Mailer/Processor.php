@@ -8,7 +8,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -19,6 +18,7 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -149,16 +149,16 @@ class Processor
         $this->persistAttachments($model, $email);
 
         // associate the email with the target entity if exist
-        if ($model->hasEntity()) {
-            $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
-            if ($targetEntity) {
-                $this->emailActivityManager->addAssociation($email, $targetEntity);
-            }
+        $contexts = $model->getContexts();
+        foreach ($contexts as $context) {
+            $this->emailActivityManager->addAssociation($email, $context);
         }
 
         // flush all changes to the database
         $this->getEntityManager()->flush();
-        $this->eventEmailBody($email);
+
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
         return $email;
     }
@@ -169,8 +169,9 @@ class Processor
      */
     protected function addAttachments(\Swift_Message $message, EmailModel $model)
     {
-        /** @var EmailAttachment $attachment */
-        foreach ($model->getAttachments() as $attachment) {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
             $swiftAttachment = new \Swift_Attachment(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
@@ -189,8 +190,10 @@ class Processor
      */
     protected function persistAttachments(EmailModel $model, Email $email)
     {
-        /** @var EmailAttachment $attachment */
-        foreach ($model->getAttachments() as $attachment) {
+        /** @var AttachmentModel $attachmentModel */
+        foreach ($model->getAttachments() as $attachmentModel) {
+            $attachment = $attachmentModel->getEmailAttachment();
+
             if (!$attachment->getId()) {
                 $this->getEntityManager()->persist($attachment);
             } else {
@@ -326,7 +329,7 @@ class Processor
     {
         $messageId = '';
         $parentEmailId = $model->getParentEmailId();
-        if ($parentEmailId) {
+        if ($parentEmailId && $model->getMailType() == EmailModel::MAIL_TYPE_REPLY) {
             $parentEmail = $this->getEntityManager()
                 ->getRepository('OroEmailBundle:Email')
                 ->find($parentEmailId);
@@ -345,14 +348,5 @@ class Processor
         }
 
         return $this->em;
-    }
-
-    /**
-     * @param $email
-     */
-    protected function eventEmailBody($email)
-    {
-        $event = new EmailBodyAdded($email);
-        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
     }
 }
