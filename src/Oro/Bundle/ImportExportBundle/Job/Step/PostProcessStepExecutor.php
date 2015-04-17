@@ -137,8 +137,7 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
                 $this->write($itemsToWrite, $warningHandler);
             }
 
-            if ($this->checkPostProcessingJobsBatch()) {
-                $this->writeWithoutClear($itemsToWrite, $warningHandler);
+            if ($this->checkPostProcessingJobsNotEmpty()) {
                 $this->runPostProcessingJobs();
             }
 
