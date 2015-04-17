@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
 /**
- *
  * Factory is intended to provide flexible way to extend form models
  *
  * Class Factory

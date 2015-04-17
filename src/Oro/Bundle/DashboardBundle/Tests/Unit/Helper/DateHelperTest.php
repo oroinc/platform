@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Helper;
 
+use DateTime;
+
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
@@ -15,6 +17,12 @@ class DateHelperTest extends OrmTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $settings;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $aclHelper;
+
     public function setUp()
     {
         $this->settings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
@@ -23,7 +31,13 @@ class DateHelperTest extends OrmTestCase
         $this->settings->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-        $this->helper = new DateHelper($this->settings);
+        $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->helper = new DateHelper($this->settings, $this->doctrine, $this->aclHelper);
     }
 
     /**
@@ -225,5 +239,95 @@ class DateHelperTest extends OrmTestCase
                     . 'GROUP BY dateCreated, hourCreated'
             ]
         ];
+    }
+
+    public function testConvertToCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    {
+        $result = $this->helper->convertToCurrentPeriod(
+            new DateTime(),
+            new DateTime(),
+            [],
+            'row',
+            'data'
+        );
+
+        $this->assertSame([], $result);
+    }
+
+    public function testConvertToCurrentPeriod()
+    {
+        $from = new DateTime('2015-05-10');
+        $to = new DateTime('2015-05-15');
+
+        $data = [
+            [
+                'yearCreated'  => '2015',
+                'monthCreated' => '05',
+                'dayCreated'   => '12',
+                'cnt'          => 3,
+            ],
+            [
+                'yearCreated'  => '2015',
+                'monthCreated' => '05',
+                'dayCreated'   => '14',
+                'cnt'          => 5,
+            ],
+        ];
+        $expectedData = [
+            ['date' => '2015-05-10'],
+            ['date' => '2015-05-11'],
+            ['date' => '2015-05-12', 'count' => 3],
+            ['date' => '2015-05-13'],
+            ['date' => '2015-05-14', 'count' => 5],
+        ];
+
+        $actualData = $this->helper->convertToCurrentPeriod($from, $to, $data, 'cnt', 'count');
+
+        $this->assertEquals($expectedData, $actualData);
+    }
+
+    public function testCombinePreviousDataWithCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    {
+        $result = $this->helper->combinePreviousDataWithCurrentPeriod(
+            new DateTime(),
+            new DateTime(),
+            [],
+            'row',
+            'data'
+        );
+
+        $this->assertSame([], $result);
+    }
+
+    public function testCombinePreviousDataWithCurrentPeriod()
+    {
+        $previousFrom = new DateTime('2015-05-05');
+        $previousTo = new DateTime('2015-05-10');
+
+        $data = [
+            [
+                'yearCreated'  => '2015',
+                'monthCreated' => '05',
+                'dayCreated'   => '07',
+                'cnt'          => 5,
+            ],
+        ];
+        $expectedData = [
+            ['date' => '2015-05-10'],
+            ['date' => '2015-05-11'],
+            ['date' => '2015-05-12', 'count' => 5],
+            ['date' => '2015-05-13'],
+            ['date' => '2015-05-14'],
+        ];
+
+        $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
+            $previousFrom,
+            $previousTo,
+            $data,
+            'cnt',
+            'count'
+        );
+
+        $this->assertEquals($expectedData, $actualData);
     }
 }

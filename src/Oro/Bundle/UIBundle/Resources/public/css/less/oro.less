@@ -1,3 +1,4 @@
+@import "mixins";
 // Base
 * {
   -webkit-box-sizing:border-box;
@@ -3147,4 +3148,12 @@ label .popover-content {
 
 .invisible {
   opacity: 0;
+}
+// dropdowns should be able to exceed accordion body area
+.accordion-body {
+  .clearfix();
+  // once accordion is opened and animation is finished
+  &[style="height: auto;"] {
+    overflow: visible;
+  }
 }

@@ -107,6 +107,8 @@ services:
         class: %oro_dashboard.datetime.hepler.class%
         arguments:
             - @oro_locale.settings
+            - @doctrine
+            - @oro_security.acl_helper
 
     oro_dashboard.event_listener.widget_configuration_load:
         class: %oro_dashboard.event_listener.widget_configuration_load.class%
@@ -151,6 +153,7 @@ services:
         arguments:
             - @oro_locale.formatter.date_time
             - @oro_filter.expression.date.compiler
+            - @translator
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_date_range" }
 
@@ -159,6 +162,7 @@ services:
           arguments:
               - @oro_locale.formatter.date_time
               - @oro_filter.expression.date.compiler
+              - @translator
           tags:
               - { name: oro_dashboard.value.converter, alias: "oro_type_widget_previous_date_range" }
 

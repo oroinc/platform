@@ -233,4 +233,6 @@
 .user-status-list .list-group-item-text {
     display:table-cell;
 }
-
+.oro-multiselect-holder .float-holder span.validation-failed {
+    padding-top: 4px;
+}
