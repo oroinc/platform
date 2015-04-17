@@ -244,6 +244,35 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
+    {
+        try {
+            if (!$optionName) {
+                throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
+                throw new Exception\LogicException('Cannot change already resolved options.');
+            }
+            $this->optionsManipulator->replaceOption($id, $optionName, $oldOptionValue, $newOptionValue);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot replace a value for "%s" option for "%s" item. Reason: %s',
+                    $optionName,
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function removeOption($id, $optionName)
     {
         try {

@@ -33,20 +33,23 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** The action name for add/update an option for the layout item */
     const SET_OPTION = 6;
 
-    /** The action name for add/update an option for the layout item */
+    /** The action name for add additional value for an option for the layout item */
     const APPEND_OPTION = 7;
 
-    /** The action name for add/update an option for the layout item */
+    /** The action name for remove a value from an option for the layout item */
     const SUBTRACT_OPTION = 8;
 
+    /** The action name for replace one value with another value for an option for the layout item */
+    const REPLACE_OPTION = 9;
+
     /** The action name for remove an option for the layout item */
-    const REMOVE_OPTION = 9;
+    const REMOVE_OPTION = 10;
 
     /** The action name for change the block type for the layout item */
-    const CHANGE_BLOCK_TYPE = 10;
+    const CHANGE_BLOCK_TYPE = 11;
 
     /** The action name for add the theme(s) to be used for rendering the layout item and its children */
-    const SET_BLOCK_THEME = 11;
+    const SET_BLOCK_THEME = 12;
 
     /** @var LayoutRegistryInterface */
     protected $registry;
@@ -61,7 +64,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      *
      * Example:
      *  [
-     *      'add' => [ // add new items related actions: add, move, addAlias, setOption, removeOption
+     *      'add' => [ // add new items related actions:
+     *          // add, move, addAlias, [set/append/subtract/replace/remove]Option
      *          ['add', ['root', null, 'root', [], null, false]],
      *          ['add', ['my_label', 'my_root', 'label', ['text' => 'test'], null, true]],
      *          ['addAlias', ['my_root', 'root']],
@@ -178,6 +182,17 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function subtractOption($id, $optionName, $optionValue)
     {
         $this->actions[self::GROUP_ADD][] = [self::SUBTRACT_OPTION, __FUNCTION__, [$id, $optionName, $optionValue]];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
+    {
+        $this->actions[self::GROUP_ADD][] =
+            [self::REPLACE_OPTION, __FUNCTION__, [$id, $optionName, $oldOptionValue, $newOptionValue]];
 
         return $this;
     }
@@ -317,6 +332,9 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      *  * move
      *  * addAlias
      *  * setOption
+     *  * appendOption
+     *  * subtractOption
+     *  * replaceOption
      *  * removeOption
      *  * changeBlockType
      */
@@ -423,6 +441,9 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                     );
             case self::REMOVE:
             case self::SET_OPTION:
+            case self::APPEND_OPTION:
+            case self::SUBTRACT_OPTION:
+            case self::REPLACE_OPTION:
             case self::REMOVE_OPTION:
             case self::CHANGE_BLOCK_TYPE:
                 $id = $args[0];

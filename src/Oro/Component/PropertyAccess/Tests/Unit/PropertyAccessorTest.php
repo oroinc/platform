@@ -2,12 +2,17 @@
 
 namespace Oro\Component\PropertyAccess\Tests\Unit;
 
+use Oro\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClass;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicCall;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicGet;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Ticket5775Object;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -326,6 +331,194 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($value, 'foobar.baz', 'bam');
     }
 
+    /**
+     * @dataProvider getValidPropertyPathsForRemove
+     */
+    public function testRemove($objectOrArray, $path)
+    {
+        $this->propertyAccessor->remove($objectOrArray, $path);
+
+        if (count(func_get_args()) === 3) {
+            $expectedValue = func_get_args()[2];
+            $actualValue   = $this->propertyAccessor->getValue($objectOrArray, $path);
+            $this->assertSame($expectedValue, $actualValue);
+        } else {
+            try {
+                $this->propertyAccessor->getValue($objectOrArray, $path);
+                $this->fail(sprintf('It is expected that "%s" is removed.', $path));
+            } catch (NoSuchPropertyException $ex) {
+            }
+        }
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidArgumentException
+     */
+    public function testRemoveThrowsExceptionForInvalidPropertyPathType()
+    {
+        $this->propertyAccessor->remove(new \stdClass(), 123);
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
+    {
+        $this->propertyAccessor->remove($objectOrArray, $path);
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testRemoveThrowsNoExceptionIfIndexNotFound($objectOrArray, $path)
+    {
+        $clone = unserialize(serialize($objectOrArray));
+
+        $this->propertyAccessor->remove($objectOrArray, $path);
+
+        try {
+            $this->propertyAccessor->getValue($objectOrArray, $path);
+            $this->fail(sprintf('It is expected that "%s" is removed.', $path));
+        } catch (NoSuchPropertyException $ex) {
+        }
+
+        $this->assertEquals($clone, $objectOrArray);
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveThrowsExceptionIfNotArrayAccess()
+    {
+        $this->propertyAccessor->remove(new \stdClass(), 'index');
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveThrowsExceptionIfThereIsInvalidItemInGraph()
+    {
+        $objectOrArray = new \stdClass();
+        $objectOrArray->root = ['index' => 123];
+
+        $this->propertyAccessor->remove($objectOrArray, 'root.index.firstName');
+    }
+
+    public function testRemoveUpdatesMagicUnset()
+    {
+        $author = new TestClassMagicGet('John');
+
+        $this->propertyAccessor->remove($author, 'magicProperty');
+
+        $this->assertNull($author->__get('magicProperty'));
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveThrowsExceptionIfThereAreMissingParameters()
+    {
+        $this->propertyAccessor->remove(new TestClass('John'), 'publicAccessorWithMoreRequiredParameters');
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveThrowsExceptionIfPublicPropertyHasNoUnsetter()
+    {
+        $this->propertyAccessor->remove(new TestClass('John'), 'publicProperty');
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveThrowsExceptionIfProtectedProperty()
+    {
+        $this->propertyAccessor->remove(new TestClass('John'), 'protectedProperty');
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveThrowsExceptionIfPrivateProperty()
+    {
+        $this->propertyAccessor->remove(new TestClass('John'), 'privateProperty');
+    }
+
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testRemoveDoesNotUpdateMagicCallByDefault()
+    {
+        $author = new TestClassMagicCall('John');
+
+        $this->propertyAccessor->remove($author, 'magicCallProperty');
+    }
+
+    public function testRemoveUpdatesMagicCallIfEnabled()
+    {
+        $this->propertyAccessor = new PropertyAccessor(true);
+
+        $author = new TestClassMagicCall('John');
+
+        $this->propertyAccessor->remove($author, 'magicCallProperty');
+
+        $this->assertNull($author->__call('getMagicCallProperty', array()));
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testRemoveThrowsExceptionIfNotObjectOrArray()
+    {
+        $value = 'baz';
+
+        $this->propertyAccessor->remove($value, 'foobar');
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testRemoveThrowsExceptionIfNull()
+    {
+        $value = null;
+
+        $this->propertyAccessor->remove($value, 'foobar');
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testRemoveThrowsExceptionIfEmpty()
+    {
+        $value = '';
+
+        $this->propertyAccessor->remove($value, 'foobar');
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testRemoveNestedExceptionMessage()
+    {
+        $value = (object)array('foobar' => null);
+
+        $this->propertyAccessor->remove($value, 'foobar.baz');
+    }
+
     public function testGetValueWhenArrayValueIsNull()
     {
         $this->propertyAccessor = new PropertyAccessor();
@@ -369,6 +562,34 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(array('index' => array('%!@$§.' => 'John')), 'index[%!@$§.]', 'John'),
             array((object)array('%!@$§' => 'John'), '%!@$§', 'John'),
             array((object)array('property' => (object)array('%!@$§' => 'John')), 'property.%!@$§', 'John'),
+        );
+    }
+
+    public function getValidPropertyPathsForRemove()
+    {
+        return array(
+            array(array('John', 'Doo'), '0'),
+            array(array('John', 'Doo'), '1'),
+            array(array('firstName' => 'John'), 'firstName'),
+            array(array('firstName' => 'John'), '[firstName]'),
+            array(array('index' => array('firstName' => 'John')), 'index.firstName'),
+            array(array('index' => array('firstName' => 'John')), '[index][firstName]'),
+            array(array('index' => array('firstName' => 'John')), '[index].firstName'),
+            array(array('index' => array('firstName' => 'John')), 'index[firstName]'),
+            // Accessor methods
+            array(new TestClass('John'), 'publicAccessor', null),
+            array(new TestClass('John'), '[publicAccessor]', null),
+            array(new TestClass('John'), 'publicAccessorWithDefaultValue', null),
+            array(new TestClass('John'), '[publicAccessorWithDefaultValue]', null),
+            // Methods are camelized
+            array(new TestClass('John'), 'public_accessor', null),
+            array(new TestClass('John'), '[public_accessor]', null),
+            array(new TestClass('John'), '_public_accessor', null),
+            array(new TestClass('John'), '[_public_accessor]', null),
+            // Special chars
+            array(array('%!@$§' => 'John'), '%!@$§'),
+            array(array('%!@$§.' => 'John'), '[%!@$§.]'),
+            array(array('index' => array('%!@$§.' => 'John')), 'index[%!@$§.]'),
         );
     }
 

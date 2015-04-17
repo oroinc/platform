@@ -110,6 +110,18 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
     public function subtractOption($id, $optionName, $optionValue);
 
     /**
+     * Replaces one value with another value for existing option of the item
+     *
+     * @param string $id             The item id
+     * @param string $optionName     The option name or path
+     * @param mixed  $oldOptionValue The option value to be replaced
+     * @param mixed  $newOptionValue The option value to replace a value specified in $oldOptionValue parameter
+     *
+     * @return self
+     */
+    public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue);
+
+    /**
      * Removes the option for the item
      *
      * @param string $id         The item id

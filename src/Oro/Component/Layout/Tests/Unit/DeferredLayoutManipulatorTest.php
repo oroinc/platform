@@ -13,6 +13,9 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
  * This class contains unit tests which are NOT RELATED to ALIASES and CHANGE COUNTERS
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {
@@ -475,6 +478,225 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
+    public function testSetOptionByPath()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->setOption('logo', 'attr.class', 'test_class')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => '', 'attr' => ['class' => 'test_class']]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAppendOption()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->appendOption('logo', 'attr.class', 'test_class2')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1']]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => '',
+                                    'attr'  => ['class' => 'test_class1 test_class2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAppendOptionWhenNoPrevOption()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->appendOption('logo', 'attr.class', 'test_class2')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => '',
+                                    'attr'  => ['class' => 'test_class2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testSubtractOption()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->subtractOption('logo', 'attr.class', 'test_class2')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1 test_class2']]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => '',
+                                    'attr'  => ['class' => 'test_class1']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testSubtractOptionWhenNoPrevOption()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->subtractOption('logo', 'attr.class', 'test_class2')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => ''
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceOption()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->replaceOption('logo', 'attr.class', 'test_class1', 'new_class1')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1 test_class2']]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => '',
+                                    'attr'  => ['class' => 'new_class1 test_class2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceOptionForUnknownValue()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->replaceOption('logo', 'attr.class', 'unknown_class', 'new_class')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1 test_class2']]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => '',
+                                    'attr'  => ['class' => 'test_class1 test_class2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     public function testRemoveOption()
     {
         $this->layoutManipulator
@@ -503,6 +725,34 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
+    public function testRemoveOptionByPath()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->removeOption('logo', 'attr.class')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class']]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => '', 'attr' => []]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     public function testSetOptionForRemovedItem()
     {
         $this->layoutManipulator
@@ -511,6 +761,63 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->remove('header')
             ->setOption('logo', 'title', 'test1');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars' => ['id' => 'root'],
+            ],
+            $view
+        );
+    }
+
+    public function testAppendOptionForRemovedItem()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1']])
+            ->remove('header')
+            ->appendOption('logo', 'attr.class', 'test_class2');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars' => ['id' => 'root'],
+            ],
+            $view
+        );
+    }
+
+    public function testSubtractOptionForRemovedItem()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1 test_class2']])
+            ->remove('header')
+            ->subtractOption('logo', 'attr.class', 'test_class2');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars' => ['id' => 'root'],
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceOptionForRemovedItem()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1 test_class2']])
+            ->remove('header')
+            ->replaceOption('logo', 'attr.class', 'test_class1', 'new_class1');
 
         $view = $this->getLayoutView();
 
@@ -536,6 +843,76 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->assertBlockView(
             [ // root
                 'vars' => ['id' => 'root'],
+            ],
+            $view
+        );
+    }
+
+    public function testOptionManipulations()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1']])
+            ->appendOption('logo', 'attr.class', 'test_class2')
+            ->subtractOption('logo', 'attr.class', 'test_class1')
+            ->setOption('logo', 'attr.class', 'new_class1')
+            ->appendOption('logo', 'attr.class', 'new_class2')
+            ->subtractOption('logo', 'attr.class', 'new_class1')
+            ->replaceOption('logo', 'attr.class', 'new_class2', 'replaced_class2');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => '',
+                                    'attr'  => ['class' => 'replaced_class2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testSubtractAndThenAppendOption()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['attr' => ['class' => 'test_class1']])
+            ->subtractOption('logo', 'attr.class', 'test_class2')
+            ->appendOption('logo', 'attr.class', 'test_class2');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => '',
+                                    'attr'  => ['class' => 'test_class1 test_class2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
             $view
         );

@@ -117,7 +117,7 @@ class ConfigExpressionCompilerPassTest extends \PHPUnit_Framework_TestCase
         $encodingServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with(
-                2,
+                1,
                 [
                     'json' => 'json_encoder',
                     'xml'  => 'xml_encoder'

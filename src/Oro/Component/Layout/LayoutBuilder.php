@@ -129,6 +129,16 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
+    {
+        $this->layoutManipulator->replaceOption($id, $optionName, $oldOptionValue, $newOptionValue);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function removeOption($id, $optionName)
     {
         $this->layoutManipulator->removeOption($id, $optionName);

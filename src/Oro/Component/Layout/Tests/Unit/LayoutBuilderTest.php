@@ -134,6 +134,49 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->layoutBuilder, $result);
     }
 
+    public function testAppendOption()
+    {
+        $id          = 'test_alias';
+        $optionName  = 'test_option_name';
+        $optionValue = 'test_option_value';
+
+        $this->layoutManipulator->expects($this->once())
+            ->method('appendOption')
+            ->with($id, $optionName, $optionValue);
+
+        $result = $this->layoutBuilder->appendOption($id, $optionName, $optionValue);
+        $this->assertSame($this->layoutBuilder, $result);
+    }
+
+    public function testSubtractOption()
+    {
+        $id          = 'test_alias';
+        $optionName  = 'test_option_name';
+        $optionValue = 'test_option_value';
+
+        $this->layoutManipulator->expects($this->once())
+            ->method('subtractOption')
+            ->with($id, $optionName, $optionValue);
+
+        $result = $this->layoutBuilder->subtractOption($id, $optionName, $optionValue);
+        $this->assertSame($this->layoutBuilder, $result);
+    }
+
+    public function testReplaceOption()
+    {
+        $id             = 'test_alias';
+        $optionName     = 'test_option_name';
+        $oldOptionValue = 'old_option_value';
+        $newOptionValue = 'new_option_value';
+
+        $this->layoutManipulator->expects($this->once())
+            ->method('replaceOption')
+            ->with($id, $optionName, $oldOptionValue, $newOptionValue);
+
+        $result = $this->layoutBuilder->replaceOption($id, $optionName, $oldOptionValue, $newOptionValue);
+        $this->assertSame($this->layoutBuilder, $result);
+    }
+
     public function testRemoveOption()
     {
         $id         = 'test_id';

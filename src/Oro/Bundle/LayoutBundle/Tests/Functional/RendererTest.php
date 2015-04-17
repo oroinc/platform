@@ -29,9 +29,10 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form']);
+        $context->getResolver()->setOptional(['form', 'body_class']);
         $form = $this->getTestForm();
         $context->set('form', new FormAccessor($form));
+        $context->set('body_class', 'test-body');
 
         // revert TWIG form renderer to Symfony's default theme
         $this->getContainer()->get('twig.form.renderer')->setTheme(
@@ -54,9 +55,10 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form']);
+        $context->getResolver()->setOptional(['form', 'body_class']);
         $form = $this->getTestForm();
         $context->set('form', new FormAccessor($form));
+        $context->set('body_class', 'test-body');
 
         $result   = $this->getCoreBlocksTestLayout($context)->setRenderer('php')->render();
         $expected = $this->getCoreBlocksTestLayoutResult(
@@ -234,6 +236,9 @@ class RendererTest extends LayoutTestCase
                 ['type' => 'input', 'action' => 'submit', 'name' => 'btn2', 'text' => 'Btn2'],
                 'button'
             )
+            // test manipulations of 'class' attribute
+            ->appendOption('content', 'attr.class', ['@join' => [' ', 'class1', 'class2']])
+            ->replaceOption('content', 'attr.class', 'class1', ['@value' => ['$context.body_class']])
             ->getLayout($context);
 
         return $layout;
@@ -287,7 +292,7 @@ class RendererTest extends LayoutTestCase
         </script>
         <link rel="stylesheet" href="test.css"/>
     </head>
-<body>
+<body class="test-body class2">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
     <input type="submit" name="btn2" value="Btn2"/>
     <ul>
