@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use JMS\JobQueueBundle\Entity\Job;
+
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 class ChannelRepository extends EntityRepository
 {
+    const BUFFER_SIZE = 100;
+
     /**
      * @param string $commandName
      * @param int|null $integrationId
@@ -63,22 +68,23 @@ class ChannelRepository extends EntityRepository
             ->setFirstResult(0)
             ->setMaxResults(1);
 
-        $statuses = $queryBuilder->getQuery()->execute();
-
-        return $statuses ? reset($statuses) : null;
+        return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
     /**
      * @param Integration $integration
      * @param string $connector
      * @param int|null $code
-     * @return Status[]
+     * @return Status[]|\Iterator
      */
     public function getConnectorStatuses(Integration $integration, $connector, $code = null)
     {
-        return $this->getConnectorStatusesQueryBuilder($integration, $connector, $code)
-            ->getQuery()
-            ->execute();
+        $iterator = new BufferedQueryResultIterator(
+            $this->getConnectorStatusesQueryBuilder($integration, $connector, $code)
+        );
+        $iterator->setBufferSize(self::BUFFER_SIZE);
+
+        return $iterator;
     }
 
     /**
@@ -95,7 +101,7 @@ class ChannelRepository extends EntityRepository
             ->where('status.channel = :integration')
             ->andWhere('status.connector = :connector')
             ->setParameters(['integration' => $integration, 'connector' => (string)$connector])
-            ->orderBy('status.date', 'DESC');
+            ->orderBy('status.date', Criteria::DESC);
 
         if ($code) {
             $queryBuilder->andWhere('status.code = :code')
