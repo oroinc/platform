@@ -1,3 +1,4 @@
+@import "mixins";
 // Base
 * {
   -webkit-box-sizing:border-box;
@@ -1569,6 +1570,8 @@ footer {
     color: #fff;
     font-size: @baseFontSize;
     display: block;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
   }
   .ui-dialog-titlebar-buttonpane {
@@ -3146,4 +3149,12 @@ label .popover-content {
 
 .invisible {
   opacity: 0;
+}
+// dropdowns should be able to exceed accordion body area
+.accordion-body {
+  .clearfix();
+  // once accordion is opened and animation is finished
+  &[style="height: auto;"] {
+    overflow: visible;
+  }
 }

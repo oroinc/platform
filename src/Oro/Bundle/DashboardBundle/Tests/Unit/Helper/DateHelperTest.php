@@ -17,6 +17,12 @@ class DateHelperTest extends OrmTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $settings;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $aclHelper;
+
     public function setUp()
     {
         $this->settings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
@@ -25,7 +31,13 @@ class DateHelperTest extends OrmTestCase
         $this->settings->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-        $this->helper = new DateHelper($this->settings);
+        $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->helper = new DateHelper($this->settings, $this->doctrine, $this->aclHelper);
     }
 
     /**
@@ -229,6 +241,19 @@ class DateHelperTest extends OrmTestCase
         ];
     }
 
+    public function testConvertToCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    {
+        $result = $this->helper->convertToCurrentPeriod(
+            new DateTime(),
+            new DateTime(),
+            [],
+            'row',
+            'data'
+        );
+
+        $this->assertSame([], $result);
+    }
+
     public function testConvertToCurrentPeriod()
     {
         $from = new DateTime('2015-05-10');
@@ -259,6 +284,19 @@ class DateHelperTest extends OrmTestCase
         $actualData = $this->helper->convertToCurrentPeriod($from, $to, $data, 'cnt', 'count');
 
         $this->assertEquals($expectedData, $actualData);
+    }
+
+    public function testCombinePreviousDataWithCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    {
+        $result = $this->helper->combinePreviousDataWithCurrentPeriod(
+            new DateTime(),
+            new DateTime(),
+            [],
+            'row',
+            'data'
+        );
+
+        $this->assertSame([], $result);
     }
 
     public function testCombinePreviousDataWithCurrentPeriod()

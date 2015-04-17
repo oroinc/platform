@@ -14,14 +14,14 @@ use Oro\Bundle\TrackingBundle\Processor\TrackingProcessor;
 class TrackCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const STATUS_SUCCESS = 0;
-    const COMMAND_NAME = 'oro:cron:tracking:parse';
+    const COMMAND_NAME   = 'oro:cron:tracking:parse';
 
     /**
      * {@inheritdoc}
      */
     public function getDefaultDefinition()
     {
-        return '*/15 * * * *';
+        return '*/5 * * * *';
     }
 
     /**
