@@ -275,7 +275,7 @@ class FieldType extends AbstractType
 
         if ($fieldId
             && $extendProvider->hasConfigById($fieldId)
-            && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETE)
+            && $extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETE)
         ) {
             return false;
         }

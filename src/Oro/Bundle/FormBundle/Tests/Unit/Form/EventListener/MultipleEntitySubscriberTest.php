@@ -104,6 +104,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
         $subscriber = new MultipleEntitySubscriber();
 
         $form  = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, null);
 
         $existing = (object)['$existing' => true];
@@ -120,6 +121,8 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
         $map = [['added', $formAdded], ['removed', $formRemoved]];
         $form->expects($this->any())->method('get')->willReturnMap($map);
         $form->expects($this->any())->method('getData')->willReturn($collection);
+        $parentForm->expects($this->any())->method('getData')->willReturn([]);
+        $form->expects($this->any())->method('getParent')->willReturn($parentForm);
 
         $subscriber->postSubmit($event);
 
