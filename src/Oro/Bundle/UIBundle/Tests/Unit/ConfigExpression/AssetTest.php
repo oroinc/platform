@@ -57,6 +57,22 @@ class AssetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
     }
 
+    public function testEvaluateWithShortBundleNameInPath()
+    {
+        $options        = ['@AcmeTestBundle/Resources/public/images/picture.png'];
+        $normalizedPath = 'bundles/acmetest/images/picture.png';
+        $context        = [];
+        $expectedResult = 'assets/bundles/acmetest/images/picture.png';
+
+        $this->assetsHelper->expects($this->once())
+            ->method('getUrl')
+            ->with($normalizedPath, null)
+            ->will($this->returnValue($expectedResult));
+
+        $this->assertSame($this->function, $this->function->initialize($options));
+        $this->assertEquals($expectedResult, $this->function->evaluate($context));
+    }
+
     public function testEvaluateWithNullPath()
     {
         $options = [new PropertyPath('path')];
