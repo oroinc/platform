@@ -258,6 +258,7 @@ class AuditField
             case 'manyToOne':
             case 'enum':
             case 'multiEnum':
+            case 'ref-many':
                 return 'text';
             case 'smallint':
             case 'integer':
