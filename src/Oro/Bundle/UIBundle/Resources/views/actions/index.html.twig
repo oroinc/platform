@@ -19,7 +19,9 @@
                         <h1 class="oro-subtitle">{{ pageTitle is defined ? pageTitle : '' }}</h1>
                     </div>
                 </div>
-                <div class="pull-right title-buttons-container">
+                <div class="pull-right title-buttons-container invisible"
+                         data-page-component-module="oroui/js/app/components/hidden-initialization-component"
+                         data-layout="separate">
                     {% placeholder index_navButtons_before with buttonsPlaceholderData %}
                     {% block navButtons %}{% endblock navButtons %}
                     {% placeholder index_navButtons_after with buttonsPlaceholderData %}
