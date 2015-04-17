@@ -5,9 +5,9 @@ namespace Oro\Bundle\ReminderBundle\Model\Email;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 
@@ -32,17 +32,25 @@ class EmailNotification implements SenderAwareEmailNotificationInterface
     protected $reminder;
 
     /**
+     * @var NameFormatter
+     */
+    protected $nameFormatter;
+
+    /**
      * Constructor
      *
      * @param ObjectManager  $em
      * @param ConfigProvider $configProvider
+     * @param NameFormatter  $nameFormatter
      */
     public function __construct(
         ObjectManager $em,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        NameFormatter $nameFormatter
     ) {
         $this->em = $em;
         $this->configProvider = $configProvider;
+        $this->nameFormatter = $nameFormatter;
     }
 
     /**
@@ -101,7 +109,7 @@ class EmailNotification implements SenderAwareEmailNotificationInterface
     {
         $sender = $this->getReminder()->getSender();
         if ($sender) {
-            return $sender->getFirstName() . ' ' .$sender->getLastName();
+            return $this->nameFormatter->format($sender);
         }
 
         return null;

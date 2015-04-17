@@ -100,59 +100,132 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test processor
+     * @dataProvider processDataProvider
+     * @param array $data
+     * @param array $expected
      */
-    public function testProcess()
+    public function testProcess(array $data, array $expected)
     {
         $object       = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $template->expects($this->once())
             ->method('getType')
             ->will($this->returnValue('html'));
 
+        if ($data['senderAware']) {
+            $notification = $this->getMock(
+                'Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface'
+            );
+            if ($data['fromEmail']) {
+                $notification->expects($this->once())
+                    ->method('getSenderName')
+                    ->will($this->returnValue($data['fromName']));
+                $notification->expects($this->exactly(2))
+                    ->method('getSenderEmail')
+                    ->will($this->returnValue($data['fromEmail']));
+            } else {
+                $notification->expects($this->once())
+                    ->method('getSenderEmail')
+                    ->will($this->returnValue(null));
+            }
+        } else {
+            $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
+        }
+
         $notification->expects($this->once())
             ->method('getTemplate')
             ->will($this->returnValue($template));
 
-        $expectedSubject = 'subject';
-        $expectedBody    = 'body';
-
         $this->emailRenderer->expects($this->once())
             ->method('compileMessage')
             ->with($template, array('entity' => $object))
-            ->will($this->returnValue(array($expectedSubject, $expectedBody)));
+            ->will($this->returnValue(array($data['subject'], $data['body'])));
 
-        $expectedTo = 'recipient@example.com';
         $notification->expects($this->once())
             ->method('getRecipientEmails')
-            ->will($this->returnValue(array($expectedTo)));
+            ->will($this->returnValue(array($data['to'])));
 
+        $assertCallWithExpectedMessage = function ($message) use ($expected) {
+            /** @var \Swift_Message $message */
+            $this->isInstanceOf('Swift_Message', $message);
+            $this->assertEquals($expected['subject'], $message->getSubject());
+            $this->assertEquals($expected['body'], $message->getBody());
+            $this->assertEquals(
+                array($expected['fromEmail'] => $expected['fromName']),
+                $message->getFrom()
+            );
+            $this->assertEquals(array($expected['to'] => null), $message->getTo());
+            $this->assertEquals('text/html', $message->getContentType());
+
+            return true;
+        };
         $this->mailer->expects($this->once())
             ->method('send')
             ->with(
                 $this->callback(
-                    function ($message) use ($expectedSubject, $expectedBody, $expectedTo) {
-                        /** @var \Swift_Message $message */
-                        $this->isInstanceOf('Swift_Message', $message);
-                        $this->assertEquals($expectedSubject, $message->getSubject());
-                        $this->assertEquals($expectedBody, $message->getBody());
-                        $this->assertEquals(
-                            array(self::TEST_SENDER_EMAIL => self::TEST_SENDER_NAME),
-                            $message->getFrom()
-                        );
-                        $this->assertEquals(array($expectedTo => null), $message->getTo());
-                        $this->assertEquals('text/html', $message->getContentType());
-
-                        return true;
-                    }
+                    $assertCallWithExpectedMessage
                 )
             );
 
         $this->expectAddJob();
 
         $this->processor->process($object, array($notification));
+    }
+
+    public function processDataProvider()
+    {
+        return [
+            'Process Notification implement EmailNotificationInterface' => [
+                'data' => [
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'to' => 'recipient@example.com',
+                    'senderAware' => false
+                ],
+                'expected' => [
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'to' => 'recipient@example.com',
+                    'fromName' => self::TEST_SENDER_NAME,
+                    'fromEmail' => self::TEST_SENDER_EMAIL
+                ]
+            ],
+            'Process Notification implement SenderAwareEmailNotificationInterface' => [
+                'data' => [
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'to' => 'recipient@example.com',
+                    'fromName' => 'test sender',
+                    'fromEmail' => 'test_sender@mail.com',
+                    'senderAware' => true
+                ],
+                'expected' => [
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'to' => 'recipient@example.com',
+                    'fromName' => 'test sender',
+                    'fromEmail' => 'test_sender@mail.com'
+                ]
+            ],
+            'Process Notification implement SenderAwareEmailNotificationInterface but sender email is empty' => [
+                'data' => [
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'to' => 'recipient@example.com',
+                    'fromName' => null,
+                    'fromEmail' => null,
+                    'senderAware' => true
+                ],
+                'expected' => [
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'to' => 'recipient@example.com',
+                    'fromName' => self::TEST_SENDER_NAME,
+                    'fromEmail' => self::TEST_SENDER_EMAIL
+                ]
+            ],
+        ];
     }
 
     /**
