@@ -12,6 +12,28 @@ use Oro\Bundle\DataAuditBundle\Exception\UnsupportedDataTypeException;
  */
 class AuditField
 {
+    /** @var string[] */
+    protected static $typeMap = [
+        'boolean'   => 'boolean',
+        'text'      => 'text',
+        'string'    => 'text',
+        'guid'      => 'text',
+        'manyToOne' => 'text',
+        'enum'      => 'text',
+        'multiEnum' => 'text',
+        'ref-many'  => 'text',
+        'smallint'  => 'integer',
+        'integer'   => 'integer',
+        'bigint'    => 'integer',
+        'decimal'   => 'float',
+        'float'     => 'float',
+        'money'     => 'float',
+        'percent'   => 'float',
+        'date'      =>  'date',
+        'time'      => 'time',
+        'datetime'  => 'datetime',
+    ];
+
     /**
      * @var int
      *
@@ -249,34 +271,10 @@ class AuditField
      */
     public static function normalizeDataTypeName($dataType)
     {
-        switch ($dataType) {
-            case 'boolean':
-                return 'boolean';
-            case 'text':
-            case 'string':
-            case 'guid':
-            case 'manyToOne':
-            case 'enum':
-            case 'multiEnum':
-            case 'ref-many':
-                return 'text';
-            case 'smallint':
-            case 'integer':
-            case 'bigint':
-                return 'integer';
-            case 'decimal':
-            case 'float':
-            case 'money':
-            case 'percent':
-                return 'float';
-            case 'date':
-                return 'date';
-            case 'time':
-                return 'time';
-            case 'datetime':
-                return 'datetime';
-            default:
-                return null;
+        if (isset(static::$typeMap[$dataType])) {
+            return static::$typeMap[$dataType];
         }
+
+        return null;
     }
 }

@@ -35,7 +35,13 @@ class AuditFieldTest extends \PHPUnit_Framework_TestCase
             ['field', 'guid', 'new', 'old', 'text'],
             ['field', 'date', new \DateTime('2014-01-05'), new \DateTime('2014-01-07'), 'date'],
             ['field', 'time', new \DateTime('13:22:15'), new \DateTime('13:32:15'), 'time'],
-            ['field', 'datetime', new \DateTime('2014-01-05 13:22:15'), new \DateTime('2014-01-07 13:34:07'), 'datetime'],
+            [
+                'field',
+                'datetime',
+                new \DateTime('2014-01-05 13:22:15'),
+                new \DateTime('2014-01-07 13:34:07'),
+                'datetime'
+            ],
         ];
     }
 }

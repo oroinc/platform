@@ -22,6 +22,28 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
     /** @var Connection */
     private $connection;
 
+    /** @var string[] */
+    protected static $typeMap = [
+        'boolean'   => 'boolean',
+        'text'      => 'text',
+        'string'    => 'text',
+        'guid'      => 'text',
+        'manyToOne' => 'text',
+        'enum'      => 'text',
+        'multiEnum' => 'text',
+        'ref-many'  => 'text',
+        'smallint'  => 'integer',
+        'integer'   => 'integer',
+        'bigint'    => 'integer',
+        'decimal'   => 'float',
+        'float'     => 'float',
+        'money'     => 'float',
+        'percent'   => 'float',
+        'date'      =>  'date',
+        'time'      => 'time',
+        'datetime'  => 'datetime',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -51,7 +73,8 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      */
     private function processRow(array $row)
     {
-        $fields = Type::getType(Type::TARRAY)->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
+        $fields = Type::getType(Type::TARRAY)
+            ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
         foreach ($fields as $field => $values) {
             $fieldType = $this->getFieldType($row['entity_id'], $field);
             $dataType = $this->normalizeDataTypeName($fieldType);
@@ -157,34 +180,10 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      */
     private function normalizeDataTypeName($dataType)
     {
-        switch ($dataType) {
-            case 'boolean':
-                return 'boolean';
-            case 'text':
-            case 'string':
-            case 'guid':
-            case 'manyToOne':
-            case 'enum':
-            case 'multiEnum':
-            case 'ref-many':
-                return 'text';
-            case 'smallint':
-            case 'integer':
-            case 'bigint':
-                return 'integer';
-            case 'decimal':
-            case 'float':
-            case 'money':
-            case 'percent':
-                return 'float';
-            case 'date':
-                return 'date';
-            case 'time':
-                return 'time';
-            case 'datetime':
-                return 'datetime';
-            default:
-                throw new LogicException(sprintf('Cannot normalize type "%s".', $dataType));
+        if (isset(static::$typeMap[$dataType])) {
+            return static::$typeMap[$dataType];
         }
+
+        throw new LogicException(sprintf('Cannot normalize type "%s".', $dataType));
     }
 }
