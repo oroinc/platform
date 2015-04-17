@@ -31,7 +31,7 @@ class ContentProcessor
     public function processHtml(PartInterface $part)
     {
         if (!$part->isMultipart()) {
-            return null;
+            return $this->extractContent($part);
         }
 
         $content = $this->getMultipartContentRecursively($part, 'text/html');
