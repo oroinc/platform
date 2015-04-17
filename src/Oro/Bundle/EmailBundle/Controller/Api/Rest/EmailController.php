@@ -111,6 +111,10 @@ class EmailController extends RestGetController
      */
     public function getAssociationsDataAction($entityId)
     {
+        /**
+         * @var $entityRoutingHelper EntityRoutingHelper
+         */
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
 
@@ -123,6 +127,7 @@ class EmailController extends RestGetController
         $itemsArray = array();
         foreach ($associations as $association) {
             $className = ClassUtils::getClass($association);
+            $encodeClassName = $entityRoutingHelper->encodeClassName($className);
             /** @var $configManager ConfigManager */
             $configManager = $this->container->get('oro_entity_config.config_manager');
             $nameFormater = $this->get('oro_locale.formatter.name');
@@ -147,7 +152,7 @@ class EmailController extends RestGetController
                 $itemsArray[] = array(
                     'entityId'=> $entity->getId(),
                     'targetId'=> $association->getId(),
-                    'targetClassName'=> $className,
+                    'targetClassName'=> $encodeClassName,
                     'title'=> $title,
                     'icon'=> $config->get('icon'),
                     'link'=> $link
