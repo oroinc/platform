@@ -144,7 +144,7 @@ define([
         _appendFilter: function() {
             var data = this.element.data('value');
 
-            if (data.criterion.data.filter) {
+            if (data && data.criterion && data.criterion.data.filter) {
                 var fieldConditionData = $.extend(true, {
                     criterion: {
                         data: {
