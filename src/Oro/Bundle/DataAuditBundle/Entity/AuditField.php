@@ -22,6 +22,7 @@ class AuditField
         'enum'      => 'text',
         'multiEnum' => 'text',
         'ref-many'  => 'text',
+        'ref-one'   => 'text',
         'smallint'  => 'integer',
         'integer'   => 'integer',
         'bigint'    => 'integer',
