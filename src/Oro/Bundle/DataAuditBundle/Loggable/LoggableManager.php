@@ -348,16 +348,6 @@ class LoggableManager
                     continue;
                 }
 
-                // need to distinguish date and datetime
-                if ($fieldMapping && in_array($fieldMapping['type'], array('date', 'datetime'))) {
-                    if ($old instanceof \DateTime) {
-                        $old = array('type' => $fieldMapping['type'], 'value' => $old);
-                    }
-                    if ($new instanceof \DateTime) {
-                        $new = array('type' => $fieldMapping['type'], 'value' => $new);
-                    }
-                }
-
                 if ($entityMeta->isSingleValuedAssociation($field) && $new) {
                     $oid   = spl_object_hash($new);
                     $value = $this->getIdentifier($new);
