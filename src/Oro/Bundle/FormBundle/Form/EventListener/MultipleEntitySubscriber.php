@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Form\EventListener;
 
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -54,14 +55,47 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         $added   = $form->get('added')->getData();
         $removed = $form->get('removed')->getData();
 
+        $parentData = $form->getParent()->getData();
+
         /** @var Collection $collection */
         $collection = $form->getData();
+
+        $mapping = [];
+        if ($collection instanceof PersistentCollection) {
+            $mapping = $collection->getMapping();
+        }
+
         foreach ($added as $relation) {
+            if ($mapping && $mapping['type'] === ClassMetadata::ONE_TO_MANY) {
+                $mappedBy = $mapping['mappedBy'];
+                $setter = $this->getSetterName($mappedBy);
+                $relation->$setter($parentData);
+            }
             $collection->add($relation);
         }
 
         foreach ($removed as $relation) {
+            if ($mapping && $mapping['type'] === ClassMetadata::ONE_TO_MANY) {
+                $mappedBy = $mapping['mappedBy'];
+                $setter = $this->getSetterName($mappedBy);
+                $relation->$setter(null);
+            }
             $collection->removeElement($relation);
         }
+    }
+
+    /**
+     * @param string $mappedBy
+     * @return string
+     */
+    protected function getSetterName($mappedBy)
+    {
+        $parts = explode('_', $mappedBy);
+        $setter = 'set';
+        foreach ($parts as $part) {
+            $setter .= ucfirst($part);
+        }
+
+        return $setter;
     }
 }
