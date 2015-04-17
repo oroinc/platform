@@ -115,6 +115,12 @@ class EmailController extends RestGetController
          * @var $entityRoutingHelper EntityRoutingHelper
          */
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        /** @var $configManager ConfigManager */
+        $configManager = $this->container->get('oro_entity_config.config_manager');
+        $nameFormatter = $this->get('oro_locale.formatter.name');
+        $router = $this->get('router');
+
         /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
 
@@ -128,10 +134,7 @@ class EmailController extends RestGetController
         foreach ($associations as $association) {
             $className = ClassUtils::getClass($association);
             $classNameEncoded = $entityRoutingHelper->encodeClassName($className);
-            /** @var $configManager ConfigManager */
-            $configManager = $this->container->get('oro_entity_config.config_manager');
-            $nameFormater = $this->get('oro_locale.formatter.name');
-            $title = $nameFormater->format($association);
+            $title = $nameFormatter->format($association);
             if ($title === '') {
                 $title = $association->getEmail();
             } elseif ($title === null) {
@@ -140,12 +143,10 @@ class EmailController extends RestGetController
             $metadata = $configManager->getEntityMetadata($className);
             $route = $configManager->getEntityMetadata($className)->getRoute('view', false);
             if ($metadata->routeView) {
-                $link = $this->container->get('router')->generate($route, ['id' => $association->getId()]);
+                $link = $router->generate($route, ['id' => $association->getId()]);
             } else {
                 $link = false;
             }
-
-            $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
             $config = $entityConfigProvider->getConfig($className);
 
             if ($title) {
@@ -201,6 +202,7 @@ class EmailController extends RestGetController
 
         $entityId = $this->getRequest()->get('entityId');
         $targetClassName = $this->getRequest()->get('targetClassName');
+        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         $targetId = $this->getRequest()->get('targetId');
 
         /**
@@ -212,7 +214,6 @@ class EmailController extends RestGetController
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
-        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
