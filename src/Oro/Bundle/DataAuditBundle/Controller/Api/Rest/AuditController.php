@@ -13,6 +13,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -130,7 +131,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
      */
     public function getFieldsAction()
     {
-        /** @var EntityWithFieldsProvider $provider */
+        /* @var $provider EntityWithFieldsProvider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
         $withRelations = filter_var($this->getRequest()->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
         $statusCode = Codes::HTTP_OK;

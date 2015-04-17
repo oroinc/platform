@@ -55,27 +55,30 @@ class AuditTest extends \PHPUnit_Framework_TestCase
         $audit->createField('field', 'integer', 1, 0);
         $audit->createField('field2', 'string', 'new_', '_old');
 
-        $this->assertEquals([
-            'field' => [
-                'new' => [
-                    'value' => 1,
-                    'type'  => 'integer',
+        $this->assertEquals(
+            [
+                'field' => [
+                    'new' => [
+                        'value' => 1,
+                        'type'  => 'integer',
+                    ],
+                    'old' => [
+                        'value' => 0,
+                        'type'  => 'integer',
+                    ],
                 ],
-                'old' => [
-                    'value' => 0,
-                    'type'  => 'integer',
+                'field2' => [
+                    'new' => [
+                        'value' => 'new_',
+                        'type'  => 'text',
+                    ],
+                    'old' => [
+                        'value' => '_old',
+                        'type'  => 'text',
+                    ],
                 ],
             ],
-            'field2' => [
-                'new' => [
-                    'value' => 'new_',
-                    'type'  => 'text',
-                ],
-                'old' => [
-                    'value' => '_old',
-                    'type'  => 'text',
-                ],
-            ],
-        ], $audit->getData());
+            $audit->getData()
+        );
     }
 }

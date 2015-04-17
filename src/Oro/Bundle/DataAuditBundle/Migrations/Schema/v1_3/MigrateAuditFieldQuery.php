@@ -53,15 +53,13 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
         $steps = ceil($this->getAuditCount() / static::LIMIT);
 
         $auditQb = $this->createAuditQb()
-            ->setMaxResults(static::LIMIT)
-        ;
+            ->setMaxResults(static::LIMIT);
 
         for ($i = 0; $i < $steps; $i++) {
             $rows = $auditQb
                 ->setFirstResult($i * static::LIMIT)
                 ->execute()
-                ->fetchAll(PDO::FETCH_ASSOC)
-            ;
+                ->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($rows as $row) {
                 $this->processRow($row);

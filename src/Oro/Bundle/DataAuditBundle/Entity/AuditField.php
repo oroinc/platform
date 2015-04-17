@@ -239,20 +239,28 @@ class AuditField
 
     /**
      * @param mixed $value
+     *
+     * @return this
      */
     private function setOldValue($value)
     {
         $propertyValue = $this->getPropertyName('old');
         $this->$propertyValue = $value;
+
+        return $this;
     }
 
     /**
      * @param mixed $value
+     *
+     * @return this
      */
     private function setNewValue($value)
     {
         $propertyValue = $this->getPropertyName('new');
         $this->$propertyValue = $value;
+
+        return $this;
     }
 
     /**

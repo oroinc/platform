@@ -579,7 +579,7 @@ class LoggableManager
             $type = Type::STRING;
         } else {
             throw new \InvalidArgumentExcepttion(sprintf(
-                'Field "%s" does is not mapped field of "%s" entity.',
+                'Field "%s" is not mapped field of "%s" entity.',
                 $field,
                 $entityMeta->getName()
             ));
