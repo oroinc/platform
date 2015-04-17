@@ -140,9 +140,7 @@ class Processor
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
         $email->setSeen(true);
-        if ($parentMessageId
-            && in_array($model->getMailType(), [EmailModel::MAIL_TYPE_DIRECT, EmailModel::MAIL_TYPE_REPLY])
-        ) {
+        if ($parentMessageId) {
             $email->setRefs($parentMessageId);
         }
 
@@ -331,7 +329,7 @@ class Processor
     {
         $messageId = '';
         $parentEmailId = $model->getParentEmailId();
-        if ($parentEmailId) {
+        if ($parentEmailId && $model->getMailType() == EmailModel::MAIL_TYPE_REPLY) {
             $parentEmail = $this->getEntityManager()
                 ->getRepository('OroEmailBundle:Email')
                 ->find($parentEmailId);

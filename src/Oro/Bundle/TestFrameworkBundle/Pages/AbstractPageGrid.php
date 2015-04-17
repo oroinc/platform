@@ -59,7 +59,8 @@ abstract class AbstractPageGrid extends AbstractPage
             );
 
         $entityData = array();
-        for ($i=0; $i < count($headers); $i++) {
+        $headersCount = count($headers);
+        for ($i=0; $i < $headersCount; $i++) {
             $entityData[$headers[$i]->text()] = $entity[$i]->text();
         }
         return $entityData;

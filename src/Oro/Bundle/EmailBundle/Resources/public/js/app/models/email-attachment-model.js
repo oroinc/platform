@@ -3,6 +3,8 @@ define(function (require) {
     'use strict';
 
     var EmailAttachmentModel,
+        datetime = require('orolocale/js/formatter/datetime'),
+        numeral = require('numeral'),
         BaseModel = require('oroui/js/app/models/base/model');
 
     /**
@@ -14,7 +16,8 @@ define(function (require) {
             type: '',
             title: '',
             fileName: '',
-            info: '',
+            fileSize: '',
+            modified: '',
             checked: false, // whether file is checked for attaching to an email
             visible: true
         },
@@ -36,6 +39,14 @@ define(function (require) {
             for (var attr in attrs) {
                 if (attr == 'fileName') {
                     attrs['fileName'] = this.formatFileName(attrs['fileName']);
+                } else if (attr == 'fileSize') {
+                    if (attrs['fileSize']) {
+                        attrs['fileSize'] = numeral(attrs['fileSize']).format('b');
+                    }
+                } else if (attr == 'modified') {
+                    if (attrs['modified']) {
+                        attrs['modified'] = datetime.formatDateTime(attrs['modified']);
+                    }
                 }
             }
 
