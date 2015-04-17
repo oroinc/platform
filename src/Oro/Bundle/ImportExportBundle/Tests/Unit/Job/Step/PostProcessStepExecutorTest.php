@@ -137,7 +137,7 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
         return [
             'empty keys' => [[], [], []],
             'defined key with empty context' => [['some-key'], [], []],
-            'defined key' => [['some-key'], ['some-key' => 'value'], []],
+            'defined key' => [['some-key'], ['some-key' => 'value'], [], true, 0, ['some-key']],
             'defined key with post process job' => [
                 ['some-key'],
                 ['some-key' => ['value', 'value1'], 'another-key' => ['next-value']],
