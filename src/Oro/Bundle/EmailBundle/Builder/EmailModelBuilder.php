@@ -183,6 +183,7 @@ class EmailModelBuilder
     {
         $emailModel = $this->factory->getEmail();
         $emailModel->setMailType(EmailModel::MAIL_TYPE_FORWARD);
+        $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
@@ -354,24 +355,21 @@ class EmailModelBuilder
         if ($emailModel->getParentEmailId()) {
             $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
                 ->find($emailModel->getParentEmailId());
-            $attachments = array_merge(
-                $attachments,
-                $this->emailAttachmentProvider->getThreadAttachments($parentEmail)
-            );
+            $threadAttachments = $this->emailAttachmentProvider->getThreadAttachments($parentEmail);
+            $threadAttachments = $this->filterAttachmentsByName($threadAttachments);
+            $attachments = array_merge($attachments, $threadAttachments);
         }
         if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
             $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
                 ->find($emailModel->getEntityId());
 
             if ($scopeEntity) {
-                $attachments = array_merge(
-                    $attachments,
-                    $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity)
-                );
+                $scopeEntityAttachments = $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity);
+                $scopeEntityAttachments = $this->filterAttachmentsByName($scopeEntityAttachments);
+                $attachments = array_merge($attachments, $scopeEntityAttachments);
             }
         }
 
-        $attachments = $this->filterAttachmentsByName($attachments);
         $emailModel->setAttachmentsAvailable($attachments);
     }
 

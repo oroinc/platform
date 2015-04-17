@@ -15,9 +15,9 @@
             function(_, __, widgetManager, messenger, mediator) {
                 widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                     messenger.notificationFlashMessage('success', __('The email was sent'));
-                    mediator.trigger('widget_success:' + widget.getAlias());
-                    mediator.trigger('widget_success:' + widget.getWid());
+                    mediator.trigger('widget_success:activity_list:item:update');
                     mediator.trigger('datagrid:doRefresh:attachment-grid');
+                    mediator.trigger('widget:doRefresh:email-thread');
                     widget.remove(true);
                 });
             });
@@ -31,7 +31,7 @@
             </div>
         {% endif %}
         <div class="form-container">
-            <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post" enctype="multipart/form-data">
+            <form id="{{ form.vars.name }}" method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
                 {%
                     set emailEditorOptions = {
                         entityId: entity.entityId,

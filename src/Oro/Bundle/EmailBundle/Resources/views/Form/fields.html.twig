@@ -74,7 +74,7 @@
     <script type="text/template" id="email-attachment-list-row-view">
         <div class="attachment-list-row <% if (!visible) { %>hide<% } %>">
             <input type="checkbox" class="checkbox" <% if (checked) { %>checked<% } %>>
-            <span><%= fileName %> (<%= info %>)</span>
+            <span><%= fileName %> (<%= fileSize %>, <%= modified %>)</span>
         </div>
     </script>
 
@@ -94,7 +94,8 @@
             'id': attachment.id,
             'type': attachment.type,
             'fileName': attachment.fileName,
-            'info': attachment.info
+            'fileSize': attachment.fileSize,
+            'modified': attachment.modified
         } %}
         {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
     {% endfor %}

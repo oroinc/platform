@@ -6,6 +6,11 @@ use \DateTime;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateHelper
@@ -21,12 +26,83 @@ class DateHelper
     /** @var LocaleSettings */
     protected $localeSettings;
 
+    /** @var RegistryInterface */
+    protected $doctrine;
+
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /**
-     * @param LocaleSettings $localeSettings
+     * @param LocaleSettings    $localeSettings
+     * @param RegistryInterface $doctrine
+     * @param AclHelper         $aclHelper
      */
-    public function __construct(LocaleSettings $localeSettings)
+    public function __construct(LocaleSettings $localeSettings, RegistryInterface $doctrine, AclHelper $aclHelper)
     {
+        $this->doctrine       = $doctrine;
         $this->localeSettings = $localeSettings;
+        $this->aclHelper      = $aclHelper;
+    }
+
+    /**
+     * @param DateTime $from
+     * @param DateTime $to
+     * @param array    $data
+     * @param string   $rowKey
+     * @param string   $dataKey
+     *
+     * @return array
+     */
+    public function convertToCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
+    {
+        if (empty($data)) {
+            return [];
+        }
+
+        $items = $this->getDatePeriod($from, $to);
+        foreach ($data as $row) {
+            $key                   = $this->getKey($from, $to, $row);
+            $items[$key][$dataKey] = $row[$rowKey];
+        }
+
+        return array_combine(range(0, count($items) - 1), array_values($items));
+    }
+
+    /**
+     * @param DateTime $from
+     * @param DateTime $to
+     * @param array    $data
+     * @param string   $rowKey
+     * @param string   $dataKey
+     *
+     * @return array
+     */
+    public function combinePreviousDataWithCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
+    {
+        if (empty($data)) {
+            return [];
+        }
+
+        $items = $this->getDatePeriod($from, $to);
+        foreach ($data as $row) {
+            $key                   = $this->getKey($from, $to, $row);
+            $items[$key][$dataKey] = $row[$rowKey];
+        }
+
+        $currentFrom = $to;
+        $currentTo   = clone $to;
+        $diff        = $to->getTimestamp() - $from->getTimestamp();
+        $currentTo->setTimestamp($currentFrom->getTimestamp() + $diff);
+
+        $currentItems = $this->getDatePeriod($currentFrom, $currentTo);
+
+        $mixedItems = array_combine(array_keys($currentItems), array_values($items));
+        foreach ($mixedItems as $currentDate => $previousData) {
+            $previousData['date']       = $currentItems[$currentDate]['date'];
+            $currentItems[$currentDate] = $previousData;
+        }
+
+        return array_combine(range(0, count($currentItems) - 1), array_values($currentItems));
     }
 
     /**
@@ -175,6 +251,32 @@ class DateHelper
             'valueStringFormat' => $valueStringFormat,
             'viewType'          => $viewType
         ];
+    }
+
+    /**
+     * Returns correct date period dates for cases if user select 'less than' period type
+     *
+     * @param array  $dateRange selected date range
+     * @param string $entity    Entity name to search min date
+     * @param string $field     Field name to search min date
+     * @return array
+     */
+    public function getPeriod($dateRange, $entity, $field)
+    {
+        $start = $dateRange['start'];
+        $end   = $dateRange['end'];
+
+        if ($dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
+            $qb = $this->doctrine
+                ->getRepository($entity)
+                ->createQueryBuilder('e')
+                ->select(sprintf('MIN(e.%s) as val', $field));
+
+            $start = $this->aclHelper->apply($qb)->getSingleScalarResult();
+            $start = new \DateTime($start, new \DateTimeZone('UTC'));
+        }
+
+        return [$start, $end];
     }
 
     /**

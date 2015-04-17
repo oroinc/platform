@@ -188,7 +188,8 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
     {
         $entity      = null;
         $rootAliases = $qb->getRootAliases();
-        for ($i = 0; $i < count($rootAliases); $i++) {
+        $rootAliasesCount = count($rootAliases);
+        for ($i = 0; $i < $rootAliasesCount; $i++) {
             if ($rootAliases[$i] === $alias) {
                 $entity = $qb->getRootEntities()[$i];
                 break;
