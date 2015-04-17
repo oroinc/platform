@@ -390,6 +390,59 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider formatDayDataProvider
+     */
+    public function testFormatDay(
+        $expected,
+        \DateTime $date,
+        $dateType,
+        $locale,
+        $timeZone,
+        $language,
+        $defaultLocale = null,
+        $defaultTimeZone = null
+    ) {
+        $this->localeSettings->expects($this->any())->method('getLanguage')->will($this->returnValue($language));
+        if ($defaultLocale) {
+            $this->localeSettings->expects($this->any())->method('getLocale')
+                ->will($this->returnValue($defaultLocale));
+        }
+        if ($defaultTimeZone) {
+            $this->localeSettings->expects($this->any())->method('getTimeZone')
+                ->will($this->returnValue($defaultTimeZone));
+        }
+
+        $this->assertEquals(
+            $expected,
+            $this->formatter->formatDay($date, $dateType, $locale, $timeZone)
+        );
+    }
+
+    public function formatDayDataProvider()
+    {
+        return [
+            [
+                'expected' => 'Feb 2',
+                'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
+                'dateType' => \IntlDateFormatter::MEDIUM,
+                'locale' => 'ru_RU',
+                'timeZone' => 'America/Los_Angeles',
+                'language' => 'en_US',
+            ],
+            [
+                'expected' => '02 февр.',
+                'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
+                'dateType' => \IntlDateFormatter::MEDIUM,
+                'locale' => null,
+                'timeZone' => null,
+                'language' => 'ru_RU',
+                'defaultLocale' => 'en_US',
+                'defaultTimeZone' => 'America/Los_Angeles',
+            ],
+        ];
+    }
+
+    /**
      * @param string $date
      * @param string $timeZone
      * @return \DateTime

@@ -29,10 +29,8 @@ class ControllersTest extends WebTestCase
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->loadHTML($crawler->html());
         $dom->getElementById('oro_email_emailtemplate');
-        $form = $crawler->filterXPath("//form[@name='oro_email_emailtemplate']");
 
         $form = $crawler->selectButton('Save and Close')->form();
-        $fields = $form->all();
         $form['oro_email_emailtemplate[entityName]'] = 'Oro\Bundle\UserBundle\Entity\User';
         $form['oro_email_emailtemplate[name]'] = 'User Template';
         $form['oro_email_emailtemplate[translations][defaultLocale][en][content]'] = 'Content template';

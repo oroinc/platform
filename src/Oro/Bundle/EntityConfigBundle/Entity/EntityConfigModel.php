@@ -9,7 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\EntityConfigRepository")
  * @ORM\Table(name="oro_entity_config",
  *      uniqueConstraints={@ORM\UniqueConstraint(name="oro_entity_config_uq", columns={"class_name"})})
  * @ORM\HasLifecycleCallbacks()

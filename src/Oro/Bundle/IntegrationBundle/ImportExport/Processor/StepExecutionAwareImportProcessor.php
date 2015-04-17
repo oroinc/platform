@@ -40,6 +40,10 @@ class StepExecutionAwareImportProcessor extends ImportProcessor implements StepE
             throw new \InvalidArgumentException('Missing ContextRegistry');
         }
 
+        if ($this->strategy instanceof StepExecutionAwareInterface) {
+            $this->strategy->setStepExecution($stepExecution);
+        }
+
         $this->setImportExportContext($this->contextRegistry->getByStepExecution($this->stepExecution));
     }
 

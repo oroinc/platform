@@ -76,7 +76,8 @@ class ConfigManager
             $value = $manager->getSettingValue($name, $full);
 
             if (!is_null($value)) {
-                if (is_array($value)
+                if ($full
+                    && is_array($value)
                     && ($scopeName !== $this->scopeName
                         || (isset($value['scope']) && $value['scope'] !== $manager->getScopedEntityName())
                     )

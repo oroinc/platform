@@ -1,3 +1,4 @@
+@import "mixins";
 // Base
 * {
   -webkit-box-sizing:border-box;
@@ -49,6 +50,12 @@ a {
 form {
   margin: 0;
 }
+h1, h2, h3, h4, h5, h6 {
+  // supress bootstrap's optimizeLegibility text-rendering
+  // it gives bad results on small size fonts
+  // that could be applied only for fonts larger than 20px
+  text-rendering: auto;
+}
 #main {
   background-color: #fff;
 }
@@ -80,7 +87,9 @@ form {
 .dark {
   background-color: #f6f5f5;
 }
-
+.nowrap {
+  white-space: nowrap;
+}
 label.disabled {
   cursor: default;
 }
@@ -1561,6 +1570,8 @@ footer {
     color: #fff;
     font-size: @baseFontSize;
     display: block;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
   }
   .ui-dialog-titlebar-buttonpane {
@@ -2698,7 +2709,7 @@ label.radio.error {
   .box-content {
     padding: 20px 15px;
     background: url("../../img/vertical-separator.png") repeat-y 50% 0;
-    .responsive-small & {
+    .responsive-small &, .responsive-big & {
       background: none;
     }
   }
@@ -3138,4 +3149,12 @@ label .popover-content {
 
 .invisible {
   opacity: 0;
+}
+// dropdowns should be able to exceed accordion body area
+.accordion-body {
+  .clearfix();
+  // once accordion is opened and animation is finished
+  &[style="height: auto;"] {
+    overflow: visible;
+  }
 }

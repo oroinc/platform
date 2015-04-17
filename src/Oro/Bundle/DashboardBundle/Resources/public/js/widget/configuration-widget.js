@@ -10,14 +10,15 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
             }
 
             this.options.el = '#widget-configuration';
-            this.options.title = __('oro.dashboard.widget_configuration_label');
             this.options.url = routing.generate('oro_dashboard_configure', {
                 id: options.widget.state.id
             });
 
             options.dialogOptions = {
+                title: __('oro.dashboard.widget_configuration_label') + ' - ' + options.widget.options.title,
                 modal: true,
-                width: 575
+                minWidth: 575,
+                resizable: false
             };
 
             ConfigurationWidget.__super__.initialize.apply(this, arguments);

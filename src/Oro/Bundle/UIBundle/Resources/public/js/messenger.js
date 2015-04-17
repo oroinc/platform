@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen:true*/
-define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap'],
+define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap', 'cryptojs/sha256'],
 function ($, _, tools) {
     'use strict';
 
@@ -101,11 +101,22 @@ function ($, _, tools) {
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                var isFlash = notFlashTypes.indexOf(type) == -1;
+                var isFlash   = notFlashTypes.indexOf(type) == -1;
                 var namespace = (options || {}).namespace;
-                if (namespace) {
-                    this.clear(namespace, options);
+
+                if (!namespace) {
+                    namespace = CryptoJS.SHA256(message + this.type).toString();
+
+                    if (!options) {
+                        options = {
+                            namespace: null
+                        };
+                    }
+                    options.namespace = namespace;
                 }
+
+                this.clear(namespace, options);
+
                 return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
             },
 

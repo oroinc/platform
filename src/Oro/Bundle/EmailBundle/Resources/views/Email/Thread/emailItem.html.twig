@@ -1,0 +1,90 @@
+{% import "OroEmailBundle::actions.html.twig" as Actions %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroEmailBundle::macros.html.twig' as EA %}
+
+{#
+  variables:
+    email - an Oro\Bundle\EmailBundle\Entity\Email
+    emailCollapsed - bool, flag to show full email or collapsed, by default it is false (full email)
+#}
+
+{% set emailCollapsed = emailCollapsed is defined ? emailCollapsed : false %}
+<div class="email-info{{ emailCollapsed ? '': ' in'}}">
+    <div class="email-short">
+        <div class="email-view-toggle">
+            <div class="pull-right">
+                <div class="email-sent-date">
+                    {% if email.emailBody.hasAttachments %}
+                        <i class="icon-paper-clip email-has-attachment"></i>
+                    {% endif %}
+                    {{ EA.date_smart_format(email.sentAt) }}
+                </div>
+            </div>
+            <div class="email-participants">
+                <span class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</span>
+                <span class="email-recipients">{{ 'To'|trans|lower }} {{ EA.email_participants_name(email.recipients, true, false) }}</span>
+            </div>
+            <div class="email-body">
+                {% if email.emailBody %}
+                    {{ EA.email_short_body(email.emailBody, 200) }}
+                {% else %}
+                    {{ 'oro.email.body_is_unavailable'|trans }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="email-full">
+        <div class="email-view-toggle">
+            <div class="pull-right">
+                {% set actionParameters = routeParameters is defined ? {
+                    routeParameters: routeParameters
+                } : {} %}
+                {% set buttonsHtml %}
+                    {{ Actions.replyButton(email, actionParameters) }}
+                    {{ Actions.forwardButton(email, actionParameters ) }}
+                {% endset %}
+                {{ UI.pinnedDropdownButton({
+                    'html': buttonsHtml
+                }) }}
+                <div class="email-sent-date">
+                    {% if email.emailBody.hasAttachments %}
+                        <i class="icon-paper-clip email-has-attachment"></i>
+                    {% endif %}
+                    {{ EA.date_smart_format(email.sentAt) }}<br />
+                </div>
+            </div>
+            <div class="email-participants">
+                <div class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</div>
+                <span class="email-recipients">{{ 'To'|trans }}: {{ EA.email_participants_name(email.recipients, true) }}</span>
+                <div class="email-detailed-info-table dropdown">
+                    <span class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.email.show_details.tooltip'|trans }}">
+                        <i class="fa fa-caret-square-o-down"></i>
+                    </span>
+                    <div class="dropdown-menu" role="menu">
+                        {{ EA.email_detailed_info_table(email) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="email-body">
+            {% if email.emailBody %}
+                {% if email.emailBody.bodyIsText %}
+                    {{ email.emailBody.bodyContent|nl2br }}
+                {% else %}
+                    {{ email.emailBody.bodyContent|raw }}
+                {% endif %}
+            {% else %}
+                {{ 'oro.email.body_is_unavailable'|trans }}
+            {% endif %}
+            <ul class="email-attachments-list">
+                {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
+            </ul>
+        </div>
+        {%- set commentsData -%}
+            {% placeholder view_content_data_comments with {entity: email} %}
+        {%- endset -%}
+        {% if commentsData is not empty %}
+            {{ commentsData }}
+        {% endif  %}
+    </div>
+</div>

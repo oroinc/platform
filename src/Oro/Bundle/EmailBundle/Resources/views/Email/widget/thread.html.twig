@@ -1,39 +1,37 @@
-{% import "OroEmailBundle::actions.html.twig" as Actions %}
-{% import 'OroEmailBundle::macros.html.twig' as EA %}
+{% import "OroEmailBundle::macros.html.twig" as EA %}
 
-<div class="widget-content thread-view">
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        {% for email in thread %}
-            <div id="{{ email.id }}" class="panel panel-default">
-                <div class="panel-heading email-head" role="tab" id="heading{{ loop.index }}">
-                    <div class="panel-title pull-left">
-                        <a class="subject" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
-                            {{ email.subject }}
-                        </a>
-                        <div class="clearfix"></div>
-                        <span class="recipients">{{ 'To'|trans }}: {{ EA.recipient_email_addresses(email.toCc, false, false) }}</span>
-                        <br/>
-                        <span class="sentAt">{{ email.sentAt|oro_format_datetime }}</span>
-                    </div>
-                    <div class="pull-right">
-                        <div class="btn-group">
-                            {{ Actions.replyButton(email) }}
-                            {{ Actions.forwardButton(email) }}
-                        </div>
-                    </div>
-                </div>
-                <div id="collapse{{ loop.index }}"
-                     class="panel-collapse collapse {{ loop.first ? 'in' : '' }} email-body"
-                     role="tabpanel" aria-labelledby="heading{{ loop.index }}">
-                    <div class="panel-body email-body">
-                        {% if email.emailBody %}
-                            {{ email.emailBody.bodyContent|raw }}
-                        {% else %}
-                            {{ 'oro.email.body_is_unavailable'|trans }}
-                        {% endif %}
-                    </div>
-                </div>
+{% if renderContexts is defined and renderContexts %}
+<div class="email-context-activity-list">
+    {{ EA.email_contexts(thread[0]) }}
+</div>
+{% endif %}
+
+{% if shortEmailThread is not defined and thread|length >= 7 %}
+    {# if shortEmailThread is not turned off and length of thread over 6 emails -- render short thread #}
+    {% set shortEmailThread = true %}
+    {% set skippedEmails = [] %}
+{% endif %}
+{% set threadViewOptions = {
+    view: 'oroemail/js/app/views/email-thread-view',
+    actionPanelSelector: '.email-thread-action-panel'
+} %}
+{% set threadViewOptions = threadViewOptions|merge({isBaseView: not renderContexts}) %}
+<div class="widget-content thread-view"
+     data-page-component-module="oroui/js/app/components/view-component"
+     data-page-component-options="{{ threadViewOptions|json_encode }}"
+     data-layout="separate">
+    {% for email in thread|reverse %}
+        {% if shortEmailThread is defined and shortEmailThread and loop.index > 2 and loop.index < (loop.length - 1) %}
+            {% set skippedEmails = skippedEmails|merge([email.id]) %}
+            {% if loop.index == loop.length - 2 %}
+            <div class="email-load-more" data-emails-items="{{ skippedEmails|json_encode }}">
+                <span class="load-more-label">{{ 'oro.email.load_more_emails'|trans({'%quantity%': skippedEmails|length}) }}</span>
             </div>
-        {% endfor %}
-    </div>
+            {% endif %}
+        {% else %}
+            {# email collapsed also can be evaluated for other conditions here #}
+            {% set emailCollapsed = not loop.last %}
+            {% include 'OroEmailBundle:Email/Thread:emailItem.html.twig' %}
+        {% endif %}
+    {% endfor %}
 </div>

@@ -5,6 +5,8 @@
 {% if not widgetTitle is defined %}
     {% if not widgetLabel is defined %}
         {% set widgetTitle = false %}
+    {% elseif widgetConfiguration is defined and widgetConfiguration.title is defined and widgetConfiguration.title.value is not empty %}
+        {% set widgetTitle = widgetConfiguration.title.value|trans %}
     {% else %}
         {% set widgetTitle = widgetLabel|trans %}
     {% endif %}
@@ -13,6 +15,18 @@
 <div id="{{ widgetContentId }}" class="invisible widget-content {{ widgetType }}-widget-content {{ widgetClass }}-widget-content">
     {% block content %}
     {% endblock %}
+    {% if widgetConfiguration is defined %}
+        {% for configName, config in widgetConfiguration %}
+            {% if config.show_on_widget and config.value is not null%}
+                {% if config.options is defined and config.options.label is defined %}
+                    {% set label = config.options.label %}
+                {% else %}
+                    {% set label = configName %}
+                {% endif %}
+                <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ config.value }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     {% block actions %}
         <div class="widget-actions">
             {% if actions is defined %}
@@ -38,7 +52,7 @@
         require(['jquery', 'underscore', 'oroui/js/widget-manager'],
         function($, _, widgetManager){
             widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
-                {% if widgetTitle %}
+                {% if widgetTitle is not empty %}
                 widget.setTitle({{ widgetTitle|json_encode|raw }});
                 {% endif %}
             });
