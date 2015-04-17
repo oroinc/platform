@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Entity;
 
+use DateTime;
+
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -51,30 +53,43 @@ class AuditTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataShouldRetrieveOldFormadUsingFields()
     {
+        $oldDate = new DateTime();
+        $newDate = new DateTime();
+
         $audit = new Audit();
         $audit->createField('field', 'integer', 1, 0);
         $audit->createField('field2', 'string', 'new_', '_old');
+        $audit->createField('field3', 'date', $newDate, $oldDate);
+        $audit->createField('field4', 'datetime', $newDate, $oldDate);
 
         $this->assertEquals(
             [
                 'field' => [
-                    'new' => [
-                        'value' => 1,
-                        'type'  => 'integer',
-                    ],
-                    'old' => [
-                        'value' => 0,
-                        'type'  => 'integer',
-                    ],
+                    'new' => 1,
+                    'old' => 0,
                 ],
                 'field2' => [
+                    'new' => 'new_',
+                    'old' => '_old',
+                ],
+                'field3' => [
                     'new' => [
-                        'value' => 'new_',
-                        'type'  => 'text',
+                        'value' => $newDate,
+                        'type'  => 'date',
                     ],
                     'old' => [
-                        'value' => '_old',
-                        'type'  => 'text',
+                        'value' => $oldDate,
+                        'type'  => 'date',
+                    ],
+                ],
+                'field4' => [
+                    'new' => [
+                        'value' => $newDate,
+                        'type'  => 'datetime',
+                    ],
+                    'old' => [
+                        'value' => $oldDate,
+                        'type'  => 'datetime',
                     ],
                 ],
             ],

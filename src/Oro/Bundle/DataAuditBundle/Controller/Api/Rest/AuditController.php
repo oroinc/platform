@@ -194,6 +194,9 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         $result['object_name']  = $result['objectName'];
         $result['username']     = $entity->getUser() ? $entity->getUser()->getUsername() : null;
 
+        unset($result['fields']);
+        $result['data'] = $entity->getData();
+
         return $result;
     }
 
