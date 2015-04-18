@@ -95,3 +95,13 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListType
         tags:
              - { name: layout.block_type, alias: list }
+
+    oro_layout.block_type.ordered_list:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\OrderedListType
+        tags:
+             - { name: layout.block_type, alias: ordered_list }
+
+    oro_layout.block_type.list_item:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListItemType
+        tags:
+             - { name: layout.block_type, alias: list_item }
