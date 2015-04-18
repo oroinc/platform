@@ -3,11 +3,15 @@
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsExtension extends AbstractExtension
 {
@@ -15,25 +19,36 @@ class GridViewsExtension extends AbstractExtension
     const VIEWS_PARAM_KEY          = 'view';
     const MINIFIED_VIEWS_PARAM_KEY = 'v';
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        SecurityFacade $securityFacade,
+        TranslatorInterface $translator
+    ) {
+        $this->eventDispatcher = $eventDispatcher;
+        $this->securityFacade = $securityFacade;
+        $this->translator = $translator;
+    }
+
     /**
      * {@inheritDoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-
-        if ($list !== false && !$list instanceof AbstractViewsList) {
-            throw new InvalidTypeException(
-                sprintf(
-                    'Invalid type for path "%s.%s". Expected AbstractViewsList, but got %s.',
-                    $config->getName(),
-                    self::VIEWS_LIST_KEY,
-                    gettype($list)
-                )
-            );
-        }
-
-        return $list !== false;
+        return true;
     }
 
     /**
@@ -46,11 +61,58 @@ class GridViewsExtension extends AbstractExtension
         $data->offsetAddToArray('initialState', ['gridView' => null]);
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 
+        $allLabel = null;
+        if (isset($config['options'])
+                &&isset($config['options']['gridViews'])
+                && isset($config['options']['gridViews']['allLabel'])
+            ) {
+            $allLabel = $this->translator->trans($config['options']['gridViews']['allLabel']);
+        }
+
         /** @var AbstractViewsList $list */
         $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+        $gridViews = [
+            'choices' => [
+                [
+                    'label' => $allLabel,
+                    'value' => '__all__',
+                ],
+            ],
+            'views' => [
+                (new View('__all__'))->getMetadata(),
+            ],
+        ];
         if ($list !== false) {
-            $data->offsetSet('gridViews', $list->getMetadata());
+            $configuredGridViews = $list->getMetadata();
+            $configuredGridViews['views'] = array_merge($gridViews['views'], $configuredGridViews['views']);
+            $configuredGridViews['choices'] = array_merge($gridViews['choices'], $configuredGridViews['choices']);
+            $gridViews = $configuredGridViews;
         }
+
+        if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
+            $event = new GridViewsLoadEvent($config->getName(), $gridViews);
+            $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
+            $gridViews = $event->getGridViews();
+        }
+
+        $gridViews['gridName'] = $config->getName();
+        $gridViews['permissions'] = $this->getPermissions();
+        $data->offsetSet('gridViews', $gridViews);
+    }
+
+    /**
+     * @return array
+     */
+    private function getPermissions()
+    {
+        return [
+            'VIEW' => $this->securityFacade->isGranted('oro_datagrid_gridview_view'),
+            'CREATE' => $this->securityFacade->isGranted('oro_datagrid_gridview_create'),
+            'EDIT' => $this->securityFacade->isGranted('oro_datagrid_gridview_update'),
+            'DELETE' => $this->securityFacade->isGranted('oro_datagrid_gridview_delete'),
+            'SHARE' => $this->securityFacade->isGranted('oro_datagrid_gridview_publish'),
+            'EDIT_SHARED' => $this->securityFacade->isGranted('oro_datagrid_gridview_edit_public'),
+        ];
     }
 
     /**
