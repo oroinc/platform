@@ -38,6 +38,9 @@ Here is the list of available actions:
 | `addAlias` | Add alias for the layout item. Could be used for backward compatibility. |
 | `removeAlias` | Remove the alias previously defined for the layout item |
 | `setOption` | Set the option value for the layout item |
+| `appendOption` | Add a new value in addition to existing values of an option of the layout item |
+| `subtractOption` | Remove existing value from an option of the layout item |
+| `replaceOption` | Replace one value with another value of an option of the layout item |
 | `removeOption` | Unset the option from the layout item |
 | `changeBlockType` | Change block type of the layout item |
 | `setBlockTheme` | Define theme file where renderer should look up for block templates |

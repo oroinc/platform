@@ -10,15 +10,25 @@ namespace Oro\Component\Layout;
  *  - an alias must be added before you can use it
  *  - an alias can be added for existing item only
  *  - only existing alias can be removed
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RawLayoutBuilder implements RawLayoutBuilderInterface
 {
     /** @var RawLayout */
     protected $rawLayout;
 
-    public function __construct()
+    /** @var BlockOptionsManipulatorInterface */
+    protected $optionsManipulator;
+
+    /**
+     * @param BlockOptionsManipulatorInterface $optionsManipulator
+     */
+    public function __construct(BlockOptionsManipulatorInterface $optionsManipulator = null)
     {
-        $this->rawLayout = new RawLayout();
+        $this->rawLayout          = new RawLayout();
+        $this->optionsManipulator = $optionsManipulator ?: new BlockOptionsManipulator();
+        $this->optionsManipulator->setRawLayout($this->rawLayout);
     }
 
     /**
@@ -156,13 +166,98 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
             if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
                 throw new Exception\LogicException('Cannot change already resolved options.');
             }
-            $options              = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
-            $options[$optionName] = $optionValue;
-            $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
+            $this->optionsManipulator->setOption($id, $optionName, $optionValue);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
                     'Cannot set a value for "%s" option for "%s" item. Reason: %s',
+                    $optionName,
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function appendOption($id, $optionName, $optionValue)
+    {
+        try {
+            if (!$optionName) {
+                throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
+                throw new Exception\LogicException('Cannot change already resolved options.');
+            }
+            $this->optionsManipulator->appendOption($id, $optionName, $optionValue);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot append a value for "%s" option for "%s" item. Reason: %s',
+                    $optionName,
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function subtractOption($id, $optionName, $optionValue)
+    {
+        try {
+            if (!$optionName) {
+                throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
+                throw new Exception\LogicException('Cannot change already resolved options.');
+            }
+            $this->optionsManipulator->subtractOption($id, $optionName, $optionValue);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot subtract a value for "%s" option for "%s" item. Reason: %s',
+                    $optionName,
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
+    {
+        try {
+            if (!$optionName) {
+                throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
+                throw new Exception\LogicException('Cannot change already resolved options.');
+            }
+            $this->optionsManipulator->replaceOption($id, $optionName, $oldOptionValue, $newOptionValue);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot replace a value for "%s" option for "%s" item. Reason: %s',
                     $optionName,
                     $id,
                     $e->getMessage()
@@ -187,9 +282,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
             if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
                 throw new Exception\LogicException('Cannot change already resolved options.');
             }
-            $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
-            unset($options[$optionName]);
-            $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
+            $this->optionsManipulator->removeOption($id, $optionName);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(

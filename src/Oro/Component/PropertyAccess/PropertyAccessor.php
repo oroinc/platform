@@ -11,6 +11,8 @@ use Symfony\Component\PropertyAccess\StringUtil;
  * but it is a bit faster getValue method, allows to use the same syntax of the property
  * path for objects and arrays, and fixes some issues of Symfony's PropertyAccessor,
  * for example working with magic __get method.
+ * New features:
+ * * 'remove' method is added to allow to remove items from arrays or objects
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -76,7 +78,7 @@ class PropertyAccessor
         }
 
         $path      = $property->getElements();
-        $values    = &$this->readPropertiesUntil($object, $property, count($path) - 1);
+        $values    = &$this->readPropertiesUntil($object, $property, true);
         $overwrite = true;
 
         // Add the root object to the list
@@ -104,6 +106,93 @@ class PropertyAccessor
                 $property = $path[$i];
 
                 $this->writeValue($object, $property, $value);
+            }
+
+            $value     = &$object;
+            $overwrite = !$values[$i][self::IS_REF];
+        }
+    }
+
+    /**
+     * Removes the property at the end of the property path of the object.
+     *
+     * Example:
+     *
+     * <code>
+     *     use Oro\Component\PropertyAccess;
+     *
+     *     $propertyAccessor = new PropertyAccessor();
+     *
+     *     echo $propertyAccessor->remove($object, 'child.name');
+     *     // equals echo $object->getChild()->removeName();
+     * </code>
+     *
+     * This method first tries to find a public setter for each property in the
+     * path. The name of the unsetter must be the camel-cased property name
+     * prefixed with "remove".
+     *
+     * If it is found, an exception is thrown.
+     *
+     * @param object|array                 $object   The object or array to modify
+     * @param string|PropertyPathInterface $property The property path to modify
+     *
+     * @throws Exception\InvalidArgumentException If an object or a property path has invalid type.
+     * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
+     */
+    public function remove(&$object, $property)
+    {
+        if (is_string($property)) {
+            $property = new PropertyPath($property);
+        } elseif (!$property instanceof PropertyPathInterface) {
+            throw new Exception\InvalidArgumentException(
+                sprintf(
+                    'The property path must be a string or an instance of ' .
+                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    'Got: "%s".',
+                    is_object($property) ? get_class($property) : gettype($property)
+                )
+            );
+        }
+
+        $path   = $property->getElements();
+        $values = &$this->readPropertiesUntil($object, $property);
+
+        if (count($values) < count($path) - 1) {
+            return;
+        }
+
+        // Add the root object to the list
+        array_unshift(
+            $values,
+            [self::VALUE => &$object, self::IS_REF => true]
+        );
+
+        $value     = null;
+        $overwrite = true;
+        $lastIndex = count($values) - 1;
+        for ($i = $lastIndex; $i >= 0; --$i) {
+            $object = &$values[$i][self::VALUE];
+
+            if ($overwrite) {
+                if (!is_object($object) && !is_array($object)) {
+                    throw new Exception\NoSuchPropertyException(
+                        sprintf(
+                            'PropertyAccessor requires a graph of objects or arrays to operate on, ' .
+                            'but it found type "%s" while trying to traverse path "%s" at property "%s".',
+                            gettype($object),
+                            (string)$property,
+                            $path[$i]
+                        )
+                    );
+                }
+
+                $property = $path[$i];
+
+                if ($i === $lastIndex) {
+                    $this->unsetProperty($object, $property);
+                } else {
+                    $this->writeValue($object, $property, $value);
+                }
             }
 
             $value     = &$object;
@@ -172,6 +261,7 @@ class PropertyAccessor
      *
      * @param object|array          $object       The object or array to read from
      * @param PropertyPathInterface $propertyPath The property path to read
+     * @param bool                  $addMissing   Set true to allow create missing nested arrays on demand
      * @param int                   $lastIndex    The index up to which should be read
      *
      * @return array The values read in the path.
@@ -179,11 +269,18 @@ class PropertyAccessor
      * @throws Exception\NoSuchPropertyException If a value within the path is neither object nor array.
      *                                           If a non-existing index is accessed.
      */
-    private function &readPropertiesUntil(&$object, PropertyPathInterface $propertyPath, $lastIndex)
-    {
+    private function &readPropertiesUntil(
+        &$object,
+        PropertyPathInterface $propertyPath,
+        $addMissing = false,
+        $lastIndex = -1
+    ) {
         $values = [];
         $path   = $propertyPath->getElements();
         $length = count($path);
+        if (-1 === $lastIndex) {
+            $lastIndex = $length - 1;
+        }
 
         for ($i = 0; $i < $lastIndex; ++$i) {
             if (!is_object($object) && !is_array($object)) {
@@ -204,6 +301,9 @@ class PropertyAccessor
             if (($object instanceof \ArrayAccess && !isset($object[$property]))
                 || (is_array($object) && !array_key_exists($property, $object))
             ) {
+                if (!$addMissing) {
+                    break;
+                }
                 $object[$property] = $i + 1 < $length ? [] : null;
             }
 
@@ -471,6 +571,55 @@ class PropertyAccessor
 
         foreach ($itemsToAdd as $item) {
             $object->{$addMethod}($item);
+        }
+    }
+
+    /**
+     * Unsets a property in the given object.
+     *
+     * @param array|object $object   The object or array to unset from
+     * @param mixed        $property The property or index to unset
+     *
+     * @throws Exception\NoSuchPropertyException If the property does not exist or is not public.
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function unsetProperty(&$object, $property)
+    {
+        if ($object instanceof \ArrayAccess) {
+            if (isset($object[$property])) {
+                unset($object[$property]);
+            }
+        } elseif (is_array($object)) {
+            unset($object[$property]);
+        } elseif (is_object($object)) {
+            $reflClass = new \ReflectionClass($object);
+            $unsetter  = 'remove' . $this->camelize($property);
+
+            if ($this->isMethodAccessible($reflClass, $unsetter, 0)) {
+                $object->$unsetter();
+            } elseif ($this->isMethodAccessible($reflClass, '__unset', 1)) {
+                unset($object->$property);
+            } elseif ($this->magicCall && $this->isMethodAccessible($reflClass, '__call', 2)) {
+                // we call the unsetter and hope the __call do the job
+                $object->$unsetter();
+            } else {
+                throw new Exception\NoSuchPropertyException(
+                    sprintf(
+                        'Neither one of the methods "%s()", ' .
+                        '"__unset()" or "__call()" exist and have public access in class "%s".',
+                        $unsetter,
+                        $reflClass->name
+                    )
+                );
+            }
+        } else {
+            throw new Exception\NoSuchPropertyException(
+                sprintf(
+                    'Unexpected object type. Expected "array or object", "%s" given.',
+                    is_object($object) ? get_class($object) : gettype($object)
+                )
+            );
         }
     }
 

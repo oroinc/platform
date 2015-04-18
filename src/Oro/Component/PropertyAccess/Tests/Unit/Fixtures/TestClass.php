@@ -33,7 +33,17 @@ class TestClass
         $this->publicAccessor = $value;
     }
 
+    public function removePublicAccessor()
+    {
+        $this->publicAccessor = null;
+    }
+
     public function setPublicAccessorWithDefaultValue($value = null)
+    {
+        $this->publicAccessorWithDefaultValue = $value;
+    }
+
+    public function removePublicAccessorWithDefaultValue($value = null)
     {
         $this->publicAccessorWithDefaultValue = $value;
     }
@@ -44,6 +54,11 @@ class TestClass
     }
 
     public function setPublicAccessorWithMoreRequiredParameters($value, $needed)
+    {
+        $this->publicAccessorWithMoreRequiredParameters = $value;
+    }
+
+    public function removePublicAccessorWithMoreRequiredParameters($value)
     {
         $this->publicAccessorWithMoreRequiredParameters = $value;
     }

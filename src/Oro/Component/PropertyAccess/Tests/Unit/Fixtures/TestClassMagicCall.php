@@ -24,5 +24,9 @@ class TestClassMagicCall
         if ('setMagicCallProperty' === $method) {
             $this->magicCallProperty = reset($args);
         }
+
+        if ('removeMagicCallProperty' === $method) {
+            $this->magicCallProperty = null;
+        }
     }
 }
