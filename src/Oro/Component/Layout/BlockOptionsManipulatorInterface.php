@@ -21,7 +21,7 @@ interface BlockOptionsManipulatorInterface
     public function setOption($id, $optionName, $optionValue);
 
     /**
-     * Adds a new value in additional to existing one for a new or existing option
+     * Adds a new value in addition to existing one for a new or existing option
      *
      * @param string $id          The item id
      * @param string $optionName  The option name or path

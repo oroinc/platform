@@ -10,7 +10,7 @@ use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\StringOptionValueBuilder;
 
 /**
- * This extension normalizes 'class' attribute and allow to use [append/subtract/replace]Option methods
+ * This extension normalizes 'class' attribute and allows to use [append/subtract/replace]Option methods
  * of the layout manipulator for this attribute.
  */
 class ClassAttributeExtension extends AbstractBlockTypeExtension

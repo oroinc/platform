@@ -88,7 +88,7 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     public function setOption($id, $optionName, $optionValue);
 
     /**
-     * Adds a new value in additional to existing one for a new or existing option of the item
+     * Adds a new value in addition to existing one for a new or existing option of the item
      *
      * @param string $id          The item id
      * @param string $optionName  The option name or path

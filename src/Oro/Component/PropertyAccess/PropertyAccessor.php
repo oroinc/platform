@@ -12,7 +12,7 @@ use Symfony\Component\PropertyAccess\StringUtil;
  * path for objects and arrays, and fixes some issues of Symfony's PropertyAccessor,
  * for example working with magic __get method.
  * New features:
- * * 'remove' method is added to allow remove items from array or object
+ * * 'remove' method is added to allow to remove items from arrays or objects
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */

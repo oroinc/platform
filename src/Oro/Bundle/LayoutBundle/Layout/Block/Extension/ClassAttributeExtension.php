@@ -10,7 +10,7 @@ use Oro\Component\Layout\OptionValueBag;
 use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry;
 
 /**
- * This extension normalizes 'class' attribute and allow to use [append/subtract/replace]Option methods
+ * This extension normalizes 'class' attribute and allows to use [append/subtract/replace]Option methods
  * of the layout manipulator for this attribute.
  * This extension allows to use config expressions 'class' attribute.
  */
