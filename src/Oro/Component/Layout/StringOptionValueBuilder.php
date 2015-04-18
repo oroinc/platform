@@ -65,7 +65,7 @@ class StringOptionValueBuilder implements OptionValueBuilderInterface
             return;
         }
 
-        if ($this->allowTokenize && !empty($this->delimiter)) {
+        if ($this->allowTokenize) {
             $this->values = array_diff($this->values, explode($this->delimiter, $value));
         } else {
             $this->values = array_diff($this->values, [$value]);
