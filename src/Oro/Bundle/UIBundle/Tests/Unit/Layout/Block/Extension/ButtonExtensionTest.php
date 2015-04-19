@@ -389,6 +389,9 @@ class ButtonExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedVars, $view->vars);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function buildViewOptionsDataProvider()
     {
         return [

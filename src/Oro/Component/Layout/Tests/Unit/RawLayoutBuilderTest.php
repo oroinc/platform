@@ -8,6 +8,7 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RawLayoutBuilderTest extends LayoutTestCase
 {
