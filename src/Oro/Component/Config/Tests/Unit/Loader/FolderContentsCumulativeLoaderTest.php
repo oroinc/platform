@@ -59,7 +59,9 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
-        $this->assertSame($expectedRegisteredResources, $resource->getFound($bundleClass));
+        $foundResources = $resource->getFound($bundleClass);
+        sort($foundResources);
+        $this->assertEquals($expectedRegisteredResources, $foundResources);
     }
 
     /**
@@ -142,7 +144,7 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Component\Config\CumulativeResourceInfo', $result);
 
         ksort($result->data);
-        $this->assertSame(
+        $this->assertEquals(
             [
                 str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml'),
                 'sub' => [
@@ -155,12 +157,14 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
-        $this->assertSame(
+        $foundResources = $resource->getFound($bundleClass);
+        sort($foundResources);
+        $this->assertEquals(
             [
                 str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/sub/test.yml'),
                 str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/folder_to_track/test.xml')
             ],
-            $resource->getFound($bundleClass)
+            $foundResources
         );
     }
 

@@ -217,20 +217,17 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     protected function getDirectoryContents($dir)
     {
-        $directoryIterator = new \RecursiveDirectoryIterator($dir);
-        $recursiveIterator = new \RecursiveIteratorIterator($directoryIterator);
+        $recursiveIterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
         $recursiveIterator->setMaxDepth($this->maxNestingLevel);
         $iterator = new \CallbackFilterIterator(
             $recursiveIterator,
             function (\SplFileInfo $file) {
-                if (!$file->isFile()) {
-                    return false;
-                }
-                if (!empty($this->fileExtensions)) {
-                    return in_array($file->getExtension(), $this->fileExtensions, true);
-                }
-
-                return true;
+                return empty($this->fileExtensions)
+                    ? true
+                    : in_array($file->getExtension(), $this->fileExtensions, true);
             }
         );
 
