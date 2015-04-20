@@ -41,6 +41,7 @@ config:
         'oro/datagrid/cell/html-cell': 'bundles/orodatagrid/js/datagrid/cell/html-cell.js'
         'oro/datagrid/cell/date-cell': 'bundles/orodatagrid/js/datagrid/cell/date-cell.js'
         'oro/datagrid/cell/datetime-cell': 'bundles/orodatagrid/js/datagrid/cell/datetime-cell.js'
+        'oro/datagrid/cell/time-cell': 'bundles/orodatagrid/js/datagrid/cell/time-cell.js'
         'oro/datagrid/cell/number-cell': 'bundles/orodatagrid/js/datagrid/cell/number-cell.js'
         'oro/datagrid/cell/select-cell': 'bundles/orodatagrid/js/datagrid/cell/select-cell.js'
         'oro/datagrid/cell/select-row-cell': 'bundles/orodatagrid/js/datagrid/cell/select-row-cell.js'
