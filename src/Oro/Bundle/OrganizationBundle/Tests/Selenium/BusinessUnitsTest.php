@@ -57,7 +57,7 @@ class BusinessUnitsTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
-            ->assertTitle('Business Units - User Management - System');
+            ->assertTitle('All - Business Units - User Management - System');
 
         return $newUnitName;
     }

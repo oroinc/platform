@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
+namespace Oro\Bundle\EmailBundle\Tests\Selenium;
 
 use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\EmailTemplates;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
