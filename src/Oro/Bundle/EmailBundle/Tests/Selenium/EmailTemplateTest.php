@@ -55,7 +55,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->close()
             ->open(array($newTemplateName))
             ->assertTitle("Template {$newTemplateName} - Edit - Templates - Emails - System")
@@ -85,7 +85,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->close();
 
         return $newTemplateName;
@@ -101,7 +101,7 @@ class EmailTemplateTest extends Selenium2TestCase
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->delete('Template name', $templateName)
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->assertMessage('Item deleted');
     }
 }
