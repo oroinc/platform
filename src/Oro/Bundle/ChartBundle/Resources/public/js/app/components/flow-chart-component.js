@@ -5,9 +5,11 @@ define(function(require) {
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         Flotr = require('flotr2'),
-        numberFormatter = require('orolocale/js/formatter/number'),
+        dataFormatter = require('orochart/js/data_formatter'),
         PieChartComponent = require('orochart/js/app/components/pie-chart-component');
     require('orochart/js/flotr2/funnel');
+
+    var valueFormat = 'currency';
 
     /**
      * @class orochart.app.components.FlowChartComponent
@@ -22,6 +24,7 @@ define(function(require) {
          */
         initialize: function(options) {
             FlowChartComponent.__super__.initialize.call(this, options);
+            valueFormat = options.options.data_schema.value.type;
 
             this.date = options.date;
             this._prepareData();
@@ -39,7 +42,7 @@ define(function(require) {
                 params = {
                     label: item.label,
                     date: date,
-                    value: numberFormatter.formatCurrency(item.value)
+                    value: dataFormatter.formatValue(item.value, valueFormat)
                 };
                 format = 'oro.chart.flow_chart.label_fromatter.' + (item.isNozzle ? 'nozzle' : 'tick');
                 item.originalLabel = item.label;
@@ -79,7 +82,7 @@ define(function(require) {
                     funnel: {
                         show: true,
                         showLabels: hasPlaceForLabels,
-                        formatter: numberFormatter.formatCurrency,
+                        formatter: _.partial(dataFormatter.formatValue, _, valueFormat),
                         colors: options.settings.chartColors,
                         marginX: labelsWidth
                     },

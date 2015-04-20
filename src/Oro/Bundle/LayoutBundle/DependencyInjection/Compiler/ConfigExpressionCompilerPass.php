@@ -12,7 +12,7 @@ class ConfigExpressionCompilerPass implements CompilerPassInterface
     const EXTENSION_SERVICE = 'oro_layout.expression.extension';
 
     const EXPRESSION_ENCODER_TAG = 'oro_layout.expression.encoder';
-    const EXPRESSION_ENCODING_SERVICE = 'oro_layout.block_type_extension.config_expression';
+    const EXPRESSION_ENCODING_SERVICE = 'oro_layout.expression.encoder_registry';
 
     /**
      * @param ContainerBuilder $container
@@ -67,6 +67,6 @@ class ConfigExpressionCompilerPass implements CompilerPassInterface
         }
 
         $encodingServiceDef = $container->getDefinition(self::EXPRESSION_ENCODING_SERVICE);
-        $encodingServiceDef->replaceArgument(2, $serviceIds);
+        $encodingServiceDef->replaceArgument(1, $serviceIds);
     }
 }

@@ -112,10 +112,22 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension
         arguments:
             - @oro_layout.expression.assembler
-            - @service_container
-            - {}
+            - @oro_layout.expression.encoder_registry
         tags:
             - { name: layout.block_type_extension, alias: block, priority: 255 }
+
+    oro_layout.block_type_extension.class_attribute:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension
+        arguments:
+            - @oro_layout.expression.encoder_registry
+        tags:
+            - { name: layout.block_type_extension, alias: block, priority: 260 }
+
+    oro_layout.expression.encoder_registry:
+        class: Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry
+        arguments:
+            - @service_container
+            - {}
 
     oro_layout.expression.json_encoder:
         class: Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder

@@ -273,8 +273,14 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
             $updateResources,
             function (&$resource) {
                 ksort($resource);
+                array_walk(
+                    $resource,
+                    function (&$subResource) {
+                        sort($subResource);
+                    }
+                );
             }
         );
-        $this->assertSame($expectedResult, $updateResources);
+        $this->assertEquals($expectedResult, $updateResources);
     }
 }

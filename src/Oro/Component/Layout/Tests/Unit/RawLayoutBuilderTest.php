@@ -6,6 +6,10 @@ use Oro\Component\Layout\RawLayout;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class RawLayoutBuilderTest extends LayoutTestCase
 {
     /** @var RawLayoutBuilder */
@@ -279,6 +283,132 @@ class RawLayoutBuilderTest extends LayoutTestCase
     {
         $this->rawLayoutBuilder
             ->setOption('root', 'test', 123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot append a value for "" option for "root" item. Reason: The option name must not be empty.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAppendOptionWithEmptyName($name)
+    {
+        $this->rawLayoutBuilder
+            ->appendOption('root', $name, 123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot append a value for "test" option for "root" item. Reason: Cannot change already resolved options.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAppendOptionForAlreadyResolvedItem()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root');
+        $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
+
+        $this->rawLayoutBuilder
+            ->appendOption('root', 'test', 123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot append a value for "test" option for "root" item. Reason: The "root" item does not exist.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAppendOptionForUnknownItem()
+    {
+        $this->rawLayoutBuilder
+            ->appendOption('root', 'test', 123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot subtract a value for "" option for "root" item. Reason: The option name must not be empty.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testSubtractOptionWithEmptyName($name)
+    {
+        $this->rawLayoutBuilder
+            ->subtractOption('root', $name, 123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot subtract a value for "test" option for "root" item. Reason: Cannot change already resolved options.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testSubtractOptionForAlreadyResolvedItem()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root');
+        $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
+
+        $this->rawLayoutBuilder
+            ->subtractOption('root', 'test', 123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot subtract a value for "test" option for "root" item. Reason: The "root" item does not exist.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testSubtractOptionForUnknownItem()
+    {
+        $this->rawLayoutBuilder
+            ->subtractOption('root', 'test', 123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot replace a value for "" option for "root" item. Reason: The option name must not be empty.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testReplaceOptionWithEmptyName($name)
+    {
+        $this->rawLayoutBuilder
+            ->replaceOption('root', $name, 123, 456);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot replace a value for "test" option for "root" item. Reason: Cannot change already resolved options.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testReplaceOptionForAlreadyResolvedItem()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root');
+        $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
+
+        $this->rawLayoutBuilder
+            ->replaceOption('root', 'test', 123, 456);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot replace a value for "test" option for "root" item. Reason: The "root" item does not exist.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testReplaceOptionForUnknownItem()
+    {
+        $this->rawLayoutBuilder
+            ->replaceOption('root', 'test', 123, 456);
     }
 
     /**

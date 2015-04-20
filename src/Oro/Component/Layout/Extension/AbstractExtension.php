@@ -225,7 +225,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * Registers block type extensions.
      *
-     * @return array of BlockTypeExtensionInterface[]
+     * @return BlockTypeExtensionInterface[]
      */
     protected function loadTypeExtensions()
     {

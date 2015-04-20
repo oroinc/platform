@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
@@ -12,9 +10,9 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
+use Oro\Component\Layout\OptionValueBag;
 
-use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass;
-use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderInterface;
+use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry;
 
 /**
  * Allows to use expressions (see ConfigExpression component) in block type options and attributes.
@@ -24,25 +22,19 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
     /** @var AssemblerInterface */
     protected $expressionAssembler;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var string[] */
-    protected $encoders;
+    /** @var ConfigExpressionEncoderRegistry */
+    protected $encoderRegistry;
 
     /**
-     * @param AssemblerInterface $expressionAssembler
-     * @param ContainerInterface $container
-     * @param string[]           $encoders
+     * @param AssemblerInterface              $expressionAssembler
+     * @param ConfigExpressionEncoderRegistry $encoderRegistry
      */
     public function __construct(
         AssemblerInterface $expressionAssembler,
-        ContainerInterface $container,
-        array $encoders
+        ConfigExpressionEncoderRegistry $encoderRegistry
     ) {
         $this->expressionAssembler = $expressionAssembler;
-        $this->container           = $container;
-        $this->encoders            = $encoders;
+        $this->encoderRegistry     = $encoderRegistry;
     }
 
     /**
@@ -104,6 +96,14 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
                 }
             } elseif ($value instanceof ExpressionInterface) {
                 $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
+            } elseif ($value instanceof OptionValueBag) {
+                foreach ($value->all() as $action) {
+                    $args = $action->getArguments();
+                    $this->processExpressions($args, $context, $data, $evaluate, $encoding);
+                    foreach ($args as $index => $arg) {
+                        $action->setArgument($index, $arg);
+                    }
+                }
             }
         }
     }
@@ -126,35 +126,7 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension
     ) {
         return $evaluate
             ? $expr->evaluate(['context' => $context, 'data' => $data])
-            : $this->encodeExpression($expr, $encoding);
-    }
-
-    /**
-     * @param ExpressionInterface $expr
-     * @param string              $format
-     *
-     * @return string
-     *
-     * @throws \RuntimeException if the appropriate encoder does not exist
-     */
-    protected function encodeExpression(ExpressionInterface $expr, $format)
-    {
-        if (!isset($this->encoders[$format])) {
-            throw new \RuntimeException(
-                sprintf(
-                    'The expression encoder for "%s" formatting was not found. '
-                    . 'Check that the appropriate encoder service is registered in '
-                    . 'the container and marked by tag "%s".',
-                    $format,
-                    ConfigExpressionCompilerPass::EXPRESSION_ENCODER_TAG
-                )
-            );
-        }
-
-        /** @var ConfigExpressionEncoderInterface $encoder */
-        $encoder = $this->container->get($this->encoders[$format]);
-
-        return $encoder->encode($expr);
+            : $this->encoderRegistry->getEncoder($encoding)->encodeExpr($expr);
     }
 
     /**

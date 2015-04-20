@@ -6,11 +6,9 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 
 class EmailAttachmentProvider
 {
@@ -30,9 +28,9 @@ class EmailAttachmentProvider
     protected $attachmentProvider;
 
     /**
-     * @var DateTimeFormatter
+     * @var EmailAttachmentTransformer
      */
-    protected $dateTimeFormatter;
+    protected $emailAttachmentTransformer;
 
     /**
      * @var Factory
@@ -40,24 +38,21 @@ class EmailAttachmentProvider
     protected $factory;
 
     /**
-     * @param EmailThreadProvider $emailThreadProvider
-     * @param EntityManager       $entityManager
-     * @param AttachmentProvider  $attachmentProvider
-     * @param DateTimeFormatter   $dateTimeFormatter
-     * @param Factory             $factory
+     * @param EmailThreadProvider        $emailThreadProvider
+     * @param EntityManager              $entityManager
+     * @param AttachmentProvider         $attachmentProvider
+     * @param EmailAttachmentTransformer $emailAttachmentTransformer
      */
     public function __construct(
         EmailThreadProvider $emailThreadProvider,
         EntityManager $entityManager,
         AttachmentProvider $attachmentProvider,
-        DateTimeFormatter $dateTimeFormatter,
-        Factory $factory
+        EmailAttachmentTransformer $emailAttachmentTransformer
     ) {
-        $this->emailThreadProvider = $emailThreadProvider;
-        $this->em                  = $entityManager;
-        $this->attachmentProvider  = $attachmentProvider;
-        $this->dateTimeFormatter   = $dateTimeFormatter;
-        $this->factory             = $factory;
+        $this->emailThreadProvider        = $emailThreadProvider;
+        $this->em                         = $entityManager;
+        $this->attachmentProvider         = $attachmentProvider;
+        $this->emailAttachmentTransformer = $emailAttachmentTransformer;
     }
 
     /**
@@ -73,10 +68,10 @@ class EmailAttachmentProvider
         /** @var Email $threadEmail */
         foreach ($threadEmails as $threadEmail) {
             if ($threadEmail->getEmailBody()->getHasAttachments()) {
-                $emailAttachments = $emailEntity->getEmailBody()->getAttachments();
+                $emailAttachments = $threadEmail->getEmailBody()->getAttachments();
 
                 foreach ($emailAttachments as $emailAttachment) {
-                    $attachments[] = $this->emailAttachmentToAttachmentModel($emailAttachment);
+                    $attachments[] = $this->emailAttachmentTransformer->entityToModel($emailAttachment);
                 }
             }
         }
@@ -95,35 +90,9 @@ class EmailAttachmentProvider
         $oroAttachments = $this->attachmentProvider->getEntityAttachments($entity);
 
         foreach ($oroAttachments as $oroAttachment) {
-            $attachmentModel = $this->factory->getEmailAttachment();
-            $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
-            $attachmentModel->setId($oroAttachment->getId());
-            $attachmentModel->setFileName($oroAttachment->getFile()->getOriginalFilename());
-            $attachmentModel->setFileSize($oroAttachment->getFile()->getFileSize());
-            $attachmentModel->setModified($this->dateTimeFormatter->format(
-                $oroAttachment->getCreatedAt()
-            ));
-
-            $attachments[] = $attachmentModel;
+            $attachments[] = $this->emailAttachmentTransformer->oroToModel($oroAttachment);
         }
 
         return $attachments;
-    }
-
-    /**
-     * @param EmailAttachment $emailAttachment
-     *
-     * @return AttachmentModel
-     */
-    protected function emailAttachmentToAttachmentModel(EmailAttachment $emailAttachment)
-    {
-        $attachmentModel = $this->factory->getEmailAttachment();
-        $attachmentModel->setEmailAttachment($emailAttachment);
-        $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
-        $attachmentModel->setId($emailAttachment->getId());
-        $attachmentModel->setFileSize(strlen($emailAttachment->getContent()->getContent()));
-        $attachmentModel->setModified($this->dateTimeFormatter->format(new \DateTime('now'))); // todo now?
-
-        return $attachmentModel;
     }
 }

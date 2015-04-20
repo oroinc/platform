@@ -28,4 +28,11 @@ class TestClassMagicGet
             return 'constant value';
         }
     }
+
+    public function __unset($property)
+    {
+        if ('magicProperty' === $property) {
+            $this->magicProperty = null;
+        }
+    }
 }

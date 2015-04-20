@@ -6,7 +6,7 @@ Overview
 
 A **layout update** is a set of actions that should be performed with the **[layout](what_is_layout.md)** in order to
 customize the page look depending on our needs. The **layout update** may be performed manually
-(via `\Oro\Component\Layout\LayoutBuilder`) or collected by *Oro Platform* loaders automatically.
+(via [LayoutBuilder](../../../../Component/Layout/LayoutBuilder.php)) or collected by the *Oro Platform* loaders automatically.
 
 Loaders
 -------
@@ -20,12 +20,12 @@ Yaml syntax
 -----------
 
 This section covers basic layout update file structure and syntax that can be extended for advanced usage.
-The **layout update** file should have `oro_layout` as a root node and may consist of `actions` and `conditions` nodes.
+The **layout update** file should have `layout` as a root node and may consist of `actions` and `conditions` nodes.
 
 ### Actions
 
 **Actions** -- array node with a set of actions to execute. Generally, each action will be compiled as a separate call
-to corresponding method of `\Oro\Component\Layout\LayoutManipulatorInterface`.
+to corresponding method of [LayoutManipulatorInterface](../../../../Component/Layout/LayoutManipulatorInterface.php).
 
 Here is the list of available actions:
 
@@ -38,6 +38,9 @@ Here is the list of available actions:
 | `addAlias` | Add alias for the layout item. Could be used for backward compatibility. |
 | `removeAlias` | Remove the alias previously defined for the layout item |
 | `setOption` | Set the option value for the layout item |
+| `appendOption` | Add a new value in addition to existing values of an option of the layout item |
+| `subtractOption` | Remove existing value from an option of the layout item |
+| `replaceOption` | Replace one value with another value of an option of the layout item |
 | `removeOption` | Unset the option from the layout item |
 | `changeBlockType` | Change block type of the layout item |
 | `setBlockTheme` | Define theme file where renderer should look up for block templates |
@@ -47,7 +50,8 @@ Action definition is a multidimensional array where the keys are **action name**
 arguments that will be passed directly to proxied method call. Arguments can be passed as a sequential list or an associative array.
 
 **Example**
-```yml
+
+```yaml
 layout:
     actions:
         - @add: # Sequential list
@@ -69,7 +73,8 @@ Optional parameters can be skipped in case when named arguments are used. In the
 `parentId` that will be set to the default value automatically.
 
 **Example**
-```yml
+
+```yaml
 layout:
     actions:
         - @move:
@@ -88,7 +93,8 @@ action has been developed. It requires two nodes to be defined - `items` and `tr
 parent block.
 
 **Example**
-```yml
+
+```yaml
 layout:
     actions:
         - @addTree:
@@ -122,14 +128,15 @@ The syntax of conditions declaration is very similar to *actions*, except that i
 Special grouping conditions (such as `@or`, `@and`) could be utilized in order to combine multiple conditions.
 
 **Example**
-```yml
+
+```yaml
 layout:
     actions:
         ....
     conditions:
-        - @and:
-            - @lte: [$call_timeout, 30]
-            - @gt:  [$call_timeout, 0]
+        - @or:
+            - @eq: [ $context.user_agent.mobile, true ]
+            - @eq: [ $context.navbar_position, 'top' ]
 ```
 
 **[Layout context](./layout_context.md)** could be accessed through the condition expressions by referencing to `$context` variable.
@@ -144,6 +151,7 @@ case when other *config based* loaders do not satisfy your specific requirements
 can be omitted. It's recommended to use opening tag and *PHPDoc* variable typehinting to get your IDE autocomplete working.
 
 **Example**
+
 ```php
 /** @var Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator */
 /** @var Oro\Component\Layout\LayoutItemInterface $item */
@@ -156,12 +164,11 @@ Developer reference
 
 Here is a list of key classes involved in the layout update loading mechanism and their responsibilities:
 
- - `Oro\Component\Layout\Loader\Driver\YamlDriver` - Loads layout update instructions based on *YAML* config.
- - `Oro\Component\Layout\Loader\Driver\PhpDriver` - *PHP* loader, takes *PHP* instructions and compiles them into layout update.
- - `Oro\Component\Layout\Loader\Generator\AbstractLayoutUpdateGenerator` - base class to implement generator for a new format.
- - `Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator` - config based generator, now utilized by *YAML* loader,
-    but may be reused for other formats (such as *XML*, *PHP arrays*) as well.
+ - [YamlDriver](../../../../Component/Layout/Loader/Driver/YamlDriver.php) - Loads layout update instructions from *YAML* file.
+ - [PhpDriver](../../../../Component/Layout/Loader/Driver/PhpDriver.php) - *PHP* loader, takes *PHP* instructions and compiles them into the layout update.
+ - [AbstractLayoutUpdateGenerator](../../../../Component/Layout/Loader/Generator/AbstractLayoutUpdateGenerator.php) - base class to implement generator for different formats.
+ - [ConfigLayoutUpdateGenerator](../../../../Component/Layout/Loader/Generator/ConfigLayoutUpdateGenerator.php) - config based generator, now utilized by *YAML* loader, but may be reused for other formats (such as *XML*, *PHP arrays*) as well.
 
-In order to implement a loader for a new format different form supported, the `Oro\Component\Layout\Loader\Driver\DriverInterface`
-interface should be implemented and added as a known driver to the loader (add `addDriver` *method call*
+In order to implement a loader for a new format different from supported ones, the [DriverInterface](../../../../Component/Layout/Loader/Driver/DriverInterface.php)
+interface should be implemented and registered in the loader as a known driver (add `addDriver` *method call*
 for `oro_layout.loader` service definition).

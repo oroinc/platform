@@ -6,6 +6,8 @@ class ThemeFactory implements ThemeFactoryInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function create($themeName, array $themeDefinition)
     {

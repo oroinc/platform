@@ -80,7 +80,7 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
      * Adds a new option or updates a value of existing option for the item
      *
      * @param string $id          The item id
-     * @param string $optionName  The option name
+     * @param string $optionName  The option name or path
      * @param mixed  $optionValue The option value
      *
      * @return self
@@ -88,10 +88,44 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
     public function setOption($id, $optionName, $optionValue);
 
     /**
+     * Adds a new value in addition to existing one for a new or existing option of the item
+     *
+     * @param string $id          The item id
+     * @param string $optionName  The option name or path
+     * @param mixed  $optionValue The option value to be added
+     *
+     * @return self
+     */
+    public function appendOption($id, $optionName, $optionValue);
+
+    /**
+     * Removes existing value from existing option of the item
+     *
+     * @param string $id          The item id
+     * @param string $optionName  The option name or path
+     * @param mixed  $optionValue The option value to be removed
+     *
+     * @return self
+     */
+    public function subtractOption($id, $optionName, $optionValue);
+
+    /**
+     * Replaces one value with another value for existing option of the item
+     *
+     * @param string $id             The item id
+     * @param string $optionName     The option name or path
+     * @param mixed  $oldOptionValue The option value to be replaced
+     * @param mixed  $newOptionValue The option value to replace a value specified in $oldOptionValue parameter
+     *
+     * @return self
+     */
+    public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue);
+
+    /**
      * Removes the option for the item
      *
      * @param string $id         The item id
-     * @param string $optionName The option name
+     * @param string $optionName The option name or path
      *
      * @return self
      */

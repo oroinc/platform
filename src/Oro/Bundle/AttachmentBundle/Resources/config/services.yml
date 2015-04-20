@@ -20,6 +20,7 @@ parameters:
     oro_attachment.datagrid.action.dialog.class:          Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
 
     oro_attachment.provider.attachment.class:             Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
+    oro_attachment.config.class:                          Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
 services:
     oro_attachment.manager:
@@ -84,8 +85,7 @@ services:
     oro_attachment.placeholder.filter:
         class: %oro_attachment.placeholder.filter.class%
         arguments:
-            - @oro_entity_config.provider.attachment
-            - @oro_entity_config.provider.entity
+            - @oro_attachment.config
 
     oro_attachment.event_listener.attachment_grid_listener:
         class: %oro_attachment.attachment_grid_listener%
@@ -113,3 +113,10 @@ services:
         class: %oro_attachment.provider.attachment.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_attachment.config
+
+    oro_attachment.config:
+        class: %oro_attachment.config.class%
+        arguments:
+            - @oro_entity_config.provider.attachment
+            - @oro_entity_config.provider.entity
