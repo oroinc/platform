@@ -34,7 +34,11 @@
             {% if gridScope is defined %}
                 {% set gridName = oro_datagrid_build_fullname(gridName, gridScope) %}
             {% endif %}
-            {% set renderParams = renderParams|default({})|merge({'enableFullScreenLayout': true}) %}
+            {% set renderParams = renderParams|default({})|merge({
+                'enableFullScreenLayout': true,
+                'enableViews': true,
+                'showViewsInNavbar': true,
+            }) %}
 
             {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
 
