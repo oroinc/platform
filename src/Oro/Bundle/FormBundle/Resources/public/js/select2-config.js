@@ -183,7 +183,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
                 // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
                 dataIds = _.compact(dataIds);
 
-                if (dataIds.length === 0 || dataIds.sort().join(this.config.separator) === currentValue.sort().join(this.options.separator)) {
+                if (dataIds.length === 0 || dataIds.sort().join(this.config.separator) === currentValue.sort().join(this.config.separator)) {
                     handleResults(elementData);
                 } else {
                     setSelect2ValueById(currentValue);
