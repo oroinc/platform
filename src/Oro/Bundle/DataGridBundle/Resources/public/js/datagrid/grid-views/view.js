@@ -94,7 +94,7 @@ define([
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
                 if (!this._getView('__all__').label) {
-                    this._getView('__all__').label = __('oro.datagrid.gridView.all') + (options.title || '');
+                    this._getView('__all__').label = __('oro.datagrid.gridView.all');
                 }
             }
 
