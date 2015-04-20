@@ -13,6 +13,9 @@ placeholders:
                 order: 50
             template_datagrid_action_header_cell:
                 order: 50
+            template_datagrid_gridview: ~
+            template_datagrid_gridview_label: ~
+            template_datagrid_view_name_modal: ~
 
 items:
    template_datagrid_toolbar:
@@ -27,3 +30,9 @@ items:
        template: OroDataGridBundle:js:select-all-header-cell.html.twig
    template_datagrid_action_header_cell:
        template: OroDataGridBundle:js:action-header-cell.html.twig
+   template_datagrid_gridview:
+       template: OroDataGridBundle:js:grid-view.html.twig
+   template_datagrid_gridview_label:
+       template: OroDataGridBundle:js:grid-view-label.html.twig
+   template_datagrid_view_name_modal:
+       template: OroDataGridBundle:js:view-name-modal.html.twig

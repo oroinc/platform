@@ -79,4 +79,12 @@ class NameStrategy implements NameStrategyInterface
 
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridUniqueName($name)
+    {
+        return $name;
+    }
 }
