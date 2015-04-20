@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
-/*global define, localStorage*/
-define(['./dropdown-button'], function ($) {
+/*global define */
+define(['./dropdown-button', 'oroui/js/localStorage'], function ($, localStorage) {
     'use strict';
 
     $.widget('oroui.pinnedDropdownButtonProcessor', $.oroui.dropdownButtonProcessor, {
