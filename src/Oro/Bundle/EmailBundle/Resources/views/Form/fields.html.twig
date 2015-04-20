@@ -13,7 +13,7 @@
                     collection: new Collection(
                         '{{ data_route }}',
                         {{ data_route_parameter|json_encode|raw }},
-                        {{ includeSystem is defined and includeSystem ? 'true' : 'false' }}
+                        {{ includeNonEntity is defined and includeNonEntity ? 'true' : 'false' }}
                     )
                 });
             });
