@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_12;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigIndexFieldValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class UpdateCreatedUpdatedLabels implements Migration
+class UpdateUserEntityFieldsLabels implements Migration
 {
     /**
      * {@inheritdoc}
@@ -30,11 +31,6 @@ class UpdateCreatedUpdatedLabels implements Migration
                 'entityName' => 'Oro\Bundle\UserBundle\Entity\User',
                 'field' => 'image',
                 'value' => 'oro.user.avatar.label'
-            ],
-            [
-                'entityName' => 'Oro\Bundle\UserBundle\Entity\User',
-                'field' => 'serialized_data',
-                'value' => 'oro.entity_serialized_fields.data.label'
             ]
         ];
 
