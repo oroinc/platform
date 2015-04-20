@@ -158,7 +158,7 @@ class RendererTest extends LayoutTestCase
             ->add('content', 'root', 'body')
             ->add('list', 'content', 'list')
             ->add(
-                'list_tem_1',
+                'list_item_1',
                 'list',
                 'text',
                 [
@@ -169,8 +169,44 @@ class RendererTest extends LayoutTestCase
                 ]
             )
             ->add(
-                'list_tem_2',
+                'list_item_2_container',
                 'list',
+                'list_item',
+                ['attr' => ['class' => 'list-item-2']]
+            )
+            ->add(
+                'list_item_2',
+                'list_item_2_container',
+                'link',
+                [
+                    'path' => 'http://example.com',
+                    'text' => [
+                        'label'      => 'Hi %val%!',
+                        'parameters' => ['%val%' => 'World']
+                    ]
+                ]
+            )
+            ->add('ordered_list', 'content', 'ordered_list', ['type' => 'a'])
+            ->add(
+                'ordered_list_item_1',
+                'ordered_list',
+                'text',
+                [
+                    'text' => [
+                        'label'      => 'Hi %val%!',
+                        'parameters' => ['%val%' => 'World']
+                    ]
+                ]
+            )
+            ->add(
+                'ordered_list_item_2_container',
+                'ordered_list',
+                'list_item',
+                ['attr' => ['class' => 'list-item-2']]
+            )
+            ->add(
+                'ordered_list_item_2',
+                'ordered_list_item_2_container',
                 'link',
                 [
                     'path' => 'http://example.com',
@@ -297,8 +333,12 @@ class RendererTest extends LayoutTestCase
     <input type="submit" name="btn2" value="Btn2"/>
     <ul>
         <li>Hi World!</li>
-        <li><a href="http://example.com">Hi World!</a></li>
+        <li class="list-item-2"><a href="http://example.com">Hi World!</a></li>
     </ul>
+    <ol type="a">
+        <li>Hi World!</li>
+        <li class="list-item-2"><a href="http://example.com">Hi World!</a></li>
+    </ol>
     {form_layout}
 </body>
 </html>

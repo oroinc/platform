@@ -55,6 +55,8 @@ The **OroLayoutBundle** introduces a set of block types that allow to easily bui
 | `fieldset` | [FieldsetType.php](../../Layout/Block/Type/FieldsetType.php) | `<fieldset>` |
 | `link` | [LinkType.php](../../Layout/Block/Type/LinkType.php) | `<a>` |
 | `list` | [ListType.php](../../Layout/Block/Type/ListType.php) | `<ul>` |
+| `ordered_list` | [OrderedListType.php](../../Layout/Block/Type/OrderedListType.php) | `<ol>` |
+| `list_item` | [ListItemType.php](../../Layout/Block/Type/ListItemType.php) | `<li>`, this block type can be used if you want to control rendering of `li` tag and its attributes |
 | `text` | [TextType.php](../../Layout/Block/Type/TextType.php) | Text node |
 | `button` | [ButtonType.php](../../Layout/Block/Type/ButtonType.php) | `<button>` or `<input type="submit/reset/button">` |
 | `button_group` | [ButtonGroupType.php](../../Layout/Block/Type/ButtonGroupType.php) | Nothing, this is just a logical grouping of buttons. You can define how to render the button group in your application |
