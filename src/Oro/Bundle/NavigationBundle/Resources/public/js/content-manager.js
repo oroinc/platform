@@ -292,6 +292,9 @@ define([
          */
         add: function () {
             var path;
+            if (current.path[0] !== '/') {
+                current.path = '/' + current.path;
+            }
             path = current.path;
             pagesCache[path] = current;
         },

@@ -24,6 +24,10 @@ oro:
 
         quick_launchpad_widget_description: This widget gives you access to most commonly used actions and pages
 
+        grid:
+            fields:
+                grid_view.label: Grid view
+
         no_data_found:    No data found
 
         no_one_available: You have no dashboards available

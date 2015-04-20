@@ -47,7 +47,7 @@ define([
             options.collection = this.collection;
             filtersList = new FiltersManager(options);
             this.$el.prepend(filtersList.render().$el);
-            mediator.trigger('datagrid_filters:rendered', this.collection);
+            mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
                 filtersList.$el.hide();
