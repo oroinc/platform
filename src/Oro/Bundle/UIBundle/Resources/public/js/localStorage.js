@@ -1,5 +1,9 @@
 define(function (require) {
     'use strict';
+    /**
+     * Provides clint-side storage storage
+     * Uses localStorage if supported, otherwise cookies
+     */
     require('jquery.cookie');
     if (localStorage) {
         try {
@@ -10,6 +14,7 @@ define(function (require) {
             // catch IE protected mode or browsers w/o localStorage support
         }
     }
+    
     // use cookies storage instead
     return {
         setItem: function (name, value) {
