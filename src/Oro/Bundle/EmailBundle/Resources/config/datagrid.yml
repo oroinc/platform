@@ -20,7 +20,8 @@ datagrid:
                             alias: r_cc_bcc
                             conditionType: WITH
                             condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
-
+                        -
+                            { join: e.folders, alias: f }
         columns:
             contacts:
                 type: twig
