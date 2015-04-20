@@ -89,7 +89,7 @@ oro:
 
         attachment:
             copy_to_record: Copy to Record
-            open: Open
+            open: Save
             select_file: Select file
 
         menu:
