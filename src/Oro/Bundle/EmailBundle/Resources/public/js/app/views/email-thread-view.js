@@ -38,6 +38,11 @@ define(function (require) {
         initialize: function (options) {
             _.extend(this, _.pick(options, ['actionPanelSelector']));
             EmailTreadView.__super__.initialize.apply(this, arguments);
+            mediator.on('widget:doRefresh:email-thread', function() {
+                if (options.isBaseView) {
+                    mediator.trigger('widget:doRefresh:email-thread-context');
+                }
+            });
         },
 
         /**

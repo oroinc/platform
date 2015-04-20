@@ -1,0 +1,4 @@
+oro:
+    datagrid:
+        gridview:
+            unique: This name already exists.

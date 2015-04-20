@@ -2,3 +2,13 @@ oro_datagrid_bundle:
     resource: "@OroDataGridBundle/Controller"
     type:     annotation
     prefix:   /datagrid
+
+oro_datagrid_api:
+    resource: "@OroDataGridBundle/Resources/config/oro/routing_api.yml"
+    type: rest
+    prefix: api/rest/{version}
+    requirements:
+        version:  latest|v1
+        _format: json
+    defaults:
+        version:  latest
