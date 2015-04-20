@@ -51,7 +51,7 @@ class TransactionEmailsTest extends Selenium2TestCase
             ->setEmail($newEmail)
             ->save()
             ->assertMessage('Email notification rule saved')
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->close();
 
         return $newEmail;
