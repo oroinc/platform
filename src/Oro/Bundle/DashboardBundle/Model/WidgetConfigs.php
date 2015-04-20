@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -51,6 +52,14 @@ class WidgetConfigs
         $this->resolver       = $resolver;
         $this->entityManager  = $entityManager;
         $this->valueProvider  = $valueProvider;
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -120,6 +129,29 @@ class WidgetConfigs
     }
 
     /**
+     * @param $widgetName
+     * @param $widgetId
+     * @return array
+     */
+    public function getWidgetItemsData($widgetName, $widgetId)
+    {
+        $widgetConfig  = $this->configProvider->getWidgetConfig($widgetName);
+        $widgetOptions = $this->getWidgetOptions($widgetId);
+
+        $items = isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [];
+        $items = $this->filterWidgets($items, true, $widgetOptions->get('subWidgets', []));
+
+        foreach ($items as $itemName => $config) {
+            $items[$itemName]['value'] = $this->resolver->resolve(
+                [$config['data_provider']],
+                ['widgetOptions' => $widgetOptions]
+            )[0];
+        }
+
+        return $items;
+    }
+
+    /**
      * Returns a list of options for widget with id $widgetId or current widget if $widgetId is not specified
      *
      * @param int|null $widgetId
@@ -146,27 +178,57 @@ class WidgetConfigs
 
         foreach ($widgetConfig['configuration'] as $name => $config) {
             $value          = isset($options[$name]) ? $options[$name] : null;
-            $options[$name] = $this->valueProvider->getConvertedValue($widgetConfig, $config['type'], $value);
+            $options[$name] = $this->valueProvider->getConvertedValue(
+                $widgetConfig,
+                $config['type'],
+                $value,
+                $config,
+                $options
+            );
         }
 
         return new WidgetOptionBag($options);
     }
 
     /**
-     * Filter widget configs based on acl enabled and applicable flag
+     * @param Widget $widget
+     * @return array
+     */
+    public function getFormValues(Widget $widget)
+    {
+        $options      = $widget->getOptions();
+        $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
+
+        foreach ($widgetConfig['configuration'] as $name => $config) {
+            $value          = isset($options[$name]) ? $options[$name] : null;
+            $options[$name] = $this->valueProvider->getFormValue($config['type'], $config, $value);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Filter widget configs based on acl enabled, applicable flag and selected items
      *
-     * @param array $items
+     * @param array   $items
+     * @param boolean $applyVisible
+     * @param array   $visibleItems
      *
      * @return array filtered items
      */
-    protected function filterWidgets(array $items)
+    protected function filterWidgets(array $items, $applyVisible = false, array $visibleItems = [])
     {
         $securityFacade = $this->securityFacade;
         $resolver       = $this->resolver;
 
         return array_filter(
             $items,
-            function (&$item) use ($securityFacade, $resolver) {
+            function (&$item) use ($securityFacade, $resolver, $applyVisible, $visibleItems, &$items) {
+                $visible = true;
+                if ($applyVisible && !in_array(key($items), $visibleItems)) {
+                    $visible = false;
+                }
+                next($items);
                 $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
                 $applicable    = true;
                 $enabled       = $item['enabled'];
@@ -177,7 +239,7 @@ class WidgetConfigs
 
                 unset ($item['acl'], $item['applicable'], $item['enabled']);
 
-                return $enabled && $accessGranted && $applicable;
+                return $visible && $enabled && $accessGranted && $applicable;
             }
         );
     }
@@ -193,10 +255,20 @@ class WidgetConfigs
     }
 
     /**
-     * @param Request $request
+     * @param array           $widgetConfig
+     * @param WidgetOptionBag $widgetOptions
+     * @return array|mixed
      */
-    public function setRequest(Request $request = null)
+    protected function getEnabledItems(array $widgetConfig, WidgetOptionBag $widgetOptions)
     {
-        $this->request = $request;
+        if (isset($widgetConfig['configuration'])) {
+            foreach ($widgetConfig['configuration'] as $parameterName => $config) {
+                if ($config['type'] === WidgetItemsChoiceType::NAME) {
+                    return $widgetOptions->get($parameterName, []);
+                }
+            }
+        }
+
+        return [];
     }
 }

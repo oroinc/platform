@@ -21,7 +21,11 @@ use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 
 /**
  * @Route("/dashboard")
@@ -107,7 +111,7 @@ class DashboardController extends Controller
         $form  = $this->getFormProvider()->getForm($widget->getName());
         $saved = false;
 
-        $form->setData($widget->getOptions());
+        $form->setData($this->get('oro_dashboard.widget_configs')->getFormValues($widget));
 
         $form->handleRequest($request);
         if ($form->isValid()) {
@@ -228,12 +232,37 @@ class DashboardController extends Controller
      */
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
-        /** @var WidgetAttributes $manager */
+        /** @var WidgetConfigs $manager */
         $manager = $this->get('oro_dashboard.widget_configs');
 
         $params = array_merge(
             [
                 'items' => $manager->getWidgetItems($widget)
+            ],
+            $manager->getWidgetAttributesForTwig($widget)
+        );
+
+        return $this->render(
+            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            $params
+        );
+    }
+
+    /**
+     * @Route(
+     *      "/itemized_data_widget/{widget}/{bundle}/{name}",
+     *      name="oro_dashboard_itemized_data_widget",
+     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     * )
+     */
+    public function itemizedDataWidgetAction($widget, $bundle, $name)
+    {
+        /** @var WidgetConfigs $manager */
+        $manager = $this->get('oro_dashboard.widget_configs');
+
+        $params = array_merge(
+            [
+                'items' => $manager->getWidgetItemsData($widget, $this->getRequest()->query->get('_widgetId', null))
             ],
             $manager->getWidgetAttributesForTwig($widget)
         );
@@ -281,6 +310,62 @@ class DashboardController extends Controller
         }
 
         return $dashboard;
+    }
+
+    /**
+     * @Route(
+     *      "/grid/{widget}/{gridName}",
+     *      name="oro_dashboard_grid",
+     *      requirements={"gridName"="[\w\:-]+"}
+     * )
+     * @Template("OroDashboardBundle:Dashboard:grid.html.twig")
+     *
+     * @param string $gridName
+     *
+     * @return array
+     */
+    public function gridAction($widget, $gridName)
+    {
+        $params = $this->getRequest()->get('params', []);
+        $renderParams = $this->getRequest()->get('renderParams', []);
+
+        $viewId = $this->getWidgetConfigs()->getWidgetOptions()->get('gridView');
+        if ($viewId && null !== $view = $this->findView($viewId)) {
+            $params = array_merge($params, [
+                ParameterBag::ADDITIONAL_PARAMETERS => [
+                    GridViewsExtension::VIEWS_PARAM_KEY => $viewId
+                ],
+                '_filter' => $view->getFiltersData(),
+                '_sort_by' => $view->getSortersData(),
+            ]);
+        }
+
+        return array_merge(
+            [
+                'gridName'     => $gridName,
+                'params'       => $params,
+                'renderParams' => $renderParams,
+            ],
+            $this->getWidgetConfigs()->getWidgetAttributesForTwig($widget)
+        );
+    }
+
+    /**
+     * @return WidgetConfigs
+     */
+    protected function getWidgetConfigs()
+    {
+        return $this->get('oro_dashboard.widget_configs');
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return GridView
+     */
+    protected function findView($id)
+    {
+        return $this->getDoctrine()->getRepository('OroDataGridBundle:GridView')->find($id);
     }
 
     /**

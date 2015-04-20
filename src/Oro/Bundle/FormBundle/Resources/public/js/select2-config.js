@@ -8,7 +8,8 @@ define(['jquery', 'underscore', 'oroui/js/tools'
      * @class   oroform.Select2Config
      */
     var Select2Config = function (config, url, perPage, excluded) {
-        this.config = config;
+        this.config = config || {};
+        this.config.separator = config.separator || ',';
         this.url = url;
         this.perPage = perPage;
         this.excluded = excluded;
@@ -131,7 +132,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
 
             var setSelect2ValueById = function(id) {
                 if (_.isArray(id)) {
-                    id = id.join(',');
+                    id = id.join(self.config.separator);
                 }
                 var select2Obj = element.data('select2');
                 var select2AjaxOptions = select2Obj.opts.ajax;
@@ -182,7 +183,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
                 // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
                 dataIds = _.compact(dataIds);
 
-                if (dataIds.length === 0 || dataIds.sort().join(',') === currentValue.sort().join(',')) {
+                if (dataIds.length === 0 || dataIds.sort().join(this.config.separator) === currentValue.sort().join(this.config.separator)) {
                     handleResults(elementData);
                 } else {
                     setSelect2ValueById(currentValue);
