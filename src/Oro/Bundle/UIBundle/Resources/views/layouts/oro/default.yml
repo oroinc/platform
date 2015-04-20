@@ -1,0 +1,178 @@
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroUIBundle:layouts:oro/default.html.twig'
+        - @addTree:
+            items:
+                head:
+                    blockType: head
+                    options:
+                        cache: false
+                theme_icon:
+                    blockType: external_resource
+                    options:
+                        href: { @asset: $data.theme.icon }
+                        rel: shortcut icon
+                head_style:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: head_style
+                scripts_before:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: scripts_before
+                require_js_init_script:
+                    blockType: require_js
+                    options:
+                        compressed:
+                            @not:
+                              - { @value: $context.debug }
+                        modules:
+                            - 'oroui/js/app'
+                            - 'oroui/js/init-layout'
+                            - 'orouser/js/init-user'
+                            - 'oroui/js/widget-manager'
+                debug_init_script:
+                    blockType: script
+                    options:
+                        visible: { @value: $context.debug }
+                mobile_init_script:
+                    blockType: script
+                    options:
+                        visible: { @value: $context.user_agent.mobile }
+                scripts_after:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: scripts_after
+                head_script:
+                    blockType: container
+                body:
+                    blockType: body
+                    options:
+                        attr:
+                            class:
+                                @join:
+                                  - ' '
+                                  - { @iif: [$context.user_agent.mobile, 'mobile-version', 'desktop-version'] }
+                                  - { @iif: [$context.debug, 'dev-mode', ''] }
+                header:
+                    blockType: container
+                navigation_bar:
+                    blockType: container
+                header_logo:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: header_logo
+                user_menu:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: user_menu
+                navbar_menu:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: navbar
+                pin_tabs:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: pin_tabs_list
+                main_menu:
+                    blockType: container
+                    options:
+                        visible:
+                            @or:
+                              - @eq: [ $context.user_agent.mobile, true ]
+                              - @eq: [ $context.navbar_position, 'top' ]
+                main_application_menu:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: application_menu
+                left_panel:
+                    blockType: container
+                    options:
+                        visible: { @value: $context.user_agent.desktop }
+                left_side_bar:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: left_panel
+                        placeholder_parameters:
+                            placement: left
+                right_panel:
+                    blockType: container
+                    options:
+                        visible: { @value: $context.user_agent.desktop }
+                right_side_bar:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: right_panel
+                        placeholder_parameters:
+                            placement: right
+                footer:
+                    blockType: container
+                footer_script:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: footer_inner
+                main_panel:
+                    blockType: container
+                main_header:
+                    blockType: container
+                breadcrumb:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: breadcrumb
+                pin_buttons:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: pin_button
+                before_content_addition:
+                    blockType: container
+                flash_messages:
+                    blockType: block
+                page_container:
+                    blockType: container
+                content_before:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: content_before
+                content:
+                    blockType: container
+                content_after:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: content_after
+            tree:
+                root:
+                    head:
+                        theme_icon: ~
+                        head_style: ~
+                        scripts_before: ~
+                        require_js_init_script: ~
+                        debug_init_script: ~
+                        mobile_init_script: ~
+                        scripts_after: ~
+                        head_script: ~
+                    body:
+                        header:
+                            navigation_bar:
+                                header_logo: ~
+                                user_menu: ~
+                                navbar_menu: ~
+                                pin_tabs: ~
+                            main_menu:
+                                main_application_menu: ~
+                        left_panel:
+                            left_side_bar: ~
+                        main_panel:
+                            main_header:
+                                breadcrumb: ~
+                                pin_buttons: ~
+                                before_content_addition: ~
+                                flash_messages: ~
+                            page_container:
+                                content_before: ~
+                                content: ~
+                                content_after: ~
+                        right_panel:
+                            right_side_bar: ~
+                        footer:
+                            footer_script: ~

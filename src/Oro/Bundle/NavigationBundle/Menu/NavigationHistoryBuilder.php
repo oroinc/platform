@@ -14,7 +14,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
     private $matcher;
 
     /**
-     * @var \Oro\Bundle\ConfigBundle\Config\UserConfigManager
+     * @var \Oro\Bundle\ConfigBundle\Config\ConfigManager
      */
     private $configOptions = null;
 
@@ -37,7 +37,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
     /**
      * Inject config
      *
-     * @param \Oro\Bundle\ConfigBundle\Config\UserConfigManager $config
+     * @param \Oro\Bundle\ConfigBundle\Config\ConfigManager $config
      */
     public function setOptions($config)
     {
