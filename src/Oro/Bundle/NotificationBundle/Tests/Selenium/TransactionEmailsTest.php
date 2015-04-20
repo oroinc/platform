@@ -20,7 +20,7 @@ class TransactionEmailsTest extends Selenium2TestCase
 
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->add()
             ->assertTitle('Add Notification Rule - Notification Rules - Emails - System')
             ->setEntityName('Calendar event')
@@ -31,7 +31,7 @@ class TransactionEmailsTest extends Selenium2TestCase
             ->setEmail($email)
             ->save()
             ->assertMessage('Email notification rule saved')
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->close();
 
         return $email;
@@ -66,7 +66,7 @@ class TransactionEmailsTest extends Selenium2TestCase
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
             ->delete('Recipient email', $email)
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->assertMessage('Item deleted');
     }
 }

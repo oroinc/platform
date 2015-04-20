@@ -22,7 +22,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $login = $this->login();
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
             ->setEntityName('User')
@@ -32,7 +32,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setContent('Template content')
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->close();
 
         return $templateName;

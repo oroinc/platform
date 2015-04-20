@@ -27,7 +27,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->assertTitle('Create Role - Roles - User Management - System')
             ->save()
             ->assertMessage('Role saved')
-            ->assertTitle('Roles - User Management - System')
+            ->assertTitle('All - Roles - User Management - System')
             ->close();
 
         return ($randomPrefix);
@@ -63,7 +63,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - User Management - System');
+            ->assertTitle('All - Users - User Management - System');
 
         return $username;
     }
@@ -78,7 +78,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
         $login = $this->login();
         /** @var TrackingWebsites $login */
         $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
-            ->assertTitles('Tracking Websites', 'Tracking Websites - Marketing')
+            ->assertTitles('Tracking Websites', 'All - Tracking Websites - Marketing')
             ->add()
             ->assertTitles('Create Tracking Website', 'Create Tracking Website - Tracking Websites - Marketing')
             ->setName($identifier)
