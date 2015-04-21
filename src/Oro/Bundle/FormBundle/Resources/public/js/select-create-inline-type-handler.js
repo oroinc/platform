@@ -43,11 +43,26 @@ function (routing, DialogWidget, widgetManager, __) {
 
             entitySelectDialog.on('grid-row-select', function (data) {
                 entitySelectDialog._showLoading();
+                var loadingStarted = false,
+                    onSelect = function () {
+                        entitySelectDialog.remove();
+                        selectorEl.select2('focus');
+                        selectorEl.off('select2-data-loaded.' + entitySelectDialog._wid, onSelect);
+                    },
+                    onDataRequest = function () {
+                        loadingStarted = true;
+                        selectorEl.off('select2-data-request.' + entitySelectDialog._wid, onDataRequest);
+                        selectorEl.on('select2-data-loaded.' + entitySelectDialog._wid, onSelect);
+                    };
+                // set value
+                selectorEl.on('select2-data-request.' + entitySelectDialog._wid, onDataRequest);
                 selectorEl.select2('val', data.model.get(existingEntityGridId), true);
-                selectorEl.on('change.' + entitySelectDialog._wid, function(){
-                    entitySelectDialog.remove();
-                    selectorEl.select2('focus');
-                });
+                // if there was no data request sent to server
+                if (!loadingStarted) {
+                    onSelect();
+                    // cleanup
+                    selectorEl.off('select2-data-request.' + entitySelectDialog._wid, onDataRequest);
+                }
             });
             entitySelectDialog.render();
         };
