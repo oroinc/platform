@@ -62,7 +62,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('orderBy')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(2))
+        $qb->expects($this->exactly(3))
             ->method('setParameter')
             ->will($this->returnSelf());
 
@@ -100,7 +100,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('orderBy')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(2))
+        $qb->expects($this->exactly(3))
             ->method('setParameter')
             ->will($this->returnSelf());
 
@@ -138,7 +138,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('orderBy')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(2))
+        $qb->expects($this->exactly(3))
             ->method('setParameter')
             ->will($this->returnSelf());
 
