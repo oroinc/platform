@@ -15,10 +15,10 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateHelper
 {
-    const YEAR_TYPE_DAYS = 1460;
+    const YEAR_TYPE_DAYS  = 1460;
     const MONTH_TYPE_DAYS = 93;
-    const WEEK_TYPE_DAYS = 60;
-    const DAY_TYPE_DAYS = 2;
+    const WEEK_TYPE_DAYS  = 60;
+    const DAY_TYPE_DAYS   = 2;
 
     /** @var string */
     protected $offset;
