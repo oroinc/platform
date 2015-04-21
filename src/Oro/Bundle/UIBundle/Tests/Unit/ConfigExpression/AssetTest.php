@@ -57,12 +57,28 @@ class AssetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
     }
 
-    public function testEvaluateWithShortBundleNameInPath()
+    public function testEvaluateWithFullPath()
     {
-        $options        = ['@AcmeTestBundle/Resources/public/images/picture.png'];
-        $normalizedPath = 'bundles/acmetest/images/picture.png';
+        $options        = ['@AcmeTestBundle/Resources/public/images/Picture.png'];
+        $normalizedPath = 'bundles/acmetest/images/Picture.png';
         $context        = [];
-        $expectedResult = 'assets/bundles/acmetest/images/picture.png';
+        $expectedResult = 'assets/bundles/acmetest/images/Picture.png';
+
+        $this->assetsHelper->expects($this->once())
+            ->method('getUrl')
+            ->with($normalizedPath, null)
+            ->will($this->returnValue($expectedResult));
+
+        $this->assertSame($this->function, $this->function->initialize($options));
+        $this->assertEquals($expectedResult, $this->function->evaluate($context));
+    }
+
+    public function testEvaluateWithNonBundlePath()
+    {
+        $options        = ['@AcmeTest/Resources/public/images/Picture.png'];
+        $normalizedPath = '@AcmeTest/Resources/public/images/Picture.png';
+        $context        = [];
+        $expectedResult = 'assets/@AcmeTest/Resources/public/images/Picture.png';
 
         $this->assetsHelper->expects($this->once())
             ->method('getUrl')

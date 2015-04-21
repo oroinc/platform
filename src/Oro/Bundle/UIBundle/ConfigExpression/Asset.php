@@ -141,10 +141,18 @@ class Asset extends AbstractFunction
      */
     private function normalizeAssetsPath($path)
     {
-        if ('@' == $path[0]) {
-            $path = ltrim($path, '@');
-            $path = preg_replace('@bundle/resources/public@', '', strtolower($path));
-            $path = 'bundles/'. $path;
+        if ($path && '@' === $path[0]) {
+            $trimmedPath = substr($path, 1);
+            $normalizedPath = preg_replace_callback(
+                '#(\w+)Bundle/Resources/public#',
+                function ($matches) {
+                    return strtolower($matches[1]);
+                },
+                $trimmedPath
+            );
+            if ($normalizedPath && $normalizedPath !== $trimmedPath) {
+                $path = 'bundles/' . $normalizedPath;
+            }
         }
 
         return $path;
