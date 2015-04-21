@@ -23,7 +23,7 @@ class TrackingWebsiteTest extends Selenium2TestCase
         $login = $this->login();
         /** @var TrackingWebsites $login */
         $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
-            ->assertTitles('Tracking Websites', 'All - Tracking Websites - Marketing')
+            ->assertTitles('All - Tracking Websites', 'All - Tracking Websites - Marketing')
             ->add()
             ->assertTitles('Create Tracking Website', 'Create Tracking Website - Tracking Websites - Marketing')
             ->setName($identifier)
