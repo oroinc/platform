@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -31,6 +34,9 @@ class EmailRenderer extends \Twig_Environment
     /** @var PropertyAccessor */
     protected $accessor;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param \Twig_LoaderInterface   $loader
      * @param array                   $options
@@ -39,6 +45,7 @@ class EmailRenderer extends \Twig_Environment
      * @param                         $cacheKey
      * @param \Twig_Extension_Sandbox $sandbox
      * @param TranslatorInterface     $translator
+     * @param LoggerInterface         $logger
      */
     public function __construct(
         \Twig_LoaderInterface $loader,
@@ -47,7 +54,8 @@ class EmailRenderer extends \Twig_Environment
         Cache $cache,
         $cacheKey,
         \Twig_Extension_Sandbox $sandbox,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        LoggerInterface $logger
     ) {
         parent::__construct($loader, $options);
 
@@ -59,6 +67,7 @@ class EmailRenderer extends \Twig_Environment
         $this->configureSandbox();
 
         $this->translator = $translator;
+        $this->logger = $logger;
     }
 
     /**
@@ -132,8 +141,14 @@ class EmailRenderer extends \Twig_Environment
             $content = $this->processDateTimeVariables($content, $templateParams['entity']);
         }
 
-        $templateRendered = $this->render($content, $templateParams);
-        $subjectRendered  = $this->render($subject, $templateParams);
+        try {
+            $templateRendered = $this->render($content, $templateParams);
+            $subjectRendered  = $this->render($subject, $templateParams);
+        } catch (\Twig_Error_Runtime $e) {
+            $templateRendered = '';
+            $subjectRendered = '';
+            $this->logger->log(LogLevel::WARNING, $e->getMessage());
+        }
 
         return array($subjectRendered, $templateRendered);
     }

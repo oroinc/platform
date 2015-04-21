@@ -241,7 +241,7 @@ services:
             - %oro_email.cache.available_in_template_key%
             - @oro_email.twig.email_sandbox
             - @translator
-            - @doctrine
+            - @logger
         lazy: true
 
     oro_email.twig.email_security_policy:
