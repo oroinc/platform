@@ -34,9 +34,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
     /** @var TranslatorInterface */
     protected $translation;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $logger;
-
     /**
      * setup mocks
      */
@@ -68,10 +65,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $this->translation->expects($this->any())->method('trans')
             ->will($this->returnArgument(0));
         ;
-
-        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
-            ->getMock();
-        $this->logger->expects($this->any())->method('log');
     }
 
     /**
@@ -315,8 +308,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 $this->cache,
                 $this->cacheKey,
                 $this->sandbox,
-                $this->translation,
-                $this->logger
+                $this->translation
             )
         );
     }
