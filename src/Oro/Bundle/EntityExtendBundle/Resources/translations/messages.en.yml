@@ -95,6 +95,7 @@ oro:
                         owner: "Type"
                         is_extend: "Is Extend"
                         state: "Schema status"
+                        is_deleted: "Deleted"
                 field:
                     grid_action:
                         remove: "Remove"
@@ -111,6 +112,7 @@ oro:
                         scale: "Scale"
                         set_expanded: "Expanded"
                         set_options: "Options"
+                        is_deleted: "Deleted"
 
         config_grid:
             entities: Entities
