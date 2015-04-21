@@ -1,0 +1,42 @@
+{% block _content_widget %}
+    <div class="layout-content">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_left_panel_widget %}
+    <div class="pull-left pull-left-extra">
+        <div class="clearfix customer-info well-small customer-simple">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_title_rows_widget %}
+    <div class="customer-content pull-left">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_title_first_row_widget %}
+    <div class="clearfix">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_title_second_row_widget %}
+    <div class="clearfix">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_content_widget %}
+    <div class="layout-content scrollable-container">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _navigation_content_tags_widget %}
+    {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
+    {{ navigationMacro.navigationContentTags(entity) }}
+{% endblock %}

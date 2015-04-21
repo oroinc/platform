@@ -1,0 +1,33 @@
+parameters:
+    oro_layout.php.renderer.class:           Symfony\Component\Form\FormRenderer
+    oro_layout.php.renderer.engine.class:    Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine
+    oro_layout.php.layout_renderer.class:    Oro\Component\Layout\LayoutRenderer
+    oro_layout.php.templating.helper.class:  Oro\Component\Layout\Templating\Helper\LayoutHelper
+
+services:
+    oro_layout.php.renderer:
+        public: false
+        class: %oro_layout.php.renderer.class%
+        arguments:
+            - @oro_layout.php.renderer.engine
+
+    oro_layout.php.renderer.engine:
+        public: false
+        class: %oro_layout.php.renderer.engine.class%
+        arguments:
+            - @templating.engine.php
+            - %oro_layout.php.resources%
+
+    oro_layout.php.layout_renderer:
+        public: false
+        class: %oro_layout.php.layout_renderer.class%
+        arguments:
+            - @oro_layout.php.renderer
+
+    oro_layout.php.templating.helper:
+        class: %oro_layout.php.templating.helper.class%
+        arguments:
+            - @oro_layout.php.renderer
+            - @oro_layout.text.helper
+        tags:
+             - { name: templating.helper, alias: layout }
