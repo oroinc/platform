@@ -56,7 +56,8 @@ class EmailTemplateRepository extends EntityRepository
         if ($includeNonEntity) {
             $qb->orWhere('e.entityName IS NULL');
         }
-        $qb->andWhere('e.isSystem = 0');
+        $qb->andWhere('e.isSystem = :isSystem')
+            ->setParameter('isSystem', false);
 
         $qb->andWhere("e.organization = :organization")
             ->setParameter('organization', $organization);
