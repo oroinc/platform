@@ -77,7 +77,15 @@ class IntegrationController extends Controller
      */
     public function scheduleAction(Integration $integration)
     {
-        $job = new Job(SyncCommand::COMMAND_NAME, ['--integration-id=' . $integration->getId(), '-v']);
+        $force = (bool)$this->getRequest()->get('force', false);
+        $jobParameters = [
+            '--integration-id=' . $integration->getId(),
+            '-v'
+        ];
+        if ($force) {
+            $jobParameters[] = '--force';
+        }
+        $job = new Job(SyncCommand::COMMAND_NAME, $jobParameters);
 
         $status  = Codes::HTTP_OK;
         $response = [
