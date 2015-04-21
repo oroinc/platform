@@ -1,3 +1,4 @@
+<?php //@codingStandardsIgnoreFile ?>
 <?php if (!empty($attr['href'])): ?>
     <link rel="stylesheet" <?php echo $view['layout']->block($block, 'block_attributes', array('attr' => $attr)) ?>/>
 <?php else: ?>

@@ -52,7 +52,11 @@ class EntityRelationGridListener
         $extendFieldConfig    = $extendConfigProvider->getConfig($entityClassName, $fieldName);
 
         $targetEntityName = $extendFieldConfig->get('target_entity');
-        $targetFieldNames = $extendFieldConfig->get('target_grid');
+        $targetFieldNames = array_merge(
+            $extendFieldConfig->get('target_grid'),
+            $extendFieldConfig->get('target_title'),
+            $extendFieldConfig->get('target_detailed')
+        );
 
         // build 'assigned' field expression
         if ($entityId) {

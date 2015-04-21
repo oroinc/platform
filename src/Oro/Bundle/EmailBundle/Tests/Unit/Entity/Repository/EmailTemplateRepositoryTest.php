@@ -56,7 +56,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('orWhere')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->exactly(2))
             ->method('andWhere')
             ->will($this->returnSelf());
         $qb->expects($this->once())
@@ -94,7 +94,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('orWhere')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->exactly(2))
             ->method('andWhere')
             ->will($this->returnSelf());
         $qb->expects($this->once())
@@ -132,7 +132,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->never())
             ->method('orWhere')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->exactly(2))
             ->method('andWhere')
             ->will($this->returnSelf());
         $qb->expects($this->once())

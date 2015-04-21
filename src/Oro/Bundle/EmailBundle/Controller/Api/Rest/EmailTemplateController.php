@@ -73,21 +73,21 @@ class EmailTemplateController extends RestController
      * REST GET templates by entity name
      *
      * @param string $entityName
-     * @param bool   $includeSystem
+     * @param bool   $includeNonEntity
      *
      * @ApiDoc(
      *     description="Get templates by entity name",
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_index")
-     * @Get("/emailtemplates/list/{entityName}/{includeSystem}",
-     *      requirements={"entityName"="\w+", "includeSystem"="\d+"},
-     *      defaults={"includeSystem"=false}
+     * @Get("/emailtemplates/list/{entityName}/{includeNonEntity}",
+     *      requirements={"entityName"="\w+", "includeNonEntity"="\d+"},
+     *      defaults={"includeNonEntity"=false}
      * )
      *
      * @return Response
      */
-    public function cgetAction($entityName = null, $includeSystem = false)
+    public function cgetAction($entityName = null, $includeNonEntity = false)
     {
         if (!$entityName) {
             return $this->handleView(
@@ -105,7 +105,7 @@ class EmailTemplateController extends RestController
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
         $templates = $emailTemplateRepository
-            ->getTemplateByEntityName($entityName, $organization, (bool)$includeSystem);
+            ->getTemplateByEntityName($entityName, $organization, (bool)$includeNonEntity);
 
         return $this->handleView(
             $this->view($templates, Codes::HTTP_OK)

@@ -27,13 +27,13 @@ class EmailTemplateRepository extends EntityRepository
      *
      * @param string       $entityName
      * @param Organization $organization
-     * @param bool         $includeSystem
+     * @param bool         $includeNonEntity
      *
      * @return EmailTemplate[]
      */
-    public function getTemplateByEntityName($entityName, Organization $organization, $includeSystem = false)
+    public function getTemplateByEntityName($entityName, Organization $organization, $includeNonEntity = false)
     {
-        return $this->getEntityTemplatesQueryBuilder($entityName, $organization, $includeSystem)
+        return $this->getEntityTemplatesQueryBuilder($entityName, $organization, $includeNonEntity)
             ->getQuery()->getResult();
     }
 
@@ -42,20 +42,21 @@ class EmailTemplateRepository extends EntityRepository
      *
      * @param string       $entityName    entity class
      * @param Organization $organization
-     * @param bool         $includeSystem if true - system templates will be included in result set
+     * @param bool         $includeNonEntity if true - system templates will be included in result set
      *
      * @return QueryBuilder
      */
-    public function getEntityTemplatesQueryBuilder($entityName, Organization $organization, $includeSystem = false)
+    public function getEntityTemplatesQueryBuilder($entityName, Organization $organization, $includeNonEntity = false)
     {
         $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
             ->orderBy('e.name', 'ASC')
             ->setParameter('entityName', $entityName);
 
-        if ($includeSystem) {
+        if ($includeNonEntity) {
             $qb->orWhere('e.entityName IS NULL');
         }
+        $qb->andWhere('e.isSystem = 0');
 
         $qb->andWhere("e.organization = :organization")
             ->setParameter('organization', $organization);

@@ -44,7 +44,7 @@
 {% endblock %}
 
 {% block meta_widget %}
-    <meta{{ block('block_attributes') }} />
+    <meta{{ block('block_attributes') }}/>
 {% endblock %}
 
 {% block script_widget %}
@@ -136,13 +136,33 @@
 {%- endblock %}
 
 {% block external_resource_widget %}
-    <link {{ block('block_attributes') }} />
+    <link{{ block('block_attributes') }}/>
 {% endblock %}
 
 {% block list_widget -%}
     <ul{{ block('block_attributes') }}>
     {% for child in block if child.vars.visible -%}
-        <li>{{ block_widget(child) }}</li>
+        {% if child.vars.own_template is defined and child.vars.own_template -%}
+            {{ block_widget(child) }}
+        {%- else %}
+            <li>{{ block_widget(child) }}</li>
+        {%- endif %}
     {%- endfor %}
     </ul>
+{%- endblock %}
+
+{% block ordered_list_widget -%}
+    <ol{{ block('block_attributes') }}>
+    {% for child in block if child.vars.visible -%}
+        {% if child.vars.own_template is defined and child.vars.own_template -%}
+            {{ block_widget(child) }}
+        {%- else %}
+            <li>{{ block_widget(child) }}</li>
+        {%- endif %}
+    {%- endfor %}
+    </ol>
+{%- endblock %}
+
+{% block list_item_widget -%}
+    <li{{ block('block_attributes') }}>{{ block_widget(block) }}</li>
 {%- endblock %}
