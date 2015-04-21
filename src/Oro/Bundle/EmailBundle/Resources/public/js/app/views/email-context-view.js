@@ -36,12 +36,6 @@ define(function (require) {
             var self = this;
             var dropdown = this.$el.find('#context-items-dropdown');
             var firstItem = this.$el.find('#email-context-current-item');
-            var dropdownButton = this.$el.find('#email-context-current-block');
-
-            dropdownButton.bind('click', function()
-            {
-                dropdown.toggle(0);
-            });
 
             this.collection.on('add', function(model) {
                 var gridUrl = self.options.params.grid_path + '/' + model.attributes.className;
@@ -59,7 +53,6 @@ define(function (require) {
                 dropdown.find('.context-item:last').click(function() {
                     $('#context-current-target-class').data('value', model.attributes.className);
                     dropdown.find('> .context-item').each(function() {$(this).removeClass('active')})
-                    dropdown.hide(0);
                     var item = $(this);
                     firstItem.html(item.html());
                     item.addClass('active');

@@ -340,7 +340,7 @@
                 {% if hasGrantReattach and target is defined and oro_can_attache(attachment, target) %}
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                     <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                        {{ 'oro.email.attachment.open'|trans }}
+                        {{ 'oro.email.attachment.save'|trans }}
                     </a>
                     {% set options = {
                         'view': 'oroemail/js/app/views/email-attachment-link-view',
@@ -363,7 +363,7 @@
                 {% else %}
                 <ul class="dropdown-menu one" role="menu" aria-labelledby="dropdownMenu">
                     <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                        {{ 'oro.email.attachment.open'|trans }}
+                        {{ 'oro.email.attachment.save'|trans }}
                     </a>
                 </ul>
                 {% endif %}
@@ -535,10 +535,11 @@
     {% set itemsArray = [] %}
     {% for item in entity.getActivityTargetEntities() %}
         {% set itemClassName = oro_class_name(item) %}
+        {% set itemClassNameEncoded = oro_class_name(item, true) %}
         {% set itemArray = {
             'entityId': entity.id,
             'targetId': item.id,
-            "targetClassName": itemClassName ,
+            "targetClassName": itemClassNameEncoded,
             'title': item|oro_format_name|default(item.email)|default(item.id),
             'icon': oro_entity_config_value(itemClassName, 'icon' ),
             'link': oro_entity_metadata_value(itemClassName, 'routeView') ? path(oro_entity_route(itemClassName), {id:item.id} ) : false

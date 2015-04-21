@@ -89,7 +89,7 @@ oro:
 
         attachment:
             copy_to_record: Copy to Record
-            open: Open
+            save: Save
             select_file: Select file
 
         menu:
@@ -121,7 +121,6 @@ oro:
                 view:
                     inbox: Inbox
                     sent: Sent Mail
-                    all: All Mail
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
