@@ -128,6 +128,33 @@ class Asset extends AbstractFunction
             return $path;
         }
 
-        return $this->assetsHelper->getUrl($path, $packageName);
+        return $this->assetsHelper->getUrl($this->normalizeAssetsPath($path), $packageName);
+    }
+
+    /**
+     * Normalizes assets path
+     * E.g. '@AcmeTestBundle/Resources/public/images/picture.png' => 'bundles/acmetest/images/picture.png'
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    private function normalizeAssetsPath($path)
+    {
+        if ($path && '@' === $path[0]) {
+            $trimmedPath = substr($path, 1);
+            $normalizedPath = preg_replace_callback(
+                '#(\w+)Bundle/Resources/public#',
+                function ($matches) {
+                    return strtolower($matches[1]);
+                },
+                $trimmedPath
+            );
+            if ($normalizedPath && $normalizedPath !== $trimmedPath) {
+                $path = 'bundles/' . $normalizedPath;
+            }
+        }
+
+        return $path;
     }
 }
