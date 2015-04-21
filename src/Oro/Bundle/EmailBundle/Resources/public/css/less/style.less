@@ -464,6 +464,9 @@ a.attachment .icon .icon-link {
     background-color: #ebebeb;
   }
 }
+.context-item:hover {
+  background-color: #ebebeb;
+}
 .customer-content .context-item .icon-remove {
   cursor: pointer;
 }
@@ -490,13 +493,6 @@ a.attachment .icon .icon-link {
 }
 
 #context-items-dropdown {
-  margin: -1px 0 0 0;
-  min-width: 150px;
-  position: absolute;
-  width: auto;
-  border: 1px solid #ccc;
-  background-color: white;
-  z-index: 1000;
   top: 35px;
   left: 15px;
 }
@@ -506,10 +502,12 @@ a.attachment .icon .icon-link {
   border: none;
   outline:none;
   margin: 10px 10px 15px 10px;
+  box-shadow: none;
 }
 #email-context-current-item {
   font-size: 18px;
   font-weight: bold;
+  color: #666666;
 }
 .attachment-list-popup {
   width: 350px;
