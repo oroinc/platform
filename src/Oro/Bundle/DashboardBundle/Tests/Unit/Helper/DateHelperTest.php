@@ -61,7 +61,8 @@ class DateHelperTest extends OrmTestCase
                     '2007' => ['date' => '2007'],
                     '2008' => ['date' => '2008'],
                     '2009' => ['date' => '2009'],
-                    '2010' => ['date' => '2010']
+                    '2010' => ['date' => '2010'],
+                    '2011' => ['date' => '2011']
                 ]
             ],
             'month' => [
@@ -71,7 +72,8 @@ class DateHelperTest extends OrmTestCase
                     '2000-01' => ['date' => '2000-01-01'],
                     '2000-02' => ['date' => '2000-02-01'],
                     '2000-03' => ['date' => '2000-03-01'],
-                    '2000-04' => ['date' => '2000-04-01']
+                    '2000-04' => ['date' => '2000-04-01'],
+                    '2000-05' => ['date' => '2000-05-01']
                 ]
             ],
             'week'  => [
@@ -87,6 +89,7 @@ class DateHelperTest extends OrmTestCase
                     '2000-15' => ['date' => '2000-04-10'],
                     '2000-16' => ['date' => '2000-04-17'],
                     '2000-17' => ['date' => '2000-04-24'],
+                    '2000-18' => ['date' => '2000-05-01'],
                 ]
             ],
             'day'   => [
@@ -96,6 +99,7 @@ class DateHelperTest extends OrmTestCase
                     '2000-03-01' => ['date' => '2000-03-01'],
                     '2000-03-02' => ['date' => '2000-03-02'],
                     '2000-03-03' => ['date' => '2000-03-03'],
+                    '2000-03-04' => ['date' => '2000-03-04'],
                 ]
             ],
             'hour'  => [
@@ -125,7 +129,8 @@ class DateHelperTest extends OrmTestCase
                     '2000-03-01-20' => ['date' => '2000-03-01T20:00:00+00:00'],
                     '2000-03-01-21' => ['date' => '2000-03-01T21:00:00+00:00'],
                     '2000-03-01-22' => ['date' => '2000-03-01T22:00:00+00:00'],
-                    '2000-03-01-23' => ['date' => '2000-03-01T23:00:00+00:00']
+                    '2000-03-01-23' => ['date' => '2000-03-01T23:00:00+00:00'],
+                    '2000-03-02-00' => ['date' => '2000-03-02T00:00:00+00:00']
                 ]
             ]
         ];
@@ -279,6 +284,7 @@ class DateHelperTest extends OrmTestCase
             ['date' => '2015-05-12', 'count' => 3],
             ['date' => '2015-05-13'],
             ['date' => '2015-05-14', 'count' => 5],
+            ['date' => '2015-05-15'],
         ];
 
         $actualData = $this->helper->convertToCurrentPeriod($from, $to, $data, 'cnt', 'count');
@@ -318,6 +324,7 @@ class DateHelperTest extends OrmTestCase
             ['date' => '2015-05-12', 'count' => 5],
             ['date' => '2015-05-13'],
             ['date' => '2015-05-14'],
+            ['date' => '2015-05-15'],
         ];
 
         $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(

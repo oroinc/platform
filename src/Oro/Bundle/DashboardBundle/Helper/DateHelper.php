@@ -15,10 +15,10 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateHelper
 {
-    const YEAR_TYPE_DAYS  = 1460;
+    const YEAR_TYPE_DAYS = 1460;
     const MONTH_TYPE_DAYS = 93;
-    const WEEK_TYPE_DAYS  = 60;
-    const DAY_TYPE_DAYS   = 2;
+    const WEEK_TYPE_DAYS = 60;
+    const DAY_TYPE_DAYS = 2;
 
     /** @var string */
     protected $offset;
@@ -127,6 +127,13 @@ class DateHelper
                 'date' => $this->getFormattedLabel($config, $dt, $increment),
             ];
             $increment++;
+        }
+
+        $endDateKey = $end->format($config['valueStringFormat']);
+        if (!in_array($endDateKey, array_keys($dates))) {
+            $dates[$endDateKey] = [
+                'date' => $this->getFormattedLabel($config, $end, $increment),
+            ];
         }
 
         return $dates;
@@ -274,6 +281,7 @@ class DateHelper
 
             $start = $this->aclHelper->apply($qb)->getSingleScalarResult();
             $start = new \DateTime($start, new \DateTimeZone('UTC'));
+            $start = $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
 
         return [$start, $end];
