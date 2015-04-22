@@ -5,6 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -33,25 +34,31 @@ class WidgetConfigs
     /** @var ConfigValueProvider */
     protected $valueProvider;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param ConfigProvider         $configProvider
      * @param SecurityFacade         $securityFacade
      * @param ResolverInterface      $resolver
      * @param EntityManagerInterface $entityManager
      * @param ConfigValueProvider    $valueProvider
+     * @param TranslatorInterface    $translator
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
         ResolverInterface $resolver,
         EntityManagerInterface $entityManager,
-        ConfigValueProvider $valueProvider
+        ConfigValueProvider $valueProvider,
+        TranslatorInterface $translator
     ) {
         $this->configProvider = $configProvider;
         $this->securityFacade = $securityFacade;
         $this->resolver       = $resolver;
         $this->entityManager  = $entityManager;
         $this->valueProvider  = $valueProvider;
+        $this->translator  = $translator;
     }
 
     /**
@@ -202,6 +209,26 @@ class WidgetConfigs
         foreach ($widgetConfig['configuration'] as $name => $config) {
             $value          = isset($options[$name]) ? $options[$name] : null;
             $options[$name] = $this->valueProvider->getFormValue($config['type'], $config, $value);
+        }
+
+        $options = $this->loadDefaultValue($options, $widgetConfig);
+
+        return $options;
+    }
+
+    /**
+     * @param $options
+     * @param $widgetConfig
+     *
+     * @return mixed
+     */
+    protected function loadDefaultValue($options, $widgetConfig)
+    {
+        if (!$options['title']) {
+            $options['title'] = [
+                'title'      => $this->translator->trans($widgetConfig['label']),
+                'useDefault' => true
+            ];
         }
 
         return $options;
