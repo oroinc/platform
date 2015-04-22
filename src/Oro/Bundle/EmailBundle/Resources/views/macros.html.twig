@@ -340,7 +340,7 @@
                 {% if hasGrantReattach and target is defined and oro_can_attache(attachment, target) %}
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                     <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                        {{ 'oro.email.attachment.open'|trans }}
+                        {{ 'oro.email.attachment.save'|trans }}
                     </a>
                     {% set options = {
                         'view': 'oroemail/js/app/views/email-attachment-link-view',
@@ -363,7 +363,7 @@
                 {% else %}
                 <ul class="dropdown-menu one" role="menu" aria-labelledby="dropdownMenu">
                     <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                        {{ 'oro.email.attachment.open'|trans }}
+                        {{ 'oro.email.attachment.save'|trans }}
                     </a>
                 </ul>
                 {% endif %}

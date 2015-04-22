@@ -17,7 +17,7 @@ class DashboardsTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Dashboards $login */
         $login->openDashboards('Oro\Bundle\DashboardBundle')
-            ->assertTitle('Manage dashboards - Dashboards');
+            ->assertTitle('All - Manage dashboards - Dashboards');
     }
 
     /**
@@ -79,6 +79,6 @@ class DashboardsTest extends Selenium2TestCase
         $login->openDashboards('Oro\Bundle\DashboardBundle')
             ->filterBy('Label', $dashboardName)
             ->assertNoDataMessage('No entity was found to match your search')
-            ->assertTitle('Manage dashboards - Dashboards');
+            ->assertTitle('All - Manage dashboards - Dashboards');
     }
 }

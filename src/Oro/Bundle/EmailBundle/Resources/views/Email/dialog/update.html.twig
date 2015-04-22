@@ -53,7 +53,7 @@
                     {{ form_row(form.cc) }}
                     {{ form_row(form.bcc) }}
                     {{ form_row(form.subject) }}
-                    {{ form_row(form.template, {'includeSystem': true}) }}
+                    {{ form_row(form.template, {'includeNonEntity': true}) }}
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 

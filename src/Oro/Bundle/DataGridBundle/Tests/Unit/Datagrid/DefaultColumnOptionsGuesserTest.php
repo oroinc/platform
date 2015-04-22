@@ -37,6 +37,7 @@ class DefaultColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
             ['boolean', ['frontend_type' => Property::TYPE_BOOLEAN]],
             ['date', ['frontend_type' => Property::TYPE_DATE]],
             ['datetime', ['frontend_type' => Property::TYPE_DATETIME]],
+            ['time', ['frontend_type' => Property::TYPE_TIME]],
             ['money', ['frontend_type' => Property::TYPE_CURRENCY]],
             ['percent', ['frontend_type' => Property::TYPE_PERCENT]],
             ['string', ['frontend_type' => Property::TYPE_STRING]],

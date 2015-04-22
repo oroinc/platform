@@ -12,7 +12,7 @@ define(function (require) {
     EmailContextActivityCollection = BaseCollection.extend({
         route: null,
         routeId: null,
-        includeSystem: false,
+        includeNonEntity: false,
         url: null,
         model: EmailContextActivityModel
     });

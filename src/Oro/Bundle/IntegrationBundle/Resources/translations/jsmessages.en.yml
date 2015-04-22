@@ -12,3 +12,11 @@ oro:
         channel.sync_priority.tooltip: >
             Select if your local version of the data or    the remote application
             data get priority in the case that both were updated since the last sync process.
+
+        force_sync:
+            title: Force Integration Resync
+            message: >
+                Warning: Running sync with force option will perofrm sync from beginning.
+                All existing data will be synced again. This operation will take some time.
+            ok: Run Resync
+            cancel: Cancel

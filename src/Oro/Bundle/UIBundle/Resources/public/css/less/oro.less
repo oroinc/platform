@@ -3158,4 +3158,8 @@ label .popover-content {
   &[style="height: auto;"] {
     overflow: visible;
   }
+  &.in {
+    // fixes expand in FF
+    min-height: 1px;
+  }
 }
