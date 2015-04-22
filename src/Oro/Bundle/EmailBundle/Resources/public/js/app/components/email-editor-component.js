@@ -9,6 +9,7 @@ define(function (require) {
         routing = require('routing'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
+        messenger = require('oroui/js/messenger'),
         ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
     function showField(fieldName) {
@@ -137,7 +138,7 @@ define(function (require) {
                                 .trigger('change');
                         },
                         error: function () {
-                            mediator.execute('notificationMessage', 'error', __('oro.email.emailtemplate.load_failed'));
+                            messenger.showErrorMessage(__('oro.email.emailtemplate.load_failed'));
                         },
                         dataType: 'json'
                     }).always(function () {

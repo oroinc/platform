@@ -94,7 +94,7 @@ define([
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
                 if (!this._getView('__all__').label) {
-                    this._getView('__all__').label = __('oro.datagrid.gridView.all');
+                    this._getView('__all__').label = __('oro.datagrid.gridView.all') + (options.title || '');
                 }
             }
 
@@ -650,7 +650,12 @@ define([
                 return this.originalTitle;
             }
 
-            return currentView.label + ' - ' + this.originalTitle;
+            var title = currentView.label;
+            if (currentView.value == '__all__') {
+                title = __('oro.datagrid.gridView.all');
+            }
+
+            return title + ' - ' + this.originalTitle;
         },
 
         /**

@@ -142,6 +142,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
                     : select2AjaxOptions.url;
 
                 searchData.search_by_id = true;
+                element.trigger('select2-data-request');
                 $.ajax({
                     url: url,
                     data: searchData,
