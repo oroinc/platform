@@ -67,11 +67,25 @@
         {% endif %}
 
         {% if entity.enabled == true %}
-            {{ UI.clientButton({
-                'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
-                'aCss':   'no-hash schedule-button btn-primary',
-                'label' : 'Schedule sync'|trans
-            }) }}
+        <div class="btn-group">
+            {% set buttonsHtml %}
+                {{ UI.clientButton({
+                    'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
+                    'aCss':   'no-hash schedule-button',
+                    'label' : 'oro.integration.button.sync'|trans
+                }) }}
+
+                {{ UI.clientButton({
+                    'dataUrl': path('oro_integration_schedule', { 'id': entity.id, 'force': true }) ,
+                    'aCss':   'no-hash schedule-button',
+                    'label' : 'oro.integration.button.force_sync'|trans,
+                    'dataAttributes': {
+                        'force': true
+                    }
+                }) }}
+            {% endset %}
+            {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}
+        </div>
         {% endif %}
     {% endif %}
 
@@ -156,14 +170,10 @@
     } %}
     {{ parent() }}
     <script type="text/javascript">
-        require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger', 'oroui/js/mediator'],
-        function ($, __, routing, messenger, mediator) {
+        require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger', 'oroui/js/mediator', 'oroui/js/modal'],
+        function ($, __, routing, messenger, mediator, Modal) {
             $(function () {
-                $('.schedule-button').click(function (e) {
-                    e.preventDefault();
-
-                    var url = $(this).data('url');
-
+                var scheduleSync = function (url) {
                     mediator.execute('showLoading');
 
                     $.ajax(url, {
@@ -177,6 +187,31 @@
                     }).always(function () {
                         mediator.execute('hideLoading');
                     });
+                };
+
+                $('.schedule-button').click(function (e) {
+                    e.preventDefault();
+                    var url = $(this).data('url');
+
+                    if ($(this).data('force')) {
+                        var confirmation = new Modal({
+                            title: __('oro.integration.force_sync.title'),
+                            okText: __('oro.integration.force_sync.ok'),
+                            cancelText: __("oro.integration.force_sync.cancel"),
+                            content: __('oro.integration.force_sync.message'),
+                            className: 'modal oro-modal-danger',
+                            okButtonClass: 'btn-danger',
+                            handleClose: true
+                        });
+
+                        confirmation.on('ok', function () {
+                            scheduleSync(url);
+                        });
+
+                        confirmation.open();
+                    } else {
+                        scheduleSync(url);
+                    }
                 });
             });
         });

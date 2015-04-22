@@ -75,6 +75,12 @@ abstract class AbstractProperty implements PropertyInterface
                 }
                 $result = (string)$value;
                 break;
+            case self::TYPE_TIME:
+                if ($value instanceof \DateTime) {
+                    $value = $value->format('H:i:s');
+                }
+                $result = (string)$value;
+                break;
             case self::TYPE_STRING:
                 $result = (string)$value;
                 break;

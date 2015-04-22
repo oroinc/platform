@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use JMS\Serializer\Exception\RuntimeException;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Routing\Route;
+
+use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Serializer;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Entity\Title;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Title\StoredTitle;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
-
-use Doctrine\ORM\EntityRepository;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -65,9 +64,14 @@ class TitleService implements TitleServiceInterface
     private $prefix = null;
 
     /**
-     * @var Translator
+     * @var TitleProvider
      */
-    private $translator;
+    private $titleProvider;
+
+    /**
+     * @var TitleTranslator
+     */
+    private $titleTranslator;
 
     /**
      * @var ObjectManager
@@ -79,34 +83,33 @@ class TitleService implements TitleServiceInterface
      */
     protected $serializer = null;
 
-    /** @var array */
-    protected $titles = null;
-
     /**
      * @var BreadcrumbManager
      */
     protected $breadcrumbManager;
 
     /**
-     * @var UserConfigManager
+     * @var ConfigManager
      */
     protected $userConfigManager;
 
     public function __construct(
         AnnotationsReader $reader,
         ConfigReader $configReader,
-        Translator $translator,
+        TitleTranslator $titleTranslator,
         ObjectManager $em,
         Serializer $serializer,
         $userConfigManager,
-        BreadcrumbManager $breadcrumbManager
+        BreadcrumbManager $breadcrumbManager,
+        TitleProvider $titleProvider
     ) {
         $this->readers = array($reader, $configReader);
-        $this->translator = $translator;
+        $this->titleTranslator = $titleTranslator;
         $this->em = $em;
         $this->serializer = $serializer;
         $this->userConfigManager = $userConfigManager;
         $this->breadcrumbManager = $breadcrumbManager;
+        $this->titleProvider = $titleProvider;
     }
 
     /**
@@ -173,28 +176,9 @@ class TitleService implements TitleServiceInterface
             $title = $prefix . $title . $suffix;
         }
 
-        $this->translateTitleParts($title, $params);
+        $title = $this->titleTranslator->trans($title, $params);
 
         return $title;
-    }
-
-    /**
-     * Checks if the given template contains several parts and if so translate each part individually
-     *
-     * @param string $translatedTemplate
-     * @param array  $params
-     */
-    protected function translateTitleParts(&$translatedTemplate, array $params)
-    {
-        if ($translatedTemplate) {
-            $delimiter = ' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ';
-            $transItems = explode($delimiter, $translatedTemplate);
-            foreach ($transItems as $key => $transItem) {
-                $transItems[$key] = $this->translator->trans($transItem, $params);
-            }
-
-            $translatedTemplate = implode($delimiter, $transItems);
-        }
     }
 
     /**
@@ -329,17 +313,10 @@ class TitleService implements TitleServiceInterface
      */
     public function loadByRoute($route)
     {
-        /** @var $bdData Title */
-        $bdData = $this->getStoredTitlesRepository()->findOneBy(
-            array('route' => $route)
-        );
-
-        if ($bdData) {
-            $this->setTemplate($bdData->getTitle());
-            $this->setShortTemplate($bdData->getShortTitle());
-        } elseif (isset($this->titles[$route])) {
-            $this->setTemplate($this->titles[$route]);
-            $this->setShortTemplate($this->titles[$route]);
+        $templates = $this->titleProvider->getTitleTemplates($route);
+        if (!empty($templates)) {
+            $this->setTemplate($templates['title']);
+            $this->setShortTemplate($templates['short_title']);
         }
     }
 
@@ -485,15 +462,5 @@ class TitleService implements TitleServiceInterface
             ->setSuffix($this->suffix);
 
         return $this->serializer->serialize($storedTitle, 'json');
-    }
-
-    /**
-     * Inject titles from config
-     *
-     * @param $titles
-     */
-    public function setTitles($titles)
-    {
-        $this->titles = $titles;
     }
 }

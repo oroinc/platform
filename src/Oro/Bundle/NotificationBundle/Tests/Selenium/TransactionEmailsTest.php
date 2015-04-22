@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Selenium;
 
+use Oro\Bundle\NotificationBundle\Tests\Selenium\Pages\TransactionEmails;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
@@ -18,9 +19,10 @@ class TransactionEmailsTest extends Selenium2TestCase
     {
         $email = 'Email'.mt_rand() . '@mail.com';
 
+        /** @var TransactionEmails $login */
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->add()
             ->assertTitle('Add Notification Rule - Notification Rules - Emails - System')
             ->setEntityName('Calendar event')
@@ -31,7 +33,7 @@ class TransactionEmailsTest extends Selenium2TestCase
             ->setEmail($email)
             ->save()
             ->assertMessage('Email notification rule saved')
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->close();
 
         return $email;
@@ -45,13 +47,15 @@ class TransactionEmailsTest extends Selenium2TestCase
     public function testUpdateTransactionEmail($email)
     {
         $newEmail = 'Update_' . $email;
+        /** @var TransactionEmails $login */
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
-            ->open(array($email))
+            ->assertTitle('All - Notification Rules - Emails - System')
+            ->open([$email])
             ->setEmail($newEmail)
             ->save()
             ->assertMessage('Email notification rule saved')
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->close();
 
         return $newEmail;
@@ -63,10 +67,11 @@ class TransactionEmailsTest extends Selenium2TestCase
      */
     public function testDeleteTransactionEmail($email)
     {
+        /** @var TransactionEmails $login */
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
             ->delete('Recipient email', $email)
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->assertMessage('Item deleted');
     }
 }

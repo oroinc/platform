@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 
 class EmbedFormController extends Controller
 {
@@ -89,27 +88,21 @@ class EmbedFormController extends Controller
             return $this->redirect($this->generateUrl('oro_embedded_form_success', ['id' => $formEntity->getId()]));
         }
 
-        $this->render(
-            'OroEmbeddedFormBundle:EmbedForm:form.html.twig',
-            [
-                'form'             => $form->createView(),
-                'formEntity'       => $formEntity,
-                'customFormLayout' => $formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
-            ],
-            $response
-        );
+        /** @var EmbedFormLayoutManager $layoutManager */
+        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+        $response->setContent($layoutManager->getLayout($formEntity, $form)->render());
 
         return $response;
     }
 
     /**
      * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
-     * @Template
      */
     public function formSuccessAction(EmbeddedForm $formEntity)
     {
-        return [
-            'formEntity' => $formEntity
-        ];
+        /** @var EmbedFormLayoutManager $layoutManager */
+        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+
+        return new Response($layoutManager->getLayout($formEntity)->render());
     }
 }

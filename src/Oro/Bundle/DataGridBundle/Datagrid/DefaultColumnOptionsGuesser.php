@@ -31,6 +31,9 @@ class DefaultColumnOptionsGuesser extends AbstractColumnOptionsGuesser
             case 'datetime':
                 $frontendType = Property::TYPE_DATETIME;
                 break;
+            case 'time':
+                $frontendType = Property::TYPE_TIME;
+                break;
             case 'money':
                 $frontendType = Property::TYPE_CURRENCY;
                 break;

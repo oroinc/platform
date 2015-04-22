@@ -41,7 +41,9 @@
 {% endblock oro_type_widget_date_range_widget %}
 
 {% block oro_type_widget_title_widget %}
-    {{ form_widget(form.title) }}
+    <div class="widget_title_widget">
+        {{ form_widget(form.title) }}
+    </div>
     {{ form_row(form.useDefault) }}
     <script type="text/javascript">
         require(['jquery'], function ($) {

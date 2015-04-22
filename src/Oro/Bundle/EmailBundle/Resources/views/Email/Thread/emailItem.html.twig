@@ -66,19 +66,29 @@
                 </div>
             </div>
         </div>
-        <div class="email-body">
-            {% if email.emailBody %}
-                {% if email.emailBody.bodyIsText %}
-                    {{ email.emailBody.bodyContent|nl2br }}
+        <div class="email-content clearfix">
+            <div class="email-body responsive-cell">
+                {% if email.emailBody %}
+                    {% if email.emailBody.bodyIsText %}
+                        {{ email.emailBody.bodyContent|nl2br }}
+                    {% else %}
+                        {{ email.emailBody.bodyContent|raw }}
+                    {% endif %}
                 {% else %}
-                    {{ email.emailBody.bodyContent|raw }}
+                    {{ 'oro.email.body_is_unavailable'|trans }}
                 {% endif %}
-            {% else %}
-                {{ 'oro.email.body_is_unavailable'|trans }}
-            {% endif %}
-            <ul class="email-attachments-list">
-                {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
-            </ul>
+                <ul class="email-attachments-list">
+                    {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
+                </ul>
+            </div>
+            {%- set commentsData -%}
+            {% placeholder view_content_data_comments with {entity: email} %}
+            {%- endset -%}
+            {% if commentsData is not empty %}
+                <div class="responsive-cell">
+                    {{ commentsData }}
+                </div>
+            {% endif  %}
         </div>
     </div>
 </div>

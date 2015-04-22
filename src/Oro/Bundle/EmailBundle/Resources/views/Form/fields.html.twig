@@ -13,7 +13,7 @@
                     collection: new Collection(
                         '{{ data_route }}',
                         {{ data_route_parameter|json_encode|raw }},
-                        {{ includeSystem is defined and includeSystem ? 'true' : 'false' }}
+                        {{ includeNonEntity is defined and includeNonEntity ? 'true' : 'false' }}
                     )
                 });
             });
@@ -25,6 +25,33 @@
         <% }); %>
     </script>
 
+    {{ form_row(form) }}
+{% endblock %}
+
+{% block oro_email_link_to_scope_row %}
+    <script type="text/javascript">
+        require(['jquery'],
+            function($) {
+                function initLinkToScopeEl(mainEl, el) {
+                    if (parseInt($(mainEl).val())) {
+                        $(el).attr('disabled', false);
+                        $(el).parent('div').removeClass('disabled');
+                    } else {
+                        $(el).attr('disabled', true);
+                        $(el).parent('div').addClass('disabled');
+                    }
+                }
+                $(function () {
+                    var selectorEl = '{{ form.vars.id }}';
+                    var emailLinkToScopeEl = $('#' + selectorEl);
+                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form').find('#oro_entity_config_type_attachment_enabled');
+                    initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
+                    $(enableAttachmentEl).on('change', function() {
+                        initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
+                    });
+                });
+            })
+    </script>
     {{ form_row(form) }}
 {% endblock %}
 
