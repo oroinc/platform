@@ -202,12 +202,10 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedBody = file_get_contents(__DIR__ . '/../Fixtures/' . $expectedFile);
 
         /**
-         * Support different line endings. On windows we have \r\n line endings and but
-         * \CG\Generator\Writer::write use only \n and add extra spaces only to empty lines
-         * because of this we need to remove spaces in generated and expected code.
+         * Support different line endings.
          */
-        $expectedBody = str_replace(["\r\n", ' '], ["\n", ''], $expectedBody);
-        $classBody = str_replace(["\r\n", ' '], ["\n", ''], $classBody);
+        $expectedBody = str_replace(PHP_EOL, "\n", $expectedBody);
+        $classBody = str_replace(PHP_EOL, "\n", $classBody);
         $expectedBody = trim($expectedBody);
         $classBody = trim($classBody);
 

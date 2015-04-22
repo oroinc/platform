@@ -1,0 +1,26 @@
+{
+    "name": "oro/config-expression",
+    "type": "library",
+    "description": "Oro Config Expression Component",
+    "keywords": ["ORO", "BAP", "Config", "Expression"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.9",
+        "oro/property-access": "dev-master"
+    },
+    "require-dev": {
+        "symfony/dependency-injection": "~2.3",
+        "symfony/yaml": "~2.3",
+        "doctrine/collections": "~1.0"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\ConfigExpression": "" }
+    },
+    "target-dir": "Oro/Component/ConfigExpression",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

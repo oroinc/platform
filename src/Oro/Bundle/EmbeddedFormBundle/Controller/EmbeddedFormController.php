@@ -73,10 +73,13 @@ class EmbeddedFormController extends Controller
         $css = $formManager->getDefaultCssByType($formType);
         $successMessage = $formManager->getDefaultSuccessMessageByType($formType);
 
-        return new JsonResponse([
-            'css' => $css,
-            'successMessage' => $successMessage
-        ], Codes::HTTP_OK);
+        return new JsonResponse(
+            [
+                'css'            => $css,
+                'successMessage' => $successMessage
+            ],
+            Codes::HTTP_OK
+        );
     }
 
     /**

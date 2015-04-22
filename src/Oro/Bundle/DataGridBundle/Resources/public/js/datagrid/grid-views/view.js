@@ -650,7 +650,12 @@ define([
                 return this.originalTitle;
             }
 
-            return currentView.label + ' - ' + this.originalTitle;
+            var title = currentView.label;
+            if (currentView.value == '__all__') {
+                title = __('oro.datagrid.gridView.all');
+            }
+
+            return title + ' - ' + this.originalTitle;
         },
 
         /**
