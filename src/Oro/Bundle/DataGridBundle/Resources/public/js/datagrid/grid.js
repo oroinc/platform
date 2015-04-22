@@ -162,7 +162,9 @@ define(function (require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
-            opts.columns.push(this._createActionsColumn());
+            if (Object.keys(this.rowActions).length > 0) {
+                opts.columns.push(this._createActionsColumn());
+            }
 
             if (opts.multiSelectRowEnabled) {
                 opts.columns.unshift(this._createSelectRowColumn());
