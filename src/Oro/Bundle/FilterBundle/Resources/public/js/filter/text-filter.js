@@ -167,7 +167,6 @@ define([
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
                 this._hideCriteria();
                 this.applyValue();
-                e.stopPropagation();
             }
         },
 
