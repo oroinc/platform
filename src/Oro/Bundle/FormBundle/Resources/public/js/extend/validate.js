@@ -235,8 +235,11 @@ define([
         errorClass: 'validation-failed',
         errorPlacement: function (label, $el) {
             var $targetElem = getErrorTarget($el),
-                $errorHolder = $targetElem.parent();
-            label.insertAfter($errorHolder.is('.fields-row') ? $errorHolder : $targetElem);
+                $errorHolder = $targetElem.parent(),
+                $sibling = $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
+            // we need this to remove server side error, because js does not know about it
+            $sibling.next('.' + this.errorClass).remove();
+            label.insertAfter($sibling);
         },
         highlight: function (element) {
             this.settings.unhighlight.call(this, element);

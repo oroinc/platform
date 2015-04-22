@@ -554,7 +554,8 @@ a.button:hover {
 }
 
 .horizontal-form input[type=checkbox] {
-    margin: 7px 0 0
+    margin: 10px 0 0;
+    padding: 0;
 }
 
 .horizontal-form select {

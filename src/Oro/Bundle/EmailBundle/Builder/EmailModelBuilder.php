@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
@@ -57,12 +58,18 @@ class EmailModelBuilder
     protected $activityListProvider;
 
     /**
+     * @var Factory
+     */
+    protected $factory;
+
+    /**
      * @param EmailModelBuilderHelper   $emailModelBuilderHelper
      * @param Request                   $request
      * @param EntityManager             $entityManager
      * @param ConfigManager             $configManager
      * @param EmailActivityListProvider $activityListProvider
      * @param EmailAttachmentProvider   $emailAttachmentProvider
+     * @param Factory                   $factory
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
@@ -70,7 +77,8 @@ class EmailModelBuilder
         EntityManager $entityManager,
         ConfigManager $configManager,
         EmailActivityListProvider $activityListProvider,
-        EmailAttachmentProvider $emailAttachmentProvider
+        EmailAttachmentProvider $emailAttachmentProvider,
+        Factory $factory
     ) {
         $this->helper               = $emailModelBuilderHelper;
         $this->request              = $request;
@@ -78,6 +86,7 @@ class EmailModelBuilder
         $this->configManager        = $configManager;
         $this->activityListProvider = $activityListProvider;
         $this->emailAttachmentProvider = $emailAttachmentProvider;
+        $this->factory = $factory;
     }
 
     /**
@@ -88,7 +97,8 @@ class EmailModelBuilder
     public function createEmailModel(EmailModel $emailModel = null)
     {
         if (!$emailModel) {
-            $emailModel = EmailModel::createDirectEmail();
+            $emailModel = $this->factory->getEmail();
+            $emailModel->setMailType(EmailModel::MAIL_TYPE_DIRECT);
         }
 
         if ($this->request->getMethod() === 'GET') {
@@ -119,7 +129,9 @@ class EmailModelBuilder
      */
     public function createReplyEmailModel(EmailEntity $parentEmailEntity)
     {
-        $emailModel = EmailModel::createReplyEmail($parentEmailEntity);
+        $emailModel = $this->factory->getEmail();
+        $emailModel->setMailType(EmailModel::MAIL_TYPE_REPLY);
+        $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
         if ($fromAddress->getOwner() == $this->helper->getUser()) {
@@ -169,7 +181,9 @@ class EmailModelBuilder
      */
     public function createForwardEmailModel(EmailEntity $parentEmailEntity)
     {
-        $emailModel = EmailModel::createForwardEmail($parentEmailEntity);
+        $emailModel = $this->factory->getEmail();
+        $emailModel->setMailType(EmailModel::MAIL_TYPE_FORWARD);
+        $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
@@ -208,8 +222,10 @@ class EmailModelBuilder
             $emailModel->setEntityId($this->request->query->get('entityId'));
         }
         if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
-            if ($emailModel->getParentEmail()) {
-                $this->applyEntityDataFromEmail($emailModel, $emailModel->getParentEmail());
+            if ($emailModel->getParentEmailId()) {
+                $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
+                    ->find($emailModel->getParentEmailId());
+                $this->applyEntityDataFromEmail($emailModel, $parentEmail);
             }
         }
     }
@@ -317,7 +333,7 @@ class EmailModelBuilder
             $this->helper->ensureEmailBodyCached($emailEntity);
 
             foreach ($emailEntity->getEmailBody()->getAttachments() as $attachment) {
-                $attachmentModel = new EmailAttachment();
+                $attachmentModel = $this->factory->getEmailAttachment();
                 $attachmentModel->setId($attachment->getId());
                 $attachmentModel->setType(EmailAttachment::TYPE_EMAIL_ATTACHMENT);
                 $attachmentModel->setEmailAttachment($attachment);
@@ -336,25 +352,24 @@ class EmailModelBuilder
     {
         $attachments = [];
 
-        if ($emailModel->getParentEmail()) {
-            $attachments = array_merge(
-                $attachments,
-                $this->emailAttachmentProvider->getThreadAttachments($emailModel->getParentEmail())
-            );
+        if ($emailModel->getParentEmailId()) {
+            $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
+                ->find($emailModel->getParentEmailId());
+            $threadAttachments = $this->emailAttachmentProvider->getThreadAttachments($parentEmail);
+            $threadAttachments = $this->filterAttachmentsByName($threadAttachments);
+            $attachments = array_merge($attachments, $threadAttachments);
         }
         if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
             $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
                 ->find($emailModel->getEntityId());
 
             if ($scopeEntity) {
-                $attachments = array_merge(
-                    $attachments,
-                    $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity)
-                );
+                $scopeEntityAttachments = $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity);
+                $scopeEntityAttachments = $this->filterAttachmentsByName($scopeEntityAttachments);
+                $attachments = array_merge($attachments, $scopeEntityAttachments);
             }
         }
 
-        $attachments = $this->filterAttachmentsByName($attachments);
         $emailModel->setAttachmentsAvailable($attachments);
     }
 

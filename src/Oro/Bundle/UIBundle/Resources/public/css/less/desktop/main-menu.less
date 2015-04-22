@@ -5,6 +5,9 @@
 
 // common decoration
 .main-menu {
+  .dropdown-menu {
+    z-index: 1000;
+  }
   .unclickable {
     cursor: default;
   }
@@ -64,7 +67,7 @@
           position: absolute;
           top: 6px;
           left: 100%;
-          z-index: 901;
+          z-index: 1001;
         }
         > a:after {
           content: '';
@@ -76,7 +79,7 @@
           margin-left: -3px;
           top: 4px;
           left: 100%;
-          z-index: 901;
+          z-index: 1001;
         }
         > a:hover:after {
           border-left-color: #f3f3f3;
@@ -237,7 +240,7 @@
     .dropdown-menu.menu_level_1 {
       left: 100%;
       margin-left: -29px;
-      z-index: 901;
+      z-index: 1001;
       .border-radius(4px);
       > .dropdown-menu-title {
         &, & + .divider {
@@ -506,7 +509,7 @@
             width: 100%;
             background-color: #fff;
             position: absolute;
-            z-index: 901;
+            z-index: 1001;
             i[class^=icon-] {
               font-size: 18px;
               line-height: 36px;

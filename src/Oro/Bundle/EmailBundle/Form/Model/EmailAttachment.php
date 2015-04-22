@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class EmailAttachment
 {
@@ -187,38 +186,5 @@ class EmailAttachment
         $this->file = $uploadedFile;
 
         return $this;
-    }
-
-    /**
-     * get string info
-     * @return string
-     */
-    public function getInfo()
-    {
-        $info = '';
-        if ($this->fileSize) {
-            $info .= $this->humanFilesize($this->fileSize, 1);
-        }
-        if ($this->modified) {
-            $info .= ', ' . $this->modified;
-        }
-
-        return $info;
-    }
-
-    /**
-     * todo move to formatter
-     *
-     * @param     $bytes
-     * @param int $dec
-     *
-     * @return string
-     */
-    protected function humanFilesize($bytes, $dec = 2)
-    {
-        $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-        $factor = floor((strlen($bytes) - 1) / 3);
-
-        return sprintf("%.{$dec}f", $bytes / pow(1024, $factor)) . @$size[$factor];
     }
 }

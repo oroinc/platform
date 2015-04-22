@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
+namespace Oro\Bundle\EmailBundle\Tests\Selenium;
 
 use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\EmailTemplates;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
@@ -22,7 +22,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $login = $this->login();
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
             ->setEntityName('User')
@@ -32,7 +32,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setContent('Template content')
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->close();
 
         return $templateName;
@@ -55,7 +55,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->close()
             ->open(array($newTemplateName))
             ->assertTitle("Template {$newTemplateName} - Edit - Templates - Emails - System")
@@ -85,7 +85,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->close();
 
         return $newTemplateName;
@@ -101,7 +101,7 @@ class EmailTemplateTest extends Selenium2TestCase
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->delete('Template name', $templateName)
-            ->assertTitle('Templates - Emails - System')
+            ->assertTitle('All - Templates - Emails - System')
             ->assertMessage('Item deleted');
     }
 }

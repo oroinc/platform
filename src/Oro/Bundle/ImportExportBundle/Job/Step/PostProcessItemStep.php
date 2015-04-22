@@ -6,7 +6,6 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class PostProcessItemStep extends ItemStep
 {
@@ -47,15 +46,6 @@ class PostProcessItemStep extends ItemStep
     public function setJobExecutor(JobExecutor $jobExecutor)
     {
         $this->jobExecutor = $jobExecutor;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function initializeStepElements(StepExecution $stepExecution)
-    {
-        $stepExecution->getExecutionContext()->put(EntityWriter::SKIP_CLEAR, true);
-        parent::initializeStepElements($stepExecution);
     }
 
     /**

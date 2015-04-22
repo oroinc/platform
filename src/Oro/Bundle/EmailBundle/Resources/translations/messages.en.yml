@@ -89,7 +89,8 @@ oro:
 
         attachment:
             copy_to_record: Copy to Record
-            open: Open
+            save: Save
+            select_file: Select file
 
         menu:
             emailtemplate_list.description: List of email templates
@@ -120,7 +121,6 @@ oro:
                 view:
                     inbox: Inbox
                     sent: Sent Mail
-                    all: All Mail
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -156,6 +156,7 @@ oro:
         type.label:               Type
         head.label:               Is Head
         refs.label:               References Header
+        thread.label:             Thread
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
@@ -180,9 +181,6 @@ oro:
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
-
-        attachment:
-            select_file:          Select file
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

@@ -52,7 +52,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                 this._getTitleContainer().closest(this.options.titleBlock).show();
             }
             this.options.title = title;
-            this._getTitleContainer().html(this.options.title);
+            this._getTitleContainer().html(this.options.title).attr('title', this.options.title);
         },
 
         getActionsElement: function() {

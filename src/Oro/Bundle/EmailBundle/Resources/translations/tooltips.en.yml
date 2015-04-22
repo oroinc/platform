@@ -1,5 +1,5 @@
 oro:
     email:
-        contexts.tooltip: Choose an entity to link with email
+        contexts.tooltip: Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         emailtemplate:
             entity_name.tooltip:  Choose an entity this template is related to or keep it empty if this template is not related to any entity.

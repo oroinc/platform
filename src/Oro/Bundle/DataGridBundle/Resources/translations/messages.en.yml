@@ -6,6 +6,20 @@ oro_datagrid:
     label_loading_mask: "Loading . . ."
 
 oro:
+    datagrid:
+        gridview:
+            entity_label: Grid view
+            entity_plural_label: Grid views
+            entity_description: Represent grid views
+            filters_data.label: Filters
+            grid_name.label: Grid name
+            id.label: Id
+            name.label: Name
+            owner.label: Owner
+            organization.label: Organization
+            sorters_data.label: Sorters
+            type.label: Type
+            shared_by: %name% (Shared by %owner%)
     grid:
         mass_action:
             label: Mass Actions
@@ -29,6 +43,8 @@ oro:
             update: Edit
             delete: Delete
             clone: Clone
+            gridview_create_public: Share grid view
+            gridview_edit_public: Unshare grid view
 
         system_configuration:
             groups:

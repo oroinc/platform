@@ -27,12 +27,12 @@
         </script>
 
         <div data-page-component-module="oroemail/js/app/components/email-context-component"
-             data-page-component-options="{{ options|json_encode }}">
-            <button id="email-context-current-block">
+             data-page-component-options="{{ options|json_encode }}" class="btn-group">
+            <button id="email-context-current-block" class="dropdown-toggle" data-toggle="dropdown">
                 <span id="email-context-current-item"></span>
                 <span id="email-context-arrow" class="icon-caret-down"></span>
             </button>
-            <ul id="context-items-dropdown" style="display: none"></ul>
+            <ul id="context-items-dropdown" class="dropdown-menu"></ul>
             <input type="hidden" id="context-current-target-class"/>
             <input type="hidden" id="context-current-target-grid"/>
         </div>

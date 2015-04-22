@@ -4,21 +4,15 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Gaufrette\Filesystem;
-
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 
 class EmailAttachmentType extends AbstractType
@@ -29,17 +23,18 @@ class EmailAttachmentType extends AbstractType
     protected $em;
 
     /**
-     * @var Filesystem
+     * @var EmailAttachmentTransformer
      */
-    protected $filesystem;
+    protected $emailAttachmentTransformer;
 
     /**
-     * @param ObjectManager $objectManager
+     * @param ObjectManager              $objectManager
+     * @param EmailAttachmentTransformer $emailAttachmentTransformer
      */
-    public function __construct(ObjectManager $objectManager, FilesystemMap $filesystemMap)
+    public function __construct(ObjectManager $objectManager, EmailAttachmentTransformer $emailAttachmentTransformer)
     {
         $this->em = $objectManager;
-        $this->filesystem = $filesystemMap->get('attachments');
+        $this->emailAttachmentTransformer = $emailAttachmentTransformer;
     }
 
     /**
@@ -93,7 +88,7 @@ class EmailAttachmentType extends AbstractType
                 case AttachmentModel::TYPE_ATTACHMENT:
                     $repo = $this->em->getRepository('OroAttachmentBundle:Attachment');
                     $oroAttachment = $repo->find($attachment->getId());
-                    $emailAttachment = $this->createEmailAttachmentFromOroAttachment($oroAttachment);
+                    $emailAttachment = $this->emailAttachmentTransformer->oroToEntity($oroAttachment);
 
                     break;
                 case AttachmentModel::TYPE_EMAIL_ATTACHMENT:
@@ -102,7 +97,8 @@ class EmailAttachmentType extends AbstractType
 
                     break;
                 case AttachmentModel::TYPE_UPLOADED:
-                    $emailAttachment = $this->createEmailAttachmentFromUploadedFile($attachment->getFile());
+                    $emailAttachment = $this->emailAttachmentTransformer
+                        ->entityFromUploadedFile($attachment->getFile());
 
                     break;
                 default:
@@ -113,56 +109,5 @@ class EmailAttachmentType extends AbstractType
         }
 
         $event->setData($attachment);
-    }
-
-    /**
-     * @param Attachment $oroAttachment
-     *
-     * @return EmailAttachmentEntity
-     */
-    protected function createEmailAttachmentFromOroAttachment(Attachment $oroAttachment)
-    {
-        $emailAttachmentEntity = new EmailAttachmentEntity();
-
-        $emailAttachmentEntity->setFileName($oroAttachment->getFile()->getFilename());
-
-        $emailAttachmentContent = new EmailAttachmentContent();
-        $emailAttachmentContent->setContent(
-            base64_encode($this->filesystem->get($oroAttachment->getFile()->getFilename())->getContent())
-        );
-
-        $emailAttachmentContent->setContentTransferEncoding('base64');
-        $emailAttachmentContent->setEmailAttachment($emailAttachmentEntity);
-
-        $emailAttachmentEntity->setContent($emailAttachmentContent);
-        $emailAttachmentEntity->setContentType($oroAttachment->getFile()->getMimeType());
-        $emailAttachmentEntity->setFileName(
-            $oroAttachment->getFile()->getOriginalFilename()
-        );
-
-        return $emailAttachmentEntity;
-    }
-
-    /**
-     * @param UploadedFile $uploadedFile
-     *
-     * @return EmailAttachmentEntity
-     */
-    protected function createEmailAttachmentFromUploadedFile(UploadedFile $uploadedFile)
-    {
-        $emailAttachment = new EmailAttachmentEntity();
-
-        $attachmentContent = new EmailAttachmentContent();
-        $attachmentContent->setContent(
-            base64_encode(file_get_contents($uploadedFile->getRealPath()))
-        );
-        $attachmentContent->setContentTransferEncoding('base64');
-        $attachmentContent->setEmailAttachment($emailAttachment);
-
-        $emailAttachment->setContent($attachmentContent);
-        $emailAttachment->setContentType($uploadedFile->getMimeType());
-        $emailAttachment->setFileName($uploadedFile->getClientOriginalName());
-
-        return $emailAttachment;
     }
 }

@@ -28,7 +28,52 @@
 }
 
 .grid-views {
-  margin-left: 15px;
+  margin: 0 0 0 15px;
+
+  .page-title & {
+    float: left;
+  }
+
+  .btn,
+  .btn-group.open .btn.dropdown-toggle {
+    background: none;
+    background-color: inherit;
+    box-shadow: none;
+    text-decoration: none;
+
+    &:focus {
+      font-weight: normal;
+    }
+
+    .caret {
+      margin: 0 0 0 5px;
+      vertical-align: middle;
+    }
+  }
+
+  .actions-group {
+    .btn,
+    .btn-group.open .btn.dropdown-toggle {
+      color: #006acc;
+    }
+  }
+
+  .btn-link {
+      line-height: 32px;
+  }
+
+  .edited-label {
+    font-size: 13px;
+    color: #777;
+    vertical-align: bottom;
+    display: inline-block;
+    line-height: 24px;
+  }
+
+  .btn-toolbar {
+    margin: 0;
+    display: inline-block;
+  }
 }
 
 table.grid {
@@ -117,10 +162,8 @@ table.grid {
   th:first-child {
       text-align: left !important;
   }
-  td:first-child:after {
-      content: '';
-      min-height: 14px;
-      display: inline-block;
+  td:first-child {
+      height: 30px;
   }
   .select-row-cell input[type=checkbox] {
       margin-top: -3px;
@@ -154,10 +197,11 @@ table.grid {
 .other-scroll {
   display: none;
 }
+table .thead-sizing {
+  display: none;
+}
+
 .floatThead{
-  .thead-sizing {
-    display: none;
-  }
   table .dropdown-menu{
     z-index: 898;
   }

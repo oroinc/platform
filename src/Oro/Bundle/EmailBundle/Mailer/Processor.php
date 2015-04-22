@@ -8,7 +8,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -141,9 +140,7 @@ class Processor
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
         $email->setSeen(true);
-        if ($parentMessageId
-            && in_array($model->getMailType(), [EmailModel::MAIL_TYPE_DIRECT, EmailModel::MAIL_TYPE_REPLY])
-        ) {
+        if ($parentMessageId) {
             $email->setRefs($parentMessageId);
         }
 
@@ -330,11 +327,15 @@ class Processor
      */
     protected function getParentMessageId(EmailModel $model)
     {
-        if ($model->getParentEmail()) {
-            return $model->getParentEmail()->getMessageId();
+        $messageId = '';
+        $parentEmailId = $model->getParentEmailId();
+        if ($parentEmailId && $model->getMailType() == EmailModel::MAIL_TYPE_REPLY) {
+            $parentEmail = $this->getEntityManager()
+                ->getRepository('OroEmailBundle:Email')
+                ->find($parentEmailId);
+            $messageId = $parentEmail->getMessageId();
         }
-
-        return '';
+        return $messageId;
     }
 
     /**

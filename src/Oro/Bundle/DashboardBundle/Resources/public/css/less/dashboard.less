@@ -77,11 +77,9 @@
     .actions-container .collapse-expand-action-container {
       margin-top: -1px;
     }
-    
+
     .actions-container {
-      position: absolute;
-      top: 10px;
-      height: 0px;
+      margin-top: 10px;
       .collapse-action{
         color: #727272;
         font-size: 13px;
@@ -94,7 +92,7 @@
           height: 13px;
           font-weight: normal;
           border: 1px solid #c3c3c3;
-          margin-right: 12px;
+          margin-right: 8px;
           background-color: #fcfcfc;
           font-size: 12px;
           line-height: 13px;
@@ -106,14 +104,6 @@
           content: '+';
         }
       }
-    }
-
-    .actions-container.pull-left {
-      left: 0;
-    }
-
-    .actions-container.pull-right {
-      right: 0;
     }
 
     .default-actions-container {
@@ -144,8 +134,11 @@
     }
 
     .title {
-      padding-left: 28px;
-      padding-right: 90px;
+      padding-left: 0;
+      padding-right: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .row-fluid {
@@ -197,7 +190,6 @@
   }
   .collapse-expand-action-container {
     padding-left: 8px;
-    padding-right: 5px;
   }
 }
 
@@ -514,5 +506,30 @@
 .navigation {
   .dashboard-widgets-add {
     margin: 0 0 0 11px;
+  }
+}
+.widget-configuration {
+  .controls > input[type=checkbox]:only-child{
+    margin-top: 8px;
+  }
+  .widget_title_widget{
+    float: left;
+    margin-right: 20px;
+  }
+  .date-range-filter {
+    .filter-separator{
+      top: 2px;
+    }
+    .filter-select-oro {
+      height: 20px;
+      line-height: 20px;
+      width: 120px;
+    }
+  }
+  .filter-criteria{
+    padding: 0;
+  }
+  .controls .horizontal{
+    padding: 0;
   }
 }

@@ -124,6 +124,7 @@ config:
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
+        'oroui/js/app/components/hidden-initialization-component': 'bundles/oroui/js/app/components/hidden-initialization-component.js'
         'oroui/js/app/components/hidden-redirect-component': 'bundles/oroui/js/app/components/hidden-redirect-component.js'
         'oroui/js/app/components/jquery-widget-component': 'bundles/oroui/js/app/components/jquery-widget-component.js'
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'

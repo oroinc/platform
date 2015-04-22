@@ -38,6 +38,7 @@ class ConfigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_field_config', [$this, 'getFieldConfig']),
             new \Twig_SimpleFunction('oro_field_config_value', [$this, 'getFieldConfigValue']),
             new \Twig_SimpleFunction('oro_entity_route', [$this, 'getClassRoute']),
+            new \Twig_SimpleFunction('oro_entity_metadata_value', [$this, 'getClassMetadataValue']),
         ];
     }
 
@@ -105,6 +106,24 @@ class ConfigExtension extends \Twig_Extension
         }
 
         return $this->configManager->getProvider($scope)->getConfig($className, $fieldName)->get($attrName);
+    }
+
+    /**
+     * @param string $className
+     * @param string $attrName
+     * @return mixed
+     */
+    public function getClassMetadataValue($className, $attrName)
+    {
+        if (!$this->configManager->hasConfig($className)) {
+            return null;
+        }
+
+        if (!isset($this->configManager->getEntityMetadata($className)->{$attrName})) {
+            return null;
+        }
+
+        return $this->configManager->getEntityMetadata($className)->{$attrName};
     }
 
     /**

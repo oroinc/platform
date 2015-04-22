@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -13,7 +15,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
@@ -24,8 +25,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Doctrine\Common\Util\ClassUtils;
 
 /**
  * @RouteResource("email")
@@ -89,6 +88,7 @@ class EmailController extends RestGetController
         }
 
         $associations = $entity->getActivityTargetEntities();
+        $this->filterUserAssociation($associations);
 
         return $this->handleView(
             $this->view($associations, is_array($associations) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
@@ -113,39 +113,46 @@ class EmailController extends RestGetController
     {
         /** @var $entity Email */
         $entity = $this->getManager()->find($entityId);
-
         if (!$entity) {
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
+        /** @var $entityRoutingHelper EntityRoutingHelper */
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        /** @var $configManager ConfigManager */
+        $configManager = $this->container->get('oro_entity_config.config_manager');
+        $nameFormatter = $this->get('oro_locale.formatter.name');
+        $router = $this->get('router');
         $associations = $entity->getActivityTargetEntities();
-        $itemsArray = array();
+        $this->filterUserAssociation($associations);
+        $itemsArray = [];
+
         foreach ($associations as $association) {
             $className = ClassUtils::getClass($association);
-            /** @var $configManager ConfigManager */
-            $configManager = $this->container->get('oro_entity_config.config_manager');
-            $nameFormater = $this->get('oro_locale.formatter.name');
-            $title = $nameFormater->format($association);
+            $title = $nameFormatter->format($association);
             if ($title === '') {
                 $title = $association->getEmail();
             } elseif ($title === null) {
                 $title = $association->getId();
             }
-            $route = $configManager->getEntityMetadata($className)->getRoute('view', false);
-            $link = $this->container->get('router')->generate($route, ['id' => $association->getId()]);
-
-            $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+            $metadata = $configManager->getEntityMetadata($className);
+            $route = $metadata->getRoute('view', false);
+            $link = false;
+            if ($metadata->routeView) {
+                $link = $router->generate($route, ['id' => $association->getId()]);
+            }
             $config = $entityConfigProvider->getConfig($className);
 
             if ($title) {
-                $itemsArray[] = array(
+                $itemsArray[] = [
                     'entityId'=> $entity->getId(),
                     'targetId'=> $association->getId(),
-                    'targetClassName'=> $className,
+                    'targetClassName'=> $entityRoutingHelper->encodeClassName($className),
                     'title'=> $title,
                     'icon'=> $config->get('icon'),
                     'link'=> $link
-                );
+                ];
             }
         }
 
@@ -190,6 +197,7 @@ class EmailController extends RestGetController
 
         $entityId = $this->getRequest()->get('entityId');
         $targetClassName = $this->getRequest()->get('targetClassName');
+        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         $targetId = $this->getRequest()->get('targetId');
 
         /**
@@ -201,7 +209,6 @@ class EmailController extends RestGetController
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
-        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
@@ -341,6 +348,24 @@ class EmailController extends RestGetController
                 break;
             default:
                 parent::transformEntityField($field, $value);
+        }
+    }
+
+    /**
+     * @param array|null $associations
+     */
+    protected function filterUserAssociation(&$associations)
+    {
+        if (!$associations) {
+            return;
+        }
+        $user = $this->get('security.context')->getToken()->getUser();
+        foreach ($associations as $key => $association) {
+            $userClassName = ClassUtils::getClass($user);
+            $associationClassName = ClassUtils::getClass($association);
+            if ($userClassName === $associationClassName && $user->getId() === $association->getId()) {
+                unset($associations[$key]);
+            }
         }
     }
 

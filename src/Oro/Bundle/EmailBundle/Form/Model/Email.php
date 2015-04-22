@@ -6,12 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 
 /**
  * Class Email
  *
- * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyFields)
  *
  * @package Oro\Bundle\EmailBundle\Form\Model
@@ -31,8 +29,8 @@ class Email
     /** @var mixed */
     protected $entityId;
 
-    /** @var EmailEntity */
-    protected $parentEmail;
+    /** @var int */
+    protected $parentEmailId;
 
     /** @var string */
     protected $from;
@@ -75,45 +73,6 @@ class Email
 
     /** @var array */
     protected $attachmentsAvailable;
-
-    /**
-     * @return Email
-     */
-    public static function createDirectEmail()
-    {
-        $email = new self();
-        $email->setMailType(self::MAIL_TYPE_DIRECT);
-
-        return $email;
-    }
-
-    /**
-     * @param EmailEntity $emailEntity
-     *
-     * @return Email
-     */
-    public static function createReplyEmail(EmailEntity $emailEntity)
-    {
-        $email = new self();
-        $email->setMailType(self::MAIL_TYPE_REPLY);
-        $email->setParentEmail($emailEntity);
-
-        return $email;
-    }
-
-    /**
-     * @param EmailEntity $emailEntity
-     *
-     * @return Email
-     */
-    public static function createForwardEmail(EmailEntity $emailEntity)
-    {
-        $email = new self();
-        $email->setMailType(self::MAIL_TYPE_FORWARD);
-        $email->setParentEmail($emailEntity);
-
-        return $email;
-    }
 
     /**
      * Constructor
@@ -196,43 +155,25 @@ class Email
     }
 
     /**
-     * Get parent email
+     * Get parent email id
      *
-     * @return EmailEntity
+     * @return int
      */
-    public function getParentEmail()
+    public function getParentEmailId()
     {
-        return $this->parentEmail;
+        return $this->parentEmailId;
     }
 
     /**
+     * Set parent email id
+     *
      * @param $parentEmailId
      *
      * @return $this
      */
     public function setParentEmailId($parentEmailId)
     {
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getParentEmailId()
-    {
-        return $this->parentEmail ? $this->parentEmail->getId() : null;
-    }
-
-    /**
-     * Set parent email
-     *
-     * @param EmailEntity $parentEmail
-     *
-     * @return $this
-     */
-    public function setParentEmail($parentEmail)
-    {
-        $this->parentEmail = $parentEmail;
+        $this->parentEmailId = $parentEmailId;
 
         return $this;
     }
