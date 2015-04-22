@@ -72,7 +72,16 @@
                     {% if email.emailBody.bodyIsText %}
                         {{ email.emailBody.bodyContent|nl2br }}
                     {% else %}
-                        {{ email.emailBody.bodyContent|raw }}
+                        {% set emailBodyViewOptions = {
+                            view: 'oroemail/js/app/views/email-body-view',
+                            bodyContent: email.emailBody.bodyContent,
+                            styles: [
+                                asset('bundles/oroform/css/wysiwyg-editor.css'),
+                                asset('bundles/oroemail/css/email-body.css')
+                            ]
+                        } %}
+                        <iframe data-page-component-module="oroui/js/app/components/view-component"
+                                data-page-component-options="{{ emailBodyViewOptions|json_encode }}"></iframe>
                     {% endif %}
                 {% else %}
                     {{ 'oro.email.body_is_unavailable'|trans }}
