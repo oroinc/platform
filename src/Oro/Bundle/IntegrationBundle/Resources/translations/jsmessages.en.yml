@@ -16,7 +16,7 @@ oro:
         force_sync:
             title: Force Integration Resync
             message: >
-                Warning: Running sync with force option will perofrm sync from beginning.
+                Warning: Running sync with force option will perform sync from beginning.
                 All existing data will be synced again. This operation will take some time.
             ok: Run Resync
             cancel: Cancel
