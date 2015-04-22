@@ -439,7 +439,7 @@ define([
          * @protected
          */
         _onBodyClick: function (e) {
-            if (!$.contains(this.el, e.target)) {
+            if (!_.contains($(e.target).parents(), this.el)) {
                 this.closeDropdown();
             }
         },
