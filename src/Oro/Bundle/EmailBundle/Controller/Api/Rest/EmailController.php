@@ -212,16 +212,7 @@ class EmailController extends RestGetController
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-
-                $em = $this->getDoctrine()->getManager();
-                $relatedEmails = $this->get('oro_email.email.thread.provider')->getThreadEmails($em, $entity);
-                foreach ($relatedEmails as $relatedEmail) {
-                    $relatedEmail->addActivityTarget($target);
-                }
-                $entity->addActivityTarget($target);
-                $em->persist($entity);
-                $em->flush();
-
+                $this->get('oro_email.email.manager')->addContext($entity, $target);
                 $view = $this->view(['status' => Codes::HTTP_OK], Codes::HTTP_OK);
             } else {
                 $view = $this->view([], Codes::HTTP_NOT_ACCEPTABLE);
@@ -263,15 +254,8 @@ class EmailController extends RestGetController
 
         try {
             $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-            $em = $this->getDoctrine()->getManager();
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-            $relatedEmails = $this->get('oro_email.email.thread.provider')->getThreadEmails($em, $entity);
-            foreach ($relatedEmails as $relatedEmail) {
-                $relatedEmail->removeActivityTarget($target);
-            }
-            $em->persist($entity);
-            $em->flush();
-
+            $this->get('oro_email.email.manager')->deleteContext($entity, $target);
             $view = $this->view(['message' => 'Successfully removed'], Codes::HTTP_OK);
         } catch (\RuntimeException $e) {
             $view = $this->view([], Codes::HTTP_BAD_REQUEST);

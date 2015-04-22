@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
 class EmailManager
 {
@@ -13,17 +14,24 @@ class EmailManager
      */
     protected $emailThreadManager;
 
+    /**
+     * @var EmailThreadProvider
+     */
+    protected $emailThreadProvider;
+
     /** @var EntityManager */
     protected $em;
 
     /**
      * @param EntityManager $em
      * @param EmailThreadManager $emailThreadManager
+     * @param EmailThreadProvider $emailThreadProvider
      */
-    public function __construct(EntityManager $em, EmailThreadManager $emailThreadManager)
+    public function __construct(EntityManager $em, EmailThreadManager $emailThreadManager, EmailThreadProvider $emailThreadProvider)
     {
         $this->em = $em;
         $this->emailThreadManager = $emailThreadManager;
+        $this->emailThreadProvider = $emailThreadProvider;
     }
 
     /**
@@ -38,5 +46,33 @@ class EmailManager
             $this->em->persist($entity);
             $this->em->flush();
         }
+    }
+
+    /**
+     * @param Email $entity
+     * @param $target
+     */
+    public function addContext(Email $entity, $target)
+    {
+        $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
+        foreach ($relatedEmails as $relatedEmail) {
+            $relatedEmail->addActivityTarget($target);
+        }
+        $this->em->persist($entity);
+        $this->em->flush();
+    }
+
+    /**
+     * @param Email $entity
+     * @param $target
+     */
+    public function deleteContext(Email $entity, $target)
+    {
+        $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
+        foreach ($relatedEmails as $relatedEmail) {
+            $relatedEmail->removeActivityTarget($target);
+        }
+        $this->em->persist($entity);
+        $this->em->flush();
     }
 }
