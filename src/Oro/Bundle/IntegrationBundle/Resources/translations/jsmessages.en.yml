@@ -14,9 +14,7 @@ oro:
             data get priority in the case that both were updated since the last sync process.
 
         force_sync:
-            title: Force Integration Resync
-            message: >
-                Warning: Running sync with force option will perform sync from beginning.
-                All existing data will be synced again. This operation will take some time.
-            ok: Run Resync
+            title: Confirm full integration re-sync
+            message: Attention: This action will start full re-synchronization of all {{ integration_name }} data. It might require some time to complete.
+            ok: Run Re-sync
             cancel: Cancel
