@@ -10,8 +10,6 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Util\Codes;
 
-use Doctrine\ORM\EntityManager;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -216,7 +214,7 @@ class EmailController extends RestGetController
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
 
                 $em = $this->getDoctrine()->getManager();
-                $relatedEmails = $this->getRelatedEmails($entity, $em);
+                $relatedEmails = $this->get('oro_email.email.thread.provider')->getThreadEmails($em, $entity);
                 foreach ($relatedEmails as $relatedEmail) {
                     $relatedEmail->addActivityTarget($target);
                 }
@@ -267,7 +265,7 @@ class EmailController extends RestGetController
             $entityRoutingHelper = $this->get('oro_entity.routing_helper');
             $em = $this->getDoctrine()->getManager();
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-            $relatedEmails = $this->getRelatedEmails($entity, $em);
+            $relatedEmails = $this->get('oro_email.email.thread.provider')->getThreadEmails($em, $entity);
             foreach ($relatedEmails as $relatedEmail) {
                 $relatedEmail->removeActivityTarget($target);
             }
@@ -348,24 +346,6 @@ class EmailController extends RestGetController
             default:
                 parent::transformEntityField($field, $value);
         }
-    }
-
-    /**
-     * @param $entity
-     * @param EntityManager $em
-     *
-     * @return array
-     */
-    protected function getRelatedEmails($entity, EntityManager $em)
-    {
-        $thread = $entity->getThread();
-        if ($thread) {
-            $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-        } else {
-            $relatedEmails = [$entity];
-        }
-
-        return $relatedEmails;
     }
 
     /**
