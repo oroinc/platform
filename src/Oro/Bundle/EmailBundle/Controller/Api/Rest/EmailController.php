@@ -10,6 +10,8 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Util\Codes;
 
+use Doctrine\ORM\EntityManager;
+
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -214,12 +216,7 @@ class EmailController extends RestGetController
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
 
                 $em = $this->getDoctrine()->getManager();
-                $thread = $entity->getThread();
-                if ($thread) {
-                    $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-                } else {
-                    $relatedEmails = [$entity];
-                }
+                $relatedEmails = $this->getRelatedEmails($entity, $em);
                 foreach ($relatedEmails as $relatedEmail) {
                     $relatedEmail->addActivityTarget($target);
                 }
@@ -266,12 +263,14 @@ class EmailController extends RestGetController
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
-        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $em = $this->getDoctrine()->getManager();
-
         try {
+            $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+            $em = $this->getDoctrine()->getManager();
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-            $entity->removeActivityTarget($target);
+            $relatedEmails = $this->getRelatedEmails($entity, $em);
+            foreach ($relatedEmails as $relatedEmail) {
+                $relatedEmail->removeActivityTarget($target);
+            }
             $em->persist($entity);
             $em->flush();
 
@@ -340,7 +339,7 @@ class EmailController extends RestGetController
                             'type' => $recipient->getType(),
                             'emailAddress' => $recipient->getEmailAddress() ?
                                 $recipient->getEmailAddress()->getEmail()
-                                : null,
+                                : null
                         );
                     }
                     $value = $result;
@@ -349,6 +348,24 @@ class EmailController extends RestGetController
             default:
                 parent::transformEntityField($field, $value);
         }
+    }
+
+    /**
+     * @param $entity
+     * @param EntityManager $em
+     *
+     * @return array
+     */
+    protected function getRelatedEmails($entity, EntityManager $em)
+    {
+        $thread = $entity->getThread();
+        if ($thread) {
+            $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+        } else {
+            $relatedEmails = [$entity];
+        }
+
+        return $relatedEmails;
     }
 
     /**
