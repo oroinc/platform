@@ -27,9 +27,9 @@ abstract class AbstractPageEntity extends AbstractPage
     public function save()
     {
         $this->test->byXpath("//button[normalize-space(.) = 'Save and Close']")->click();
-        sleep(1);
         $this->waitPageToLoad();
         $this->waitForAjax();
+        sleep(1);
         return $this;
     }
 
