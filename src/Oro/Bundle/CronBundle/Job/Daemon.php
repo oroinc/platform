@@ -23,7 +23,7 @@ class Daemon
     protected $maxJobs;
 
     /**
-     * Maximum number of concurrent jobs
+     * Maximum runtime in seconds
      *
      * @var int
      */
@@ -57,7 +57,7 @@ class Daemon
      *
      * @param string $rootDir
      * @param int    $maxJobs [optional] Maximum number of concurrent jobs. Default value is 5.
-     * @param int    $maxRuntime [optional] Maximum runtime. Default value is 3600.
+     * @param int    $maxRuntime [optional] Maximum runtime in seconds. Default value is 3600.
      * @param string $env [optional] Environment. Default value is "prod".
      */
     public function __construct($rootDir, $maxJobs = 5, $maxRuntime = 3600, $env = 'prod')
@@ -215,7 +215,7 @@ class Daemon
             '%s %sconsole jms-job-queue:run --max-runtime=%u --max-concurrent-jobs=%u --env=%s',
             $this->phpExec,
             $this->rootDir . DIRECTORY_SEPARATOR,
-            $this->maxRuntime,
+            max($this->maxRuntime, 1),
             max($this->maxJobs, 1),
             escapeshellarg($this->env)
         );
