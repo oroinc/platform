@@ -54,6 +54,7 @@ define([
                 success:function(r) {
                     self.collection.reset();
                     self.collection.add(r);
+                    self.render();
                 }
             });
         },
