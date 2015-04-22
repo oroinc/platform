@@ -129,6 +129,13 @@ class DateHelper
             $increment++;
         }
 
+        $endDateKey = $end->format($config['valueStringFormat']);
+        if (!in_array($endDateKey, array_keys($dates))) {
+            $dates[$endDateKey] = [
+                'date' => $this->getFormattedLabel($config, $end, $increment),
+            ];
+        }
+
         return $dates;
     }
 
@@ -274,6 +281,7 @@ class DateHelper
 
             $start = $this->aclHelper->apply($qb)->getSingleScalarResult();
             $start = new \DateTime($start, new \DateTimeZone('UTC'));
+            $start = $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
 
         return [$start, $end];
