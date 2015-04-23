@@ -6,7 +6,6 @@ oro:
             alternative.label: Or login using
         system_configuration:
                 groups:
-                    integration_setup.title: Integration
                     google_settings.title: Google settings
                     google_integration_settings.title: Google Single Sign-On
                 fields:
