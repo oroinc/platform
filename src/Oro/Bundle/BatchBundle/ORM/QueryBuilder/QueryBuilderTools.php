@@ -284,7 +284,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
 
             $joinDependencies[$joinAlias] = [$join->getJoinType(), []];
             if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
-                $data                           = explode('.', $joinTable);
+                $data                              = explode('.', $joinTable);
                 $joinDependencies[$joinAlias][1][] = $data[0];
             }
 
