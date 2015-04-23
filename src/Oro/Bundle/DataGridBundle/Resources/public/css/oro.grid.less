@@ -78,8 +78,13 @@
 
 table.grid {
   overflow: hidden;
-  td.align-right, th.align-right {
-    text-align: right;
+  td, th {
+    &.align-right {
+      text-align: right;
+    }
+    > ul:only-child {
+      margin-bottom: 0;
+    }
   }
   thead {
     th {
