@@ -13,6 +13,7 @@ define(function (require) {
         route: null,
         routeId: null,
         includeNonEntity: false,
+        includeSystemTemplates: true,
         url: null,
         model: EmailContextActivityModel
     });
