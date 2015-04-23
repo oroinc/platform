@@ -7,13 +7,19 @@
             $(function () {
                 'use strict';
                 var $templateSelectorEl = $('#{{ id }}');
+                {% if includeSystemTemplates is defined and not includeSystemTemplates %}
+                    var includeSystemTemplates = false;
+                {% else %}
+                    var includeSystemTemplates = true;
+                {% endif %}
                 new View({
                     el: $templateSelectorEl.closest('form').find('[name$="[{{ depends_on_parent_field }}]"]'),
                     target: $templateSelectorEl,
                     collection: new Collection(
                         '{{ data_route }}',
                         {{ data_route_parameter|json_encode|raw }},
-                        {{ includeNonEntity is defined and includeNonEntity ? 'true' : 'false' }}
+                        {{ includeNonEntity is defined and includeNonEntity ? 'true' : 'false' }},
+                        includeSystemTemplates
                     )
                 });
             });

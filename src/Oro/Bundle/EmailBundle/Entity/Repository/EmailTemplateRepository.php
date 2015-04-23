@@ -28,12 +28,22 @@ class EmailTemplateRepository extends EntityRepository
      * @param string       $entityName
      * @param Organization $organization
      * @param bool         $includeNonEntity
+     * @param bool         $includeSystemTemplates
      *
      * @return EmailTemplate[]
      */
-    public function getTemplateByEntityName($entityName, Organization $organization, $includeNonEntity = false)
-    {
-        return $this->getEntityTemplatesQueryBuilder($entityName, $organization, $includeNonEntity)
+    public function getTemplateByEntityName(
+        $entityName,
+        Organization $organization,
+        $includeNonEntity = false,
+        $includeSystemTemplates = true
+    ) {
+        return $this->getEntityTemplatesQueryBuilder(
+            $entityName,
+            $organization,
+            $includeNonEntity,
+            $includeSystemTemplates
+        )
             ->getQuery()->getResult();
     }
 
@@ -43,11 +53,16 @@ class EmailTemplateRepository extends EntityRepository
      * @param string       $entityName    entity class
      * @param Organization $organization
      * @param bool         $includeNonEntity if true - system templates will be included in result set
+     * @param bool         $includeSystemTemplates
      *
      * @return QueryBuilder
      */
-    public function getEntityTemplatesQueryBuilder($entityName, Organization $organization, $includeNonEntity = false)
-    {
+    public function getEntityTemplatesQueryBuilder(
+        $entityName,
+        Organization $organization,
+        $includeNonEntity = false,
+        $includeSystemTemplates = true
+    ) {
         $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
             ->orderBy('e.name', 'ASC')
@@ -55,6 +70,11 @@ class EmailTemplateRepository extends EntityRepository
 
         if ($includeNonEntity) {
             $qb->orWhere('e.entityName IS NULL');
+        }
+
+        if (!$includeSystemTemplates) {
+            $qb->andWhere('e.isSystem = :isSystem')
+                ->setParameter('isSystem', false);
         }
 
         $qb->andWhere("e.organization = :organization")
