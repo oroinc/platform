@@ -43,7 +43,7 @@ class RolesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Roles $login */
         $login->openRoles('Oro\Bundle\UserBundle')
-            ->assertTitle('All - Roles - User Management - System');
+            ->assertTitle('Roles - User Management - System');
     }
 
     public function testRolesGridDefaultContent()
@@ -88,7 +88,7 @@ class RolesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Roles $login */
         $roles = $login->openRoles('Oro\Bundle\UserBundle')
-            ->assertTitle('All - Roles - User Management - System')
+            ->assertTitle('Roles - User Management - System')
             ->add()
             ->assertTitle('Create Role - Roles - User Management - System')
             ->setLabel($this->newRole['LABEL'] . $randomPrefix)

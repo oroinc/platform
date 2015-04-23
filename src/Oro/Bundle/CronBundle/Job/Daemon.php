@@ -23,6 +23,13 @@ class Daemon
     protected $maxJobs;
 
     /**
+     * Maximum runtime in seconds
+     *
+     * @var int
+     */
+    protected $maxRuntime;
+
+    /**
      * Current environment
      *
      * @var string
@@ -50,14 +57,16 @@ class Daemon
      *
      * @param string $rootDir
      * @param int    $maxJobs [optional] Maximum number of concurrent jobs. Default value is 5.
-     * @param string $env     [optional] Environment. Default value is "prod".
+     * @param int    $maxRuntime [optional] Maximum runtime in seconds. Default value is 3600.
+     * @param string $env [optional] Environment. Default value is "prod".
      */
-    public function __construct($rootDir, $maxJobs = 5, $env = 'prod')
+    public function __construct($rootDir, $maxJobs = 5, $maxRuntime = 3600, $env = 'prod')
     {
-        $this->rootDir   = rtrim($rootDir, DIRECTORY_SEPARATOR);
-        $this->maxJobs   = (int)$maxJobs;
-        $this->env       = $env;
-        $this->dateStart = new \DateTime('now');
+        $this->rootDir    = rtrim($rootDir, DIRECTORY_SEPARATOR);
+        $this->maxJobs    = (int)$maxJobs;
+        $this->maxRuntime = (int)$maxRuntime;
+        $this->env        = $env;
+        $this->dateStart  = new \DateTime('now');
     }
 
     /**
@@ -203,9 +212,10 @@ class Daemon
         }
 
         $runCommand = sprintf(
-            '%s %sconsole jms-job-queue:run --max-runtime=3600 --max-concurrent-jobs=%u --env=%s',
+            '%s %sconsole jms-job-queue:run --max-runtime=%u --max-concurrent-jobs=%u --env=%s',
             $this->phpExec,
             $this->rootDir . DIRECTORY_SEPARATOR,
+            max($this->maxRuntime, 1),
             max($this->maxJobs, 1),
             escapeshellarg($this->env)
         );

@@ -101,6 +101,21 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertTrue($this->rawLayoutBuilder->hasAlias('root_alias2'));
     }
 
+    public function testGetAliases()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->addAlias('root_alias1', 'root')
+            ->addAlias('root_alias2', 'root_alias1');
+
+        $this->assertEquals(['root_alias1', 'root_alias2'], $this->rawLayoutBuilder->getAliases('root'));
+        $this->assertEquals([], $this->rawLayoutBuilder->getAliases('root_alias1'));
+        $this->assertEquals([], $this->rawLayoutBuilder->getAliases('root_alias2'));
+        $this->assertEquals([], $this->rawLayoutBuilder->getAliases('header'));
+        $this->assertEquals([], $this->rawLayoutBuilder->getAliases('unknown'));
+    }
+
     public function testGetType()
     {
         $this->rawLayoutBuilder->add('root', null, 'root');

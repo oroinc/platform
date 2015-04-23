@@ -8,6 +8,7 @@ services:
         arguments:
             - %kernel.root_dir%
             - %oro_cron.max_jobs%
+            - %oro_cron.max_runtime%
             - %kernel.environment%
 
     oro_cron.job_manager:

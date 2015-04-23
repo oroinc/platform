@@ -1,5 +1,8 @@
 body {
     font-size: 13px;
+    line-height: 20px;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #444;
 }
 .email-prev-body {
     margin-left: 10px;

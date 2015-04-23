@@ -70,7 +70,7 @@ oro:
         activate: Activate
         deactivate: Deactivate
         button:
-            force_sync: Force resync
+            force_sync: Full Re-sync
             sync: Schedule sync
 
         delete_sync_integration:
@@ -82,4 +82,4 @@ oro:
 
         system_configuration:
             groups:
-                integrations.title:         'Integrations'
+                integrations.title: Integrations
