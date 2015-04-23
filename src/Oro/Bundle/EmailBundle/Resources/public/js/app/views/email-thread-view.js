@@ -15,14 +15,12 @@ define(function (require) {
         events: {
             'click .email-view-toggle': 'onEmailHeadClick',
             'click .email-view-toggle-all': 'onToggleAllClick',
-            'click .email-load-more': 'onLoadMoreClick',
-            'click .email-extra-body-toggle': 'onEmailExtraBodyToggle'
+            'click .email-load-more': 'onLoadMoreClick'
         },
 
         selectors: {
             emailItem: '.email-info',
             emailBody: '.email-body',
-            emailExtraBody: '.email-body>.quote, .email-body>.gmail_extra',
             loadMore: '.email-load-more',
             toggleAll: '.email-view-toggle-all'
         },
@@ -176,27 +174,6 @@ define(function (require) {
          */
         updateThreadLayout: function () {
             mediator.execute('layout:init', this.$el, this);
-            this.markEmailExtraBody();
-        },
-
-        /**
-         * Marks email extra-body part and adds the toggler
-         */
-        markEmailExtraBody: function () {
-            var $extraBodies = this.$(this.selectors.emailExtraBody)
-                .not('.email-extra-body')
-                .addClass('email-extra-body');
-            $('<div class="email-extra-body-toggle"></div>').insertBefore($extraBodies);
-        },
-
-        /**
-         * Handles click on email extra-body toggle button
-         * @param e
-         */
-        onEmailExtraBodyToggle: function (e) {
-            this.$(e.currentTarget)
-                .next()
-                .toggleClass('in');
         },
 
         /**
@@ -207,6 +184,9 @@ define(function (require) {
          */
         toggleEmail: function ($email, flag) {
             $email.toggleClass('in', flag);
+            if ($email.hasClass('in')) {
+                $email.find('iframe').triggerHandler('emailShown');
+            }
             this.updateToggleAllAction();
         },
 
