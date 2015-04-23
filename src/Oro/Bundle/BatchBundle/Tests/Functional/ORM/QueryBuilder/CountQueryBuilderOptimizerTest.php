@@ -100,6 +100,28 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username', 'api.apiKey')),
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u',
             ),
+            'unused_left_join_without_conditions' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->leftJoin('u.owner', 'o')
+                    ->select('u.id, o.name'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u',
+            ),
+            'unused_left_join_with_condition' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->leftJoin('u.owner', 'o', Join::WITH, 'o.id = 123')
+                    ->select('u.id, o.name'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u',
+            ),
+            'unused_left_join_with_condition_in_several_joins' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->leftJoin('u.owner', 'o', Join::WITH, 'o.id = 123')
+                    ->leftJoin('o.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
+                    ->select('u.id, o.name'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u',
+            ),
             'used_left_join' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
@@ -114,11 +136,30 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             'with_inner_join' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
+                    ->innerJoin('u.businessUnits', 'bu')
+                    ->leftJoin('bu.organization', 'o')
+                    ->select(array('u.id', 'u.username', 'api.apiKey as aKey')),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'INNER JOIN u.businessUnits bu'
+            ),
+            'with_inner_join_with_condition' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
                     ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu', Join::WITH, 'u.owner = bu.id')
                     ->leftJoin('OroUserBundle:UserApi', 'api')
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey')),
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
                     . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu WITH u.owner = bu.id'
+            ),
+            'with_inner_join_depends_on_left_join' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu', Join::WITH, 'owner.id = bu.id')
+                    ->leftJoin('u.owner', 'owner')
+                    ->select(array('u.id')),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu WITH owner.id = bu.id '
+                    . 'LEFT JOIN u.owner owner'
             ),
             'inner_with_2_left_group' => array(
                 'queryBuilder' => self::createQueryBuilder($em)

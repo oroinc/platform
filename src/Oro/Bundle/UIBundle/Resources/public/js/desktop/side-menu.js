@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['../side-menu', '../mediator'], function ($, mediator) {
+define(['../side-menu', '../mediator', 'oroui/js/persistent-storage'], function ($, mediator, persistentStorage) {
     'use strict';
 
     var STATE_STORAGE_KEY = 'main-menu-state',
@@ -19,7 +19,7 @@ define(['../side-menu', '../mediator'], function ($, mediator) {
          * Updates menu's minimized/maximized view
          */
         _update: function () {
-            var isMinimized = localStorage[STATE_STORAGE_KEY] !== MAXIMIZED_STATE;
+            var isMinimized = persistentStorage.getItem(STATE_STORAGE_KEY) !== MAXIMIZED_STATE;
             this.element.toggleClass('minimized', isMinimized);
             $('#main').toggleClass('main-menu-maximized', isMinimized);
             if (isMinimized) {
@@ -33,7 +33,10 @@ define(['../side-menu', '../mediator'], function ($, mediator) {
          * Handles menu toggle state action
          */
         _toggle: function () {
-            localStorage[STATE_STORAGE_KEY] = this.element.hasClass('minimized') ? MAXIMIZED_STATE : MINIMIZED_STATE;
+            persistentStorage.setItem(
+                STATE_STORAGE_KEY,
+                this.element.hasClass('minimized') ? MAXIMIZED_STATE : MINIMIZED_STATE
+            );
             this._update();
             mediator.trigger('layout:adjustHeight');
         }
