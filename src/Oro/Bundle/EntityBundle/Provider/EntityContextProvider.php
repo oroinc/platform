@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Manager;
+namespace Oro\Bundle\EntityBundle\Provider;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -8,50 +8,69 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
-class EntityManager
+class EntityContextProvider
 {
     /**
      * @var ContainerInterface
      */
     protected $container;
 
-    /** @var EntityRoutingHelper */
+    /**
+     * @var EntityRoutingHelper
+     */
     protected $routingHelper;
+
+    /**
+     * @var EntityProvider
+     */
+    protected $entityProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $entityConfigProvider;
 
     /**
      * @param ContainerInterface $container
      * @param EntityRoutingHelper $routingHelper
+     * @param EntityProvider $entityProvider
+     * @param ConfigProvider $entityConfigProvider
      */
-    public function __construct(ContainerInterface $container, EntityRoutingHelper $routingHelper)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        EntityRoutingHelper $routingHelper,
+        EntityProvider $entityProvider,
+        ConfigProvider $entityConfigProvider
+    ) {
         $this->container = $container;
         $this->routingHelper  = $routingHelper;
+        $this->entityProvider = $entityProvider;
+        $this->entityConfigProvider = $entityConfigProvider;
     }
 
     /**
-     * @param EntityProvider $entityProvider
-     * @param ConfigProvider $entityConfigProvider
      * @param object $entity
      * @return array
      */
-    public function getSupportedTargets(EntityProvider $entityProvider, ConfigProvider $entityConfigProvider, $entity)
+    public function getSupportedTargets($entity)
     {
-        $targetEntities = $entityProvider->getEntities();
+        $targetEntities = $this->entityProvider->getEntities();
         $entityTargets = [];
 
         if (!is_object($entity) || !method_exists($entity, 'supportActivityTarget')) {
             return $entityTargets;
         }
 
-        $i=1;
-        foreach ($targetEntities as $targetEntity) {
+        $count = count($targetEntities);
+        for ($i=0; $i < $count; $i++) {
+            $targetEntity = $targetEntities[$i];
             $className = $targetEntity['name'];
             if (!empty($className) && $entity->supportActivityTarget($className)) {
                 $entityTargets[] = [
                     'label' => $targetEntity['label'],
                     'className' => $this->routingHelper->encodeClassName($targetEntity['name']),
-                    'first' => ($i == 1 ? true : false),
-                    'gridName' => $this->getContextGridByEntity($entityConfigProvider, $className)
+                    'first' => ($i == 0 ? true : false),
+                    'gridName' => $this->getContextGridByEntity($className)
                 ];
 
                 $i++;
@@ -62,17 +81,14 @@ class EntityManager
     }
 
     /**
-     * @param ConfigProvider $entityConfigProvider
      * @param string $entityClass
      * @return string|null
      */
-    public function getContextGridByEntity(
-        ConfigProvider $entityConfigProvider,
-        $entityClass
-    ) {
+    public function getContextGridByEntity($entityClass)
+    {
         if (!empty($entityClass)) {
             $entityClass = $this->routingHelper->decodeClassName($entityClass);
-            $config = $entityConfigProvider->getConfig($entityClass);
+            $config = $this->entityConfigProvider->getConfig($entityClass);
             $gridName = $config->get('context-grid');
             if ($gridName) {
                 return $gridName;

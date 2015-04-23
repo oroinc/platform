@@ -303,10 +303,7 @@ class EmailController extends Controller
      */
     public function contextAction(Email $emailEntity)
     {
-        $entityProvider = $this->get('oro_entity.entity_provider');
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-        $entityTargets = $this->get('oro_entity.entity.manager')
-            ->getSupportedTargets($entityProvider, $entityConfigProvider, $emailEntity);
+        $entityTargets = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($emailEntity);
         return [
             'sourceEntity' => $emailEntity,
             'entityTargets' => $entityTargets,
@@ -330,10 +327,7 @@ class EmailController extends Controller
      */
     public function contextGridAction($activityId, $entityClass = null)
     {
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-        $gridName = $this
-            ->get('oro_entity.entity.manager')
-            ->getContextGridByEntity($entityConfigProvider, $entityClass);
+        $gridName = $this->get('oro_entity.entity_context_provider')->getContextGridByEntity($entityClass);
         return [
             'gridName' => $gridName,
             'multiselect' => false,

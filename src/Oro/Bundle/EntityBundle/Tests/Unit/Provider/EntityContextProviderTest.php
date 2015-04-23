@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Manager;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\Manager\EntityManager;
+use Oro\Bundle\EntityBundle\Provider\EntityContextProvider;
 
-class EntityManagerTest extends \PHPUnit_Framework_TestCase
+class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -32,9 +32,9 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     protected $mockEntity;
 
     /**
-     * @var EntityManager
+     * @var EntityContextProvider
      */
-    protected $manager;
+    protected $provider;
 
     /**
      * @var string
@@ -99,23 +99,24 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         $this->mockContainer = $this
             ->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $this->manager = new EntityManager($this->mockContainer, $this->routingHelper);
+        $this->provider = new EntityContextProvider(
+            $this->mockContainer,
+            $this->routingHelper,
+            $this->entityProvider,
+            $this->configProvider
+        );
     }
 
     public function testGetSupportedTargets()
     {
-        $targets = $this->manager->getSupportedTargets($this->entityProvider, $this->configProvider, $this->mockEntity);
+        $targets = $this->provider->getSupportedTargets($this->mockEntity);
 
         $this->assertCount(1, $targets);
     }
 
     public function testGetContextGridByEntity()
     {
-        $gridName = $this->manager->getContextGridByEntity(
-            $this->configProvider,
-            $this->entityClass
-        );
-
+        $gridName = $this->provider->getContextGridByEntity($this->entityClass);
         $this->assertEquals($this->expectedGridName, $gridName);
     }
 }
