@@ -19,12 +19,14 @@ class UpdateCreatedUpdatedLabels implements Migration
             [
                 'entityName' => 'Oro\Bundle\AddressBundle\Entity\Address',
                 'field' => 'created',
-                'value' => 'oro.ui.created_at'
+                'value' => 'oro.ui.created_at',
+                'replace' => 'oro.address.created.label'
             ],
             [
                 'entityName' => 'Oro\Bundle\AddressBundle\Entity\Address',
                 'field' => 'updated',
-                'value' => 'oro.ui.updated_at'
+                'value' => 'oro.ui.updated_at',
+                'replace' => 'oro.address.updated.label'
             ]
         ];
 
@@ -44,7 +46,8 @@ class UpdateCreatedUpdatedLabels implements Migration
                     $field['field'],
                     'entity',
                     'label',
-                    $field['value']
+                    $field['value'],
+                    $field['replace']
                 )
             );
         }

@@ -43,19 +43,26 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
     protected $connection;
 
     /**
+     * @var null|string
+     */
+    protected $replaceValue;
+
+    /**
      * @param string $entityName
      * @param string $fieldName
      * @param string $scope
      * @param string $code
      * @param string $value
+     * @param null   $replaceValue
      */
-    public function __construct($entityName, $fieldName, $scope, $code, $value)
+    public function __construct($entityName, $fieldName, $scope, $code, $value, $replaceValue = null)
     {
         $this->entityName = $entityName;
         $this->fieldName = $fieldName;
         $this->scope = $scope;
         $this->code = $code;
         $this->value = $value;
+        $this->replaceValue = $replaceValue;
     }
 
     /**
@@ -114,6 +121,11 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
                 code = ?
             ";
         $parameters = [$this->value, $this->entityName, $this->fieldName, $this->scope, $this->code];
+
+        if ($this->replaceValue !== null) {
+            $sql .= " AND value = ?";
+            $parameters[] = $this->replaceValue;
+        }
         $this->logQuery($logger, $sql, $parameters);
 
         if (!$dryRun) {

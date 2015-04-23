@@ -19,22 +19,26 @@ class UpdateCreatedUpdatedLabels implements Migration
             [
                 'entityName' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
                 'field' => 'createdAt',
-                'value' => 'oro.ui.created_at'
+                'value' => 'oro.ui.created_at',
+                'replace' => 'oro.workflow.workflowdefinition.created_at.label'
             ],
             [
                 'entityName' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
                 'field' => 'updatedAt',
-                'value' => 'oro.ui.updated_at'
+                'value' => 'oro.ui.updated_at',
+                'replace' => 'oro.workflow.workflowdefinition.updated_at.label'
             ],
             [
                 'entityName' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
                 'field' => 'created',
-                'value' => 'oro.ui.created_at'
+                'value' => 'oro.ui.created_at',
+                'replace' => 'oro.workflow.workflowitem.created.label'
             ],
             [
                 'entityName' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
                 'field' => 'updated',
-                'value' => 'oro.ui.updated_at'
+                'value' => 'oro.ui.updated_at',
+                'replace' => 'oro.workflow.workflowitem.updated.label'
             ]
         ];
 
@@ -45,7 +49,8 @@ class UpdateCreatedUpdatedLabels implements Migration
                     $field['field'],
                     'entity',
                     'label',
-                    $field['value']
+                    $field['value'],
+                    $field['replace']
                 )
             );
             $queries->addQuery(
@@ -54,7 +59,8 @@ class UpdateCreatedUpdatedLabels implements Migration
                     $field['field'],
                     'entity',
                     'label',
-                    $field['value']
+                    $field['value'],
+                    $field['replace']
                 )
             );
         }

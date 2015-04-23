@@ -20,17 +20,20 @@ class UpdateUserEntityFieldsLabels implements Migration
             [
                 'entityName' => 'Oro\Bundle\UserBundle\Entity\User',
                 'field' => 'createdAt',
-                'value' => 'oro.ui.created_at'
+                'value' => 'oro.ui.created_at',
+                'replace' => 'oro.user.created_at.label'
             ],
             [
                 'entityName' => 'Oro\Bundle\UserBundle\Entity\User',
                 'field' => 'updatedAt',
-                'value' => 'oro.ui.updated_at'
+                'value' => 'oro.ui.updated_at',
+                'replace' => 'oro.user.updated_at.label'
             ],
             [
                 'entityName' => 'Oro\Bundle\UserBundle\Entity\User',
                 'field' => 'image',
-                'value' => 'oro.user.avatar.label'
+                'value' => 'oro.user.avatar.label',
+                'replace' => 'oro.user.image.label'
             ]
         ];
 
