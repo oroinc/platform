@@ -153,12 +153,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetCompiledSystemEmailTemplate()
     {
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-
-//        $emailTemplate = $em
-//            ->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')
-//            ->findOneBy(['name' => 'no_entity_name']);
         $emailTemplate = $this->getReference('emailTemplate1');
-
         $calendarEvent = $em
             ->getRepository('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
             ->findOneBy(['title' => 'test_title']);
@@ -185,12 +180,7 @@ class EmailTemplateControllerTest extends WebTestCase
      */
     public function testGetCompiledEmailTemplateNoEntityFound()
     {
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-
-        $emailTemplate = $em
-            ->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')
-            ->findOneBy(['name' => 'test_template']);
-
+        $emailTemplate = $this->getReference('emailTemplate2');
         $this->client->request(
             'GET',
             $this->getUrl(
