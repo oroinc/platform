@@ -332,6 +332,161 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
+    public function testMoveChildByAliasAndThenRemoveParentById()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('header2', 'root', 'header')
+            ->addAlias('header1_alias', 'header1')
+            ->addAlias('header2_alias', 'header2')
+            ->add('logo', 'header1_alias', 'logo', ['title' => 'logo'])
+            ->move('logo', 'header2_alias');
+        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator
+            ->remove('header1');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testMoveChildByAliasOfRemovedByIdParent()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('header2', 'root', 'header')
+            ->addAlias('header1_alias', 'header1')
+            ->addAlias('header2_alias', 'header2')
+            ->add('logo', 'header1_alias', 'logo', ['title' => 'logo'])
+            ->remove('header1');
+        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator
+            ->move('logo', 'header2_alias');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceItemWhenOldItemIsRemovedByAlias()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'logo'])
+            ->remove('logo_alias')
+            ->addAlias('logo_alias', 'logo')
+            ->add('logo', 'header', 'logo', ['title' => 'new_logo']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'new_logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceItemWhenNewItemIsAddedInAnotherBatchAndOldItemIsRemovedByAlias()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'logo'])
+            ->addAlias('logo_alias', 'logo')
+            ->remove('logo_alias');
+        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator
+            ->add('logo', 'header', 'logo', ['title' => 'new_logo']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'new_logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceItemAfterRemoveParentByAlias()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->addAlias('header_alias', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'logo'])
+            ->remove('header_alias')
+            ->add('logo', 'root', 'logo', ['title' => 'new_logo']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // logo
+                        'vars' => ['id' => 'logo', 'title' => 'new_logo']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     public function testSetOptionByAlias()
     {
         $this->layoutManipulator

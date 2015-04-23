@@ -281,6 +281,154 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
+    public function testMoveChildAndThenRemoveParent()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('header2', 'root', 'header')
+            ->add('logo', 'header1', 'logo', ['title' => 'logo'])
+            ->move('logo', 'header2');
+        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator
+            ->remove('header1');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testMoveChildOfRemovedParent()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('header2', 'root', 'header')
+            ->add('logo', 'header1', 'logo', ['title' => 'logo'])
+            ->remove('header1');
+        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator
+            ->move('logo', 'header2');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceItem()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'logo'])
+            ->remove('logo')
+            ->add('logo', 'header', 'logo', ['title' => 'new_logo']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'new_logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceItemWhenNewItemIsAddedInAnotherBatch()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'logo'])
+            ->remove('logo');
+        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator
+            ->add('logo', 'header', 'logo', ['title' => 'new_logo']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'new_logo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testReplaceItemAfterRemoveParent()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'logo'])
+            ->remove('header')
+            ->add('logo', 'root', 'logo', ['title' => 'new_logo']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // logo
+                        'vars' => ['id' => 'logo', 'title' => 'new_logo']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException

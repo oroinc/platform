@@ -219,6 +219,15 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
     public function hasAlias($alias);
 
     /**
+     * Returns a list of all aliases registered for the given item
+     *
+     * @param string $id The item id
+     *
+     * @return string[] The list of all registered aliases for the given item
+     */
+    public function getAliases($id);
+
+    /**
      * Returns the name of the block type associated with the given layout item
      *
      * @param string $id The item id
