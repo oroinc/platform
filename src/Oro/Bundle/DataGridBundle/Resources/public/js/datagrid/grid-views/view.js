@@ -104,10 +104,10 @@ define([
 
             if (options.title) {
                 this.title = options.title;
-                this._updateTitle();
             }
 
             this.originalTitle = $(document).prop('title');
+            this._updateTitle();
 
             this.gridName = options.gridName;
             this.collection = options.collection;
