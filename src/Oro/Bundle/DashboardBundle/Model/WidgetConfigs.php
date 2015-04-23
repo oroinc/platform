@@ -55,10 +55,10 @@ class WidgetConfigs
     ) {
         $this->configProvider = $configProvider;
         $this->securityFacade = $securityFacade;
-        $this->resolver       = $resolver;
-        $this->entityManager  = $entityManager;
-        $this->valueProvider  = $valueProvider;
-        $this->translator  = $translator;
+        $this->resolver = $resolver;
+        $this->entityManager = $entityManager;
+        $this->valueProvider = $valueProvider;
+        $this->translator = $translator;
     }
 
     /**
@@ -224,11 +224,9 @@ class WidgetConfigs
      */
     protected function loadDefaultValue($options, $widgetConfig)
     {
-        if (!$options['title']) {
-            $options['title'] = [
-                'title'      => $this->translator->trans($widgetConfig['label']),
-                'useDefault' => true
-            ];
+        if (!$options['title']['title'] || $options['title']['useDefault']) {
+            $options['title']['title'] = $this->translator->trans($widgetConfig['label']);
+            $options['title']['useDefault'] = true;
         }
 
         return $options;
