@@ -26,4 +26,3 @@ Usage sample:
 <a name="HiddenInitializationComponent#initialize"></a>
 ### hiddenInitializationComponent.initialize
 **Kind**: instance class of <code>[HiddenInitializationComponent](#HiddenInitializationComponent)</code>  
-

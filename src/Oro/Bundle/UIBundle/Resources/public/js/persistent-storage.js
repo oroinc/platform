@@ -3,12 +3,16 @@ define(function (require) {
     'use strict';
     require('jquery.cookie');
 
+    var persistentStorage;
+
     try {
         // test localStorage
         window.localStorage.getItem('dummy-key');
-        return window.localStorage;
+        persistentStorage = window.localStorage;
     } catch (e) {
-        // catch IE protected mode or browsers w/o localStorage support
+
+        // catch IE protected mode and browsers w/o localStorage support
+
         // use cookies storage instead
         // https://developer.mozilla.org/en-US/docs/Web/API/Storage/LocalStorage
 
@@ -17,26 +21,23 @@ define(function (require) {
          * Uses localStorage if supported, otherwise cookies
          * Realizes Storage Interface https://developer.mozilla.org/en-US/docs/Web/API/Storage
          */
-        var persistentStorage = {
-            /**
-             * Keys which should be ignored on clear
-             * @type {Array.<string>}
-             */
-            ignoreKeys: ['BAPID_DIST', 'CRMID'],
-
+        persistentStorage = {
             /**
              * When passed a key name, will return that key's value.
              *
              * @param sKey {string}
-             * @returns {*}
+             * @returns {string}
              */
             getItem: function (sKey) {
                 if (!sKey || !this.hasOwnProperty(sKey)) { return null; }
-                return $.cookie(sKey);
+                return decodeURIComponent(document.cookie.replace(new RegExp('(?:^|.*;\\s*)' + encodeURIComponent(sKey)
+                    .replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*((?:[^;](?!;))*[^;]?).*'), '$1'));
             },
 
             /**
              * When passed a number n, this method will return the name of the nth key in the storage.
+             *
+             * @param nKeyId {number}
              */
             key: function (nKeyId) {
                 return decodeURIComponent(
@@ -51,50 +52,52 @@ define(function (require) {
              * already exists.
              *
              * @param sKey {string}
-             * @param sValue {*}
+             * @param sValue {string}
              */
             setItem: function (sKey, sValue) {
                 if (!sKey) { return; }
-                $.cookie(sKey, sValue, {expires: 365, path: '/'});
+                document.cookie = encodeURIComponent(sKey) +
+                    '=' + encodeURIComponent(sValue) + '; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/';
                 this.length = document.cookie.match(/=/g).length;
             },
 
             /**
              * Returns an integer representing the number of data items stored in the Storage object.
              * @readonly
+             * @type number
              */
             length: 0,
 
             /**
              * When passed a key name, will remove that key from the storage.
              *
-             * @param sKey
+             * @param sKey {string}
              */
             removeItem: function (sKey) {
                 if (!sKey || !this.hasOwnProperty(sKey)) { return; }
-                $.cookie(sKey, null);
+                document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
                 this.length--;
+            },
+
+            /**
+             * @inheritDoc
+             */
+            hasOwnProperty: function (sKey) {
+                return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\='))
+                    .test(document.cookie);
             },
 
             /**
              * When invoked, will empty all keys out of the storage.
              */
             clear: function () {
-                var i, key,
-                    currentKeys = document.cookie
-                        .replace(/\s*=(?:.(?!;))*$/, '')
-                        .split(/\s*=(?:[^;](?!;))*[^;]?;\s*/;
-                for (i = 0; i < currentKeys.length;i++) {
-                    key = decodeURIComponent(currentKeys[i]);
-                    if (-1 === this.ignoreKeys.indexOf(key)) {
-                        this.removeItem(key);
-                    }
-                }
+                throw new Error('Clearing of cookie persistent storage may cause issues');
             }
         };
 
         persistentStorage.length = (document.cookie.match(/=/g) || persistentStorage).length;
-
-        return persistentStorage;
     }
+
+    return persistentStorage;
+
 });

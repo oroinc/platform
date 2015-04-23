@@ -11,7 +11,6 @@ function ($, _, tools) {
             insertMethod: 'appendTo'
         },
         queue = [],
-        storageKey = 'flash',
         notFlashTypes = ['error', 'danger', 'warning', 'alert'],
 
         /**
