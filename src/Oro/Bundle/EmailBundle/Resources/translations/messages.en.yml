@@ -165,10 +165,10 @@ oro:
         contexts:
               label:              Context
               placeholder:        Add Context
-              added:              Context has been added
-              added.already:      Context has already been added
-              type.not_supported: Type of context is not supported
-              removed:            Context has been removed
+              added:              The context has been added
+              added.already:      The context has already been added
+              type.not_supported: The context type is not supported
+              removed:            The context has been removed
         not_found:                Email with id "%s" can not be found
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
