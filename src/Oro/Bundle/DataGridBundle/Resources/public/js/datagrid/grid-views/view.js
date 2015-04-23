@@ -104,6 +104,7 @@ define([
 
             if (options.title) {
                 this.title = options.title;
+                this._updateTitle();
             }
 
             this.originalTitle = $(document).prop('title');
@@ -156,7 +157,7 @@ define([
                 this.render();
             }, this);
 
-            this._updateTitle();
+            //this._updateTitle();
 
             GridViewsView.__super__.initialize.call(this, options);
         },
