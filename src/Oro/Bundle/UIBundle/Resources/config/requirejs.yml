@@ -30,6 +30,9 @@ config:
         'bootstrap':
             deps:
                 - 'jquery'
+        'oroui/lib/bootstrap/js/bootstrap-popover':
+            deps:
+                - 'oroui/lib/bootstrap/js/bootstrap-tooltip'
         'underscore':
             exports: '_'
         'backbone-bootstrap-modal':
@@ -89,6 +92,7 @@ config:
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
+#        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'
         'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
