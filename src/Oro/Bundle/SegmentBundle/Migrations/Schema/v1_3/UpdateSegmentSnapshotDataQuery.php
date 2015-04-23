@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_3;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
