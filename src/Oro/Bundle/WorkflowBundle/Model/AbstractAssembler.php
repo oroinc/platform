@@ -90,7 +90,13 @@ abstract class AbstractAssembler
     {
         foreach ($requiredOptions as $optionName) {
             if (empty($options[$optionName])) {
-                throw new AssemblerException(sprintf('Option "%s" is required', $optionName));
+                if (isset($options['property_path'])) {
+                    $e = sprintf('Option "%s" is required for path "%s"', $optionName, $options['property_path']);
+                } else {
+                    $e = sprintf('Option "%s" is required', $optionName);
+                }
+
+                throw new AssemblerException($e);
             }
         }
     }
