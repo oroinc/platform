@@ -83,7 +83,7 @@ class EmailTemplateController extends RestController
      * @AclAncestor("oro_email_emailtemplate_index")
      * @Get("/emailtemplates/list/{entityName}/{includeNonEntity}/{includeSystemTemplates}",
      *      requirements={"entityName"="\w+", "includeNonEntity"="\d+", "includeSystemTemplates"="\d+"},
-     *      defaults={"includeNonEntity"=false, "includeSystemTemplates"=true}
+     *      defaults={"entityName"=null, "includeNonEntity"=false, "includeSystemTemplates"=true}
      * )
      *
      * @return Response
