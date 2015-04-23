@@ -81,12 +81,12 @@ class EmailController extends SoapGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($id);
+        $translator = $this->container->get('translator');
 
         if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Email with id "%s" can not be found', $id));
+            throw new \SoapFault('NOT_FOUND', $translator->trans('oro.email.not_found', $id));
         }
 
-        $translator = $this->container->get('translator');
         /**
          * @var $entityRoutingHelper EntityRoutingHelper
          */
@@ -122,9 +122,10 @@ class EmailController extends SoapGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($id);
+        $translator = $this->container->get('translator');
 
         if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Email with id "%s" can not be found', $id));
+            throw new \SoapFault('NOT_FOUND', $translator->trans('oro.email.not_found', $id));
         }
 
         $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');

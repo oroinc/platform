@@ -31,7 +31,9 @@ define([
             if (this.options.items) {
                 this.collection.reset();
                 for (var i in this.options.items) {
-                    this.collection.add(this.options.items[i]);
+                    if (this.options.items.hasOwnProperty(i)) {
+                        this.collection.add(this.options.items[i]);
+                    }
                 }
             }
 
@@ -73,7 +75,7 @@ define([
         initEvents: function() {
             var self = this;
 
-            this.collection.on('reset', function(model) {
+            this.collection.on('reset', function() {
                 self.$containerForItems.html('');
             });
 
@@ -94,11 +96,15 @@ define([
                                 $view.remove();
                                 self.render();
                             }
-                            messenger.notificationFlashMessage(response.status, __(response.message));
+                            messenger.notificationFlashMessage(response.status, response.message);
                             mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                         },
                         error: function(model, response) {
-                            messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
+                            if (response.status == 'error') {
+                                messenger.notificationFlashMessage('error', response.message);
+                            } else {
+                                messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
+                            }
                         }
                     });
                 });

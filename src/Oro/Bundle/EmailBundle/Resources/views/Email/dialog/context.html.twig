@@ -57,7 +57,7 @@
                                     data: {entityId: {{ sourceEntity.id }}, targetClassName: contextTargetClass, targetId: id},
                                     dataType: 'json',
                                     success: function (response) {
-                                        messenger.notificationFlashMessage(response.status, __(response.message));
+                                        messenger.notificationFlashMessage(response.status, response.message);
                                         mediator.trigger('widget_success:activity_list:item:update');
                                         mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                                     }

@@ -194,6 +194,7 @@ class EmailController extends RestGetController
          * @var $entityRoutingHelper EntityRoutingHelper
          */
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $translator = $this->get('translator');
 
         $entityId = $this->getRequest()->get('entityId');
         $targetClassName = $this->getRequest()->get('targetClassName');
@@ -206,7 +207,10 @@ class EmailController extends RestGetController
         $entity = $this->getManager()->find($entityId);
 
         if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([
+                'status'  => 'error',
+                'message' => $translator->trans('oro.email.not_found', [$entityId])
+            ], Codes::HTTP_NOT_FOUND));
         }
 
         try {
@@ -215,12 +219,16 @@ class EmailController extends RestGetController
 
                 if (!$entity->hasActivityTarget($target)) {
                     $this->get('oro_email.email.manager')->addContextToEmailThread($entity, $target);
-                    $response = ['status' =>'success', 'message' => 'oro.email.contexts.added'];
+                    $response = [ 'status' => 'success', 'message' => $translator->trans('oro.email.contexts.added') ];
                 } else {
-                    $response = ['status' =>'warning', 'message' => 'oro.email.contexts.added.already'];
+                    $response = [ 'status'  => 'warning',
+                                  'message' => $translator->trans('oro.email.contexts.added.already')
+                    ];
                 }
             } else {
-                $response = ['status' =>'error', 'message' => 'oro.email.contexts.type.not_supported'];
+                $response = [ 'status'  => 'error',
+                              'message' => $translator->trans('oro.email.contexts.type.not_supported')
+                ];
             }
 
             $view = $this->view($response, Codes::HTTP_OK);
@@ -254,20 +262,22 @@ class EmailController extends RestGetController
          * @var $entity Email
          */
         $entity = $this->getManager()->find($entityId);
-
+        $translator = $this->get('translator');
         if (!$entity) {
-            $response = [
+            return $this->handleView($this->view([
                 'status'  => 'error',
-                'message' => sprintf('Email with id "%s" can not be found', $entityId)
-            ];
-            return $this->handleView($this->view($response, Codes::HTTP_NOT_FOUND));
+                'message' => $translator->trans('oro.email.not_found', [$entityId])
+            ], Codes::HTTP_NOT_FOUND));
         }
 
         try {
             $entityRoutingHelper = $this->get('oro_entity.routing_helper');
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
             $this->get('oro_email.email.manager')->deleteContextFromEmailThread($entity, $target);
-            $view = $this->view(['status'=>'success', 'message' => 'oro.email.contexts.removed'], Codes::HTTP_OK);
+            $view = $this->view([
+                'status'  => 'success',
+                'message' => $translator->trans('oro.email.contexts.removed')
+            ], Codes::HTTP_OK);
         } catch (\RuntimeException $e) {
             $view = $this->view(['status'=> 'error', 'message' => $e->getMessage() ], Codes::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
