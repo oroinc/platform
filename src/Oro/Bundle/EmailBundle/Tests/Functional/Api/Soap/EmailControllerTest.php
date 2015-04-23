@@ -10,7 +10,7 @@ use Rhumsaa\Uuid\Console\Exception;
  */
 class EmailControllerTest extends WebTestCase
 {
-    const INCORRECT_ID = 1111;
+    const INCORRECT_ID = -1;
 
     protected function setUp()
     {
@@ -24,7 +24,7 @@ class EmailControllerTest extends WebTestCase
         $emailId = (int)$this->getReference('email_1')->getId();
         $userId = $this->getReference('simple_user2')->getId();
 
-        $this->setExpectedException('\SoapFault', printf('Email with id "%s" can not be found', self::INCORRECT_ID));
+        $this->setExpectedException('\SoapFault', 'Email with id "'.self::INCORRECT_ID.'" can not be found');
         $this->soapClient->postAssociation(self::INCORRECT_ID, 'Oro_Bundle_UserBundle_Entity_User', $userId);
 
         $this->soapClient->deleteAssociation($emailId, 'Oro_Bundle_UserBundle_Entity_User', $userId);
@@ -37,7 +37,7 @@ class EmailControllerTest extends WebTestCase
     {
         $userId = $this->getReference('simple_user2')->getId();
 
-        $this->setExpectedException('\SoapFault', printf('Email with id "%s" can not be found', self::INCORRECT_ID));
+        $this->setExpectedException('\SoapFault', 'Email with id "'.self::INCORRECT_ID.'" can not be found');
         $this->soapClient->deleteAssociation(self::INCORRECT_ID, 'Oro_Bundle_UserBundle_Entity_User', $userId);
 
         $emailId = (int)$this->getReference('email_1')->getId();

@@ -209,7 +209,7 @@ class EmailController extends RestGetController
         if (!$entity) {
             return $this->handleView($this->view([
                 'status'  => 'error',
-                'message' => $translator->trans('oro.email.not_found', [$entityId])
+                'message' => $translator->trans('oro.email.not_found', ['%id%'=>$entityId])
             ], Codes::HTTP_NOT_FOUND));
         }
 
@@ -266,7 +266,7 @@ class EmailController extends RestGetController
         if (!$entity) {
             return $this->handleView($this->view([
                 'status'  => 'error',
-                'message' => $translator->trans('oro.email.not_found', [$entityId])
+                'message' => $translator->trans('oro.email.not_found', ['%id%'=>$entityId])
             ], Codes::HTTP_NOT_FOUND));
         }
 
