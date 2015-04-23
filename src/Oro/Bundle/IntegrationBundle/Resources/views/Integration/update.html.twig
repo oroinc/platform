@@ -198,7 +198,7 @@
                             title: __('oro.integration.force_sync.title'),
                             okText: __('oro.integration.force_sync.ok'),
                             cancelText: __("oro.integration.force_sync.cancel"),
-                            content: __('oro.integration.force_sync.message'),
+                            content: __('oro.integration.force_sync.message', {'integration_name': {{ entity.name|json_encode|raw }} }),
                             className: 'modal oro-modal-danger',
                             okButtonClass: 'btn-danger',
                             handleClose: true

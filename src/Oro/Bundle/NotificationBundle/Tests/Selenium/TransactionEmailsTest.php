@@ -50,6 +50,7 @@ class TransactionEmailsTest extends Selenium2TestCase
         /** @var TransactionEmails $login */
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->open([$email])
             ->setEmail($newEmail)
             ->save()

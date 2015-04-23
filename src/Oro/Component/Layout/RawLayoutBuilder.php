@@ -423,6 +423,14 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAliases($id)
+    {
+        return $this->rawLayout->getAliases($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType($id)
     {
         try {
