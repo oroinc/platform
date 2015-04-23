@@ -127,7 +127,7 @@ class NavigationTest extends Selenium2TestCase
         $login->openUsers('Oro\Bundle\UserBundle')
             ->pin()
             ->assertElementPresent(
-                "//div[@class='list-bar']//a[@title = 'All - Users - User Management - System' and text() = 'Users']",
+                "//div[@class='list-bar']//a[@title[contains('Users - User Management - System') and text() = 'Users']",
                 'Element does not minimised to pinbar tab'
             );
     }

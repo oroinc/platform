@@ -107,7 +107,6 @@ define([
             }
 
             this.originalTitle = $(document).prop('title');
-            this._updateTitle();
 
             this.gridName = options.gridName;
             this.collection = options.collection;
@@ -157,7 +156,7 @@ define([
                 this.render();
             }, this);
 
-            //this._updateTitle();
+            this._updateTitle();
 
             GridViewsView.__super__.initialize.call(this, options);
         },
