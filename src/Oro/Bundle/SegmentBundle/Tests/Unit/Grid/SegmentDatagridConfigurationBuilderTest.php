@@ -130,7 +130,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                         'view' => [
                             'type'         => 'navigate',
                             'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
-                            'label'        => 'oro.report.datagrid.view',
+                            'label'        => 'oro.report.datagrid.row.action.view',
                             'icon'         => 'eye-open',
                             'link'         => 'view_link',
                             'rowAction'    => true,
