@@ -56,9 +56,8 @@
                                     type: 'POST',
                                     data: {entityId: {{ sourceEntity.id }}, targetClassName: contextTargetClass, targetId: id},
                                     dataType: 'json',
-                                    success: function (res) {
-                                        //TODO: add success check
-                                        messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
+                                    success: function (response) {
+                                        messenger.notificationFlashMessage(response.status, __(response.message));
                                         mediator.trigger('widget_success:activity_list:item:update');
                                         mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                                     }

@@ -27,8 +27,11 @@ class EmailManager
      * @param EmailThreadManager $emailThreadManager
      * @param EmailThreadProvider $emailThreadProvider
      */
-    public function __construct(EntityManager $em, EmailThreadManager $emailThreadManager, EmailThreadProvider $emailThreadProvider)
-    {
+    public function __construct(
+        EntityManager $em,
+        EmailThreadManager $emailThreadManager,
+        EmailThreadProvider $emailThreadProvider
+    ) {
         $this->em = $em;
         $this->emailThreadManager = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
@@ -52,7 +55,7 @@ class EmailManager
      * @param Email $entity
      * @param $target
      */
-    public function addContext(Email $entity, $target)
+    public function addContextToEmailThread(Email $entity, $target)
     {
         $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
         foreach ($relatedEmails as $relatedEmail) {
@@ -66,7 +69,7 @@ class EmailManager
      * @param Email $entity
      * @param $target
      */
-    public function deleteContext(Email $entity, $target)
+    public function deleteContextFromEmailThread(Email $entity, $target)
     {
         $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
         foreach ($relatedEmails as $relatedEmail) {

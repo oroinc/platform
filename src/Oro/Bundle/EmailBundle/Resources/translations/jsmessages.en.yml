@@ -22,7 +22,9 @@ oro:
             added: Attachment added
         contexts:
             added: Context has been added
-
+            added.already: Context has already added
+            type.not_supported: Type of context is not supported
+            removed: Context has been removed
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"

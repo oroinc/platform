@@ -78,29 +78,31 @@ class EmailController extends SoapGetController
     public function postAssociationsAction($id, $targetClassName, $targetId)
     {
         /**
-         * @var $entityRoutingHelper EntityRoutingHelper
-         */
-        $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
-
-        /**
          * @var $entity Email
          */
         $entity = $this->getManager()->find($id);
 
+        if (!$entity) {
+            throw new \SoapFault('NOT_FOUND', sprintf('Email with id "%s" can not be found', $id));
+        }
+
+        $translator = $this->container->get('translator');
+        /**
+         * @var $entityRoutingHelper EntityRoutingHelper
+         */
+        $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
         $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
+
         if ($entity->supportActivityTarget($targetClassName)) {
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
 
             if (!$entity->hasActivityTarget($target)) {
-                $entity->addActivityTarget($target);
-                $om = $this->getManager()->getObjectManager();
-                $om->persist($entity);
-                $om->flush();
+                $this->container->get('oro_email.email.manager')->deleteContextFromEmailThread($entity, $target);
             } else {
-                throw new \SoapFault('BAD_REQUEST', 'Already added');
+                throw new \SoapFault('BAD_REQUEST', $translator->trans('oro.email.contexts.added.already'));
             }
         } else {
-            throw new \SoapFault('BAD_REQUEST', 'Does not support');
+            throw new \SoapFault('BAD_REQUEST', $translator->trans('oro.email.contexts.type.not_supported'));
         }
 
         return $this->getManager()->getEntityId($entity);
@@ -116,25 +118,21 @@ class EmailController extends SoapGetController
      */
     public function deleteAssociationAction($id, $targetClassName, $targetId)
     {
-        try {
-            /**
-             * @var $entity Email
-             */
-            $entity = $this->getManager()->find($id);
-            $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
-            $om = $this->getManager()->getObjectManager();
-            $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
-            $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-            $entity->removeActivityTarget($target);
-            $om->persist($entity);
-            $om->flush();
+        /**
+         * @var $entity Email
+         */
+        $entity = $this->getManager()->find($id);
 
-            $response = true;
-        } catch (\RuntimeException $e) {
-            $response = false;
+        if (!$entity) {
+            throw new \SoapFault('NOT_FOUND', sprintf('Email with id "%s" can not be found', $id));
         }
 
-        return $response;
+        $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
+        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
+        $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
+        $this->container->get('oro_email.email.manager')->deleteContextFromEmailThread($entity, $target);
+
+        return true;
     }
 
     /**
