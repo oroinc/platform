@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
-/*global define, localStorage*/
-define(['./dropdown-button'], function ($) {
+/*global define */
+define(['./dropdown-button', 'oroui/js/persistent-storage'], function ($, persistentStorage) {
     'use strict';
 
     $.widget('oroui.pinnedDropdownButtonProcessor', $.oroui.dropdownButtonProcessor, {
@@ -43,7 +43,7 @@ define(['./dropdown-button'], function ($) {
         _mainButtons: function ($buttons) {
             var index, key;
             key = this._getStorageKey();
-            index = key ? localStorage.getItem(key) || 0 : 0;
+            index = key ? persistentStorage.getItem(key) || 0 : 0;
             return $($buttons.get(index)) || this._superApply(arguments);
         },
 
@@ -56,7 +56,7 @@ define(['./dropdown-button'], function ($) {
         _onButtonClick: function (e) {
             var key = this._getStorageKey();
             if (key) {
-                localStorage.setItem(key, $(e.target).data('button-index') || 0);
+                persistentStorage.setItem(key, $(e.target).data('button-index') || 0);
             }
         },
 
