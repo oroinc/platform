@@ -17,7 +17,7 @@ class UserChangeEmailTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
-            ->assertTitle('All - Users - User Management - System')
+            ->assertTitle('Users - User Management - System')
             ->add()
             ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
@@ -35,7 +35,7 @@ class UserChangeEmailTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('All - Users - User Management - System');
+            ->assertTitle('Users - User Management - System');
 
         return $username;
     }
@@ -62,7 +62,7 @@ class UserChangeEmailTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->checkEntityFieldData('Emails', $newEmail)
             ->toGrid()
-            ->assertTitle('All - Users - User Management - System')
+            ->assertTitle('Users - User Management - System')
             ->close();
     }
 }
