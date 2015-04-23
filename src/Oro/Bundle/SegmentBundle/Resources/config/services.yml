@@ -20,6 +20,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_segment.query.dynamic_segment.query_builder
+            - @oro_security.owner.ownership_metadata_provider
 
     oro_segment.segment_manager:
         class: %oro_segment.segment_manager.class%
