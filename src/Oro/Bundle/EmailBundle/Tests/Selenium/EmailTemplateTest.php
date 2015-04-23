@@ -20,9 +20,9 @@ class EmailTemplateTest extends Selenium2TestCase
         $templateName = 'EmailTemplate_'.mt_rand();
 
         $login = $this->login();
-        /* @var EmailTemplates $login*/
+        /* @var EmailTemplates $login */
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
-            ->assertTitle('All - Templates - Emails - System')
+            ->assertTitle('Templates - Emails - System')
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
             ->setEntityName('User')
@@ -32,7 +32,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setContent('Template content')
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('All - Templates - Emails - System')
+            ->assertTitle('Templates - Emails - System')
             ->close();
 
         return $templateName;
@@ -55,7 +55,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('All - Templates - Emails - System')
+            ->assertTitle('Templates - Emails - System')
             ->close()
             ->open(array($newTemplateName))
             ->assertTitle("Template {$newTemplateName} - Edit - Templates - Emails - System")
@@ -85,7 +85,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
-            ->assertTitle('All - Templates - Emails - System')
+            ->assertTitle('Templates - Emails - System')
             ->close();
 
         return $newTemplateName;
@@ -101,7 +101,7 @@ class EmailTemplateTest extends Selenium2TestCase
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->delete('Template name', $templateName)
-            ->assertTitle('All - Templates - Emails - System')
+            ->assertTitle('Templates - Emails - System')
             ->assertMessage('Item deleted');
     }
 }
