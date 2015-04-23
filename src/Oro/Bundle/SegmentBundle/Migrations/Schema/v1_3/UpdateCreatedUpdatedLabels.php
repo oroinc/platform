@@ -19,12 +19,14 @@ class UpdateCreatedUpdatedLabels implements Migration
             [
                 'entityName' => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                 'field' => 'createdAt',
-                'value' => 'oro.ui.created_at'
+                'value' => 'oro.ui.created_at',
+                'replace' => 'oro.segment.created_at.label'
             ],
             [
                 'entityName' => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                 'field' => 'updatedAt',
-                'value' => 'oro.ui.updated_at'
+                'value' => 'oro.ui.updated_at',
+                'replace' => 'oro.segment.updated_at.label'
             ]
         ];
 
@@ -35,7 +37,8 @@ class UpdateCreatedUpdatedLabels implements Migration
                     $field['field'],
                     'entity',
                     'label',
-                    $field['value']
+                    $field['value'],
+                    $field['replace']
                 )
             );
             $queries->addQuery(
@@ -44,7 +47,8 @@ class UpdateCreatedUpdatedLabels implements Migration
                     $field['field'],
                     'entity',
                     'label',
-                    $field['value']
+                    $field['value'],
+                    $field['replace']
                 )
             );
         }

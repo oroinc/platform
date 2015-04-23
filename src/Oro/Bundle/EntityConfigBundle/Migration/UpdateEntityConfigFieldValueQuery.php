@@ -37,19 +37,26 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
     protected $value;
 
     /**
+     * @var null|string
+     */
+    protected $replaceValue;
+
+    /**
      * @param string $entityName
      * @param string $fieldName
      * @param string $scope
      * @param string $code
      * @param string $value
+     * @param null   $replaceValue
      */
-    public function __construct($entityName, $fieldName, $scope, $code, $value)
+    public function __construct($entityName, $fieldName, $scope, $code, $value, $replaceValue = null)
     {
         $this->entityName = $entityName;
         $this->fieldName = $fieldName;
         $this->scope = $scope;
         $this->code = $code;
         $this->value = $value;
+        $this->replaceValue = $replaceValue;
     }
 
     /**
@@ -100,18 +107,30 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
             $data = $row['data'];
             $id = $row['id'];
             $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+
             $data[$this->scope][$this->code] = $this->value;
             $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+            if ($this->isDoUpdate()) {
+                // update field itself
+                $sql = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
+                $parameters = [$data, $id];
+                $this->logQuery($logger, $sql, $parameters);
 
-            // update field itself
-            $sql = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
-            $parameters = [$data, $id];
-            $this->logQuery($logger, $sql, $parameters);
-
-            if (!$dryRun) {
-                $statement = $this->connection->prepare($sql);
-                $statement->execute($parameters);
+                if (!$dryRun) {
+                    $statement = $this->connection->prepare($sql);
+                    $statement->execute($parameters);
+                }
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDoUpdate()
+    {
+        return !isset($data[$this->scope][$this->code])
+            || $this->replaceValue === null
+            || $this->replaceValue === $data[$this->scope][$this->code];
     }
 }

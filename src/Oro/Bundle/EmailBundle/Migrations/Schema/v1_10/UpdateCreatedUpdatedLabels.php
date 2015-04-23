@@ -19,10 +19,24 @@ class UpdateCreatedUpdatedLabels implements Migration
         $entityName = 'Oro\Bundle\EmailBundle\Entity\Email';
 
         $queries->addQuery(
-            new UpdateEntityConfigFieldValueQuery($entityName, 'created', 'entity', 'label', 'oro.ui.created_at')
+            new UpdateEntityConfigFieldValueQuery(
+                $entityName,
+                'created',
+                'entity',
+                'label',
+                'oro.ui.created_at',
+                'oro.email.created.label'
+            )
         );
         $queries->addQuery(
-            new UpdateEntityConfigIndexFieldValueQuery($entityName, 'created', 'entity', 'label', 'oro.ui.created_at')
+            new UpdateEntityConfigIndexFieldValueQuery(
+                $entityName,
+                'created',
+                'entity',
+                'label',
+                'oro.ui.created_at',
+                'oro.email.created.label'
+            )
         );
     }
 }
