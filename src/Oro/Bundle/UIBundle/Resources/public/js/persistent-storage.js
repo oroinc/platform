@@ -1,7 +1,6 @@
 /** @exports persistentStorage */
-define(function (require) {
+define(function () {
     'use strict';
-    require('jquery.cookie');
 
     var persistentStorage;
 
