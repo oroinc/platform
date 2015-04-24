@@ -552,16 +552,16 @@
         items: itemsArray,
         entityId: entity.id
     } %}
-    {% if itemsArray|length > 0 %}
-        <div class="email-context-activity">
-            <div class="email-context-activity-label">
-                {{ 'oro.email.contexts.label'|trans }}
-            </div>
-            <div class="email-context-activity-items"
-                 data-page-component-module="oroemail/js/app/components/email-context-activity-component"
-                 data-page-component-options="{{ options|json_encode }}"
-                 data-layout="separate">
-            </div>
+
+    <div class="email-context-activity"
+         data-page-component-module="oroemail/js/app/components/email-context-activity-component"
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate">
+        <div class="email-context-activity-label">
+            {{ 'oro.email.contexts.label'|trans }}
         </div>
-    {% endif %}
+        <div class="email-context-activity-items">
+
+        </div>
+    </div>
 {% endmacro %}
