@@ -173,7 +173,7 @@ class ApiEntityManager
         $qb = $this->getRepository()->createQueryBuilder('e');
 
         foreach ($joins as $join) {
-            $qb->join('e.' . $join, $join);
+            $qb->leftJoin('e.' . $join, $join);
         }
         // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
         // http://www.doctrine-project.org/jira/browse/DDC-2798
