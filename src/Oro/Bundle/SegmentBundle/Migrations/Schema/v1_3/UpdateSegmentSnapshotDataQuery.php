@@ -38,13 +38,15 @@ class UpdateSegmentSnapshotDataQuery extends ParametrizedMigrationQuery
     protected function updateSnapshotData(LoggerInterface $logger, $dryRun = false)
     {
         $query = <<<SQL
-UPDATE oro_segment_snapshot set integer_entity_id = CAST(entity_id as int) WHERE entity_id %s '^[0-9]+$';
+UPDATE oro_segment_snapshot set integer_entity_id = CAST(entity_id as %s) WHERE entity_id %s '^[0-9]+$';
 SQL;
+        $type = 'UNSIGNED';
         $function = 'REGEXP';
         if ($this->connection->getDriver()->getName() === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
             $function = '~';
+            $type = 'int';
         }
-        $query = sprintf($query, $function);
+        $query = sprintf($query, $type, $function);
 
         $this->logQuery($logger, $query);
         if (!$dryRun) {
