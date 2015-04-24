@@ -210,7 +210,7 @@ JS;
      */
     public function assertTitle($title, $message = null)
     {
-        PHPUnit_Framework_Assert::assertEquals(
+        PHPUnit_Framework_Assert::assertContains(
             $title,
             $this->test->title(),
             $message ?: $this->test->source()

@@ -43,7 +43,7 @@ class View
     /**
      * @param string $label
      *
-     * @return this
+     * @return $this
      */
     public function setLabel($label)
     {
@@ -123,7 +123,7 @@ class View
      *
      * @param bool $editable
      *
-     * @return this
+     * @return $this
      */
     public function setEditable($editable = true)
     {
@@ -137,7 +137,7 @@ class View
      *
      * @param bool $deletable
      *
-     * @return this
+     * @return $this
      */
     public function setDeletable($deletable = true)
     {

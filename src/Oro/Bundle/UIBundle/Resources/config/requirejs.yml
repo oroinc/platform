@@ -21,15 +21,19 @@ config:
         'jquery.jstree':
             deps:
                 - 'jquery'
-        'jstree/jquery.cookie':
+                - 'jquery.cookie'
+        'jquery.cookie':
             deps:
-                - 'jquery.jstree'
+                - 'jquery'
         'jstree/jquery.hotkeys':
             deps:
                 - 'jquery.jstree'
         'bootstrap':
             deps:
                 - 'jquery'
+        'oroui/lib/bootstrap/js/bootstrap-popover':
+            deps:
+                - 'oroui/lib/bootstrap/js/bootstrap-tooltip'
         'underscore':
             exports: '_'
         'backbone-bootstrap-modal':
@@ -84,11 +88,13 @@ config:
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
+        'jquery.cookie': 'bundles/oroui/lib/jquery/jquery.cookie.js'
         'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
         'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
+#        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'
         'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'

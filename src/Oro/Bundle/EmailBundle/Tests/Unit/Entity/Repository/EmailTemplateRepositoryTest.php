@@ -151,4 +151,43 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
             new Organization()
         );
     }
+
+    public function testGetEntityTemplatesQueryBuilderExcludeSystemTemplates()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->once())
+            ->method('select')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('from')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('where')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('orWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->exactly(2))
+            ->method('andWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('orderBy')
+            ->will($this->returnSelf());
+        $qb->expects($this->exactly(3))
+            ->method('setParameter')
+            ->will($this->returnSelf());
+
+        $this->entityManager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb));
+
+        $this->repository->getEntityTemplatesQueryBuilder(
+            'Oro\Bundle\UserBundle\Entity\User',
+            new Organization(),
+            true,
+            false
+        );
+    }
 }

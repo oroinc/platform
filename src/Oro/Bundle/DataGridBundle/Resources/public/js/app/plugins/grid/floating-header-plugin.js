@@ -304,6 +304,14 @@ define(function (require) {
             scrollStateModel.on('change:scrollTop', function (model, val) {
                 otherScroll.scrollTop(val);
             }, this);
+
+            function updateScroll() {
+                scrollStateModel.set({
+                    scrollTop: scrollContainer[0].scrollTop
+                });
+            }
+            scrollContainer.on('scroll', updateScroll);
+
             function setup() {
                 scrollStateModel.set({
                     headerHeight: self.headerHeight
@@ -317,7 +325,7 @@ define(function (require) {
                     scrollTop:     scrollContainer[0].scrollTop
                 });
             }
-            scrollContainer.on('scroll', setup);
+
             otherScroll.on('scroll', function () {
                 var mainScrollTop = scrollContainer.scrollTop(),
                     otherScrollTop = otherScroll.scrollTop();
@@ -326,6 +334,7 @@ define(function (require) {
                     self.checkLayout();
                 }
             });
+
             setup();
             return setup;
         },
