@@ -15,7 +15,7 @@ class WsseNoncePhpFileCache extends BasePhpFileCache
     /** Determines how many files can be deleted at once */
     const PURGE_BATCH_SIZE = 100;
 
-    /** Determines a length of directory names where cached data are located */
+    /** Determines the length of directory names where cached data are located */
     const DIRECTORY_NAME_LENGTH = 1;
 
     /** @var int */
