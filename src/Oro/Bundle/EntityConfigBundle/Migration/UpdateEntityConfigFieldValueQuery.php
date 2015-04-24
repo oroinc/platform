@@ -108,9 +108,9 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
             $id = $row['id'];
             $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
 
-            $data[$this->scope][$this->code] = $this->value;
-            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
-            if ($this->isDoUpdate()) {
+            if ($this->isDoUpdate($data)) {
+                $data[$this->scope][$this->code] = $this->value;
+                $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
                 // update field itself
                 $sql = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
                 $parameters = [$data, $id];
@@ -125,9 +125,10 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
     }
 
     /**
+     * @param array $data
      * @return bool
      */
-    protected function isDoUpdate()
+    protected function isDoUpdate(array $data)
     {
         return !isset($data[$this->scope][$this->code])
             || $this->replaceValue === null
