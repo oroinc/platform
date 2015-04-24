@@ -25,7 +25,7 @@ class Folder extends BaseFolder
     ];
 
     /** @var array */
-    protected static $possibleSentFolderNameMap = [
+    protected $possibleSentFolderNameMap = [
         'SentBox', 'Sent'
     ];
 
@@ -149,7 +149,7 @@ class Folder extends BaseFolder
      */
     public function guessSentTypeByName()
     {
-        if (in_array($this->getGlobalName(), self::$possibleSentFolderNameMap, true)) {
+        if (in_array($this->getGlobalName(), $this->possibleSentFolderNameMap, true)) {
             return true;
         }
         return false;
