@@ -68,12 +68,6 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
                     continue;
                 }
 
-                if (isset($definitions[$definitionName])) {
-                    throw new InvalidConfigurationException(
-                        sprintf('Duplicated process definition name "%s" in %s', $definitionName, $realPathName)
-                    );
-                }
-
                 $definitions[$definitionName] = $definitionConfiguration;
             }
 
