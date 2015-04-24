@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
+use Oro\Bundle\CommentBundle\Model\CommentLogicGetCountInterface;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
@@ -126,22 +127,28 @@ class CommentApiManager extends ApiEntityManager
     }
 
     /**
-     * @param string $entityClass
-     * @param string $entityId
-     *
+     * @param $entityClass
+     * @param $entityId
+     * @param CommentLogicGetCountInterface $logicGetCount
      * @return int
      */
-    public function getCommentCount($entityClass, $entityId)
+    public function getCommentCount($entityClass, $entityId, CommentLogicGetCountInterface $logicGetCount = null)
     {
         $result = 0;
 
         if ($this->isCommentable()) {
-            $entityName = $this->convertRelationEntityClassName($entityClass);
-            try {
-                if ($this->isCorrectClassName($entityName)) {
-                    $result = $this->getBuildCommentCount($entityName, $entityId);
+            if ($logicGetCount instanceof CommentLogicGetCountInterface) {
+                $result = $logicGetCount->getCount($entityClass, $entityId);
+            } else {
+                $entityName = $this->convertRelationEntityClassName($entityClass);
+
+                try {
+                    if ($this->isCorrectClassName($entityName)) {
+                        $result = $this->getBuildCommentCount($entityName, $entityId);
+                    }
+                } catch (\Exception $e) {
+
                 }
-            } catch (\Exception $e) {
             }
         }
         return $result;

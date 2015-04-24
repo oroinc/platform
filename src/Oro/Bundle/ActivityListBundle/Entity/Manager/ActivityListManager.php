@@ -184,9 +184,11 @@ class ActivityListManager
             $editorId   = $entity->getEditor()->getId();
         }
 
+        $logitGetCount=null;
         $numberOfComments = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
-            $entity->getRelatedActivityId()
+            $entity->getRelatedActivityId(),
+            $logitGetCount
         );
 
         $isHead = false;
