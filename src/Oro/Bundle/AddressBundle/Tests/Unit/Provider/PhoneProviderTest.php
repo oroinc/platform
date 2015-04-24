@@ -338,26 +338,31 @@ class PhoneProviderTest extends \PHPUnit_Framework_TestCase
     public function getPhoneNumbersProvider()
     {
         $testPhoneHolder = new TestPhoneHolder('123-123');
-        $testUser        = new TestUser('123-123');
+        $testUser = new TestUser('123-123');
+        $testUserWithoutPhone = new TestUser();
 
-        return array(
-            'null'                                => array(null, []),
-            'not obj'                             => array(
+        return [
+            'null' => [null, []],
+            'not obj' => [
                 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder',
                 []
-            ),
-            'obj implements PhoneHolderInterface' => array(
+            ],
+            'obj implements PhoneHolderInterface' => [
                 $testPhoneHolder,
                 [
                     ['123-123', $testPhoneHolder]
                 ]
-            ),
-            'obj has getPhone method'             => array(
+            ],
+            'obj has getPhone method' => [
                 $testUser,
                 [
                     ['123-123', $testUser]
                 ]
-            ),
-        );
+            ],
+            'obj has getPhone method and phone not exists' => [
+                $testUserWithoutPhone,
+                []
+            ]
+        ];
     }
 }
