@@ -32,7 +32,10 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testPostSetData($data, $expectedAddedData, $expectedRemovedData)
     {
-        $subscriber = new MultipleEntitySubscriber();
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $subscriber = new MultipleEntitySubscriber($doctrineHelper);
 
         $form  = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, null);
@@ -101,7 +104,19 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPostSubmit()
     {
-        $subscriber = new MultipleEntitySubscriber();
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadata->expects($this->any())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrineHelper->expects($this->once())
+            ->method('getEntityMetadata')
+            ->willReturn($metadata);
+        $subscriber = new MultipleEntitySubscriber($doctrineHelper);
 
         $form  = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
@@ -121,7 +136,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
         $map = [['added', $formAdded], ['removed', $formRemoved]];
         $form->expects($this->any())->method('get')->willReturnMap($map);
         $form->expects($this->any())->method('getData')->willReturn($collection);
-        $parentForm->expects($this->any())->method('getData')->willReturn([]);
+        $parentForm->expects($this->any())->method('getData')->willReturn(new \stdClass());
         $form->expects($this->any())->method('getParent')->willReturn($parentForm);
 
         $subscriber->postSubmit($event);
