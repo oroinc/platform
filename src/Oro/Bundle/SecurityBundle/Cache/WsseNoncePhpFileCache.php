@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\PhpFileCache as BasePhpFileCache;
 
 class WsseNoncePhpFileCache extends BasePhpFileCache
 {
-    /** Determines how ofter the purging of expired nonces is executed */
+    /** Determines how often the purging of expired nonces is executed */
     const PURGE_INTERVAL = 300; // 5 minutes
 
     /** Determines how long the purging of expired nonces can be executed */
