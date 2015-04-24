@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
@@ -11,8 +12,21 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 class MultipleEntitySubscriber implements EventSubscriberInterface
 {
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -57,30 +71,43 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
 
         $parentData = $form->getParent()->getData();
 
+        /** @var ClassMetadata $parentMetadata */
+        $parentMetadata = $this->doctrineHelper->getEntityMetadata(ClassUtils::getClass($parentData));
+
         /** @var Collection $collection */
         $collection = $form->getData();
 
-        $mapping = [];
-        if ($collection instanceof PersistentCollection) {
-            $mapping = $collection->getMapping();
-        }
-
         foreach ($added as $relation) {
-            if ($mapping && $mapping['type'] === ClassMetadata::ONE_TO_MANY) {
-                $mappedBy = $mapping['mappedBy'];
-                $setter = $this->getSetterName($mappedBy);
-                $relation->$setter($parentData);
-            }
+            $this->processRelation($parentMetadata, $relation, $parentData);
             $collection->add($relation);
         }
 
         foreach ($removed as $relation) {
-            if ($mapping && $mapping['type'] === ClassMetadata::ONE_TO_MANY) {
-                $mappedBy = $mapping['mappedBy'];
-                $setter = $this->getSetterName($mappedBy);
-                $relation->$setter(null);
-            }
+            $this->processRelation($parentMetadata, $relation, null);
             $collection->removeElement($relation);
+        }
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param object $relation
+     * @param mixed $value
+     */
+    protected function processRelation($metadata, $relation, $value)
+    {
+        foreach ($metadata->getAssociationMappings() as $mapping) {
+            if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
+                continue;
+            }
+            if ($mapping['targetEntity'] !== ClassUtils::getClass($relation)) {
+                continue;
+            }
+            if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
+                continue;
+            }
+            $mappedBy = $mapping['mappedBy'];
+            $setter = $this->getSetterName($mappedBy);
+            $relation->$setter($value);
         }
     }
 
