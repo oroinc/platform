@@ -48,12 +48,12 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
     protected $replaceValue;
 
     /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @param string $scope
-     * @param string $code
-     * @param string $value
-     * @param null   $replaceValue
+     * @param string      $entityName
+     * @param string      $fieldName
+     * @param string      $scope
+     * @param string      $code
+     * @param string      $value
+     * @param string|null $replaceValue
      */
     public function __construct($entityName, $fieldName, $scope, $code, $value, $replaceValue = null)
     {
