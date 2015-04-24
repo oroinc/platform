@@ -58,13 +58,13 @@ class TrackingWebsites extends AbstractPageFilteredGrid
     public function assertTitles($required, $optional, $message = '')
     {
         try {
-            PHPUnit_Framework_Assert::assertEquals(
+            PHPUnit_Framework_Assert::assertContains(
                 $optional,
                 $this->test->title(),
                 $message
             );
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            PHPUnit_Framework_Assert::assertEquals(
+            PHPUnit_Framework_Assert::assertContains(
                 $required,
                 $this->test->title(),
                 $message

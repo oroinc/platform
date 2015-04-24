@@ -9,7 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
  * @method ConfigEntities openConfigEntities() openConfigEntities(string)
- * @method ConfigEntities assertTitle() assertTitle($title, $message = '')
  */
 class ConfigEntities extends AbstractPageFilteredGrid
 {
