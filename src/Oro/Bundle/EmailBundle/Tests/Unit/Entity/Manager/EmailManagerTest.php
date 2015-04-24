@@ -15,6 +15,9 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $emailThreadManager;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailThreadProvider;
+
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -23,7 +26,10 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->emailThreadManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->manager = new EmailManager($this->em, $this->emailThreadManager);
+        $this->emailThreadProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->manager = new EmailManager($this->em, $this->emailThreadManager, $this->emailThreadProvider);
     }
 
     public function testSetEmailSeenNothinChanges()

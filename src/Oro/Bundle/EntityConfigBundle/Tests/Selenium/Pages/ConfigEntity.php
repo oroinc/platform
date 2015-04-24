@@ -7,7 +7,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages;
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
  * @method ConfigEntity openConfigEntity() openConfigEntity(string)
- * @method ConfigEntity assertTitle() assertTitle($title, $message = '')
  */
 class ConfigEntity extends CustomEntity
 {

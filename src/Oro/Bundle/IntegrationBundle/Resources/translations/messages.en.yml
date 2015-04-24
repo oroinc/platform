@@ -82,4 +82,4 @@ oro:
 
         system_configuration:
             groups:
-                integrations.title:         'Integrations'
+                integrations.title: Integrations

@@ -47,6 +47,7 @@ services:
             - @oro_dashboard.config_resolver
             - @doctrine.orm.entity_manager
             - @oro_dashboard.widget_config_value.provider
+            - @translator
         calls:
             - [setRequest, ["@?request="]]
 

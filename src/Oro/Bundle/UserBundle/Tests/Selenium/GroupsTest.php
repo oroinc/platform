@@ -27,7 +27,7 @@ class GroupsTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Groups $login */
         $login->openGroups('Oro\Bundle\UserBundle')
-            ->assertTitle('All - Groups - User Management - System');
+            ->assertTitle('Groups - User Management - System');
     }
 
     public function testGroupsGridDefaultContent()

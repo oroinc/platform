@@ -290,7 +290,8 @@ define(function (require) {
             _.extend(options, {
                 nativeMode: tools.isMobile(),
                 dateInputAttrs: {
-                    'class': 'datepicker-input ' + this.inputClass
+                    'class': 'datepicker-input ' + this.inputClass,
+                    'placeholder': __('oro.form.choose_date')
                 },
                 datePickerOptions: this.dateWidgetOptions,
                 dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector),
