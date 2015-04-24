@@ -1,16 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Manager;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\Manager\EntityManager;
+use Oro\Bundle\EntityBundle\Provider\EntityContextProvider;
 
-class EntityManagerTest extends \PHPUnit_Framework_TestCase
+class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $mockContainer;
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -32,11 +27,19 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     protected $mockEntity;
 
     /**
-     * @var EntityManager
+     * @var EntityContextProvider
      */
-    protected $manager;
+    protected $provider;
 
+    /**
+     * @var string
+     */
     protected $entityClass = "Oro\\Bundle\\UserBundle\\Entity\\User";
+
+    /**
+     * @var string
+     */
+    protected $expectedGridName = 'mygrig1';
 
     protected function setUp()
     {
@@ -78,23 +81,6 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getConfig', 'get'])
             ->getMock();
 
-        $this->mockContainer = $this
-            ->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $this->manager = new EntityManager($this->mockContainer, $this->routingHelper);
-    }
-
-    public function testGetSupportedTargets()
-    {
-        $targets = $this->manager->getSupportedTargets($this->entityProvider, $this->mockEntity);
-
-        $this->assertCount(1, $targets);
-    }
-
-    public function testGetContextGridByEntity()
-    {
-        $expectedGridName = 'mygrig1';
-
         $this->configProvider->expects($this->any())
             ->method('getConfig')
             ->with($this->routingHelper->encodeClassName($this->entityClass))
@@ -103,13 +89,25 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->any())
             ->method('get')
             ->with('context-grid')
-            ->will($this->returnValue($expectedGridName));
+            ->will($this->returnValue($this->expectedGridName));
 
-        $gridName = $this->manager->getContextGridByEntity(
-            $this->configProvider,
-            $this->entityClass
+        $this->provider = new EntityContextProvider(
+            $this->routingHelper,
+            $this->entityProvider,
+            $this->configProvider
         );
+    }
 
-        $this->assertEquals($expectedGridName, $gridName);
+    public function testGetSupportedTargets()
+    {
+        $targets = $this->provider->getSupportedTargets($this->mockEntity);
+
+        $this->assertCount(1, $targets);
+    }
+
+    public function testGetContextGridByEntity()
+    {
+        $gridName = $this->provider->getContextGridByEntity($this->entityClass);
+        $this->assertEquals($this->expectedGridName, $gridName);
     }
 }
