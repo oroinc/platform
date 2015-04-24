@@ -147,7 +147,9 @@ oro:
         send_email:               Send email
         sent_at.label:            Sent at
         sent_by.label:            sent by {{ user }}
-        subject.label:            Subject
+        subject:
+            label:            Subject
+            no_subject.label: (no subject)
         to.label:                 To
         cc_bcc.label:             Cc/Bcc
         x_message_id.label:       xMessage Id
