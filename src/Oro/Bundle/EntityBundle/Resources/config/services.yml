@@ -204,7 +204,6 @@ services:
     oro_entity.entity_context_provider:
         class: %oro_entity.entity_context_provider.class%
         arguments:
-            - @service_container
             - @oro_entity.routing_helper
             - @oro_entity.entity_provider
             - @oro_entity_config.provider.entity

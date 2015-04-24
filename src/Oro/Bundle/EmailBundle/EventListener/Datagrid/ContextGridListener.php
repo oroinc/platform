@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 
 class ContextGridListener
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var ObjectManager */
+    protected $entityManager;
 
     /**
-     * @param ManagerRegistry $doctrine
+     * @param ObjectManager $entityManager
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ObjectManager $entityManager)
     {
-        $this->doctrine = $doctrine;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -30,18 +29,23 @@ class ContextGridListener
         $datagrid = $event->getDatagrid();
         $config = $datagrid->getConfig();
         $configParameters = $config->toArray();
-        $targetClass =
-            isset($configParameters['extended_entity_name']) ? $configParameters['extended_entity_name'] : null;
+
+        if (!array_key_exists('extended_entity_name', $configParameters) ||
+            !$configParameters['extended_entity_name']) {
+            return;
+        }
+
+        $targetClass = $configParameters['extended_entity_name'];
         $parameters = $datagrid->getParameters();
         $dataSource = $datagrid->getDatasource();
         $queryBuilder = $dataSource->getQueryBuilder();
         $alias = current($queryBuilder->getDQLPart('from'))->getAlias();
 
-        if ($dataSource instanceof OrmDatasource && $targetClass && $parameters->has('activityId')) {
+        if ($dataSource instanceof OrmDatasource && $parameters->has('activityId')) {
             $activityId = $parameters->get('activityId');
-            $email = $this->doctrine->getRepository('OroEmailBundle:Email')->find($activityId);
+            $email = $this->entityManager->getRepository('OroEmailBundle:Email')->find($activityId);
 
-            if ($email->getId()) {
+            if ($email) {
                 $targetsArray = $email->getActivityTargets($targetClass);
 
                 $targetIds=[];
@@ -49,7 +53,7 @@ class ContextGridListener
                     $targetIds[]=$target->getId();
                 }
 
-                if (count($targetIds) > 0) {
+                if ($targetIds) {
                     $queryBuilder->andWhere($queryBuilder->expr()->notIn("$alias.id", $targetIds));
                 }
             }

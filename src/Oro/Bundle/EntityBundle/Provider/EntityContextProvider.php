@@ -2,19 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class EntityContextProvider
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
     /**
      * @var EntityRoutingHelper
      */
@@ -31,18 +24,15 @@ class EntityContextProvider
     protected $entityConfigProvider;
 
     /**
-     * @param ContainerInterface $container
      * @param EntityRoutingHelper $routingHelper
      * @param EntityProvider $entityProvider
      * @param ConfigProvider $entityConfigProvider
      */
     public function __construct(
-        ContainerInterface $container,
         EntityRoutingHelper $routingHelper,
         EntityProvider $entityProvider,
         ConfigProvider $entityConfigProvider
     ) {
-        $this->container = $container;
         $this->routingHelper  = $routingHelper;
         $this->entityProvider = $entityProvider;
         $this->entityConfigProvider = $entityConfigProvider;
@@ -69,7 +59,7 @@ class EntityContextProvider
                 $entityTargets[] = [
                     'label' => $targetEntity['label'],
                     'className' => $this->routingHelper->encodeClassName($targetEntity['name']),
-                    'first' => ($i == 0 ? true : false),
+                    'first' => !(bool) $i,
                     'gridName' => $this->getContextGridByEntity($className)
                 ];
 

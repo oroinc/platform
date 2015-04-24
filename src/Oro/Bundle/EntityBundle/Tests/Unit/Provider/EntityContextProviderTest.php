@@ -9,11 +9,6 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $mockContainer;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $entityProvider;
 
     /**
@@ -96,11 +91,7 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
             ->with('context-grid')
             ->will($this->returnValue($this->expectedGridName));
 
-        $this->mockContainer = $this
-            ->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
         $this->provider = new EntityContextProvider(
-            $this->mockContainer,
             $this->routingHelper,
             $this->entityProvider,
             $this->configProvider
