@@ -198,7 +198,10 @@ define(function (require) {
             options.model = PageableCollection.prototype.model.extend({
                 // to make grid collection insensible to not unique model.id
                 // (shows in the grid all passed models, even with the same id)
-                idAttribute: this.metadata.options.idAttribute || '%__id__%'
+                idAttribute: this.metadata.options.idAttribute || '%__id__%',
+                isNew: function() {
+                    return !this.has(this.idAttribute !== '%__id__%' ? this.idAttribute : 'id');
+                }
             });
             return options;
         },
