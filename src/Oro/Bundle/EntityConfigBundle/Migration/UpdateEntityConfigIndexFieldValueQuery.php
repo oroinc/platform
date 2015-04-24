@@ -48,20 +48,20 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
     protected $replaceValue;
 
     /**
-     * @param string      $entityName
-     * @param string      $fieldName
-     * @param string      $scope
-     * @param string      $code
-     * @param string      $value
-     * @param string|null $replaceValue
+     * @param string $entityName
+     * @param string $fieldName
+     * @param string $scope
+     * @param string $code
+     * @param string $value
+     * @param string $replaceValue if passed, updating will not happen if existing value !== replaceValue
      */
     public function __construct($entityName, $fieldName, $scope, $code, $value, $replaceValue = null)
     {
-        $this->entityName = $entityName;
-        $this->fieldName = $fieldName;
-        $this->scope = $scope;
-        $this->code = $code;
-        $this->value = $value;
+        $this->entityName   = $entityName;
+        $this->fieldName    = $fieldName;
+        $this->scope        = $scope;
+        $this->code         = $code;
+        $this->value        = $value;
         $this->replaceValue = $replaceValue;
     }
 
@@ -91,6 +91,7 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
                 $this->value
             )
         );
+
         return $logger->getMessages();
     }
 
@@ -104,12 +105,12 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
 
     /**
      * @param LoggerInterface $logger
-     * @param bool $dryRun
+     * @param bool            $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function updateEntityConfigIndexValue(LoggerInterface $logger, $dryRun = false)
     {
-        $sql =
+        $sql        =
             "UPDATE oro_entity_config_index_value
             SET value = ?
             WHERE
@@ -136,8 +137,8 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
 
     /**
      * @param LoggerInterface $logger
-     * @param string $sql
-     * @param array $parameters
+     * @param string          $sql
+     * @param array           $parameters
      */
     protected function logQuery(LoggerInterface $logger, $sql, array $parameters)
     {
