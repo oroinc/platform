@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class EmailControllerTest extends WebTestCase
 {
-    const INCORRECT_ID = 1111;
+    const INCORRECT_ID = -1;
 
     protected function setUp()
     {

@@ -156,6 +156,8 @@ define(function (require) {
                 // otherwise, create collection from metadata
                 collectionOptions = this.combineCollectionOptions();
                 collection = new PageableCollection(this.data, collectionOptions);
+            } else if (this.data) {
+                collection.reset(this.data, {parse: true});
             }
 
             // create grid
@@ -183,7 +185,7 @@ define(function (require) {
          * @returns {Object}
          */
         combineCollectionOptions: function () {
-            return _.extend({
+            var options = _.extend({
                 inputName: this.inputName,
                 parse: true,
                 url: '\/user\/json',
@@ -193,6 +195,12 @@ define(function (require) {
                 }, this.metadata.state),
                 initialState: this.metadata.initialState
             }, this.metadata.options);
+            options.model = PageableCollection.prototype.model.extend({
+                // to make grid collection insensible to not unique model.id
+                // (shows in the grid all passed models, even with the same id)
+                idAttribute: this.metadata.options.idAttribute || '%__id__%'
+            });
+            return options;
         },
 
         /**
@@ -237,7 +245,10 @@ define(function (require) {
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
             } else {
-                if (this.metadata.enableFullScreenLayout) {
+                if (this.metadata.enableFullScreenLayout &&
+                    window.navigator.userAgent.indexOf('MSIE ') === -1 &&
+                    window.navigator.userAgent.match(/Trident.*rv\:11\./) === null
+                ) {
                     plugins.push(FullscreenPlugin);
                 }
             }

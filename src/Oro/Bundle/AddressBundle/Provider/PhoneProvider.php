@@ -139,8 +139,8 @@ class PhoneProvider implements PhoneProviderInterface
 
             return $phones;
         } elseif (method_exists($object, self::GET_PHONE_METHOD)) {
-            $phone = $object->getPhone();
-            if (!is_object($phone)) {
+            $phone = $object->{self::GET_PHONE_METHOD}();
+            if ($phone && !is_object($phone)) {
                 return [[$phone, $object]];
             }
         }

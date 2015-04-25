@@ -593,6 +593,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             var collectionOptions = {};
             collectionOptions.url = this.url;
             collectionOptions.inputName = this.inputName;
+            collectionOptions.model = this.model;
             var newCollection = new PageableCollection(this.toJSON(), collectionOptions);
             newCollection.state = tools.deepClone(this.state);
             newCollection.initialState = tools.deepClone(this.initialState);

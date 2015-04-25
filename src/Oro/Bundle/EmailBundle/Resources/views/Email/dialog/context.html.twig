@@ -11,7 +11,8 @@
             {% set itemArray = {
             'label': item.label,
             'first': item.first,
-            'className': item.className
+            'className': item.className,
+            'gridName': item.gridName
             } %}
             {% set itemsArray = itemsArray|merge([itemArray]) %}
         {% endfor %}
@@ -33,12 +34,13 @@
             </button>
             <ul id="context-items-dropdown" class="dropdown-menu"></ul>
             <input type="hidden" id="context-current-target-class"/>
+            <input type="hidden" id="context-current-target-grid"/>
         </div>
 
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_email_context_grid', {entityClass: firstContext.className}),
-            'alias': 'email-context-grid'
+            'url': path('oro_email_context_grid', {entityClass: firstContext.className, activityId: sourceEntity.id}),
+            'alias': 'email-context-grid',
         }) }}
 
         <script type="text/javascript">
@@ -56,9 +58,8 @@
                                     type: 'POST',
                                     data: {entityId: {{ sourceEntity.id }}, targetClassName: contextTargetClass, targetId: id},
                                     dataType: 'json',
-                                    success: function (res) {
-                                        //TODO: add success check
-                                        messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
+                                    success: function (response) {
+                                        messenger.notificationFlashMessage(response.status, response.message);
                                         mediator.trigger('widget_success:activity_list:item:update');
                                         mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                                     }
