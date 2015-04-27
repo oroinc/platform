@@ -147,4 +147,9 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
 
         return mb_substr($string, 0, $length) . $etc;
     }
+
+    public function getCommentCountProvider()
+    {
+        return false;
+    }
 }

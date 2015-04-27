@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\EmailBundle\Provider\EmailCommentsProvider;
 
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
@@ -45,6 +46,9 @@ class EmailActivityListProvider implements
     /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
+    /** @var EmailCommentsProvider */
+    protected $emailCommentsProvider;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
@@ -59,7 +63,8 @@ class EmailActivityListProvider implements
         ServiceLink $nameFormatterLink,
         Router $router,
         ConfigManager $configManager,
-        EmailThreadProvider $emailThreadProvider
+        EmailThreadProvider $emailThreadProvider,
+        EmailCommentsProvider $emailCommentsProvider
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -67,6 +72,7 @@ class EmailActivityListProvider implements
         $this->router               = $router;
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
+        $this->emailCommentsProvider  = $emailCommentsProvider;
     }
 
     /**
@@ -265,5 +271,10 @@ class EmailActivityListProvider implements
             ->setParameter('thread', $email->getThread());
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getCommentCountProvider()
+    {
+        return $this->emailCommentsProvider;
     }
 }
