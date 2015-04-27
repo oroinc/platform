@@ -87,6 +87,16 @@ class EmailTemplateType extends AbstractType
                 'labels'   => $localeLabels,
             )
         );
+        $builder->add(
+            'translation',
+            'hidden',
+            [
+                'mapped' => false,
+                'attr' => [
+                    'class' => 'translation',
+                ]
+            ]
+        );
 
         $builder->add(
             'parentTemplate',
