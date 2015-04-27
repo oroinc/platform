@@ -67,24 +67,18 @@ class EmailTemplateType extends AbstractType
                 'label'    => 'oro.email.emailtemplate.entity_name.label',
                 'tooltip'  => 'oro.email.emailtemplate.entity_name.tooltip',
                 'required' => false,
-                'configs'  => [
-                    'allowClear' => true
-                ]
+                'configs'  => ['allowClear' => true]
             )
         );
 
-        $lang              = $this->localeSettings->getLanguage();
-        $notificationLangs = $this->userConfig->get('oro_locale.languages');
-        $notificationLangs = array_unique(array_merge($notificationLangs, [$lang]));
-        $localeLabels      = $this->localeSettings->getLocalesByCodes($notificationLangs, $lang);
         $builder->add(
             'translations',
             'oro_email_emailtemplate_translatation',
             array(
                 'label'    => 'oro.email.emailtemplate.translations.label',
                 'required' => false,
-                'locales'  => $notificationLangs,
-                'labels'   => $localeLabels,
+                'locales'  => $this->getLanguages(),
+                'labels'   => $this->getLocaleLabels(),
             )
         );
         $builder->add(
@@ -92,9 +86,7 @@ class EmailTemplateType extends AbstractType
             'hidden',
             [
                 'mapped' => false,
-                'attr' => [
-                    'class' => 'translation',
-                ]
+                'attr' => ['class' => 'translation']
             ]
         );
 
@@ -161,5 +153,23 @@ class EmailTemplateType extends AbstractType
     public function getName()
     {
         return 'oro_email_emailtemplate';
+    }
+
+    /**
+     * @return array
+     */
+    protected function getLanguages()
+    {
+        $languages = $this->userConfig->get('oro_locale.languages');
+
+        return array_unique(array_merge($languages, [$this->localeSettings->getLanguage()]));
+    }
+
+    /**
+     * @return array
+     */
+    protected function getLocaleLabels()
+    {
+        return $this->localeSettings->getLocalesByCodes($this->getLanguages(), $this->localeSettings->getLanguage());
     }
 }
