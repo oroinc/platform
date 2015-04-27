@@ -150,6 +150,39 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $emailAddress);
     }
 
+    public function testPreciseFullEmailAddressViaRoutingHelperWithExcludeCurrentUser()
+    {
+        $emailAddress = 'someaddress@example.com';
+        $expected     = false;
+
+        $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $ownerId    = 1;
+        $owner      = $this->getMock($ownerClass);
+        $ownerName  = 'Admin';
+
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('getEntity')
+            ->with($ownerClass, $ownerId)
+            ->willReturn($owner);
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($owner);
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
+        $this->assertEquals($expected, $emailAddress);
+    }
+
     public function testPreciseFullEmailAddressViaAddressManager()
     {
         $emailAddress = 'someaddress@example.com';
@@ -185,6 +218,52 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($ownerName);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
+        $this->assertEquals($expected, $emailAddress);
+    }
+
+    public function testPreciseFullEmailAddressViaAddressManagerWithExcludeCurrentUser()
+    {
+        $emailAddress = 'someaddress@example.com';
+        $expected     = false;
+
+        $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $ownerId    = null;
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $otherOwner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
+        $emailAddressObj = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $emailAddressObj->expects($this->any())
+            ->method('getOwner')
+            ->willReturn($otherOwner);
+
+        $repo->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($emailAddressObj);
+
+        $this->emailAddressManager->expects($this->once())
+            ->method('getEmailAddressRepository')
+            ->with($this->entityManager)
+            ->willReturn($repo);
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($otherOwner);
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
         $this->assertEquals($expected, $emailAddress);
     }
 
@@ -290,6 +369,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
         $this->assertEquals($emailAddress, $expected);
     }
+
+
 
     public function testGetUserTokenIsNull()
     {
