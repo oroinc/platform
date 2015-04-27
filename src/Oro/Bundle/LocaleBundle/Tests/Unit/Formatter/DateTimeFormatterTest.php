@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Symfony\Component\Intl\Intl;
 
 class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
 {
@@ -390,10 +391,17 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param \DateTime $date
+     * @param           $dateType
+     * @param           $locale
+     * @param           $timeZone
+     * @param           $language
+     * @param null      $defaultLocale
+     * @param null      $defaultTimeZone
+     *
      * @dataProvider formatDayDataProvider
      */
     public function testFormatDay(
-        $expected,
         \DateTime $date,
         $dateType,
         $locale,
@@ -412,6 +420,12 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($defaultTimeZone));
         }
 
+        $formatter = $this->getDayFormatter(
+            $language,
+            $timeZone ? $timeZone : $defaultTimeZone
+        );
+        $expected = $formatter->format($date);
+
         $this->assertEquals(
             $expected,
             $this->formatter->formatDay($date, $dateType, $locale, $timeZone)
@@ -422,7 +436,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'expected' => 'Feb 2',
                 'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::MEDIUM,
                 'locale' => 'ru_RU',
@@ -430,7 +443,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 'language' => 'en_US',
             ],
             [
-                'expected' => '02 февр.',
                 'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::MEDIUM,
                 'locale' => null,
@@ -493,6 +505,13 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param $lang
+     * @param $timeZone
+     * @param $pattern
+     *
+     * @return \IntlDateFormatter
+     */
     protected function getFormatter($lang, $timeZone, $pattern)
     {
         return new \IntlDateFormatter(
@@ -505,6 +524,35 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param $lang
+     * @param $timeZone
+     *
+     * @return \IntlDateFormatter
+     */
+    protected function getDayFormatter($lang, $timeZone)
+    {
+        $formatter = new \IntlDateFormatter(
+            $lang,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::NONE,
+            $timeZone,
+            \IntlDateFormatter::GREGORIAN
+        );
+        $pattern = $formatter->getPattern();
+        $pattern = trim(preg_replace(['/y/', "/'.*'/", '/\./', '/,/'], '', $pattern));
+        $formatter->setPattern($pattern);
+
+        return $formatter;
+    }
+
+    /**
+     * @param $locale
+     * @param $dateType
+     * @param $timeType
+     *
+     * @return string
+     */
     protected function getPattern($locale, $dateType, $timeType)
     {
         $localeFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
