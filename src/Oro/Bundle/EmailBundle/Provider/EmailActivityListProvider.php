@@ -182,6 +182,7 @@ class EmailActivityListProvider implements
         if ($email->getFromEmailAddress()->hasOwner()) {
             $owner             = $email->getFromEmailAddress()->getOwner();
             $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
+            $data['headOwnerName'] = $this->nameFormatterLink->getService()->format($owner);
 
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
                 ->getRoute('view');
