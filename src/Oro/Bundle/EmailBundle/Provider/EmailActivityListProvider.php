@@ -174,18 +174,18 @@ class EmailActivityListProvider implements
         if ($email->getThread()) {
             $emails = $email->getThread()->getEmails();
             // if there are just two email - add replayedEmailId to use on client side
-            if (count($emails) == 2) {
+            if (count($emails) === 2) {
                 $data['replayedEmailId'] = $emails[0]->getId();
             }
         }
 
         if ($email->getFromEmailAddress()->hasOwner()) {
-            $owner             = $email->getFromEmailAddress()->getOwner();
+            $owner = $email->getFromEmailAddress()->getOwner();
             $data['headOwnerName'] = $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
                 ->getRoute('view');
             if (null !== $route) {
-                $id                = $this->doctrineHelper->getSingleEntityIdentifier($owner);
+                $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
                 $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
             }
         }
