@@ -15,7 +15,7 @@ class DropUnUsedEntityFieldsQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->info('Drop entity config values');
+        $logger->info('Drop extend config values');
         $this->doExecute($logger, true);
 
         return $logger->getMessages();
@@ -34,20 +34,34 @@ class DropUnUsedEntityFieldsQuery extends ParametrizedMigrationQuery
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $updateSql = <<<DQL
+        $indexSql = <<<DQL
+             DELETE FROM oro_entity_config_index_value WHERE
+             field_id IN (SELECT id FROM oro_entity_config_field
+                    WHERE entity_id = (SELECT id FROM oro_entity_config WHERE class_name = ? LIMIT 1) AND
+                    field_name IN (?, ?)) AND
+             entity_id IS NULL;
+DQL;
+        $indexParams = [
+            'Oro\\Bundle\\OrganizationBundle\\Entity\\Organization',
+            'currency',
+            'precision',
+
+        ];
+        $fieldsSql = <<<DQL
              DELETE FROM oro_entity_config_field WHERE field_name IN (?, ?)
              AND entity_id IN (SELECT id FROM oro_entity_config WHERE class_name = ?);
 DQL;
-
-        $params = [
+        $fieldParams = [
             'currency',
             'precision',
             'Oro\\Bundle\\OrganizationBundle\\Entity\\Organization',
         ];
 
-        $this->logQuery($logger, $updateSql, $params);
+        $this->logQuery($logger, $indexSql, $indexParams);
+        $this->logQuery($logger, $fieldsSql, $fieldParams);
         if (!$dryRun) {
-            $this->connection->executeUpdate($updateSql, $params);
+            $this->connection->executeUpdate($indexSql, $indexParams);
+            $this->connection->executeUpdate($fieldsSql, $fieldParams);
         }
     }
 }
