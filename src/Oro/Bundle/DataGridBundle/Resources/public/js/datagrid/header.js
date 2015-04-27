@@ -4,9 +4,8 @@ define([
     'underscore',
     'backbone',
     'backgrid',
-    './header-row',
     './header-cell/header-cell'
-], function (_, Backbone, Backgrid, HeaderRow, HeaderCell) {
+], function (_, Backbone, Backgrid, HeaderCell) {
     "use strict";
 
     var Header;
@@ -23,7 +22,7 @@ define([
         tagName: "thead",
 
         /** @property */
-        row: HeaderRow,
+        row: Backgrid.HeaderRow,
 
         /** @property */
         headerCell: HeaderCell,
