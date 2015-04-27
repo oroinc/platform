@@ -19,11 +19,9 @@
 
 {% block breadcrumb %}
     {% if breadcrumbs is not defined %}
-        {% set breadcrumbs = [] %}
-        {% if not entity.name is empty %}
-            {% set breadcrumbs = breadcrumbs|merge([{'label': 'oro.calendar.entity_label'|trans }, {'label': entity.name}]) %}
-        {% else %}
-            {% set breadcrumbs = breadcrumbs|merge([{'label': 'oro.calendar.my_calendar'|trans }]) %}
+        {% set breadcrumbs = [{'label': 'oro.calendar.entity_label'|trans }] %}
+        {% if entity.name is not empty %}
+            {% set breadcrumbs = breadcrumbs|merge([{'label': entity.name}]) %}
         {% endif %}
     {% endif %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
