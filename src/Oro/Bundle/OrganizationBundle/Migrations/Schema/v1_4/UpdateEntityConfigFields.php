@@ -8,13 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigIndexFieldValueQue
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class UpdateCreatedUpdatedLabels implements Migration
+class UpdateEntityConfigFields implements Migration
 {
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $queries->addQuery(new DropUnUsedEntityFieldsQuery());
+
         $fields = [
             [
                 'entityName' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
