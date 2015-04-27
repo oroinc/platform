@@ -370,8 +370,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($emailAddress, $expected);
     }
 
-
-
     public function testGetUserTokenIsNull()
     {
         $this->securityContext->expects($this->once())
