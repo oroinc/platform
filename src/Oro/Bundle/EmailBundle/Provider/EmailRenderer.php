@@ -10,6 +10,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\Common\Cache\Cache;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
 class EmailRenderer extends \Twig_Environment
@@ -142,12 +143,23 @@ class EmailRenderer extends \Twig_Environment
      * Compile preview content
      *
      * @param EmailTemplate $entity
+     * @param null|string $locale
      *
      * @return string
      */
-    public function compilePreview(EmailTemplate $entity)
+    public function compilePreview(EmailTemplate $entity, $locale = null)
     {
-        return $this->render('{% verbatim %}' . $entity->getContent() . '{% endverbatim %}', []);
+        $content = $entity->getContent();
+        if ($locale) {
+            foreach ($entity->getTranslations() as $translation) {
+                /** @var EmailTemplateTranslation $translation */
+                if ($translation->getLocale() === $locale && $translation->getField() === 'content') {
+                    $content = $translation->getContent();
+                }
+            }
+        }
+        
+        return $this->render('{% verbatim %}' . $content . '{% endverbatim %}', []);
     }
 
     /**

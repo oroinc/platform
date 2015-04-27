@@ -111,7 +111,7 @@ class EmailTemplateController extends Controller
         }
 
         $templateRendered = $this->get('oro_email.email_renderer')
-            ->compilePreview($emailTemplate);
+            ->compilePreview($emailTemplate, $form->get('translation')->getData());
 
         return array(
             'content'     => $templateRendered,
