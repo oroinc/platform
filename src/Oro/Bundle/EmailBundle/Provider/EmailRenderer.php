@@ -158,6 +158,7 @@ class EmailRenderer extends \Twig_Environment
                 }
             }
         }
+        
         return $this->render('{% verbatim %}' . $content . '{% endverbatim %}', []);
     }
 
