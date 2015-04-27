@@ -73,7 +73,8 @@ define([
             }
 
             if (this.column.has('align')) {
-                this.$el.css('text-align', this.column.get('align'));
+                this.$el.removeClass('align-left align-center align-right');
+                this.$el.addClass('align-' + this.column.get('align'));
             }
 
             return this;
