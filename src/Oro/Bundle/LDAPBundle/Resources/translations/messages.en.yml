@@ -1,0 +1,25 @@
+oro:
+    ldap:
+        system_configuration:
+            groups:
+                ldap_settings.title: LDAP
+                ldap_server_settings.title: Server
+                ldap_admin_settings.title: Admin
+                ldap_user_settings.title: User
+                ldap_role_settings.title: Roles
+            fields:
+                server_enable_login.label: Enable login
+                server_name.label: Name
+                server_hostname.label: Hostname
+                server_port.label: Port
+                server_encryption_enabled.label: Enable SSL/TLS
+                server_protocol_version.label: Protocol version
+                admin_dn.label: Dn
+                admin_password.label: Password
+                user_filter.label: Filter
+                user_mapping.label: Mapping
+                role_base_dn.label: Base Dn
+                role_user_id_attribute.label: User id attribute
+                role_mapping.label: Mapping
+                role_ldap.label: LDAP Role
+                role_crm.label: CRM Roles

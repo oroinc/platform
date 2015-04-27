@@ -17,6 +17,9 @@
 .fa-google:before {
   content: "\f1a0";
 }
+.fa-users:before {
+    content: "\f0c0";
+}
 .fa-chevron-down:before {
   content: "\f078";
 }

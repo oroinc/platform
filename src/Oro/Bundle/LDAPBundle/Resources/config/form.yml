@@ -1,0 +1,18 @@
+parameters:
+    oro_ldap.form.type.user_mapping_type.class:  Oro\Bundle\LDAPBundle\Form\Type\UserMappingType
+    oro_ldap.form.type.role_mapping_type.class:  Oro\Bundle\LDAPBundle\Form\Type\RoleMappingType
+
+services:
+    oro_ldap.form.type.user_mapping_type:
+        class: %oro_ldap.form.type.user_mapping_type.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_ldap_user_mapping }
+
+    oro_ldap.form.type.role_mapping_type:
+        class: %oro_ldap.form.type.role_mapping_type.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_ldap_role_mapping }

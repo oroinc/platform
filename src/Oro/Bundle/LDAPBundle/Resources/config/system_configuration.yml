@@ -1,0 +1,150 @@
+oro_system_configuration:
+    groups:
+        ldap_settings:
+            icon: fa-users
+            title: oro.ldap.system_configuration.groups.ldap_settings.title
+        ldap_server_settings:
+            title: oro.ldap.system_configuration.groups.ldap_server_settings.title
+        ldap_admin_settings:
+            title: oro.ldap.system_configuration.groups.ldap_admin_settings.title
+        ldap_user_settings:
+            title: oro.ldap.system_configuration.groups.ldap_user_settings.title
+        ldap_role_settings:
+            title: oro.ldap.system_configuration.groups.ldap_role_settings.title
+    fields:
+        oro_ldap.server_enable_login:
+            data_type: boolean
+            type: oro_config_checkbox
+            options:
+                label: oro.ldap.system_configuration.fields.server_enable_login.label
+                required: false
+                resettable: false
+            priority: 60
+        oro_ldap.server_name:
+            data_type: string
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.server_name.label
+                required: false
+                resettable: false
+            priority: 50
+        oro_ldap.server_hostname:
+            data_type: string
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.server_hostname.label
+                required: false
+                resettable: false
+            priority: 40
+        oro_ldap.server_port:
+            data_type: integer
+            type: integer
+            options:
+                label: oro.ldap.system_configuration.fields.server_port.label
+                required: false
+                constraints:
+                    - Range:
+                        min: 1
+                        max: 65535
+                resettable: false
+            priority: 30
+        oro_ldap.server_encryption_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            options:
+                label: oro.ldap.system_configuration.fields.server_encryption_enabled.label
+                required: false
+                resettable: false
+            priority: 20
+        oro_ldap.server_protocol_version:
+            data_type: text
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.server_protocol_version.label
+                required: false
+                resettable: false
+            priority: 10
+        oro_ldap.admin_dn:
+            data_type: text
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.admin_dn.label
+                required: false
+                resettable: false
+        oro_ldap.admin_password:
+            data_type: text
+            type: password
+            options:
+                label: oro.ldap.system_configuration.fields.admin_password.label
+                required: false
+                resettable: false
+        oro_ldap.user_filter:
+            data_type: text
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.user_filter.label
+                required: false
+                resettable: false
+        oro_ldap.user_mapping:
+            data_type: array
+            type: oro_ldap_user_mapping
+            options:
+                label: oro.ldap.system_configuration.fields.user_mapping.label
+                required: false
+                resettable: false
+        oro_ldap.role_base_dn:
+            data_type: string
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.role_base_dn.label
+                required: false
+                resettable: false
+        oro_ldap.role_user_id_attribute:
+            data_type: string
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.role_user_id_attribute.label
+                required: false
+                resettable: false
+        oro_ldap.role_mapping:
+            data_type: array
+            type: oro_collection
+            options:
+                type: oro_ldap_role_mapping
+                label: oro.ldap.system_configuration.fields.role_mapping.label
+                required: false
+                resettable: false
+                handle_primary: false
+                show_form_when_empty: false
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    integrations:
+                        children:
+                            ldap_settings:
+                                children:
+                                    ldap_server_settings:
+                                        priority: 40
+                                        children:
+                                            - oro_ldap.server_enable_login
+                                            - oro_ldap.server_name
+                                            - oro_ldap.server_hostname
+                                            - oro_ldap.server_port
+                                            - oro_ldap.server_protocol_version
+                                    ldap_admin_settings:
+                                        priority: 30
+                                        children:
+                                            - oro_ldap.admin_dn
+                                            - oro_ldap.admin_password
+                                    ldap_user_settings:
+                                        priority: 20
+                                        children:
+                                            - oro_ldap.user_filter
+                                            - oro_ldap.user_mapping
+                                    ldap_role_settings:
+                                        priority: 10
+                                        children:
+                                            - oro_ldap.role_base_dn
+                                            - oro_ldap.role_user_id_attribute
+                                            - oro_ldap.role_mapping

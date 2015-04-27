@@ -1,0 +1,81 @@
+<?php
+
+namespace Oro\Bundle\LDAPBundle\DependencyInjection;
+
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
+class Configuration implements ConfigurationInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode    = $treeBuilder->root('oro_ldap');
+
+        SettingsBuilder::append($rootNode, [
+            'server_enable_login' => [
+                'value' => false,
+                'type'  => 'boolean',
+            ],
+            'server_name' => [
+                'value' => null,
+                'type'  => 'text',
+            ],
+            'server_hostname' => [
+                'value' => null,
+                'type'  => 'text',
+            ],
+            'server_port' => [
+                'value' => null,
+                'type'  => 'text',
+            ],
+            'server_encryption_enabled' => [
+                'value' => true,
+                'type'  => 'boolean',
+            ],
+            'server_port' => [
+                'value' => null,
+                'type'  => 'integer',
+            ],
+            'server_protocol_version' => [
+                'value' => 3,
+                'type'  => 'text',
+            ],
+            'admin_dn' => [
+                'value' => null,
+                'type'  => 'text',
+            ],
+            'admin_password' => [
+                'value' => null,
+                'type'  => 'text',
+            ],
+            'user_filter' => [
+                'value' => '*',
+                'type'  => 'text',
+            ],
+            'user_mapping' => [
+                'value' => [],
+                'type'  => 'array',
+            ],
+            'role_base_dn' => [
+                'value' => null,
+                'type'  => 'text',
+            ],
+            'role_user_id_attribute' => [
+                'value' => null,
+                'type'  => 'text',
+            ],
+            'role_mapping' => [
+                'value' => [],
+                'type'  => 'text',
+            ],
+        ]);
+
+        return $treeBuilder;
+    }
+}
