@@ -531,6 +531,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $lang
      * @param string $timeZone
+     * @param string $pattern
      *
      * @return \IntlDateFormatter
      */
