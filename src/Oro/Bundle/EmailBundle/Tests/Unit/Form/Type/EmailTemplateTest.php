@@ -57,7 +57,7 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $builder->expects($this->exactly(5))
+        $builder->expects($this->exactly(6))
             ->method('add');
 
         $this->configManager->expects($this->once())

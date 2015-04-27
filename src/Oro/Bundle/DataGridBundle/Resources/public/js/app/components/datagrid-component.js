@@ -195,11 +195,6 @@ define(function (require) {
                 }, this.metadata.state),
                 initialState: this.metadata.initialState
             }, this.metadata.options);
-            options.model = PageableCollection.prototype.model.extend({
-                // to make grid collection insensible to not unique model.id
-                // (shows in the grid all passed models, even with the same id)
-                idAttribute: this.metadata.options.idAttribute || '%__id__%'
-            });
             return options;
         },
 
