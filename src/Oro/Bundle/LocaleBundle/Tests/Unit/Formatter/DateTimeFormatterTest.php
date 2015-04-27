@@ -391,12 +391,12 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \DateTime $date
-     * @param           $dateType
-     * @param           $locale
-     * @param           $timeZone
-     * @param           $language
-     * @param null      $defaultLocale
-     * @param null      $defaultTimeZone
+     * @param int       $dateType
+     * @param string    $locale
+     * @param string    $timeZone
+     * @param string    $language
+     * @param string    $defaultLocale
+     * @param string    $defaultTimeZone
      *
      * @dataProvider formatDayDataProvider
      */
@@ -505,9 +505,9 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $lang
-     * @param $timeZone
-     * @param $pattern
+     * @param string $lang
+     * @param string $timeZone
+     * @param string $pattern
      *
      * @return \IntlDateFormatter
      */
@@ -524,8 +524,8 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $lang
-     * @param $timeZone
+     * @param string $lang
+     * @param string $timeZone
      *
      * @return \IntlDateFormatter
      */
@@ -546,9 +546,9 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $locale
-     * @param $dateType
-     * @param $timeType
+     * @param string $locale
+     * @param int $dateType
+     * @param int $timeType
      *
      * @return string
      */
