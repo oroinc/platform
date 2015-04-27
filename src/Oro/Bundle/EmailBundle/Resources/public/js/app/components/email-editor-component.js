@@ -23,6 +23,7 @@ define(function (require) {
                 }
             }, 200);
         });
+        $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').focus();
 
         $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__('oro.email.to'));
         addForgedAsterisk();
@@ -33,7 +34,7 @@ define(function (require) {
         var field = fieldName.toLowerCase();
         $('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'none');
 
-        if ($('span#show'+fieldName).length > 0) {
+        if ($('span#show' + fieldName).length > 0) {
             return;
         }
 
