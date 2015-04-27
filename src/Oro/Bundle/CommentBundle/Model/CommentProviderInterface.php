@@ -17,7 +17,7 @@ interface CommentProviderInterface
     public function hasComments(ConfigManager $configManager, $entityName);
 
     /**
-     * @return mixed
+     * @return false | CommentCountAmountInterface
      */
     public function getCommentCountProvider();
 }
