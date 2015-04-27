@@ -395,7 +395,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
      * @param string    $locale
      * @param string    $timeZone
      * @param string    $language
-     * @param string    $pattern
+     * @param string    $year
      * @param string    $defaultLocale
      * @param string    $defaultTimeZone
      *
@@ -407,6 +407,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         $locale,
         $timeZone,
         $language,
+        $year,
         $defaultLocale = null,
         $defaultTimeZone = null
     ) {
@@ -423,24 +424,27 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         $actual = $this->formatter->formatDay($date, $dateType, $locale, $timeZone);
         $this->assertNotContains("'", $actual);
         $this->assertNotContains(',', $actual);
+        $this->assertNotContains($year, $actual);
     }
 
     public function formatDayDataProvider()
     {
         return [
             [
-                'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
+                'date' => $this->createDateTime('2032-02-03 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::MEDIUM,
                 'locale' => 'ru_RU',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
+                'year' => '32',
             ],
             [
-                'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
+                'date' => $this->createDateTime('2032-02-03 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::MEDIUM,
                 'locale' => null,
                 'timeZone' => null,
                 'language' => 'ru_RU',
+                'year' => '32',
                 'defaultLocale' => 'en_US',
                 'defaultTimeZone' => 'America/Los_Angeles',
             ],
