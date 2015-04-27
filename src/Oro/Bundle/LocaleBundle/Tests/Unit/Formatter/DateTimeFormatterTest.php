@@ -407,7 +407,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         $locale,
         $timeZone,
         $language,
-        $pattern,
         $defaultLocale = null,
         $defaultTimeZone = null
     ) {
@@ -421,17 +420,9 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($defaultTimeZone));
         }
 
-        $formatter = $this->getDayFormatter(
-            $language,
-            $timeZone ? $timeZone : $defaultTimeZone,
-            $pattern
-        );
-        $expected = $formatter->format($date);
-
-        $this->assertEquals(
-            $expected,
-            $this->formatter->formatDay($date, $dateType, $locale, $timeZone)
-        );
+        $actual = $this->formatter->formatDay($date, $dateType, $locale, $timeZone);
+        $this->assertNotContains("'", $actual);
+        $this->assertNotContains(',', $actual);
     }
 
     public function formatDayDataProvider()
@@ -443,7 +434,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 'locale' => 'ru_RU',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-                'pattern' => 'MMM d',
             ],
             [
                 'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
@@ -451,7 +441,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 'locale' => null,
                 'timeZone' => null,
                 'language' => 'ru_RU',
-                'pattern' => 'dd MMM',
                 'defaultLocale' => 'en_US',
                 'defaultTimeZone' => 'America/Los_Angeles',
             ],
@@ -526,27 +515,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
             \IntlDateFormatter::GREGORIAN,
             $pattern
         );
-    }
-
-    /**
-     * @param string $lang
-     * @param string $timeZone
-     * @param string $pattern
-     *
-     * @return \IntlDateFormatter
-     */
-    protected function getDayFormatter($lang, $timeZone, $pattern)
-    {
-        $formatter = new \IntlDateFormatter(
-            $lang,
-            \IntlDateFormatter::MEDIUM,
-            \IntlDateFormatter::NONE,
-            $timeZone,
-            \IntlDateFormatter::GREGORIAN
-        );
-        $formatter->setPattern($pattern);
-
-        return $formatter;
     }
 
     /**
