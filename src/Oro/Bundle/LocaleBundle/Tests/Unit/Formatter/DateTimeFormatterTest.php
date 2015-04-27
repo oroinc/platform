@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Symfony\Component\Intl\Intl;
 
 class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
 {
