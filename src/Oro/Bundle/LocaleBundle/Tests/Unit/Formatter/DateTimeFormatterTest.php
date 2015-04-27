@@ -395,6 +395,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
      * @param string    $locale
      * @param string    $timeZone
      * @param string    $language
+     * @param string    $pattern
      * @param string    $defaultLocale
      * @param string    $defaultTimeZone
      *
@@ -406,6 +407,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         $locale,
         $timeZone,
         $language,
+        $pattern,
         $defaultLocale = null,
         $defaultTimeZone = null
     ) {
@@ -421,7 +423,8 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
 
         $formatter = $this->getDayFormatter(
             $language,
-            $timeZone ? $timeZone : $defaultTimeZone
+            $timeZone ? $timeZone : $defaultTimeZone,
+            $pattern
         );
         $expected = $formatter->format($date);
 
@@ -440,6 +443,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 'locale' => 'ru_RU',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
+                'pattern' => 'MMM d',
             ],
             [
                 'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
@@ -447,6 +451,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 'locale' => null,
                 'timeZone' => null,
                 'language' => 'ru_RU',
+                'pattern' => 'dd MMM',
                 'defaultLocale' => 'en_US',
                 'defaultTimeZone' => 'America/Los_Angeles',
             ],
@@ -529,7 +534,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
      *
      * @return \IntlDateFormatter
      */
-    protected function getDayFormatter($lang, $timeZone)
+    protected function getDayFormatter($lang, $timeZone, $pattern)
     {
         $formatter = new \IntlDateFormatter(
             $lang,
@@ -538,8 +543,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
             $timeZone,
             \IntlDateFormatter::GREGORIAN
         );
-        $pattern = $formatter->getPattern();
-        $pattern = trim(preg_replace(['/y/', "/'.*'/", '/\./', '/,/'], '', $pattern));
         $formatter->setPattern($pattern);
 
         return $formatter;
