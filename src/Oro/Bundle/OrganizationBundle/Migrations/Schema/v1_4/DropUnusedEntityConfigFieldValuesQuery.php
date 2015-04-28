@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class DropUnUsedEntityFieldsQuery extends ParametrizedMigrationQuery
+class DropUnusedEntityConfigFieldValuesQuery extends ParametrizedMigrationQuery
 {
     /**
      * {@inheritdoc}
@@ -15,7 +15,7 @@ class DropUnUsedEntityFieldsQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->info('Drop extend config values');
+        $logger->info('Drop unused extend config field values');
         $this->doExecute($logger, true);
 
         return $logger->getMessages();
