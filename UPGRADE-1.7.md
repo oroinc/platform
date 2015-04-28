@@ -22,3 +22,5 @@ UPGRADE FROM 1.6 to 1.7
 
 ####OroEntityExtendBundle:
 - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension` class
+
+- Integration import processors may be tagged with `oro_integration.sync_processor` DIC tag with `integration` name. During integration import appropriate processor will be used if registered.
