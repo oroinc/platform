@@ -3,6 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_4;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigIndexFieldValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -15,7 +16,7 @@ class UpdateEntityConfigFields implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(new DropUnUsedEntityFieldsQuery());
+        $queries->addQuery(new DropUnusedEntityConfigFieldValuesQuery());
 
         $fields = [
             [
