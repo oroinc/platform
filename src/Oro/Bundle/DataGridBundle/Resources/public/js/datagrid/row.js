@@ -100,7 +100,8 @@ define([
                 model: this.model
             });
             if (column.has('align')) {
-                cell.$el.addClass('align-right');
+                cell.$el.removeClass('align-left align-center align-right');
+                cell.$el.addClass('align-' + column.get('align'));
             }
             this._listenToCellEvents(cell);
             return cell;
