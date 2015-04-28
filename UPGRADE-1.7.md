@@ -22,3 +22,6 @@ UPGRADE FROM 1.6 to 1.7
 
 ####OroEntityExtendBundle:
 - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension` class
+
+####ImportExportBundle
+ - `Oro\Bundle\ImportExportBundle\Context\ContextInterface` added $incrementBy integer parameter for methods: incrementReadCount, incrementAddCount, incrementUpdateCount, incrementReplaceCount, incrementDeleteCount, incrementErrorEntriesCount
