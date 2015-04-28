@@ -11,12 +11,12 @@
     ],
     "repositories": [
         {
-            "type": "composer",
-            "url": "http://packagist.orocrm.com"
-        },
-        {
             "type": "vcs",
             "url": "https://github.com/orocrm/composer"
+        },
+        {
+            "type": "composer",
+            "url": "http://packagist.orocrm.com"
         }
     ],
     "require": {
