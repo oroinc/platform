@@ -365,6 +365,9 @@ class OrmTotalsExtension extends AbstractExtension
                 case PropertyInterface::TYPE_DATETIME:
                     $val = $this->dateTimeFormatter->format($val);
                     break;
+                case PropertyInterface::TYPE_TIME:
+                    $val = $this->dateTimeFormatter->formatTime($val);
+                    break;
                 case PropertyInterface::TYPE_DECIMAL:
                     $val = $this->numberFormatter->formatDecimal($val);
                     break;
