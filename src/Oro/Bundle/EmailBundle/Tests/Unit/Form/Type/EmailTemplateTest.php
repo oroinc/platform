@@ -60,7 +60,7 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->exactly(6))
             ->method('add');
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->with('oro_locale.languages')
             ->will($this->returnValue(['en', 'fr_FR']));
