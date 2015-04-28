@@ -144,7 +144,10 @@ class EmailActivityListProvider implements
         return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
     }
 
-
+    /**
+     * @param ActivityList $activityListEntity
+     * @return Email
+     */
     public function getEntity(ActivityList $activityListEntity)
     {
         return $this->doctrineRegistryLink->getService()

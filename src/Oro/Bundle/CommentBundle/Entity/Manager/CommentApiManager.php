@@ -15,7 +15,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
-use Oro\Bundle\CommentBundle\Model\CommentCountAmountInterface;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
@@ -128,30 +127,22 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param $entityClass
-     * @param $entityId
-     * @param CommentCountAmountInterface $commentCountAmountProvider
+     * @param $groupRelationEntities
      * @return int
      */
-    public function getCommentCount(
-        $entityClass,
-        $entityId
-    )
+    public function getCommentCount($entityClass, $groupRelationEntities)
     {
         $result = 0;
 
         if ($this->isCommentable()) {
             $entityName = $this->convertRelationEntityClassName($entityClass);
-            $items = [];
-            foreach ($entityId as $item){
-                $items[] = $item->getRelatedActivityId();
-            }
+            $entityIds = $this->prepareRelationEntityId($groupRelationEntities);
 
             try {
                 if ($this->isCorrectClassName($entityName)) {
-                    $result = $this->getBuildCommentCount($entityName, $items);
+                    $result = $this->getBuildCommentCount($entityName, $entityIds);
                 }
             } catch (\Exception $e) {
-                var_dump($e);
             }
         }
         return $result;
@@ -411,5 +402,19 @@ class CommentApiManager extends ApiEntityManager
         $query      = $this->aclHelper->apply($qb);
 
         return  (int) $query->getSingleScalarResult();
+    }
+
+    /**
+     * @param $groupRelationEntities
+     * @return array
+     */
+    protected function prepareRelationEntityId($groupRelationEntities)
+    {
+        $relatedActivityId = [];
+        foreach ($groupRelationEntities as $activityEntity) {
+            $relatedActivityId[] = $activityEntity->getRelatedActivityId();
+        }
+
+        return $relatedActivityId;
     }
 }

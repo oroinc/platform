@@ -9,15 +9,15 @@ class CommentRepository extends EntityRepository
 {
     /**
      * @param string $fieldName
-     * @param string $entityId
+     * @param array $entityIds
      *
      * @return QueryBuilder
      */
-    public function getBaseQueryBuilder($fieldName, $entityId)
+    public function getBaseQueryBuilder($fieldName, $entityIds)
     {
         $qb = $this->createQueryBuilder('c');
         $qb->andWhere('c.' . $fieldName . ' in (:param1)');
-        $qb->setParameter('param1', $entityId);
+        $qb->setParameter('param1', $entityIds);
 
         return $qb;
     }

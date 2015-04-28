@@ -29,6 +29,7 @@ parameters:
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
 
+
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
     # Email template API
