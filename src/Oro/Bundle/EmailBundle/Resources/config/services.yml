@@ -28,7 +28,6 @@ parameters:
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
-    oro_email.email.comment_count.provider.class: Oro\Bundle\EmailBundle\Provider\EmailCommentsProvider
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -490,7 +489,6 @@ services:
            - @router
            - @oro_entity_config.config_manager
            - @oro_email.email.thread.provider
-           - @oro_email.email.comment_count.provider
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 
@@ -531,12 +529,3 @@ services:
         arguments:
             - @knp_gaufrette.filesystem_map
             - @oro_email.form.factory
-
-    oro_email.email.comment_count.provider:
-        class: %oro_email.email.comment_count.provider.class%
-        arguments:
-              - @oro_email.email.thread.provider
-              - @oro_entity.routing_helper
-              - @doctrine
-              - @oro_security.acl_helper
-        lazy: true

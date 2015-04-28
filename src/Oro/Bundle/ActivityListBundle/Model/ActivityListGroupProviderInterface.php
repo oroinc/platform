@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+
 interface ActivityListGroupProviderInterface
 {
     /**
@@ -27,4 +29,6 @@ interface ActivityListGroupProviderInterface
      * @return string
      */
     public function getGroupedTemplate();
+
+    public function getEntity(ActivityList $activityListEntity);
 }

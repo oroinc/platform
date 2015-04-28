@@ -132,9 +132,4 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
 
         return $config->is('enabled');
     }
-
-    public function getCommentCountProvider()
-    {
-        return false;
-    }
 }

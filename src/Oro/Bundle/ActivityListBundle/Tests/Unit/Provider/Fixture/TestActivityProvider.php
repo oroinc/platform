@@ -108,9 +108,4 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     {
         return true;
     }
-
-    public function getCommentCountProvider()
-    {
-        return false;
-    }
 }

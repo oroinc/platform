@@ -16,8 +16,8 @@ class CommentRepository extends EntityRepository
     public function getBaseQueryBuilder($fieldName, $entityId)
     {
         $qb = $this->createQueryBuilder('c');
-        $qb->andWhere('c.' . $fieldName . ' = :param1');
-        $qb->setParameter('param1', (int)$entityId);
+        $qb->andWhere('c.' . $fieldName . ' in (:param1)');
+        $qb->setParameter('param1', $entityId);
 
         return $qb;
     }

@@ -184,16 +184,32 @@ class ActivityListManager
             $editorId   = $entity->getEditor()->getId();
         }
 
-        $numberOfComments = $this->commentManager->getCommentCount(
-            $entity->getRelatedActivityClass(),
-            $entity->getRelatedActivityId(),
-            $entityProvider->getCommentCountProvider()
-        );
+//        $numberOfComments = $this->commentManager->getCommentCount(
+//            $entity->getRelatedActivityClass(),
+//            $entity->getRelatedActivityId(),
+//            $entityProvider->getCommentCountProvider()
+//        );
 
         $isHead = false;
         if ($this->isGroupingApplicable($entityProvider)) {
             $isHead = $entity->isHead();
+
+//            $entityProvider->get
+            $entityRelattedActivity = $entityProvider->getEntity($entity);
+            $emails = $entityProvider->getGroupedEntities($entityRelattedActivity);
+
+            $numberOfComments = $this->commentManager->getCommentCount(
+                $entity->getRelatedActivityClass(),
+                $emails
+            );
+        } else {
+            $numberOfComments = $this->commentManager->getCommentCount(
+                $entity->getRelatedActivityClass(),
+                $entity->getRelatedActivityId(),
+                $entityProvider->getCommentCountProvider()
+            );
         }
+
         $data = $entityProvider->getData($entity);
         if (isset($data['isHead']) && !$data['isHead']) {
             $isHead = false;

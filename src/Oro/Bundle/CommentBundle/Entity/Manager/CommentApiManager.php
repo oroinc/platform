@@ -134,24 +134,24 @@ class CommentApiManager extends ApiEntityManager
      */
     public function getCommentCount(
         $entityClass,
-        $entityId,
-        CommentCountAmountInterface $commentCountAmountProvider = null
-    ) {
+        $entityId
+    )
+    {
         $result = 0;
 
         if ($this->isCommentable()) {
-            if ($commentCountAmountProvider instanceof CommentCountAmountInterface) {
-                $result = $commentCountAmountProvider->getAmount($entityClass, $entityId);
-            } else {
-                $entityName = $this->convertRelationEntityClassName($entityClass);
+            $entityName = $this->convertRelationEntityClassName($entityClass);
+            $items = [];
+            foreach ($entityId as $item){
+                $items[] = $item->getRelatedActivityId();
+            }
 
-                try {
-                    if ($this->isCorrectClassName($entityName)) {
-                        $result = $this->getBuildCommentCount($entityName, $entityId);
-                    }
-                } catch (\Exception $e) {
-
+            try {
+                if ($this->isCorrectClassName($entityName)) {
+                    $result = $this->getBuildCommentCount($entityName, $items);
                 }
+            } catch (\Exception $e) {
+                var_dump($e);
             }
         }
         return $result;
