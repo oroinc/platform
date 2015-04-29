@@ -1,4 +1,6 @@
 oro:
+    user:
+        dn.label: Dn
     ldap:
         system_configuration:
             groups:
@@ -14,6 +16,7 @@ oro:
                 server_port.label: Port
                 server_encryption_enabled.label: Enable SSL/TLS
                 server_protocol_version.label: Protocol version
+                server_base_dn.label: Base Dn
                 admin_dn.label: Dn
                 admin_password.label: Password
                 user_filter.label: Filter

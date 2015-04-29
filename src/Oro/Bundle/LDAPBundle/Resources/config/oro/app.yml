@@ -1,0 +1,13 @@
+security:
+    firewalls:
+        main:
+            fr3d_ldap: ~
+
+fr3_d_ldap:
+    driver:
+        host: changedIn_LdapConfigurationCompilerPass
+    user:
+        baseDn: changedIn_LdapConfigurationCompilerPass
+        filter: '*'
+    service:
+        user_manager: oro_user.manager

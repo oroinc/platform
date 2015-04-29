@@ -1,0 +1,25 @@
+{
+    "name": "oro/ldap-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP LDAP Bundle",
+    "keywords": ["BAP", "LDAP"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4",
+        "symfony/symfony": "2.3.*",
+        "fr3d/ldap-bundle": "2.0.x-dev",
+        "oro/config-bundle": "dev-master",
+        "oro/migration-bundle": "dev-master",
+        "oro/user-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-4": { "Oro\\Bundle\\LDAPBundle": "" }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

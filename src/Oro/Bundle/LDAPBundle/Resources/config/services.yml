@@ -1,3 +1,19 @@
-parameters: ~
+parameters:
+    fr3d_ldap.security.authentication.provider.class: Oro\Bundle\LDAPBundle\Security\LdapProvider
+    oro_ldap.extension.user_type.class:               Oro\Bundle\LDAPBundle\Form\Extension\UserTypeExtension
 
-services: ~
+services:
+    fr3d_ldap.security.authentication.provider:
+        class: %fr3d_ldap.security.authentication.provider.class%
+        arguments:
+            - @security.user_checker
+            - ""
+            - ""
+            - @fr3d_ldap.ldap_manager
+            - @oro_config.global
+            - %security.authentication.hide_user_not_found%
+
+    oro_ldap.extension.user_type:
+        class: %oro_ldap.extension.user_type.class%
+        tags:
+            - { name: form.type_extension, alias: oro_user_user }

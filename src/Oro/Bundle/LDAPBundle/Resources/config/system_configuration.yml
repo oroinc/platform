@@ -33,19 +33,20 @@ oro_system_configuration:
             type: text
             options:
                 label: oro.ldap.system_configuration.fields.server_hostname.label
-                required: false
                 resettable: false
+                constraints:
+                    - NotBlank: ~
             priority: 40
         oro_ldap.server_port:
             data_type: integer
             type: integer
             options:
                 label: oro.ldap.system_configuration.fields.server_port.label
-                required: false
                 constraints:
                     - Range:
                         min: 1
                         max: 65535
+                    - NotBlank: ~
                 resettable: false
             priority: 30
         oro_ldap.server_encryption_enabled:
@@ -64,6 +65,15 @@ oro_system_configuration:
                 required: false
                 resettable: false
             priority: 10
+        oro_ldap.server_base_dn:
+            data_type: text
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.server_base_dn.label
+                resettable: false
+                constraints:
+                    - NotBlank: ~
+            priority: 0
         oro_ldap.admin_dn:
             data_type: text
             type: text
@@ -132,6 +142,7 @@ oro_system_configuration:
                                             - oro_ldap.server_hostname
                                             - oro_ldap.server_port
                                             - oro_ldap.server_protocol_version
+                                            - oro_ldap.server_base_dn
                                     ldap_admin_settings:
                                         priority: 30
                                         children:

@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
                 'type'  => 'text',
             ],
             'server_hostname' => [
-                'value' => null,
+                'value' => '127.0.0.1',
                 'type'  => 'text',
             ],
             'server_port' => [
@@ -39,11 +39,15 @@ class Configuration implements ConfigurationInterface
                 'type'  => 'boolean',
             ],
             'server_port' => [
-                'value' => null,
+                'value' => 389,
                 'type'  => 'integer',
             ],
             'server_protocol_version' => [
                 'value' => 3,
+                'type'  => 'text',
+            ],
+            'server_base_dn' => [
+                'value' => 'dc=local',
                 'type'  => 'text',
             ],
             'admin_dn' => [
