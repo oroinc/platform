@@ -16,7 +16,6 @@ use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -311,7 +310,7 @@ class JobExecutor
                 if ($stepExecutions->count() > 1) {
                     /** @var StepExecution $stepExecution */
                     foreach ($stepExecutions->slice(1) as $stepExecution) {
-                        $this->mergeContextCounters(
+                        ContextHelper::mergeContextCounters(
                             $context,
                             $this->contextRegistry->getByStepExecution($stepExecution)
                         );
@@ -402,19 +401,5 @@ class JobExecutor
     public function isSkipClear()
     {
         return $this->skipClear;
-    }
-
-    /**
-     * @param ContextInterface $firstContext
-     * @param ContextInterface $context
-     */
-    protected function mergeContextCounters(ContextInterface $firstContext, ContextInterface $context)
-    {
-        $firstContext->incrementReadCount($context->getReadCount());
-        $firstContext->incrementAddCount($context->getAddCount());
-        $firstContext->incrementUpdateCount($context->getUpdateCount());
-        $firstContext->incrementReplaceCount($context->getReplaceCount());
-        $firstContext->incrementDeleteCount($context->getDeleteCount());
-        $firstContext->incrementErrorEntriesCount($context->getErrorEntriesCount());
     }
 }
