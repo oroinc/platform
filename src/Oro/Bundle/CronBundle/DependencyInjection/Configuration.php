@@ -20,6 +20,9 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('max_concurrent_jobs')
                     ->defaultValue(5)
                 ->end()
+                ->scalarNode('max_runtime')
+                    ->defaultValue(3600)
+                ->end()
                 ->booleanNode('jms_statistics')->defaultTrue()->end()
             ->end();
 

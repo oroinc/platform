@@ -27,7 +27,8 @@ parameters:
     oro_email.email.manager.class:                Oro\Bundle\EmailBundle\Entity\Manager\EmailManager
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
-    oro_email.manager.email_context_manager.class: Oro\Bundle\EmailBundle\Manager\EmailContextManager
+    oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
+
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -62,6 +63,7 @@ parameters:
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
     oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
+    oro_email.listener.datagrid.context.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\ContextGridListener
 
     # Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
@@ -240,7 +242,6 @@ services:
             - %oro_email.cache.available_in_template_key%
             - @oro_email.twig.email_sandbox
             - @translator
-            - @doctrine
         lazy: true
 
     oro_email.twig.email_security_policy:
@@ -463,6 +464,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_email.email.thread.manager
+            - @oro_email.email.thread.provider
 
     oro_email.twig.extension.email:
         class: %oro_email.twig.extension.email.class%
@@ -504,6 +506,7 @@ services:
             - @kernel
             - @oro_security.security_facade.link
             - @oro_attachment.validator.file_config_validator
+            - @oro_attachment.config
 
     oro_email.listener.email_body_add_listener:
         class: %oro_email.listener.email_body_add_listener.class%
@@ -521,5 +524,10 @@ services:
             - @oro_email.email.thread.provider
             - @doctrine.orm.entity_manager
             - @oro_attachment.provider.attachment
-            - @oro_locale.formatter.date_time
+            - @oro_email.email_attachment_transformer
+
+    oro_email.email_attachment_transformer:
+        class: %oro_email.email_attachment_transformer.class%
+        arguments:
+            - @knp_gaufrette.filesystem_map
             - @oro_email.form.factory

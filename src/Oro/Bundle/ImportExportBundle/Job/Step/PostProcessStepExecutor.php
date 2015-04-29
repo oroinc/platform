@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Job\Step;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
@@ -12,6 +13,7 @@ use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class PostProcessStepExecutor extends StepExecutor implements StepExecutionAwareInterface
 {
@@ -94,32 +96,106 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
     /**
      * {@inheritdoc}
      */
-    protected function write($processedItems, StepExecutionWarningHandlerInterface $warningHandler = null)
+    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
     {
-        parent::write($processedItems, $warningHandler);
+        $itemsToWrite = [];
+        $writeCount   = 0;
 
-        $this->runPostProcessingJobs();
+        try {
+            $stopExecution = false;
+            while (!$stopExecution) {
+                try {
+                    $readItem = $this->reader->read();
+                    if (null === $readItem) {
+                        $stopExecution = true;
+                        continue;
+                    }
+
+                } catch (InvalidItemException $e) {
+                    $this->handleStepExecutionWarning($this->reader, $e, $warningHandler);
+
+                    continue;
+                }
+
+                $processedItem = $this->process($readItem, $warningHandler);
+                if (null !== $processedItem) {
+                    $itemsToWrite[] = $processedItem;
+                    $writeCount++;
+                    if (0 === $writeCount % $this->batchSize) {
+                        $this->write($itemsToWrite, $warningHandler);
+                        $itemsToWrite = [];
+                    }
+                }
+
+                if ($this->checkPostProcessingJobsBatch()) {
+                    $this->writeWithoutClear($itemsToWrite, $warningHandler);
+                    $this->runPostProcessingJobs();
+                }
+            }
+
+            if (count($itemsToWrite) > 0) {
+                $this->write($itemsToWrite, $warningHandler);
+            }
+
+            if ($this->checkPostProcessingJobsNotEmpty()) {
+                $this->runPostProcessingJobs();
+            }
+
+            $this->ensureResourcesReleased($warningHandler);
+        } catch (\Exception $error) {
+            $this->ensureResourcesReleased($warningHandler);
+            throw $error;
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * @param array                                $itemsToWrite
+     * @param StepExecutionWarningHandlerInterface $warningHandler
      */
-    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
+    protected function writeWithoutClear(array $itemsToWrite, $warningHandler)
     {
-        parent::execute($warningHandler);
+        if (!$itemsToWrite) {
+            return;
+        }
 
-        $requirePostprocessing = false;
+        $clearSkipped = $this->getJobContext()->get(EntityWriter::SKIP_CLEAR);
+        $this->getJobContext()->put(EntityWriter::SKIP_CLEAR, true);
+        $this->write($itemsToWrite, $warningHandler);
+        $this->getJobContext()->put(EntityWriter::SKIP_CLEAR, $clearSkipped);
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkPostProcessingJobsBatch()
+    {
         foreach ($this->contextSharedKeys as $key) {
-            $sharedData = $this->getJobContext()->get($key);
-            if (!empty($sharedData)) {
-                $requirePostprocessing = true;
-                break;
+            $value = $this->getJobContext()->get($key);
+            if (!$value) {
+                continue;
+            }
+
+            if (0 === (count($value) % $this->batchSize)) {
+                return true;
             }
         }
 
-        if ($requirePostprocessing) {
-            $this->runPostProcessingJobs();
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkPostProcessingJobsNotEmpty()
+    {
+        foreach ($this->contextSharedKeys as $key) {
+            $value = $this->getJobContext()->get($key);
+            if ($value) {
+                return true;
+            }
         }
+
+        return false;
     }
 
     /**
@@ -155,6 +231,9 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
             $configuration[JobExecutor::JOB_CONTEXT_DATA_KEY][$key] = $jobContext->get($key);
         }
 
+        // avoid detached entities after post process jobs, clear will be executed each write after post process jobs
+        $configuration[EntityWriter::SKIP_CLEAR] = true;
+
         return $configuration;
     }
 
@@ -172,9 +251,10 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
             if (!$jobResult->isSuccessful()) {
                 throw new RuntimeException(
                     sprintf(
-                        'Post processing job "%s" failed. Job id "%s"',
-                        $jobData[self::JOB_NAME_KEY],
-                        $jobResult->getJobId()
+                        'Post processing job "%s" failed. Job id "%s". Errors: %s',
+                        $jobResult->getJobCode(),
+                        $jobResult->getJobId(),
+                        implode(PHP_EOL, $jobResult->getFailureExceptions())
                     )
                 );
             }

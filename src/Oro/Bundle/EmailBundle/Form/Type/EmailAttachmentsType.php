@@ -39,7 +39,6 @@ class EmailAttachmentsType extends AbstractType
 
     /**
      * @param FormEvent $event
-     * @SuppressWarnings(PHPMD)
      */
     public function sanitizeAttachments(FormEvent $event)
     {

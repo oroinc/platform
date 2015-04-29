@@ -1,0 +1,18 @@
+layout:
+    actions:
+        - @add:
+            id:        change_history_link
+            parentId:  page_actions
+            blockType: link
+            options:
+                visible: { @acl: oro_dataaudit_history }
+                text: oro.dataaudit.change_history
+                route_name: oro_dataaudit_history
+                route_parameters:
+                    entity: { @encode_class: $context.entity_class }
+                    id: { @value: $data.entity.id }
+                attr:
+                    id: view-activity-btn
+                    class: no-hash
+    conditions:
+        @eq: [ $context.entity_auditable, true ]

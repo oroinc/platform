@@ -29,8 +29,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
         $formFactory->expects($this->once())
             ->method('create')
             ->with($type, null, [])
-            ->will($this->returnValue($formInstance))
-        ;
+            ->will($this->returnValue($formInstance));
 
         $this->assertSame($formInstance, $manager->createForm($type));
     }

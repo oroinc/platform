@@ -7,13 +7,19 @@
             $(function () {
                 'use strict';
                 var $templateSelectorEl = $('#{{ id }}');
+                {% if includeSystemTemplates is defined and not includeSystemTemplates %}
+                    var includeSystemTemplates = false;
+                {% else %}
+                    var includeSystemTemplates = true;
+                {% endif %}
                 new View({
                     el: $templateSelectorEl.closest('form').find('[name$="[{{ depends_on_parent_field }}]"]'),
                     target: $templateSelectorEl,
                     collection: new Collection(
                         '{{ data_route }}',
                         {{ data_route_parameter|json_encode|raw }},
-                        {{ includeSystem is defined and includeSystem ? 'true' : 'false' }}
+                        {{ includeNonEntity is defined and includeNonEntity ? 'true' : 'false' }},
+                        includeSystemTemplates
                     )
                 });
             });
@@ -25,6 +31,33 @@
         <% }); %>
     </script>
 
+    {{ form_row(form) }}
+{% endblock %}
+
+{% block oro_email_link_to_scope_row %}
+    <script type="text/javascript">
+        require(['jquery'],
+            function($) {
+                function initLinkToScopeEl(mainEl, el) {
+                    if (parseInt($(mainEl).val())) {
+                        $(el).attr('disabled', false);
+                        $(el).parent('div').removeClass('disabled');
+                    } else {
+                        $(el).attr('disabled', true);
+                        $(el).parent('div').addClass('disabled');
+                    }
+                }
+                $(function () {
+                    var selectorEl = '{{ form.vars.id }}';
+                    var emailLinkToScopeEl = $('#' + selectorEl);
+                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form').find('#oro_entity_config_type_attachment_enabled');
+                    initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
+                    $(enableAttachmentEl).on('change', function() {
+                        initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
+                    });
+                });
+            })
+    </script>
     {{ form_row(form) }}
 {% endblock %}
 
@@ -74,7 +107,7 @@
     <script type="text/template" id="email-attachment-list-row-view">
         <div class="attachment-list-row <% if (!visible) { %>hide<% } %>">
             <input type="checkbox" class="checkbox" <% if (checked) { %>checked<% } %>>
-            <span><%= fileName %> (<%= info %>)</span>
+            <span><%= fileName %> (<%= fileSize %>, <%= modified %>)</span>
         </div>
     </script>
 
@@ -94,7 +127,8 @@
             'id': attachment.id,
             'type': attachment.type,
             'fileName': attachment.fileName,
-            'info': attachment.info
+            'fileSize': attachment.fileSize,
+            'modified': attachment.modified
         } %}
         {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
     {% endfor %}
@@ -145,6 +179,18 @@
             {% endspaceless %}
         </div>
     </div>
+    <script type="text/javascript">
+        require(['jquery'],
+                function($) {
+                    $('.emailtemplate-translatation.oro-tabs.tabbable ul.nav.nav-tabs li a').on('show', function(e) {
+                        var target = e.target || window.event.target;
+                        var dataRelated = $(target).attr('data-related');
+                        $($(target).closest('form').find(':input.translation')).each(function(key, el) {
+                            $(el).val(dataRelated);
+                        });
+                    });
+                })
+    </script>
 {% endblock %}
 
 {#
@@ -158,7 +204,7 @@
     {% set locale = form.vars.name %}
 
     <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
-        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab">
+        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
             {{- localeLabels[locale]|default('N/A')|trans|capitalize -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
         </a>
     </li>

@@ -10,7 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
  * @method Users openUsers() openUsers(string)
  * @method User openUser() openUser(string)
- * @method User assertTitle() assertTitle($title, $message = '')
  */
 class User extends AbstractPageEntity
 {

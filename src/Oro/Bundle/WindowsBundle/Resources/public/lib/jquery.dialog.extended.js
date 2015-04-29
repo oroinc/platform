@@ -507,7 +507,18 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
         },
 
         _restoreFromMaximized: function () {
-            var original = this._loadSnapshot();
+            var original = this._loadSnapshot(),
+                widget = this.widget().get(0),
+                widgetCSS = {
+                    'min-height': widget.style.minHeight,
+                    'border': widget.style.border,
+                    'position': 'fixed',
+                    'left': this._getVisibleLeft(original.position.left, original.size.width),
+                    'top': this._getVisibleTop(original.position.top, original.size.height)
+                };
+            // reset css props of widget to correct calculation non-content height in jquery-ui code
+            this.widget().css({'min-height': '0', 'border': '0 none'});
+
             // restore dialog
             this._setOptions({
                 resizable: original.config.resizable,
@@ -517,6 +528,9 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
                 maxHeight: original.size.maxHeight,
                 position: [ original.position.left, original.position.top ]
             });
+
+            // adjust widget position
+            this.widget().css(widgetCSS);
 
             return this;
         },

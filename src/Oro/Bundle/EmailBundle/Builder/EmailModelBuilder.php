@@ -183,6 +183,7 @@ class EmailModelBuilder
     {
         $emailModel = $this->factory->getEmail();
         $emailModel->setMailType(EmailModel::MAIL_TYPE_FORWARD);
+        $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
@@ -255,7 +256,9 @@ class EmailModelBuilder
      */
     protected function applyRecipients(EmailModel $emailModel)
     {
-        $emailModel->setTo(array_merge($emailModel->getTo(), $this->getRecipients($emailModel, EmailRecipient::TO)));
+        $emailModel->setTo(
+            array_merge($emailModel->getTo(), $this->getRecipients($emailModel, EmailRecipient::TO, true))
+        );
         $emailModel->setCc(array_merge($emailModel->getCc(), $this->getRecipients($emailModel, EmailRecipient::CC)));
         $emailModel->setBcc(array_merge($emailModel->getBcc(), $this->getRecipients($emailModel, EmailRecipient::BCC)));
     }
@@ -263,10 +266,11 @@ class EmailModelBuilder
     /**
      * @param EmailModel $emailModel
      * @param string $type
+     * @param bool $excludeCurrentUser
      *
      * @return array
      */
-    protected function getRecipients(EmailModel $emailModel, $type)
+    protected function getRecipients(EmailModel $emailModel, $type, $excludeCurrentUser = false)
     {
         $addresses = [];
         if ($this->request->query->has($type)) {
@@ -275,10 +279,13 @@ class EmailModelBuilder
                 $this->helper->preciseFullEmailAddress(
                     $address,
                     $emailModel->getEntityClass(),
-                    $emailModel->getEntityId()
+                    $emailModel->getEntityId(),
+                    $excludeCurrentUser
                 );
             }
-            $addresses = [$address];
+            if ($address) {
+                $addresses = [$address];
+            }
         }
         return $addresses;
     }
@@ -354,24 +361,21 @@ class EmailModelBuilder
         if ($emailModel->getParentEmailId()) {
             $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
                 ->find($emailModel->getParentEmailId());
-            $attachments = array_merge(
-                $attachments,
-                $this->emailAttachmentProvider->getThreadAttachments($parentEmail)
-            );
+            $threadAttachments = $this->emailAttachmentProvider->getThreadAttachments($parentEmail);
+            $threadAttachments = $this->filterAttachmentsByName($threadAttachments);
+            $attachments = array_merge($attachments, $threadAttachments);
         }
         if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
             $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
                 ->find($emailModel->getEntityId());
 
             if ($scopeEntity) {
-                $attachments = array_merge(
-                    $attachments,
-                    $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity)
-                );
+                $scopeEntityAttachments = $this->emailAttachmentProvider->getScopeEntityAttachments($scopeEntity);
+                $scopeEntityAttachments = $this->filterAttachmentsByName($scopeEntityAttachments);
+                $attachments = array_merge($attachments, $scopeEntityAttachments);
             }
         }
 
-        $attachments = $this->filterAttachmentsByName($attachments);
         $emailModel->setAttachmentsAvailable($attachments);
     }
 

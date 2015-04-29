@@ -8,19 +8,25 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 
 class MultipleEntityType extends AbstractType
 {
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var SecurityFacade */
     protected $securityFacade;
 
     /**
+     * @param DoctrineHelper $doctrineHelper
      * @param SecurityFacade $securityFacade
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(DoctrineHelper $doctrineHelper, SecurityFacade $securityFacade)
     {
+        $this->doctrineHelper = $doctrineHelper;
         $this->securityFacade = $securityFacade;
     }
 
@@ -48,7 +54,7 @@ class MultipleEntityType extends AbstractType
             ]
         );
 
-        $builder->addEventSubscriber(new MultipleEntitySubscriber());
+        $builder->addEventSubscriber(new MultipleEntitySubscriber($this->doctrineHelper));
     }
 
     /**

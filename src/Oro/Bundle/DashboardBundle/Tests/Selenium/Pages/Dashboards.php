@@ -72,7 +72,7 @@ class Dashboards extends AbstractPageFilteredGrid
         $result = true;
         foreach ($widgets as $widget) {
             $result = $result && $this->isElementPresent(
-                "//span[@class = 'widget-title' and normalize-space(text()) = '{$widget}']"
+                "//div[contains(@class, 'widget-title') and normalize-space(text()) = '{$widget}']"
             );
         }
 

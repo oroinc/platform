@@ -1,6 +1,9 @@
 UPGRADE FROM 1.6 to 1.7
 =======================
 
+####OroEmbeddedFormBundle:
+- The `Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface` interface and `Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager::getCustomFormLayoutByFormType` method are marked deprecated in favor of using new layout update mechanism introduced by the **OroLayoutBundle**.
+
 ####OroIntegrationBundle:
 - `Oro\Bundle\IntegrationBundle\Entity\Channel::getStatusesForConnector` method marked as deprecated in favor of new `Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector` method because of performance impact.
 - `Oro\Bundle\IntegrationBundle\Command\AbstractSyncCronCommand::SYNC_PROCESSOR` constant removed
@@ -19,3 +22,5 @@ UPGRADE FROM 1.6 to 1.7
 
 ####OroEntityExtendBundle:
 - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension` class
+
+- Integration import processors may be tagged with `oro_integration.sync_processor` DIC tag with `integration` name. During integration import appropriate processor will be used if registered.

@@ -24,20 +24,26 @@ define([
 
             this.template = _.template($('#email-context-activity-list').html());
             this.$container = options.$container;
+            this.$containerForItems = $(options.$container.context).find('.email-context-activity-items');
             this.collection = new EmailContextActivityCollection('oro_api_delete_email_association');
             this.initEvents();
 
             if (this.options.items) {
+                this.collection.reset();
                 for (var i in this.options.items) {
-                    this.collection.add(this.options.items[i]);
+                    if (this.options.items.hasOwnProperty(i)) {
+                        this.collection.add(this.options.items[i]);
+                    }
                 }
             }
 
             /**
             * on adding activity item listen to "widget:doRefresh:email-context-activity-list-widget"
             */
-            mediator.on('widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this );
+            this.listenTo(mediator, 'widget:doRefresh:email-context-activity-list-widget', this.doRefresh, this);
+            this.listenTo(mediator, 'widget:doRefresh:email-thread-context', this.doRefresh, this);
             EmailContextActivityView.__super__.initialize.apply(this, arguments);
+            this.render();
         },
 
         add: function(model) {
@@ -53,12 +59,13 @@ define([
                 success:function(r) {
                     self.collection.reset();
                     self.collection.add(r);
+                    self.render();
                 }
             });
         },
 
         render: function() {
-            if (this.collection.models.length == 0) {
+            if (this.collection.length == 0) {
                 this.$el.hide();
             } else {
                 this.$el.show();
@@ -68,9 +75,8 @@ define([
         initEvents: function() {
             var self = this;
 
-
-            this.collection.on('reset', function(model) {
-                $(self.$container.context).html('');
+            this.collection.on('reset', function() {
+                self.$containerForItems.html('');
             });
 
             this.collection.on('add', function(model) {
@@ -80,22 +86,25 @@ define([
                 });
 
                 var $view = $(view);
-                $(self.$container.context).append($view);
+                self.$containerForItems.append($view);
 
                 $view.find('i.icon-remove').click(function() {
                     model.destroy({
                         success: function(model, response) {
-                            var statusNotFound = 'NOT_FOUND';
-                            if (response.status != statusNotFound) {
-                                var $view = $(self.$container.context).find('[data-cid="' + model.cid + '"]');
+                            if (response.status != 'success') {
+                                var $view = self.$containerForItems.find('[data-cid="' + model.cid + '"]');
                                 $view.remove();
                                 self.render();
                             }
-                            messenger.notificationFlashMessage(response.status != statusNotFound ? 'success': 'error', __(response.message));
+                            messenger.notificationFlashMessage(response.status, response.message);
                             mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                         },
                         error: function(model, response) {
-                            messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
+                            if (response.status == 'error') {
+                                messenger.notificationFlashMessage('error', response.message);
+                            } else {
+                                messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
+                            }
                         }
                     });
                 });

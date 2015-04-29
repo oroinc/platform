@@ -18,6 +18,7 @@
                     mediator.trigger('widget_success:' + widget.getAlias());
                     mediator.trigger('widget_success:' + widget.getWid());
                     mediator.trigger('datagrid:doRefresh:attachment-grid');
+                    mediator.trigger('widget:doRefresh:email-thread');
                     widget.remove(true);
                 });
             });
@@ -31,7 +32,7 @@
             </div>
         {% endif %}
         <div class="form-container">
-            <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post" enctype="multipart/form-data">
+            <form id="{{ form.vars.name }}" method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
                 {%
                     set emailEditorOptions = {
                         entityId: entity.entityId,
@@ -52,7 +53,7 @@
                     {{ form_row(form.cc) }}
                     {{ form_row(form.bcc) }}
                     {{ form_row(form.subject) }}
-                    {{ form_row(form.template, {'includeSystem': true}) }}
+                    {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': false}) }}
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
