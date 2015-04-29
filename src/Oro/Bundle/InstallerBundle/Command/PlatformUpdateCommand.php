@@ -55,10 +55,19 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 $this->getApplication(),
                 $this->getContainer()->get('oro_cache.oro_data_cache_manager')
             );
-            $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
+
+            $timeout = $input->getOption('timeout');
+            $commandExecutor->setDefaultTimeout($timeout);
 
             $commandExecutor
-                ->runCommand('oro:migration:load', array('--process-isolation' => true, '--force' => true))
+                ->runCommand(
+                    'oro:migration:load',
+                    array(
+                        '--process-isolation' => true,
+                        '--force'             => true,
+                        '--timeout'           => $timeout
+                    )
+                )
                 ->runCommand('oro:workflow:definitions:load', array('--process-isolation' => true))
                 ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
                 ->runCommand('oro:migration:data:load', array('--process-isolation' => true))

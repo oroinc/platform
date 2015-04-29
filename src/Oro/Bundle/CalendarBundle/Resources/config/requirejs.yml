@@ -1,4 +1,9 @@
 config:
+    shim:
+        'jquery.fullcalendar':
+            deps:
+                - 'jquery'
+                - 'moment'
     paths:
         'jquery.fullcalendar': 'bundles/orocalendar/lib/fullcalendar/fullcalendar.js'
         'orocalendar/js/calendar-view': 'bundles/orocalendar/js/calendar-view.js'
@@ -13,5 +18,9 @@ config:
         'orocalendar/js/app/views/change-status-view': 'bundles/orocalendar/js/app/views/change-status-view.js'
         'orocalendar/js/app/views/guest-notifier-view': 'bundles/orocalendar/js/app/views/guest-notifier-view.js'
         'orocalendar/js/app/views/calendar-event-form-view': 'bundles/orocalendar/js/app/views/calendar-event-form-view.js'
+        'orocalendar/js/app/components/calendar-component': 'bundles/orocalendar/js/app/components/calendar-component.js'
+        'orocalendar/js/app/components/dashboard-calendar-component': 'bundles/orocalendar/js/app/components/dashboard-calendar-component.js'
+        'orocalendar/js/app/modules/calendar-module': 'bundles/orocalendar/js/app/modules/calendar-module.js'
+        'orocalendar/js/validator/dateearlierthan': 'bundles/orocalendar/js/validator/dateearlierthan.js'
     appmodules:
         - orocalendar/js/app/modules/calendar-module

@@ -63,6 +63,7 @@ parameters:
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
     oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
+    oro_email.listener.datagrid.context.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\ContextGridListener
 
     # Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail

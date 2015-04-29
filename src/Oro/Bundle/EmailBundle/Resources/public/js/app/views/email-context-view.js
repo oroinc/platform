@@ -47,11 +47,13 @@ define(function (require) {
                 if (model.attributes.first) {
                     firstItem.html(model.attributes.label);
                     $('#context-current-target-class').data('value', model.attributes.className);
+                    $('#context-current-target-grid').data('value', model.attributes.gridName);
                 }
 
                 dropdown.append($view);
                 dropdown.find('.context-item:last').click(function() {
                     $('#context-current-target-class').data('value', model.attributes.className);
+                    $('#context-current-target-grid').data('value', model.attributes.gridName);
                     dropdown.find('> .context-item').each(function() {$(this).removeClass('active')})
                     var item = $(this);
                     firstItem.html(item.html());

@@ -27,7 +27,7 @@ parameters:
     oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
 
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
-    oro_entity.entity.manager.class:                Oro\Bundle\EntityBundle\Manager\EntityManager
+    oro_entity.entity_context_provider.class:                Oro\Bundle\EntityBundle\Provider\EntityContextProvider
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
@@ -201,8 +201,9 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: change_type }
 
-    oro_entity.entity.manager:
-        class: %oro_entity.entity.manager.class%
+    oro_entity.entity_context_provider:
+        class: %oro_entity.entity_context_provider.class%
         arguments:
-            - @service_container
             - @oro_entity.routing_helper
+            - @oro_entity.entity_provider
+            - @oro_entity_config.provider.entity
