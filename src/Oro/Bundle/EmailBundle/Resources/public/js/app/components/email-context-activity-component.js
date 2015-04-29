@@ -30,7 +30,8 @@ define(function (require) {
                 entityId:this.options.entityId,
                 el: this.options._sourceElement,
                 $container: $container,
-                inputName: this.options.inputName
+                inputName: this.options.inputName,
+                target: this.options.target
             });
         }
     });
