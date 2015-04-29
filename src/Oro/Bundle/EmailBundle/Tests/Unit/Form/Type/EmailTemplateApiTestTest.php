@@ -61,12 +61,12 @@ class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->with('oro_locale.languages')
             ->will($this->returnValue(['en', 'fr_FR']));
 
-        $this->localeSettings->expects($this->once())
+        $this->localeSettings->expects($this->exactly(3))
             ->method('getLanguage')
             ->will($this->returnValue('ru_UA'));
 

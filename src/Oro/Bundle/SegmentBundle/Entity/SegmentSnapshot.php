@@ -7,15 +7,23 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Snapshot of static segment
  *
- * @ORM\Table(name="oro_segment_snapshot",  uniqueConstraints={
- *      @ORM\UniqueConstraint(columns={"segment_id", "entity_id"})
- * })
+ * @ORM\Table(
+ *      name="oro_segment_snapshot",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(columns={"segment_id", "entity_id"})
+ *      },
+ *      indexes={
+ *          @ORM\Index(name="sgmnt_snpsht_int_entity_idx", columns={"integer_entity_id"}),
+ *          @ORM\Index(name="sgmnt_snpsht_str_entity_idx", columns={"entity_id"})
+ *      }
+ * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class SegmentSnapshot
 {
-    const ENTITY_REF_FIELD = 'entityId';
+    const ENTITY_REF_FIELD         = 'entityId';
+    const ENTITY_REF_INTEGER_FIELD = 'integerEntityId';
 
     /**
      * @var int
@@ -29,9 +37,16 @@ class SegmentSnapshot
     /**
      * @var string
      *
-     * @ORM\Column(name="entity_id", type="string", nullable=false)
+     * @ORM\Column(name="entity_id", type="string", nullable=true)
      */
     protected $entityId;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="integer_entity_id", type="integer", nullable=true)
+     */
+    protected $integerEntityId;
 
     /**
      * @var Segment
@@ -114,5 +129,21 @@ class SegmentSnapshot
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return int
+     */
+    public function getIntegerEntityId()
+    {
+        return $this->integerEntityId;
+    }
+
+    /**
+     * @param int $integerEntityId
+     */
+    public function setIntegerEntityId($integerEntityId)
+    {
+        $this->integerEntityId = $integerEntityId;
     }
 }

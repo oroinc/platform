@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
-use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Driver\Statement;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Parameter;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 class StaticSegmentManager
 {
@@ -19,24 +24,29 @@ class StaticSegmentManager
     /** @var DynamicSegmentQueryBuilder */
     protected $dynamicSegmentQB;
 
-    /** @var array */
-    private $toWrite;
-
-    /** @var int */
-    private $batchSize = 100;
+    /**
+     * @var OwnershipMetadataProvider
+     */
+    protected $ownershipMetadataProvider;
 
     /**
      * @param EntityManager              $em
      * @param DynamicSegmentQueryBuilder $dynamicSegmentQB
+     * @param OwnershipMetadataProvider  $ownershipMetadataProvider
      */
-    public function __construct(EntityManager $em, DynamicSegmentQueryBuilder $dynamicSegmentQB)
-    {
-        $this->em               = $em;
-        $this->dynamicSegmentQB = $dynamicSegmentQB;
+    public function __construct(
+        EntityManager $em,
+        DynamicSegmentQueryBuilder $dynamicSegmentQB,
+        OwnershipMetadataProvider $ownershipMetadataProvider
+    ) {
+        $this->em                        = $em;
+        $this->dynamicSegmentQB          = $dynamicSegmentQB;
+        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
     /**
      * Runs static repository restriction query and stores it state into snapshot entity
+     * Doctrine does not supports insert in DQL. To increase the speed of query here uses plain sql query.
      *
      * @param Segment $segment
      *
@@ -48,36 +58,44 @@ class StaticSegmentManager
         if ($segment->getType()->getName() !== SegmentType::TYPE_STATIC) {
             throw new \LogicException('Only static segments could have snapshots.');
         }
+        $entityMetadata = $this->em->getClassMetadata($segment->getEntity());
+
+        if (count($entityMetadata->getIdentifierFieldNames()) > 1) {
+            throw new \LogicException('Only entities with single identifier supports.');
+        }
 
         $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment);
-
-        $qb        = $this->dynamicSegmentQB->build($segment);
-        $iterator  = new BufferedQueryResultIterator($qb);
-
-        $writeCount = 0;
         try {
             $this->em->beginTransaction();
-            $this->em->clear(ClassUtils::getClass($segment));
-            foreach ($iterator as $data) {
-                // only not composite identifiers are supported
-                $id = reset($data);
+            $date       = new \DateTime('now', new \DateTimeZone('UTC'));
+            $dateString = '\'' . $date->format('Y-m-d H:i:s') . '\'';
+            if ($this->em->getConnection()->getDriver()->getName() === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
+                $dateString = sprintf('TIMESTAMP %s', $dateString);
+            }
+            $insertString = sprintf(
+                ', %d, %s ',
+                $segment->getId(),
+                $dateString
+            );
 
-                $writeCount++;
-                /** @var Segment $reference */
-                $reference = $this->em->getReference(ClassUtils::getClass($segment), $segment->getId());
-                $snapshot = new SegmentSnapshot($reference);
-                $snapshot->setEntityId($id);
-                $this->toWrite[] = $snapshot;
-                if (0 === $writeCount % $this->batchSize) {
-                    $this->write($this->toWrite);
+            $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
+            $this->applyOrganizationLimit($segment, $qb);
+            $query = $qb->getQuery();
 
-                    $this->toWrite = [];
-                }
+            $segmentQuery = $query->getSQL();
+            $segmentQuery = substr_replace($segmentQuery, $insertString, stripos($segmentQuery, 'from'), 0);
+
+            $fieldToSelect = 'entity_id';
+            if ($entityMetadata->getTypeOfField($entityMetadata->getSingleIdentifierFieldName()) === 'integer') {
+                $fieldToSelect = 'integer_entity_id';
             }
 
-            if (count($this->toWrite) > 0) {
-                $this->write($this->toWrite);
-            }
+            $dbQuery = 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) (%s)';
+            $dbQuery = sprintf($dbQuery, $segmentQuery);
+
+            $statement = $this->em->getConnection()->prepare($dbQuery);
+            $this->bindParameters($statement, $query->getParameters());
+            $statement->execute();
 
             $this->em->commit();
         } catch (\Exception $exception) {
@@ -93,16 +111,55 @@ class StaticSegmentManager
     }
 
     /**
-     * Do persist into EntityManager
+     * Limit segment data by segment's organization
      *
-     * @param array $items
+     * @param Segment      $segment
+     * @param QueryBuilder $qb
      */
-    private function write(array $items)
+    protected function applyOrganizationLimit(Segment $segment, QueryBuilder $qb)
     {
-        foreach ($items as $item) {
-            $this->em->persist($item);
+        $organizationField = $this->ownershipMetadataProvider
+            ->getMetadata($segment->getEntity())
+            ->getOrganizationFieldName();
+        if ($organizationField) {
+            $qb->andWhere(
+                sprintf(
+                    '%s.%s = %s',
+                    $qb->getRootAliases()[0],
+                    $organizationField,
+                    $segment->getOrganization()->getId()
+                )
+            );
         }
-        $this->em->flush();
-        $this->em->clear();
+    }
+
+    /**
+     * Bind parameters to statement
+     *
+     * @param Statement       $stmt
+     * @param ArrayCollection $parameters
+     */
+    public function bindParameters(Statement $stmt, ArrayCollection $parameters)
+    {
+        $values = [];
+        $types  = [];
+        foreach ($parameters as $parameter) {
+            /* @var $parameter Parameter */
+            $values[] = $parameter->getValue();
+            $types[]  = $parameter->getType();
+        }
+        $typeOffset = array_key_exists(0, $types) ? -1 : 0;
+        $bindIndex  = 1;
+
+        foreach ($values as $value) {
+            $typeIndex = $bindIndex + $typeOffset;
+            if (isset($types[$typeIndex])) {
+                $type = $types[$typeIndex];
+                $stmt->bindValue($bindIndex, $value, $type);
+            } else {
+                $stmt->bindValue($bindIndex, $value);
+            }
+            ++$bindIndex;
+        }
     }
 }

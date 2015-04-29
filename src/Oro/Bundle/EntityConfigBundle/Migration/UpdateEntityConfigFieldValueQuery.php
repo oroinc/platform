@@ -37,19 +37,26 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
     protected $value;
 
     /**
+     * @var null|string
+     */
+    protected $replaceValue;
+
+    /**
      * @param string $entityName
      * @param string $fieldName
      * @param string $scope
      * @param string $code
      * @param string $value
+     * @param string $replaceValue if passed, updating will not happen if existing value !== replaceValue
      */
-    public function __construct($entityName, $fieldName, $scope, $code, $value)
+    public function __construct($entityName, $fieldName, $scope, $code, $value, $replaceValue = null)
     {
-        $this->entityName = $entityName;
-        $this->fieldName = $fieldName;
-        $this->scope = $scope;
-        $this->code = $code;
-        $this->value = $value;
+        $this->entityName   = $entityName;
+        $this->fieldName    = $fieldName;
+        $this->scope        = $scope;
+        $this->code         = $code;
+        $this->value        = $value;
+        $this->replaceValue = $replaceValue;
     }
 
     /**
@@ -83,35 +90,48 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param bool $dryRun
+     * @param bool            $dryRun
      */
     protected function updateFieldConfig(LoggerInterface $logger, $dryRun = false)
     {
-        $sql = 'SELECT f.id, f.data
+        $sql        = 'SELECT f.id, f.data
             FROM oro_entity_config_field as f
             INNER JOIN oro_entity_config as e ON f.entity_id = e.id
             WHERE e.class_name = ?
             AND field_name = ?
             LIMIT 1';
         $parameters = [$this->entityName, $this->fieldName];
-        $row = $this->connection->fetchAssoc($sql, $parameters);
+        $row        = $this->connection->fetchAssoc($sql, $parameters);
 
         if ($row) {
             $data = $row['data'];
-            $id = $row['id'];
+            $id   = $row['id'];
             $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
-            $data[$this->scope][$this->code] = $this->value;
-            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
 
-            // update field itself
-            $sql = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
-            $parameters = [$data, $id];
-            $this->logQuery($logger, $sql, $parameters);
+            if ($this->isDoUpdate($data)) {
+                $data[$this->scope][$this->code] = $this->value;
+                $data                            = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+                // update field itself
+                $sql        = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
+                $parameters = [$data, $id];
+                $this->logQuery($logger, $sql, $parameters);
 
-            if (!$dryRun) {
-                $statement = $this->connection->prepare($sql);
-                $statement->execute($parameters);
+                if (!$dryRun) {
+                    $statement = $this->connection->prepare($sql);
+                    $statement->execute($parameters);
+                }
             }
         }
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    protected function isDoUpdate(array $data)
+    {
+        return !isset($data[$this->scope][$this->code])
+        || $this->replaceValue === null
+        || $this->replaceValue === $data[$this->scope][$this->code];
     }
 }
