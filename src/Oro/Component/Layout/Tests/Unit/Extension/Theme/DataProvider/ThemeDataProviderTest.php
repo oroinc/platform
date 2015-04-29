@@ -24,7 +24,6 @@ class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->context      = new LayoutContext();
         $this->dataProvider = new ThemeDataProvider($this->themeManager);
-        $this->dataProvider->setContext($this->context);
     }
 
     /**
@@ -46,6 +45,6 @@ class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
             ->with($themeName)
             ->willReturn($theme);
 
-        $this->assertSame($theme, $this->dataProvider->getData());
+        $this->assertSame($theme, $this->dataProvider->getData($this->context));
     }
 }
