@@ -190,21 +190,11 @@ class ActivityListManager
             $editorId   = $entity->getEditor()->getId();
         }
 
-        $isHead = false;
-        if ($this->isGroupingApplicable($entityProvider)) {
-            $isHead = $entity->isHead();
-            $entityRelationActivity = $this->doctrineHelper->getEntity(
-                $entity->getRelatedActivityClass(),
-                $entity->getRelatedActivityId()
-            );
-            $groupRelationEntities = $entityProvider->getGroupedEntities($entityRelationActivity);
-        } else {
-            $groupRelationEntities = [$entity];
-        }
-
+        $isHead = $this->getHeadStatus($entity, $entityProvider);
+        $relationEntities = $this->getRelationEntities($entity, $entityProvider);
         $numberOfComments = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
-            $groupRelationEntities
+            $relationEntities
         );
 
         $data = $entityProvider->getData($entity);
@@ -304,5 +294,44 @@ class ActivityListManager
     protected function isGroupingApplicable($entityProvider)
     {
         return $entityProvider instanceof ActivityListGroupProviderInterface;
+    }
+
+    /**
+     * @param ActivityList $entity
+     * @param $entityProvider
+     *
+     * @return bool
+     */
+    protected function getHeadStatus(ActivityList $entity, $entityProvider)
+    {
+        $isHead = false;
+        if ($this->isGroupingApplicable($entityProvider)) {
+            $isHead = $entity->isHead();
+        }
+
+        return $isHead;
+    }
+
+    /**
+     * @param ActivityList $entity
+     * @param $entityProvider
+     *
+     * @return array
+     */
+    protected function getRelationEntities(ActivityList $entity, $entityProvider)
+    {
+        $relationEntities = [$entity];
+        if ($this->isGroupingApplicable($entityProvider)) {
+            $entityRelationActivity = $this->doctrineHelper->getEntity(
+                $entity->getRelatedActivityClass(),
+                $entity->getRelatedActivityId()
+            );
+            $relationEntities = $entityProvider->getGroupedEntities($entityRelationActivity);
+            if (count($relationEntities) === 0) {
+                $relationEntities = [$entity];
+            }
+        }
+
+        return $relationEntities;
     }
 }
