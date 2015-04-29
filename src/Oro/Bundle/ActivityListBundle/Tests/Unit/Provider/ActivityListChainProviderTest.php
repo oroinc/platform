@@ -90,6 +90,13 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->provider->getSubject($testEntity));
     }
 
+    public function testGetDescription()
+    {
+        $testEntity          = new \stdClass();
+        $testEntity->description = 'test';
+        $this->assertEquals('test', $this->provider->getDescription($testEntity));
+    }
+
     public function testGetEmptySubject()
     {
         $testEntity = new TestTarget();
@@ -170,6 +177,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
         $testEntity = new \stdClass();
         $testEntity->subject = 'testSubject';
+        $testEntity->description = 'testDescription';
 
         $this->testActivityProvider->setTargets([new \stdClass()]);
         $this->doctrineHelper->expects($this->any())

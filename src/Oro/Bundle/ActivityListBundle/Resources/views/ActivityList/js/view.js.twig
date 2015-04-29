@@ -27,6 +27,9 @@
             <div class="message-item message">
                 {% block activityShortMessage %}
                     <%= subject %>
+                    <% if (description) { %>
+                    - <%= description %>
+                    <% } %>                    
                 {% endblock %}
             </div>
             <div class="created-at">
