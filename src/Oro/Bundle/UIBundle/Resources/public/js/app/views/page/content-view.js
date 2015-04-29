@@ -1,8 +1,9 @@
 /*global define*/
 define([
     'oroui/js/mediator',
+    'oroui/js/tools',
     './../base/page-region-view'
-], function (mediator, PageRegionView) {
+], function (mediator, tools, PageRegionView) {
     'use strict';
 
     var PageContentView;
@@ -36,7 +37,7 @@ define([
         onPageAfterChange: function () {
             // should not be applied before layouting (see init-layout.js)
             // that will give issues on extra small screens
-            _.defer(_.bind(this.focusFirstInput, this));
+            _.defer(_.bind(this.initFocus, this));
 
             // force to redraw page header to avoid wrong width
             this.$(".page-title:first").hide().show(0);
@@ -45,8 +46,45 @@ define([
         /**
          * Sets focus on first form field
          */
-        focusFirstInput: function () {
-            this.$('form:first').focusFirstInput();
+        initFocus: function () {
+            var view = this,
+                activeElement = document.activeElement;
+
+            function focusScrollElement() {
+                // timeout for fix Mozilla DOM updating latency
+                setTimeout(view._focusScrollElement, 200);
+            }
+
+            view.$('form:first').focusFirstInput();
+
+            if(!tools.isMobile() && activeElement === document.activeElement){
+                if(document.hasOwnProperty('page-rendered')) {
+                    focusScrollElement();
+                } else {
+                    mediator.on('page-rendered', focusScrollElement);
+                }
+            }
+
+        },
+
+        _focusScrollElement: function() {
+            var scrollable = [
+                '.scrollable-container',
+                '.other-scroll',
+                '.layout-content .scrollable-container',
+                '.scrollspy'
+            ];
+
+            $.each(scrollable, function () {
+
+                var $el = $(this).first(),
+                    overflow = $el.css('overflow-y');
+
+                if ($el.length > 0 && /auto|scroll/.test(overflow) && $el[0].scrollHeight > $el[0].clientHeight) {
+                    $el.attr('tabindex', 0).css('outline', '0 none').focus();
+                    return false;
+                }
+            });
         }
     });
 
