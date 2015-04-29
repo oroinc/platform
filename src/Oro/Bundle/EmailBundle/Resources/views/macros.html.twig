@@ -512,7 +512,7 @@
     Parameters:
         email - email body entity Oro\Bundle\EmailBundle\Entity\Email
 #}
-{% macro email_contexts(entity) %}
+{% macro email_contexts(entity, target) %}
     <script type="text/template" id="email-context-activity-list">
         <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
                 <span data-id="<%= entity.get('targetId') %>">
@@ -533,6 +533,8 @@
     </script>
 
     {% set itemsArray = [] %}
+    {% set targetClassNameEncoded = oro_class_name(target, true) %}
+
     {% for item in entity.getActivityTargetEntities() %}
         {% set itemClassName = oro_class_name(item) %}
         {% set itemClassNameEncoded = oro_class_name(item, true) %}
@@ -550,7 +552,11 @@
     {% endfor %}
     {% set options = {
         items: itemsArray,
-        entityId: entity.id
+        entityId: entity.id,
+        target: {
+            'id' : target.id,
+            'className': targetClassNameEncoded
+        },
     } %}
 
     <div class="email-context-activity"

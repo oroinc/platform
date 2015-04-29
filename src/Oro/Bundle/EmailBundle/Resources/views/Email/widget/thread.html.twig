@@ -2,7 +2,7 @@
 
 {% if renderContexts is defined and renderContexts %}
 <div class="email-context-activity-list">
-    {{ EA.email_contexts(thread[0]) }}
+    {{ EA.email_contexts(thread[0], target) }}
 </div>
 {% endif %}
 

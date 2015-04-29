@@ -98,6 +98,12 @@ define([
                             }
                             messenger.notificationFlashMessage(response.status, response.message);
                             mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
+
+                            if (model.get('targetClassName') == self.options.target.className &&
+                                model.get('targetId') == self.options.target.id) {
+                                mediator.trigger('widget_success:activity_list:item:update');
+                                //mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
+                            }
                         },
                         error: function(model, response) {
                             if (response.status == 'error') {
