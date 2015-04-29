@@ -51,10 +51,12 @@ define(['jquery', 'jquery-ui'], function ($) {
             offset = {left: pos[0], top: pos[1]};
             offset = $.datepicker._checkOffset(inst, offset, isFixed);
             inst.dpDiv.css({left: offset.left + "px", top: offset.top + "px"});
+            $(input).toggleClass(dialogIsBelowClassName, offset.top - $(input).offset().top > 0);
         }
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
-            _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
+            _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker,
+            dialogIsBelowClassName = 'ui-datepicker-dialog-is-below';
 
         /**
          * Bind update position method after datepicker is opened
@@ -81,6 +83,8 @@ define(['jquery', 'jquery-ui'], function ($) {
                     input.blur();
                 });*/
             });
+
+            updatePos.call(input);
         };
 
         /**
