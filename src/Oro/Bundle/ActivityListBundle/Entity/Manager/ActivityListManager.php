@@ -16,6 +16,7 @@ use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -42,6 +43,9 @@ class ActivityListManager
     /** @var ActivityListFilterHelper */
     protected $activityListFilterHelper;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * @param Registry                  $doctrine
      * @param SecurityFacade            $securityFacade
@@ -60,7 +64,8 @@ class ActivityListManager
         ConfigManager $config,
         ActivityListChainProvider $provider,
         ActivityListFilterHelper $activityListFilterHelper,
-        CommentApiManager $commentManager
+        CommentApiManager $commentManager,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
@@ -70,6 +75,7 @@ class ActivityListManager
         $this->chainProvider            = $provider;
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->commentManager           = $commentManager;
+        $this->doctrineHelper           = $doctrineHelper;
     }
 
     /**
@@ -187,7 +193,11 @@ class ActivityListManager
         $isHead = false;
         if ($this->isGroupingApplicable($entityProvider)) {
             $isHead = $entity->isHead();
-            $entityRelationActivity = $entityProvider->getEntity($entity);
+
+            $entityRelationActivity = $this->doctrineHelper->getEntity(
+                $entity->getRelatedActivityClass(),
+                $entity->getRelatedActivityId()
+            );
             $groupRelationEntities = $entityProvider->getGroupedEntities($entityRelationActivity);
         } else {
             $groupRelationEntities = [$entity];

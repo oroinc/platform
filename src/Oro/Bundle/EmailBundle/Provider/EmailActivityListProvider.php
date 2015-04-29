@@ -145,23 +145,15 @@ class EmailActivityListProvider implements
     }
 
     /**
-     * @param ActivityList $activityListEntity
-     * @return Email
-     */
-    public function getEntity(ActivityList $activityListEntity)
-    {
-        return $this->doctrineRegistryLink->getService()
-            ->getRepository($activityListEntity->getRelatedActivityClass())
-            ->find($activityListEntity->getRelatedActivityId());
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getData(ActivityList $activityListEntity)
     {
         /** @var Email $email */
-        $email = $headEmail = $this->getEntity($activityListEntity);
+        $email = $headEmail = $this->doctrineRegistryLink->getService()
+            ->getRepository($activityListEntity->getRelatedActivityClass())
+            ->find($activityListEntity->getRelatedActivityId());
+
         if ($email->isHead() && $email->getThread()) {
             $headEmail = $this->emailThreadProvider->getHeadEmail(
                 $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),

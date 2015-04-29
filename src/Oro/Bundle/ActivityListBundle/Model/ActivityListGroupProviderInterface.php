@@ -29,10 +29,4 @@ interface ActivityListGroupProviderInterface
      * @return string
      */
     public function getGroupedTemplate();
-
-    /**
-     * @param ActivityList $activityListEntity
-     * @return object
-     */
-    public function getEntity(ActivityList $activityListEntity);
 }
