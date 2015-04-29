@@ -98,7 +98,8 @@ define([
                             }
                             messenger.notificationFlashMessage(response.status, response.message);
 
-                            if (model.get('targetClassName') == self.options.target.className &&
+                            if (self.options.target &&
+                                model.get('targetClassName') == self.options.target.className &&
                                 model.get('targetId') == self.options.target.id) {
                                 mediator.trigger('widget_success:activity_list:item:update');
                             } else {
