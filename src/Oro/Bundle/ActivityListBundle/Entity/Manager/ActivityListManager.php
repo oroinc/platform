@@ -55,6 +55,7 @@ class ActivityListManager
      * @param ActivityListChainProvider $provider
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param CommentApiManager         $commentManager
+     * @param DoctrineHelper            $doctrineHelper
      */
     public function __construct(
         Registry $doctrine,

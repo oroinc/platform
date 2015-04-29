@@ -126,8 +126,8 @@ class CommentApiManager extends ApiEntityManager
     }
 
     /**
-     * @param $entityClass
-     * @param $groupRelationEntities
+     * @param string $entityClass
+     * @param object[] $groupRelationEntities
      * @return int
      */
     public function getCommentCount($entityClass, $groupRelationEntities)
@@ -389,24 +389,24 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param string $entityName
-     * @param string $entityId
+     * @param int[] $entityIds
      *
      * @return int important to return int
      */
-    protected function getBuildCommentCount($entityName, $entityId)
+    protected function getBuildCommentCount($entityName, $entityIds)
     {
         /** @var CommentRepository $repository */
         $fieldName  = $this->getFieldName($entityName);
         $repository = $this->getRepository();
-        $qb         = $repository->getNumberOfComment($fieldName, $entityId);
+        $qb         = $repository->getNumberOfComment($fieldName, $entityIds);
         $query      = $this->aclHelper->apply($qb);
 
         return  (int) $query->getSingleScalarResult();
     }
 
     /**
-     * @param $groupRelationEntities
-     * @return array
+     * @param object[] $groupRelationEntities
+     * @return int[]
      */
     protected function prepareRelationEntityId($groupRelationEntities)
     {
