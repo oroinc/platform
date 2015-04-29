@@ -192,10 +192,10 @@ class ActivityListManager
         }
 
         $isHead = $this->getHeadStatus($entity, $entityProvider);
-        $relationEntities = $this->getRelationEntities($entity, $entityProvider);
+        $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider);
         $numberOfComments = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
-            $relationEntities
+            $relatedActivityEntities
         );
 
         $data = $entityProvider->getData($entity);
@@ -299,7 +299,7 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
-     * @param $entityProvider
+     * @param object $entityProvider
      *
      * @return bool
      */
@@ -315,24 +315,24 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
-     * @param $entityProvider
+     * @param object $entityProvider
      *
      * @return array
      */
-    protected function getRelationEntities(ActivityList $entity, $entityProvider)
+    protected function getRelatedActivityEntities(ActivityList $entity, $entityProvider)
     {
-        $relationEntities = [$entity];
+        $relatedActivityEntities = [$entity];
         if ($this->isGroupingApplicable($entityProvider)) {
-            $entityRelationActivity = $this->doctrineHelper->getEntity(
+            $relationEntity = $this->doctrineHelper->getEntity(
                 $entity->getRelatedActivityClass(),
                 $entity->getRelatedActivityId()
             );
-            $relationEntities = $entityProvider->getGroupedEntities($entityRelationActivity);
-            if (count($relationEntities) === 0) {
-                $relationEntities = [$entity];
+            $relatedActivityEntities = $entityProvider->getGroupedEntities($relationEntity);
+            if (count($relatedActivityEntities) === 0) {
+                $relatedActivityEntities = [$entity];
             }
         }
 
-        return $relationEntities;
+        return $relatedActivityEntities;
     }
 }
