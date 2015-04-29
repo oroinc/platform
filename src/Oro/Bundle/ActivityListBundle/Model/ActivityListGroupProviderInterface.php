@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-
 interface ActivityListGroupProviderInterface
 {
     /**

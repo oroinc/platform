@@ -193,7 +193,6 @@ class ActivityListManager
         $isHead = false;
         if ($this->isGroupingApplicable($entityProvider)) {
             $isHead = $entity->isHead();
-
             $entityRelationActivity = $this->doctrineHelper->getEntity(
                 $entity->getRelatedActivityClass(),
                 $entity->getRelatedActivityId()
