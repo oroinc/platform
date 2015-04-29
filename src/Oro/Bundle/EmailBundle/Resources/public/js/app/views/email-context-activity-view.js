@@ -24,15 +24,15 @@ define([
 
             this.template = _.template($('#email-context-activity-list').html());
             this.$container = options.$container;
-            this.$containerForItems = $(options.$container.context).find('.email-context-activity-items');
+            this.$containerContextTargets = $(options.$container.context).find('.email-context-activity-items');
             this.collection = new EmailContextActivityCollection('oro_api_delete_email_association');
             this.initEvents();
 
-            if (this.options.items) {
+            if (this.options.contextTargets) {
                 this.collection.reset();
-                for (var i in this.options.items) {
-                    if (this.options.items.hasOwnProperty(i)) {
-                        this.collection.add(this.options.items[i]);
+                for (var i in this.options.contextTargets) {
+                    if (this.options.contextTargets.hasOwnProperty(i)) {
+                        this.collection.add(this.options.contextTargets[i]);
                     }
                 }
             }
@@ -76,7 +76,7 @@ define([
             var self = this;
 
             this.collection.on('reset', function() {
-                self.$containerForItems.html('');
+                self.$containerContextTargets.html('');
             });
 
             this.collection.on('add', function(model) {
@@ -86,13 +86,13 @@ define([
                 });
 
                 var $view = $(view);
-                self.$containerForItems.append($view);
+                self.$containerContextTargets.append($view);
 
                 $view.find('i.icon-remove').click(function() {
                     model.destroy({
                         success: function(model, response) {
                             if (response.status != 'success') {
-                                var $view = self.$containerForItems.find('[data-cid="' + model.cid + '"]');
+                                var $view = self.$containerContextTargets.find('[data-cid="' + model.cid + '"]');
                                 $view.remove();
                                 self.render();
                             }
