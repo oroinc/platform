@@ -9,7 +9,7 @@ Data providers types
 
 There is two way how to provide data for layouts:
 
-- put it to `data` collection of the [layout context](../../../../Component/Layout/LayoutContextInterface.php). This method can be used for page specific data or the data retrieved from the HTTP request.
+- put it to `data` collection of the [layout context](../../../../Component/Layout/ContextInterface.php). This method can be used for page specific data or the data retrieved from the HTTP request.
 - create standalone data provider. This method is useful if some data is used on many pages and the data source is a database, HTTP session, external web service, etc.
 
 Using the layout context as data provider
