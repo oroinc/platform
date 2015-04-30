@@ -18,7 +18,7 @@
             <div class="message-item message">
                 {% block activityShortMessage %}
                     <%= subject %>
-                    <% if (description) { %>
+                    <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
                     - <%= description %>
                     <% } %>
                 {% endblock %}
