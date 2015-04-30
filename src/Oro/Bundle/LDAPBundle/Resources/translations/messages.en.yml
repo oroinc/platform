@@ -27,7 +27,8 @@ oro:
                 admin_password.label: Password
                 user_filter.label: Filter
                 user_mapping.label: Mapping
-                role_base_dn.label: Base Dn
+                role_filter.label: Filter
+                role_id_attribute.label: Role id
                 role_user_id_attribute.label: User id attribute
                 role_mapping.label: Mapping
                 role_ldap.label: LDAP Role

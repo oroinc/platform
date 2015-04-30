@@ -15,12 +15,6 @@ class LdapConfigurationCompilerPass implements CompilerPassInterface
     {
         $this->updateConfiguration(
             $container,
-            'fr3d_ldap.ldap_manager.default',
-            'Oro\Bundle\LDAPBundle\LDAP\LdapManager'
-        );
-
-        $this->updateConfiguration(
-            $container,
             'fr3d_ldap.ldap_driver.zend.driver',
             'Oro\Bundle\LDAPBundle\LDAP\Ldap'
         );

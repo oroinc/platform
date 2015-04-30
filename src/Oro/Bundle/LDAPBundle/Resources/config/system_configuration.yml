@@ -102,13 +102,22 @@ oro_system_configuration:
                 label: oro.ldap.system_configuration.fields.user_mapping.label
                 required: false
                 resettable: false
-        oro_ldap.role_base_dn:
-            data_type: string
+        oro_ldap.role_filter:
+            data_type: text
             type: text
             options:
-                label: oro.ldap.system_configuration.fields.role_base_dn.label
+                label: oro.ldap.system_configuration.fields.role_filter.label
                 required: false
                 resettable: false
+            priority: 40
+        oro_ldap.role_id_attribute:
+            data_type: text
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.role_id_attribute.label
+                required: false
+                resettable: false
+            priority: 30
         oro_ldap.role_user_id_attribute:
             data_type: string
             type: text
@@ -116,6 +125,7 @@ oro_system_configuration:
                 label: oro.ldap.system_configuration.fields.role_user_id_attribute.label
                 required: false
                 resettable: false
+            priority: 20
         oro_ldap.role_mapping:
             data_type: array
             type: oro_collection
@@ -126,6 +136,7 @@ oro_system_configuration:
                 resettable: false
                 handle_primary: false
                 show_form_when_empty: false
+            priority: 10
     tree:
         system_configuration:
             platform:
@@ -156,6 +167,7 @@ oro_system_configuration:
                                     ldap_role_settings:
                                         priority: 10
                                         children:
-                                            - oro_ldap.role_base_dn
+                                            - oro_ldap.role_filter
+                                            - oro_ldap.role_id_attribute
                                             - oro_ldap.role_user_id_attribute
                                             - oro_ldap.role_mapping

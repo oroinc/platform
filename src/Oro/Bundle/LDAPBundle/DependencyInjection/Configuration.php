@@ -66,12 +66,16 @@ class Configuration implements ConfigurationInterface
                 'value' => [],
                 'type'  => 'array',
             ],
-            'role_base_dn' => [
-                'value' => null,
+            'role_filter' => [
+                'value' => 'objectClass=groupOfNames',
+                'type'  => 'text',
+            ],
+            'role_id_attribute' => [
+                'value' => 'cn',
                 'type'  => 'text',
             ],
             'role_user_id_attribute' => [
-                'value' => null,
+                'value' => 'member',
                 'type'  => 'text',
             ],
             'role_mapping' => [

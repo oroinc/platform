@@ -15,6 +15,16 @@ services:
             - @oro_config.global
             - %security.authentication.hide_user_not_found%
 
+    oro_ldap.ldap.ldap_manager:
+        class: Oro\Bundle\LDAPBundle\LDAP\LdapManager
+        arguments:
+            - @doctrine
+            - @fr3d_ldap.ldap_driver
+            - @fr3d_ldap.user_manager
+            - %fr3d_ldap.ldap_manager.parameters%
+        calls:
+            - [updateOroConfiguration, [@oro_config.global]]
+
     oro_ldap.extension.user_type:
         class: %oro_ldap.extension.user_type.class%
         tags:

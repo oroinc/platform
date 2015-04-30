@@ -11,3 +11,4 @@ fr3_d_ldap:
         filter: '*'
     service:
         user_manager: oro_user.manager
+        ldap_manager: oro_ldap.ldap.ldap_manager
