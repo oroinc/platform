@@ -41,10 +41,10 @@ class EmailHelper
     public function getOnlyLastAnswer(EmailBody $body)
     {
         if (!$body->getBodyIsText()) {
-            preg_match('/(.+)(<div class="quote">)/siU', $body->getBodyContent(), $match);
+            preg_match('/(.+)(<div class="(quote|gmail_extra)">)/siU', $body->getBodyContent(), $match);
 
             if (isset($match[1])) {
-                return $match[1];
+                return trim($match[1]);
             }
         }
 
