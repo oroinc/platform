@@ -7,20 +7,19 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
         routing = require('routing'),
+        EmailItemView = require('./email-item-view'),
         BaseView = require('oroui/js/app/views/base/view');
 
     EmailTreadView = BaseView.extend({
         autoRender: true,
 
         events: {
-            'click .email-view-toggle': 'onEmailHeadClick',
             'click .email-view-toggle-all': 'onToggleAllClick',
             'click .email-load-more': 'onLoadMoreClick'
         },
 
         selectors: {
             emailItem: '.email-info',
-            emailBody: '.email-body',
             loadMore: '.email-load-more',
             toggleAll: '.email-view-toggle-all'
         },
@@ -36,7 +35,7 @@ define(function (require) {
         initialize: function (options) {
             _.extend(this, _.pick(options, ['actionPanelSelector']));
             EmailTreadView.__super__.initialize.apply(this, arguments);
-            this.listenTo(mediator, 'widget:doRefresh:email-thread', function() {
+            this.listenTo(mediator, 'widget:doRefresh:email-thread', function () {
                 if (options.isBaseView) {
                     mediator.trigger('widget:doRefresh:email-thread-context');
                 }
@@ -69,47 +68,27 @@ define(function (require) {
                 this.updateToggleAllAction();
             }
             EmailTreadView.__super__.render.apply(this, arguments);
-            this.updateThreadLayout();
+            this.initEmailItemViews(this.$(this.selectors.emailItem));
             return this;
         },
 
         /**
          * Handles click on toggle all action element
-         *  - expands or collapses all full email bodies
          *
          * @param {jQuery.Event} e
          */
         onToggleAllClick: function (e) {
-            this.loadEmails().done(_.bind(function () {
-                var $emails = this.$(this.selectors.emailItem).not(':last'),
-                    show = this._hasHiddenEmails();
-                this.toggleEmail($emails, show);
-            }, this));
+            this.loadEmails().done(_.bind(this.toggleAllEmails, this));
         },
 
         /**
-         * Handles click on email head
-         *  - expands or collapses full email body
-         *
-         * @param {jQuery.Event} e
+         * Expands or collapses all emails
          */
-        onEmailHeadClick: function (e) {
-            var $email, $target,
-                exclude = 'a, .dropdown';
-
-            $target = this.$(e.target);
-            // if the target is an action element, skip toggling the email
-            if ($target.is(exclude) || $target.parents(exclude).length) {
-                return;
-            }
-
-            $email = this.$(e.currentTarget).closest(this.selectors.emailItem);
-            // if this is the last email, skip toggling
-            if ($email.is(':last-child')) {
-                return;
-            }
-
-            this.toggleEmail($email);
+        toggleAllEmails: function () {
+            var show = this._hasHiddenEmails();
+            _.each(this.subviews, function (emailItemView) {
+                emailItemView.toggle(show);
+            });
         },
 
         /**
@@ -152,8 +131,9 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
-            this.$(this.selectors.loadMore).replaceWith(content);
-            this.updateThreadLayout();
+            var $content = $(content);
+            this.$(this.selectors.loadMore).replaceWith($content);
+            this.initEmailItemViews($content.filter(this.selectors.emailItem));
         },
 
         /**
@@ -168,26 +148,31 @@ define(function (require) {
         },
 
         /**
-         * Updates layout for view's element
-         *  - executes layout init
-         *  - marks email extra-body part and adds the toggler
+         * Initializes EmailItemView for all passed elements
+         *
+         * @param {Array<jQuery.Element>} $elems
          */
-        updateThreadLayout: function () {
-            mediator.execute('layout:init', this.$el, this);
+        initEmailItemViews: function ($elems) {
+            _.each($elems, this._initEmailItemViews, this);
         },
 
         /**
-         * Expands or collapses full email body
+         * Creates EmailItemView for the element and registers it as subview of the thread
          *
-         * @param {jQuery} $email element related to the email
-         * @param {boolean=} flag expand or collapse flag (true to expand)
+         * @param {HTMLElement} elem
+         * @protected
          */
-        toggleEmail: function ($email, flag) {
-            $email.toggleClass('in', flag);
-            if ($email.hasClass('in')) {
-                $email.find('iframe').triggerHandler('emailShown');
-            }
-            this.updateToggleAllAction();
+        _initEmailItemViews: function (elem) {
+            var emailItemView;
+            emailItemView = new EmailItemView({
+                autoRender: true,
+                el: elem
+            });
+            this.subview('email:' + emailItemView.cid, emailItemView);
+            this.listenTo(emailItemView, {
+                'toggle': this.updateToggleAllAction,
+                'change:commentCount': this.onCommentCountChange
+            });
         },
 
         /**
@@ -218,6 +203,15 @@ define(function (require) {
             hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
             hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
             return hasCollapsedEmails || hasEmailsToLoad;
+        },
+
+        /**
+         * Handles comments count change (added/removed)
+         *
+         * @param {number} diff
+         */
+        onCommentCountChange: function (diff) {
+            this.trigger('change:commentCount', diff);
         }
     });
 

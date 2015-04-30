@@ -8,7 +8,6 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
-        routing       = require('routing'),
         tools         = require('oroui/js/tools'),
         mediator      = require('oroui/js/mediator'),
         ActivityView       = require('../views/activity-view'),
@@ -17,9 +16,7 @@ define(function (require) {
         ActivityCollection = require('../models/activity-list-collection'),
         MultiSelectFilter  = require('oro/filter/multiselect-filter'),
         DatetimeFilter     = require('oro/filter/datetime-filter'),
-        dataFilterWrapper  = require('orofilter/js/datafilter-wrapper'),
-        CommentComponent = require('orocomment/js/app/components/comment-component');
-    require('jquery');
+        dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
 
     ActivityListComponent = BaseComponent.extend({
         defaults: {
@@ -67,13 +64,13 @@ define(function (require) {
         },
 
         processOptions: function () {
-            var defaults;
+            var defaults, activityListData;
             defaults = $.extend(true, {}, this.defaults);
             _.defaults(this.options, defaults);
             _.defaults(this.options.activityListOptions, defaults.activityListOptions);
             _.defaults(this.options.commentOptions, defaults.commentOptions);
 
-            var activityListData = JSON.parse(this.options.activityListData);
+            activityListData = JSON.parse(this.options.activityListData);
             this.options.activityListData  = activityListData.data;
             this.options.activityListCount = activityListData.count;
 
@@ -130,7 +127,7 @@ define(function (require) {
             return {
                 dateRange: this.dateRangeFilter.getValue(),
                 activityType: this.activityTypeFilter.getValue()
-            }
+            };
         },
 
         /**
@@ -145,40 +142,37 @@ define(function (require) {
         /**
          * Handles activity load event
          *
-         *  - init comments, if activity is configured to have them
-         *
          * @param {ActivityModel} model
          */
         onViewActivity: function (model) {
-            var activityClass = model.getRelatedActivityClass(),
-                configuration = this.options.activityListOptions.configuration[activityClass];
-
-            if (configuration && configuration.has_comments && model.get('commentable')) {
-                this.initComments(model);
-            }
+            this.initComments(model);
         },
 
         /**
+         * Init comments, if activity is configured to have them
+         *
          * @param {ActivityModel} model
          */
         initComments: function (model) {
-            var itemView, commentOptions, comments;
-            itemView = this.listView.getItemView(model);
+            var itemView, commentOptions,
+                activityClass = model.getRelatedActivityClass(),
+                configuration = this.options.activityListOptions.configuration[activityClass];
 
-            if (itemView.hasCommentComponent()) {
-                // comments block already initialized
+            if (!configuration || !configuration.has_comments) {
+                // comments component is not configured for the activity
                 return;
             }
 
+            itemView = this.listView.getItemView(model);
+
+            // makes copy of commentOptions
             commentOptions = $.extend(true, {}, this.options.commentOptions);
+            // extend commentOptions with model related options
             _.extend(commentOptions, {
-                _sourceElement: itemView.getCommentsBlock(),
                 relatedEntityId: model.get('relatedActivityId'),
                 relatedEntityClassName: model.getRelatedActivityClass()
             });
-            comments = new CommentComponent(commentOptions);
-
-            itemView.setCommentComponent(comments);
+            itemView.initCommentsComponent(commentOptions);
         },
 
         /**
@@ -222,7 +216,7 @@ define(function (require) {
             // render
             this.dateRangeFilter.render();
             this.dateRangeFilter.on('update', this.onFilterStateChange, this);
-            $el.find('.date-range-filter').append(this.dateRangeFilter.$el)
+            $el.find('.date-range-filter').append(this.dateRangeFilter.$el);
         },
 
         registerWidget: function () {
