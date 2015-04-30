@@ -117,6 +117,8 @@ services:
 
     oro_email.email_helper:
         class: %oro_email.email_helper.class%
+        arguments:
+            - %kernel.cache_dir%
 
     oro_email.email.address.helper:
         class: %oro_email.email.address.helper.class%

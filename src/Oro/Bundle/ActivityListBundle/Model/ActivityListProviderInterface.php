@@ -29,7 +29,7 @@ interface ActivityListProviderInterface
     /**
      * @param object $entity
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription($entity);
 
