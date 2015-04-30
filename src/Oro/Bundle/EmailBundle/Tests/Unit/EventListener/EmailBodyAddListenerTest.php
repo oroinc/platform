@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener;
@@ -30,6 +33,12 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
     /** @var ServiceLink */
     protected $securityFacadeLink;
 
+    /** @var ActivityListChainProvider */
+    protected $chainProvider;
+
+    /** @var EntityManager */
+    protected $entityManager;
+
     public function setUp()
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -46,16 +55,23 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
         $this->securityFacadeLink->expects($this->once())
             ->method('getService')
             ->willReturn($this->securityFacade);
+        $this->chainProvider =
+            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
+            ->disableOriginalConstructor()->getMock();
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()->getMock();
 
         $this->listener = new EmailBodyAddListener(
             $this->emailAttachmentManager,
             $this->configProvider,
             $this->activityListProvider,
-            $this->securityFacadeLink
+            $this->securityFacadeLink,
+            $this->chainProvider,
+            $this->entityManager
         );
     }
 
-    public function testLinkToScopeEventIsNotGranted()
+    public function testLinkToScopeIsNotGranted()
     {
         $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
             ->disableOriginalConstructor()->getMock();
@@ -70,13 +86,13 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getTargetEntities')
             ->willReturn([new SomeEntity()]);
 
-        $this->listener->linkToScopeEvent($event);
+        $this->listener->linkToScope($event);
     }
 
     /**
      * @dataProvider getTestData
      */
-    public function testLinkToScopeEvent($config, $managerCalls, $attachmentCalls)
+    public function testLinkToScope($config, $managerCalls, $attachmentCalls)
     {
         $attachments = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailAttachment')
             ->disableOriginalConstructor()->getMock();
@@ -120,7 +136,7 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEmail')
             ->will($this->returnValue($email));
 
-        $this->listener->linkToScopeEvent($event);
+        $this->listener->linkToScope($event);
     }
 
     public function getTestData()
