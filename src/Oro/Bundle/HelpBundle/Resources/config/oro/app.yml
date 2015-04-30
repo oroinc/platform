@@ -1,0 +1,4 @@
+oro_help:
+    defaults:
+        # @TODO: drop static link BAP-7554
+        link: 'http://www.orocrm.com/documentation/index'

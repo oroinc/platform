@@ -20,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_11';
     }
 
     /**
@@ -112,6 +112,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table = $schema->createTable('oro_integration_transport');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('type', 'string', ['length' => 30]);
+        $table->addIndex(['type'], 'oro_int_trans_type_idx', []);
         $table->setPrimaryKey(['id']);
     }
 

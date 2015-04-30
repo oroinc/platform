@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Builder\Helper;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Security\Core\SecurityContext;
@@ -102,13 +103,21 @@ class EmailModelBuilderHelper
      * @param string      $emailAddress
      * @param string|null $ownerClass
      * @param mixed|null  $ownerId
+     * @param bool        $excludeCurrentUser
      */
-    public function preciseFullEmailAddress(&$emailAddress, $ownerClass = null, $ownerId = null)
-    {
+    public function preciseFullEmailAddress(
+        &$emailAddress,
+        $ownerClass = null,
+        $ownerId = null,
+        $excludeCurrentUser = false
+    ) {
         if (!$this->emailAddressHelper->isFullEmailAddress($emailAddress)) {
             if (!empty($ownerClass) && !empty($ownerId)) {
                 $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
                 if ($owner) {
+                    if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
+                        return;
+                    }
                     $ownerName = $this->nameFormatter->format($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
@@ -122,6 +131,9 @@ class EmailModelBuilderHelper
             if ($emailAddressObj) {
                 $owner = $emailAddressObj->getOwner();
                 if ($owner) {
+                    if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
+                        return;
+                    }
                     $ownerName = $this->nameFormatter->format($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
@@ -129,6 +141,27 @@ class EmailModelBuilderHelper
                 }
             }
         }
+    }
+
+    /**
+     * @param bool $excludeCurrentUser
+     * @param string $emailAddress
+     * @param object $owner
+     * @return bool
+     */
+    protected function doExcludeCurrentUser($excludeCurrentUser, &$emailAddress, $owner)
+    {
+        if (!$excludeCurrentUser) {
+            return false;
+        }
+        $user = $this->getUser();
+        if (ClassUtils::getClass($owner) === ClassUtils::getClass($user) && $owner->getId() === $user->getId()) {
+            $emailAddress = false;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
