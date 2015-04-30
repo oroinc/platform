@@ -67,7 +67,7 @@ class Message extends \Zend\Mail\Storage\Message
     /**
      * @return null|ContentType
      */
-    public function getContentType()
+    public function getPriorContentType()
     {
         if ($this->isMultipart()) {
             $htmlContentType = false;
