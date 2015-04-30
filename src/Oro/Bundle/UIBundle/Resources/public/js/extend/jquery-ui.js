@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen:true, browser:true*/
-define(['jquery', 'jquery-ui'], function ($) {
+define(['jquery', 'jquery-ui', 'jquery.select2'], function ($) {
     'use strict';
 
     /* datepicker extend:start */
@@ -32,8 +32,8 @@ define(['jquery', 'jquery-ui'], function ($) {
          * Process position update for datepicker element
          */
         function updatePos() {
-            var pos, isFixed, offset, inst,
-                input = this;
+            var pos, isFixed, offset, inst, dialogIsBelow,
+                input = this, $input = $(this);
 
             inst = $.datepicker._getInst(input);
 
@@ -43,7 +43,7 @@ define(['jquery', 'jquery-ui'], function ($) {
             }
 
             isFixed = false;
-            $(input).parents().each(function () {
+            $input.parents().each(function () {
                 isFixed |= $(this).css("position") === "fixed";
                 return !isFixed;
             });
@@ -51,12 +51,21 @@ define(['jquery', 'jquery-ui'], function ($) {
             offset = {left: pos[0], top: pos[1]};
             offset = $.datepicker._checkOffset(inst, offset, isFixed);
             inst.dpDiv.css({left: offset.left + "px", top: offset.top + "px"});
-            $(input).toggleClass(dialogIsBelowClassName, offset.top - $(input).offset().top > 0);
+
+            dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
+
+            $input.toggleClass(dateDialogClassName, dialogIsBelow);
+
+            if($input.data('datetime-mode')) {
+                $input.parent().toggleClass(datetimeDialogClassName, dialogIsBelow);
+            }
+
         }
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
             _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker,
-            dialogIsBelowClassName = 'ui-datepicker-dialog-is-below';
+            dateDialogClassName = 'ui-datepicker-dialog-is-below',
+            datetimeDialogClassName = 'datetimepicker-dialog-is-below';
 
         /**
          * Bind update position method after datepicker is opened
@@ -123,4 +132,22 @@ define(['jquery', 'jquery-ui'], function ($) {
         };
     }());
     /* datepicker extend:end */
+
+    /* select2 extend:start */
+    (function(){
+        var select2DropBelowClassName = 'select2-drop-below',
+            _positionDropdown = window.Select2.class.abstract.prototype.positionDropdown,
+            _close = window.Select2.class.abstract.prototype.close;
+        window.Select2.class.abstract.prototype.positionDropdown = function(){
+            var needClass;
+            _positionDropdown.apply(this, arguments);
+            needClass = this.container.hasClass('select2-dropdown-open') && !this.container.hasClass('select2-drop-above');
+            this.container.parent().toggleClass(select2DropBelowClassName, needClass);
+        }
+        window.Select2.class.abstract.prototype.close = function(){
+            _close.apply(this, arguments);
+            this.container.parent().removeClass(select2DropBelowClassName);
+        }
+    }());
+    /* select2 extend:end */
 });

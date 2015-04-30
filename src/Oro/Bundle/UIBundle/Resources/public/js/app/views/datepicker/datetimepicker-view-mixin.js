@@ -88,7 +88,11 @@ define(function (require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontDateField.on('blur', _.bind(function(){
+                this.$frontDateField.parent().removeClass('datetimepicker-dialog-is-below');
+            }, this));
             this.$frontDateField.after(this.$frontTimeField);
+            this.$frontDateField.data('datetime-mode', true);
         },
 
         /**
@@ -99,6 +103,32 @@ define(function (require) {
         initPickerWidget: function (options) {
             var widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
+            this.$frontTimeField.on('showTimepicker', function(){
+                var $el = $(this),
+                    needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+                $el.parent().toggleClass('datetimepicker-dialog-is-below', needClass);
+            });
+            this.$frontTimeField.on('hideTimepicker', function(){
+                $(this).parent().removeClass('datetimepicker-dialog-is-below');
+            });
+            this.$frontDateField.on('blur', function(){
+                var $parent = $(this).parent();
+
+                if($(this).hasClass('error')) {
+                    $parent.removeClass('timepicker-error').addClass('datepicker-error');
+                } else {
+                    $parent.removeClass('datepicker-error');
+                }
+            });
+            this.$frontTimeField.on('blur', function(){
+                var $parent = $(this).parent();
+
+                if($(this).hasClass('error')) {
+                    $parent.removeClass('datepicker-error').addClass('timepicker-error');
+                } else {
+                    $parent.removeClass('timepicker-error');
+                }
+            });
             this._super().initPickerWidget.apply(this, arguments);
         },
 
