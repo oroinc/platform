@@ -153,7 +153,7 @@ define(function (require) {
          * @param {Array<jQuery.Element>} $elems
          */
         initEmailItemViews: function ($elems) {
-            _.each($elems, this._initEmailItemViews, this);
+            _.each($elems, this._initEmailItemView, this);
         },
 
         /**
@@ -162,7 +162,7 @@ define(function (require) {
          * @param {HTMLElement} elem
          * @protected
          */
-        _initEmailItemViews: function (elem) {
+        _initEmailItemView: function (elem) {
             var emailItemView;
             emailItemView = new EmailItemView({
                 autoRender: true,
@@ -171,7 +171,16 @@ define(function (require) {
             this.subview('email:' + emailItemView.cid, emailItemView);
             this.listenTo(emailItemView, {
                 'toggle': this.updateToggleAllAction,
-                'change:commentCount': this.onCommentCountChange
+                'commentCountChanged': this.onCommentCountChange
+            });
+        },
+
+        /**
+         * Invokes refresh method for all emails
+         */
+        refreshEmails: function () {
+            _.each(this.subviews, function (emailItemView) {
+                emailItemView.refresh();
             });
         },
 
@@ -211,7 +220,7 @@ define(function (require) {
          * @param {number} diff
          */
         onCommentCountChange: function (diff) {
-            this.trigger('change:commentCount', diff);
+            this.trigger('commentCountChanged', diff);
         }
     });
 

@@ -75,6 +75,15 @@ define(function (require) {
         },
 
         /**
+         * Fixes issue when iframe get empty after DOM-manipulation
+         */
+        reattachBody: function () {
+            this.undelegateEvents();
+            this.$frame.contents().find('html').replaceWith(this.$el);
+            this.delegateEvents();
+        },
+
+        /**
          * Add application styles to the iframe document
          *
          * @protected

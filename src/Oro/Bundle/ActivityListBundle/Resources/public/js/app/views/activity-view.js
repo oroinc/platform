@@ -38,6 +38,12 @@ define(function (require) {
             'click .accordion-heading': 'onAccordionHeaderClick'
         },
         listen: {
+            'addedToParent': function () {
+                var emailTreadComponent = this.pageComponent('email-thread');
+                if (emailTreadComponent) {
+                    emailTreadComponent.view.refreshEmails();
+                }
+            },
             'change:contentHTML model': '_onContentChange',
             'change:commentCount model': '_onCommentCountChange',
             'change:isContentLoading model': '_onContentLoadingStatusChange'
@@ -141,7 +147,7 @@ define(function (require) {
                 // if the activity has an emailTreadComponent -- handle comment count change in own way
                 var threadComponent = this.pageComponent('email-thread');
                 if (threadComponent) {
-                    this.listenTo(threadComponent.view, 'change:commentCount', function (diff) {
+                    this.listenTo(threadComponent.view, 'commentCountChanged', function (diff) {
                         this.model.set('commentCount', this.model.get('commentCount') + diff);
                     });
                 }
