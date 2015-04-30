@@ -14,7 +14,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class ActivityListMigration implements Migration
 {
-    /**  @var ActivityListChainProvider */
+    /** @var ActivityListChainProvider */
     protected $provider;
 
     /** @var ActivityListExtension */
