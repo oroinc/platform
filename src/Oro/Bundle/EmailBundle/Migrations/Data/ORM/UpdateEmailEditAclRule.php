@@ -5,12 +5,13 @@ namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
-class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareInterface
+class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
      * @var ContainerInterface
@@ -21,6 +22,14 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
      * @var ObjectManager
      */
     protected $objectManager;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return ['Oro\Bundle\SecurityBundle\Migrations\Data\ORM\LoadAclRoles'];
+    }
 
     /**
      * {@inheritdoc}
