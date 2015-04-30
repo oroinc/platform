@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use \Zend\Mail\Header\ContentType;
 use \Zend\Mail\Header\HeaderInterface;
 use \Zend\Mail\Storage\Part;
 use \Zend\Mime\Decode;
@@ -61,6 +62,38 @@ class Message extends \Zend\Mail\Storage\Message
         }
 
         return $result;
+    }
+
+    /**
+     * @return null|ContentType
+     */
+    public function getContentType()
+    {
+        if ($this->isMultipart()) {
+            $htmlContentType = false;
+            $textContentType = false;
+            foreach ($this as $part) {
+                $contentType = $this->getPartContentType($part);
+                if ($contentType) {
+                    if ($contentType->getType() === 'text/plain') {
+                        $textContentType =  $contentType;
+                    } else if ($contentType->getType() === 'text/html') {
+                        $htmlContentType = $contentType;
+                    }
+                }
+            }
+            if ($htmlContentType) {
+                // html is preferred part
+                return $htmlContentType;
+            } else if ($textContentType) {
+                // in case when only text part presents
+                return $textContentType;
+            } else {
+                return null;
+            }
+        } else {
+            return $this->getPartContentType($this);
+        }
     }
 
     /**

@@ -56,7 +56,7 @@ define(function (require) {
          * @inheritDoc
          */
         render: function () {
-            var $content = $('<div />').append(this.bodyContent);
+            var $content = $(this.bodyContent);
             this.$('head').html($content.find('head')[0] || '');
             this.$('body').html($content.find('body')[0] || $content);
             this._injectStyles();

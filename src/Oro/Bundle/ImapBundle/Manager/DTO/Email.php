@@ -72,12 +72,13 @@ class Email extends EmailHeader
     {
         if ($this->body === null) {
             $this->body = new EmailBody();
-
             $body = $this->message->getBody();
-            try {
+
+            $contentType = $this->message->getContentType();
+            if ($contentType && $contentType->getType() === 'text/html') {
                 $this->body->setContent($body->getContent(Body::FORMAT_HTML)->getDecodedContent());
                 $this->body->setBodyIsText(false);
-            } catch (InvalidBodyFormatException $ex) {
+            } else {
                 $this->body->setContent($body->getContent(Body::FORMAT_TEXT)->getDecodedContent());
                 $this->body->setBodyIsText(true);
             }
