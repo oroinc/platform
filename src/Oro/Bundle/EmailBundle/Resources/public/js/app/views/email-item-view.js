@@ -12,22 +12,14 @@ define(function (require) {
         },
 
         listen: {
-            'change:commentCount': 'updateCommentsQuantity'
+            'commentCountChanged': 'updateCommentsQuantity'
         },
 
         /**
          * Comments counter
          * @type {number}
          */
-        commentCount: null,
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function () {
-            this.commentCount = 0;
-            EmailItemView.__super__.initialize.apply(this, arguments);
-        },
+        commentCount: 0,
 
         /**
          * @inheritDoc
@@ -46,6 +38,16 @@ define(function (require) {
         },
 
         /**
+         * Refreshes email-body if there's email-body component
+         */
+        refresh: function () {
+            var emailBodyComponent = this.pageComponent('email-body');
+            if (emailBodyComponent) {
+                emailBodyComponent.view.reattachBody();
+            }
+        },
+
+        /**
          * Handles comments state change
          */
         onCommentsStateChange: function () {
@@ -53,7 +55,7 @@ define(function (require) {
             if (diff === 0) {
                 return;
             }
-            this.trigger('change:commentCount', diff);
+            this.trigger('commentCountChanged', diff);
             this.commentCount += diff;
         },
 

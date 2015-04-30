@@ -79,6 +79,7 @@
                         {{ email.emailBody.bodyContent|nl2br }}
                     {% else %}
                         {% set emailBodyViewOptions = {
+                            name: 'email-body',
                             view: 'oroemail/js/app/views/email-body-view',
                             bodyContent: email.emailBody.bodyContent,
                             styles: [
