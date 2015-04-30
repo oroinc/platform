@@ -17,8 +17,8 @@ class EmailHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStrippedBody()
     {
-        $actualString = '<div class="new">test</div>';
-        $expectedString = strip_tags($actualString);
+        $actualString = '<style type="text/css">H1 {border-width: 1;}</style><div class="new">test</div>';
+        $expectedString = 'test';
 
         $this->assertEquals($expectedString, $this->helper->getStrippedBody($actualString));
     }

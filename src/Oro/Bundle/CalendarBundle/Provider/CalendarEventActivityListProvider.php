@@ -66,8 +66,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * @param object $entity
-     * @return null
+     * {@inheritdoc}
      */
     public function getDescription($entity)
     {
