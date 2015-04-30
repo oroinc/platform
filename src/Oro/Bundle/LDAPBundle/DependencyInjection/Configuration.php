@@ -59,7 +59,7 @@ class Configuration implements ConfigurationInterface
                 'type'  => 'text',
             ],
             'user_filter' => [
-                'value' => '*',
+                'value' => 'objectClass=inetOrgPerson',
                 'type'  => 'text',
             ],
             'user_mapping' => [

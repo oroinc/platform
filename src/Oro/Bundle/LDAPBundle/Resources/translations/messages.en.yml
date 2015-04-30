@@ -2,6 +2,12 @@ oro:
     user:
         dn.label: Dn
     ldap:
+        action:
+            import_users: Import users from LDAP
+        import_users:
+            import: Import
+            error: Error occured during import. Please rechek ldap configuration.
+            search_error: Error occured during import. Please recheck user filter configuration.
         system_configuration:
             groups:
                 ldap_settings.title: LDAP

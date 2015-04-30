@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UserMappingType extends AbstractType
 {
@@ -14,6 +15,12 @@ class UserMappingType extends AbstractType
 
     /** @var Registry */
     protected $registry;
+
+    /** @var array */
+    protected $requiredFields = [
+        'username',
+        'email',
+    ];
 
     /**
      * @param Registry $registry
@@ -30,12 +37,35 @@ class UserMappingType extends AbstractType
     {
         $userManager = $this->getUserManager();
         $metadata = $userManager->getClassMetadata(static::USER_CLASS);
-        $fields = $metadata->getFieldNames();
+        $notRequiredFields = array_diff($metadata->getFieldNames(), $this->requiredFields);
 
+        $requiredOptions = [
+            'required'    => true,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ];
+
+        $this->addFields($builder, $this->requiredFields, $requiredOptions);
+        $this->addFields($builder, $notRequiredFields);
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $fields
+     * @param array $options
+     */
+    protected function addFields(FormBuilderInterface $builder, array $fields, array $options = [])
+    {
         foreach ($fields as $field) {
-            $builder->add($field, 'text', [
-                'label' => $field,
-            ]);
+            $fieldOptions = array_merge(
+                [
+                    'label'    => $field,
+                    'required' => false,
+                ],
+                $options
+            );
+            $builder->add($field, 'text', $fieldOptions);
         }
     }
 

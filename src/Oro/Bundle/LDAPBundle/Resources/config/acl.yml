@@ -1,0 +1,5 @@
+oro_ldap_import_users:
+    label: oro.ldap.action.import_users
+    type: action
+    group_name: ""
+    bindings: ~

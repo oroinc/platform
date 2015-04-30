@@ -1,0 +1,3 @@
+oro:
+    ldap:
+        import_users_success: Users imported successfully

@@ -1,0 +1,10 @@
+placeholders:
+    index_navButtons_before:
+        items:
+            ldap_import_users_button: ~
+
+items:
+    ldap_import_users_button:
+        template: OroLDAPBundle:Synchronization:importUsersLink.html.twig
+        applicable: @oro_ui.placeholder.filter->isEqual($entity_class$, %oro_user.entity.class%)
+        acl: oro_ldap_import_users

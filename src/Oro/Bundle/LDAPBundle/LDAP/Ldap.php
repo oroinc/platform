@@ -9,7 +9,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 class Ldap extends BaseLdap
 {
     /**
-     * Changes baseDn to value given from ConfigManager
+     * Changes options to values given from ConfigManager
      *
      * @param ConfigManager $cm
      */

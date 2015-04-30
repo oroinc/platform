@@ -1,6 +1,8 @@
 parameters:
     fr3d_ldap.security.authentication.provider.class: Oro\Bundle\LDAPBundle\Security\LdapProvider
     oro_ldap.extension.user_type.class:               Oro\Bundle\LDAPBundle\Form\Extension\UserTypeExtension
+    oro_ldap.provider.user.class:                     Oro\Bundle\LDAPBundle\Provider\UserProvider
+    oro_ldap.manager.import.class:                    Oro\Bundle\LDAPBundle\Manager\ImportManager
 
 services:
     fr3d_ldap.security.authentication.provider:
@@ -17,3 +19,16 @@ services:
         class: %oro_ldap.extension.user_type.class%
         tags:
             - { name: form.type_extension, alias: oro_user_user }
+
+    oro_ldap.provider.user:
+        class: %oro_ldap.provider.user.class%
+        arguments:
+            - @doctrine
+
+    oro_ldap.manager.import:
+        class: %oro_ldap.manager.import.class%
+        arguments:
+            - @fr3d_ldap.ldap_manager
+            - @oro_user.manager
+            - @doctrine
+            - @oro_ldap.provider.user
