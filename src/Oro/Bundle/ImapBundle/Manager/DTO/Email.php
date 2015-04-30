@@ -74,7 +74,7 @@ class Email extends EmailHeader
             $this->body = new EmailBody();
             $body = $this->message->getBody();
 
-            $contentType = $this->message->getContentType();
+            $contentType = $this->message->getPriorContentType();
             if ($contentType && $contentType->getType() === 'text/html') {
                 $this->body->setContent($body->getContent(Body::FORMAT_HTML)->getDecodedContent());
                 $this->body->setBodyIsText(false);
