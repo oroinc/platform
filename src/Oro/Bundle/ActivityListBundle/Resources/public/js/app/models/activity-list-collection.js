@@ -11,7 +11,7 @@ define([
     var ActivityCollection;
 
     ActivityCollection = BaseCollection.extend({
-        model:    ActivityModel,
+        model: ActivityModel,
         route: '',
         routeParameters: {},
         filter:   {},
