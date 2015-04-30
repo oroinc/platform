@@ -58,9 +58,11 @@ class StepExecutionProxyContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function incrementReadCount()
+    public function incrementReadCount($incrementBy = 1)
     {
-        $this->stepExecution->incrementReadCount();
+        $this->stepExecution->setReadCount(
+            $this->stepExecution->getReadCount() + $incrementBy
+        );
     }
 
     /**
@@ -90,9 +92,9 @@ class StepExecutionProxyContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function incrementAddCount()
+    public function incrementAddCount($incrementBy = 1)
     {
-        $this->setValue('add_count', (int)$this->getValue('add_count') + 1);
+        $this->setValue('add_count', (int)$this->getValue('add_count') + $incrementBy);
     }
 
     /**
@@ -106,9 +108,9 @@ class StepExecutionProxyContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function incrementUpdateCount()
+    public function incrementUpdateCount($incrementBy = 1)
     {
-        $this->setValue('update_count', (int)$this->getValue('update_count') + 1);
+        $this->setValue('update_count', (int)$this->getValue('update_count') + $incrementBy);
     }
 
     /**
@@ -122,9 +124,9 @@ class StepExecutionProxyContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function incrementReplaceCount()
+    public function incrementReplaceCount($incrementBy = 1)
     {
-        $this->setValue('replace_count', (int)$this->getValue('replace_count') + 1);
+        $this->setValue('replace_count', (int)$this->getValue('replace_count') + $incrementBy);
     }
 
     /**
@@ -138,9 +140,9 @@ class StepExecutionProxyContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function incrementDeleteCount()
+    public function incrementDeleteCount($incrementBy = 1)
     {
-        $this->setValue('delete_count', (int)$this->getValue('delete_count') + 1);
+        $this->setValue('delete_count', (int)$this->getValue('delete_count') + $incrementBy);
     }
 
     /**
@@ -154,9 +156,9 @@ class StepExecutionProxyContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function incrementErrorEntriesCount()
+    public function incrementErrorEntriesCount($incrementBy = 1)
     {
-        $this->setValue('error_entries_count', (int)$this->getValue('error_entries_count') + 1);
+        $this->setValue('error_entries_count', (int)$this->getValue('error_entries_count') + $incrementBy);
     }
 
     /**

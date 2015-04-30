@@ -512,7 +512,7 @@
     Parameters:
         email - email body entity Oro\Bundle\EmailBundle\Entity\Email
 #}
-{% macro email_contexts(entity) %}
+{% macro email_contexts(entity, target, checkTarget) %}
     <script type="text/template" id="email-context-activity-list">
         <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
                 <span data-id="<%= entity.get('targetId') %>">
@@ -532,11 +532,16 @@
         </div>
     </script>
 
-    {% set itemsArray = [] %}
+    {% if checkTarget is empty %}
+        {% set checkTarget = false %}
+    {% endif %}
+
+    {% set contextTargetArray = [] %}
+    {% set targetClassNameEncoded = oro_class_name(target, true) %}
     {% for item in entity.getActivityTargetEntities() %}
         {% set itemClassName = oro_class_name(item) %}
         {% set itemClassNameEncoded = oro_class_name(item, true) %}
-        {% set itemArray = {
+        {% set contextTarget = {
             'entityId': entity.id,
             'targetId': item.id,
             "targetClassName": itemClassNameEncoded,
@@ -545,13 +550,26 @@
             'link': oro_entity_metadata_value(itemClassName, 'routeView') ? path(oro_entity_route(itemClassName), {id:item.id} ) : false
         } %}
         {% if not ((app.user.id == item.id) and (oro_class_name(app.user) == itemClassName)) %}
-            {% set itemsArray = itemsArray|merge([itemArray]) %}
+            {% set contextTargetArray = contextTargetArray|merge([contextTarget]) %}
         {% endif %}
     {% endfor %}
+
     {% set options = {
-        items: itemsArray,
-        entityId: entity.id
+        contextTargets: contextTargetArray,
+        entityId: entity.id,
+        target: false,
+        checkTarget: checkTarget
     } %}
+
+    {% if checkTarget %}
+        {% set targetEntity = {
+            'target': {
+                'id' : target.id,
+                'className': targetClassNameEncoded
+            }
+        } %}
+        {% set options = options|merge(targetEntity) %}
+    {% endif %}
 
     <div class="email-context-activity"
          data-page-component-module="oroemail/js/app/components/email-context-activity-component"
@@ -561,7 +579,6 @@
             {{ 'oro.email.contexts.label'|trans }}
         </div>
         <div class="email-context-activity-items">
-
         </div>
     </div>
 {% endmacro %}
