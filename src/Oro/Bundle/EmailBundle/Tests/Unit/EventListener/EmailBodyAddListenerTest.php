@@ -139,6 +139,33 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->linkToScope($event);
     }
 
+    public function testUpdateActivityDescription()
+    {
+        $activityList = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
+            ->getMock();
+
+        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
+            ->disableOriginalConstructor()->getMock();
+
+        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
+            ->disableOriginalConstructor()->getMock();
+
+        $event->expects($this->exactly(1))
+            ->method('getEmail')
+            ->will($this->returnValue($email));
+
+        $this->chainProvider->expects($this->exactly(1))
+            ->method('getUpdatedActivityList')
+            ->with($this->identicalTo($email), $this->identicalTo($this->entityManager))
+            ->will($this->returnValue($activityList));
+
+        $this->entityManager->expects($this->exactly(1))
+            ->method('persist')
+            ->with($activityList);
+
+        $this->listener->updateActivityDescription($event);
+    }
+
     public function getTestData()
     {
         return [
