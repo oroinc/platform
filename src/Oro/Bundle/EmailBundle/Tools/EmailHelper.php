@@ -2,16 +2,33 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 
 class EmailHelper
 {
+    /**
+     * @var string
+     */
+    protected $cacheDir;
+
+    /**
+     * @param string|null $cacheDir
+     */
+    public function __construct($cacheDir = null)
+    {
+        $this->cacheDir = $cacheDir;
+    }
+
     /**
      * @param string $content
      * @return string
      */
     public function getStrippedBody($content)
     {
+        $transformer = new SanitizeHTMLTransformer(null, $this->cacheDir);
+        $content = $transformer->transform($content);
         return strip_tags($content);
     }
 
