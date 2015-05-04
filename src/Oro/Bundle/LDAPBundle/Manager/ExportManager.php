@@ -52,7 +52,7 @@ class ExportManager
             $result['errors'][] = 'oro.ldap.export_users.error';
         }
 
-        $result['exported'] = !$dryRun && !$result['errors'];
+        $result['done'] = !$dryRun && !$result['errors'];
 
         return $result;
     }

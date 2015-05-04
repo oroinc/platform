@@ -79,7 +79,7 @@ class ImportManager
             $result['errors'][] = 'oro.ldap.import_users.error';
         }
 
-        $result['imported'] = !$dryRun && !$result['errors'];
+        $result['done'] = !$dryRun && !$result['errors'];
 
         return $result;
     }
