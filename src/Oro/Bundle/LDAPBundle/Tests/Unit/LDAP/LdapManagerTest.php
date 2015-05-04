@@ -23,26 +23,6 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
         $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->driver = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $attributes = [
-            'filter' => '*',
-            'attributes' => [
-                ['ldap_attr' => 'attr'],
-            ],
-        ];
-
-        $this->ldapManager = new LdapManager($this->registry, $this->driver, null, $attributes);
-    }
-
-    public function testHydrate()
-    {
         $this->cm->expects($this->exactly(9))
             ->method('get')
             ->withConsecutive(
@@ -62,7 +42,7 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
                 'objectClass=groupOfNames',
                 'cn',
                 'member',
-                'cn=admin,ou=users,dc=domain,dc=local',
+                'ou=users,dc=domain,dc=local',
                 'inetOrgPerson',
                 [
                     [
@@ -77,6 +57,26 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
+        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->driver = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $attributes = [
+            'filter' => '*',
+            'attributes' => [
+                ['ldap_attr' => 'attr'],
+            ],
+        ];
+
+        $this->ldapManager = new LdapManager($this->registry, $this->driver, null, $attributes);
+        $this->ldapManager->updateOroConfiguration($this->cm);
+    }
+
+    public function testHydrate()
+    {
         $entry = [
             'cn'   => ['user1'],
             'mail' => ['sth@example.com'],
@@ -105,12 +105,50 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($roleEntries));
 
         $user = new TestingUser();
-        $this->ldapManager->updateOroConfiguration($this->cm);
         $this->ldapManager->hydrate($user, $entry);
         $this->assertEquals('user1', $user->getUsername());
         $this->assertEquals('sth@example.com', $user->getEmail());
         $this->assertEquals('cn=user1,dn=local', $user->getDn());
         $this->assertCount(1, $user->getRoles());
         $this->assertSame($role, $user->getRoles()[0]);
+    }
+
+    public function testSaveWithoutDn()
+    {
+        $expectedEntry = [
+            'objectClass' => ['inetOrgPerson'],
+            'cn'          => 'user1',
+            'mail'        => 'email@example.com',
+        ];
+
+        $this->driver->expects($this->once())
+            ->method('save')
+            ->with('cn=user1,ou=users,dc=domain,dc=local', $expectedEntry);
+
+        $user = new TestingUser();
+        $user->setUsername('user1');
+        $user->setEmail('email@example.com');
+
+        $this->ldapManager->save($user);
+    }
+
+    public function testSaveWithDn()
+    {
+        $expectedEntry = [
+            'objectClass' => ['inetOrgPerson'],
+            'cn'          => 'user1',
+            'mail'        => 'email@example.com',
+        ];
+
+        $this->driver->expects($this->once())
+            ->method('save')
+            ->with('cn=user1,ou=org,dc=domain,dc=local', $expectedEntry);
+
+        $user = new TestingUser();
+        $user->setUsername('user1');
+        $user->setEmail('email@example.com');
+        $user->setDn('cn=user1,ou=org,dc=domain,dc=local');
+
+        $this->ldapManager->save($user);
     }
 }

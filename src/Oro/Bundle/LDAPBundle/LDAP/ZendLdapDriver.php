@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 class ZendLdapDriver extends BaseDriver
 {
     /**
-     * @var Ldap 
+     * @var Ldap
      */
     protected $driver;
 
