@@ -89,7 +89,7 @@ class ImportManagerTest extends \PHPUnit_Framework_TestCase
             'add'      => 1,
             'replace'  => 0,
             'total'    => 1,
-            'imported' => true,
+            'done'     => true,
             'errors'   => [],
         ];
 
@@ -109,7 +109,7 @@ class ImportManagerTest extends \PHPUnit_Framework_TestCase
             'add'      => 0,
             'replace'  => 0,
             'total'    => 0,
-            'imported' => false,
+            'done'     => false,
             'errors'   => [
                 'oro.ldap.import_users.error'
             ],
@@ -146,7 +146,7 @@ class ImportManagerTest extends \PHPUnit_Framework_TestCase
             'add'      => 1,
             'replace'  => 0,
             'total'    => 1,
-            'imported' => false,
+            'done'     => false,
             'errors'   => [],
         ];
 

@@ -17,17 +17,21 @@ class LdapTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateOroConfiguration()
     {
-        $this->cm->expects($this->exactly(3))
+        $this->cm->expects($this->exactly(5))
             ->method('get')
             ->withConsecutive(
                 ['oro_ldap.server_base_dn'],
                 ['oro_ldap.server_hostname'],
-                ['oro_ldap.server_port']
+                ['oro_ldap.server_port'],
+                ['oro_ldap.admin_dn'],
+                ['oro_ldap.admin_password']
             )
             ->willReturnOnConsecutiveCalls(
                 'dc=domain,dc=local',
                 'domain.local',
-                123
+                123,
+                'cn=admin,ou=users,dc=domain,dc=local',
+                'password'
             );
 
         $ldap = new Ldap();

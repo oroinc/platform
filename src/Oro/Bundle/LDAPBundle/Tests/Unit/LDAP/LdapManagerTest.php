@@ -27,7 +27,9 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->driver = $this->getMock('FR3D\LdapBundle\Driver\LdapDriverInterface');
+        $this->driver = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $attributes = [
             'filter' => '*',
@@ -41,7 +43,7 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testHydrate()
     {
-        $this->cm->expects($this->exactly(7))
+        $this->cm->expects($this->exactly(9))
             ->method('get')
             ->withConsecutive(
                 ['oro_ldap.server_base_dn'],
@@ -49,6 +51,8 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
                 ['oro_ldap.role_filter'],
                 ['oro_ldap.role_id_attribute'],
                 ['oro_ldap.role_user_id_attribute'],
+                ['oro_ldap.export_user_base_dn'],
+                ['oro_ldap.export_user_class'],
                 ['oro_ldap.role_mapping'],
                 ['oro_ldap.user_mapping']
             )
@@ -58,6 +62,8 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
                 'objectClass=groupOfNames',
                 'cn',
                 'member',
+                'cn=admin,ou=users,dc=domain,dc=local',
+                'inetOrgPerson',
                 [
                     [
                         'ldapName' => 'role1',
