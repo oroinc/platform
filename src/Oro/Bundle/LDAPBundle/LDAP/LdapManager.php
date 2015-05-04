@@ -13,6 +13,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * @property ZendLdapDriver $driver
+ */
 class LdapManager extends BaseManager
 {
     /** @var Registry */
@@ -38,9 +41,16 @@ class LdapManager extends BaseManager
      */
     public function findUsers()
     {
+        $attributes = $this->params['attributes'];
+        $userAttributes = [];
+        foreach ($attributes as $attribute) {
+            $userAttributes[] = $attribute['ldap_attr'];
+        }
+
         return $this->driver->search(
             $this->params['baseDn'],
-            $this->params['filter']
+            $this->params['filter'],
+            $userAttributes
         );
     }
 
@@ -58,7 +68,8 @@ class LdapManager extends BaseManager
                 $this->params['role_filter'],
                 $this->params['role_user_id_attribute'],
                 $userDn
-            )
+            ),
+            [$this->params['role_id_attribute']]
         );
     }
 
