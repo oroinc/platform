@@ -7,21 +7,34 @@ use Oro\Bundle\LDAPBundle\Tests\Unit\Stub\TestingUser;
 
 class ExportManagerTest extends \PHPUnit_Framework_TestCase
 {
+    private $em;
+
     private $ldapManager;
     private $userManager;
+    private $userProvider;
 
     private $exportManager;
 
     public function setUp()
     {
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->ldapManager = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\LdapManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->userProvider = $this->getMockBuilder('Oro\Bundle\LDAPBundle\Provider\UserProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->userManager->expects($this->any())
+            ->method('getStorageManager')
+            ->will($this->returnValue($this->em));
 
-        $this->exportManager = new ExportManager($this->ldapManager, $this->userManager);
+        $this->exportManager = new ExportManager($this->ldapManager, $this->userManager, $this->userProvider);
     }
 
     public function testExportNewUser()
@@ -30,9 +43,12 @@ class ExportManagerTest extends \PHPUnit_Framework_TestCase
         $user1->setUsername('user1');
         $user1->setEmail('user1@example.com');
 
-        $this->userManager->expects($this->once())
-            ->method('findUsers')
-            ->will($this->returnValue([$user1]));
+        $this->userProvider->expects($this->once())
+            ->method('getNumberOfUsers')
+            ->will($this->returnValue(1));
+        $this->userProvider->expects($this->once())
+            ->method('getUsersIterator')
+            ->will($this->returnValue([[$user1]]));
         $this->ldapManager->expects($this->once())
             ->method('exists')
             ->with($user1)
@@ -59,9 +75,12 @@ class ExportManagerTest extends \PHPUnit_Framework_TestCase
         $user1->setUsername('user1');
         $user1->setEmail('user1@example.com');
 
-        $this->userManager->expects($this->once())
-            ->method('findUsers')
-            ->will($this->returnValue([$user1]));
+        $this->userProvider->expects($this->once())
+            ->method('getNumberOfUsers')
+            ->will($this->returnValue(1));
+        $this->userProvider->expects($this->once())
+            ->method('getUsersIterator')
+            ->will($this->returnValue([[$user1]]));
         $this->ldapManager->expects($this->once())
             ->method('exists')
             ->with($user1)
@@ -88,9 +107,12 @@ class ExportManagerTest extends \PHPUnit_Framework_TestCase
         $user1->setUsername('user1');
         $user1->setEmail('user1@example.com');
 
-        $this->userManager->expects($this->once())
-            ->method('findUsers')
-            ->will($this->returnValue([$user1]));
+        $this->userProvider->expects($this->once())
+            ->method('getNumberOfUsers')
+            ->will($this->returnValue(1));
+        $this->userProvider->expects($this->once())
+            ->method('getUsersIterator')
+            ->will($this->returnValue([[$user1]]));
         $this->ldapManager->expects($this->once())
             ->method('exists')
             ->with($user1)

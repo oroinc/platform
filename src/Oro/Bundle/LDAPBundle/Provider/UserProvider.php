@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\LDAPBundle\Provider;
 
+use Iterator;
+
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+
 use Oro\Bundle\LDAPBundle\Model\User;
 
 class UserProvider
@@ -19,6 +22,27 @@ class UserProvider
     public function __construct(Registry $registry)
     {
         $this->registry = $registry;
+    }
+
+    /**
+     * @return Iterator
+     */
+    public function getUsersIterator()
+    {
+        $qb = $this->getUserRepository()->createQueryBuilder('u');
+
+        return $qb->getQuery()->iterate();
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumberOfUsers()
+    {
+        $qb = $this->getUserRepository()->createQueryBuilder('u');
+        $paginator = new Paginator($qb);
+
+        return $paginator->count();
     }
 
     /**

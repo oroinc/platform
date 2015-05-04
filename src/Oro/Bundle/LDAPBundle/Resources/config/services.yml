@@ -50,3 +50,4 @@ services:
         arguments:
             - @fr3d_ldap.ldap_manager
             - @oro_user.manager
+            - @oro_ldap.provider.user
