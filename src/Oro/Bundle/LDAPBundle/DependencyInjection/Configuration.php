@@ -34,12 +34,12 @@ class Configuration implements ConfigurationInterface
                 'value' => null,
                 'type'  => 'text',
             ],
-            'server_encryption_enabled' => [
-                'value' => true,
-                'type'  => 'boolean',
+            'server_encryption' => [
+                'value' => 'tls',
+                'type'  => 'text',
             ],
             'server_port' => [
-                'value' => 389,
+                'value' => 636,
                 'type'  => 'integer',
             ],
             'server_protocol_version' => [

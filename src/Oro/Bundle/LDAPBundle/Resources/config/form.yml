@@ -1,6 +1,7 @@
 parameters:
     oro_ldap.form.type.user_mapping_type.class:  Oro\Bundle\LDAPBundle\Form\Type\UserMappingType
     oro_ldap.form.type.role_mapping_type.class:  Oro\Bundle\LDAPBundle\Form\Type\RoleMappingType
+    oro_ldap.form.type.encryption_type.class:    Oro\Bundle\LDAPBundle\Form\Type\EncryptionType
 
 services:
     oro_ldap.form.type.user_mapping_type:
@@ -16,3 +17,8 @@ services:
             - @doctrine
         tags:
             - { name: form.type, alias: oro_ldap_role_mapping }
+
+    oro_ldap.form.type.encryption_type:
+        class: %oro_ldap.form.type.encryption_type.class%
+        tags:
+            - { name: form.type, alias: oro_ldap_encryption }

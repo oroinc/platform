@@ -21,5 +21,9 @@ class Ldap extends BaseLdap
 
         $this->options['username'] = $cm->get('oro_ldap.admin_dn');
         $this->options['password'] = $cm->get('oro_ldap.admin_password');
+
+        $encryption = $cm->get('oro_ldap.server_encryption');
+        $this->options['useSsl']      = $encryption === 'ssl' ? true : false;
+        $this->options['useStartTls'] = $encryption === 'tls' ? true : false;
     }
 }
