@@ -35,12 +35,14 @@ class ImportManagerTest extends \PHPUnit_Framework_TestCase
         $this->userProvider = $this->getMockBuilder('Oro\Bundle\LDAPBundle\Provider\UserProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
         
         $this->importManager = new ImportManager(
             $this->ldapManager,
             $this->userManager,
             $this->registry,
-            $this->userProvider
+            $this->userProvider,
+            $logger
         );
     }
 

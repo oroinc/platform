@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManager;
 
 use FR3D\LdapBundle\Driver\LdapDriverException;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\LDAPBundle\Provider\UserProvider;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -27,22 +29,28 @@ class ImportManager
     /** @var UserProvider */
     protected $userProvider;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param LdapManager $ldapManager
      * @param UserManager $userManager
      * @param Registry $registry
      * @param UserProvider $userProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
         LdapManager $ldapManager,
         UserManager $userManager,
         Registry $registry,
-        UserProvider $userProvider
+        UserProvider $userProvider,
+        LoggerInterface $logger
     ) {
         $this->ldapManager = $ldapManager;
         $this->userManager = $userManager;
         $this->registry = $registry;
         $this->userProvider = $userProvider;
+        $this->logger = $logger;
     }
 
     /**
@@ -75,8 +83,10 @@ class ImportManager
             $result['total']   = $ldapResults['count'];
         } catch (LdapDriverException $ex) {
             $result['errors'][] = 'oro.ldap.import_users.search_error';
+            $this->logger->error($ex->getMessage(), ['exception' => $ex]);
         } catch (Exception $ex) {
             $result['errors'][] = 'oro.ldap.import_users.error';
+            $this->logger->error($ex->getMessage(), ['exception' => $ex]);
         }
 
         $result['done'] = !$dryRun && !$result['errors'];

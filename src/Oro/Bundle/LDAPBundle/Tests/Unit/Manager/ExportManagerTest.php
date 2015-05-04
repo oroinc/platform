@@ -33,8 +33,9 @@ class ExportManagerTest extends \PHPUnit_Framework_TestCase
         $this->userManager->expects($this->any())
             ->method('getStorageManager')
             ->will($this->returnValue($this->em));
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
 
-        $this->exportManager = new ExportManager($this->ldapManager, $this->userManager, $this->userProvider);
+        $this->exportManager = new ExportManager($this->ldapManager, $this->userManager, $this->userProvider, $logger);
     }
 
     public function testExportNewUser()

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LDAPBundle\Manager;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\LDAPBundle\Provider\UserProvider;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -19,19 +21,25 @@ class ExportManager
     /** @var UserProvider */
     protected $userProvider;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param LdapManager $ldapManager
      * @param UserManager $userManager
      * @param UserProvider $userProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
         LdapManager $ldapManager,
         UserManager $userManager,
-        UserProvider $userProvider
+        UserProvider $userProvider,
+        LoggerInterface $logger
     ) {
         $this->ldapManager = $ldapManager;
         $this->userManager = $userManager;
         $this->userProvider = $userProvider;
+        $this->logger = $logger;
     }
 
     public function export($dryRun)
@@ -66,6 +74,7 @@ class ExportManager
             }
         } catch (Exception $ex) {
             $result['errors'][] = 'oro.ldap.export_users.error';
+             $this->logger->error($ex->getMessage(), ['exception' => $ex]);
         }
 
         $result['done'] = !$dryRun && !$result['errors'];

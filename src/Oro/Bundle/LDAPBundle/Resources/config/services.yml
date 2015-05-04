@@ -44,6 +44,9 @@ services:
             - @oro_user.manager
             - @doctrine
             - @oro_ldap.provider.user
+            - @logger
+        tags:
+            - { name: monolog.logger, channel: oro_distribution }
 
     oro_ldap.manager.export:
         class: %oro_ldap.manager.export.class%
@@ -51,3 +54,6 @@ services:
             - @fr3d_ldap.ldap_manager
             - @oro_user.manager
             - @oro_ldap.provider.user
+            - @logger
+        tags:
+            - { name: monolog.logger, channel: oro_distribution }
