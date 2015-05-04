@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\LDAPBundle\Manager\ExportManager;
 use Oro\Bundle\LDAPBundle\Manager\ImportManager;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -27,10 +28,28 @@ class SynchronizationController extends Controller
     }
 
     /**
+     * @Route("/export", name="oro_ldap_export_users")
+     * @Template
+     * @AclAncestor("oro_ldap_export_users")
+     */
+    public function exportUsersAction(Request $request)
+    {
+        return $this->getExportManager()->export(!$request->isMethod('POST'));
+    }
+
+    /**
      * @return ImportManager
      */
     protected function getImportManager()
     {
         return $this->container->get('oro_ldap.manager.import');
+    }
+
+    /**
+     * @return ExportManager
+     */
+    protected function getExportManager()
+    {
+        return $this->container->get('oro_ldap.manager.export');
     }
 }

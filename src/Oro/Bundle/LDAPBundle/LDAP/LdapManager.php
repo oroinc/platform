@@ -4,23 +4,30 @@ namespace Oro\Bundle\LDAPBundle\LDAP;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
-use FR3D\LdapBundle\Driver\LdapDriverInterface;
+
 use FR3D\LdapBundle\Ldap\LdapManager as BaseManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class LdapManager extends BaseManager
 {
     /** @var Registry */
     private $registry;
 
+    /** @var PropertyAccessor|null */
+    private $propertyAccessor;
+
     /**
      * @param Registry $registry
-     * @param LdapDriverInterface $driver
+     * @param ZendLdapDriver $driver
      * @param type $userManager
      * @param array $params
      */
-    public function __construct(Registry $registry, LdapDriverInterface $driver, $userManager, array $params)
+    public function __construct(Registry $registry, ZendLdapDriver $driver, $userManager, array $params)
     {
         parent::__construct($driver, $userManager, $params);
         $this->registry = $registry;
@@ -61,6 +68,48 @@ class LdapManager extends BaseManager
     public function getUsernameAttr()
     {
         return $this->ldapUsernameAttr;
+    }
+
+    /**
+     * @param UserInterface $user
+     */
+    public function save(UserInterface $user)
+    {
+        $propertyAccessor = $this->getPropertyAccessor();
+
+        $entry = array(
+            'objectClass' => [$this->params['export_class']],
+        );
+        foreach ($this->params['attributes'] as $attribute) {
+            $entry[$attribute['ldap_attr']] = $propertyAccessor->getValue($user, $attribute['user_field']);
+        }
+
+        $this->driver->save($this->createDn($user), $entry);
+    }
+
+    /**
+     * @param UserInterface $user
+     *
+     * @return bool
+     */
+    public function exists(UserInterface $user)
+    {
+        return $this->driver->exists($this->createDn($user));
+    }
+
+    /**
+     * @param UserInterface $user
+     *
+     * @return string
+     */
+    private function createDn(UserInterface $user)
+    {
+        $dn = $user->getDn();
+        if (!$dn) {
+            $dn = sprintf('%s=%s,%s', $this->ldapUsernameAttr, $user->getUsername(), $this->params['export_dn']);
+        }
+
+        return $dn;
     }
 
     /**
@@ -144,6 +193,9 @@ class LdapManager extends BaseManager
         $this->params['role_id_attribute']      = $cm->get('oro_ldap.role_id_attribute');
         $this->params['role_user_id_attribute'] = $cm->get('oro_ldap.role_user_id_attribute');
 
+        $this->params['export_dn']    = $cm->get('oro_ldap.export_user_base_dn');
+        $this->params['export_class'] = $cm->get('oro_ldap.export_user_class');
+
         $roleMapping = $cm->get('oro_ldap.role_mapping');
         $roles = [];
         foreach ($roleMapping as $mapping) {
@@ -190,6 +242,7 @@ class LdapManager extends BaseManager
             $attributes[] = [
                 'ldap_attr'   => $ldapAttr,
                 'user_method' => sprintf('set%s', ucfirst($userField)),
+                'user_field'  => $userField,
             ];
         }
 
@@ -202,5 +255,17 @@ class LdapManager extends BaseManager
     private function getRoleEntityManager()
     {
         return $this->registry->getManagerForClass('OroUserBundle:Role');
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    private function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = new PropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

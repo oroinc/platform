@@ -3,3 +3,9 @@ oro_ldap_import_users:
     type: action
     group_name: ""
     bindings: ~
+
+oro_ldap_export_users:
+    label: oro.ldap.action.export_users
+    type: action
+    group_name: ""
+    bindings: ~

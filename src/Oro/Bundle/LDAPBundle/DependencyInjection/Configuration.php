@@ -82,6 +82,14 @@ class Configuration implements ConfigurationInterface
                 'value' => [],
                 'type'  => 'text',
             ],
+            'export_user_base_dn' => [
+                'value' => 'ou=users,dc=local',
+                'type'  => 'text',
+            ],
+            'export_user_class' => [
+                'value' => 'inetOrgPerson',
+                'type'  => 'text',
+            ],
         ]);
 
         return $treeBuilder;

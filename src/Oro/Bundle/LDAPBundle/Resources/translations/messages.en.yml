@@ -4,10 +4,14 @@ oro:
     ldap:
         action:
             import_users: Import users from LDAP
+            export_users: Export users to LDAP
         import_users:
             import: Import
             error: Error occured during import. Please rechek ldap configuration.
             search_error: Error occured during import. Please recheck user filter configuration.
+        export_users:
+            export: Export
+            error: Error occured during export. Please rechek ldap configuration.
         system_configuration:
             groups:
                 ldap_settings.title: LDAP
@@ -15,6 +19,7 @@ oro:
                 ldap_admin_settings.title: Admin
                 ldap_user_settings.title: User
                 ldap_role_settings.title: Roles
+                ldap_role_export_settings.title: Export
             fields:
                 server_enable_login.label: Enable login
                 server_name.label: Name
@@ -33,3 +38,5 @@ oro:
                 role_mapping.label: Mapping
                 role_ldap.label: LDAP Role
                 role_crm.label: CRM Roles
+                export_user_base_dn.label: Base Dn
+                export_user_class.label: User class

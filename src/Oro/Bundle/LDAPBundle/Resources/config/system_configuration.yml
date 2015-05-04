@@ -11,6 +11,8 @@ oro_system_configuration:
             title: oro.ldap.system_configuration.groups.ldap_user_settings.title
         ldap_role_settings:
             title: oro.ldap.system_configuration.groups.ldap_role_settings.title
+        ldap_role_export_settings:
+            title: oro.ldap.system_configuration.groups.ldap_role_export_settings.title
     fields:
         oro_ldap.server_enable_login:
             data_type: boolean
@@ -86,6 +88,7 @@ oro_system_configuration:
             type: password
             options:
                 label: oro.ldap.system_configuration.fields.admin_password.label
+                always_empty: false
                 required: false
                 resettable: false
         oro_ldap.user_filter:
@@ -137,6 +140,24 @@ oro_system_configuration:
                 handle_primary: false
                 show_form_when_empty: false
             priority: 10
+        oro_ldap.export_user_base_dn:
+            data_type: string
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.export_user_base_dn.label
+                resettable: false
+                constraints:
+                    - NotBlank: ~
+            priority: 20
+        oro_ldap.export_user_class:
+            data_type: string
+            type: text
+            options:
+                label: oro.ldap.system_configuration.fields.export_user_class.label
+                resettable: false
+                constraints:
+                    - NotBlank: ~
+            priority: 10
     tree:
         system_configuration:
             platform:
@@ -171,3 +192,8 @@ oro_system_configuration:
                                             - oro_ldap.role_id_attribute
                                             - oro_ldap.role_user_id_attribute
                                             - oro_ldap.role_mapping
+                                    ldap_role_export_settings:
+                                        priority: 0
+                                        children:
+                                            - oro_ldap.export_user_base_dn
+                                            - oro_ldap.export_user_class

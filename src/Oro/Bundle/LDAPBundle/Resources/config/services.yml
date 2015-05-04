@@ -1,8 +1,10 @@
 parameters:
     fr3d_ldap.security.authentication.provider.class: Oro\Bundle\LDAPBundle\Security\LdapProvider
+    fr3d_ldap.ldap_driver.zend.class:                 Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver
     oro_ldap.extension.user_type.class:               Oro\Bundle\LDAPBundle\Form\Extension\UserTypeExtension
     oro_ldap.provider.user.class:                     Oro\Bundle\LDAPBundle\Provider\UserProvider
     oro_ldap.manager.import.class:                    Oro\Bundle\LDAPBundle\Manager\ImportManager
+    oro_ldap.manager.export.class:                    Oro\Bundle\LDAPBundle\Manager\ExportManager
 
 services:
     fr3d_ldap.security.authentication.provider:
@@ -42,3 +44,9 @@ services:
             - @oro_user.manager
             - @doctrine
             - @oro_ldap.provider.user
+
+    oro_ldap.manager.export:
+        class: %oro_ldap.manager.export.class%
+        arguments:
+            - @fr3d_ldap.ldap_manager
+            - @oro_user.manager

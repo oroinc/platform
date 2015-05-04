@@ -18,5 +18,8 @@ class Ldap extends BaseLdap
         $this->options['baseDn'] = $cm->get('oro_ldap.server_base_dn');
         $this->options['host']   = $cm->get('oro_ldap.server_hostname');
         $this->options['port']   = $cm->get('oro_ldap.server_port');
+
+        $this->options['username'] = $cm->get('oro_ldap.admin_dn');
+        $this->options['password'] = $cm->get('oro_ldap.admin_password');
     }
 }
