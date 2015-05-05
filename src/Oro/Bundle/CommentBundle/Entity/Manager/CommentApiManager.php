@@ -127,19 +127,20 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param string $entityClass
-     * @param string $entityId
-     *
+     * @param object[] $groupRelationEntities
      * @return int
      */
-    public function getCommentCount($entityClass, $entityId)
+    public function getCommentCount($entityClass, $groupRelationEntities)
     {
         $result = 0;
 
         if ($this->isCommentable()) {
             $entityName = $this->convertRelationEntityClassName($entityClass);
+            $entityIds = $this->prepareRelationEntityId($groupRelationEntities);
+
             try {
                 if ($this->isCorrectClassName($entityName)) {
-                    $result = $this->getBuildCommentCount($entityName, $entityId);
+                    $result = $this->getBuildCommentCount($entityName, $entityIds);
                 }
             } catch (\Exception $e) {
             }
@@ -388,18 +389,32 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param string $entityName
-     * @param string $entityId
+     * @param int[] $entityIds
      *
      * @return int important to return int
      */
-    protected function getBuildCommentCount($entityName, $entityId)
+    protected function getBuildCommentCount($entityName, $entityIds)
     {
         /** @var CommentRepository $repository */
         $fieldName  = $this->getFieldName($entityName);
         $repository = $this->getRepository();
-        $qb         = $repository->getNumberOfComment($fieldName, $entityId);
+        $qb         = $repository->getNumberOfComment($fieldName, $entityIds);
         $query      = $this->aclHelper->apply($qb);
 
         return  (int) $query->getSingleScalarResult();
+    }
+
+    /**
+     * @param object[] $groupRelationEntities
+     * @return int[]
+     */
+    protected function prepareRelationEntityId($groupRelationEntities)
+    {
+        $relatedActivityId = [];
+        foreach ($groupRelationEntities as $activityEntity) {
+            $relatedActivityId[] = $activityEntity->getRelatedActivityId();
+        }
+
+        return $relatedActivityId;
     }
 }

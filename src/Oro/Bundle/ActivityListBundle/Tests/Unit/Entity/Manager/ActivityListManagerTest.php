@@ -46,6 +46,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $commentManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
     public function setUp()
     {
         $this->doctrine       = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
@@ -58,6 +61,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->config         = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()->getMock();
@@ -82,7 +88,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->config,
             $this->provider,
             $this->activityListFilterHelper,
-            $this->commentManager
+            $this->commentManager,
+            $this->doctrineHelper
         );
     }
 

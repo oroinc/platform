@@ -72,6 +72,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
                 filterId = this._getApplicableFilterId(conditions),
                 filter = this.options.filters[filterId];
+
+            // @TODO temporary workaround. Will by fixed in BAP-8112
+            if (conditions.entity === 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account' && conditions.field === 'lifetimeValue') {
+                filterId = 'not_supported_lifetimeValue';
+                filter = {
+                    type: 'none',
+                    applicable: {},
+                    popupHint: '<span style="color: red">The filtering by the LifetimeValue is not supported yet.</span>'
+                };
+                this._createFilter(filter, filterId);
+                return;
+            }
+
             this._createFilter(filter, fieldId);
         },
 
