@@ -42,6 +42,11 @@ class ExportManager
         $this->logger = $logger;
     }
 
+    /**
+     * @param bool $dryRun
+     *
+     * @return array Result
+     */
     public function export($dryRun)
     {
         $users = $this->userProvider->getUsersIterator();
