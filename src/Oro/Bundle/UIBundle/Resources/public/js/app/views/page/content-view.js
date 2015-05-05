@@ -8,6 +8,34 @@ define([
 
     var PageContentView;
 
+    /**
+     * Finds first container that has active scrollbar and sets focus on it for ability of scrolling it by keyboard
+     */
+    function focusScrollElement() {
+        var scrollable = [
+            '.scrollable-container',
+            '.other-scroll',
+            '.layout-content .scrollable-container',
+            '.system-configuration-container .scrollable-container',
+            '.scrollspy'
+        ], target;
+
+        target = _.find(scrollable, function (item) {
+            var $el = $(item).first(),
+                overflow = $el.css('overflow-y');
+            return $el.length && /auto|scroll/.test(overflow) && $el[0].scrollHeight > $el[0].clientHeight;
+        });
+
+        if(!_.isUndefined(target)) {
+            $(target).attr({
+                'tabindex': 0,
+                'data-scroll-focus': ''
+            }).one('blur', function(){
+                $(this).removeAttr('data-scroll-focus tabindex');
+            }).focus();
+        }
+    }
+
     PageContentView = PageRegionView.extend({
         template: function (data) {
             return data.content;
@@ -48,43 +76,18 @@ define([
          */
         initFocus: function () {
             var view = this,
-                activeElement = document.activeElement;
-
-            function focusScrollElement() {
-                // timeout for fix Mozilla DOM updating latency
-                setTimeout(view._focusScrollElement, 200);
-            }
+                activeElement = document.activeElement,
+                delay = 200;
 
             view.$('form:first').focusFirstInput();
 
             if(!tools.isMobile() && activeElement === document.activeElement){
                 if(document.hasOwnProperty('page-rendered')) {
-                    focusScrollElement();
+                    _.delay(focusScrollElement, delay);
                 } else {
-                    mediator.on('page-rendered', focusScrollElement);
+                    mediator.on('page-rendered', _.debounce(focusScrollElement, delay));
                 }
             }
-
-        },
-
-        _focusScrollElement: function() {
-            var scrollable = [
-                '.scrollable-container',
-                '.other-scroll',
-                '.layout-content .scrollable-container',
-                '.scrollspy'
-            ];
-
-            $.each(scrollable, function () {
-
-                var $el = $(this).first(),
-                    overflow = $el.css('overflow-y');
-
-                if ($el.length > 0 && /auto|scroll/.test(overflow) && $el[0].scrollHeight > $el[0].clientHeight) {
-                    $el.attr('tabindex', 0).css('outline', '0 none').focus();
-                    return false;
-                }
-            });
         }
     });
 
