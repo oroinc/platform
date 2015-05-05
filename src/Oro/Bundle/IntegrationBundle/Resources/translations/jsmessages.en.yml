@@ -12,3 +12,9 @@ oro:
         channel.sync_priority.tooltip: >
             Select if your local version of the data or    the remote application
             data get priority in the case that both were updated since the last sync process.
+
+        force_sync:
+            title: Confirm full integration re-sync
+            message: Attention: This action will start full re-synchronization of all {{ integration_name }} data. It might require some time to complete.
+            ok: Run Re-sync
+            cancel: Cancel

@@ -138,19 +138,19 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
             return '$this->' . $fieldName . ' = $value; return $this;';
         } else {
             $addMethodName = $this->generateAddMethodName($fieldName);
+            $removeMethodName = $this->generateRemoveMethodName($fieldName);
             $body = <<<METHOD_BODY
 if ((!\$value instanceof \Traversable && !is_array(\$value) && !\$value instanceof \ArrayAccess) ||
     !\$this->$fieldName instanceof \Doctrine\Common\Collections\Collection) {
     \$this->$fieldName = \$value;
-
     return \$this;
 }
-
-\$this->{$fieldName}->clear();
+foreach (\$this->$fieldName as \$item) {
+    \$this->$removeMethodName(\$item);
+}
 foreach (\$value as \$item) {
     \$this->$addMethodName(\$item);
 }
-
 return \$this;
 METHOD_BODY;
             return $body;

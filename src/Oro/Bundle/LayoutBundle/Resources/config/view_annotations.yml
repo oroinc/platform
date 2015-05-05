@@ -1,0 +1,8 @@
+services:
+    oro_layout.view.listener:
+        class: Oro\Bundle\LayoutBundle\EventListener\LayoutListener
+        arguments:
+            - @service_container
+        tags:
+            # process the @Layout annotation before the @Template annotation
+            - { name: kernel.event_listener, event: kernel.view, method: onKernelView, priority: 10 }

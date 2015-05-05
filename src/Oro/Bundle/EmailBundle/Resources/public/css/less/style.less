@@ -57,6 +57,7 @@
 }
 .ui-dialog {
   .email-form {
+    padding-bottom: 12px;
     .mce-tinymce {
       width: calc(~"97% + 12px");
     }
@@ -105,30 +106,15 @@
 #showCc:hover, #showBcc:hover {
   text-decoration: underline;
 }
-.thread-view {
-  .email-head {
-    border-bottom: 1px solid #eee;
-    overflow: hidden;
-    padding: 10px;
-    a.subject {
-      font-size: 16px;
-    }
-  }
-  .email-body {
-    margin: 10px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    .quote,
-    .gmail_quote {
-      background-color: #fbfbfb;
-      padding: 4px;
-      .border-radius(4px);
-    }
-  }
-}
 .activity-list-widget {
   .email-info, .email-load-more {
     margin: 0 20px 0 0;
+  }
+  .email-context-activity-list {
+    padding: 0 @horizontalPadding;
+  }
+  .accordion-body > .message .email-content .comment {
+    padding-right: 0;
   }
 }
 .icon-email-thread {
@@ -145,6 +131,7 @@ span.icon.grid .icon-paperclip {
 }
 
 .thread-view{
+  padding-left: @horizontalPadding;
   .email-load-more{
     border-bottom: 1px solid #e5e5e5;
     .load-more-items(#e5e5e5, #f5f5f5, #888);
@@ -187,40 +174,16 @@ span.icon.grid .icon-paperclip {
     display: inline-block;
     padding: 5px 18px;
   }
+  .comment-count {
+    margin-right: 5px;
+  }
   .email-has-attachment{
     font-size: 1.3em;
     margin-right: .5em;
   }
-  .email-body {
+  .email-content {
     padding: 0 15px 10px;
     margin: 0;
-    /* @todo remove old style */
-    .email-extra-body {
-      display: none;
-      &.in {
-        display: block;
-      }
-    }
-    .email-extra-body-toggle {
-      cursor: pointer;
-      margin: 10px 0;
-      width: 22px;
-      height: 10px;
-      text-align: center;
-      line-height: 1px;
-      background-color: #f1f1f1;
-      border: 1px solid #ddd;
-      color: #888;
-      &:hover {
-        background-color: #d8d8d8;
-        border-color: #cdcdcd;
-        color: #000;
-        font-weight: bold;
-      }
-      &:before {
-        content: '...';
-      }
-    }
   }
   .email-view-toggle {
     cursor: pointer;
@@ -228,13 +191,13 @@ span.icon.grid .icon-paperclip {
     padding: 10px 15px;
     width: 100%;
     box-sizing: border-box;
-    .email-body {
-      padding: 0;
-    }
   }
   &:only-child {
     .email-view-toggle {
-      padding-top: 0;
+      padding: 0 0 10px;
+    }
+    .email-content {
+      padding: 0 0 10px;
     }
   }
   .email-recipients {
@@ -256,10 +219,9 @@ span.icon.grid .icon-paperclip {
       }
     }
     .email-sent-date {
-      padding: 11px 0px;
+      padding: 11px 0;
       color: #888;
       font-style: normal;
-      font-size: smaller;
     }
   }
   .email-full {
@@ -269,6 +231,14 @@ span.icon.grid .icon-paperclip {
     }
     .email-view-toggle {
       padding-bottom: 9px;
+    }
+    .email-body {
+      &>iframe {
+        border: 0;
+        width: 100%;
+        height: 0;
+        overflow: auto;
+      }
     }
   }
   &.in {
@@ -310,6 +280,23 @@ span.icon.grid .icon-paperclip {
     margin-left: 10px;
     padding-left: 10px;
     border-left: 1px solid #000000;
+  }
+}
+.responsive-section {
+  .email-content {
+    .responsive-cell {
+      padding-left: 0;
+      padding-right: 15px;
+    }
+    .responsive-cell:only-child,
+    .responsive-cell:last-child {
+      padding-right: 0;
+    }
+  }
+  &.responsive-small {
+    .responsive-cell {
+      padding-right: 0;
+    }
   }
 }
 .email-detailed-info-table {
@@ -446,12 +433,11 @@ a.attachment .icon .icon-link {
     left: 9px;
   }
 }
-
-
+.email-context-activity-list {
+  margin-bottom: 5px;
+}
 .email-context-activity-items .context-item {
   display: inline-block;
-  float: left;
-  position: relative;
   margin-right: 8px;
   font-size: 11px;
 }
@@ -459,9 +445,13 @@ a.attachment .icon .icon-link {
   list-style: none;
   cursor: pointer;
   padding: 0 7px 0 7px;
+  white-space: nowrap;
   .active {
     background-color: #ebebeb;
   }
+}
+.context-item:hover {
+  background-color: #ebebeb;
 }
 .customer-content .context-item .icon-remove {
   cursor: pointer;
@@ -474,28 +464,17 @@ a.attachment .icon .icon-link {
 }
 .email-context-activity-items {
   margin-left: 55px;
-  height: 28px;
-  overflow: auto;
   font-size: 11px;
   line-height: 14px;
 }
 .email-context-activity-block {
-  position: absolute;
-  width: 100%;
   .email-context-activity {
     margin-top: 5px;
-    width: calc(~"100% - 160px");
+    width: 720px;
   }
 }
 
 #context-items-dropdown {
-  margin: -1px 0 0 0;
-  min-width: 150px;
-  position: absolute;
-  width: auto;
-  border: 1px solid #ccc;
-  background-color: white;
-  z-index: 1000;
   top: 35px;
   left: 15px;
 }
@@ -505,10 +484,12 @@ a.attachment .icon .icon-link {
   border: none;
   outline:none;
   margin: 10px 10px 15px 10px;
+  box-shadow: none;
 }
 #email-context-current-item {
   font-size: 18px;
   font-weight: bold;
+  color: #666666;
 }
 .attachment-list-popup {
   width: 350px;

@@ -302,8 +302,19 @@ define(function (require) {
                 });
             });
             scrollStateModel.on('change:scrollTop', function (model, val) {
-                otherScroll.scrollTop(val);
+                otherScroll[0].scrollTop = scrollContainer[0].scrollTop = val;
             }, this);
+
+            function updateScroll(e) {
+                scrollStateModel.set({
+                    scrollTop: e.currentTarget.scrollTop
+                });
+            }
+
+            scrollContainer.on('scroll', updateScroll);
+
+            otherScroll.on('scroll', updateScroll);
+
             function setup() {
                 scrollStateModel.set({
                     headerHeight: self.headerHeight
@@ -317,15 +328,7 @@ define(function (require) {
                     scrollTop:     scrollContainer[0].scrollTop
                 });
             }
-            scrollContainer.on('scroll', setup);
-            otherScroll.on('scroll', function () {
-                var mainScrollTop = scrollContainer.scrollTop(),
-                    otherScrollTop = otherScroll.scrollTop();
-                if (mainScrollTop !== otherScrollTop) {
-                    scrollContainer.scrollTop(otherScroll.scrollTop());
-                    self.checkLayout();
-                }
-            });
+
             setup();
             return setup;
         },

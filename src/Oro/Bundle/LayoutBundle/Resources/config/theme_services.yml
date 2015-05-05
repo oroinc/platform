@@ -1,0 +1,118 @@
+parameters:
+    oro_layout.theme_factory.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeFactory
+    oro_layout.theme_manager.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeManager
+    oro_layout.theme_extension.class:                  Oro\Component\Layout\Extension\Theme\ThemeExtension
+    oro_layout.request.listener.theme.class:           Oro\Bundle\LayoutBundle\EventListener\ThemeListener
+
+    oro_layout.default_active_theme:    ~
+    oro_layout.theme_updates_resources: []
+    oro_layout.updates_cache_dir:       %kernel.cache_dir%/layouts
+
+services:
+    oro_layout.dependency_initializer:
+        class:  Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer
+        public: false
+        arguments:
+            - @service_container
+        calls:
+            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
+
+    oro_layout.theme_factory:
+        class:  %oro_layout.theme_factory.class%
+        public: false
+
+    oro_layout.theme_manager:
+        class:  %oro_layout.theme_manager.class%
+        public: false
+        arguments:
+            - @oro_layout.theme_factory
+            - []
+
+    oro_layout.loader:
+        class:  Oro\Component\Layout\Loader\LayoutUpdateLoader
+        public: false
+        calls:
+            - [addDriver, [yml, @oro_layout.loader.yaml_driver]]
+            - [addDriver, [php, @oro_layout.loader.php_driver]]
+
+    oro_layout.loader.php_driver:
+        class:  Oro\Component\Layout\Loader\Driver\PhpDriver
+        public: false
+        arguments:
+            - @oro_layout.layout_update_generator.php
+            - %kernel.debug%
+            - %oro_layout.updates_cache_dir%
+
+    oro_layout.loader.yaml_driver:
+        class:  Oro\Component\Layout\Loader\Driver\YamlDriver
+        public: false
+        arguments:
+            - @oro_layout.layout_update_generator.config
+            - %kernel.debug%
+            - %oro_layout.updates_cache_dir%
+
+    oro_layout.loader.path_provider:
+        class:  Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider
+        public: false
+
+    oro_layout.loader.theme_path_provider:
+        class: Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider
+        public: false
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: layout.resource.path_provider }
+
+    oro_layout.layout_context_configurator.theme:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator, priority: -100 }
+
+    oro_layout.theme_extension:
+        class: %oro_layout.theme_extension.class%
+        arguments:
+            - %oro_layout.theme_updates_resources%
+            - @oro_layout.loader
+            - @oro_layout.dependency_initializer
+            - @oro_layout.loader.path_provider
+
+    oro_layout.data_provider.theme:
+        class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: layout.data_provider, alias: theme }
+
+    oro_layout.yaml_updates_warmer:
+        class: Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer
+        public: false
+        arguments:
+            - %oro_layout.theme_updates_resources%
+            - @oro_layout.loader
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_layout.layout_update_generator.config:
+        class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
+        public: false
+        calls:
+            - [addExtension, [@oro_layout.layout_update_generator.extension.config_conditions]]
+
+    oro_layout.layout_update_generator.extension.config_conditions:
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
+        public: false
+        arguments:
+            - @oro_layout.expression.assembler
+
+    oro_layout.layout_update_generator.php:
+        class:  Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator
+        public: false
+
+    oro_layout.request.listener.theme:
+        class: %oro_layout.request.listener.theme.class%
+        arguments:
+            - %oro_layout.default_active_theme%
+        tags:
+            - { name: kernel.event_subscriber }

@@ -282,6 +282,7 @@ class SegmentFilterTest extends OrmTestCase
     {
         $dynamicSegmentStub = new Segment();
         $dynamicSegmentStub->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
+        $dynamicSegmentStub->setEntity('Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser');
 
         $filterData = ['value' => $dynamicSegmentStub];
         $em         = $this->getEM();
@@ -325,6 +326,7 @@ class SegmentFilterTest extends OrmTestCase
     {
         $staticSegmentStub = new Segment();
         $staticSegmentStub->setType(new SegmentType(SegmentType::TYPE_STATIC));
+        $staticSegmentStub->setEntity('Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser');
 
         $filterData = ['value' => $staticSegmentStub];
 
@@ -353,7 +355,7 @@ class SegmentFilterTest extends OrmTestCase
         $expectedResult = [
             'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
             'EXISTS(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 ' .
-            'WHERE ts1.segmentId = :segment AND CAST(ts1.entityId as int) = t1.id)'
+            'WHERE ts1.segmentId = :segment AND ts1.integerEntityId = t1.id)'
         ];
         $expectedResult = implode(' ', $expectedResult);
 

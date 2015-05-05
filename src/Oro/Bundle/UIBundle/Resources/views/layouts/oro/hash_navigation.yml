@@ -1,0 +1,23 @@
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroUIBundle:layouts:oro/hash_navigation.html.twig'
+        - @add:
+            id:        hash_navigation_data
+            parentId:  root
+            blockType: container
+        - @move:
+            id:        head_script
+            parentId:  hash_navigation_data
+        - @move:
+            id:        page_container
+            parentId:  hash_navigation_data
+        - @move:
+            id:        breadcrumb
+            parentId:  hash_navigation_data
+        - @move:
+            id:        before_content_addition
+            parentId:  hash_navigation_data
+
+    conditions:
+        @eq: [$context.hash_navigation, true]

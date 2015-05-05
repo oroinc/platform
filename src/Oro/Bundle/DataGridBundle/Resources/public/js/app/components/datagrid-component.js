@@ -17,7 +17,7 @@ define(function (require) {
         gridContentManager = require('orodatagrid/js/content-manager'),
         FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin'),
         FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
-    
+
     helpers = {
         cellType: function (type) {
             return type + 'Cell';
@@ -45,12 +45,18 @@ define(function (require) {
     DataGridComponent = BaseComponent.extend({
         initialize: function (options) {
             var promises, self;
+            if (!options.enableFilters) {
+                options.builders = _.reject(options.builders, function(module) {
+                    return module === 'orofilter/js/datafilter-builder';
+                });
+            }
 
             self = this;
             this._deferredInit();
             this.built = $.Deferred();
 
             options = options || {};
+            this.fixStates(options);
             this.processOptions(options);
             this.initDataGrid(options);
 
@@ -77,6 +83,10 @@ define(function (require) {
          * @param options
          */
         processOptions: function (options) {
+            if (typeof options.inputName === 'undefined') {
+                throw new Error('Option inputName has to be specified');
+            }
+
             options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
@@ -93,6 +103,7 @@ define(function (require) {
             this.$el = $('<div>');
             $(options.el).append(this.$el);
             this.gridName = options.gridName;
+            this.inputName = options.inputName;
             this.data = options.data;
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
@@ -145,6 +156,8 @@ define(function (require) {
                 // otherwise, create collection from metadata
                 collectionOptions = this.combineCollectionOptions();
                 collection = new PageableCollection(this.data, collectionOptions);
+            } else if (this.data) {
+                collection.reset(this.data, {parse: true});
             }
 
             // create grid
@@ -172,8 +185,8 @@ define(function (require) {
          * @returns {Object}
          */
         combineCollectionOptions: function () {
-            return _.extend({
-                inputName: this.gridName,
+            var options = _.extend({
+                inputName: this.inputName,
                 parse: true,
                 url: '\/user\/json',
                 state: _.extend({
@@ -182,6 +195,7 @@ define(function (require) {
                 }, this.metadata.state),
                 initialState: this.metadata.initialState
             }, this.metadata.options);
+            return options;
         },
 
         /**
@@ -246,6 +260,24 @@ define(function (require) {
                 plugins: plugins
             };
         },
+
+        fixStates: function (options) {
+            if (options.metadata) {
+                this.fixState(options.metadata.state);
+                this.fixState(options.metadata.initialState);
+            }
+        },
+
+        fixState: function(state) {
+            if (_.isArray(state.filters) && _.isEmpty(state.filters)) {
+                state.filters = {};
+            }
+
+            if (_.isArray(state.sorters) && _.isEmpty(state.sorters)) {
+                state.sorters = {};
+            }
+        },
+
         dispose: function () {
             // disposes registered sub-components
             if (this.subComponents) {

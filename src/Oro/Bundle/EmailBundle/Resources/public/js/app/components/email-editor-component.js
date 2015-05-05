@@ -9,6 +9,7 @@ define(function (require) {
         routing = require('routing'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
+        messenger = require('oroui/js/messenger'),
         ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
     function showField(fieldName) {
@@ -16,10 +17,13 @@ define(function (require) {
         $('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'block');
         $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').unbind('focusout');
         $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').on('focusout', function(e) {
-            if (!$('#oro_email_email_' + field).val()) {
-                hideField(fieldName);
-            }
+            setTimeout(function(){
+                if (!$('#oro_email_email_' + field).val()) {
+                    hideField(fieldName);
+                }
+            }, 200);
         });
+        $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').focus();
 
         $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__('oro.email.to'));
         addForgedAsterisk();
@@ -29,6 +33,11 @@ define(function (require) {
     function hideField(fieldName) {
         var field = fieldName.toLowerCase();
         $('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'none');
+
+        if ($('span#show' + fieldName).length > 0) {
+            return;
+        }
+
         $('#cc-bcc-holder').append('<span id="show' + fieldName + '">' + fieldName +  '</span>');
         $('#show' + fieldName).on('click', function(e) {
             e.stopPropagation();
@@ -137,7 +146,7 @@ define(function (require) {
                                 .trigger('change');
                         },
                         error: function () {
-                            mediator.execute('notificationMessage', 'error', __('oro.email.emailtemplate.load_failed'));
+                            messenger.showErrorMessage(__('oro.email.emailtemplate.load_failed'));
                         },
                         dataType: 'json'
                     }).always(function () {

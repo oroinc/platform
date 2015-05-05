@@ -9,7 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  *
  * @package Oro\Bundle\OrganizationBundle\Tests\Selenium\Pages
  * @method BusinessUnits openBusinessUnits openBusinessUnits(string)
- * @method BusinessUnit assertTitle() assertTitle($title, $message = '')
  */
 class BusinessUnits extends AbstractPageFilteredGrid
 {

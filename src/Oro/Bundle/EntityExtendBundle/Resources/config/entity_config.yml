@@ -74,6 +74,8 @@ oro_entity_config:
                         auditable:          false
                         indexed:            true
                     grid:
+                        type:               boolean
+                        label:              oro.entity_extend.entity_config.extend.entity.items.is_deleted
                         renderable:         false
                         query:
                             operator:       '!='
@@ -261,6 +263,8 @@ oro_entity_config:
                         auditable:          false
                         indexed:            true
                     grid:
+                        type:               boolean
+                        label:              oro.entity_extend.entity_config.extend.field.items.is_deleted
                         renderable:         false
                         query:
                             operator:       '!='

@@ -1,4 +1,6 @@
 parameters:
+    oro_datagrid.datagrid.name_strategy.class:   Oro\Bundle\DashboardBundle\Datagrid\NameStrategy
+
     oro_dashboard.config_resolver.class:         Oro\Component\Config\Resolver\SystemAwareResolver
     oro_dashboard.manager.state.class:           Oro\Bundle\DashboardBundle\Model\StateManager
     oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
@@ -13,6 +15,7 @@ parameters:
     oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
     oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
     oro_dashboard.datetime.hepler.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
+    oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
 
     oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
     oro_dashboard.widget_config_value.previous_date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
@@ -26,6 +29,11 @@ parameters:
     oro_dashboard.form.type.widget_items_choice.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType
 
 services:
+    oro_datagrid.datagrid.name_strategy:
+        class: %oro_datagrid.datagrid.name_strategy.class%
+        calls:
+            - [setRequest, [@?request=]]
+
     oro_dashboard.config_resolver:
         class: %oro_dashboard.config_resolver.class%
         arguments:
@@ -39,6 +47,7 @@ services:
             - @oro_dashboard.config_resolver
             - @doctrine.orm.entity_manager
             - @oro_dashboard.widget_config_value.provider
+            - @translator
         calls:
             - [setRequest, ["@?request="]]
 
@@ -101,6 +110,14 @@ services:
             - @oro_locale.settings
             - @doctrine
             - @oro_security.acl_helper
+
+    oro_dashboard.event_listener.widget_configuration_load:
+        class: %oro_dashboard.event_listener.widget_configuration_load.class%
+        arguments:
+            - @oro_datagrid.datagrid.manager.link
+            - @oro_datagrid.datagrid.builder
+        tags:
+            - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad }
 
     oro_dashboard.form.type.widget_date_range:
         class: %oro_dashboard.form.type.widget_date_range.class%

@@ -17,7 +17,7 @@ class OroSegmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -59,11 +59,14 @@ class OroSegmentBundleInstaller implements Installation
         $table = $schema->createTable('oro_segment_snapshot');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('segment_id', 'integer', []);
-        $table->addColumn('entity_id', 'string', ['length' => 255]);
+        $table->addColumn('integer_entity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_id', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('createdat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addUniqueIndex(['segment_id', 'entity_id'], 'uniq_43b8bb67db296aad81257d5d');
         $table->addIndex(['segment_id'], 'idx_43b8bb67db296aad', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['integer_entity_id'], 'sgmnt_snpsht_int_entity_idx');
+        $table->addIndex(['entity_id'], 'sgmnt_snpsht_str_entity_idx');
     }
 
     /**

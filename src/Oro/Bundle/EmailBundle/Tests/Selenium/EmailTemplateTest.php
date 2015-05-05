@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
+namespace Oro\Bundle\EmailBundle\Tests\Selenium;
 
 use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\EmailTemplates;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
@@ -20,7 +20,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $templateName = 'EmailTemplate_'.mt_rand();
 
         $login = $this->login();
-        /* @var EmailTemplates $login*/
+        /* @var EmailTemplates $login */
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->assertTitle('Templates - Emails - System')
             ->add()

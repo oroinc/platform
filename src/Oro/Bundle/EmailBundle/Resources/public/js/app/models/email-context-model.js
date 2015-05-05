@@ -12,7 +12,8 @@ define(function (require) {
         defaults: {
             label: '',
             first: '',
-            className: ''
+            className: '',
+            gridName: ''
         }
     });
 
