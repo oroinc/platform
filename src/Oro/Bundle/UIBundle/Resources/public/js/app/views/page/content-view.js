@@ -1,9 +1,11 @@
 /*global define*/
 define([
+    'jquery',
+    'underscore',
     'oroui/js/mediator',
     'oroui/js/tools',
     './../base/page-region-view'
-], function (mediator, tools, PageRegionView) {
+], function ($, _, mediator, tools, PageRegionView) {
     'use strict';
 
     var PageContentView;
@@ -12,13 +14,14 @@ define([
      * Finds first container that has active scrollbar and sets focus on it for ability of scrolling it by keyboard
      */
     function focusScrollElement() {
-        var scrollable = [
+        var target,
+            scrollable = [
             '.scrollable-container',
             '.other-scroll',
             '.layout-content .scrollable-container',
             '.system-configuration-container .scrollable-container',
             '.scrollspy'
-        ], target;
+        ];
 
         target = _.find(scrollable, function (item) {
             var $el = $(item).first(),
@@ -75,18 +78,13 @@ define([
          * Sets focus on first form field
          */
         initFocus: function () {
-            var view = this,
-                activeElement = document.activeElement,
+            var activeElement = document.activeElement,
                 delay = 200;
 
-            view.$('form:first').focusFirstInput();
+            this.$('form:first').focusFirstInput();
 
             if(!tools.isMobile() && activeElement === document.activeElement){
-                if(document.hasOwnProperty('page-rendered')) {
-                    _.delay(focusScrollElement, delay);
-                } else {
-                    mediator.on('page-rendered', _.debounce(focusScrollElement, delay));
-                }
+                _.delay(focusScrollElement, delay);
             }
         }
     });
