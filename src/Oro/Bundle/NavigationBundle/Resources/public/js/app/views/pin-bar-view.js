@@ -31,27 +31,6 @@ define([
                 return false;
             }
             return this.el.offsetLeft + this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;
-        },
-
-        /**
-         * Looks for last visible item-view
-         *
-         * @returns {Chaplin.View|undefined}
-         */
-        getLastVisibleView: function () {
-            var itemView, i, models;
-            models = this.collection.models;
-
-            // iterate from the end of models list until first visible view
-            for (i = models.length - 1; i >= 0; i -= 1) {
-                itemView = this.subview("itemView:" + models[i].cid);
-                if (this.isVisibleView(itemView)) {
-                    break;
-                }
-                itemView = null;
-            }
-
-            return itemView;
         }
     });
 

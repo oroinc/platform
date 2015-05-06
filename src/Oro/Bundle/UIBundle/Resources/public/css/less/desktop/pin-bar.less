@@ -159,14 +159,13 @@
     display: block;
     position: absolute;
     top: 0;
-    right: 100%;
+    left: 0;
     height: 100%;
-    width: 200%;
-    #gradient > .horizontal(fade(@logoBackgroundColor, 10%), fade(@logoBackgroundColor, 100%));
-    background-color: transparent;
+    width: 0;
+    .box-shadow(0 0 20px 20px fade(@logoBackgroundColor, 90%));
   }
-  //.box-shadow(-16px 0 36px 18px @logoBackgroundColor);
   a.dropdown-toggle {
+    position: relative;
     color: @headerTextColor;
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
     width: 20px;
