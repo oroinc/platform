@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Doctrine\ORM\UnitOfWork;
@@ -298,9 +300,23 @@ class JobExecutor
         /** @var JobExecution $jobExecution */
         $jobExecution = $jobInstance->getJobExecutions()->first();
         if ($jobExecution) {
-            $stepExecution = $jobExecution->getStepExecutions()->first();
-            if ($stepExecution) {
-                $context = $this->contextRegistry->getByStepExecution($stepExecution);
+            $stepExecutions = $jobExecution->getStepExecutions();
+            /** @var StepExecution $firstStepExecution */
+            $firstStepExecution = $stepExecutions->first();
+
+            if ($firstStepExecution) {
+                $context = $this->contextRegistry->getByStepExecution($firstStepExecution);
+
+                if ($stepExecutions->count() > 1) {
+                    /** @var StepExecution $stepExecution */
+                    foreach ($stepExecutions->slice(1) as $stepExecution) {
+                        ContextHelper::mergeContextCounters(
+                            $context,
+                            $this->contextRegistry->getByStepExecution($stepExecution)
+                        );
+                    }
+                }
+
                 $jobResult->setContext($context);
             }
         }

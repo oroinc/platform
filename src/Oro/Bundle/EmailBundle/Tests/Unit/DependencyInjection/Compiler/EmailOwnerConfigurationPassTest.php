@@ -63,13 +63,14 @@ class EmailOwnerConfigurationPassTest extends \PHPUnit_Framework_TestCase
                         'provider2' => array(array('order' => 1)),
                         'provider4' => array(),
                         'provider3' => array(array('order' => 2)),
+                        'provider5' => array(array('order' => 3)),
                     )
                 )
             );
 
         $serviceMethodCalls = array();
         $serviceProviders = array();
-        $service->expects($this->exactly(4))
+        $service->expects($this->exactly(5))
             ->method('addMethodCall')
             ->will(
                 $this->returnCallback(
@@ -102,11 +103,11 @@ class EmailOwnerConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($containerBuilder);
 
         $this->assertEquals(
-            array('addProvider', 'addProvider', 'addProvider', 'addProvider'),
+            array('addProvider', 'addProvider', 'addProvider', 'addProvider', 'addProvider'),
             $serviceMethodCalls
         );
         $this->assertEquals(
-            array('provider2', 'provider3', 'provider1', 'provider4'),
+            array('provider2', 'provider3', 'provider1', 'provider5', 'provider4'),
             $serviceProviders
         );
     }
