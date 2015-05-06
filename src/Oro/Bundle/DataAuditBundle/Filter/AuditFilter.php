@@ -58,8 +58,7 @@ class AuditFilter extends EntityFilter
         $qb = $ds->getQueryBuilder();
 
         list($objectAlias, $fieldName) = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
-        $rootEntities = $qb->getRootEntities();
-        $objectClass = reset($rootEntities);
+        $objectClass = $this->getClass($data['auditFilter']['columnName'], $qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($objectClass);
 
         if ($metadata->isIdentifierComposite) {
@@ -142,6 +141,24 @@ class AuditFilter extends EntityFilter
         if ($form->isValid()) {
             $filter->apply($ds, $form->getData());
         }
+    }
+
+    /**
+     * @param string $columnName
+     * @param string[] $rootEntities
+     *
+     * @return string
+     */
+    protected function getClass($columnName, array $rootEntities)
+    {
+        if (strpos($columnName, '::') === false) {
+            return reset($rootEntities);
+        }
+
+        $matches = [];
+        preg_match_all('/(?<=\+)[^\+]+(?=::)/', $columnName, $matches);
+
+        return end($matches[0]);
     }
 
     /**

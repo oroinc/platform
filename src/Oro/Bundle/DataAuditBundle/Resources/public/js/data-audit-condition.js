@@ -122,6 +122,7 @@ define([
 
             var auditFilter = {};
             if (this.auditFilter) {
+                auditFilter.columnName = this.element.find('input.select').select2('val');
                 auditFilter.data = this.auditFilter.getValue();
 
                 if (this.auditFilter.filterParams) {

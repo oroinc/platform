@@ -25,6 +25,7 @@ class FilterType extends AbstractType
                         'fields' => [
                             'data' => [],
                             'type' => [],
+                            'columnName' => [],
                         ],
                     ]),
                 ],
