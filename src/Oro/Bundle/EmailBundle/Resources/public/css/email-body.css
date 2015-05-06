@@ -2,6 +2,9 @@ html, body {
     margin: 0;
     padding: 0;
 }
+.plain-text {
+    white-space: pre-line;
+}
 .email-extra-body {
     display: none;
 }

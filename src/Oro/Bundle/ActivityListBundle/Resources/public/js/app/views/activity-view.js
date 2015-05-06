@@ -1,18 +1,16 @@
-/*jslint browser:true, nomen:true*/
-/*global define, alert*/
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'oroui/js/mediator',
-    'oroui/js/app/views/base/view',
-    'routing',
-    'orolocale/js/formatter/datetime',
-    'oroui/js/app/views/loading-mask-view'
-], function ($, _, Backbone, mediator, BaseView, routing, dateTimeFormatter, LoadingMaskView) {
+/*global define*/
+define(function (require) {
     'use strict';
 
-    var ActivityView;
+    var ActivityView,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        mediator = require('oroui/js/mediator'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        routing = require('routing'),
+        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
+        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
+        CommentComponent = require('orocomment/js/app/components/comment-component');
     
     ActivityView = BaseView.extend({
         options: {
@@ -40,6 +38,12 @@ define([
             'click .accordion-heading': 'onAccordionHeaderClick'
         },
         listen: {
+            'addedToParent': function () {
+                var emailTreadComponent = this.pageComponent('email-thread');
+                if (emailTreadComponent) {
+                    emailTreadComponent.view.refreshEmails();
+                }
+            },
             'change:contentHTML model': '_onContentChange',
             'change:commentCount model': '_onCommentCountChange',
             'change:isContentLoading model': '_onContentLoadingStatusChange'
@@ -139,7 +143,15 @@ define([
 
         _onContentChange: function () {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
-            mediator.execute('layout:init', this.$el, this);
+            mediator.execute('layout:init', this.$el, this).done(_.bind(function () {
+                // if the activity has an emailTreadComponent -- handle comment count change in own way
+                var threadComponent = this.pageComponent('email-thread');
+                if (threadComponent) {
+                    this.listenTo(threadComponent.view, 'commentCountChanged', function (diff) {
+                        this.model.set('commentCount', this.model.get('commentCount') + diff);
+                    });
+                }
+            }, this));
         },
 
         _onCommentCountChange: function () {
@@ -160,21 +172,35 @@ define([
             }
         },
 
-        getCommentsBlock: function () {
-            return this.$(this.options.commentsBlock);
+        /**
+         * Initializes comments component if it is necessary
+         *
+         * @param {Object} options
+         */
+        initCommentsComponent: function (options) {
+            var commentsComponent;
+            if (!this.isCommentComponentRequired()) {
+                return;
+            }
+            options._sourceElement = this.$(this.options.commentsBlock);
+            commentsComponent = new CommentComponent(options);
+            this.pageComponent('comments', commentsComponent);
+            this.listenTo(commentsComponent.collection, 'stateChange', this.updateCommentsQuantity, this);
         },
 
-        setCommentComponent: function (comments) {
-            this.subview('comments', comments);
-            this.listenTo(comments.collection, 'stateChange', this.updateCommentsQuantity, this);
-        },
-
-        hasCommentComponent: function () {
-            return Boolean(this.subview('comments'));
+        /**
+         * Check if comments component have to be initialized
+         * @returns {boolean}
+         */
+        isCommentComponentRequired: function () {
+            // comments component is not initialized yet, activity is "commentable" and it has place to be initialized
+            return !this.pageComponent('comments') &&
+                this.model.get('commentable') &&
+                Boolean(this.$(this.options.commentsBlock).length);
         },
 
         updateCommentsQuantity: function () {
-            this.model.set('commentCount', this.subview('comments').collection.getState().totalItemsQuantity);
+            this.model.set('commentCount', this.pageComponent('comments').collection.getState().totalItemsQuantity);
         }
     });
 
