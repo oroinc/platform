@@ -164,8 +164,19 @@ class AuditController extends RestGetController implements ClassResourceInterfac
 
             $auditableEntities[$entityClass] = [];
             foreach ($entityData['fields'] as $fieldData) {
-                if (!$auditConfigProvider->hasConfig($entityClass, $fieldData['name']) ||
-                    !$auditConfigProvider->getConfig($entityClass, $fieldData['name'])->is('auditable')
+                $class = $entityClass;
+                $field = $fieldData['name'];
+
+                $fieldChunks = explode('::', $fieldData['name']);
+                if (count($fieldChunks) === 2) {
+                    list($class, $field) = $fieldChunks;
+                    if (!$auditConfigProvider->getConfig($class)->is('auditable')) {
+                        continue;
+                    }
+                }
+
+                if (!$auditConfigProvider->hasConfig($class, $field) ||
+                    !$auditConfigProvider->getConfig($class, $field)->is('auditable')
                 ) {
                     continue;
                 }
