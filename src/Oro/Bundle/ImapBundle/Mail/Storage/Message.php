@@ -77,7 +77,7 @@ class Message extends \Zend\Mail\Storage\Message
                 if ($contentType) {
                     if ($contentType->getType() === 'text/plain') {
                         $textContentType =  $contentType;
-                    } else if ($contentType->getType() === 'text/html') {
+                    } elseif ($contentType->getType() === 'text/html') {
                         $htmlContentType = $contentType;
                     }
                 }
@@ -85,7 +85,7 @@ class Message extends \Zend\Mail\Storage\Message
             if ($htmlContentType) {
                 // html is preferred part
                 return $htmlContentType;
-            } else if ($textContentType) {
+            } elseif ($textContentType) {
                 // in case when only text part presents
                 return $textContentType;
             } else {
