@@ -35,7 +35,7 @@ define(function (require) {
         },
 
         render: function () {
-            var loadingMaskContainer, id,
+            var loadingMaskContainer,
                 self = this;
             if (this.tinymceConnected) {
                 if (!this.tinymceInstance) {
@@ -70,13 +70,6 @@ define(function (require) {
                     }
                 }
                 this.renderDeferred = $.Deferred();
-                id = this.$el.attr('id');
-                if ($('[id="' + id + '"]').length > 1) {
-                    /**
-                     * tinymce editor does not work with elements that has not unique id
-                     */
-                    this.$el.attr('id', id + '-' + this.cid);
-                }
                 var options = this.options;
                 if ($(this.$el).prop('disabled')) {
                     options.readonly = true;
