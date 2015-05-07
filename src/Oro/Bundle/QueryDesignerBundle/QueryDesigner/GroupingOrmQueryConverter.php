@@ -138,7 +138,7 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         $columnExpr
     ) {
         $filterById = false;
-        if ($this->virtualFieldProvider->isVirtualField($entityClassName, $fieldName)) {
+        if ($entityClassName && $this->virtualFieldProvider->isVirtualField($entityClassName, $fieldName)) {
             $key = sprintf('%s::%s', $entityClassName, $fieldName);
             if (isset($this->virtualColumnOptions[$key]['filter_by_id'])) {
                 if ($this->virtualColumnOptions[$key]['filter_by_id']) {

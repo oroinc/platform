@@ -48,6 +48,27 @@
     </div>
 </script>
 
+<script type="text/template" id="many-to-many-filter-template">
+    <div class="choice-filter">
+        <div class="btn-group btn-block">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+                <%- selectedChoiceLabel %><span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <% _.each(choices, function (option) { %>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                        <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+        <div class="value-field-frame">
+            <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+            <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+        </div>
+    </div>
+</script>
+
 <script type="text/template" id="select-field-template">
     <div class="horizontal clearfix">
         <select name="<%= name %>" class="filter-select-oro">

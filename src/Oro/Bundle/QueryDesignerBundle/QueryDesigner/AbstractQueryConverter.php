@@ -772,7 +772,7 @@ abstract class AbstractQueryConverter
         }
         $className = $this->getEntityClassName($columnName);
         $fieldName = $this->getFieldName($columnName);
-        if (!$this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
+        if (!$className || !$this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
             // non virtual column
             return;
         }

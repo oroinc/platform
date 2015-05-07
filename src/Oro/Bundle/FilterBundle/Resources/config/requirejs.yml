@@ -28,6 +28,7 @@ config:
         'oro/filter/select-filter': 'bundles/orofilter/js/filter/select-filter.js'
         'oro/filter/select-row-filter': 'bundles/orofilter/js/filter/select-row-filter.js'
         'oro/filter/text-filter': 'bundles/orofilter/js/filter/text-filter.js'
+        'oro/filter/many-to-many-filter': 'bundles/orofilter/js/filter/many-to-many-filter.js'
         'orofilter/js/formatter/abstract-formatter': 'bundles/orofilter/js/formatter/abstract-formatter.js'
         'orofilter/js/formatter/number-formatter': 'bundles/orofilter/js/formatter/number-formatter.js'
         'orofilter/js/filters-manager': 'bundles/orofilter/js/filters-manager.js'

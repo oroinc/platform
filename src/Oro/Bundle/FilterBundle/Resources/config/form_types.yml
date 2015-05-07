@@ -13,6 +13,7 @@ parameters:
     oro_filter.form.type.filter.boolean.class: Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType
     oro_filter.form.type.filter.entity.class: Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType
     oro_filter.form.type.filter.selectrow.class: Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType
+    oro_filter.form.type.filter.many_to_many.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType
 
 services:
     oro_filter.form.event_subscriber.date:
@@ -91,3 +92,9 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_selectrow_filter }
+
+    oro_filter.form.type.filter.many_to_many:
+        class: %oro_filter.form.type.filter.many_to_many.class%
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_many_to_many_filter }

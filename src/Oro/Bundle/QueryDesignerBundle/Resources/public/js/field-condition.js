@@ -73,6 +73,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 filterId = this._getApplicableFilterId(conditions),
                 filter = this.options.filters[filterId];
 
+            if (!filterId) {
+                return;
+            }
+
             // @TODO temporary workaround. Will by fixed in BAP-8112
             if (conditions.entity === 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account' && conditions.field === 'lifetimeValue') {
                 filterId = 'not_supported_lifetimeValue';

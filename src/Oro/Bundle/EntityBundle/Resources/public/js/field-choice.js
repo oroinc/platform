@@ -221,6 +221,13 @@ define(function (require) {
                 }
             });
 
+            if (!_.isEmpty(path)) {
+                results.push({
+                    id: path,
+                    text: __('oro.entity.field_choice.none')
+                });
+            }
+
             if (!_.isEmpty(fields)) {
                 results.push({
                     text: __("oro.entity.field_choice.fields"),
