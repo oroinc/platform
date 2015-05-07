@@ -13,6 +13,8 @@ services:
     oro_workflow.expression.pass.property_path:
 #        public: false
         class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
+        calls:
+            - [setPrefix, ["data"]]
 
     oro_workflow.expression.factory:
         class: Oro\Component\ConfigExpression\ExpressionFactory
