@@ -152,7 +152,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->globalScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->willReturnCallback(function($name, $full) {
+            ->willReturnCallback(function ($name, $full) {
                 if ($name === 'oro_test.someArrayValue') {
                     $value = ['foo' => 'bar'];
                     if ($full) {

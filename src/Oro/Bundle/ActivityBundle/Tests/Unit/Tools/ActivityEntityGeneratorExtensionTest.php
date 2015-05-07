@@ -108,43 +108,39 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $schema = [
             'relationData' => [
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity1', ActivityScope::ASSOCIATION_KIND),
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity1', ActivityScope::ASSOCIATION_KIND),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity1',
                 ],
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity2', ActivityScope::ASSOCIATION_KIND),
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity2', ActivityScope::ASSOCIATION_KIND),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity2',
                 ],
                 [ // should be ignored because field type is not manyToMany
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity3', ActivityScope::ASSOCIATION_KIND),
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity3', ActivityScope::ASSOCIATION_KIND),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity3'
                 ],
                 [ // should be ignored because field name is not match association naming conventions
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            'testField',
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        'testField',
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity4'
                 ],
             ],
