@@ -4,9 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Component\ConfigExpression\ExpressionInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
 
 class Transition
@@ -27,12 +28,12 @@ class Transition
     protected $label;
 
     /**
-     * @var ConditionInterface|null
+     * @var ExpressionInterface|null
      */
     protected $condition;
 
     /**
-     * @var ConditionInterface|null
+     * @var ExpressionInterface|null
      */
     protected $preCondition;
 
@@ -116,10 +117,10 @@ class Transition
     /**
      * Set condition.
      *
-     * @param ConditionInterface $condition
+     * @param ExpressionInterface $condition
      * @return Transition
      */
-    public function setCondition(ConditionInterface $condition = null)
+    public function setCondition(ExpressionInterface $condition = null)
     {
         $this->condition = $condition;
         return $this;
@@ -128,7 +129,7 @@ class Transition
     /**
      * Get condition.
      *
-     * @return ConditionInterface|null
+     * @return ExpressionInterface|null
      */
     public function getCondition()
     {
@@ -138,7 +139,7 @@ class Transition
     /**
      * Set pre-condition.
      *
-     * @param ConditionInterface|null $condition
+     * @param ExpressionInterface|null $condition
      * @return Transition
      */
     public function setPreCondition($condition)
@@ -150,7 +151,7 @@ class Transition
     /**
      * Get pre-condition.
      *
-     * @return ConditionInterface|null
+     * @return ExpressionInterface|null
      */
     public function getPreCondition()
     {
@@ -227,60 +228,55 @@ class Transition
      * Check is transition condition is allowed for current workflow item.
      *
      * @param WorkflowItem $workflowItem
-     * @param Collection|null $errors
      * @return boolean
      */
-    protected function isConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
+    protected function isConditionAllowed(WorkflowItem $workflowItem)
     {
         if (!$this->condition) {
             return true;
         }
 
-        return $this->condition->isAllowed($workflowItem, $errors);
+        return $this->condition->isConditionAllowed($workflowItem);
     }
 
     /**
      * Check is transition pre condition is allowed for current workflow item.
      *
      * @param WorkflowItem $workflowItem
-     * @param Collection|null $errors
      * @return boolean
      */
-    protected function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
+    protected function isPreConditionAllowed(WorkflowItem $workflowItem)
     {
         if (!$this->preCondition) {
             return true;
         }
 
-        return $this->preCondition->isAllowed($workflowItem, $errors);
+        return $this->preCondition->isConditionAllowed($workflowItem);
     }
 
     /**
      * Check is transition allowed for current workflow item.
      *
      * @param WorkflowItem $workflowItem
-     * @param Collection $errors
      * @return bool
      */
-    public function isAllowed(WorkflowItem $workflowItem, Collection $errors = null)
+    public function isAllowed(WorkflowItem $workflowItem)
     {
-        return $this->isPreConditionAllowed($workflowItem, $errors)
-            && $this->isConditionAllowed($workflowItem, $errors);
+        return $this->isPreConditionAllowed($workflowItem) && $this->isConditionAllowed($workflowItem);
     }
 
     /**
      * Check that transition is available to show.
      *
      * @param WorkflowItem $workflowItem
-     * @param Collection $errors
      * @return bool
      */
-    public function isAvailable(WorkflowItem $workflowItem, Collection $errors = null)
+    public function isAvailable(WorkflowItem $workflowItem)
     {
         if ($this->hasForm()) {
-            return $this->isPreConditionAllowed($workflowItem, $errors);
+            return $this->isPreConditionAllowed($workflowItem);
         } else {
-            return $this->isAllowed($workflowItem, $errors);
+            return $this->isAllowed($workflowItem);
         }
     }
 

@@ -57,11 +57,11 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->with($this->testContext);
 
-        $condition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface')
+        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $condition->expects($this->never())
-            ->method('isAllowed');
+            ->method('isConditionAllowed');
 
         $this->assembler->expects($this->once())
             ->method('assemble')

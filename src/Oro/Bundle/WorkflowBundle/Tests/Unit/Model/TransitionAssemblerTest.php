@@ -406,7 +406,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function createCondition()
     {
-        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface')
+        return $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
             ->getMockForAbstractClass();
     }
 

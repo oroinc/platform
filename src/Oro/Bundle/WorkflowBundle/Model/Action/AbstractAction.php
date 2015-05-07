@@ -4,9 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Component\ConfigExpression\ExpressionInterface;
+
 use Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvent;
 use Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface
@@ -17,7 +18,7 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
     protected $contextAccessor;
 
     /**
-     * @var ConditionInterface
+     * @var ExpressionInterface
      */
     protected $condition;
 
@@ -37,7 +38,7 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
     /**
      * {@inheritDoc}
      */
-    public function setCondition(ConditionInterface $condition)
+    public function setCondition(ExpressionInterface $condition)
     {
         $this->condition = $condition;
     }
@@ -82,7 +83,7 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
             return true;
         }
 
-        return $this->condition->isAllowed($context);
+        return $this->condition->isConditionAllowed($context);
     }
 
     /**

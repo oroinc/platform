@@ -39,7 +39,7 @@ services:
 ```
 
 Symbol "|" in alias can be used to have several aliases. Note that service class must implement
-Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface.
+Oro\Component\ConfigExpression\ExpressionInterface.
 
 And Condition
 -------------
@@ -397,5 +397,5 @@ $condition = $conditionFactory->create(Configurable::ALIAS', $configuration);
 /** @var object $data */
 $data->call_timeout = 20;
 
-var_dump($condition->isAllowed($data)); // will output TRUE
+var_dump($condition->isConditionAllowed($data)); // will output TRUE
 ```
