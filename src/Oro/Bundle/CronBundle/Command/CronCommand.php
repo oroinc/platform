@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use JMS\JobQueueBundle\Entity\Job;
+use Cron\CronExpression;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
@@ -50,7 +51,13 @@ class CronCommand extends ContainerAwareCommand
         }
 
         foreach ($commands as $name => $command) {
+
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
+
+            if (!$command->isEnabled()) {
+                $output->writeln('<info>command disabled and skipped</info>');
+                continue;
+            }
 
             if (!$command instanceof CronCommandInterface) {
                 $output->writeln(
@@ -93,7 +100,7 @@ class CronCommand extends ContainerAwareCommand
                 $schedule->setDefinition($defaultDefinition);
             }
 
-            $cron = \Cron\CronExpression::factory($schedule->getDefinition());
+            $cron = CronExpression::factory($schedule->getDefinition());
 
             /**
              * @todo Add "Oro timezone" setting as parameter to isDue method
