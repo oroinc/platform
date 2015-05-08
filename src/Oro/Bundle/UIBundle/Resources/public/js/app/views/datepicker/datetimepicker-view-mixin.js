@@ -92,7 +92,7 @@ define(function (require) {
             this.$frontDateField.on('blur', function(e){
                 $(this).parent().removeClass(dialogBelowClass);
             }).on('datepicker:dialogReposition', function(e, position){
-                $(this).parent().toggleClass(dialogBelowClass, position == 'below');
+                $(this).parent().toggleClass(dialogBelowClass, position === 'below');
             });
             this.$frontDateField.after(this.$frontTimeField);
         },

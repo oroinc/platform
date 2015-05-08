@@ -22,7 +22,8 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             selection = this.val();
 
         populate = function (results, container, depth, parentStack) {
-            var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted, subId, parent, resultId;
+            var i, l, result, selectable, disabled, compound, node, label, innerContainer,
+                formatted, subId, parent, resultId;
             results = opts.sortResults(results, container, query);
             parent = container.parent();
 
@@ -122,17 +123,18 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
 
             var additionalRequestParams = options.element.data('select2_query_additional_params');
             if (additionalRequestParams && options.ajax !== undefined) {
-                options.ajax.url += (options.ajax.url.indexOf('?') == -1 ? '?' : '&') + $.param(additionalRequestParams);
+                options.ajax.url += (options.ajax.url.indexOf('?') < 0 ? '?' : '&') + $.param(additionalRequestParams);
             }
 
             return prepareOpts.call(this, options);
         };
 
         prototype.positionDropdown = function(){
-            var dialogIsBelow;
+            var dialogIsBelow,
+                $container = this.container;
             positionDropdown.apply(this, arguments);
-            dialogIsBelow = this.container.hasClass('select2-dropdown-open') && !this.container.hasClass('select2-drop-above');
-            this.container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
+            dialogIsBelow = $container.hasClass('select2-dropdown-open') && !$container.hasClass('select2-drop-above');
+            $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
         };
 
         prototype.close = function(){
@@ -213,7 +215,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
         prototype.resizeSearch = function() {
             resizeSearch.apply(this, arguments);
             this.search.width(Math.floor($(this.search).width()) - 1);
-        }
+        };
     }(Select2['class'].multi.prototype));
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {

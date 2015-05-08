@@ -54,7 +54,7 @@ define(['jquery', 'jquery-ui'], function ($) {
 
             dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
 
-            if( $input.hasClass(dateDialogClassName) ^ dialogIsBelow) {
+            if( $input.hasClass(dateDialogClassName) !== dialogIsBelow) {
                 $input.trigger('datepicker:dialogReposition', dialogIsBelow ? 'below' : 'above');
                 $input.toggleClass(dateDialogClassName, dialogIsBelow);
             }
