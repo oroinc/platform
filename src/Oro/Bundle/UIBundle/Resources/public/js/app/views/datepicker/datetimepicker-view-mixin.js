@@ -78,6 +78,7 @@ define(function (require) {
          * @param {Object} options
          */
         createFrontField: function (options) {
+            var dialogBelowClass = 'datetimepicker-dialog-is-below';
             this._super().createFrontField.call(this, options);
             if (options.fieldsWrapper) {
                 this.$frontDateField
@@ -88,11 +89,12 @@ define(function (require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
-            this.$frontDateField.on('blur', _.bind(function(){
-                this.$frontDateField.parent().removeClass('datetimepicker-dialog-is-below');
-            }, this));
+            this.$frontDateField.on('blur', function(e){
+                $(this).parent().removeClass(dialogBelowClass);
+            }).on('datepicker:dialogReposition', function(e, position){
+                $(this).parent().toggleClass(dialogBelowClass, position == 'below');
+            });
             this.$frontDateField.after(this.$frontTimeField);
-            this.$frontDateField.data('datetime-mode', true);
         },
 
         /**
@@ -112,22 +114,12 @@ define(function (require) {
                 $(this).parent().removeClass('datetimepicker-dialog-is-below');
             });
             this.$frontDateField.on('blur', function(){
-                var $parent = $(this).parent();
-
                 if($(this).hasClass('error')) {
-                    $parent.removeClass('timepicker-error').addClass('datepicker-error');
-                } else {
-                    $parent.removeClass('datepicker-error');
+                    $(this).parent().removeClass('timepicker-error');
                 }
             });
             this.$frontTimeField.on('blur', function(){
-                var $parent = $(this).parent();
-
-                if($(this).hasClass('error')) {
-                    $parent.removeClass('datepicker-error').addClass('timepicker-error');
-                } else {
-                    $parent.removeClass('timepicker-error');
-                }
+                $(this).parent().toggleClass('timepicker-error', $(this).hasClass('error'));
             });
             this._super().initPickerWidget.apply(this, arguments);
         },
