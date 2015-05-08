@@ -1,7 +1,7 @@
 /*jshint browser:true, nomen:true*/
 /*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($, __) {
+define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($, __, Select2) {
     'use strict';
 
     /**
@@ -106,7 +106,11 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
 
     // Override methods of AbstractSelect2 class
     (function (prototype) {
-        var prepareOpts = prototype.prepareOpts;
+        var select2DropBelowClassName = 'select2-drop-below',
+            positionDropdown = prototype.positionDropdown,
+            close = prototype.close,
+            prepareOpts = prototype.prepareOpts,
+            init = prototype.init;
         prototype.prepareOpts = function (options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -123,12 +127,19 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
 
             return prepareOpts.call(this, options);
         };
-    }(window.Select2['class'].abstract.prototype));
 
-    (function (prototype) {
-        var init = prototype.init;
+        prototype.positionDropdown = function(){
+            var dialogIsBelow;
+            positionDropdown.apply(this, arguments);
+            dialogIsBelow = this.container.hasClass('select2-dropdown-open') && !this.container.hasClass('select2-drop-above');
+            this.container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
+        };
 
-        // abstract
+        prototype.close = function(){
+            close.apply(this, arguments);
+            this.container.parent().removeClass(select2DropBelowClassName);
+        };
+
         prototype.init = function () {
             init.apply(this, arguments);
             this.breadcrumbs = $('<ul class="select2-breadcrumbs"></ul>');
@@ -156,9 +167,8 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
                 });
             }
         };
-    }(window.Select2['class'].abstract.prototype));
+    }(Select2['class'].abstract.prototype));
 
-    // Override methods of SingleSelect2 class
     (function (prototype) {
         var onSelect = prototype.onSelect;
         var updateResults = prototype.updateResults;
@@ -193,7 +203,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             this.pagePath = '';
             clear.apply(this, arguments);
         };
-    }(window.Select2['class'].single.prototype));
+    }(Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
     // Fix is valid for version 3.4.1
@@ -204,7 +214,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             resizeSearch.apply(this, arguments);
             this.search.width(Math.floor($(this.search).width()) - 1);
         }
-    }(window.Select2['class'].multi.prototype));
+    }(Select2['class'].multi.prototype));
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
         formatSearching: function() { return __('Searching...'); },

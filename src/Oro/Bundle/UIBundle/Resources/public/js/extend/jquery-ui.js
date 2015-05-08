@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen:true, browser:true*/
-define(['jquery', 'jquery-ui', 'jquery.select2'], function ($) {
+define(['jquery', 'jquery-ui'], function ($) {
     'use strict';
 
     /* datepicker extend:start */
@@ -54,18 +54,16 @@ define(['jquery', 'jquery-ui', 'jquery.select2'], function ($) {
 
             dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
 
-            $input.toggleClass(dateDialogClassName, dialogIsBelow);
-
-            if($input.data('datetime-mode')) {
-                $input.parent().toggleClass(datetimeDialogClassName, dialogIsBelow);
+            if( $input.hasClass(dateDialogClassName) ^ dialogIsBelow) {
+                $input.trigger('datepicker:dialogReposition', dialogIsBelow ? 'below' : 'above');
+                $input.toggleClass(dateDialogClassName, dialogIsBelow);
             }
 
         }
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
             _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker,
-            dateDialogClassName = 'ui-datepicker-dialog-is-below',
-            datetimeDialogClassName = 'datetimepicker-dialog-is-below';
+            dateDialogClassName = 'ui-datepicker-dialog-is-below';
 
         /**
          * Bind update position method after datepicker is opened
@@ -82,7 +80,7 @@ define(['jquery', 'jquery-ui', 'jquery.select2'], function ($) {
             input = elem.target || elem;
             events = getEvents(input.id);
 
-            $(input).parents().add(window).each(function () {
+            $(input).removeClass(dateDialogClassName).parents().add(window).each(function () {
                 $(this).on(events, $.proxy(updatePos, input));
                 // @TODO develop other approach than hide on scroll
                 // because on mobile devices it's impossible to open calendar without scrolling
@@ -132,22 +130,4 @@ define(['jquery', 'jquery-ui', 'jquery.select2'], function ($) {
         };
     }());
     /* datepicker extend:end */
-
-    /* select2 extend:start */
-    (function(){
-        var select2DropBelowClassName = 'select2-drop-below',
-            _positionDropdown = window.Select2.class.abstract.prototype.positionDropdown,
-            _close = window.Select2.class.abstract.prototype.close;
-        window.Select2.class.abstract.prototype.positionDropdown = function(){
-            var needClass;
-            _positionDropdown.apply(this, arguments);
-            needClass = this.container.hasClass('select2-dropdown-open') && !this.container.hasClass('select2-drop-above');
-            this.container.parent().toggleClass(select2DropBelowClassName, needClass);
-        }
-        window.Select2.class.abstract.prototype.close = function(){
-            _close.apply(this, arguments);
-            this.container.parent().removeClass(select2DropBelowClassName);
-        }
-    }());
-    /* select2 extend:end */
 });
