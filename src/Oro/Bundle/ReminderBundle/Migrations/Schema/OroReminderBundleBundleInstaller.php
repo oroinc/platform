@@ -6,7 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ReminderBundle\Migrations\Schema\v1_2\AddReminderSender;
 
 class OroReminderBundleBundleInstaller implements Installation
 {
@@ -15,7 +14,7 @@ class OroReminderBundleBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_2_1';
     }
 
     /**
@@ -24,9 +23,6 @@ class OroReminderBundleBundleInstaller implements Installation
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->createReminderTable($schema);
-
-        $addReminderSender = new AddReminderSender();
-        $addReminderSender->up($schema, $queries);
     }
 
     /**
@@ -53,9 +49,11 @@ class OroReminderBundleBundleInstaller implements Installation
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->addColumn('sent_at', 'datetime', ['notnull' => false]);
         $table->addColumn('failure_exception', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('sender_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['recipient_id'], 'IDX_2F4F9F57E92F8F78', []);
         $table->addIndex(['state'], 'reminder_state_idx', []);
+        $table->addIndex(['sender_id'], 'idx_2f4f9f57f624b39d', []);
         /** End of generate table oro_reminder **/
 
         /** Generate foreign keys for table oro_reminder **/
@@ -64,6 +62,13 @@ class OroReminderBundleBundleInstaller implements Installation
             ['recipient_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['sender_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
         /** End of generate foreign keys for table oro_reminder **/
     }
