@@ -20,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v1_11';
     }
 
     /**
@@ -98,6 +98,8 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('data', Type::JSON_ARRAY, ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA', []);
+        $table->addIndex(['date'], 'oro_intch_date_idx', []);
+        $table->addIndex(['connector', 'code'], 'oro_intch_con_state_idx', []);
     }
 
     /**
@@ -110,6 +112,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table = $schema->createTable('oro_integration_transport');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('type', 'string', ['length' => 30]);
+        $table->addIndex(['type'], 'oro_int_trans_type_idx', []);
         $table->setPrimaryKey(['id']);
     }
 

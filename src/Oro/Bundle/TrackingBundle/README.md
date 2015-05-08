@@ -189,7 +189,7 @@ The main entity for this data is **Visitor event**. This entity have next fields
  
  - **Mobile**. Virtual boolean field. True if visitor comes from mobile system 
  
- - **Logged in**. Virtual boolean field. True if visitor was detected. (Non anonymous event) 
+ - **Identified**. Virtual boolean field. True if visitor was detected. (Non anonymous event) 
  
  - **Event date**. Virtual datetime field. Date than event was executed
  

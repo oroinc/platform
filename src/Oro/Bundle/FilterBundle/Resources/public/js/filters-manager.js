@@ -13,7 +13,29 @@ define([
 ], function ($, _, Backbone, mediator, tools, __, MultiselectDecorator, filterWrapper) {
     'use strict';
 
-    var FiltersManager;
+    var FiltersManager,
+        DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
+
+    /**
+     * Defines parent element for dropdown-menu by toggle element
+     * (this method is taken from Bootstrap-Dropdown)
+     *
+     * @param {jQuery} $toggle
+     * @returns {*|jQuery|HTMLElement}
+     */
+    function getDropdownMenuParent($toggle) {
+        var $parent,
+            selector = $toggle.attr('data-target');
+        if (!selector) {
+            selector = $toggle.attr('href')
+            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
+        }
+        $parent = selector && $(selector);
+        if (!$parent || !$parent.length) {
+            $parent = $toggle.parent();
+        }
+        return $parent;
+    }
 
     /**
      * View that represents all grid filters
@@ -102,6 +124,7 @@ define([
 
             if (tools.isMobile()) {
                 filterListeners.updateCriteriaClick = this._onUpdateCriteriaClick;
+                $('body').on('click.' + this.cid, DROPDOWN_TOGGLE_SELECTOR, _.bind(this._onBodyClick, this));
             }
 
             _.each(this.filters, function (filter) {
@@ -126,6 +149,7 @@ define([
             if (this.disposed) {
                 return;
             }
+            $('body').off('.' + this.cid);
             _.each(this.filters, function (filter) {
                 filter.dispose();
             });
@@ -290,7 +314,7 @@ define([
                 fragment.appendChild(filter.$el.get(0));
             }, this);
 
-            this.trigger("rendered");
+            this.trigger('rendered');
 
             if (_.isEmpty(this.filters)) {
                 $container.hide();
@@ -395,16 +419,36 @@ define([
          * @private
          */
         _onDropdownToggle: function (e) {
+            var $dropdown = this.$('.dropdown');
             e.preventDefault();
             e.stopPropagation();
-            this.$el.find('.dropdown').toggleClass('oro-open');
+            if (!$dropdown.hasClass('oro-open')) {
+                // closes other dropdown-menus
+                $(DROPDOWN_TOGGLE_SELECTOR).each(function () {
+                    getDropdownMenuParent($(this)).removeClass('open');
+                });
+            }
+            $dropdown.toggleClass('oro-open');
+        },
+
+        /**
+         * Handles click on body element
+         * closes the filters-dropdown if event target does not belong to the view element
+         *
+         * @param {jQuery.Event} e
+         * @protected
+         */
+        _onBodyClick: function (e) {
+            if (!_.contains($(e.target).parents(), this.el)) {
+                this.closeDropdown();
+            }
         },
 
         /**
          * Closes dropdown on mobile
          */
         closeDropdown: function () {
-            this.$el.find('.dropdown').removeClass('oro-open');
+            this.$('.dropdown').removeClass('oro-open');
         },
 
         /**
@@ -414,7 +458,6 @@ define([
             filter.once('update', this.closeDropdown, this);
             _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
         }
-
     });
 
     return FiltersManager;

@@ -139,5 +139,6 @@ services:
         class: %oro_ui.twig.html_tag.class%
         arguments:
             - @oro_form.provider.html_tag_provider
+            - %kernel.cache_dir%
         tags:
             - { name: twig.extension }

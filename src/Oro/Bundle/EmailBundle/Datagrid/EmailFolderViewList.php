@@ -26,9 +26,6 @@ class EmailFolderViewList extends AbstractViewsList
                     'folders' => ['value' => FolderType::SENT]
                 ]
             ),
-            new View(
-                'oro.email.datagrid.emailfolder.view.all'
-            )
         ];
     }
 }

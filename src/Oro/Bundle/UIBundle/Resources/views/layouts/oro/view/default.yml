@@ -1,0 +1,94 @@
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroUIBundle:layouts:oro/view/default.html.twig'
+        - @add:
+            id:        before_content_addition_placeholder
+            parentId:  before_content_addition
+            blockType: placeholder
+            options:
+                placeholder_name: view_before_content_addition
+                placeholder_parameters:
+                    entity: { @value: $data.entity }
+        - @addTree:
+            items:
+                page_header_panel:
+                    blockType: container
+                page_header:
+                    blockType: container
+                page_header_left_panel:
+                    blockType: container
+                page_header_right_panel:
+                    blockType: container
+                page_title_rows:
+                    blockType: container
+                page_title_first_row:
+                    blockType: container
+                page_title_second_row:
+                    blockType: container
+                page_title_panel:
+                    blockType: breadcrumbs
+                page_title:
+                    blockType: text
+                page_buttons_panel:
+                    blockType: container
+                nav_buttons:
+                    blockType: container
+                nav_buttons_before:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: view_navButtons_before
+                        placeholder_parameters:
+                            entity: { @value: $data.entity }
+                nav_buttons_after:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: view_navButtons_after
+                        placeholder_parameters:
+                            entity: { @value: $data.entity }
+                page_actions_panel:
+                    blockType: container
+                    options:
+                        attr:
+                            class: inline-decorate
+                page_actions:
+                    blockType: container
+                page_actions_before:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: view_pageActions_before
+                        placeholder_parameters:
+                            entity: { @value: $data.entity }
+                page_actions_after:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: view_pageActions_after
+                        placeholder_parameters:
+                            entity: { @value: $data.entity }
+                page_content:
+                    blockType: container
+                navigation_content_tags:
+                    blockType: block
+                    options:
+                        vars:
+                            entity: { @value: $data.entity }
+            tree:
+                content:
+                    page_header_panel:
+                        page_header:
+                            page_header_left_panel:
+                                page_title_rows:
+                                    page_title_first_row:
+                                        page_title_panel: ~
+                                    page_title_second_row: ~
+                            page_header_right_panel:
+                                page_buttons_panel:
+                                    nav_buttons_before: ~
+                                    nav_buttons: ~
+                                    nav_buttons_after: ~
+                                page_actions_panel:
+                                    page_actions_before: ~
+                                    page_actions: ~
+                                    page_actions_after: ~
+                    page_content: ~
+                    navigation_content_tags: ~

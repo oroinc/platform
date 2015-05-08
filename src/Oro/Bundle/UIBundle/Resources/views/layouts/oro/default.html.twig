@@ -1,0 +1,395 @@
+{% block head_widget %}
+    <head{{ block('block_attributes') }}>
+        <title>{% trans %}Loading...{% endtrans %}</title>
+        <script id="page-title" type="text/html">{{ title|replace(title_parameters) }}</script>
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
+        {% if cache is same as(false) -%}
+        <meta http-equiv="cache-control" content="max-age=0" />
+        <meta http-equiv="cache-control" content="no-cache" />
+        <meta http-equiv="expires" content="0" />
+        <meta http-equiv="pragma" content="no-cache" />
+        {% endif -%}
+        {{ block_widget(block) }}
+    </head>
+{% endblock %}
+
+{% block body_widget %}
+    <body{{ block('block_attributes') }}>
+        <div id="progressbar">
+            <h3>{% trans %}Loading...{% endtrans %}</h3>
+            <div class="progress progress-striped active">
+                <div class="bar" style="width: 90%;"></div>
+            </div>
+        </div>
+        <div id="page" style="display:none;">
+            <div id="top-page">
+                {{ block_widget(block) }}
+            </div>
+        </div>
+    </body>
+{% endblock %}
+
+{% block placeholder_widget %}
+    {{ placeholder(placeholder_name, placeholder_parameters) }}
+{% endblock %}
+
+{% block require_js_widget %}
+    {% set requirejs_config_extend %}
+        {%- placeholder requirejs_config_extend -%}
+    {% endset %}
+    {% include 'OroRequireJSBundle::scripts.html.twig' with {
+        compressed: compressed,
+        config_extend: requirejs_config_extend
+    } %}
+    {% if not modules is empty %}
+    <script type="text/javascript">
+        require({{ modules|json_encode(constant('JSON_UNESCAPED_SLASHES'))|raw }});
+    </script>
+    {% endif %}
+{% endblock %}
+
+{% block form_start_widget %}
+    {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
+    {% if method is defined and method not in ['GET', 'POST'] -%}
+        {% set form_method = 'POST' %}
+    {%- endif -%}
+    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ with_page_parameters ? oro_url_add_query(action) : action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+    {%- if form_method is defined -%}
+        <input type="hidden" name="_method" value="{{ method }}" />
+    {%- endif -%}
+{% endblock %}
+
+{% block form_end_widget %}
+    {{ form_end(form) }}
+    {{ oro_form_js_validation(form) }}
+{% endblock %}
+
+{% block link_widget -%}
+    {% set href = path is defined ? path : path(route_name, route_parameters) -%}
+    <a{{ block('block_attributes') }} href="{{ with_page_parameters ? oro_url_add_query(href) : href }}">
+        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+    </a>
+{%- endblock %}
+
+{% block button_widget -%}
+    {% set attr = attr|merge({
+        'class': 'btn' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    }) -%}
+    {% if type is same as('link') %}
+        {%- if icon is defined -%}
+            {% set icon_class = 'hide-text' -%}
+            {% set attr = attr|merge({
+                'class': attr.class ~ ' icons-holder-text'
+            }) -%}
+        {% endif %}
+        {{- block('button_widget_link') -}}
+    {% elseif type is same as('input') %}
+        {{- block('button_widget_input') -}}
+    {% else %}
+        {{- block('button_widget_button') -}}
+    {% endif %}
+{%- endblock %}
+
+{% block button_widget_link -%}
+    {% set url = path is defined ? path : (route_name is defined ? path(route_name, route_parameters) : null) -%}
+    {% set url = url is not same as(null) and with_page_parameters ? oro_url_add_query(url) : url -%}
+    {% if icon is defined -%}
+        {% set attr = attr|merge({'class': attr.class ~ ' icons-holder-text'}) -%}
+    {% endif -%}
+    {% set redirectUrl = redirect_path is defined ? redirect_path : (redirect_route_name is defined ? path(redirect_route_name, redirect_route_parameters) : null) -%}
+    {% if redirectUrl is not same as(null) -%}
+        {% set attr = attr|merge({'data-redirect': with_page_parameters ? oro_url_add_query(redirectUrl) : redirectUrl}) -%}
+    {% endif -%}
+    {% if entity_id is defined -%}
+        {% set attr = attr|merge({'data-id': entity_id}) -%}
+    {% endif -%}
+    {% if confirm_message is defined -%}
+        {% set attr = attr|merge({'data-message': confirm_message|block_text(translation_domain)}) -%}
+    {% endif -%}
+    {% if success_message is defined -%}
+        {% set attr = attr|merge({'data-success-message': success_message|block_text(translation_domain)}) -%}
+    {% endif -%}
+    <a{{ block('block_attributes') }}
+        {%- if use_data_url|default is same as(true) %} href="javascript: void(0);" data-url="{{ url|default('') }}"
+        {%- else %} href="{{ url|default('javascript: void(0);') }}"{% endif %}>
+        {%- if icon is defined -%}
+            {% set icon_class = 'hide-text' -%}
+            {{ block('icon_block') }}
+        {%- endif %}
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+    </a>
+{%- endblock %}
+
+{% block submit_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'class': 'btn-primary' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block create_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'class': 'btn-primary' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block cancel_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'class': 'back' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block save_button_widget -%}
+    {{ block_widget(block, {
+        'attr': {
+            'data-action': 'save_and_stay',
+            'class': 'btn-success action-button' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block save_and_close_button_widget -%}
+    {{ block_widget(block, {
+        'action': 'submit',
+        'attr': {
+            'class': 'btn-success' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block delete_button_widget -%}
+    {{ block_widget(block, {
+        'icon': icon|default('trash'),
+        'use_data_url': true,
+        'attr': {
+            'class': 'no-hash remove-button' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    } }) }}
+{%- endblock %}
+
+{% block button_separator_widget -%}
+    <div{{ block('block_attributes') }}>
+        <div class="separator-btn"></div>
+    </div>
+{%- endblock %}
+
+{% block button_group_widget -%}
+    {% set attr = attr|merge({
+        'class': 'btn-group' ~ (attr.class is defined ? ' ' ~ attr.class : '')
+    }) -%}
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{%- endblock %}
+
+{% block pinned_button_group_widget -%}
+    {% set pinnedAttr = {
+        'groupKey': group_name,
+        'useMainButtonsClone': true
+    } -%}
+    {% if more_button_attr is defined -%}
+        {% set pinnedAttr = pinnedAttr|merge({'moreButtonAttrs': more_button_attr}) -%}
+    {% endif -%}
+    {{ block_widget(block, {'attr': {'data-pinned-dropdown-button': pinnedAttr|json_encode} }) }}
+{%- endblock %}
+
+{% block breadcrumbs_widget -%}
+    <div class="pull-left">
+    {% for child in block -%}
+        {% if child.vars.visible -%}
+            {% if not loop.last %}
+            <div class="sub-title">{{ block_widget(child) }}</div><span class="separator">/</span>
+            {%- else -%}
+            <h1 class="user-name">{{ block_widget(child) }}</h1>
+            {% endif %}
+        {%- endif %}
+    {%- endfor %}
+    </div>
+{%- endblock %}
+
+{% block datagrid_widget %}
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {{ dataGrid.renderGrid(grid_full_name, grid_parameters) }}
+{% endblock %}
+
+{% block taggable_datagrid_widget %}
+    {{ block_widget(block) }}
+    <script type="text/javascript">
+        require(['oronavigation/js/content/grid-builder'], function (GridTagBuilder) {
+            GridTagBuilder.allowTracking({{ grid_full_name|json_encode|raw }});
+        });
+    </script>
+{% endblock %}
+
+{% block _debug_init_script_widget %}
+    <script{{ block('block_attributes') }}>
+        require(['oroui/js/tools'], function (tools) {tools.debug = true;});
+    </script>
+{% endblock %}
+
+{% block _mobile_init_script_widget %}
+    <script{{ block('block_attributes') }}>
+        require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
+    </script>
+{% endblock %}
+
+{% block _header_widget %}
+    <header class="navbar" id="oroplatform-header">
+        {{ block_widget(block) }}
+    </header>
+{% endblock %}
+
+{% block _navigation_bar_widget %}
+    <div class="navbar-inner">
+        <div class="container">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _user_menu_widget %}
+    <ul class="nav pull-right user-menu">
+        {{ block_widget(block) }}
+    </ul>
+{% endblock %}
+
+{% block _navbar_menu_widget %}
+    <div class="nav top-search shortcuts">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _main_menu_widget %}
+    <div id="main-menu" class="main-menu-top">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _left_panel_widget %}
+    <div id="left-panel">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _right_panel_widget %}
+    <div id="right-panel">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _footer_widget %}
+    <div id="dialog-extend-fixed-container"></div>
+    <footer id="footer" class="footer">
+        {{ block_widget(block) }}
+    </footer>
+{% endblock %}
+
+{% block _main_panel_widget %}
+    <div id="main">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _main_header_widget %}
+    <div class="breadcrumb-pin">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _breadcrumb_widget %}
+    <div id="breadcrumb">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _before_content_addition_widget %}
+    <div id="before-content-addition">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _flash_messages_widget %}
+    <div id="flash-messages">
+        <div class="flash-messages-frame">
+            <div class="flash-messages-holder"></div>
+        </div>
+        <script type="text/template" id="message-item-template">
+            <div class="alert <% if (type) {  %><%= 'alert-' + type %><% } %> fade in top-messages ">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <div class="message"><%= message %></div>
+            </div>
+        </script>
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/messenger'],
+                    function($, messenger) {
+                        messenger.setup({
+                            container: '#flash-messages .flash-messages-holder',
+                            template: _.template($.trim($('#message-item-template').html()))
+                        });
+                        {% if app.session.flashbag.peekAll|length > 0 %}
+                        $(function() {
+                            {% for type, messages in app.session.flashbag.all %}
+                            {% for message in messages %}
+                            messenger.notificationFlashMessage({{ type|json_encode|raw }}, {{ message|trans|json_encode|raw }});
+                            {% endfor %}
+                            {% endfor %}
+                        });
+                        {% endif %}
+                    });
+        </script>
+    </div>
+{% endblock %}
+
+{% block _page_container_widget %}
+    <div id="container" class="scrollable-container">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_panel_widget %}
+    <div class="container-fluid page-title">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_widget %}
+    <div class="navigation clearfix navbar-extra navbar-extra-right">
+        <div class="row">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_header_left_panel_widget %}
+    <div class="pull-left pull-left-extra">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_right_panel_widget %}
+    <div class="pull-right">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_buttons_panel_widget %}
+    <div class="pull-right title-buttons-container">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_actions_panel_widget %}
+    <div class="pull-right user-info-state">
+        <div class="inline-decorate-container">
+            <ul{{ block('block_attributes') }}>
+                {{ block_widget(block) }}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_actions_widget %}
+    {% for child in block if child.vars.visible -%}
+        <li>{{ block_widget(child) }}</li>
+    {%- endfor %}
+{% endblock %}

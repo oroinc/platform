@@ -1022,9 +1022,15 @@ footer {
   line-height:1.2em;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^="icon-"], [class*=" icon-"],
+[class^="fa-"], [class*=" fa-"] {
   margin: 0 3px;
 }
+
+.fa-google {
+  margin: 0 5px;
+}
+
 .icons-holder [class^="icon-"],
 .icons-holder [class*=" icon-"] {
   margin: 0 -3px;
@@ -1570,6 +1576,8 @@ footer {
     color: #fff;
     font-size: @baseFontSize;
     display: block;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
   }
   .ui-dialog-titlebar-buttonpane {
@@ -2355,7 +2363,8 @@ div.uploader.focus,
 .alert-error > ul{
   margin-bottom: 0;
 }
-#flash-messages {
+#flash-messages,
+.flash-messages {
   position: relative;
   .alert {
     margin: 3px 0 0;
@@ -3154,5 +3163,9 @@ label .popover-content {
   // once accordion is opened and animation is finished
   &[style="height: auto;"] {
     overflow: visible;
+  }
+  &.in {
+    // fixes expand in FF
+    min-height: 1px;
   }
 }

@@ -34,8 +34,7 @@ class ProcessConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->definitionConfiguration);
-        unset($this->triggerConfiguration);
+        unset($this->definitionConfiguration, $this->triggerConfiguration);
     }
 
     /**
@@ -52,18 +51,19 @@ class ProcessConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         $configurationProvider->getProcessConfiguration();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testGetWorkflowDefinitionsDuplicateConfiguration()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new DuplicateConfigurationBundle());
+        $bundles = [new CorrectConfigurationBundle(), new DuplicateConfigurationBundle()];
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
             $this->triggerConfiguration
         );
-        $configurationProvider->getProcessConfiguration();
+
+        static::assertEquals(
+            $this->getExpectedProcessConfiguration('DuplicateConfiguration'),
+            $configurationProvider->getProcessConfiguration()
+        );
     }
 
     public function testGetWorkflowDefinitions()

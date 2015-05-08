@@ -1,0 +1,111 @@
+services:
+    #
+    # Conditions
+    #
+
+    oro_layout.expression.andx:
+        class: Oro\Component\ConfigExpression\Condition\Andx
+        tags:
+            - { name: oro_layout.expression, alias: and }
+
+    oro_layout.expression.orx:
+        class: Oro\Component\ConfigExpression\Condition\Orx
+        tags:
+            - { name: oro_layout.expression, alias: or }
+
+    oro_layout.expression.not:
+        class: Oro\Component\ConfigExpression\Condition\Not
+        tags:
+            - { name: oro_layout.expression, alias: not }
+
+    oro_layout.expression.true:
+        class: Oro\Component\ConfigExpression\Condition\True
+        tags:
+            - { name: oro_layout.expression, alias: "true" }
+
+    oro_layout.expression.false:
+        class: Oro\Component\ConfigExpression\Condition\False
+        tags:
+            - { name: oro_layout.expression, alias: "false" }
+
+    oro_layout.expression.equal_to:
+        class: Oro\Component\ConfigExpression\Condition\EqualTo
+        tags:
+            - { name: oro_layout.expression, alias: eq|equal }
+
+    oro_layout.expression.not_equal_to:
+        class: Oro\Component\ConfigExpression\Condition\NotEqualTo
+        tags:
+            - { name: oro_layout.expression, alias: neq|not_equal }
+
+    oro_layout.expression.blank:
+        class: Oro\Component\ConfigExpression\Condition\Blank
+        tags:
+            - { name: oro_layout.expression, alias: empty|blank }
+
+    oro_layout.expression.not_blank:
+        class: Oro\Component\ConfigExpression\Condition\NotBlank
+        tags:
+            - { name: oro_layout.expression, alias: not_empty|not_blank }
+
+    oro_layout.expression.has_value:
+        class: Oro\Component\ConfigExpression\Condition\HasValue
+        tags:
+            - { name: oro_layout.expression, alias: has|has_value }
+
+    oro_layout.expression.not_has_value:
+        class: Oro\Component\ConfigExpression\Condition\NotHasValue
+        tags:
+            - { name: oro_layout.expression, alias: not_has|not_has_value }
+
+    oro_layout.expression.greater_than:
+        class: Oro\Component\ConfigExpression\Condition\GreaterThan
+        tags:
+            - { name: oro_layout.expression, alias: gt|greater }
+
+    oro_layout.expression.greater_than_or_equal:
+        class: Oro\Component\ConfigExpression\Condition\GreaterThanOrEqual
+        tags:
+            - { name: oro_layout.expression, alias: gte|ge|greater_or_equal }
+
+    oro_layout.expression.less_than:
+        class: Oro\Component\ConfigExpression\Condition\LessThan
+        tags:
+            - { name: oro_layout.expression, alias: lt|less }
+
+    oro_layout.expression.less_than_or_equal:
+        class: Oro\Component\ConfigExpression\Condition\LessThanOrEqual
+        tags:
+            - { name: oro_layout.expression, alias: lte|le|less_or_equal }
+
+    oro_layout.expression.acl_granted:
+        class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
+        arguments:
+            - @oro_security.security_facade
+            - @doctrine
+        tags:
+            - { name: oro_layout.expression, alias: acl|acl_granted }
+
+    #
+    # Functions
+    #
+
+    oro_layout.expression.value:
+        class: Oro\Component\ConfigExpression\Func\GetValue
+        tags:
+            - { name: oro_layout.expression, alias: value|get }
+
+    oro_layout.expression.iif:
+        class: Oro\Component\ConfigExpression\Func\Iif
+        tags:
+            - { name: oro_layout.expression, alias: iif }
+
+    oro_layout.expression.trim:
+        class: Oro\Component\ConfigExpression\Func\Trim
+        tags:
+            - { name: oro_layout.expression, alias: trim }
+
+    oro_layout.expression.join:
+        class: Oro\Component\ConfigExpression\Func\Join
+        tags:
+            - { name: oro_layout.expression, alias: join }

@@ -85,12 +85,14 @@
                                 {% block pageActions %}
                                     {% placeholder view_pageActions_before with {entity: entity} %}
 
-                                    {% if isDesktopVersion() %}
-                                        {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                        {% if ownerLink %}
-                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
+                                    {% block ownerLink %}
+                                        {% if isDesktopVersion() %}
+                                            {% set ownerLink = UI.entityOwnerLink(entity) %}
+                                            {% if ownerLink %}
+                                                <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
+                                            {% endif %}
                                         {% endif %}
-                                    {% endif %}
+                                    {% endblock ownerLink %}
 
                                     {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : entity.id|default %}
                                     {% if audit_entity_id %}

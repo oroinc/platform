@@ -89,7 +89,7 @@ oro:
 
         attachment:
             copy_to_record: Copy to Record
-            open: Open
+            save: Save
             select_file: Select file
 
         menu:
@@ -121,7 +121,6 @@ oro:
                 view:
                     inbox: Inbox
                     sent: Sent Mail
-                    all: All Mail
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -148,7 +147,9 @@ oro:
         send_email:               Send email
         sent_at.label:            Sent at
         sent_by.label:            sent by {{ user }}
-        subject.label:            Subject
+        subject:
+            label:            Subject
+            no_subject.label: (no subject)
         to.label:                 To
         cc_bcc.label:             Cc/Bcc
         x_message_id.label:       xMessage Id
@@ -164,9 +165,13 @@ oro:
         add_context.label:        Add Context
         add_context_entity.label: Add Context Entity
         contexts:
-              label:              Context
-              placeholder:        Add Context
-
+            label:                Context
+            placeholder:          Add Context
+            added:                The context has been added
+            added.already:        The context has already been added
+            type.not_supported:   The context type is not supported
+            removed:              The context has been removed
+        not_found:                Email with id "%id%" can not be found
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable

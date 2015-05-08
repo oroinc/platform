@@ -256,7 +256,9 @@ class EmailModelBuilder
      */
     protected function applyRecipients(EmailModel $emailModel)
     {
-        $emailModel->setTo(array_merge($emailModel->getTo(), $this->getRecipients($emailModel, EmailRecipient::TO)));
+        $emailModel->setTo(
+            array_merge($emailModel->getTo(), $this->getRecipients($emailModel, EmailRecipient::TO, true))
+        );
         $emailModel->setCc(array_merge($emailModel->getCc(), $this->getRecipients($emailModel, EmailRecipient::CC)));
         $emailModel->setBcc(array_merge($emailModel->getBcc(), $this->getRecipients($emailModel, EmailRecipient::BCC)));
     }
@@ -264,10 +266,11 @@ class EmailModelBuilder
     /**
      * @param EmailModel $emailModel
      * @param string $type
+     * @param bool $excludeCurrentUser
      *
      * @return array
      */
-    protected function getRecipients(EmailModel $emailModel, $type)
+    protected function getRecipients(EmailModel $emailModel, $type, $excludeCurrentUser = false)
     {
         $addresses = [];
         if ($this->request->query->has($type)) {
@@ -276,10 +279,13 @@ class EmailModelBuilder
                 $this->helper->preciseFullEmailAddress(
                     $address,
                     $emailModel->getEntityClass(),
-                    $emailModel->getEntityId()
+                    $emailModel->getEntityId(),
+                    $excludeCurrentUser
                 );
             }
-            $addresses = [$address];
+            if ($address) {
+                $addresses = [$address];
+            }
         }
         return $addresses;
     }
@@ -383,7 +389,7 @@ class EmailModelBuilder
         $collection = new ArrayCollection($attachments);
         $fileNames = [];
 
-        $filtered = $collection->filter(function($entry) use (&$fileNames) {
+        $filtered = $collection->filter(function ($entry) use (&$fileNames) {
             /** @var EmailAttachment $entry */
             if (in_array($entry->getFileName(), $fileNames)) {
                 return false;

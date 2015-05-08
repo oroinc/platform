@@ -236,3 +236,10 @@ services:
         arguments:
             - @security.context.link
             - @session.flash_bag
+
+    oro_email.listener.datagrid.context.user:
+        class: %oro_email.listener.datagrid.context.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-for-context-grid, method: onBuildAfter }

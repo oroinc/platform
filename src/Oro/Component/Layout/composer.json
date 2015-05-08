@@ -1,0 +1,30 @@
+{
+    "name": "oro/layout",
+    "type": "library",
+    "description": "Oro Layout Component",
+    "keywords": ["ORO", "BAP", "Layout", "Block"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.9",
+        "symfony/form": "~2.3",
+        "symfony/options-resolver": "~2.3",
+        "symfony/templating": "~2.3",
+        "oro/property-access": "dev-master"
+    },
+    "require-dev": {
+        "jms/cg": "~1.1",
+        "symfony/filesystem": "~2.3",
+        "symfony/yaml": "~2.3",
+        "symfony/dependency-injection": "~2.3"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\Layout": "" }
+    },
+    "target-dir": "Oro/Component/Layout",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

@@ -102,18 +102,27 @@
   .caret { margin-top:11px; }
 }
 .other-scroll-container {
-  overflow: hidden;
-  clear: both;
   margin: 10px 20px 20px 20px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  .other-scroll{
-    position: absolute;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    z-index: 700;
-    > div {
-      width: 1px;
+}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .other-scroll-container {
+    border-radius: 0;
+  }
+}
+.floatThead {
+  .other-scroll-container {
+    overflow: hidden;
+    clear: both;
+    .other-scroll {
+      position: absolute;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      z-index: 700;
+      > div {
+        width: 1px;
+      }
     }
   }
 }

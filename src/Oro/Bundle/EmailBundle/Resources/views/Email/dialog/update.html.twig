@@ -15,7 +15,8 @@
             function(_, __, widgetManager, messenger, mediator) {
                 widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                     messenger.notificationFlashMessage('success', __('The email was sent'));
-                    mediator.trigger('widget_success:activity_list:item:update');
+                    mediator.trigger('widget_success:' + widget.getAlias());
+                    mediator.trigger('widget_success:' + widget.getWid());
                     mediator.trigger('datagrid:doRefresh:attachment-grid');
                     mediator.trigger('widget:doRefresh:email-thread');
                     widget.remove(true);
@@ -52,29 +53,31 @@
                     {{ form_row(form.cc) }}
                     {{ form_row(form.bcc) }}
                     {{ form_row(form.subject) }}
-                    {{ form_row(form.template, {'includeSystem': true}) }}
+                    {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': false}) }}
                     {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
 
+                    {% set popupTriggerButtonId = 'attach-file-' ~ random() %}
+                    {% set uploadNewButtonId = 'upload-new-' ~ random() %}
                     <div class="control-group email-body-actions">
                         <div class="controls">
                             <span class="email-body-action"><a id="add-signature" href="javascript:void(0);">{{ 'oro.email.form.add_signature'|trans }}</a></span>
 
                             <span>{{ 'oro.email.form.attach_file'|trans }}: </span>
                             <div class="dropup" style="display: inline-block">
-                                <a id="attach-file" class="dropdown-toggle" href="javascript:void(0);" aria-expanded="true">{{ 'oro.email.form.from_record'|trans }}</a>
+                                <a id="{{ popupTriggerButtonId }}" class="dropdown-toggle" href="javascript:void(0);" aria-expanded="true">{{ 'oro.email.form.from_record'|trans }}</a>
                                 <div class="dropdown-menu attachment-list-popup" role="menu" aria-labelledby="attach-file"></div>
                             </div>
                             |
                             <span>
-                                <a id="upload-new" href="javascript:void(0);">{{ 'oro.email.form.upload'|trans }}</a>
+                                <a id="{{ uploadNewButtonId }}" href="javascript:void(0);">{{ 'oro.email.form.upload'|trans }}</a>
                             </span>
                         </div>
                     </div>
 
                     {% set emailAttachmentOptions = {
-                        popupTriggerButton: '#attach-file',
-                        uploadNewButton: '#upload-new',
+                        popupTriggerButton: '#' ~ popupTriggerButtonId,
+                        uploadNewButton: '#' ~ uploadNewButtonId,
                         popupContentEl: '.attachment-list-popup',
                         entityAttachments: entity.attachments.toArray,
                         attachmentsAvailable: entity.attachmentsAvailable

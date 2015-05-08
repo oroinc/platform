@@ -27,13 +27,23 @@ class EmailTemplateRepository extends EntityRepository
      *
      * @param string       $entityName
      * @param Organization $organization
-     * @param bool         $includeSystem
+     * @param bool         $includeNonEntity
+     * @param bool         $includeSystemTemplates
      *
      * @return EmailTemplate[]
      */
-    public function getTemplateByEntityName($entityName, Organization $organization, $includeSystem = false)
-    {
-        return $this->getEntityTemplatesQueryBuilder($entityName, $organization, $includeSystem)
+    public function getTemplateByEntityName(
+        $entityName,
+        Organization $organization,
+        $includeNonEntity = false,
+        $includeSystemTemplates = true
+    ) {
+        return $this->getEntityTemplatesQueryBuilder(
+            $entityName,
+            $organization,
+            $includeNonEntity,
+            $includeSystemTemplates
+        )
             ->getQuery()->getResult();
     }
 
@@ -42,19 +52,29 @@ class EmailTemplateRepository extends EntityRepository
      *
      * @param string       $entityName    entity class
      * @param Organization $organization
-     * @param bool         $includeSystem if true - system templates will be included in result set
+     * @param bool         $includeNonEntity if true - system templates will be included in result set
+     * @param bool         $includeSystemTemplates
      *
      * @return QueryBuilder
      */
-    public function getEntityTemplatesQueryBuilder($entityName, Organization $organization, $includeSystem = false)
-    {
+    public function getEntityTemplatesQueryBuilder(
+        $entityName,
+        Organization $organization,
+        $includeNonEntity = false,
+        $includeSystemTemplates = true
+    ) {
         $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
             ->orderBy('e.name', 'ASC')
             ->setParameter('entityName', $entityName);
 
-        if ($includeSystem) {
+        if ($includeNonEntity) {
             $qb->orWhere('e.entityName IS NULL');
+        }
+
+        if (!$includeSystemTemplates) {
+            $qb->andWhere('e.isSystem = :isSystem')
+                ->setParameter('isSystem', false);
         }
 
         $qb->andWhere("e.organization = :organization")
