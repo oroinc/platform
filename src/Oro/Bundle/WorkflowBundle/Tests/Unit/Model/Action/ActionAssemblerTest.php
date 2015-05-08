@@ -45,7 +45,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $conditionFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory')
+        $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->setMethods(array('create'))
             ->getMock();

@@ -10,9 +10,12 @@ class ReplacePropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider passDataProvider
      */
-    public function testPassConfiguration(array $sourceData, array $expectedData)
+    public function testPassConfiguration(array $sourceData, array $expectedData, $prefix = null)
     {
         $parameterPass = new ReplacePropertyPath();
+        if ($prefix) {
+            $parameterPass->setPrefix($prefix);
+        }
         $actualData    = $parameterPass->passConfiguration($sourceData);
 
         $this->assertEquals($expectedData, $actualData);
@@ -39,6 +42,19 @@ class ReplacePropertyPathTest extends \PHPUnit_Framework_TestCase
                     'b' => ['c' => new PropertyPath('another.path.component')],
                     'c' => '$path.component'
                 ]
+            ],
+            [
+                'sourceData'   => [
+                    'a' => '$path.component',
+                    'b' => ['c' => '$another.path.component'],
+                    'c' => '\$path.component'
+                ],
+                'expectedData' => [
+                    'a' => new PropertyPath('prefix.path.component'),
+                    'b' => ['c' => new PropertyPath('prefix.another.path.component')],
+                    'c' => '$path.component'
+                ],
+                'prefix'       => 'prefix'
             ]
         ];
     }

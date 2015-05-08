@@ -87,6 +87,6 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
             $this->condition = $this->assembler->assemble($this->configuration);
         }
 
-        return $this->condition->isConditionAllowed($context);
+        return $this->condition->evaluate($context, $this->errors) ? true : false;
     }
 }

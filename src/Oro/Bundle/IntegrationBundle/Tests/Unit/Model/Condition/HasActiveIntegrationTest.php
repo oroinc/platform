@@ -9,11 +9,6 @@ class HasActiveIntegrationTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $contextAccessor;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $registry;
 
     /**
@@ -23,12 +18,9 @@ class HasActiveIntegrationTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->getMock();
-        $this->condition = new HasActiveIntegration($this->contextAccessor, $this->registry);
+        $this->condition = new HasActiveIntegration($this->registry);
     }
 
     /**
@@ -58,18 +50,13 @@ class HasActiveIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->condition, $this->condition->initialize($options));
     }
 
-    public function testIsAllowed()
+    public function testEvaluate()
     {
         $context = [];
-        $options = ['test'];
         $type = 'testType';
         $entity = new \stdClass();
 
-        $this->condition->initialize($options);
-        $this->contextAccessor->expects($this->once())
-            ->method('getValue')
-            ->with($context, 'test')
-            ->will($this->returnValue($type));
+        $this->condition->initialize([$type]);
 
         $repository = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
             ->disableOriginalConstructor()
@@ -83,6 +70,6 @@ class HasActiveIntegrationTest extends \PHPUnit_Framework_TestCase
             ->with('OroIntegrationBundle:Channel')
             ->will($this->returnValue($repository));
 
-        $this->assertTrue($this->condition->isAllowed($context));
+        $this->assertTrue($this->condition->evaluate($context));
     }
 }

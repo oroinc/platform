@@ -3,17 +3,31 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\WorkflowBundle\Exception\ConditionException;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
-class ArrayCondition extends ArrayCollection implements ConditionInterface
+class ArrayCondition extends ArrayCollection implements ExpressionInterface
 {
+    /** @var string */
+    private $message;
+
     /**
-     * @var string
+     * {@inheritdoc}
      */
-    protected $message;
+    public function evaluate($context, \ArrayAccess $errors = null)
+    {
+        $result = $this->isConditionAllowed($context);
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
 
     /**
      * {@inheritdoc}
@@ -26,17 +40,8 @@ class ArrayCondition extends ArrayCollection implements ConditionInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
      * @param array $options
-     * @return ConditionInterface
-     * @throws ConditionException
+     * @return ExpressionInterface
      */
     public function initialize(array $options)
     {
@@ -46,9 +51,37 @@ class ArrayCondition extends ArrayCollection implements ConditionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return array
      */
-    public function isAllowed($context, Collection $errors = null)
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'array';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile($factoryAccessor)
+    {
+        return '';
+    }
+
+    /**
+     * Checks if context meets the condition requirements.
+     *
+     * @param mixed $context
+     *
+     * @return boolean
+     */
+    public function isConditionAllowed($context)
     {
         $isAllowed = $this->get('allowed');
 

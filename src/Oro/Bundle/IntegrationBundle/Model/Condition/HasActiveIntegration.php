@@ -5,21 +5,20 @@ namespace Oro\Bundle\IntegrationBundle\Model\Condition;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Oro\Component\ConfigExpression\Condition\AbstractCondition;
+use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
+use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
+
 use Oro\Bundle\WorkflowBundle\Exception\ConditionException;
-use Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 /**
  * Check For Active integration of given type
  * Usage:
  * @has_active_integration: 'some_type'
  */
-class HasActiveIntegration extends AbstractCondition
+class HasActiveIntegration extends AbstractCondition implements ContextAccessorAwareInterface
 {
-    /**
-     * @var ContextAccessor
-     */
-    protected $contextAccessor;
+    use ContextAccessorAwareTrait;
 
     /**
      * @var ManagerRegistry
@@ -32,13 +31,19 @@ class HasActiveIntegration extends AbstractCondition
     protected $type;
 
     /**
-     * @param ContextAccessor $contextAccessor
      * @param ManagerRegistry $registry
      */
-    public function __construct(ContextAccessor $contextAccessor, ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->contextAccessor = $contextAccessor;
         $this->registry = $registry;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'has_active_integration';
     }
 
     /**
@@ -46,7 +51,7 @@ class HasActiveIntegration extends AbstractCondition
      */
     protected function isConditionAllowed($context)
     {
-        $type = $this->contextAccessor->getValue($context, $this->type);
+        $type = $this->resolveValue($context, $this->type, false);
 
         return (bool)$this->getActiveIntegration($type);
     }
@@ -78,5 +83,21 @@ class HasActiveIntegration extends AbstractCondition
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        return $this->convertToArray($this->type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode($this->type, $factoryAccessor);
     }
 }

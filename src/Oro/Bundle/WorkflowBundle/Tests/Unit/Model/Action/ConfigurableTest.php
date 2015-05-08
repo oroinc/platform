@@ -57,11 +57,9 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->with($this->testContext);
 
-        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $condition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $condition->expects($this->never())
-            ->method('isConditionAllowed');
+            ->method('evaluate');
 
         $this->assembler->expects($this->once())
             ->method('assemble')

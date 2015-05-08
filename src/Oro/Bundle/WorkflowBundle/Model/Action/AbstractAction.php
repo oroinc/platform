@@ -83,7 +83,7 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
             return true;
         }
 
-        return $this->condition->isConditionAllowed($context);
+        return $this->condition->evaluate($context) ? true : false;
     }
 
     /**
