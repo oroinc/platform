@@ -56,13 +56,31 @@ define(function (require) {
          * @inheritDoc
          */
         render: function () {
-            var $content = $(this.bodyContent);
-            this.$('head').html($content.find('head')[0] || '');
-            this.$('body').html($content.find('body')[0] || $content);
+            var $content,
+                content = this.bodyContent;
+            try {
+                $content = $(content);
+            } catch (e) {
+                // if content can not be processed as HTML, output it as plain text
+                content = content.replace(/[&<>]/g, function (c) {
+                    return '&#' + c.charCodeAt(0) + ';';
+                });
+                $content = $('<div class="plain-text">' + content +  '</div>');
+            }
+            this.$('body').html($content);
             this._injectStyles();
             this._markEmailExtraBody();
             this._updateHeight();
             return this;
+        },
+
+        /**
+         * Fixes issue when iframe get empty after DOM-manipulation
+         */
+        reattachBody: function () {
+            this.undelegateEvents();
+            this.$frame.contents().find('html').replaceWith(this.$el);
+            this.delegateEvents();
         },
 
         /**
@@ -89,10 +107,10 @@ define(function (require) {
         _updateHeight: function () {
             var $frame = this.$frame,
                 $el = this.$el;
-            _.defer(function () {
+            _.delay(function () {
                 $frame.height(0);
                 $frame.height($el[0].scrollHeight);
-            });
+            }, 50);
         },
 
         /**

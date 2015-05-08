@@ -47,6 +47,7 @@ class ContextsSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'tooltip' => false,
+                'random_id' => true,
                 'configs' => [
                     'placeholder'        => 'oro.email.contexts.placeholder',
                     'allowClear'         => true,
