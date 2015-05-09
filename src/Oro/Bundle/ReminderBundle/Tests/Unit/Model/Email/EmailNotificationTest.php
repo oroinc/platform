@@ -16,6 +16,8 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     const EMAIL    = 'test@example.com';
     const ENTITY   = 'Namespace\Entity';
     const TEMPLATE = 'template_reminder';
+    const SENDER_EMAIL = 'test@mail.com';
+    const SENDER_NAME = 'John Doe';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -27,6 +29,16 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
      */
     protected $provider;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $nameFormatter;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $sender;
+
     protected function setUp()
     {
         $this->em = $this
@@ -36,6 +48,16 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('\Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->nameFormatter = $this
+            ->getMockBuilder('\Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->sender = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $this->sender->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue(self::SENDER_EMAIL));
     }
 
     /**
@@ -59,7 +81,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             $exceptionMessage
         );
 
-        $notification = $this->createNotification(true, false, false, $templates);
+        $notification = $this->createNotification(true, false, false, false, $templates);
         $notification->getTemplate();
     }
 
@@ -124,10 +146,30 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([self::EMAIL], $email);
     }
 
+    public function testGetSenderEmail()
+    {
+        $email = $this->createNotification(true, false, true, true)->getSenderEmail();
+
+        $this->assertEquals(self::SENDER_EMAIL, $email);
+    }
+
+    public function testGetSenderName()
+    {
+        $this->nameFormatter
+            ->expects($this->once())
+            ->method('format')
+            ->with($this->sender)
+            ->will($this->returnValue(self::SENDER_NAME));
+        $name = $this->createNotification(true, false, true, true)->getSenderName();
+
+        $this->assertEquals(self::SENDER_NAME, $name);
+    }
+
     /**
      * @param bool  $hasReminder
      * @param bool  $hasConfig
      * @param bool  $hasRecipient
+     * @param bool  $hasSender
      * @param array $templates
      * @return EmailNotification
      */
@@ -135,6 +177,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $hasReminder = true,
         $hasConfig = false,
         $hasRecipient = false,
+        $hasSender = false,
         $templates = null
     ) {
         $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
@@ -181,7 +224,8 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
 
         $notification = new EmailNotification(
             $this->em,
-            $this->provider
+            $this->provider,
+            $this->nameFormatter
         );
 
         if ($hasReminder) {
@@ -196,6 +240,10 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
                 $user = new User();
                 $user->setEmail(self::EMAIL);
                 $reminder->setRecipient($user);
+            }
+
+            if ($hasSender) {
+                $reminder->setSender($this->sender);
             }
 
             $notification->setReminder($reminder);
