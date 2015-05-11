@@ -78,6 +78,7 @@ define(function (require) {
          * @param {Object} options
          */
         createFrontField: function (options) {
+            var dialogBelowClass = 'datetimepicker-dialog-is-below';
             this._super().createFrontField.call(this, options);
             if (options.fieldsWrapper) {
                 this.$frontDateField
@@ -88,6 +89,11 @@ define(function (require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontDateField.on('blur', function(e){
+                $(this).parent().removeClass(dialogBelowClass);
+            }).on('datepicker:dialogReposition', function(e, position){
+                $(this).parent().toggleClass(dialogBelowClass, position === 'below');
+            });
             this.$frontDateField.after(this.$frontTimeField);
         },
 
@@ -99,6 +105,22 @@ define(function (require) {
         initPickerWidget: function (options) {
             var widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
+            this.$frontTimeField.on('showTimepicker', function(){
+                var $el = $(this),
+                    needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+                $el.parent().toggleClass('datetimepicker-dialog-is-below', needClass);
+            });
+            this.$frontTimeField.on('hideTimepicker', function(){
+                $(this).parent().removeClass('datetimepicker-dialog-is-below');
+            });
+            this.$frontDateField.on('blur', function(){
+                if($(this).hasClass('error')) {
+                    $(this).parent().removeClass('timepicker-error');
+                }
+            });
+            this.$frontTimeField.on('blur', function(){
+                $(this).parent().toggleClass('timepicker-error', $(this).hasClass('error'));
+            });
             this._super().initPickerWidget.apply(this, arguments);
         },
 
