@@ -1,17 +1,14 @@
 services:
     oro_workflow.expression.extension:
-#        public: false
         class: Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
             - @service_container
             - {}
 
     oro_workflow.expression.context_accessor:
-#        public: false
         class: Oro\Component\ConfigExpression\ContextAccessor
 
     oro_workflow.expression.pass.property_path:
-#        public: false
         class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
         calls:
             - [setPrefix, ["data"]]
