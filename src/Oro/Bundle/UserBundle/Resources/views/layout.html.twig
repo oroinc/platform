@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
 <head>
     {% block head %}
     <title>{{ oro_title_render() }}</title>
