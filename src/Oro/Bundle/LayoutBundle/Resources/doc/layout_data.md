@@ -1,16 +1,16 @@
 Layout data
 -----------
 
-In most cases you need use the same layout to show different data. For example the same layout can be used to show different products. To achieve this you need a way to get data and to bind them to layout elements.
-This topic describes what is the layout data and how to work with them. Please make sure that you are familiar with the [layout context](layout_context.md) before learning of the layout data.
+In most cases you need use the same layout to show different data. For example, the same layout can be used to show different products. To achieve this you need a way to get data and to bind them to layout elements.
+This topic describes what the layout data are and how to work with them. Please make sure that you are familiar with the [layout context](layout_context.md) before learning of the layout data.
 
 Data providers types
 --------------------
 
-There is two way how to provide data for layouts:
+There are two ways how to provide data for layouts:
 
-- put it to `data` collection of the [layout context](../../../../Component/Layout/ContextInterface.php). This method can be used for page specific data or the data retrieved from the HTTP request.
-- create standalone data provider. This method is useful if some data is used on many pages and the data source is a database, HTTP session, external web service, etc.
+- Add them to `data` collection of the [layout context](../../../../Component/Layout/ContextInterface.php). This method can be used for page specific data or the data retrieved from the HTTP request.
+- Create standalone data provider. This method is useful if some data is used on many pages and the data source is a database, HTTP session, external web service, etc.
 
 Using the layout context as data provider
 -----------------------------------------
@@ -127,7 +127,7 @@ Accessing data
 
 There are few ways how data could be accessed. Most common ways are the following:
  
- - Access data from the [BlockInterface](../../../../Component/Layout/BlockInterface.php) instance. For example when need to get data during view building.
+ - Access data from the [BlockInterface](../../../../Component/Layout/BlockInterface.php) instance. For example, when it is needed to get data during view building.
    Example:
 
    ```php
@@ -157,4 +157,4 @@ There are few ways how data could be accessed. Most common ways are the followin
                 text: { @value: $data.product.code }
    ```
 
-The way how you access the data is not depend on where the data is located in the layout context or in the standalone data provider. But it is important to remember that standalone data providers have higher priority than data from the layout context. It means that if there are data with the same alias in both the layout context and a standalone data provider registry, the standalone data provider will be used.
+The way how you access the data does not depend on where the data are located, in the layout context or in the standalone data provider. But it is important to remember that standalone data providers have higher priority than data from the layout context. It means that if there are data with the same alias in both the layout context and a standalone data provider registry, the standalone data provider will be used.
