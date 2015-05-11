@@ -22,7 +22,7 @@ Accessing context
 
 There are few ways how context could be accessed. Most common ways are the following:
  
- - Access context from the [BlockInterface](../../../../Component/Layout/BlockInterface.php) instance. For example when need to get values from context during view building.
+ - Access context from the [BlockInterface](../../../../Component/Layout/BlockInterface.php) instance. For example, when it is needed to get values from context during view building.
    Example:
 
    ```php
