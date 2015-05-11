@@ -137,7 +137,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         $statusCode = Codes::HTTP_OK;
 
         try {
-            $entities = $provider->getFields(true, true, $withRelations);
+            $entities = $provider->getFields(true, true, $withRelations, false);
             $result = $this->filterAuditableEntities($entities);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
@@ -162,7 +162,9 @@ class AuditController extends RestGetController implements ClassResourceInterfac
                 continue;
             }
 
-            $auditableEntities[$entityClass] = [];
+            $auditableEntities[$entityClass] = $entityData;
+            unset($auditableEntities[$entityClass]['fields']);
+
             foreach ($entityData['fields'] as $fieldData) {
                 $class = $entityClass;
                 $field = $fieldData['name'];
@@ -181,7 +183,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
                     continue;
                 }
 
-                $auditableEntities[$entityClass][] = $fieldData;
+                $auditableEntities[$entityClass]['fields'][] = $fieldData;
             }
         }
 

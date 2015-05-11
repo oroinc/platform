@@ -4,17 +4,16 @@
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
             },
-            fieldsLoaderSelector: '#' ~ params.entity_choice_id
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity'
         }
     } %}
 
     {% set dataAuditConditionOptions = {
-        auditFields: render(path('oro_api_get_audit_fields')),
         fieldChoice: {
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
             },
-            fieldsLoaderSelector: '#' ~ params.entity_choice_id,
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_get_audit_fields',
         },
     } %}
 
@@ -147,6 +146,7 @@
         {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
     {% endif %}
 
+    {% set auditFieldsData = render(path('oro_api_get_audit_fields')) %}
     {% set widgetOptions = {
         valueSource: '#' ~ type ~ '_form_definition',
         fieldsLoader: {
@@ -155,6 +155,14 @@
             router:            'oro_api_querydesigner_fields_entity',
             routingParams:     entityFieldsRouteParams,
             fieldsData:        fieldsData,
+            confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
+        },
+        auditFieldsLoader: {
+            entityChoice:      '#' ~ type ~ '_form_entity',
+            loadingMaskParent: '#' ~ form.vars.name,
+            router:            'oro_api_get_audit_fields',
+            routingParams:     {},
+            fieldsData:        auditFieldsData,
             confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
         },
         filters: {

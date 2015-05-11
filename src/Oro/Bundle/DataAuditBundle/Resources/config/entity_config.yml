@@ -28,7 +28,7 @@ oro_entity_config:
                     options:
                         priority:           60
                         default_value:      false
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, ref-one]
                         indexed:            true
                     grid:
                         type:               boolean

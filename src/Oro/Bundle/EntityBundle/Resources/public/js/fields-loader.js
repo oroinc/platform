@@ -2,12 +2,13 @@
 /*jslint nomen: true*/
 define([
     'jquery',
+    'underscore',
     'routing',
     'orotranslation/js/translator',
     'oroui/js/messenger',
     'oroui/js/tools',
     'jquery-ui'
-], function ($, routing, __, messenger, tools) {
+], function ($, _, routing, __, messenger, tools) {
     'use strict';
 
     /**
@@ -31,7 +32,8 @@ define([
             });
         },
 
-        _onChange: function (e) {
+        _onChange: function (e, extraArgs) {
+            _.extend(e, extraArgs);
             var oldVal, confirm = this.options.confirm;
             if (confirm && this.options.requireConfirm()) {
                 // @todo support also other kind of inputs than select2
@@ -81,6 +83,11 @@ define([
             var $el = this.element,
                 load = $.proxy(this.loadFields, this),
                 revert = $.proxy(function () {
+                    var $entityChoice = $el.data('relatedChoice');
+                    if ($entityChoice && $entityChoice.val() !== oldVal) {
+                        console.log('beforeChange', oldVal);
+                        $entityChoice.val(oldVal).change();
+                    }
                     $el.val(oldVal).change();
                     if ($.isFunction(this.options.afterRevertCallback)) {
                         this.options.afterRevertCallback.call(this, $el);

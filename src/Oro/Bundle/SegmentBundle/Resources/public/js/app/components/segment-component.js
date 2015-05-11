@@ -29,7 +29,16 @@ define(function (require) {
                 router: null,
                 routingParams: {},
                 fieldsData: [],
-                confirmMessage: ''
+                confirmMessage: '',
+                loadEvent: 'fieldsLoaded'
+            },
+            auditFieldsLoader: {
+                loadingMaskParent: '',
+                router: null,
+                routingParams: {},
+                fieldsData: [],
+                confirmMessage: '',
+                loadEvent: 'auditFieldsLoaded'
             },
             filters: {
                 criteriaList: '',
@@ -58,15 +67,14 @@ define(function (require) {
             this.$storage = $(this.options.valueSource);
 
             this.initEntityFieldsUtil();
-            this.initFieldsLoader();
+            var $fieldsLoader = this.initFieldsLoader();
+            this.initFieldsLoader(this.options.auditFieldsLoader);
             this.initGrouping();
             this.initColumn();
             this.configureFilters();
 
-            if (this.$entityChoice) {
-                this.trigger('fieldsLoaded',
-                    this.$entityChoice.val(), this.$entityChoice.fieldsLoader('getFieldsData'));
-            }
+            this.trigger('fieldsLoaded',
+                $fieldsLoader.val(), $fieldsLoader.fieldsLoader('getFieldsData'));
 
             SegmentComponent.__super__.initialize.call(this, options);
 
@@ -214,11 +222,11 @@ define(function (require) {
         /**
          * Initializes FieldsLoader on entityChoice element
          */
-        initFieldsLoader: function () {
+        initFieldsLoader: function (loaderOptions) {
             var self, options, confirm, loadingMask, $entityChoice;
 
             self = this;
-            options = this.options.fieldsLoader;
+            options = loaderOptions || this.options.fieldsLoader;
 
             loadingMask = new LoadingMask({
                 container: $(options.loadingMaskParent)
@@ -230,7 +238,18 @@ define(function (require) {
                 content: __(options.confirmMessage)
             });
 
-            $entityChoice = this.$entityChoice = $(options.entityChoice);
+            this.$entityChoice = $(options.entityChoice);
+
+            var entityChoiceCloneId = this.$entityChoice.attr('id') + options.router;
+            var $entityChoiceClone = $('<input>').attr({
+                'id': entityChoiceCloneId,
+                'class': 'hide'
+            });
+            this.$entityChoice.after($entityChoiceClone.prop('outerHTML'));
+            $entityChoice = $('#' + entityChoiceCloneId);
+            $entityChoice.val(this.$entityChoice.val());
+            $entityChoice.data('relatedChoice', this.$entityChoice);
+
             $entityChoice
                 .fieldsLoader({
                     router: options.router,
@@ -249,7 +268,7 @@ define(function (require) {
                 .on('fieldsloaderstart', _.bind(loadingMask.show, loadingMask))
                 .on('fieldsloadercomplete', _.bind(loadingMask.hide, loadingMask))
                 .on('fieldsloaderupdate', function (e, data) {
-                    self.trigger('fieldsLoaded', $(e.target).val(), data);
+                    self.trigger(options.loadEvent, $(e.target).val(), data);
                 })
                 .on('fieldsloadercomplete', function () {
                     var data = {};
@@ -261,11 +280,18 @@ define(function (require) {
                 $entityChoice.fieldsLoader('setFieldsData', JSON.parse(options.fieldsData));
             }
 
+            this.$entityChoice.on('change', function (e, extraArgs) {
+                _.extend(e, extraArgs);
+                $entityChoice.val(e.val).trigger('change', _.pick(e, 'val', 'removed'));
+            });
+
             this.once('dispose:before', function () {
                 loadingMask.dispose();
                 confirm.dispose();
                 delete this.$entityChoice;
             }, this);
+
+            return $entityChoice;
         },
 
         /**

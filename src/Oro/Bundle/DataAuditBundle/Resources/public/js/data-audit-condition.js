@@ -12,21 +12,10 @@ define([
 
     $.widget('oroauditquerydesigner.dataAuditCondition', $.oroquerydesigner.fieldCondition, {
         options: {
-            auditFields: {},
             changeStateTpl: _.template($('#template-audit-condition-type-select').html())
         },
 
         _create: function() {
-            var data = this.element.data('value');
-            var auditFields = JSON.parse(this.options.auditFields);
-            this.options.fieldChoice.dataFilter = function (entity, fields) {
-                return _.filter(fields, function(field) {
-                    return _.some(auditFields[entity], function (auditField) {
-                        return field.name === auditField.name;
-                    });
-                });
-            };
-
             this._superApply(arguments);
 
             var data = this.element.data('value');

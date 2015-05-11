@@ -57,7 +57,8 @@ class AuditFilter extends EntityFilter
 
         $qb = $ds->getQueryBuilder();
 
-        list($objectAlias, $fieldName) = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
+        $fieldName = $this->getField($data['auditFilter']['columnName']);
+        list($objectAlias) = $qb->getRootAliases();
         $objectClass = $this->getClass($data['auditFilter']['columnName'], $qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($objectClass);
 
@@ -110,6 +111,9 @@ class AuditFilter extends EntityFilter
 
         $metadata = $ds->getQueryBuilder()->getEntityManager()->getClassMetadata($objectClass);
         $type = $metadata->getTypeOfField($fieldName);
+        if (!$type) {
+            $type = 'text';
+        }
 
         $newValueField = sprintf('new%s', ucfirst(AuditField::normalizeDataTypeName($type)));
 
@@ -159,6 +163,24 @@ class AuditFilter extends EntityFilter
         preg_match_all('/(?<=\+)[^\+]+(?=::)/', $columnName, $matches);
 
         return end($matches[0]);
+    }
+
+    /**
+     * @param string $columnName
+     *
+     * @return string
+     */
+    protected function getField($columnName)
+    {
+        list(, $fieldName) = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
+        if (strpos($fieldName, '\\') === false) {
+            return $fieldName;
+        }
+
+        $matches = [];
+        preg_match('/^[^+]+/', $columnName, $matches);
+
+        return $matches[0];
     }
 
     /**

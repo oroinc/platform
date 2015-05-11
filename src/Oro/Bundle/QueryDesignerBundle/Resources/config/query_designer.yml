@@ -4,7 +4,7 @@ query_designer:
 
     filters:
         string:
-            applicable: [{type: string}, {type: text}]
+            applicable: [{type: string}, {type: text}, {type: ref-one}]
             type:       string
             query_type: [all]
         number:

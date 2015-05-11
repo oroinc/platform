@@ -186,7 +186,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         _onUpdate: function () {
             var value;
 
-            if (!this.filter.isEmptyValue()) {
+            if (this.filter && !this.filter.isEmptyValue()) {
                 value = {
                     columnName: this.element.find('input.select').select2('val'),
                     criterion: this._getFilterCriterion()
