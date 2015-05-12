@@ -8,24 +8,12 @@ services:
     oro_workflow.expression.context_accessor:
         class: Oro\Component\ConfigExpression\ContextAccessor
 
-    oro_workflow.expression.pass.property_path:
-        class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
-        calls:
-            - [setPrefix, ["data"]]
-
     oro_workflow.expression.factory:
         class: Oro\Component\ConfigExpression\ExpressionFactory
         arguments:
             - @oro_workflow.expression.context_accessor
         calls:
             - [addExtension, [@oro_workflow.expression.extension]]
-
-    oro_workflow.expression.assembler:
-        class: Oro\Component\ConfigExpression\ExpressionAssembler
-        arguments:
-            - @oro_workflow.expression.factory
-        calls:
-            - [addConfigurationPass, [@oro_workflow.expression.pass.property_path]]
 
     oro_workflow.condition.configurable:
         class: Oro\Bundle\WorkflowBundle\ConfigExpression\Configurable

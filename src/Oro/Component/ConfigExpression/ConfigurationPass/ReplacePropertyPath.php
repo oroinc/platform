@@ -15,9 +15,6 @@ class ReplacePropertyPath implements ConfigurationPassInterface
     /** @var PropertyPath[] */
     private $cache = [];
 
-    /** @var string */
-    protected $prefix;
-
     /**
      * {@inheritdoc}
      */
@@ -32,7 +29,7 @@ class ReplacePropertyPath implements ConfigurationPassInterface
                     if (isset($this->cache[$value])) {
                         $propertyPath = $this->cache[$value];
                     } else {
-                        $propertyPath        = $this->parsePropertyPath($value);
+                        $propertyPath        = new PropertyPath(substr($value, 1));
                         $this->cache[$value] = $propertyPath;
                     }
                     $data[$key] = $propertyPath;
@@ -43,31 +40,5 @@ class ReplacePropertyPath implements ConfigurationPassInterface
         }
 
         return $data;
-    }
-
-    /**
-     * @param string $prefix
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
-    }
-
-    /**
-     * @param string $value
-     * @return PropertyPath
-     * @throws \InvalidArgumentException
-     */
-    protected function parsePropertyPath($value)
-    {
-        $property = substr($value, 1);
-
-        if (0 === strpos($property, '.')) {
-            $property = substr($property, 1);
-        } elseif ($this->prefix) {
-            $property = $this->prefix . '.' .  $property;
-        }
-
-        return new PropertyPath($property);
     }
 }

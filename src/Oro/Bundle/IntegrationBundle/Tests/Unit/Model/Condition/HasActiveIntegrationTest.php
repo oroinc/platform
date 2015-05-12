@@ -25,7 +25,7 @@ class HasActiveIntegrationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider failingOptionsDataProvider
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ConditionException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
      * @param array $options
      */
     public function testInitializeException(array $options)

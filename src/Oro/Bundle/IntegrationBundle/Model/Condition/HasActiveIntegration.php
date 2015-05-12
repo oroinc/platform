@@ -3,13 +3,13 @@
 namespace Oro\Bundle\IntegrationBundle\Model\Condition;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
-
-use Oro\Bundle\WorkflowBundle\Exception\ConditionException;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 /**
  * Check For Active integration of given type
@@ -74,7 +74,7 @@ class HasActiveIntegration extends AbstractCondition implements ContextAccessorA
         if (1 == count($options)) {
             $this->type = reset($options);
         } else {
-            throw new ConditionException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Options must have 1 element, but %d given',
                     count($options)

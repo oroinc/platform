@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Model\ConfigurationPass;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+
 /**
  * Passes through configuration array and replaces parameter strings ($parameter.name)
  * with appropriate PropertyPath objects
