@@ -232,10 +232,10 @@ class Email extends ExtendEmail
     protected $folders;
 
     /**
-     * @var ArrayCollection
+     * @var EmailBody
      *
-     * @ORM\OneToMany(targetEntity="EmailBody", mappedBy="header", cascade={"persist", "remove"}, orphanRemoval=true)
-     * @JMS\Exclude
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailBody", cascade={"persist"})
+     * @ORM\JoinColumn(name="email_body_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $emailBody;
 
@@ -245,7 +245,6 @@ class Email extends ExtendEmail
 
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
-        $this->emailBody  = new ArrayCollection();
         $this->folders    = new ArrayCollection();
     }
 
@@ -702,11 +701,7 @@ class Email extends ExtendEmail
      */
     public function getEmailBody()
     {
-        if ($this->emailBody->count() === 0) {
-            return null;
-        }
-
-        return $this->emailBody->first();
+        return $this->emailBody;
     }
 
     /**
@@ -718,11 +713,7 @@ class Email extends ExtendEmail
      */
     public function setEmailBody(EmailBody $emailBody)
     {
-        if ($this->emailBody->count() > 0) {
-            $this->emailBody->clear();
-        }
-        $emailBody->setHeader($this);
-        $this->emailBody->add($emailBody);
+        $this->emailBody = $emailBody;
 
         return $this;
     }
