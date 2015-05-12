@@ -95,6 +95,7 @@ oro:
         menu:
             emailtemplate_list.description: List of email templates
             user_emails: My Emails
+            compose: Compose
 
         datagrid:
             emailtemplate:
