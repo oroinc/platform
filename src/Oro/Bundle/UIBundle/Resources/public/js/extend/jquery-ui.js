@@ -32,8 +32,8 @@ define(['jquery', 'jquery-ui'], function ($) {
          * Process position update for datepicker element
          */
         function updatePos() {
-            var pos, isFixed, offset, inst,
-                input = this;
+            var pos, isFixed, offset, inst, dialogIsBelow,
+                input = this, $input = $(this);
 
             inst = $.datepicker._getInst(input);
 
@@ -43,7 +43,7 @@ define(['jquery', 'jquery-ui'], function ($) {
             }
 
             isFixed = false;
-            $(input).parents().each(function () {
+            $input.parents().each(function () {
                 isFixed |= $(this).css("position") === "fixed";
                 return !isFixed;
             });
@@ -51,10 +51,19 @@ define(['jquery', 'jquery-ui'], function ($) {
             offset = {left: pos[0], top: pos[1]};
             offset = $.datepicker._checkOffset(inst, offset, isFixed);
             inst.dpDiv.css({left: offset.left + "px", top: offset.top + "px"});
+
+            dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
+
+            if( $input.hasClass(dateDialogClassName) !== dialogIsBelow) {
+                $input.trigger('datepicker:dialogReposition', dialogIsBelow ? 'below' : 'above');
+                $input.toggleClass(dateDialogClassName, dialogIsBelow);
+            }
+
         }
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
-            _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
+            _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker,
+            dateDialogClassName = 'ui-datepicker-dialog-is-below';
 
         /**
          * Bind update position method after datepicker is opened
@@ -71,7 +80,7 @@ define(['jquery', 'jquery-ui'], function ($) {
             input = elem.target || elem;
             events = getEvents(input.id);
 
-            $(input).parents().add(window).each(function () {
+            $(input).removeClass(dateDialogClassName).parents().add(window).each(function () {
                 $(this).on(events, $.proxy(updatePos, input));
                 // @TODO develop other approach than hide on scroll
                 // because on mobile devices it's impossible to open calendar without scrolling
@@ -81,6 +90,8 @@ define(['jquery', 'jquery-ui'], function ($) {
                     input.blur();
                 });*/
             });
+
+            updatePos.call(input);
         };
 
         /**

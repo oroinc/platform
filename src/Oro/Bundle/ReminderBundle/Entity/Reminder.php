@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\ReminderBundle\Model\SenderAwareReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ExtendReminder;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
@@ -127,6 +128,13 @@ class Reminder extends ExtendReminder
      * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $recipient;
+
+    /**
+     * @var User
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="sender_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $sender;
 
     /**
      * @var \DateTime
@@ -406,6 +414,26 @@ class Reminder extends ExtendReminder
     }
 
     /**
+     * @return User
+     */
+    public function getSender()
+    {
+        return $this->sender;
+    }
+
+    /**
+     * @param User $sender
+     *
+     * @return Reminder
+     */
+    public function setSender(User $sender = null)
+    {
+        $this->sender = $sender;
+
+        return $this;
+    }
+
+    /**
      * Sets reminder data
      *
      * @param ReminderDataInterface $data
@@ -415,6 +443,10 @@ class Reminder extends ExtendReminder
         $this->setSubject($data->getSubject());
         $this->setExpireAt($data->getExpireAt());
         $this->setRecipient($data->getRecipient());
+
+        if ($data instanceof SenderAwareReminderDataInterface) {
+            $this->setSender($data->getSender());
+        }
     }
 
     /**

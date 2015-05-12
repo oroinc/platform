@@ -23,3 +23,6 @@ UPGRADE FROM 1.6 to 1.7
 
 ####OroEntityExtendBundle:
 - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension` class
+
+####OroReminderBundle:
+- Added parameter `NameFormatter $nameFormatter` to constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailNotification`

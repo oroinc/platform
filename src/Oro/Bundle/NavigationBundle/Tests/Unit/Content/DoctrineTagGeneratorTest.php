@@ -207,38 +207,35 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'should not return any data when no association on entity' => [[], [], 0],
-            'should collect one to one associations'                   =>
+            'should collect one to one associations' => [
+                [self::TEST_ASSOCIATION_FIELD => new EntityStub()],
+                [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_ONE]],
+                1
+            ],
+            'should collect all collection associations' => [
                 [
-                    [self::TEST_ASSOCIATION_FIELD => new EntityStub()],
-                    [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_ONE]],
-                    1
+                    self::TEST_ASSOCIATION_FIELD => new PersistentCollectionStub([
+                        new EntityStub(),
+                        new EntityStub()
+                    ])
                 ],
-            'should collect all collection associations'               =>
+                [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_MANY]],
+                2
+            ],
+            'should process all associated values' => [
                 [
-                    [
-                        self::TEST_ASSOCIATION_FIELD => new PersistentCollectionStub([
-                                new EntityStub(),
-                                new EntityStub()
-                            ])
-                    ],
-                    [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_MANY]],
-                    2
+                    self::TEST_ASSOCIATION_FIELD . '_1' => new PersistentCollectionStub([
+                        new EntityStub(),
+                        new EntityStub()
+                    ]),
+                    self::TEST_ASSOCIATION_FIELD . '_2' => new EntityStub()
                 ],
-            'should process all associated values'                     =>
                 [
-                    [
-                        self::TEST_ASSOCIATION_FIELD . '_1' => new PersistentCollectionStub([
-                                new EntityStub(),
-                                new EntityStub()
-                            ]),
-                        self::TEST_ASSOCIATION_FIELD . '_2' => new EntityStub()
-                    ],
-                    [
-                        self::TEST_ASSOCIATION_FIELD . '_1' => ['type' => ClassMetadata::ONE_TO_MANY],
-                        self::TEST_ASSOCIATION_FIELD . '_2' => ['type' => ClassMetadata::ONE_TO_ONE]
-                    ],
-                    3
+                    self::TEST_ASSOCIATION_FIELD . '_1' => ['type' => ClassMetadata::ONE_TO_MANY],
+                    self::TEST_ASSOCIATION_FIELD . '_2' => ['type' => ClassMetadata::ONE_TO_ONE]
                 ],
+                3
+            ],
         ];
     }
 
