@@ -39,17 +39,61 @@ The Oro Layout component provides several pluggable extensions out of the box:
  - The **DI** extension adds support for Symfony's [Dependency Injection](http://symfony.com/doc/current/components/dependency_injection/introduction.html) component.
  - The **Themes** extensions allows to build layouts based on other layouts and provide flexible configuration of layouts.
 
-Low-Level Architecture
------------------------
+
+Layout life cycle
+-----------------
+
+In general terms, the layout goes through the stages outlined in the following table.
+
+| Stage | Description |
+|------ |-------------|
+| **create the layout context** | The layout context should be created manually by calling the constructor of the [LayoutContext](./LayoutContext.php) class. If needed an additional variables can be added to the context at this stage. |
+| **configure the layout context** | At this stage the `configureContext` method of all registered [layout configurators](./ContextConfiguratorInterface.php) is called. |
+| **resolve the layout context** | After this stage adding new variables to the layout context is not possible, but it is still possible to change a value of existing variables. |
+| **add `root` block** | The root block should be added manually to start executing of the layout update chain. See description of the next stage for more details. | 
+| **execute layout updates** | The layout updates are linked to the layout blocks, so they are executed after a block is added to the layout. If a block is not specified for an layout update it is linked to the root block. |
+| **build blocks** | A block hierarchy is build starting from a parent block. The `buildBlock` method of the base block type is called at the first, then the `buildBlock` method of all registered extensions of the base block type is called; next the `buildBlock` method of the inherited block type and its extensions is called, etc. |
+| **build block views** | A block view hierarchy is build starting from a parent block. The `buildView` method of the base block type is called at the first, then the `buildView` method of all registered extensions of the base block type is called; next the `buildView` method of the inherited block type and its extensions is called, etc. The `buildView` method is called before children views are built, so it is not possible to access child views there. |
+| **finish building of block views** | At the first a parent view is finishing building. The `finishView` method of the base block type is called at the first, then the `finishView` method of all registered extensions of the base block type is called; next the `finishView` method of the inherited block type and its extensions is called, etc. The `finishView` method is called after children views are built, but before children view are finished building. |
+| **render the layout** | the layout rendering is the same as in Symfony Forms. See [How to Customize Form Rendering](http://symfony.com/doc/current/cookbook/form/form_customization.html) for more details. |
+
+
+The following example shows how a simple layout can be build.
+
+```php
+$context = new LayoutContext();
+$context->getResolver()
+	->setRequired(['some_variable']);
+$context->set('some_variable', 'some_value');
+
+$layoutFactory = Layouts::createLayoutFactory();
+$layout = $layoutFactory->createLayoutBuilder()
+	->add('root', null, 'root')
+	->add('header', 'root', 'header')
+	->add('logo', 'header', 'logo', ['title' => 'Hello World!'])
+	->getLayout($context);
+
+echo $layout->render();
+```
+
+For more deep understanding how the layout works you can investigate [Layouts](./Layouts.php) class, the `getLayout` method of [LayoutBuilder](./LayoutBuilder.php) class and [BlockFactory](./BlockFactory.php) class. Also pay attention on the `postExecuteAction` method of [DeferredLayoutManipulator](./DeferredLayoutManipulator.php) class and [LayoutRegistry](./LayoutRegistry.php) class.
+
+
+Developer reference
+-------------------
 
 Here is a list of most important classes of Oro Layout component:
 
  - [LayoutManager](./LayoutManager.php) is the main entry point to the Oro Layout component.
+ - [Layouts](./Layouts.php) is the static helper that can be used if a dependency injection container is not used in your application.
  - [Layout](./Layout.php) represents a layout which is ready to be be rendered.
- - [LayoutBuilder](./LayoutBuilder.php) provides a way to build the layout.
+ - [LayoutBuilder](./LayoutBuilder.php) provides a set of methods to build the layout.
+ - [LayoutRegistry](./LayoutRegistry.php) holds all layout extensions.
  - [RawLayout](./RawLayout.php) represents a storage for all layout data, including a list of items, hierarchy of items, aliases, etc. This is internal class and usually you do not need to use it outside of the component.
  - [RawLayoutBuilder](./RawLayoutBuilder.php) provides a way to build the layout data storage. This is internal class and usually you do not need to use it outside of the component.
  - [DeferredLayoutManipulator](./DeferredLayoutManipulator.php) allows to construct a layout without worrying about the order of method calls.
  - [BlockTypeInterface](./BlockTypeInterface.php) provides an interface for all block types.
  - [AbstractType](./Block/Type/AbstractType.php) can be used as a base class for all **block** block types.
  - [AbstractContainerType](./Block/Type/AbstractContainerType.php) can be used as a base class for all **container** block types.
+ - [BlockFactory](./BlockFactory.php) implements a logic for build layout blocks and its views.
+ - [DataProviderInterface](./DataProviderInterface.php) provides an interface for all data providers.
