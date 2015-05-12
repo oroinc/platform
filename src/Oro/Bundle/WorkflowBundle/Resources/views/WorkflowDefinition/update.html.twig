@@ -1,6 +1,23 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
 
+    {% set pageComponent = {
+            module: 'oroworkflow/js/app/components/workflow-editor-component',
+            options: {
+                entity: {
+                    configuration: entityConfiguration,
+                    name: entity.name,
+                    label: entity.label,
+                    entity: entity.relatedEntity,
+                    entity_attribute: entity.entityAttributeName | default('entity'),
+                    startStep: entity.startStep.name,
+                    stepsDisplayOrdered: entity.stepsDisplayOrdered,
+                },
+                system_entities: system_entities
+            }
+        }
+    %}
+
 {% macro render_label(label, required, tooltip, tooltip_placement) %}
     <label class="control-label {% if required %}required{% endif %}">
         {% if tooltip is defined and tooltip %}
@@ -489,85 +506,4 @@
         'dataBlocks': dataBlocks,
     } %}
     {{ parent() }}
-
-    <script type="text/javascript">
-        require([
-            'oroworkflow/js/workflow-management',
-            'oroworkflow/js/workflow-management/workflow/model',
-            'oroworkflow/js/workflow-management/step/model',
-            'oroworkflow/js/workflow-management/transition/model',
-            'oroworkflow/js/workflow-management/transition-definition/model',
-            'oroworkflow/js/workflow-management/attribute/model',
-            'oroworkflow/js/workflow-management/step/collection',
-            'oroworkflow/js/workflow-management/transition/collection',
-            'oroworkflow/js/workflow-management/transition-definition/collection',
-            'oroworkflow/js/workflow-management/attribute/collection'
-        ],
-        function(WorkflowManagement, WorkflowModel,
-             StepModel,
-             TransitionModel,
-             TransitionDefinitionModel,
-             AttributeModel,
-             StepCollection,
-             TransitionCollection,
-             TransitionDefinitionCollection,
-             AttributeCollection
-        ) {
-            var steps = new StepCollection(),
-                    transitions = new TransitionCollection(),
-                    transitionDefinitions = new TransitionDefinitionCollection(),
-                    attributes = new AttributeCollection();
-
-            {% if entity.configuration.steps is defined %}
-            {% for name, config in entity.configuration.steps %}
-            {% set config = config|merge({name: name}) %}
-            steps.add(new StepModel({{ config|json_encode|raw }}));
-            {% endfor %}
-            {% endif %}
-
-            {% if entity.configuration.transition_definitions is defined %}
-            {% for name, config in entity.configuration.transition_definitions %}
-            {% set config = config|merge({name: name}) %}
-            transitionDefinitions.add(new TransitionDefinitionModel({{ config|json_encode|raw }}));
-            {% endfor %}
-            {% endif %}
-
-            {% if entity.configuration.transitions is defined %}
-            {% for name, config in entity.configuration.transitions %}
-            {% set config = config|merge({name: name}) %}
-            transitions.add(new TransitionModel({{ config|json_encode|raw }}));
-            {% endfor %}
-            {% endif %}
-
-            {% if entity.configuration.attributes is defined %}
-            {% for name, config in entity.configuration.attributes %}
-            {% set config = config|merge({name: name, translated_label: config.label|trans }) %}
-            attributes.add(new AttributeModel({{ config|json_encode|raw }}));
-            {% endfor %}
-            {% endif %}
-
-            var configuration = {{ entity.configuration|json_encode|raw }};
-            configuration.name = {{ entity.name|json_encode|raw }};
-            configuration.label = {{ entity.label|json_encode|raw }};
-            configuration.entity = {{ entity.relatedEntity|json_encode|raw }};
-            configuration.entity_attribute = {{ entity.entityAttributeName|default('entity')|json_encode|raw }};
-            configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
-            configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
-            configuration.steps = steps;
-            configuration.transition_definitions = transitionDefinitions;
-            configuration.transitions = transitions;
-            configuration.attributes = attributes;
-
-            var workflowModel = new WorkflowModel(configuration);
-            workflowModel.setSystemEntities({{ system_entities|json_encode|raw }});
-
-            var workflowManagement = new WorkflowManagement({
-                el: '#{{ form.vars.id }}',
-                stepsEl: '.workflow-definition-steps-list-container',
-                model: workflowModel
-            });
-
-            workflowManagement.render();
-        });
-    </script>
 {% endblock content_data %}

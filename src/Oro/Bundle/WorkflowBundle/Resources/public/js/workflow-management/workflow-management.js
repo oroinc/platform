@@ -188,7 +188,7 @@ function(_, Backbone, routing, messenger, __,
             //Need to manually destroy collection elements to trigger all appropriate events
             var resetCollection = function(collection) {
                 if (collection.length) {
-                    for (var i = collection.length -1; i > -1; i--) {
+                    for (var i = collection.length - 1; i > -1; i--) {
                         collection.at(i).destroy();
                     }
                 }
