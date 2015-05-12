@@ -11,7 +11,7 @@ class AddConditionAndActionCompilerPass implements CompilerPassInterface
 {
     const ACTION_TAG                    = 'oro_workflow.action';
     const ACTION_FACTORY_SERVICE        = 'oro_workflow.action_factory';
-    const EXPRESSION_TAG                = 'oro_workflow.expression';
+    const EXPRESSION_TAG                = 'oro_workflow.condition';
     const EXTENSION_SERVICE             = 'oro_workflow.expression.extension';
     const EVENT_DISPATCHER_SERVICE      = 'event_dispatcher';
     const EVENT_DISPATCHER_AWARE_ACTION = 'Oro\Bundle\WorkflowBundle\Model\Action\EventDispatcherAwareActionInterface';

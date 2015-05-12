@@ -32,82 +32,82 @@ services:
         arguments:
             - @oro_workflow.expression.assembler
         tags:
-            - { name: oro_workflow.expression, alias: configurable }
+            - { name: oro_workflow.condition, alias: configurable }
 
     oro_workflow.expression.andx:
         class: Oro\Component\ConfigExpression\Condition\Andx
         tags:
-            - { name: oro_workflow.expression, alias: and }
+            - { name: oro_workflow.condition, alias: and }
 
     oro_workflow.expression.orx:
         class: Oro\Component\ConfigExpression\Condition\Orx
         tags:
-            - { name: oro_workflow.expression, alias: or }
+            - { name: oro_workflow.condition, alias: or }
 
     oro_workflow.expression.not:
         class: Oro\Component\ConfigExpression\Condition\Not
         tags:
-            - { name: oro_workflow.expression, alias: not }
+            - { name: oro_workflow.condition, alias: not }
 
     oro_workflow.expression.true:
         class: Oro\Component\ConfigExpression\Condition\True
         tags:
-            - { name: oro_workflow.expression, alias: "true" }
+            - { name: oro_workflow.condition, alias: "true" }
 
     oro_workflow.expression.false:
         class: Oro\Component\ConfigExpression\Condition\False
         tags:
-            - { name: oro_workflow.expression, alias: "false" }
+            - { name: oro_workflow.condition, alias: "false" }
 
     oro_workflow.expression.equal_to:
         class: Oro\Component\ConfigExpression\Condition\EqualTo
         tags:
-            - { name: oro_workflow.expression, alias: eq|equal }
+            - { name: oro_workflow.condition, alias: eq|equal }
 
     oro_workflow.expression.not_equal_to:
         class: Oro\Component\ConfigExpression\Condition\NotEqualTo
         tags:
-            - { name: oro_workflow.expression, alias: neq|not_equal }
+            - { name: oro_workflow.condition, alias: neq|not_equal }
 
     oro_workflow.expression.blank:
         class: Oro\Component\ConfigExpression\Condition\Blank
         tags:
-            - { name: oro_workflow.expression, alias: empty|blank }
+            - { name: oro_workflow.condition, alias: empty|blank }
 
     oro_workflow.expression.not_blank:
         class: Oro\Component\ConfigExpression\Condition\NotBlank
         tags:
-            - { name: oro_workflow.expression, alias: not_empty|not_blank }
+            - { name: oro_workflow.condition, alias: not_empty|not_blank }
 
     oro_workflow.expression.has_value:
         class: Oro\Component\ConfigExpression\Condition\HasValue
         tags:
-            - { name: oro_workflow.expression, alias: has_value }
+            - { name: oro_workflow.condition, alias: has_value }
 
     oro_workflow.expression.not_has_value:
         class: Oro\Component\ConfigExpression\Condition\NotHasValue
         tags:
-            - { name: oro_workflow.expression, alias: not_has_value }
+            - { name: oro_workflow.condition, alias: not_has_value }
 
     oro_workflow.expression.greater_than:
         class: Oro\Component\ConfigExpression\Condition\GreaterThan
         tags:
-            - { name: oro_workflow.expression, alias: gt|greater }
+            - { name: oro_workflow.condition, alias: gt|greater }
 
     oro_workflow.expression.greater_than_or_equal:
         class: Oro\Component\ConfigExpression\Condition\GreaterThanOrEqual
         tags:
-            - { name: oro_workflow.expression, alias: gte|ge|greater_or_equal }
+            - { name: oro_workflow.condition, alias: gte|ge|greater_or_equal }
 
     oro_workflow.expression.less_than:
         class: Oro\Component\ConfigExpression\Condition\LessThan
         tags:
-            - { name: oro_workflow.expression, alias: lt|less }
+            - { name: oro_workflow.condition, alias: lt|less }
 
     oro_workflow.expression.less_than_or_equal:
         class: Oro\Component\ConfigExpression\Condition\LessThanOrEqual
         tags:
-            - { name: oro_workflow.expression, alias: lte|le|less_or_equal }
+            - { name: oro_workflow.condition, alias: lte|le|less_or_equal }
 
     oro_workflow.expression.acl_granted:
         class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
@@ -115,4 +115,4 @@ services:
             - @oro_security.security_facade
             - @doctrine
         tags:
-            - { name: oro_workflow.expression, alias: acl_granted }
+            - { name: oro_workflow.condition, alias: acl_granted }
