@@ -43,7 +43,8 @@ class OroEmailBundle implements Migration
     public static function addPostQuery(QueryBag $queries)
     {
         $queries->addPostQuery(
-            'UPDATE oro_email e LEFT JOIN oro_email_body b ON e.id = b.email_id SET e.email_body_id = b.id'
+            //'UPDATE oro_email e LEFT JOIN oro_email_body b ON e.id = b.email_id SET e.email_body_id = b.id'
+            'UPDATE oro_email e, oro_email_body b SET e.email_body_id = b.id WHERE e.id = b.email_id'
         );
     }
 }
