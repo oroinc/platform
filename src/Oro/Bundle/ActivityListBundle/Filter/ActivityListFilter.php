@@ -25,6 +25,12 @@ class ActivityListFilter extends EntityFilter
     /** @var ActivityListFilterHelper */
     protected $activityListFilterHelper;
 
+    /** @var string */
+    protected $activityAlias;
+
+    /** @var string */
+    protected $activityListAlias;
+
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
@@ -44,6 +50,9 @@ class ActivityListFilter extends EntityFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
+        $this->activityAlias = uniqid('r');
+        $this->activityListAlias = uniqid('a');
+
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
             throw new LogicException(sprintf(
                 '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
@@ -91,22 +100,25 @@ class ActivityListFilter extends EntityFilter
         array $activityFilter,
         $entityIdField
     ) {
-        $joinField = 'activity.' . ExtendHelper::buildAssociationName(
-            $this->getClassName(),
-            ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
+        $joinField = sprintf('%s.%s',
+            $this->activityListAlias,
+            ExtendHelper::buildAssociationName(
+                $this->getClassName(),
+                ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
+            )
         );
 
         $activityQb = $activityManager
             ->getRepository('OroActivityListBundle:ActivityList')
-            ->createQueryBuilder('activity');
+            ->createQueryBuilder($this->activityListAlias);
 
         $activityQb
             ->select('1')
-                ->join($joinField, 'r')
-                ->andWhere(sprintf('r.id = %s.%s', $this->getEntityAlias(), $entityIdField))
+                ->join($joinField, $this->activityAlias)
+                ->andWhere(sprintf('%s.id = %s.%s', $this->activityAlias, $this->getEntityAlias(), $entityIdField))
                 ->setMaxResults(1);
 
-        $this->activityListFilterHelper->addFiltersToQuery($activityQb, $activityFilter);
+        $this->activityListFilterHelper->addFiltersToQuery($activityQb, $activityFilter, $this->activityListAlias);
 
         return $activityQb;
     }

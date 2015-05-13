@@ -152,8 +152,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
         return $this->connection->createQueryBuilder()
             ->select('a.id AS id, a.data AS data, ec.id AS entity_id')
             ->from('oro_audit', 'a')
-            ->join('a', 'oro_entity_config', 'ec', 'a.object_class = ec.class_name')
-        ;
+            ->join('a', 'oro_entity_config', 'ec', 'a.object_class = ec.class_name');
     }
 
     /**

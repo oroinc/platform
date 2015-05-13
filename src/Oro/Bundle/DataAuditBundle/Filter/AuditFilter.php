@@ -39,8 +39,6 @@ class AuditFilter extends EntityFilter
     {
         parent::__construct($factory, $util);
         $this->queryDesignerManager = $queryDesignerManager;
-        $this->auditAlias = sprintf('a%s', time());
-        $this->auditFieldAlias = sprintf('f%s', time());
     }
 
     /**
@@ -48,6 +46,9 @@ class AuditFilter extends EntityFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
+        $this->auditAlias = uniqid('a');
+        $this->auditFieldAlias = uniqid('f');
+
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
             throw new LogicException(sprintf(
                 '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
