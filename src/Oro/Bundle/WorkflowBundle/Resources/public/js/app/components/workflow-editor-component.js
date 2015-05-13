@@ -1,5 +1,5 @@
 /*global define*/
-/** @exports HiddenInitializationComponent */
+/** @exports WorkflowEditorComponent */
 define(function (require) {
     'use strict';
 
@@ -52,6 +52,12 @@ define(function (require) {
             return config;
         },
 
+        /**
+         * Creates workflow model
+         *
+         * @param options
+         * @returns {WorkflowModel}
+         */
         createWorkflowModel: function (options) {
 
             var workflowModel, configuration;

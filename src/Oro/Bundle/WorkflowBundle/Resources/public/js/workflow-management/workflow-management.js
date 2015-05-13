@@ -1,6 +1,6 @@
 /* global define */
 define([
-    'underscore', 'backbone', 'routing', 'oroui/js/messenger', 'orotranslation/js/translator',
+    'underscore', 'chaplin', 'jquery', 'routing', 'oroui/js/messenger', 'orotranslation/js/translator',
     'oroworkflow/js/workflow-management/step/view/list',
     'oroworkflow/js/workflow-management/step/model',
     'oroworkflow/js/workflow-management/transition/model',
@@ -12,7 +12,7 @@ define([
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
 ],
-function(_, Backbone, routing, messenger, __,
+function (_, Chaplin, $, routing, messenger, __,
      StepsListView,
      StepModel,
      TransitionModel,
@@ -25,14 +25,12 @@ function(_, Backbone, routing, messenger, __,
 ) {
     'use strict';
 
-    var $ = Backbone.$;
-
     /**
      * @export  oroworkflow/js/workflow-management
      * @class   oro.WorkflowManagement
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         events: {
             'click .add-step-btn': 'addNewStep',
             'click .add-transition-btn': 'addNewTransition'
@@ -47,11 +45,6 @@ function(_, Backbone, routing, messenger, __,
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.saveAndClose = false;
-
-            _.each(this.model.get('steps').models, this.setWorkflow, this);
-            _.each(this.model.get('transitions').models, this.setWorkflow, this);
-            this.listenTo(this.model.get('steps'), 'add', this.setWorkflow);
-            this.listenTo(this.model.get('transitions'), 'add', this.setWorkflow);
 
             this.addStartingPoint();
             this.initStartStepSelector();
@@ -88,10 +81,6 @@ function(_, Backbone, routing, messenger, __,
             this.$('[data-action="save_and_stay"]').on('click', _.bind(function() {
                 this.saveAndClose = false;
             }, this));
-        },
-
-        setWorkflow: function(item) {
-            item.setWorkflow(this.model);
         },
 
         initStartStepSelector: function() {

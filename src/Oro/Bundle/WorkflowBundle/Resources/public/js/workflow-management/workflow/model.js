@@ -59,6 +59,15 @@ function(_, $, Backbone, Helper, __,
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
+
+            _.each(this.get('steps').models, this.setWorkflow, this);
+            _.each(this.get('transitions').models, this.setWorkflow, this);
+            this.listenTo(this.get('steps'), 'add', this.setWorkflow);
+            this.listenTo(this.get('transitions'), 'add', this.setWorkflow);
+        },
+
+        setWorkflow: function (item) {
+            item.setWorkflow(this);
         },
 
         cloneTransitionDefinition: function(definition) {
