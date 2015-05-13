@@ -3,6 +3,8 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
     ], function ($, _, Backbone, routing) {
     'use strict';
 
+
+    var mediator = require('oroui/js/mediator');
     /**
      * @export  oronavigation/js/shortcuts/view
      * @class   oronavigation.shortcuts.View
@@ -23,15 +25,20 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
         cache: {},
 
         initialize: function(options) {
+            var that = this;
             this.options = _.defaults(options || {}, this.options);
+
+            this.$body = jQuery('.shortcuts');
             this.$el.val('');
             this.$el.typeahead({
                 source:_.bind(this.source, this)
             });
             this.$form = this.$el.closest('form');
+            this.render();
         },
 
         source: function(query, process) {
+            //debugger;
             if (_.isArray(this.options.source)) {
                 process(this.options.source);
             } else if (!_.isUndefined(this.cache[query])) {
@@ -58,6 +65,13 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
                 dataItem = this.data[key];
                 this.$form.attr("action", dataItem.url).submit();
             }
+        },
+
+        render: function() {
+            console.log('chortcut', this.$body);
+            mediator.execute('layout:init', this.$body, this);
+            return this;
         }
+
     });
 });

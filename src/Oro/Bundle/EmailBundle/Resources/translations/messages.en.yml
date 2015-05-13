@@ -95,6 +95,8 @@ oro:
         menu:
             emailtemplate_list.description: List of email templates
             user_emails: My Emails
+            shortcut_create_email.label: Send email
+            shortcut_create_email.description: Send email
 
         datagrid:
             emailtemplate:

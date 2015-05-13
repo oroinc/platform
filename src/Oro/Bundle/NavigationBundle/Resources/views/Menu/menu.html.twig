@@ -1,4 +1,5 @@
 {% extends 'OroNavigationBundle:Menu:menu_base.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% macro attributes(attributes) %}
     {% for name, value in attributes %}
@@ -93,8 +94,11 @@
 {% block item_content %}
     {%- set linkAttributes = item.linkAttributes %}
     {%- set labelAttributes = item.labelAttributes %}
+
     {%- if item.uri is not empty and (not matcher.isCurrent(item) or options.currentAsLink) %}
         {{ block('linkElement') }}
+    {#{%- elseif %}#}
+
     {%- else %}
         {{ block('spanElement') }}
     {%- endif %}
@@ -111,7 +115,41 @@
 
 {% block linkElement %}
     {% import _self as oro_menu %}
-    <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
+    {% set extras = item.extras %}
+
+    {#{{ dump(item) }}#}
+
+    {% if extras.dialog is defined %}
+        {{
+            UI.clientLink({
+                'dataUrl': path('oro_email_email_create'),
+                'aCss': 'no-hash',
+                'iCss': 'icon-envelope',
+                'dataId': 95,
+                'label' : 'oro.email.send_email'|trans,
+                'widget' : {
+                    'type' : 'dialog',
+                    'multiple' : true,
+                    'refresh-widget-alias': 'activity-list-widget',
+                    'options' : {
+                        'alias': 'email-dialog',
+                        'dialogOptions' : {
+                            'title' : 'oro.email.send_email'|trans,
+                            'allowMaximize': true,
+                            'allowMinimize': true,
+                            'dblclick': 'maximize',
+                            'maximizedHeightDecreaseBy': 'minimize-bar',
+                            'width': 1000
+                        }
+                    }
+                }
+            })
+        }}
+    {%- else %}
+        <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
+
+    {% endif %}
+
 {% endblock %}
 
 {% block spanElement %}

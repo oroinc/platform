@@ -1,4 +1,5 @@
 {% extends bap.layout %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block title %}{% trans %}Shortcut Actions List{% endtrans %}{% endblock %}
 {% block content %}
@@ -17,8 +18,40 @@
                 <tbody>
                 {% for action in actionsList if action.url %}
                     <tr>
-                        <td><a href="{{ action.url }}" target="_blank">{{ action.label|trans }}</a></td>
-                        <td>{{ action.description|trans }}</td>
+                        {% if action.dialog_config is defined %}
+                            <td>
+                                {{
+                                    UI.clientLink({
+                                        'dataUrl': path('oro_email_email_create'),
+                                        'aCss': 'no-hash',
+                                        'iCss': 'icon-envelope',
+                                        'dataId': 95,
+                                        'label' : 'oro.email.send_email'|trans,
+                                        'widget' : {
+                                            'type' : 'dialog',
+                                            'multiple' : true,
+                                            'refresh-widget-alias': 'activity-list-widget',
+                                            'options' : {
+                                                'alias': 'email-dialog',
+                                                'dialogOptions' : {
+                                                    'title' : 'oro.email.send_email'|trans,
+                                                    'allowMaximize': true,
+                                                    'allowMinimize': true,
+                                                    'dblclick': 'maximize',
+                                                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                                                    'width': 1000
+                                                }
+                                            }
+                                        }
+                                    })
+                                }}
+                            </td>
+                            <td>{{ action.description|trans }}</td>
+                        {% else %}
+                            <td><a href="{{ action.url }}" target="_blank">{{ action.label|trans }}</a></td>
+                            <td>{{ action.description|trans }}</td>
+                        {% endif %}
+
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -17,6 +17,32 @@ oro_menu_config:
             extras:
                 position: 15
 
+        shortcut_create_email:
+            label: 'oro.email.menu.shortcut_create_email.label'
+            route: 'oro_email_email_create'
+            extras:
+                description: 'oro.email.menu.shortcut_create_email.description'
+                isCustomAction: true
+                dialog: true
+                dialog_config:
+                    aCss: 'no-hash'
+                    iCss: 'icon-envelope'
+                    dataId: 'entity.id'
+                    label : 'oro.email.send_email'
+                    widget :
+                        type: 'dialog'
+                        multiple : true
+                        refresh-widget-alias: 'activity-list-widget'
+                        options :
+                            alias: 'email-dialog'
+                            dialogOptions :
+                                title : 'oro.email.send_email'
+                                allowMaximize: true
+                                allowMinimize: true
+                                dblclick: 'maximize'
+                                maximizedHeightDecreaseBy: 'minimize-bar'
+                                width: 1000
+
     tree:
         application_menu:
             children:
@@ -28,6 +54,9 @@ oro_menu_config:
         usermenu:
             children:
                 oro_email_user_emails: ~
+        shortcuts:
+            children:
+                shortcut_create_email: ~
 
 oro_titles:
     oro_email_view: "%%subject%% - My Emails - %%username%%"

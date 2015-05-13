@@ -58,11 +58,22 @@ class ShortcutController extends Controller
         /** @var $item ItemInterface */
         foreach ($iterator as $key => $item) {
             if ($this->isItemAllowed($item)) {
-                $result[$key] = array(
-                    'url' => $item->getUri(),
-                    'label' => $item->getLabel(),
-                    'description' => $item->getExtra('description')
-                );
+
+                if (isset($item->getExtras()['dialog'])) {
+                    $result[$key] = array(
+                        'url' => $item->getUri(),
+                        'label' => $item->getLabel(),
+                        'description' => $item->getExtra('description'),
+                        'dialog_config' => $item->getExtras()['dialog_config']
+                    );
+                } else {
+                    $result[$key] = array(
+                        'url' => $item->getUri(),
+                        'label' => $item->getLabel(),
+                        'description' => $item->getExtra('description')
+                    );
+                }
+
                 $this->uris[] = $item->getUri();
             }
         }
