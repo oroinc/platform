@@ -1,0 +1,10 @@
+<script type="text-template" id="template-activity-condition-select">
+    <div>
+        <select>
+            <option <%= (selected === "hasActivity") ? "selected" : "" %> value="hasActivity"><%= hasActivityLabel %></option>
+            <option <%= (selected === "hasNotActivity") ? "selected" : "" %> value="hasNotActivity"><%= hasNotActivityLabel %></option>
+        </select>
+        <span class="active-filter">
+        </span>
+    </div>'
+</script>

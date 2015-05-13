@@ -511,7 +511,8 @@ define(function (require) {
 
         configureFilters: function () {
             var self, options, metadata,
-                $fieldCondition, $dataAuditCondition, $segmentCondition, $builder, $criteria;
+                $fieldCondition, $dataAuditCondition, $segmentCondition, $activityCondition,
+                $builder, $criteria;
 
             self = this;
             options = this.options.filters;
@@ -541,6 +542,13 @@ define(function (require) {
                     fieldChoice: this.options.fieldChoiceOptions,
                     filters: metadata.filters,
                     hierarchy: metadata.hierarchy
+                });
+            }
+
+            $activityCondition = $criteria.find('[data-criteria=condition-activity]');
+            if (!_.isEmpty($activityCondition)) {
+                $.extend(true, $activityCondition.data('options'), {
+                    filters: metadata.filters
                 });
             }
 

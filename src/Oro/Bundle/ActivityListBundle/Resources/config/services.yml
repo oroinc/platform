@@ -20,6 +20,8 @@ parameters:
 
     oro_activity_list.filter.helper.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
 
+    oro_activity_list.filter.activity_list.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
+
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
@@ -117,3 +119,12 @@ services:
             - @oro_filter.choice_filter
             - @oro_entity.routing_helper
             - @oro_activity_list.provider.chain
+
+    oro_activity_list.filter.activity_list:
+        class: %oro_activity_list.filter.activity_list.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+            - @oro_activity_list.filter.helper
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: activityList }

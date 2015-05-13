@@ -1,4 +1,9 @@
 {% macro query_designer_condition_builder(params) %}
+    {% set activityConditionOptions = {
+        listOption: render(path('oro_api_get_activitylist_activity_list_option')),
+        entitySelector: '#' ~ params.entity_choice_id,
+    } %}
+
     {% set fieldConditionOptions = {
         fieldChoice: {
             select2: {
@@ -45,6 +50,12 @@
                     <div class="span3 filter-criteria">
                         <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
                         <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                            <li class="option" data-criteria="condition-activity"
+                                data-module="oroactivitylist/js/activity-condition"
+                                data-widget="activityCondition"
+                                data-options="{{ activityConditionOptions|json_encode }}">
+                                {{ 'oro.activitylist.condition_builder.criteria.activity'|trans }}
+                            </li>
                             <li class="option" data-criteria="condition-data-audit"
                                 data-module="orodataaudit/js/data-audit-condition"
                                 data-widget="dataAuditCondition"

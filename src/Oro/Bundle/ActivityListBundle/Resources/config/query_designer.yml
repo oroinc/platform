@@ -1,0 +1,5 @@
+query_designer:
+    filters:
+        activityList:
+            type: activityList
+            query_type: [all]

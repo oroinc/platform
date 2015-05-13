@@ -87,10 +87,8 @@ class AuditFilter extends EntityFilter
                 Expr\Join::WITH,
                 sprintf('%s.field = :field', $this->auditFieldAlias)
             )
-            ->setParameters([
-                'objectClass' => $objectClass,
-                'field' => $fieldName,
-            ])
+            ->setParameter('objectClass', $objectClass)
+            ->setParameter('field', $fieldName)
         ;
 
         $this->applyFilter($ds, 'datetime', sprintf('%s.loggedAt', $this->auditAlias), $data['auditFilter']['data']);

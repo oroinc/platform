@@ -2,8 +2,13 @@ placeholders:
     view_content_data_activities:
         items:
             oro_activity_list: ~
+    scripts_before:
+        items:
+            template_activity_condition_select: ~
 
 items:
     oro_activity_list:
         applicable: @oro_activity_list.placeholder.filter->isApplicable($entity$)
         template: OroActivityListBundle:ActivityList:activities.html.twig
+    template_activity_condition_select:
+        template: OroActivityListBundle:js:activity-condition-select.html.twig

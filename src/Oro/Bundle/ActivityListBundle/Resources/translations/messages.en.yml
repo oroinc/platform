@@ -45,3 +45,7 @@ oro:
         pagination:
             page: Page:
             total: of {{ pages }} | Total of {{ records }} records
+
+        condition_builder:
+            criteria:
+                activity: Activity
