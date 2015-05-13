@@ -3,6 +3,7 @@
 namespace Oro\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\StringUtil;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Writes and reads values to/from an object/array graph.
@@ -70,7 +71,7 @@ class PropertyAccessor
             throw new Exception\InvalidArgumentException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )
@@ -147,7 +148,7 @@ class PropertyAccessor
             throw new Exception\InvalidArgumentException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )
@@ -239,7 +240,7 @@ class PropertyAccessor
             throw new Exception\InvalidArgumentException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )

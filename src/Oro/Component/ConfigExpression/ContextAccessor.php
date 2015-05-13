@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression;
 
 use Oro\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Oro\Component\PropertyAccess\PropertyAccessor;
-use Oro\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class ContextAccessor implements ContextAccessorInterface
 {
