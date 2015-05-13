@@ -19,7 +19,7 @@ class Calendar extends Calendars
      */
     public function setTitle($title)
     {
-        $this->$title = $this->test->byId('oro_calendar_event_form_title');
+        $this->$title = $this->test->byXpath("//*[starts-with(@id,'oro_calendar_event_form_title')]");
         $this->$title->clear();
         $this->$title->value($title);
 
@@ -33,25 +33,16 @@ class Calendar extends Calendars
      */
     public function setStartDate($date)
     {
-        $startDate = $this->test->byId('date_selector_oro_calendar_event_form_start');
-        $startTime = $this->test->byId('time_selector_oro_calendar_event_form_start');
+        $startDate = $this->test->byXpath("//*[starts-with(@id,'date_selector_oro_calendar_event_form_start')]");
+        $startTime = $this->test->byXpath("//*[starts-with(@id,'time_selector_oro_calendar_event_form_start')]");
         $startDate->clear();
         $startTime->clear();
-        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $date)) {
-            $this->test->execute(
-                array(
-                    'script' => "$('#date_selector_oro_calendar_event_form_start').val('$date[1]');" .
-                        "$('#date_selector_oro_calendar_event_form_start').trigger('change').trigger('blur')",
-                    'args' => array()
-                )
-            );
-            $this->test->execute(
-                array(
-                    'script' => "$('#time_selector_oro_calendar_event_form_start').val('$date[2]');" .
-                        "$('#time_selector_oro_calendar_event_form_start').trigger('change').trigger('blur')",
-                    'args' => array()
-                )
-            );
+        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $dueDateParts)) {
+            $startDate->click(); // focus
+            $startDate->value($dueDateParts[1]);
+            $startTime->click(); // focus
+            $startTime->clear();
+            $startTime->value($dueDateParts[2]);
         } else {
             throw new Exception("Value {$date} is not a valid date");
         }
@@ -66,25 +57,16 @@ class Calendar extends Calendars
      */
     public function setEndDate($date)
     {
-        $startDate = $this->test->byId('date_selector_oro_calendar_event_form_end');
-        $startTime = $this->test->byId('time_selector_oro_calendar_event_form_end');
+        $startDate = $this->test->byXpath("//*[starts-with(@id,'date_selector_oro_calendar_event_form_end')]");
+        $startTime = $this->test->byXpath("//*[starts-with(@id,'time_selector_oro_calendar_event_form_end')]");
         $startDate->clear();
         $startTime->clear();
-        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $date)) {
-            $this->test->execute(
-                array(
-                    'script' => "$('#date_selector_oro_calendar_event_form_end').val('$date[1]');" .
-                        "$('#date_selector_oro_calendar_event_form_end').trigger('change').trigger('blur')",
-                    'args' => array()
-                )
-            );
-            $this->test->execute(
-                array(
-                    'script' => "$('#time_selector_oro_calendar_event_form_end').val('$date[2]');" .
-                        "$('#time_selector_oro_calendar_event_form_end').trigger('change').trigger('blur')",
-                    'args' => array()
-                )
-            );
+        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $dueDateParts)) {
+            $startDate->click(); // focus
+            $startDate->value($dueDateParts[1]);
+            $startTime->click(); // focus
+            $startTime->clear();
+            $startTime->value($dueDateParts[2]);
         } else {
             throw new \Exception("Value {$date} is not a valid date");
         }

@@ -26,8 +26,8 @@ class AdvancedSearchTest extends Selenium2TestCase
         $userData = $users->getRandomEntity();
         $login->openNavigation('Oro\Bundle\NavigationBundle', array('url' => '/search/advanced-search-page'));
         //Fill advanced search input field
-        $login->byId('query')->value($query . $userData[$userField]);
-        $login->byId('sendButton')->click();
+        $login->byXpath("//*[starts-with(@id,'query')]")->value($query . $userData[$userField]);
+        $login->byXpath("//*[starts-with(@id,'sendButton')]")->click();
         $login->waitPageToLoad();
         $login->waitForAjax();
         //Check that result is not null

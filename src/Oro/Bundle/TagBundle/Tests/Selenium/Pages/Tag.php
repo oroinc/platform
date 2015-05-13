@@ -31,7 +31,7 @@ class Tag extends AbstractPageEntity
     public function init($new = true)
     {
         if ($new) {
-            $this->tagName = $this->test->byId('oro_tag_tag_form_name');
+            $this->tagName = $this->test->byXpath("//*[starts-with(@id,'oro_tag_tag_form_name')]");
             $this->owner = $this->test->byXpath("//div[starts-with(@id,'s2id_oro_tag_tag_form_owner')]/a");
         }
         return $this;

@@ -16,7 +16,7 @@ class BusinessUnit extends AbstractPageEntity
 
     public function init()
     {
-        $this->businessUnitName = $this->test->byId('oro_business_unit_form_name');
+        $this->businessUnitName = $this->test->byXpath("//*[starts-with(@id,'oro_business_unit_form_name')]");
 
         return $this;
     }

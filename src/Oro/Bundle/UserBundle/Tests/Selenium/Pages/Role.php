@@ -16,7 +16,7 @@ class Role extends AbstractPageEntity
     public function __construct($testCase, $redirect = true)
     {
         parent::__construct($testCase, $redirect);
-        $this->label = $this->test->byId('oro_user_role_form_label');
+        $this->label = $this->test->byXpath("//*[starts-with(@id,'oro_user_role_form_label')]");
     }
 
     public function setLabel($label)

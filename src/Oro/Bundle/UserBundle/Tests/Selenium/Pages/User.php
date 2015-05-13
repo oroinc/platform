@@ -56,19 +56,22 @@ class User extends AbstractPageEntity
 
     public function init($new = false)
     {
-        $this->username = $this->test->byId('oro_user_user_form_username');
+        $this->username = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_username')]");
         if ($new) {
-            $this->firstPassword = $this->test->byId('oro_user_user_form_plainPassword_first');
-            $this->secondPassword = $this->test->byId('oro_user_user_form_plainPassword_second');
+            $this->firstPassword = $this->test
+                ->byXpath("//*[starts-with(@id,'oro_user_user_form_plainPassword_first')]");
+            $this->secondPassword = $this->test
+                ->byXpath("//*[starts-with(@id,'oro_user_user_form_plainPassword_second')]");
         }
-        $this->enabled = $this->test->select($this->test->byId('oro_user_user_form_enabled'));
-        $this->firstName = $this->test->byId('oro_user_user_form_firstName');
-        $this->lastName = $this->test->byId('oro_user_user_form_lastName');
-        $this->email = $this->test->byId('oro_user_user_form_email');
-        $this->groups = $this->test->byId('oro_user_user_form_groups');
-        $this->roles = $this->test->byId('oro_user_user_form_roles');
-        $this->owner = $this->test->select($this->test->byId('oro_user_user_form_owner'));
-        $this->inviteUser = $this->test->byId('oro_user_user_form_inviteUser');
+        $this->enabled = $this->test
+            ->select($this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_enabled')]"));
+        $this->firstName = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_firstName')]");
+        $this->lastName = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_lastName')]");
+        $this->email = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_email')]");
+        $this->groups = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_groups')]");
+        $this->roles = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_roles')]");
+        $this->owner = $this->test->select($this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_owner')]"));
+        $this->inviteUser = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_inviteUser')]");
 
         return $this;
     }

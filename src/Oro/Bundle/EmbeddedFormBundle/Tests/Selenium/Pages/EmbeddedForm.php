@@ -22,7 +22,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setTitle($title)
     {
-        $field = $this->test->byId('embedded_form_title');
+        $field = $this->test->byXpath("//*[starts-with(@id,'embedded_form_title')]");
         $field->clear();
         $field->value($title);
 
@@ -83,7 +83,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setLastName($name)
     {
-        $field = $this->test->byId('orocrm_contactus_contact_request_lastName');
+        $field = $this->test->byXpath("//*[starts-with(@id,'orocrm_contactus_contact_request_lastName')]");
         $field->clear();
         $field->value($name);
 
@@ -96,7 +96,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setEmail($email)
     {
-        $field = $this->test->byId('orocrm_contactus_contact_request_emailAddress');
+        $field = $this->test->byXpath("//*[starts-with(@id,'orocrm_contactus_contact_request_emailAddress')]");
         $field->clear();
         $field->value($email);
 
@@ -109,7 +109,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setComment($comment)
     {
-        $field = $this->test->byId('orocrm_contactus_contact_request_comment');
+        $field = $this->test->byXpath("//*[starts-with(@id,'orocrm_contactus_contact_request_comment')]");
         $field->clear();
         $field->value($comment);
 

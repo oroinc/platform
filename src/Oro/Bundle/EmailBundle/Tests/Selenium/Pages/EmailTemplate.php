@@ -25,11 +25,14 @@ class EmailTemplate extends AbstractPageEntity
     public function __construct($testCase, $redirect = true)
     {
         parent::__construct($testCase, $redirect);
-        $this->entityName = $this->test->select($this->test->byId('oro_email_emailtemplate_entityName'));
-        $this->name = $this->test->byId('oro_email_emailtemplate_name');
-        $this->type = $this->test->byId('oro_email_emailtemplate_type');
-        $this->subject = $this->test->byId('oro_email_emailtemplate_translations_defaultLocale_en_subject');
-        $this->content = $this->test->byId('oro_email_emailtemplate_translations_defaultLocale_en_content');
+        $this->entityName = $this->test
+            ->select($this->test->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_entityName')]"));
+        $this->name = $this->test->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_name')]");
+        $this->type = $this->test->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_type')]");
+        $this->subject = $this->test
+            ->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_translations_defaultLocale_en_subject')]");
+        $this->content = $this->test
+            ->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_translations_defaultLocale_en_content')]");
     }
 
     /**
