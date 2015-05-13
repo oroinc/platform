@@ -22,7 +22,7 @@ class RandomIdExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array('random_id' => false));
+        $resolver->setDefaults(array('random_id' => true));
     }
 
     /**
