@@ -24,7 +24,7 @@ define(function (require) {
         options: {
             childTemplate: '[id^=<%= id %>_]',
             optionsTemplate: '<%= field %>(<%= group %>,<%= name %>,<%= type %>)',
-            fieldsLoaderSelector: '#oro_report_form_entity',
+            fieldsLoaderSelector: '#oro_report_form_entityoro_api_querydesigner_fields_entity',
             fieldsTableIdentifier: 'item-container'
         },
 
