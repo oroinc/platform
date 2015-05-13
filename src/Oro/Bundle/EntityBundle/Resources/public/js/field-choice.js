@@ -191,6 +191,10 @@ define(function (require) {
             }
 
             chain = this.util.pathToEntityChain(path, true);
+            if (!chain.length) {
+                return results;
+            }
+
             entityName = chain[chain.length - 1].entity.name;
             entityData = entityData[entityName];
             entityFields = entityData.fields;

@@ -74,8 +74,14 @@ define(function (require) {
 
             this.initEntityChangeEvents($fieldsLoader, $auditFieldsLoader);
 
-            this.trigger('fieldsLoaded',
-                $fieldsLoader.val(), $fieldsLoader.fieldsLoader('getFieldsData'));
+            this.trigger(
+                this.options.fieldsLoader.loadEvent,
+                $fieldsLoader.val(),
+                $fieldsLoader.fieldsLoader('getFieldsData'));
+            this.trigger(
+                this.options.auditFieldsLoader.loadEvent,
+                $auditFieldsLoader.val(),
+                $auditFieldsLoader.fieldsLoader('getFieldsData'));
 
             SegmentComponent.__super__.initialize.call(this, options);
 
@@ -563,6 +569,9 @@ define(function (require) {
 
             $dataAuditCondition = $criteria.find('[data-criteria=condition-data-audit]');
             if (!_.isEmpty($dataAuditCondition)) {
+                this.on('auditFieldsLoaded', function (className, data) {
+                    $dataAuditCondition.toggleClass('disabled', !data[className]);
+                });
                 $.extend(true, $dataAuditCondition.data('options'), {
                     fieldChoice: this.options.fieldChoiceOptions,
                     filters: metadata.filters,
