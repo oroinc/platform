@@ -56,12 +56,12 @@ define(function (require) {
 
             var workflowModel, configuration;
 
-             configuration = options.entity.configuration;
-             configuration.steps = new StepCollection(_.map(configuration.steps, this._mergeName));
-             configuration.transitions = new TransitionCollection(_.map(configuration.transitions, this._mergeName));
-             configuration.transition_definitions = new TransitionDefinitionCollection(
-                 _.map(configuration.transition_definitions, this._mergeName));
-             configuration.attributes = new AttributeCollection(_.map(configuration.attributes, this._mergeName));
+            configuration = options.entity.configuration;
+            configuration.steps = new StepCollection(_.map(configuration.steps, this._mergeName));
+            configuration.transitions = new TransitionCollection(_.map(configuration.transitions, this._mergeName));
+            configuration.transition_definitions = new TransitionDefinitionCollection(
+                _.map(configuration.transition_definitions, this._mergeName));
+            configuration.attributes = new AttributeCollection(_.map(configuration.attributes, this._mergeName));
 
             configuration.name = options.entity.name;
             configuration.label = options.entity.label;
