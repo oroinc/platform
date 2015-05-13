@@ -6,6 +6,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
+use Oro\Bundle\InstallerBundle\Command\LoadPackageDemoDataCommand;
 use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 
@@ -61,6 +62,7 @@ class DemoDataMigrationListener
     protected function isProcessingRequired(ConsoleEvent $event)
     {
         return $event->getCommand() instanceof LoadDataFixturesCommand
+            && !($event->getCommand() instanceof LoadPackageDemoDataCommand)
             && $event->getInput()->getOption('fixtures-type') == LoadDataFixturesCommand::DEMO_FIXTURES_TYPE;
     }
 }
