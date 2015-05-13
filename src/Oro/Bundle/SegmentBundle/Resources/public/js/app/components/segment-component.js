@@ -37,7 +37,6 @@ define(function (require) {
                 router: null,
                 routingParams: {},
                 fieldsData: [],
-                confirmMessage: '',
                 loadEvent: 'auditFieldsLoaded'
             },
             filters: {
@@ -68,10 +67,12 @@ define(function (require) {
 
             this.initEntityFieldsUtil();
             var $fieldsLoader = this.initFieldsLoader();
-            this.initFieldsLoader(this.options.auditFieldsLoader);
+            var $auditFieldsLoader = this.initFieldsLoader(this.options.auditFieldsLoader);
             this.initGrouping();
             this.initColumn();
             this.configureFilters();
+
+            this.initEntityChangeEvents($fieldsLoader, $auditFieldsLoader);
 
             this.trigger('fieldsLoaded',
                 $fieldsLoader.val(), $fieldsLoader.fieldsLoader('getFieldsData'));
@@ -80,6 +81,50 @@ define(function (require) {
 
             this.form = this.$storage.parents('form');
             this.form.submit(_.bind(this.onBeforeSubmit, this));
+        },
+
+        initEntityChangeEvents: function ($fieldsLoader, $auditFieldsLoader) {
+            var confirm = new DeleteConfirmation({
+                title: __('Change Entity Confirmation'),
+                okText: __('Yes'),
+                content: __(this.options.fieldsLoader.confirmMessage)
+            });
+
+            var self = this;
+            this.$entityChoice.on('change', function (e, extraArgs) {
+                _.extend(e, extraArgs);
+
+                var data = self.load() || [];
+                var requiresConfirm = _.some(data, function (value) {
+                    return !_.isEmpty(value);
+                });
+
+                var ok = function () {
+                    var additionalOptions = _.pick(e, 'val', 'removed');
+                    $fieldsLoader.val(e.val).trigger('change', additionalOptions);
+                    $auditFieldsLoader.val(e.val).trigger('change', additionalOptions);
+                };
+                var cancel = function () {
+                    var oldVal = (e.removed && e.removed.id) || null;
+                    self.$entityChoice.val(oldVal).change();
+                };
+
+                if (requiresConfirm) {
+                    confirm.on('ok', ok);
+                    confirm.on('cancel', cancel);
+                    confirm.once('hidden', function () {
+                        confirm.off('ok');
+                        confirm.off('cancel');
+                    });
+                    confirm.open();
+                } else {
+                    ok();
+                }
+            });
+
+            this.once('dispose:before', function () {
+                confirm.dispose();
+            });
         },
 
         onBeforeSubmit: function (e) {
@@ -223,19 +268,13 @@ define(function (require) {
          * Initializes FieldsLoader on entityChoice element
          */
         initFieldsLoader: function (loaderOptions) {
-            var self, options, confirm, loadingMask, $entityChoice;
+            var self, options, loadingMask, $entityChoice;
 
             self = this;
             options = loaderOptions || this.options.fieldsLoader;
 
             loadingMask = new LoadingMask({
                 container: $(options.loadingMaskParent)
-            });
-
-            confirm = new DeleteConfirmation({
-                title: __('Change Entity Confirmation'),
-                okText: __('Yes'),
-                content: __(options.confirmMessage)
             });
 
             this.$entityChoice = $(options.entityChoice);
@@ -253,17 +292,7 @@ define(function (require) {
             $entityChoice
                 .fieldsLoader({
                     router: options.router,
-                    routingParams: options.routingParams,
-                    confirm: confirm,
-                    requireConfirm: function () {
-                        var data = self.load();
-                        if (!data) {
-                            return false;
-                        }
-                        return _.some(data, function (value) {
-                            return !_.isEmpty(value);
-                        });
-                    }
+                    routingParams: options.routingParams
                 })
                 .on('fieldsloaderstart', _.bind(loadingMask.show, loadingMask))
                 .on('fieldsloadercomplete', _.bind(loadingMask.hide, loadingMask))
@@ -282,14 +311,8 @@ define(function (require) {
             var fieldsData = !_.isEmpty(options.fieldsData) ? JSON.parse(options.fieldsData) : options.fieldsData;
             $entityChoice.fieldsLoader('setFieldsData', fieldsData);
 
-            this.$entityChoice.on('change', function (e, extraArgs) {
-                _.extend(e, extraArgs);
-                $entityChoice.val(e.val).trigger('change', _.pick(e, 'val', 'removed'));
-            });
-
             this.once('dispose:before', function () {
                 loadingMask.dispose();
-                confirm.dispose();
                 delete this.$entityChoice;
             }, this);
 
