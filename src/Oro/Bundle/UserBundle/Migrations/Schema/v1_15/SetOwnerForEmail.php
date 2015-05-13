@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_12;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_15;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
@@ -8,14 +8,14 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEmailBundle implements Migration
+class SetOwnerForEmail implements Migration
 {
     /**
      * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addOwnership($schema);
+        self::addOwnerToOroEmail($schema);
     }
 
     /**
@@ -23,7 +23,7 @@ class OroEmailBundle implements Migration
      *
      * @throws SchemaException
      */
-    public static function addOwnership(Schema $schema)
+    public static function addOwnerToOroEmail(Schema $schema)
     {
         $table = $schema->getTable('oro_email');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
