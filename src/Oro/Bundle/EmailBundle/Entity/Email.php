@@ -12,6 +12,8 @@ use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Email
@@ -47,6 +49,13 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          },
  *          "comment"={
  *              "applicable"=true
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          }
  *      }
  * )
@@ -112,6 +121,23 @@ class Email extends ExtendEmail
      * @JMS\Exclude
      */
     protected $fromEmailAddress;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @JMS\Exclude
+     */
+    protected $owner;
 
     /**
      * @var ArrayCollection
@@ -337,6 +363,53 @@ class Email extends ExtendEmail
     public function setFromEmailAddress(EmailAddress $fromEmailAddress)
     {
         $this->fromEmailAddress = $fromEmailAddress;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return Email
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get owning user
+     *
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Set owning user
+     *
+     * @param User $owningUser
+     *
+     * @return Email
+     */
+    public function setOwner($owningUser)
+    {
+        $this->owner = $owningUser;
 
         return $this;
     }
