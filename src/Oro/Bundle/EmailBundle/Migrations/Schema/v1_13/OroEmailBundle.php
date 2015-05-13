@@ -34,7 +34,7 @@ class OroEmailBundle implements Migration
             $emailBodyTable,
             ['email_body_id'],
             ['id'],
-            ['onDelete' => null],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_2A30C17126A2754B'
         );
         $emailTable->addIndex(['email_body_id'], 'IDX_2A30C17126A2754B');
