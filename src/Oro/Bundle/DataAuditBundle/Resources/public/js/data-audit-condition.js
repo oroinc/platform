@@ -27,6 +27,9 @@ define([
 
             this._on(this.$fieldChoice, {
                 changed: function (e, fieldId) {
+                    if (this.auditFilter) {
+                        this.auditFilter.reset();
+                    }
                     this._renderChangeStateChoice();
                 }
             });
