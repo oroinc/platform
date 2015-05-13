@@ -85,7 +85,6 @@ define([
                 revert = $.proxy(function () {
                     var $entityChoice = $el.data('relatedChoice');
                     if ($entityChoice && $entityChoice.val() !== oldVal) {
-                        console.log('beforeChange', oldVal);
                         $entityChoice.val(oldVal).change();
                     }
                     $el.val(oldVal).change();

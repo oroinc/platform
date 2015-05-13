@@ -268,6 +268,9 @@ define(function (require) {
                 .on('fieldsloaderstart', _.bind(loadingMask.show, loadingMask))
                 .on('fieldsloadercomplete', _.bind(loadingMask.hide, loadingMask))
                 .on('fieldsloaderupdate', function (e, data) {
+                    if (!loaderOptions) {
+                        self.$entityChoice.trigger('fieldsloaderupdate', data);
+                    }
                     self.trigger(options.loadEvent, $(e.target).val(), data);
                 })
                 .on('fieldsloadercomplete', function () {
@@ -276,9 +279,8 @@ define(function (require) {
                     self.save(data);
                 });
 
-            if (!_.isEmpty(options.fieldsData)) {
-                $entityChoice.fieldsLoader('setFieldsData', JSON.parse(options.fieldsData));
-            }
+            var fieldsData = !_.isEmpty(options.fieldsData) ? JSON.parse(options.fieldsData) : options.fieldsData;
+            $entityChoice.fieldsLoader('setFieldsData', fieldsData);
 
             this.$entityChoice.on('change', function (e, extraArgs) {
                 _.extend(e, extraArgs);

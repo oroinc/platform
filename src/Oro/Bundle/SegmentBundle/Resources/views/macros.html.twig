@@ -40,7 +40,13 @@
         criteriaListSelector: '#' ~ params.criteria_list_id,
         entityChoiceSelector: '#' ~ params.entity_choice_id,
         onFieldsUpdate: {
-            toggleCriteria: ['condition-data-audit', 'condition-item', 'condition-segment', 'conditions-group']
+            toggleCriteria: [
+                'condition-activity',
+                'condition-data-audit',
+                'condition-item',
+                'condition-segment',
+                'conditions-group',
+            ]
         }
     } %}
     <div class="condition-builder left-panel-container">
