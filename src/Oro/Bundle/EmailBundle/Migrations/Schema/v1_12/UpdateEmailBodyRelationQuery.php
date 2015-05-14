@@ -40,8 +40,8 @@ class UpdateEmailBodyRelationQuery extends ParametrizedMigrationQuery
         $dbDriver = $this->connection->getDriver()->getName();
         switch ($dbDriver) {
             case DatabaseDriverInterface::DRIVER_POSTGRESQL:
-                $query = 'UPDATE oro_email AS em SET email_body_id = b.id
-                    FROM oro_email_body AS b WHERE em.id = b.email_id';
+                $query = 'UPDATE oro_email AS e SET email_body_id = b.id
+                    FROM oro_email_body AS b WHERE e.id = b.email_id';
 
                 break;
             case DatabaseDriverInterface::DRIVER_MYSQL:
