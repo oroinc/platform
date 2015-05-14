@@ -13,6 +13,8 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_4\OroEmailBundle as OroEmailBund
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_7\OroEmailBundle as OroEmailBundle17;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_8\OroEmailBundle as OroEmailBundle18;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_9\OroEmailBundle as OroEmailBundle19;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\OroEmailBundle as OroEmailBundle112_1;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\RemoveOldRelation as OroEmailBundle112_2;
 
 class OroEmailBundleInstaller implements Installation
 {
@@ -21,7 +23,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_11';
+        return 'v1_12';
     }
 
     /**
@@ -61,5 +63,8 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle18::addAttachmentRelation($schema);
         OroEmailBundle19::changeAttachmentRelation($schema);
+
+        OroEmailBundle112_1::addEmailReference($schema, $queries);
+        OroEmailBundle112_2::removeOldRelation($schema);
     }
 }

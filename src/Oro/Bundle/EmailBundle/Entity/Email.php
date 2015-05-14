@@ -22,7 +22,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      name="oro_email",
  *      indexes={
  *          @ORM\Index(name="IDX_email_message_id", columns={"message_id"}),
- *          @ORM\Index(name="oro_email_is_head", columns={"is_head"})
  *      }
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository")
@@ -50,13 +49,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "comment"={
  *              "applicable"=true
  *          },
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          }
  *      }
  * )
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -102,7 +94,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
-    protected $subject; // todo move
+    protected $subject;
 
     /**
      * @var string
@@ -111,7 +103,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", name="from")
      * @JMS\Type("string")
      */
-    protected $fromName; // todo move
+    protected $fromName;
 
     /**
      * @var EmailAddress
@@ -120,24 +112,7 @@ class Email extends ExtendEmail
      * @ORM\JoinColumn(name="from_email_address_id", referencedColumnName="id", nullable=false)
      * @JMS\Exclude
      */
-    protected $fromEmailAddress; // todo move
-
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
-
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @JMS\Exclude
-     */
-    protected $owner;
+    protected $fromEmailAddress;
 
     /**
      * @var ArrayCollection
@@ -146,16 +121,7 @@ class Email extends ExtendEmail
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailRecipient[]")
      */
-    protected $recipients; // todo move
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="received", type="datetime")
-     * @Soap\ComplexType("dateTime")
-     * @JMS\Type("dateTime")
-     */
-    protected $receivedAt;
+    protected $recipients;
 
     /**
      * @var \DateTime
@@ -164,7 +130,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("dateTime")
      * @JMS\Type("DateTime")
      */
-    protected $sentAt; // todo move
+    protected $sentAt;
 
     /**
      * @var integer
@@ -173,7 +139,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("int")
      * @JMS\Type("integer")
      */
-    protected $importance; // todo move
+    protected $importance;
 
     /**
      * @var \DateTime
@@ -181,25 +147,7 @@ class Email extends ExtendEmail
      * @ORM\Column(name="internaldate", type="datetime")
      * @JMS\Type("DateTime")
      */
-    protected $internalDate; // todo move
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
-     * @Soap\ComplexType("boolean")
-     * @JMS\Type("boolean")
-     */
-    protected $head = true;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
-     * @Soap\ComplexType("boolean")
-     * @JMS\Type("boolean")
-     */
-    protected $seen = false;
+    protected $internalDate;
 
     /**
      * @var string
@@ -208,7 +156,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
-    protected $messageId; // todo move
+    protected $messageId;
 
     /**
      * @var string
@@ -217,7 +165,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $xMessageId; // todo move
+    protected $xMessageId;
 
     /**
      * @var EmailThread
@@ -236,7 +184,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $xThreadId; // todo move
+    protected $xThreadId;
 
     /**
      * @var string
@@ -245,24 +193,25 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $refs; // todo move
+    protected $refs;
 
     /**
-     * @var EmailFolder $folder
+     * @var EmailBody
      *
-     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
-     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
-     * @JMS\Exclude
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailBody", cascade={"persist"})
+     * @ORM\JoinColumn(name="email_body_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    protected $folder;
+    protected $emailBody;
 
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="EmailBody", mappedBy="header", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
+     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\Email")
      * @JMS\Exclude
      */
-    protected $emailBody;
+    protected $emailUsers;
 
     public function __construct()
     {
@@ -270,7 +219,7 @@ class Email extends ExtendEmail
 
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
-        $this->emailBody  = new ArrayCollection();
+        $this->emailUsers = new ArrayCollection();
     }
 
     /**
@@ -366,53 +315,6 @@ class Email extends ExtendEmail
     }
 
     /**
-     * Get organization
-     *
-     * @return Organization
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
-    }
-
-    /**
-     * Set organization
-     *
-     * @param Organization $organization
-     * @return Email
-     */
-    public function setOrganization(Organization $organization = null)
-    {
-        $this->organization = $organization;
-
-        return $this;
-    }
-
-    /**
-     * Get owning user
-     *
-     * @return User
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-    /**
-     * Set owning user
-     *
-     * @param User $owningUser
-     *
-     * @return Email
-     */
-    public function setOwner($owningUser)
-    {
-        $this->owner = $owningUser;
-
-        return $this;
-    }
-
-    /**
      * Get email recipients
      *
      * @param null|string $recipientType null to get all recipients,
@@ -445,30 +347,6 @@ class Email extends ExtendEmail
         $this->recipients[] = $recipient;
 
         $recipient->setEmail($this);
-
-        return $this;
-    }
-
-    /**
-     * Get date/time when email received
-     *
-     * @return \DateTime
-     */
-    public function getReceivedAt()
-    {
-        return $this->receivedAt;
-    }
-
-    /**
-     * Set date/time when email received
-     *
-     * @param \DateTime $receivedAt
-     *
-     * @return Email
-     */
-    public function setReceivedAt($receivedAt)
-    {
-        $this->receivedAt = $receivedAt;
 
         return $this;
     }
@@ -541,54 +419,6 @@ class Email extends ExtendEmail
     public function setInternalDate($internalDate)
     {
         $this->internalDate = $internalDate;
-
-        return $this;
-    }
-
-    /**
-     * Get if email is either first unread, or the last item in the thread
-     *
-     * @return bool
-     */
-    public function isHead()
-    {
-        return $this->head;
-    }
-
-    /**
-     * Set email is_head flag
-     *
-     * @param boolean $head
-     *
-     * @return self
-     */
-    public function setHead($head)
-    {
-        $this->head = (bool)$head;
-
-        return $this;
-    }
-
-    /**
-     * Get if email is seen
-     *
-     * @return bool
-     */
-    public function isSeen()
-    {
-        return $this->seen;
-    }
-
-    /**
-     * Set email is read flag
-     *
-     * @param boolean $seen
-     *
-     * @return self
-     */
-    public function setSeen($seen)
-    {
-        $this->seen = (bool)$seen;
 
         return $this;
     }
@@ -719,39 +549,13 @@ class Email extends ExtendEmail
     }
 
     /**
-     * Get email folder
-     *
-     * @return EmailFolder
-     */
-    public function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return Email
-     */
-    public function setFolder(EmailFolder $folder)
-    {
-        $this->folder = $folder;
-
-        return $this;
-    }
-
-    /**
      * Get cached email body
      *
      * @return EmailBody
      */
     public function getEmailBody()
     {
-        if ($this->emailBody->count() === 0) {
-            return null;
-        }
-
-        return $this->emailBody->first();
+        return $this->emailBody;
     }
 
     /**
@@ -763,11 +567,7 @@ class Email extends ExtendEmail
      */
     public function setEmailBody(EmailBody $emailBody)
     {
-        if ($this->emailBody->count() > 0) {
-            $this->emailBody->clear();
-        }
-        $emailBody->setHeader($this);
-        $this->emailBody->add($emailBody);
+        $this->emailBody = $emailBody;
 
         return $this;
     }
@@ -850,5 +650,33 @@ class Email extends ExtendEmail
         }
 
         return $hasAttachment;
+    }
+
+    /**
+     * @param EmailUser $emailUser
+     *
+     * @return $this
+     */
+    public function addEmailUser(EmailUser $emailUser)
+    {
+        $this->emailUsers[] = $emailUser;
+
+        $emailUser->setEmail($this);
+
+        return $this;
+    }
+
+    /**
+     * @param EmailUser $emailUser
+     *
+     * @return $this
+     */
+    public function removeEmailUser(EmailUser $emailUser)
+    {
+        if ($this->emailUsers->contains($emailUser)) {
+            $this->emailUsers->removeElement($emailUser);
+        }
+
+        return $this;
     }
 }
