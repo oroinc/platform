@@ -10,8 +10,8 @@ class UserNameType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('firstName', 'text', ['required' => true, 'label' => 'First Name'])
-            ->add('lastName', 'text', ['required' => true, 'label' => 'Last Name']);
+            ->add('firstName', 'text', ['required' => true, 'label' => 'First Name', 'random_id' => false])
+            ->add('lastName', 'text', ['required' => true, 'label' => 'Last Name', 'random_id' => false]);
     }
 
     /**
