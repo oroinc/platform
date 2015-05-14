@@ -73,11 +73,11 @@ class ActivityListFilter extends EntityFilter
 
         $activityQb = $this->createActivityQueryBuilder($em, $data, $metadata->getIdentifier()[0]);
 
-        $activityPart = $activityQb->expr()->exists($activityQb->getQuery()->getDQL());
+        $activityPart = $ds->expr()->exists($activityQb->getQuery()->getDQL());
         if ($type === static::TYPE_HAS_NOT_ACTIVITY) {
-            $activityPart = $activityQb->expr()->not($activityPart);
+            $activityPart = $ds->expr()->not($activityPart);
         }
-        $qb->andWhere($activityPart);
+        $this->applyFilterToClause($ds, $activityPart);
 
         foreach ($activityQb->getParameters() as $parameter) {
             $qb->setParameter(
