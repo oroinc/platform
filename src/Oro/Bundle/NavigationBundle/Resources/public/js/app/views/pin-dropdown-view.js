@@ -14,7 +14,8 @@ define([
         listen: {
             'visibilityChange': 'updateVisibility',
             'add collection': 'updateDropdown',
-            'remove collection': 'updateDropdown'
+            'remove collection': 'updateDropdown',
+            'page-rendered mediator': 'updateDropdown'
         },
 
         initialize: function (options) {

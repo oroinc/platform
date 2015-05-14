@@ -17,7 +17,7 @@
                     <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
                         <i class="icon icon-comment"></i><span class="count"></span>
                     </span>
-                    {% if email.emailBody.hasAttachments %}
+                    {% if email.emailBody and email.emailBody.hasAttachments %}
                         <i class="icon-paper-clip email-has-attachment"></i>
                     {% endif %}
                     {{ EA.date_smart_format(email.sentAt) }}
@@ -53,7 +53,7 @@
                     <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
                         <i class="icon icon-comment"></i><span class="count"></span>
                     </span>
-                    {% if email.emailBody.hasAttachments %}
+                    {% if email.emailBody and email.emailBody.hasAttachments %}
                         <i class="icon-paper-clip email-has-attachment"></i>
                     {% endif %}
                     {{ EA.date_smart_format(email.sentAt) }}<br />
@@ -93,9 +93,11 @@
                 {% else %}
                     {{ 'oro.email.body_is_unavailable'|trans }}
                 {% endif %}
-                <ul class="email-attachments-list">
-                    {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
-                </ul>
+                {% if email.emailBody %}
+                    <ul class="email-attachments-list">
+                        {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
+                    </ul>
+                {% endif %}
             </div>
             {%- set commentsData -%}
             {% placeholder view_content_data_comments with {entity: email} %}
