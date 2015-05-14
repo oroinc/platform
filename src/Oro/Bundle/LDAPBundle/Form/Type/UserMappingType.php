@@ -63,7 +63,6 @@ class UserMappingType extends AbstractType
                 [
                     'label'    => $field,
                     'required' => false,
-                    //'translation_domain' => false,
                 ],
                 $options
             );

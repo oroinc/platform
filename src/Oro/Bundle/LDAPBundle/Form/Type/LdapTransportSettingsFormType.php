@@ -1,14 +1,5 @@
 <?php
-/**
- * LdapTransportSettingsFormType.php
- *
- * Project: crm-enterprise-dev
- * Author: Jakub Babiak <jakub@babiak.cz>
- * Created: 13/05/15 13:59
- */
-
 namespace Oro\Bundle\LDAPBundle\Form\Type;
-
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
