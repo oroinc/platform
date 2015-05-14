@@ -30,7 +30,6 @@ function (_, Chaplin, $, __,
 
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-            this.saveAndClose = false;
 
             this.initStartStepSelector();
 
@@ -59,16 +58,20 @@ function (_, Chaplin, $, __,
         initForm: function () {
             this.model.url = this.$el.attr('action');
             this.$el.on('submit', _.bind(this.model.trigger, this.model, 'saveWorkflow'));
+            this.$('[type=submit]').click(_.bind(function () {
+                this.submitActor = this;
+            }, this));
         },
 
         initStartStepSelector: function () {
-            var getSteps = _.bind(function (query) {
+            var select2Options,
+                getSteps = _.bind(function (query) {
                 var steps = [];
                 _.each(this.model.get('steps').models, function (step) {
                     // starting point is not allowed to be a start step
                     var stepLabel = step.get('label');
-                    if (!step.get('_is_start')
-                        && (!query.term || query.term == stepLabel || _.indexOf(stepLabel, query.term) !== -1)
+                    if (!step.get('_is_start') &&
+                        (!query.term || query.term === stepLabel || _.indexOf(stepLabel, query.term) !== -1)
                     ) {
                         steps.push({
                             'id': step.get('name'),
@@ -82,7 +85,7 @@ function (_, Chaplin, $, __,
 
             this.$startStepEl = this.$('[name="start_step"]');
 
-            var select2Options = {
+            select2Options = {
                 'allowClear': true,
                 'query': getSteps,
                 'placeholder': __('Choose step...'),
@@ -104,10 +107,10 @@ function (_, Chaplin, $, __,
                 okText: __('Yes'),
                 content: __('oro.workflow.change_entity_confirmation')
             });
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', _.bind(function () {
                 this.model.set('entity', this.$entitySelectEl.val());
             }, this));
-            confirm.on('cancel', _.bind(function() {
+            confirm.on('cancel', _.bind(function () {
                 this.$entitySelectEl.select2('val', this.model.get('entity'));
             }, this));
 
@@ -117,26 +120,26 @@ function (_, Chaplin, $, __,
                 confirm: confirm,
                 requireConfirm: _.bind(function () {
                     return this.model.get('steps').length > 1 &&
-                        (this.model.get('transitions').length
-                            + this.model.get('transition_definitions').length
-                            + this.model.get('attributes').length) > 0;
+                        (this.model.get('transitions').length +
+                            this.model.get('transition_definitions').length +
+                            this.model.get('attributes').length) > 0;
                 }, this)
             });
 
-            this.$entitySelectEl.on('change', _.bind(function() {
+            this.$entitySelectEl.on('change', _.bind(function () {
                 if (!this.model.get('entity')) {
                     this.model.set('entity', this.$entitySelectEl.val());
                 }
             }, this));
 
-            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
+            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function (e) {
                 this.initEntityFieldsData($(e.target).data('fields'));
             }, this));
 
             this._preloadEntityFieldsData();
         },
 
-        _preloadEntityFieldsData: function() {
+        _preloadEntityFieldsData: function () {
             if (this.$entitySelectEl.val()) {
                 var fieldsData = this.$entitySelectEl.fieldsLoader('getFieldsData');
                 if (!fieldsData.length) {
@@ -161,7 +164,7 @@ function (_, Chaplin, $, __,
 
         onStepRemove: function (step) {
             //Deselect start_step if it was removed
-            if (this.$startStepEl.val() == step.get('name')) {
+            if (this.$startStepEl.val() === step.get('name')) {
                 this.$startStepEl.select2('val', '');
             }
         },

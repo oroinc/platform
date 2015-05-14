@@ -228,7 +228,7 @@ define(function (require) {
                 return;
             }
 
-            var formData = Helper.getFormData(this.$el);
+            var formData = Helper.getFormData(this.workflowManagementView.$el);
             formData.steps_display_ordered = formData.hasOwnProperty('steps_display_ordered');
 
             if (!this.model.get('name')) {
@@ -249,8 +249,10 @@ define(function (require) {
                     mediator.execute('hideLoading');
 
                     var redirectUrl = '',
-                        modelName = this.model.get('name');
-                    if (this.saveAndClose) {
+                        modelName = this.model.get('name'),
+                        saveAndClose = this.workflowManagementView.submitActor &&
+                            this.workflowManagementView.submitActor.is('[data-action="save_and_stay"]');
+                    if (saveAndClose) {
                         redirectUrl = routing.generate('oro_workflow_definition_view', { name: modelName });
                     } else {
                         redirectUrl = routing.generate('oro_workflow_definition_update', { name: modelName });

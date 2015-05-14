@@ -22,8 +22,8 @@ define(function() {
             return Math.random().toString(16).slice(2);
         },
 
-        getFormData: function(form) {
-            var data = form.serializeArray();
+        getFormData: function($form) {
+            var data = $form.serializeArray();
             var result = {};
             for (var i = 0; i < data.length; i++) {
                 var field = data[i];
