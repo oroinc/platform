@@ -43,3 +43,28 @@ oro:
                 role_crm.label: CRM Roles
                 export_user_base_dn.label: Base Dn
                 export_user_class.label: User class
+        channel_type:
+            label: LDAP
+        connector:
+            user:
+              label: LDAP User Connector
+        transport:
+            ldap:
+              label: LDAP Transport
+              fields:
+                  server_hostname.label: Server Hostname
+                  server_port.label: Server Port
+                  server_encryption.label: Server Encryption
+                  server_base_dn.label: Server Base Dn
+                  admin_dn.label: Admin Dn
+                  admin_password.label: Admin Password
+                  user_filter.label: User Filter
+                  user_mapping.label: User Mapping
+                  role_filter.label: Role Filter
+                  role_id_attribute.label: Role id
+                  role_user_id_attribute.label: Role User id attribute
+                  role_mapping.label: Role Mapping
+                  role_ldap.label: LDAP Role
+                  role_crm.label: CRM Roles
+                  export_user_base_dn.label: Export Base Dn
+                  export_user_class.label: Export User class

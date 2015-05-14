@@ -63,6 +63,7 @@ class UserMappingType extends AbstractType
                 [
                     'label'    => $field,
                     'required' => false,
+                    //'translation_domain' => false,
                 ],
                 $options
             );
@@ -76,16 +77,6 @@ class UserMappingType extends AbstractType
     protected function getUserManager()
     {
         return $this->registry->getManagerForClass(static::USER_CLASS);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults([
-            'translation_domain' => false,
-        ]);
     }
 
     /**
