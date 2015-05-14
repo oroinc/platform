@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\SearchBundle\Event\BeforeMapObjectEvent;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -37,7 +38,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getEntitiesListAliases()
     {
-        $entities = array();
+        $entities = [];
 
         foreach ($this->mappingConfig as $class => $mappingEntity) {
             $entities[$class] = isset($mappingEntity['alias']) ? $mappingEntity['alias'] : '';
@@ -80,11 +81,17 @@ class ObjectMapper extends AbstractMapper
      */
     public function mapObject($object)
     {
-        $mappingConfig = $this->mappingConfig;
-        $objectData = array();
+        $objectData = [];
+
+        /**
+         *  dispatch oro_search.before_map_object event
+         */
+        $event = new BeforeMapObjectEvent($this->mappingConfig, $object);
+        $this->dispatcher->dispatch(BeforeMapObjectEvent::EVENT_NAME, $event);
+        $this->mappingConfig = $event->getMappingConfig();
 
         $objectClass = ClassUtils::getRealClass($object);
-        if (is_object($object) && isset($mappingConfig[$objectClass])) {
+        if (is_object($object) && isset($this->mappingConfig[$objectClass])) {
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
             foreach ($this->getEntityMapParameter($objectClass, 'fields', array()) as $field) {
                 if (!isset($field['relation_type'])) {
@@ -123,6 +130,9 @@ class ObjectMapper extends AbstractMapper
                 }
             }
 
+            /**
+             *  Dispatch oro_search.prepare_entity_map event
+             */
             $event = new PrepareEntityMapEvent($object, $objectClass, $objectData);
             $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
             $objectData = $event->getData();

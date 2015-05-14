@@ -37,7 +37,7 @@ parameters:
     oro_entity_extend.validation_loader.class:                Oro\Bundle\EntityExtendBundle\Validator\ExtendFieldValidationLoader
     oro_entity_extend.listener.extend_field_value_render.class:  Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
     oro_entity_extend.importexport.normalizer.enum.class:     Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
-    oro_entity_extend.listener.search_listener.class:         Oro\Bundle\EntityExtendBundle\EventListener\SearchListener
+    oro_entity_extend.listener.before_map_object_search_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -324,9 +324,9 @@ services:
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 
-    oro_entity_extend.listener.search_listener:
-          class: %oro_entity_extend.listener.search_listener.class%
+    oro_entity_extend.listener.before_map_object_search_listener:
+          class: %oro_entity_extend.listener.before_map_object_search_listener.class%
           arguments:
             - @oro_entity_config.config_manager
           tags:
-              - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 20 }
+              - { name: kernel.event_listener, event: oro_search.before_map_object, method: prepareEntityMapEvent }

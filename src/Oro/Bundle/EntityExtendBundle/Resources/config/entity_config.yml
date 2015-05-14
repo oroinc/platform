@@ -485,11 +485,21 @@ oro_entity_config:
                             tooltip:        oro.entity_extend.enum_options.tooltip
 
     search:
+        entity:
+            items:
+                searchable:
+                    form:
+                        type:               choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          oro.entity_extend.entity_config.search.field.items.searchable
         field:
             items:
                 searchable:
                     options:
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, oneToMany]
                         required_property:
                             config_id:
                                 scope:      extend
