@@ -4,7 +4,11 @@ define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-wi
     'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
     'oroworkflow/js/workflow-management/attribute/form-option-view/list',
     'oroui/js/mediator', 'jquery.validate'],
-function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, mediator) {
+function (_, __, Backbone, DialogWidget,
+         Helper,
+         AttributeFormOptionEditView,
+         AttributeFormOptionListView,
+         mediator) {
     'use strict';
 
     var $ = Backbone.$;
