@@ -64,21 +64,39 @@ define([
             });
     }
 
-    $.fn.typeahead.Constructor.prototype.render = function (items) {
-        var that = this
-        items = $(items).map(function (i, item) {
-            if (item.item.dialog_config) {
-                i = $('<li><a href="javascript: void(0);" class=" no-hash" data-id="95" data-url="/app_dev.php/email/create" title="Send email" data-page-component-module="oroui/js/app/components/widget-component" data-page-component-options="{&quot;type&quot;:&quot;dialog&quot;,&quot;multiple&quot;:true,&quot;refresh-widget-alias&quot;:&quot;activity-list-widget&quot;,&quot;options&quot;:{&quot;alias&quot;:&quot;email-dialog&quot;,&quot;dialogOptions&quot;:{&quot;title&quot;:&quot;Send email&quot;,&quot;allowMaximize&quot;:true,&quot;allowMinimize&quot;:true,&quot;dblclick&quot;:&quot;maximize&quot;,&quot;maximizedHeightDecreaseBy&quot;:&quot;minimize-bar&quot;,&quot;width&quot;:1000}},&quot;createOnEvent&quot;:&quot;click&quot;}"><i class="icon-envelope hide-text">Send email</i> '+that.highlighter(item.key)+'</a></li>')
-            } else {
-                i = $(that.options.item).attr('data-value', item.key)
-                i.find('a').html(that.highlighter(item.key))
-            }
-
-            return i[0]
-        })
-
-        items.first().addClass('active')
-        this.$menu.html(items)
-        return this
+    function Typeahead (element, options) {
+        this.$element = $(element);
+        this.options = $.extend({}, $.fn.typeahead.defaults, options);
+        this.matcher = this.options.matcher || this.matcher;
+        this.sorter = this.options.sorter || this.sorter;
+        this.highlighter = this.options.highlighter || this.highlighter;
+        this.updater = this.options.updater || this.updater;
+        this.render = this.options.render || this.render;
+        this.source = this.options.source;
+        this.$menu = $(this.options.menu);
+        this.shown = false;
+        this.listen();
     }
+
+    Typeahead.prototype = $.fn.typeahead.Constructor.prototype;
+
+    $.fn.typeahead = function (option) {
+        return this.each(function () {
+            var $this = $(this)
+                , data = $this.data('typeahead')
+                , options = typeof option == 'object' && option
+            if (!data) $this.data('typeahead', (data = new Typeahead(this, options)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    $.fn.typeahead.defaults = {
+        source: []
+        , items: 8
+        , menu: '<ul class="typeahead dropdown-menu"></ul>'
+        , item: '<li><a href="#"></a></li>'
+        , minLength: 1
+    }
+
+    $.fn.typeahead.Constructor = Typeahead
 });

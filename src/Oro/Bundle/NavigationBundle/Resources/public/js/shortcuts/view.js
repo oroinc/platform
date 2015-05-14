@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'routing', 'oroui/js/mediator', 'bootstrap'
-    ], function ($, _, Backbone, routing, mediator) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'routing', 'oroui/js/mediator', 'bootstrap'
+    ], function ($, _, __, Backbone, routing, mediator) {
     'use strict';
 
     /**
@@ -47,6 +47,52 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oroui/js/mediator', 'boo
                     }
 
                     return beginswith.concat(caseSensitive, caseInsensitive)
+                },
+                render: function (items) {
+                    var that = this;
+                    items = $(items).map(function (i, item) {
+                        if (item.item.dialog_config) {
+                            var config = item.item.dialog_config;
+                            //i = $('<a href="" class=" no-hash" data-id="95"
+
+                            var options = {
+                                    "type": config.widget.type,
+                                    "multiple":config.widget.multiple,
+                                    "refresh-widget-alias": config.widget.refreshWidgetAlias,
+                                    "options":{
+                                        "alias":config.widget.options.alias,
+                                        "dialogOptions":{
+                                            "title": __(config.widget.options.dialogOptions.title),
+                                            "allowMaximize": config.widget.options.dialogOptions.allowMaximize,
+                                            "allowMinimize":config.widget.options.dialogOptions.allowMinimize,
+                                            "dblclick":config.widget.options.dialogOptions.dblclick,
+                                            "maximizedHeightDecreaseBy":config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
+                                            "width":config.widget.options.dialogOptions.width
+                                        }
+                                    },
+                                    "createOnEvent":"click"}
+                            ;
+
+                            i = $(that.options.item).attr('data-value', item.key);
+                            i.find('a')
+                                .attr('href', 'javascript: void(0);')
+                                .attr('class', config.aCss)
+                                .attr('data-url', routing.generate(config.dataUrl))
+                                .attr('title', __(config.label))
+                                .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
+                                .attr('data-page-component-options', JSON.stringify(options))
+                                .html('<i class="icon-envelope hide-text">'+item.key+'</i> ' + that.highlighter(item.key));
+                        } else {
+                            i = $(that.options.item).attr('data-value', item.key);
+                            i.find('a').html(that.highlighter(item.key));
+                        }
+
+                        return i[0];
+                    });
+
+                    items.first().addClass('active');
+                    this.$menu.html(items);
+                    return this
                 }
             });
             this.$form = this.$el.closest('form');
@@ -85,7 +131,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oroui/js/mediator', 'boo
             this.$el.val('');
             if (!_.isUndefined(this.data[key])) {
                 dataItem = this.data[key];
-                this.$form.attr("action", dataItem.url).submit();
+                if (!dataItem.dialog) {
+                    this.$form.attr("action", dataItem.url).submit();
+                }
             }
         },
 
