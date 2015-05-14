@@ -272,7 +272,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         }
 
         return $em->getRepository('OroEmailBundle:Email')
-            ->findBy(array('messageId' => array_values($messageIds)));
+            ->findBy(['messageId' => array_values($messageIds)]);
     }
 
     /**
@@ -361,6 +361,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateFolderReferences(EmailFolder $old, EmailFolder $new)
     {
         foreach ($this->emails as $obj) {
+            // todo CRM-3324
             if ($obj->hasFolder($old)) {
                 $obj->removeFolder($old)->addFolder($new);
             }

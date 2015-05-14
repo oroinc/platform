@@ -102,7 +102,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
-    protected $subject;
+    protected $subject; // todo move
 
     /**
      * @var string
@@ -111,7 +111,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", name="from")
      * @JMS\Type("string")
      */
-    protected $fromName;
+    protected $fromName; // todo move
 
     /**
      * @var EmailAddress
@@ -120,7 +120,7 @@ class Email extends ExtendEmail
      * @ORM\JoinColumn(name="from_email_address_id", referencedColumnName="id", nullable=false)
      * @JMS\Exclude
      */
-    protected $fromEmailAddress;
+    protected $fromEmailAddress; // todo move
 
     /**
      * @var Organization
@@ -146,7 +146,7 @@ class Email extends ExtendEmail
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailRecipient[]")
      */
-    protected $recipients;
+    protected $recipients; // todo move
 
     /**
      * @var \DateTime
@@ -164,7 +164,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("dateTime")
      * @JMS\Type("DateTime")
      */
-    protected $sentAt;
+    protected $sentAt; // todo move
 
     /**
      * @var integer
@@ -173,7 +173,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("int")
      * @JMS\Type("integer")
      */
-    protected $importance;
+    protected $importance; // todo move
 
     /**
      * @var \DateTime
@@ -181,7 +181,7 @@ class Email extends ExtendEmail
      * @ORM\Column(name="internaldate", type="datetime")
      * @JMS\Type("DateTime")
      */
-    protected $internalDate;
+    protected $internalDate; // todo move
 
     /**
      * @var bool
@@ -208,7 +208,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
-    protected $messageId;
+    protected $messageId; // todo move
 
     /**
      * @var string
@@ -217,7 +217,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $xMessageId;
+    protected $xMessageId; // todo move
 
     /**
      * @var EmailThread
@@ -236,7 +236,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $xThreadId;
+    protected $xThreadId; // todo move
 
     /**
      * @var string
@@ -245,17 +245,16 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $refs;
+    protected $refs; // todo move
 
     /**
-     * @var ArrayCollection|EmailFolder[] $folders
+     * @var EmailFolder $folder
      *
-     * @ORM\ManyToMany(targetEntity="EmailFolder", inversedBy="emails")
-     * @ORM\JoinTable(name="oro_email_to_folder")
+     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
      */
-    protected $folders;
+    protected $folder;
 
     /**
      * @var ArrayCollection
@@ -272,7 +271,6 @@ class Email extends ExtendEmail
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
         $this->emailBody  = new ArrayCollection();
-        $this->folders    = new ArrayCollection();
     }
 
     /**
@@ -721,23 +719,13 @@ class Email extends ExtendEmail
     }
 
     /**
-     * Get email folders
+     * Get email folder
      *
-     * @return ArrayCollection|EmailFolder[]
+     * @return EmailFolder
      */
-    public function getFolders()
+    public function getFolder()
     {
-        return $this->folders;
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return bool
-     */
-    public function hasFolder(EmailFolder $folder)
-    {
-        return $this->folders->contains($folder);
+        return $this->folder;
     }
 
     /**
@@ -745,25 +733,9 @@ class Email extends ExtendEmail
      *
      * @return Email
      */
-    public function addFolder(EmailFolder $folder)
+    public function setFolder(EmailFolder $folder)
     {
-        if (!$this->folders->contains($folder)) {
-            $this->folders->add($folder);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return Email
-     */
-    public function removeFolder(EmailFolder $folder)
-    {
-        if ($this->folders->contains($folder)) {
-            $this->folders->removeElement($folder);
-        }
+        $this->folder = $folder;
 
         return $this;
     }
