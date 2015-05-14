@@ -77,8 +77,7 @@ class FormUtils
         $hasCallback = null !== $comparisonCallback;
         $class       = get_class($transformerToReplace);
         foreach ($transformers as $key => $transformer) {
-            if (
-                ($hasCallback && call_user_func($comparisonCallback, $transformer, $key))
+            if (($hasCallback && call_user_func($comparisonCallback, $transformer, $key))
                 || (!$hasCallback && is_a($transformer, $class))
             ) {
                 $newTransformers[] = $transformerToReplace;

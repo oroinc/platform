@@ -49,20 +49,19 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
         return [
             [
                 [
-                    'class'        => TrackingVisitEvent::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => TrackingVisitEvent::ENTITY_NAME,
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    TrackingVisitEvent::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName(
-                                        'Test\TargetEntity',
-                                        VisitEventAssociationExtension::ASSOCIATION_KIND
-                                    ),
-                                    'manyToOne'
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                TrackingVisitEvent::ENTITY_NAME,
+                                ExtendHelper::buildAssociationName(
+                                    'Test\TargetEntity',
+                                    VisitEventAssociationExtension::ASSOCIATION_KIND
                                 ),
+                                'manyToOne'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -71,17 +70,16 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
             ],
             [
                 [
-                    'class'        => TrackingVisitEvent::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => TrackingVisitEvent::ENTITY_NAME,
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    TrackingVisitEvent::ENTITY_NAME,
-                                    'testField',
-                                    'manyToOne'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                TrackingVisitEvent::ENTITY_NAME,
+                                'testField',
+                                'manyToOne'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -90,20 +88,19 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
             ],
             [
                 [
-                    'class'        => TrackingVisitEvent::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => TrackingVisitEvent::ENTITY_NAME,
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    TrackingVisitEvent::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName(
-                                        'Test\TargetEntity',
-                                        VisitEventAssociationExtension::ASSOCIATION_KIND
-                                    ),
-                                    'manyToMany'
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                TrackingVisitEvent::ENTITY_NAME,
+                                ExtendHelper::buildAssociationName(
+                                    'Test\TargetEntity',
+                                    VisitEventAssociationExtension::ASSOCIATION_KIND
                                 ),
+                                'manyToMany'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -126,52 +123,48 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
         $schema = [
             'relationData' => [
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName(
-                                'Test\TargetEntity1',
-                                VisitEventAssociationExtension::ASSOCIATION_KIND
-                            ),
-                            'manyToOne'
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName(
+                            'Test\TargetEntity1',
+                            VisitEventAssociationExtension::ASSOCIATION_KIND
                         ),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity1'
                 ],
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName(
-                                'Test\TargetEntity2',
-                                VisitEventAssociationExtension::ASSOCIATION_KIND
-                            ),
-                            'manyToOne'
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName(
+                            'Test\TargetEntity2',
+                            VisitEventAssociationExtension::ASSOCIATION_KIND
                         ),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity2'
                 ],
                 [   // should be ignored because field type is not multipleManyToOne
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName(
-                                'Test\TargetEntity3',
-                                VisitEventAssociationExtension::ASSOCIATION_KIND
-                            ),
-                            'manyToMany'
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName(
+                            'Test\TargetEntity3',
+                            VisitEventAssociationExtension::ASSOCIATION_KIND
                         ),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity3'
                 ],
                 [   // should be ignored because field name is not match association naming conventions
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            'testField',
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        'testField',
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity4'
                 ]
             ]

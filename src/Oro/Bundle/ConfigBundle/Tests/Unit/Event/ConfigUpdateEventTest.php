@@ -46,13 +46,11 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-            'oro_user.greeting' =>
-                [
+                'oro_user.greeting' => [
                     'old' => "old value",
                     'new' => "default value"
                 ],
-            'oro_user.level'    =>
-                [
+                'oro_user.level' => [
                     'old' => "pre value",
                     'new' => 50
                 ]
