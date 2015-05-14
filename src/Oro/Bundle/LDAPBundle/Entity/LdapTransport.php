@@ -22,42 +22,42 @@ class LdapTransport extends Transport
     /**
      * @var string
      *
-     * @ORM\Column(name="server_hostname", type="string")
+     * @ORM\Column(name="oro_ldap_server_hostname", type="string")
      */
     private $serverHostname;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="server_port", type="integer")
+     * @ORM\Column(name="oro_ldap_server_port", type="integer")
      */
     private $serverPort;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="server_encryption", type="string")
+     * @ORM\Column(name="oro_ldap_server_encryption", type="string")
      */
     private $serverEncryption;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="server_base_dn", type="string")
+     * @ORM\Column(name="oro_ldap_server_base_dn", type="string")
      */
     private $serverBaseDn;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="admin_dn", type="string")
+     * @ORM\Column(name="oro_ldap_admin_dn", type="string")
      */
     private $adminDn;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="admin_password", type="string")
+     * @ORM\Column(name="oro_ldap_admin_password", type="string")
      */
     private $adminPassword;
 
