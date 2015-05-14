@@ -81,7 +81,7 @@ class EmailTemplate extends AbstractPageEntity
     public function getType()
     {
         return $this->test->byXpath(
-            "//div[@id='oro_email_emailtemplate_type']/div[input[@checked = 'checked']]/label"
+            "//div[starts-with(@id,'oro_email_emailtemplate_type')]/div[input[@checked = 'checked']]/label"
         )->text();
     }
 

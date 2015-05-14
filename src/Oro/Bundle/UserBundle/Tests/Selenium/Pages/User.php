@@ -285,7 +285,7 @@ class User extends AbstractPageEntity
     {
         foreach ($businessUnits as $businessUnit) {
             $this->test->byXpath(
-                "//div[@id='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]".
+                "//div[starts-with(@id,'oro_user_user_form_organizations')]//label[contains(., '{$businessUnit}')]".
                 "/preceding-sibling::input"
             )->click();
         }
@@ -328,7 +328,7 @@ class User extends AbstractPageEntity
         $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit profile']")->click();
         $this->waitPageToLoad();
         $this->assertElementPresent(
-            "//div[@id='oro_user_user_form_roles']//input[@checked='checked' and @disabled='disabled']",
+            "//div[starts-with(@id,'oro_user_user_form_roles')]//input[@checked='checked' and @disabled='disabled']",
             'Role selector are not disabled for user'
         );
     }

@@ -70,7 +70,7 @@ class EmbeddedForm extends AbstractPageEntity
     public function setFirstName($name)
     {
         $this->test->frame('frameId');
-        $field = $this->test->byXpath("//input[@id='orocrm_magento_contactus_contact_request_firstName']");
+        $field = $this->test->byXpath("//input[starts-with(@id,'orocrm_magento_contactus_contact_request_firstName')]");
         $field->clear();
         $field->value($name);
 
@@ -121,7 +121,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function submitForm()
     {
-        $this->test->byXPath("//button[@id='orocrm_contactus_contact_request_submit']")->click();
+        $this->test->byXPath("//button[starts-with(@id,'orocrm_contactus_contact_request_submit')]")->click();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@id='page']/p[normalize-space(.)='Form has been submitted successfully']",

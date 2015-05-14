@@ -86,10 +86,12 @@ class Calendar extends Calendars
         )->value($username);
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@id='select2-drop']//div[contains(., '{$username}')]",
+            "//div[starts-with(@id,'oro_calendar_event_form_allDay')]//div[contains(., '{$username}')]",
             "Guest user not found"
         );
-        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$username}')]")->click();
+        $this->test->byXpath(
+            "//div[starts-with(@id,'oro_calendar_event_form_allDay')]//div[contains(., '{$username}')]"
+        )->click();
 
         return $this;
     }
@@ -121,8 +123,8 @@ class Calendar extends Calendars
      */
     public function setAllDayEventOff()
     {
-        if ($this->isElementPresent("//input[@id='oro_calendar_event_form_allDay'][@value='1']")) {
-            $this->test->byXPath("//input[@id='oro_calendar_event_form_allDay']")->click();
+        if ($this->isElementPresent("//input[starts-with(@id,'oro_calendar_event_form_allDay')][@value='1']")) {
+            $this->test->byXPath("//input[starts-with(@id,'oro_calendar_event_form_allDay')]")->click();
         }
 
         return $this;
