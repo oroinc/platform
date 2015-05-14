@@ -224,7 +224,7 @@ class Audit extends AbstractLogEntry
      */
     public function getField($field)
     {
-        return $this->fields->filter(function(AuditField $auditField) use ($field) {
+        return $this->fields->filter(function (AuditField $auditField) use ($field) {
             return $auditField->getField() === $field;
         })->first();
     }

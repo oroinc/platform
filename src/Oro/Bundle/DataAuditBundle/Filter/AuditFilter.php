@@ -100,7 +100,12 @@ class AuditFilter extends EntityFilter
         ;
 
         $auditDs = new OrmFilterDatasourceAdapter($auditQb);
-        $this->applyFilter($auditDs, 'datetime', sprintf('%s.loggedAt', $this->auditAlias), $data['auditFilter']['data']);
+        $this->applyFilter(
+            $auditDs,
+            'datetime',
+            sprintf('%s.loggedAt', $this->auditAlias),
+            $data['auditFilter']['data']
+        );
         $this->applyNewAuditValueFilter($auditDs, $objectClass, $fieldName, $data);
 
         $this->applyFilterToClause($ds, $ds->expr()->exists($auditQb->getQuery()->getDQL()));
