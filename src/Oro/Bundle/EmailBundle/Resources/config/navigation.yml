@@ -17,22 +17,22 @@ oro_menu_config:
             extras:
                 position: 15
 
-        shortcut_create_email:
-            label: 'oro.email.menu.shortcut_create_email.label'
+        shortcut_send_email:
+            label: 'oro.email.menu.shortcut_send_email.label'
             route: 'oro_email_email_create'
             extras:
-                description: 'oro.email.menu.shortcut_create_email.description'
+                description: 'oro.email.menu.shortcut_send_email.description'
                 isCustomAction: true
                 dialog: true
                 dialog_config:
+                    dataUrl: 'oro_email_email_create'
                     aCss: 'no-hash'
                     iCss: 'icon-envelope'
-                    dataId: 'entity.id'
                     label : 'oro.email.send_email'
                     widget :
                         type: 'dialog'
                         multiple : true
-                        refresh-widget-alias: 'activity-list-widget'
+                        refreshWidgetAlias: 'activity-list-widget'
                         options :
                             alias: 'email-dialog'
                             dialogOptions :
@@ -56,7 +56,7 @@ oro_menu_config:
                 oro_email_user_emails: ~
         shortcuts:
             children:
-                shortcut_create_email: ~
+                shortcut_send_email: ~
 
 oro_titles:
     oro_email_view: "%%subject%% - My Emails - %%username%%"

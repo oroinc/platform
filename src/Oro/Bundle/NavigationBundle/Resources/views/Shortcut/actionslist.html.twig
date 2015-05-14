@@ -22,24 +22,23 @@
                             <td>
                                 {{
                                     UI.clientLink({
-                                        'dataUrl': path('oro_email_email_create'),
-                                        'aCss': 'no-hash',
-                                        'iCss': 'icon-envelope',
-                                        'dataId': 95,
-                                        'label' : 'oro.email.send_email'|trans,
+                                        'dataUrl': path(action.dialog_config.dataUrl),
+                                        'aCss': action.dialog_config.aCss,
+                                        'iCss': action.dialog_config.iCss,
+                                        'label' : action.dialog_config.label|trans,
                                         'widget' : {
-                                            'type' : 'dialog',
-                                            'multiple' : true,
-                                            'refresh-widget-alias': 'activity-list-widget',
+                                            'type' : action.dialog_config.widget.type,
+                                            'multiple' : action.dialog_config.widget.multiple,
+                                            'refresh-widget-alias': action.dialog_config.widget.refreshWidgetAlias,
                                             'options' : {
-                                                'alias': 'email-dialog',
+                                                'alias': action.dialog_config.widget.options.alias,
                                                 'dialogOptions' : {
-                                                    'title' : 'oro.email.send_email'|trans,
-                                                    'allowMaximize': true,
-                                                    'allowMinimize': true,
-                                                    'dblclick': 'maximize',
-                                                    'maximizedHeightDecreaseBy': 'minimize-bar',
-                                                    'width': 1000
+                                                    'title' : action.dialog_config.widget.options.dialogOptions.title|trans,
+                                                    'allowMaximize': action.dialog_config.widget.options.dialogOptions.allowMaximize,
+                                                    'allowMinimize': action.dialog_config.widget.options.dialogOptions.allowMinimize,
+                                                    'dblclick': action.dialog_config.widget.options.dialogOptions.dblclick,
+                                                    'maximizedHeightDecreaseBy': action.dialog_config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
+                                                    'width': action.dialog_config.widget.options.dialogOptions.width
                                                 }
                                             }
                                         }

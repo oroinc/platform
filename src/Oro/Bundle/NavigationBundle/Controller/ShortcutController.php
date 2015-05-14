@@ -58,27 +58,37 @@ class ShortcutController extends Controller
         /** @var $item ItemInterface */
         foreach ($iterator as $key => $item) {
             if ($this->isItemAllowed($item)) {
-
-                if (isset($item->getExtras()['dialog'])) {
-                    $result[$key] = array(
-                        'url' => $item->getUri(),
-                        'label' => $item->getLabel(),
-                        'description' => $item->getExtra('description'),
-                        'dialog_config' => $item->getExtras()['dialog_config']
-                    );
-                } else {
-                    $result[$key] = array(
-                        'url' => $item->getUri(),
-                        'label' => $item->getLabel(),
-                        'description' => $item->getExtra('description')
-                    );
-                }
-
+                $result[$key] = $this->getData($item);
                 $this->uris[] = $item->getUri();
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param $item ItemInterface
+     * @return array
+     */
+    protected function getData($item)
+    {
+        if (isset($item->getExtras()['dialog'])) {
+            $data = array(
+                'url' => $item->getUri(),
+                'label' => $item->getLabel(),
+                'description' => $item->getExtra('description'),
+                'dialog' => $item->getExtras()['dialog'],
+                'dialog_config' => $item->getExtras()['dialog_config']
+            );
+        } else {
+            $data = array(
+                'url' => $item->getUri(),
+                'label' => $item->getLabel(),
+                'description' => $item->getExtra('description')
+            );
+        }
+
+        return $data;
     }
 
     /**

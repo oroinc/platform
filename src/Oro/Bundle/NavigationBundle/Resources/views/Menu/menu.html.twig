@@ -117,29 +117,26 @@
     {% import _self as oro_menu %}
     {% set extras = item.extras %}
 
-    {#{{ dump(item) }}#}
-
     {% if extras.dialog is defined %}
         {{
             UI.clientLink({
-                'dataUrl': path('oro_email_email_create'),
-                'aCss': 'no-hash',
-                'iCss': 'icon-envelope',
-                'dataId': 95,
-                'label' : 'oro.email.send_email'|trans,
+                'dataUrl': path(extras.dialog_config.dataUrl),
+                'aCss': extras.dialog_config.aCss,
+                'iCss': extras.dialog_config.iCss,
+                'label' : extras.dialog_config.label|trans,
                 'widget' : {
-                    'type' : 'dialog',
-                    'multiple' : true,
-                    'refresh-widget-alias': 'activity-list-widget',
+                    'type' : extras.dialog_config.widget.type,
+                    'multiple' : extras.dialog_config.widget.multiple,
+                    'refresh-widget-alias': extras.dialog_config.widget.refreshWidgetAlias,
                     'options' : {
-                        'alias': 'email-dialog',
+                        'alias': extras.dialog_config.widget.options.alias,
                         'dialogOptions' : {
-                            'title' : 'oro.email.send_email'|trans,
-                            'allowMaximize': true,
-                            'allowMinimize': true,
-                            'dblclick': 'maximize',
-                            'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+                            'title' : extras.dialog_config.widget.options.dialogOptions.title|trans,
+                            'allowMaximize': extras.dialog_config.widget.options.dialogOptions.allowMaximize,
+                            'allowMinimize': extras.dialog_config.widget.options.dialogOptions.allowMinimize,
+                            'dblclick': extras.dialog_config.widget.options.dialogOptions.dblclick,
+                            'maximizedHeightDecreaseBy': extras.dialog_config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
+                            'width': extras.dialog_config.widget.options.dialogOptions.width
                         }
                     }
                 }
@@ -147,7 +144,6 @@
         }}
     {%- else %}
         <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
-
     {% endif %}
 
 {% endblock %}

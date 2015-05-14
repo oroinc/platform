@@ -64,27 +64,6 @@ define([
             });
     }
 
-    $.fn.typeahead.Constructor.prototype.process = function (items) {
-        var that = this
-
-        items = $.grep(items, function (item) {
-            return that.matcher(item)
-        })
-
-        items = this.sorter(items)
-
-        if (!items.length) {
-            return this.shown ? this.hide() : this
-        }
-
-        if (this.options.render) {
-            return this.options.render(items.slice(0, this.options.items)).show()
-        } else {
-            return this.render(items.slice(0, this.options.items)).show()
-        }
-
-    }
-
     $.fn.typeahead.Constructor.prototype.render = function (items) {
         var that = this
         items = $(items).map(function (i, item) {
@@ -92,7 +71,7 @@ define([
                 i = $('<li><a href="javascript: void(0);" class=" no-hash" data-id="95" data-url="/app_dev.php/email/create" title="Send email" data-page-component-module="oroui/js/app/components/widget-component" data-page-component-options="{&quot;type&quot;:&quot;dialog&quot;,&quot;multiple&quot;:true,&quot;refresh-widget-alias&quot;:&quot;activity-list-widget&quot;,&quot;options&quot;:{&quot;alias&quot;:&quot;email-dialog&quot;,&quot;dialogOptions&quot;:{&quot;title&quot;:&quot;Send email&quot;,&quot;allowMaximize&quot;:true,&quot;allowMinimize&quot;:true,&quot;dblclick&quot;:&quot;maximize&quot;,&quot;maximizedHeightDecreaseBy&quot;:&quot;minimize-bar&quot;,&quot;width&quot;:1000}},&quot;createOnEvent&quot;:&quot;click&quot;}"><i class="icon-envelope hide-text">Send email</i> '+that.highlighter(item)+'</a></li>')
             } else {
                 i = $(that.options.item).attr('data-value', item.key)
-                i.find('a').html(that.highlighter(item))
+                i.find('a').html(that.highlighter(item.key))
             }
 
             return i[0]
@@ -120,12 +99,5 @@ define([
         }
 
         return beginswith.concat(caseSensitive, caseInsensitive)
-    }
-
-    $.fn.typeahead.Constructor.prototype.highlighter = function (item) {
-        var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-        return item.key.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-            return '<strong>' + match + '</strong>'
-        })
     }
 });

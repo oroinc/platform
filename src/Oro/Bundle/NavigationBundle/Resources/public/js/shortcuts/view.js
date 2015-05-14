@@ -1,10 +1,8 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
-    ], function ($, _, Backbone, routing) {
+define(['jquery', 'underscore', 'backbone', 'routing', 'oroui/js/mediator', 'bootstrap'
+    ], function ($, _, Backbone, routing, mediator) {
     'use strict';
 
-
-    var mediator = require('oroui/js/mediator');
     /**
      * @export  oronavigation/js/shortcuts/view
      * @class   oronavigation.shortcuts.View
@@ -47,7 +45,6 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
             } else {
                 var url = routing.generate(this.options.source, { 'query': query });
                 $.get(url, _.bind(function(data) {
-                    //console.log('data', data);
                     this.data = data;
                     var result = [];
                     _.each(data, function(item, key) {
