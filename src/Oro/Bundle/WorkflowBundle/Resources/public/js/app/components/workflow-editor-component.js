@@ -1,4 +1,4 @@
-/*global define*/
+/*global define, console*/
 /** @exports WorkflowEditorComponent */
 define(function (require) {
     'use strict';
@@ -7,7 +7,11 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
+        messenger = require('oroui/js/messenger'),
+        tools = require('oroui/js/tools'),
+        routing = require('routing'),
         BaseComponent = require('oroui/js/app/components/base/component'),
+        Helper = require('oroworkflow/js/workflow-management/helper'),
         WorkflowManagement = require('oroworkflow/js/workflow-management'),
         WorkflowModel = require('oroworkflow/js/workflow-management/workflow/model'),
         StepCollection = require('oroworkflow/js/workflow-management/step/collection'),
@@ -34,11 +38,11 @@ define(function (require) {
             'requestEditStep model': 'openManageStepForm',
             'requestCloneStep model': 'cloneStep',
             'requestRemoveStep model': 'removeStep',
-            'model requestRemoveTransition': 'removeTransition',
-            'model requestCloneTransition': 'cloneTransition',
-            'model requestEditTransition': 'openManageTransitionForm',
-            'model change:entity': 'resetWorkflow',
-            'model saveWorkflow': 'saveConfiguration'
+            'requestRemoveTransition model': 'removeTransition',
+            'requestCloneTransition model': 'cloneTransition',
+            'requestEditTransition model': 'openManageTransitionForm',
+            'change:entity model': 'resetWorkflow',
+            'saveWorkflow model': 'saveConfiguration'
         },
 
         /**
@@ -56,19 +60,12 @@ define(function (require) {
             });
 
             this.workflowManagementView.render();
-
-            /*
-            this.listenTo(this.model, 'requestRemoveTransition', this.removeTransition);
-            this.listenTo(this.model, 'requestCloneTransition', this.cloneTransition);
-            this.listenTo(this.model, 'requestEditTransition', this.openManageTransitionForm);
-
-            this.listenTo(this.model, 'change:entity', this.resetWorkflow);*/
         },
 
         /**
          * Helper function. Callback for _.map;
          *
-         * @param config {{}}
+         * @param config {object}
          * @param name {string}
          * @returns {{}}
          * @private
@@ -85,7 +82,6 @@ define(function (require) {
          * @returns {WorkflowModel}
          */
         createWorkflowModel: function (options) {
-
             var workflowModel, configuration;
 
             configuration = options.entity.configuration;
@@ -113,8 +109,7 @@ define(function (require) {
             this.openManageTransitionForm(transition, step);
         },
 
-
-        openManageTransitionForm: function (transition, step_from) {
+        openManageTransitionForm: function (transition, stepFrom) {
             if (this.model.get('steps').length === 1) {
                 this._showModalMessage(__('At least one step should be added to add transition.'), __('Warning'));
                 return;
@@ -127,7 +122,7 @@ define(function (require) {
             var transitionEditView = new TransitionEditForm({
                 'model': transition,
                 'workflow': this.model,
-                'step_from': step_from,
+                'step_from': stepFrom,
                 'entity_select_el': this.workflowManagementView.getEntitySelect(),
                 'workflowContainer': this.workflowManagementView.$el
             });
@@ -161,11 +156,11 @@ define(function (require) {
             this.openManageStepForm(clonedStep);
         },
 
-        removeStep: function(model) {
+        removeStep: function (model) {
             this._removeHandler(model, __('Are you sure you want to delete this step?'));
         },
 
-        _showModalMessage: function(message, title, okText) {
+        _showModalMessage: function (message, title, okText) {
             var confirm = new Confirmation({
                 title: title || '',
                 content: message,
@@ -175,7 +170,7 @@ define(function (require) {
             confirm.open();
         },
 
-        _removeHandler: function(model, message) {
+        _removeHandler: function (model, message) {
             var confirm = new Confirmation({
                 content: message
             });
@@ -187,7 +182,7 @@ define(function (require) {
 
         resetWorkflow: function () {
             //Need to manually destroy collection elements to trigger all appropriate events
-            var resetCollection = function(collection) {
+            var resetCollection = function (collection) {
                 if (collection.length) {
                     for (var i = collection.length - 1; i > -1; i--) {
                         collection.at(i).destroy();
@@ -261,12 +256,12 @@ define(function (require) {
                         redirectUrl = routing.generate('oro_workflow_definition_update', { name: modelName });
                     }
 
-                    mediator.once('page:afterChange', function() {
+                    mediator.once('page:afterChange', function () {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
                     });
                     mediator.execute('redirectTo', {url: redirectUrl});
                 }, this),
-                'error': function(model, response) {
+                'error': function (model, response) {
                     mediator.execute('hideLoading');
                     var jsonResponse = response.responseJSON || {};
 
@@ -292,7 +287,7 @@ define(function (require) {
             }
 
             // at least one step and one transition must exist
-            if (this.model.get('steps').length <= 1 || this.model.get('transitions').length == 0) {
+            if (this.model.get('steps').length <= 1 || this.model.get('transitions').length === 0) {
                 messenger.notificationFlashMessage(
                     'error',
                     __('Could not save workflow. Please add at least one step and one transition.')
@@ -332,8 +327,16 @@ define(function (require) {
                     .getAllowedTransitions(this.model)
                     .add(transition);
             }
-        }
+        },
 
+        addNewStep: function () {
+            var step = new StepModel();
+            this.openManageStepForm(step);
+        },
+
+        removeTransition: function (model) {
+            this._removeHandler(model, __('Are you sure you want to delete this transition?'));
+        }
     });
 
     return WorkflowEditorComponent;

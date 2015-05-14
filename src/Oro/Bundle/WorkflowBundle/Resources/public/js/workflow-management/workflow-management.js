@@ -1,24 +1,12 @@
 /* global define */
 define([
-    'underscore', 'chaplin', 'jquery', 'routing', 'oroui/js/messenger', 'orotranslation/js/translator',
+    'underscore', 'chaplin', 'jquery', 'orotranslation/js/translator',
     'oroworkflow/js/workflow-management/step/view/list',
-    'oroworkflow/js/workflow-management/step/model',
-    'oroworkflow/js/workflow-management/transition/model',
-    'oroworkflow/js/workflow-management/transition/view/edit',
-    'oroworkflow/js/workflow-management/helper',
-    'oroui/js/tools',
-    'oroui/js/mediator',
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
 ],
-function (_, Chaplin, $, routing, messenger, __,
+function (_, Chaplin, $, __,
      StepsListView,
-     StepModel,
-     TransitionModel,
-     TransitionEditForm,
-     Helper,
-     tools,
-     mediator,
      Confirmation
 ) {
     'use strict';
