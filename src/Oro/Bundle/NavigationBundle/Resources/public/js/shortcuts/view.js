@@ -25,7 +25,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
         cache: {},
 
         initialize: function(options) {
-            var that = this;
+            var self = this;
             this.options = _.defaults(options || {}, this.options);
 
             this.$body = jQuery('.shortcuts');
@@ -38,21 +38,27 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
         },
 
         source: function(query, process) {
-            //debugger;
             if (_.isArray(this.options.source)) {
                 process(this.options.source);
+                mediator.execute('layout:init', this.$body, this);
             } else if (!_.isUndefined(this.cache[query])) {
                 process(this.cache[query]);
+                mediator.execute('layout:init', this.$body, this);
             } else {
                 var url = routing.generate(this.options.source, { 'query': query });
                 $.get(url, _.bind(function(data) {
+                    //console.log('data', data);
                     this.data = data;
                     var result = [];
                     _.each(data, function(item, key) {
-                        result.push(key);
+                        result.push({
+                            key: key,
+                            item: item
+                        });
                     });
                     this.cache[query] = result;
                     process(result);
+                    mediator.execute('layout:init', this.$body, this);
                 }, this));
             }
         },
@@ -68,10 +74,8 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
         },
 
         render: function() {
-            console.log('chortcut', this.$body);
             mediator.execute('layout:init', this.$body, this);
             return this;
         }
-
     });
 });
