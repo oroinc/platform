@@ -19,7 +19,9 @@ function (_, Chaplin, $, __,
     return Chaplin.View.extend({
         events: {
             'click .add-step-btn': 'addNewStep',
-            'click .add-transition-btn': 'addNewTransition'
+            'click .add-transition-btn': 'addNewTransition',
+            'submit': 'onSubmit',
+            'click [type=submit]': 'setSubmitActor'
         },
 
         options: {
@@ -41,9 +43,8 @@ function (_, Chaplin, $, __,
 
             this.$entitySelectEl = this.$('[name$="[related_entity]"]');
             this.initEntityFieldsLoader();
-            this.initForm();
 
-            this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
+            this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
         },
 
         render: function () {
@@ -55,12 +56,12 @@ function (_, Chaplin, $, __,
             this.stepListView.render();
         },
 
-        initForm: function () {
-            this.model.url = this.$el.attr('action');
-            this.$el.on('submit', _.bind(this.model.trigger, this.model, 'saveWorkflow'));
-            this.$('[type=submit]').click(_.bind(function () {
-                this.submitActor = this;
-            }, this));
+        onSubmit: function (e) {
+            this.model.trigger('saveWorkflow', e);
+        },
+
+        setSubmitActor: function () {
+            this.submitActor = this;
         },
 
         initStartStepSelector: function () {
@@ -170,7 +171,7 @@ function (_, Chaplin, $, __,
         },
 
         isEntitySelected: function () {
-            return !!this.$entitySelectEl.val();
+            return Boolean(this.$entitySelectEl.val());
         },
 
         getEntitySelect: function () {

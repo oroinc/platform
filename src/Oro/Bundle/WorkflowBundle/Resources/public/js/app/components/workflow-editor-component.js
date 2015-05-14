@@ -10,19 +10,19 @@ define(function (require) {
         messenger = require('oroui/js/messenger'),
         tools = require('oroui/js/tools'),
         routing = require('routing'),
+        helper = require('oroworkflow/js/workflow-management/helper'),
         BaseComponent = require('oroui/js/app/components/base/component'),
-        Helper = require('oroworkflow/js/workflow-management/helper'),
-        WorkflowManagement = require('oroworkflow/js/workflow-management'),
+        WorkflowManagementView = require('oroworkflow/js/workflow-management'),
         WorkflowModel = require('oroworkflow/js/workflow-management/workflow/model'),
         StepCollection = require('oroworkflow/js/workflow-management/step/collection'),
         TransitionModel = require('oroworkflow/js/workflow-management/transition/model'),
         TransitionCollection = require('oroworkflow/js/workflow-management/transition/collection'),
         TransitionDefinitionCollection = require('oroworkflow/js/workflow-management/transition-definition/collection'),
         AttributeCollection = require('oroworkflow/js/workflow-management/attribute/collection'),
-        TransitionEditForm = require('oroworkflow/js/workflow-management/transition/view/edit'),
+        TransitionEditFormView = require('oroworkflow/js/workflow-management/transition/view/edit'),
         StepEditView = require('oroworkflow/js/workflow-management/step/view/edit'),
         StepModel = require('oroworkflow/js/workflow-management/step/model'),
-        Confirmation = require('oroui/js/delete-confirmation');
+        DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
      * Builds workflow editor UI.
@@ -53,7 +53,7 @@ define(function (require) {
             this.model = this.createWorkflowModel(options);
             this.addStartingPoint();
 
-            this.workflowManagementView = new WorkflowManagement({
+            this.workflowManagementView = new WorkflowManagementView({
                 el: options._sourceElement,
                 stepsEl: '.workflow-definition-steps-list-container',
                 model: this.model
@@ -97,6 +97,7 @@ define(function (require) {
             configuration.entity_attribute = options.entity.entity_attribute;
             configuration.start_step = options.entity.startStep;
             configuration.steps_display_ordered = options.entity.stepsDisplayOrdered;
+            configuration.url = options._sourceElement.attr('action');
 
             workflowModel = new WorkflowModel(configuration);
             workflowModel.setSystemEntities(options.system_entities);
@@ -119,7 +120,7 @@ define(function (require) {
                 return;
             }
 
-            var transitionEditView = new TransitionEditForm({
+            var transitionEditView = new TransitionEditFormView({
                 'model': transition,
                 'workflow': this.model,
                 'step_from': stepFrom,
@@ -161,7 +162,7 @@ define(function (require) {
         },
 
         _showModalMessage: function (message, title, okText) {
-            var confirm = new Confirmation({
+            var confirm = new DeleteConfirmation({
                 title: title || '',
                 content: message,
                 okText: okText || __('OK'),
@@ -171,7 +172,7 @@ define(function (require) {
         },
 
         _removeHandler: function (model, message) {
-            var confirm = new Confirmation({
+            var confirm = new DeleteConfirmation({
                 content: message
             });
             confirm.on('ok', function () {
@@ -205,10 +206,10 @@ define(function (require) {
 
         _createStartingPoint: function () {
             var startStepModel = new StepModel({
-                'name': 'step:starting_point',
-                'label': __('(Start)'),
-                'order': -1,
-                '_is_start': true
+                name: 'step:starting_point',
+                label: __('(Start)'),
+                order: -1,
+                _is_start: true
             });
 
             startStepModel
@@ -228,11 +229,11 @@ define(function (require) {
                 return;
             }
 
-            var formData = Helper.getFormData(this.workflowManagementView.$el);
+            var formData = helper.getFormData(this.workflowManagementView.$el);
             formData.steps_display_ordered = formData.hasOwnProperty('steps_display_ordered');
 
             if (!this.model.get('name')) {
-                this.model.set('name', Helper.getNameByString(formData.label, 'workflow_'));
+                this.model.set('name', helper.getNameByString(formData.label, 'workflow_'));
             }
             this.model.set('label', formData.label);
             this.model.set('steps_display_ordered', formData.steps_display_ordered);

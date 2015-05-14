@@ -524,6 +524,13 @@
     </a>
 {% endmacro %}
 
+{% macro renderPageComponentAttributes(pageComponent) %}
+    data-page-component-module="{{ pageComponent.module }}"
+    {% if pageComponent.options is defined %}
+        data-page-component-options="{{ pageComponent.options|json_encode }}"
+    {% endif %}
+{% endmacro %}
+
 {% macro renderWidgetAttributes(options) %}
     data-page-component-module="oroui/js/app/components/widget-component"
     data-page-component-options="{{ options|json_encode }}"

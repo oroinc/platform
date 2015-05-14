@@ -7,12 +7,9 @@
 {% endblock before_content_addition %}
 
 {% block content %}
-<div class="layout-content"{% if pageComponent is defined %}
-            data-page-component-module="{{ pageComponent.module }}"
-            {% if pageComponent.options is defined %}
-                data-page-component-options="{{ pageComponent.options|json_encode }}"
-            {% endif %}
-        {% endif %}>
+<div class="layout-content"
+        {% if pageComponent is defined %}{% UI.renderPageComponentAttributes(pageComponent) %}{% endif %}
+        >
     <div class="container-fluid page-title">
         {% block workflowStepListContainer %}
             {% placeholder page_title_before with {entity: entity} %}

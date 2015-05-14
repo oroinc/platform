@@ -34,12 +34,7 @@
             {{ form_enctype(form) }}
             method="{{ form.vars.method }}"
             data-collect="true"
-            {% if pageComponent is defined %}
-                data-page-component-module="{{ pageComponent.module }}"
-                {% if pageComponent.options is defined %}
-                    data-page-component-options="{{ pageComponent.options|json_encode }}"
-                {% endif %}
-            {% endif %}
+            {% if pageComponent is defined %}{% UI.renderPageComponentAttributes(pageComponent) %}{% endif %}
         >
         {% if isWidgetContext %}
             <div class="widget-actions">
