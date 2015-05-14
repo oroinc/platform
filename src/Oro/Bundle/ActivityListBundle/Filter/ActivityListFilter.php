@@ -100,7 +100,8 @@ class ActivityListFilter extends EntityFilter
         array $activityFilter,
         $entityIdField
     ) {
-        $joinField = sprintf('%s.%s',
+        $joinField = sprintf(
+            '%s.%s',
             $this->activityListAlias,
             ExtendHelper::buildAssociationName(
                 $this->getClassName(),
