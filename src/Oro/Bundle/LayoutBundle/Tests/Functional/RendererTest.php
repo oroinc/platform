@@ -290,7 +290,7 @@ class RendererTest extends LayoutTestCase
 
         $form = $formFactory->createNamedBuilder('form_for_layout_renderer_test')
             ->add('user', new UserNameType())
-            ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
+            ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false, 'random_id' => false])
             ->add(
                 'gender',
                 'choice',
@@ -298,7 +298,8 @@ class RendererTest extends LayoutTestCase
                     'label'    => 'Gender',
                     'required' => false,
                     'choices'  => ['male' => 'Male', 'female' => 'Female'],
-                    'expanded' => true
+                    'expanded' => true,
+                    'random_id' => false,// turn off random id for the test
                 ]
             )
             ->getForm();
