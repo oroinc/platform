@@ -32,6 +32,9 @@ define(function (require) {
      */
     WorkflowEditorComponent = BaseComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
 
+        /**
+         * @inheritDoc
+         */
         listen: {
             'requestAddTransition model': 'addNewStepTransition',
             'requestAddStep model': 'addNewStep',
@@ -51,7 +54,7 @@ define(function (require) {
          */
         initialize: function (options) {
             this.model = this.createWorkflowModel(options);
-            this.addStartingPoint();
+            this.addStartingStep();
 
             this.workflowManagementView = new WorkflowManagementView({
                 el: options._sourceElement,
@@ -105,11 +108,22 @@ define(function (require) {
             return workflowModel;
         },
 
-        addNewStepTransition: function (step) {
+        /**
+         * Opens a "Add transition" dialog
+         *
+         * @param stepFrom {StepModel}
+         */
+        addNewStepTransition: function (stepFrom) {
             var transition = new TransitionModel();
-            this.openManageTransitionForm(transition, step);
+            this.openManageTransitionForm(transition, stepFrom);
         },
 
+        /**
+         * Opens "Edit transition" dialog
+         *
+         * @param transition {TransitionModel}
+         * @param stepFrom {StepModel=}
+         */
         openManageTransitionForm: function (transition, stepFrom) {
             if (this.model.get('steps').length === 1) {
                 this._showModalMessage(__('At least one step should be added to add transition.'), __('Warning'));
@@ -131,6 +145,11 @@ define(function (require) {
             transitionEditView.render();
         },
 
+        /**
+         * Opens "Edit step" dialog
+         *
+         * @param step {StepModel}
+         */
         openManageStepForm: function (step) {
             if (!this.workflowManagementView.isEntitySelected()) {
                 this._showModalMessage(__('Related entity must be selected to add step.'), __('Warning'));
@@ -146,21 +165,44 @@ define(function (require) {
             stepEditView.render();
         },
 
+        /**
+         * Utility function, adds step into workflow if it is unique
+         *
+         * @param step {StepModel}
+         */
         addStep: function (step) {
             if (!this.model.get('steps').get(step.cid)) {
                 this.model.get('steps').add(step);
             }
         },
 
+        /**
+         * Opens "Clone step" dialog
+         *
+         * @param step {StepModel} step to clone
+         */
         cloneStep: function (step) {
             var clonedStep = this.model.cloneStep(step, true);
             this.openManageStepForm(clonedStep);
         },
 
-        removeStep: function (model) {
-            this._removeHandler(model, __('Are you sure you want to delete this step?'));
+        /**
+         * Opens "Remove step" dialog
+         *
+         * @param step {StepModel} step to clone
+         */
+        removeStep: function (step) {
+            this._removeHandler(step, __('Are you sure you want to delete this step?'));
         },
 
+        /**
+         * Shows message in popup
+         *
+         * @param message {string}
+         * @param title {string}
+         * @param okText {string}
+         * @private
+         */
         _showModalMessage: function (message, title, okText) {
             var confirm = new DeleteConfirmation({
                 title: title || '',
@@ -171,6 +213,13 @@ define(function (require) {
             confirm.open();
         },
 
+        /**
+         * Handles model removement
+         *
+         * @param model {Model}
+         * @param message {string} Message to show in confirmation dialog
+         * @private
+         */
         _removeHandler: function (model, message) {
             var confirm = new DeleteConfirmation({
                 content: message
@@ -181,6 +230,9 @@ define(function (require) {
             confirm.open();
         },
 
+        /**
+         * Clean ups workflow model
+         */
         resetWorkflow: function () {
             //Need to manually destroy collection elements to trigger all appropriate events
             var resetCollection = function (collection) {
@@ -197,14 +249,23 @@ define(function (require) {
             resetCollection(this.model.get('transition_definitions'));
             resetCollection(this.model.get('transitions'));
 
-            this.addStartingPoint();
+            this.addStartingStep();
         },
 
-        addStartingPoint: function () {
-            this.model.get('steps').add(this._createStartingPoint());
+        /**
+         * Adds a starting step to workflow model
+         */
+        addStartingStep: function () {
+            this.model.get('steps').add(this._createStartingStep());
         },
 
-        _createStartingPoint: function () {
+        /**
+         * Creates a starting step
+         *
+         * @returns {StepModel}
+         * @private
+         */
+        _createStartingStep: function () {
             var startStepModel = new StepModel({
                 name: 'step:starting_point',
                 label: __('(Start)'),
@@ -219,10 +280,21 @@ define(function (require) {
             return startStepModel;
         },
 
-        _getStartingPoint: function () {
+        /**
+         * Returns a starting step
+         *
+         * @returns {StepModel}
+         * @private
+         */
+        _getStartingStep: function () {
             return this.model.getStepByName('step:starting_point');
         },
 
+        /**
+         * Event callback for form submit. Saves workflow model to server and navigates out if required
+         *
+         * @param e
+         */
         saveConfiguration: function (e) {
             e.preventDefault();
             if (!this.workflowManagementView.valid()) {
@@ -240,7 +312,7 @@ define(function (require) {
             this.model.set('entity', formData.related_entity);
             this.model.set('start_step', formData.start_step);
 
-            if (!this.validateConfiguration()) {
+            if (!this.validateWorkflow()) {
                 return;
             }
 
@@ -276,7 +348,12 @@ define(function (require) {
             });
         },
 
-        validateConfiguration: function () {
+        /**
+         * Validates workflow model.
+         *
+         * @returns {boolean} validation result
+         */
+        validateWorkflow: function () {
             // workflow label should be defined
             if (!this.model.get('label')) {
                 messenger.notificationFlashMessage('error', __('Could not save workflow. Please set workflow name.'));
@@ -299,7 +376,7 @@ define(function (require) {
             }
 
             // should be defined either start step or at least one start transition
-            if (!this.model.get('start_step') && _.isEmpty(this._getStartingPoint().get('allowed_transitions'))) {
+            if (!this.model.get('start_step') && _.isEmpty(this._getStartingStep().get('allowed_transitions'))) {
                 messenger.notificationFlashMessage(
                     'error',
                     __('Could not save workflow. Please either set default step or add transitions to starting point.')
@@ -310,11 +387,23 @@ define(function (require) {
             return true;
         },
 
-        cloneTransition: function (transition, step) {
+        /**
+         * Opens "clone transition" dialog
+         *
+         * @param transition {TransitionModel}
+         * @param stepFrom {StepModel}
+         */
+        cloneTransition: function (transition, stepFrom) {
             var clonedTransition = this.model.cloneTransition(transition, true);
-            this.openManageTransitionForm(clonedTransition, step);
+            this.openManageTransitionForm(clonedTransition, stepFrom);
         },
 
+        /**
+         * Opens "add transition" dialog
+         *
+         * @param transition {TransitionModel}
+         * @param stepFrom {StepModel}
+         */
         addTransition: function (transition, stepFrom) {
             if (!this.model.get('transitions').get(transition.cid)) {
                 if (_.isString(stepFrom)) {
@@ -332,13 +421,21 @@ define(function (require) {
             }
         },
 
+        /**
+         * Opens "Add step" dialog
+         */
         addNewStep: function () {
             var step = new StepModel();
             this.openManageStepForm(step);
         },
 
-        removeTransition: function (model) {
-            this._removeHandler(model, __('Are you sure you want to delete this transition?'));
+        /**
+         * Opens "Remove step" dialog
+         *
+         * @param transition {TransitionModel}
+         */
+        removeTransition: function (transition) {
+            this._removeHandler(transition, __('Are you sure you want to delete this transition?'));
         }
     });
 
