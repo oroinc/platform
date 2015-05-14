@@ -74,6 +74,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 filter = this.options.filters[filterId];
 
             if (!filterId) {
+                filter = {
+                    type: 'none',
+                    applicable: {},
+                    popupHint: '<span style="color: red">This filter is not supported.</span>'
+                };
+                this._createFilter(filter, 'none');
                 return;
             }
 
