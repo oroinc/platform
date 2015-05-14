@@ -294,3 +294,7 @@ table.table {
 .control-group .actions {
     padding-left: 10px;
 }
+
+#page {
+    overflow: auto;
+}
