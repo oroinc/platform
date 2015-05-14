@@ -1,21 +1,13 @@
 <?php
-
-/**
- * LdapTransport.php
- *
- * Project: crm-enterprise-dev
- * Author: Jakub Babiak <jakub@babiak.cz>
- * Created: 13/05/15 15:05
- */
-
 namespace Oro\Bundle\LDAPBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Class LdapTransport
@@ -25,7 +17,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * @Config()
  * @Oro\Loggable()
  */
-
 class LdapTransport extends Transport
 {
     /**
@@ -70,9 +61,7 @@ class LdapTransport extends Transport
      */
     private $adminPassword;
 
-    /**
-     * @var ParameterBag
-     */
+    /** @var ParameterBag */
     protected $settings;
 
     public function __construct()
@@ -112,10 +101,14 @@ class LdapTransport extends Transport
 
     /**
      * @param string $serverHostname
+     *
+     * @return $this
      */
     public function setServerHostname($serverHostname)
     {
         $this->serverHostname = $serverHostname;
+
+        return $this;
     }
 
     /**
@@ -128,10 +121,14 @@ class LdapTransport extends Transport
 
     /**
      * @param string $serverPort
+     *
+     * @return $this
      */
     public function setServerPort($serverPort)
     {
         $this->serverPort = $serverPort;
+
+        return $this;
     }
 
     /**
@@ -144,10 +141,14 @@ class LdapTransport extends Transport
 
     /**
      * @param string $serverEncryption
+     *
+     * @return $this
      */
     public function setServerEncryption($serverEncryption)
     {
         $this->serverEncryption = $serverEncryption;
+
+        return $this;
     }
 
     /**
@@ -160,10 +161,14 @@ class LdapTransport extends Transport
 
     /**
      * @param string $serverBaseDn
+     *
+     * @return $this
      */
     public function setServerBaseDn($serverBaseDn)
     {
         $this->serverBaseDn = $serverBaseDn;
+
+        return $this;
     }
 
     /**
@@ -176,10 +181,14 @@ class LdapTransport extends Transport
 
     /**
      * @param string $adminDn
+     *
+     * @return $this
      */
     public function setAdminDn($adminDn)
     {
         $this->adminDn = $adminDn;
+
+        return $this;
     }
 
     /**
@@ -191,10 +200,14 @@ class LdapTransport extends Transport
     }
 
     /**
-     * @param string $adminPassword
+     * @param $adminPassword
+     *
+     * @return $this
      */
     public function setAdminPassword($adminPassword)
     {
         $this->adminPassword = $adminPassword;
+
+        return $this;
     }
 }

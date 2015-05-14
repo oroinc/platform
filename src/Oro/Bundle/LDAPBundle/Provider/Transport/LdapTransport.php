@@ -1,27 +1,18 @@
 <?php
-/**
- * LdapTransport.php
- *
- * Project: crm-enterprise-dev
- * Author: Jakub Babiak <jakub@babiak.cz>
- * Created: 13/05/15 11:00
- */
-
 namespace Oro\Bundle\LDAPBundle\Provider\Transport;
+
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 class LdapTransport implements TransportInterface
 {
-    /**
-     * @var ParameterBag
-     */
+    /** @var ParameterBag */
     protected $settings;
 
     /**
-     * @param \Oro\Bundle\IntegrationBundle\Entity\Transport $transportEntity
+     * {@inheritdoc}
      */
     public function init(Transport $transportEntity)
     {
@@ -29,9 +20,7 @@ class LdapTransport implements TransportInterface
     }
 
     /**
-     * Returns label for UI
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getLabel()
     {
@@ -39,9 +28,7 @@ class LdapTransport implements TransportInterface
     }
 
     /**
-     * Returns form type name needed to setup transport
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getSettingsFormType()
     {
@@ -49,9 +36,7 @@ class LdapTransport implements TransportInterface
     }
 
     /**
-     * Returns entity name needed to store transport settings
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getSettingsEntityFQCN()
     {
