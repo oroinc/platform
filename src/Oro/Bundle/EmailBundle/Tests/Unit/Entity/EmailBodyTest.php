@@ -42,16 +42,6 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $entity->getPersistent());
     }
 
-    public function testHeaderGetterAndSetter()
-    {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-
-        $entity = new EmailBody();
-        $entity->setHeader($email);
-
-        $this->assertTrue($email === $entity->getHeader());
-    }
-
     public function testAttachmentGetterAndSetter()
     {
         $attachment = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');

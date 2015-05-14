@@ -69,15 +69,6 @@ class EmailBody
     protected $persistent;
 
     /**
-     * @var Email
-     *
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailBody")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id")
-     * @JMS\Exclude
-     */
-    protected $header;
-
-    /**
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailAttachment", mappedBy="emailBody",
@@ -203,29 +194,6 @@ class EmailBody
     public function setPersistent($persistent)
     {
         $this->persistent = $persistent;
-
-        return $this;
-    }
-
-    /**
-     * Get email header
-     *
-     * @return Email
-     */
-    public function getHeader()
-    {
-        return $this->header;
-    }
-
-    /**
-     * Set email header
-     *
-     * @param Email $header
-     * @return $this
-     */
-    public function setHeader(Email $header)
-    {
-        $this->header = $header;
 
         return $this;
     }
