@@ -28,20 +28,39 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oroui/js/mediator', 'boo
 
             this.$body = jQuery('.shortcuts');
             this.$el.val('');
+
             this.$el.typeahead({
-                source:_.bind(this.source, this)
+                source:_.bind(this.source, this),
+                matcher: function (item) {
+                    return ~item.key.toLowerCase().indexOf(this.query.toLowerCase())
+                },
+                sorter: function (items) {
+                    var beginswith = []
+                        , caseSensitive = []
+                        , caseInsensitive = []
+                        , item;
+
+                    while (item = items.shift()) {
+                        if (!item.key.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item)
+                        else if (~item.key.indexOf(this.query)) caseSensitive.push(item)
+                        else caseInsensitive.push(item)
+                    }
+
+                    return beginswith.concat(caseSensitive, caseInsensitive)
+                }
             });
             this.$form = this.$el.closest('form');
             this.render();
         },
 
         source: function(query, process) {
+            var self = this;
             if (_.isArray(this.options.source)) {
                 process(this.options.source);
-                mediator.execute('layout:init', this.$body, this);
+                this.render();
             } else if (!_.isUndefined(this.cache[query])) {
                 process(this.cache[query]);
-                mediator.execute('layout:init', this.$body, this);
+                this.render();
             } else {
                 var url = routing.generate(this.options.source, { 'query': query });
                 $.get(url, _.bind(function(data) {
@@ -55,7 +74,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oroui/js/mediator', 'boo
                     });
                     this.cache[query] = result;
                     process(result);
-                    mediator.execute('layout:init', this.$body, this);
+                    self.render();
                 }, this));
             }
         },

@@ -94,11 +94,8 @@
 {% block item_content %}
     {%- set linkAttributes = item.linkAttributes %}
     {%- set labelAttributes = item.labelAttributes %}
-
     {%- if item.uri is not empty and (not matcher.isCurrent(item) or options.currentAsLink) %}
         {{ block('linkElement') }}
-    {#{%- elseif %}#}
-
     {%- else %}
         {{ block('spanElement') }}
     {%- endif %}

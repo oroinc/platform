@@ -68,7 +68,7 @@ define([
         var that = this
         items = $(items).map(function (i, item) {
             if (item.item.dialog_config) {
-                i = $('<li><a href="javascript: void(0);" class=" no-hash" data-id="95" data-url="/app_dev.php/email/create" title="Send email" data-page-component-module="oroui/js/app/components/widget-component" data-page-component-options="{&quot;type&quot;:&quot;dialog&quot;,&quot;multiple&quot;:true,&quot;refresh-widget-alias&quot;:&quot;activity-list-widget&quot;,&quot;options&quot;:{&quot;alias&quot;:&quot;email-dialog&quot;,&quot;dialogOptions&quot;:{&quot;title&quot;:&quot;Send email&quot;,&quot;allowMaximize&quot;:true,&quot;allowMinimize&quot;:true,&quot;dblclick&quot;:&quot;maximize&quot;,&quot;maximizedHeightDecreaseBy&quot;:&quot;minimize-bar&quot;,&quot;width&quot;:1000}},&quot;createOnEvent&quot;:&quot;click&quot;}"><i class="icon-envelope hide-text">Send email</i> '+that.highlighter(item)+'</a></li>')
+                i = $('<li><a href="javascript: void(0);" class=" no-hash" data-id="95" data-url="/app_dev.php/email/create" title="Send email" data-page-component-module="oroui/js/app/components/widget-component" data-page-component-options="{&quot;type&quot;:&quot;dialog&quot;,&quot;multiple&quot;:true,&quot;refresh-widget-alias&quot;:&quot;activity-list-widget&quot;,&quot;options&quot;:{&quot;alias&quot;:&quot;email-dialog&quot;,&quot;dialogOptions&quot;:{&quot;title&quot;:&quot;Send email&quot;,&quot;allowMaximize&quot;:true,&quot;allowMinimize&quot;:true,&quot;dblclick&quot;:&quot;maximize&quot;,&quot;maximizedHeightDecreaseBy&quot;:&quot;minimize-bar&quot;,&quot;width&quot;:1000}},&quot;createOnEvent&quot;:&quot;click&quot;}"><i class="icon-envelope hide-text">Send email</i> '+that.highlighter(item.key)+'</a></li>')
             } else {
                 i = $(that.options.item).attr('data-value', item.key)
                 i.find('a').html(that.highlighter(item.key))
@@ -80,24 +80,5 @@ define([
         items.first().addClass('active')
         this.$menu.html(items)
         return this
-    }
-
-    $.fn.typeahead.Constructor.prototype.matcher = function (item) {
-        return ~item.key.toLowerCase().indexOf(this.query.toLowerCase())
-    }
-
-    $.fn.typeahead.Constructor.prototype.sorter=  function (items) {
-        var beginswith = []
-            , caseSensitive = []
-            , caseInsensitive = []
-            , item
-
-        while (item = items.shift()) {
-            if (!item.key.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item)
-            else if (~item.key.indexOf(this.query)) caseSensitive.push(item)
-            else caseInsensitive.push(item)
-        }
-
-        return beginswith.concat(caseSensitive, caseInsensitive)
     }
 });
