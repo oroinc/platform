@@ -5,7 +5,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class LdapTransportSettingsFormType  extends AbstractType
+class LdapTransportSettingsFormType extends AbstractType
 {
     const NAME = 'oro_ldap_ldap_transport_setting_form_type';
 
