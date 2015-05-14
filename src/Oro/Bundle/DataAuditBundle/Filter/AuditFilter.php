@@ -30,6 +30,12 @@ class AuditFilter extends EntityFilter
     /** @var string */
     protected $auditFieldAlias;
 
+    /** @var string */
+    protected $fieldParam;
+
+    /** @var string */
+    protected $objectClassParam;
+
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
@@ -46,8 +52,10 @@ class AuditFilter extends EntityFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        $this->auditAlias = uniqid('a');
-        $this->auditFieldAlias = uniqid('f');
+        $this->auditAlias = $ds->generateParameterName('a');
+        $this->auditFieldAlias = $ds->generateParameterName('f');
+        $this->fieldParam = $ds->generateParameterName('field');
+        $this->objectClassParam = $ds->generateParameterName('objectClass');
 
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
             throw new LogicException(sprintf(
@@ -69,31 +77,41 @@ class AuditFilter extends EntityFilter
 
         $identifier = $metadata->getIdentifier()[0];
 
-        $qb
-            ->join(
-                'Oro\Bundle\DataAuditBundle\Entity\Audit',
-                $this->auditAlias,
-                Expr\Join::WITH,
-                sprintf(
-                    '%s.objectClass = :objectClass AND %s.objectId = %s.%s',
-                    $this->auditAlias,
-                    $this->auditAlias,
-                    $objectAlias,
-                    $identifier
-                )
-            )
+        $auditQb = $qb
+            ->getEntityManager()
+            ->getRepository('OroDataAuditBundle:Audit')
+            ->createQueryBuilder($this->auditAlias);
+
+        $auditQb
+            ->select('1')
+            ->andWhere(sprintf('%s.objectClass = :%s', $this->auditAlias, $this->objectClassParam))
+            ->andWhere(sprintf('%s.objectId = %s.%s', $this->auditAlias, $objectAlias, $identifier))
             ->join(
                 sprintf('%s.fields', $this->auditAlias),
                 $this->auditFieldAlias,
                 Expr\Join::WITH,
-                sprintf('%s.field = :field', $this->auditFieldAlias)
+                sprintf('%s.field = :%s', $this->auditFieldAlias, $this->fieldParam)
             )
-            ->setParameter('objectClass', $objectClass)
-            ->setParameter('field', $fieldName)
+            ->setMaxResults(1);
+
+        $qb
+            ->setParameter($this->objectClassParam, $objectClass)
+            ->setParameter($this->fieldParam, $fieldName)
         ;
 
-        $this->applyFilter($ds, 'datetime', sprintf('%s.loggedAt', $this->auditAlias), $data['auditFilter']['data']);
-        $this->applyNewAuditValueFilter($ds, $objectClass, $fieldName, $data);
+        $auditDs = new OrmFilterDatasourceAdapter($auditQb);
+        $this->applyFilter($auditDs, 'datetime', sprintf('%s.loggedAt', $this->auditAlias), $data['auditFilter']['data']);
+        $this->applyNewAuditValueFilter($auditDs, $objectClass, $fieldName, $data);
+
+        $this->applyFilterToClause($ds, $ds->expr()->exists($auditQb->getQuery()->getDQL()));
+
+        foreach ($auditQb->getParameters() as $parameter) {
+            $qb->setParameter(
+                $parameter->getName(),
+                $parameter->getValue(),
+                $parameter->getType()
+            );
+        }
     }
 
     /**
