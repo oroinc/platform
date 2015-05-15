@@ -24,9 +24,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
 
         initialize: function(options) {
             var self = this;
+
             this.options = _.defaults(options || {}, this.options);
 
-            this.$body = jQuery('.shortcuts');
+            //this.$body = jQuery('.shortcuts');
             this.$el.val('');
 
             this.$el.typeahead({
@@ -41,9 +42,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
                         , item;
 
                     while (item = items.shift()) {
-                        if (!item.key.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item)
-                        else if (~item.key.indexOf(this.query)) caseSensitive.push(item)
-                        else caseInsensitive.push(item)
+                        if (!item.key.toLowerCase().indexOf(this.query.toLowerCase())) {
+                            beginswith.push(item)
+                        } else if (~item.key.indexOf(this.query)) {
+                            caseSensitive.push(item);
+                        } else {
+                            caseInsensitive.push(item);
+                        }
                     }
 
                     return beginswith.concat(caseSensitive, caseInsensitive)
@@ -53,7 +58,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
                     items = $(items).map(function (i, item) {
                         if (item.item.dialog_config) {
                             var config = item.item.dialog_config;
-                            //i = $('<a href="" class=" no-hash" data-id="95"
 
                             var options = {
                                     "type": config.widget.type,
@@ -138,7 +142,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
         },
 
         render: function() {
-            mediator.execute('layout:init', this.$body, this);
+            mediator.execute('layout:init', this.$el.closest('.shortcuts'), this);
             return this;
         }
     });
