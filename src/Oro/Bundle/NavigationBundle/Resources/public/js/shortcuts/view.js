@@ -26,8 +26,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
             var self = this;
 
             this.options = _.defaults(options || {}, this.options);
-
-            //this.$body = jQuery('.shortcuts');
             this.$el.val('');
 
             this.$el.typeahead({
