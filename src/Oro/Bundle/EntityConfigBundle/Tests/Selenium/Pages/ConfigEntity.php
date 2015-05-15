@@ -130,7 +130,8 @@ class ConfigEntity extends CustomEntity
     public function setActivitiesOn($activities = array())
     {
         foreach ($activities as $activity) {
-            $xpath = "//div[starts-with(@id,'oro_entity_config_type_activity_activities')]//label[contains(., '{$activity}')]";
+            $xpath = "//div[starts-with(@id,'oro_entity_config_type_activity_activities')]" .
+                "//label[contains(., '{$activity}')]";
             if (!($this->isElementPresent($xpath."/preceding-sibling::input[@checked='checked']"))) {
                 $this->test->byXPath($xpath."/preceding-sibling::input")->click();
             }
