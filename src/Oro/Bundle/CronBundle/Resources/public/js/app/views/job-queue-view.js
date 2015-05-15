@@ -8,7 +8,7 @@ define(function (require) {
         BaseView = require('oroui/js/app/views/base/view');
 
     JobQueueView = BaseView.extend({
-        events :{
+        events: {
             'click [data-action-name=run-daemon]': 'changeDemonState',
             'click [data-action-name=stop-daemon]': 'changeDemonState',
             'click .stack-trace a': 'toggleStateTrace'

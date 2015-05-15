@@ -47,7 +47,7 @@ class LayoutTestCase extends WebTestCase
         $html = preg_replace('/^\s+/m', '', $html);
 
         // replace uid from id attributes, see RandomIdExtension
-        $html = preg_replace('/="(\w+)-uid:\w+"/', '="${1}"', $html);
+        $html = preg_replace('/="(\w+)-uid-[a-z0-9]+"/', '="${1}"', $html);
 
         $html = rtrim($html);
 
