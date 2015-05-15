@@ -1,14 +1,15 @@
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'routing', 'oroui/js/mediator', 'bootstrap'
-    ], function ($, _, __, Backbone, routing, mediator) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'routing', 'oroui/js/mediator', 'bootstrap'
+    ], function ($, _, __, BaseView, routing, mediator) {
     'use strict';
 
+    var ShortcutsView;
     /**
-     * @export  oronavigation/js/shortcuts/view
+     * @export  oronavigation/js/app/views/shortcuts-view
      * @class   oronavigation.shortcuts.View
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    return Backbone.View.extend({
+    ShortcutsView = BaseView.extend({
         options: {
             el: '.shortcuts .input-large',
             source: null
@@ -23,10 +24,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
         cache: {},
 
         initialize: function(options) {
-            var self = this;
-
             this.options = _.defaults(options || {}, this.options);
             this.$el.val('');
+            this.options.source = this.$el.data('source') ? this.$el.data('source') : null;
 
             this.$el.typeahead({
                 source:_.bind(this.source, this),
@@ -144,4 +144,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
             return this;
         }
     });
+
+
+    return ShortcutsView;
 });

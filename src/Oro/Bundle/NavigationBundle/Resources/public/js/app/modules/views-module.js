@@ -34,6 +34,17 @@ require([
     });
 
     /**
+     * Init ShortcutsView
+     */
+    BaseController.loadBeforeAction([
+        'oronavigation/js/app/views/shortcuts-view'
+    ], function (ShortcutsView) {
+        BaseController.addToReuse('shortcuts', ShortcutsView, {
+            el: '.shortcuts .input'
+        });
+    });
+
+    /**
      * Init Favorite related views
      */
     BaseController.loadBeforeAction([
