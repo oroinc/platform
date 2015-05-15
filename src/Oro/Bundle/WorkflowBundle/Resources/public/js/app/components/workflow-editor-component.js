@@ -68,9 +68,9 @@ define(function (require) {
         /**
          * Helper function. Callback for _.map;
          *
-         * @param config {object}
-         * @param name {string}
-         * @returns {{}}
+         * @param {Object} config
+         * @param {string} name
+         * @returns {Object}
          * @private
          */
         _mergeName: function (config, name) {
@@ -81,7 +81,7 @@ define(function (require) {
         /**
          * Creates workflow model
          *
-         * @param options
+         * @param {Object} options
          * @returns {WorkflowModel}
          */
         createWorkflowModel: function (options) {
@@ -112,7 +112,7 @@ define(function (require) {
         /**
          * Opens a "Add transition" dialog
          *
-         * @param stepFrom {StepModel}
+         * @param {StepModel} stepFrom
          */
         addNewStepTransition: function (stepFrom) {
             var transition = new TransitionModel();
@@ -122,8 +122,8 @@ define(function (require) {
         /**
          * Opens "Edit transition" dialog
          *
-         * @param transition {TransitionModel}
-         * @param stepFrom {StepModel=}
+         * @param {TransitionModel} transition
+         * @param {StepModel=} stepFrom
          */
         openManageTransitionForm: function (transition, stepFrom) {
             if (this.model.get('steps').length === 1) {
@@ -149,7 +149,7 @@ define(function (require) {
         /**
          * Opens "Edit step" dialog
          *
-         * @param step {StepModel}
+         * @param {StepModel} step
          */
         openManageStepForm: function (step) {
             if (!this.workflowManagementView.isEntitySelected()) {
@@ -169,7 +169,7 @@ define(function (require) {
         /**
          * Utility function, adds step into workflow if it is unique
          *
-         * @param step {StepModel}
+         * @param {StepModel} step
          */
         addStep: function (step) {
             if (!this.model.get('steps').get(step.cid)) {
@@ -180,7 +180,7 @@ define(function (require) {
         /**
          * Opens "Clone step" dialog
          *
-         * @param step {StepModel} step to clone
+         * @param {StepModel} step - step to clone
          */
         cloneStep: function (step) {
             var clonedStep = this.model.cloneStep(step, true);
@@ -190,7 +190,7 @@ define(function (require) {
         /**
          * Opens "Remove step" dialog
          *
-         * @param step {StepModel} step to clone
+         * @param {StepModel} step - step to clone
          */
         removeStep: function (step) {
             this._removeHandler(step, __('Are you sure you want to delete this step?'));
@@ -199,9 +199,9 @@ define(function (require) {
         /**
          * Shows message in popup
          *
-         * @param message {string}
-         * @param title {string}
-         * @param okText {string}
+         * @param {string} message
+         * @param {string} title
+         * @param {string} okText
          * @private
          */
         _showModalMessage: function (message, title, okText) {
@@ -217,8 +217,8 @@ define(function (require) {
         /**
          * Handles model removement
          *
-         * @param model {Model}
-         * @param message {string} Message to show in confirmation dialog
+         * @param {Model} model
+         * @param {string} message - Message to show in confirmation dialog
          * @private
          */
         _removeHandler: function (model, message) {
@@ -391,8 +391,8 @@ define(function (require) {
         /**
          * Opens "clone transition" dialog
          *
-         * @param transition {TransitionModel}
-         * @param stepFrom {StepModel}
+         * @param {TransitionModel} transition
+         * @param {StepModel} stepFrom
          */
         cloneTransition: function (transition, stepFrom) {
             var clonedTransition = this.model.cloneTransition(transition, true);
@@ -402,8 +402,8 @@ define(function (require) {
         /**
          * Opens "add transition" dialog
          *
-         * @param transition {TransitionModel}
-         * @param stepFrom {StepModel}
+         * @param {TransitionModel} transition
+         * @param {StepModel} stepFrom
          */
         addTransition: function (transition, stepFrom) {
             if (!this.model.get('transitions').get(transition.cid)) {
@@ -433,7 +433,7 @@ define(function (require) {
         /**
          * Opens "Remove step" dialog
          *
-         * @param transition {TransitionModel}
+         * @param {TransitionModel} transition
          */
         removeTransition: function (transition) {
             this._removeHandler(transition, __('Are you sure you want to delete this transition?'));
