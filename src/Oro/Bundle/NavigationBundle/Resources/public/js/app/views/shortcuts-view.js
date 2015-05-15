@@ -54,9 +54,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 render: function (items) {
                     var that = this;
                     items = $(items).map(function (i, item) {
+                        var view;
+
                         if (item.item.dialog) {
                             var config = item.item.dialog_config;
-
                             var options = {
                                     "type": config.widget.type,
                                     "multiple":config.widget.multiple,
@@ -74,8 +75,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                                     },
                                     "createOnEvent":"click"};
 
-                            i = $(that.options.item).attr('data-value', item.key);
-                            i.find('a')
+                            view = $(that.options.item).attr('data-value', item.key);
+                            view.find('a')
                                 .attr('href', 'javascript: void(0);')
                                 .attr('class', config.aCss)
                                 .attr('data-url', routing.generate(config.dataUrl))
@@ -84,11 +85,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                                 .attr('data-page-component-options', JSON.stringify(options))
                                 .html('<i class="'+config.iCss+' hide-text">'+item.key+'</i>' + that.highlighter(item.key));
                         } else {
-                            i = $(that.options.item).attr('data-value', item.key);
-                            i.find('a').html(that.highlighter(item.key));
+                            view = $(that.options.item).attr('data-value', item.key);
+                            view.find('a').html(that.highlighter(item.key));
                         }
 
-                        return i[0];
+                        return view[0];
                     });
 
                     items.first().addClass('active');
