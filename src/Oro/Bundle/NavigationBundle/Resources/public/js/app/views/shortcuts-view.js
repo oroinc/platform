@@ -54,7 +54,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 render: function (items) {
                     var that = this;
                     items = $(items).map(function (i, item) {
-                        if (item.item.dialog_config) {
+                        if (item.item.dialog) {
                             var config = item.item.dialog_config;
 
                             var options = {

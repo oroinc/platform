@@ -1,5 +1,6 @@
 {% extends 'OroNavigationBundle:Menu:menu_base.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroNavigationBundle::macros.html.twig' as Navigation %}
 
 {% macro attributes(attributes) %}
     {% for name, value in attributes %}
@@ -115,30 +116,7 @@
     {% set extras = item.extras %}
 
     {% if extras.dialog is defined and extras.dialog %}
-        {{
-            UI.clientLink({
-                'dataUrl': path(extras.dialog_config.dataUrl),
-                'aCss': extras.dialog_config.aCss,
-                'iCss': extras.dialog_config.iCss,
-                'label' : extras.dialog_config.label|trans,
-                'widget' : {
-                    'type' : extras.dialog_config.widget.type,
-                    'multiple' : extras.dialog_config.widget.multiple,
-                    'refresh-widget-alias': extras.dialog_config.widget.refreshWidgetAlias,
-                    'options' : {
-                        'alias': extras.dialog_config.widget.options.alias,
-                        'dialogOptions' : {
-                            'title' : extras.dialog_config.widget.options.dialogOptions.title|trans,
-                            'allowMaximize': extras.dialog_config.widget.options.dialogOptions.allowMaximize,
-                            'allowMinimize': extras.dialog_config.widget.options.dialogOptions.allowMinimize,
-                            'dblclick': extras.dialog_config.widget.options.dialogOptions.dblclick,
-                            'maximizedHeightDecreaseBy': extras.dialog_config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
-                            'width': extras.dialog_config.widget.options.dialogOptions.width
-                        }
-                    }
-                }
-            })
-        }}
+        {{ Navigation.renderClientLink(extras.dialog_config) }}
     {%- else %}
         <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
     {% endif %}

@@ -1,5 +1,6 @@
 {% extends bap.layout %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroNavigationBundle::macros.html.twig' as Navigation %}
 
 {% block title %}{% trans %}Shortcut Actions List{% endtrans %}{% endblock %}
 {% block content %}
@@ -20,30 +21,7 @@
                     <tr>
                         {% if action.dialog is defined and action.dialog %}
                             <td>
-                                {{
-                                    UI.clientLink({
-                                        'dataUrl': path(action.dialog_config.dataUrl),
-                                        'aCss': action.dialog_config.aCss,
-                                        'iCss': action.dialog_config.iCss,
-                                        'label' : action.dialog_config.label|trans,
-                                        'widget' : {
-                                            'type' : action.dialog_config.widget.type,
-                                            'multiple' : action.dialog_config.widget.multiple,
-                                            'refresh-widget-alias': action.dialog_config.widget.refreshWidgetAlias,
-                                            'options' : {
-                                                'alias': action.dialog_config.widget.options.alias,
-                                                'dialogOptions' : {
-                                                    'title' : action.dialog_config.widget.options.dialogOptions.title|trans,
-                                                    'allowMaximize': action.dialog_config.widget.options.dialogOptions.allowMaximize,
-                                                    'allowMinimize': action.dialog_config.widget.options.dialogOptions.allowMinimize,
-                                                    'dblclick': action.dialog_config.widget.options.dialogOptions.dblclick,
-                                                    'maximizedHeightDecreaseBy': action.dialog_config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
-                                                    'width': action.dialog_config.widget.options.dialogOptions.width
-                                                }
-                                            }
-                                        }
-                                    })
-                                }}
+                                {{ Navigation.renderClientLink(action.dialog_config) }}
                             </td>
                             <td>{{ action.description|trans }}</td>
                         {% else %}

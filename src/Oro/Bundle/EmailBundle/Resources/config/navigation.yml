@@ -28,7 +28,7 @@ oro_menu_config:
                     dataUrl: 'oro_email_email_create'
                     aCss: 'no-hash'
                     iCss: ''
-                    label : 'oro.email.send_email'
+                    label : 'oro.email.menu.shortcut_compose_email.label'
                     widget :
                         type: 'dialog'
                         multiple : true
@@ -36,7 +36,7 @@ oro_menu_config:
                         options :
                             alias: 'email-dialog'
                             dialogOptions :
-                                title : 'oro.email.send_email'
+                                title : 'oro.email.menu.shortcut_compose_email.label'
                                 allowMaximize: true
                                 allowMinimize: true
                                 dblclick: 'maximize'
