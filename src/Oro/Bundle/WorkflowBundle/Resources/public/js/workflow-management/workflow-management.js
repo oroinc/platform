@@ -60,8 +60,8 @@ function (_, Chaplin, $, __,
             this.model.trigger('saveWorkflow', e);
         },
 
-        setSubmitActor: function () {
-            this.submitActor = this;
+        setSubmitActor: function (e) {
+            this.submitActor = e.target;
         },
 
         initStartStepSelector: function () {

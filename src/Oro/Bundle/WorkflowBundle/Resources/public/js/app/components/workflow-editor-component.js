@@ -100,10 +100,11 @@ define(function (require) {
             configuration.entity_attribute = options.entity.entity_attribute;
             configuration.start_step = options.entity.startStep;
             configuration.steps_display_ordered = options.entity.stepsDisplayOrdered;
-            configuration.url = options._sourceElement.attr('action');
 
             workflowModel = new WorkflowModel(configuration);
             workflowModel.setSystemEntities(options.system_entities);
+
+            workflowModel.url = options._sourceElement.attr('action');
 
             return workflowModel;
         },
@@ -324,7 +325,7 @@ define(function (require) {
                     var redirectUrl = '',
                         modelName = this.model.get('name'),
                         saveAndClose = this.workflowManagementView.submitActor &&
-                            this.workflowManagementView.submitActor.is('[data-action="save_and_stay"]');
+                            !$(this.workflowManagementView.submitActor).is('[data-action="save_and_stay"]');
                     if (saveAndClose) {
                         redirectUrl = routing.generate('oro_workflow_definition_view', { name: modelName });
                     } else {
