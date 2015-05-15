@@ -258,3 +258,23 @@ table .thead-sizing {
     }
   }
 }
+td > .nowrap-ellipsis {
+  position: relative;
+  min-width: 100px;
+  > div {
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+}
+.td-expander {
+  font-size: 30px;
+  line-height: 0;
+  height: 0;
+  overflow: hidden;
+  &:before, &:after {
+    content: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ';
+  }
+}
