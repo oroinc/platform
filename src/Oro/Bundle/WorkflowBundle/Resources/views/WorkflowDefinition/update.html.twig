@@ -10,7 +10,7 @@
                     label: entity.label,
                     entity: entity.relatedEntity,
                     entity_attribute: entity.entityAttributeName | default('entity'),
-                    startStep: entity.startStep.name,
+                    startStep: entity.startStep.name | default(null),
                     stepsDisplayOrdered: entity.stepsDisplayOrdered,
                 },
                 system_entities: system_entities
