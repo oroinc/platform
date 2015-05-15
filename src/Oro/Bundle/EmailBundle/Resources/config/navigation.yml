@@ -17,11 +17,11 @@ oro_menu_config:
             extras:
                 position: 15
 
-        shortcut_send_email:
-            label: 'oro.email.menu.shortcut_send_email.label'
+        shortcut_compose_email:
+            label: 'oro.email.menu.shortcut_compose_email.label'
             route: 'oro_email_email_create'
             extras:
-                description: 'oro.email.menu.shortcut_send_email.description'
+                description: 'oro.email.menu.shortcut_compose_email.description'
                 isCustomAction: true
                 dialog: true
                 dialog_config:
@@ -56,7 +56,7 @@ oro_menu_config:
                 oro_email_user_emails: ~
         shortcuts:
             children:
-                shortcut_send_email: ~
+                shortcut_compose_email: ~
 
 oro_titles:
     oro_email_view: "%%subject%% - My Emails - %%username%%"

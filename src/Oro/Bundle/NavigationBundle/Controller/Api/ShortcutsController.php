@@ -83,14 +83,11 @@ class ShortcutsController extends FOSRestController
      */
     protected function getData($item)
     {
+        $data = ['url' => $item->getUri()];
+
         if ($item->getExtra('dialog')) {
-            $data = [
-                'url' => $item->getUri(),
-                'dialog' => $item->getExtra('dialog'),
-                'dialog_config' => $item->getExtra('dialog_config')
-            ];
-        } else {
-            $data = ['url' => $item->getUri()];
+            $data['dialog'] = $item->getExtra('dialog');
+            $data['dialog_config'] = $item->getExtra('dialog_config');
         }
 
         return $data;

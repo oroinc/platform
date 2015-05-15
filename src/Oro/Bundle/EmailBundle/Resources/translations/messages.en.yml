@@ -95,8 +95,8 @@ oro:
         menu:
             emailtemplate_list.description: List of email templates
             user_emails: My Emails
-            shortcut_send_email.label: Send email
-            shortcut_send_email.description: Send email
+            shortcut_compose_email.label: Compose email
+            shortcut_compose_email.description: Compose email
 
         datagrid:
             emailtemplate:

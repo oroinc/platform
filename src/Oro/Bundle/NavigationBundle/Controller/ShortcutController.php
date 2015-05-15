@@ -72,20 +72,15 @@ class ShortcutController extends Controller
      */
     protected function getData($item)
     {
+        $data = [
+            'url' => $item->getUri(),
+            'label' => $item->getLabel(),
+            'description' => $item->getExtra('description')
+        ];
+
         if ($item->getExtra('dialog')) {
-            $data = array(
-                'url' => $item->getUri(),
-                'label' => $item->getLabel(),
-                'description' => $item->getExtra('description'),
-                'dialog' => $item->getExtra('dialog'),
-                'dialog_config' => $item->getExtra('dialog_config')
-            );
-        } else {
-            $data = array(
-                'url' => $item->getUri(),
-                'label' => $item->getLabel(),
-                'description' => $item->getExtra('description')
-            );
+            $data['dialog'] = $item->getExtra('dialog');
+            $data['dialog_config'] = $item->getExtra('dialog_config');
         }
 
         return $data;
