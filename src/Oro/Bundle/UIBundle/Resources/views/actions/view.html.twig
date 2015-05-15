@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="layout-content"
-        {% if pageComponent is defined %}{% UI.renderPageComponentAttributes(pageComponent) %}{% endif %}
+        {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}
         >
     <div class="container-fluid page-title">
         {% block workflowStepListContainer %}
