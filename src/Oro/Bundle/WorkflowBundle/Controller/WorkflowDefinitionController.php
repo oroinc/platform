@@ -83,9 +83,21 @@ class WorkflowDefinitionController extends Controller
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
+
+        /*
+         * Translate attribute labels
+         */
+        /** @var TranslatorInterface $translator */
+        $translator = $this->get('translator');
+        $configuration = $workflowDefinition->getConfiguration();
+        foreach ($configuration['attributes'] as $attrName => $attrConfig) {
+            $configuration['attributes'][$attrName]['translated_label'] = $translator->trans($attrConfig['label']);
+        }
+
         return array(
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
+            'entityConfiguration' => $configuration,
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
         );
