@@ -65,8 +65,7 @@ class EmailBodyAddListener
      */
     public function linkToScope(EmailBodyAdded $event)
     {
-        if (
-            $this->securityFacade->getToken() !== null
+        if ($this->securityFacade->getToken() !== null
             && !$this->securityFacade->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)
         ) {
             return;

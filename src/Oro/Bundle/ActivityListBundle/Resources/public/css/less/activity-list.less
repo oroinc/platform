@@ -1,6 +1,5 @@
 @import "../../../oroui/css/less/mixins";
 .activity-list-widget {
-  min-width: 700px;
   position: relative;
   .actions-bottom {
     border-top: 1px solid #ddd;
@@ -80,7 +79,6 @@
       margin-left: 5px;
       .icon {
         width: auto;
-        padding: 0 3px;
         font-size: 14px;
       }
     }
@@ -94,7 +92,7 @@
     }
   }
   .accordion-heading {
-    height: 46px;
+    min-height: 46px;
     width: 100%;
     padding: 5px 10px;
     cursor: pointer;
@@ -104,7 +102,6 @@
     }
 
     >.icon, >.accordion-icon, >.details, >.comment-count, >.message, >.created-at, >.actions {
-      position: absolute;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -113,6 +110,9 @@
     > .accordion-icon {
       padding: 0;
       margin: 7px 0 0 5px;
+      float: left;
+      line-height: 20px;
+      height: 20px;
       &:before {
         content: '\f117';
         font-family: FontAwesome;
@@ -127,22 +127,25 @@
       }
     }
     > .icon {
+      float: left;
       width: 27px;
       font-size: 18px;
       color: #999;
-      margin: 8px 0 0 26px;
+      margin: 8px 0 0 10px;
     }
 
     > .actions{
-      right: 5px;
-      margin: 8px 0px 0px 0px;
+      float: right;
+      margin: 8px 0 0 8px;
       overflow: visible;
       .horizontal-icon-menu;
     }
     > .details {
-      margin: 9px 0px 0px 55px;
-      padding: 0px 5px;
-      width: 247px;
+      margin: 7px 7px 0 0;
+      max-width: 247px;
+      min-width: 247px;
+      padding-bottom: 1px;
+      float: left;
     }
     > .details:hover {
       background: #fafafa;
@@ -150,17 +153,18 @@
       z-index: 1;
     }
     > .created-at {
-      right: 41px;
-      margin-top: 8px;
+      float: right;
+      margin: 7px 0 -1px 8px;
       color: #888;
     }
     > .comment-count {
-      right: 165px;
+      float: right;
       margin-top: 8px;
     }
     > .message-item {
-      margin: 9px 215px 0 318px;
-      width: calc(~"100% - 545px");
+      margin: 7px 0 0 0;
+      float: left;
+      width: calc(~"100% - 510px");
       color: #888;
     }
   }
@@ -199,4 +203,43 @@
       padding-bottom: 5px;
     }
   }
+}
+@media screen and (max-width: 650px){
+  .mobile-version .activity-list-widget {
+    .grid-toolbar .btn-group {
+      margin: 0 10px 10px 0;
+    }
+    .pagination {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .accordion > .items {
+      .message-item {
+        clear: left;
+        margin-left: 4px;
+        width: calc(~"100% - 186px");
+      }
+      .details {
+        min-width: 0;
+        max-width: calc(~"100% - 72px");
+        margin-right: 0;
+      }
+      .actions {
+        margin-left: 0;
+        margin-right: -10px;
+      }
+    }
+    .accordion-body {
+      .widget-content > .responsive-block {
+        min-width: 100%;
+      }
+      .message .comment {
+        padding: 0 ;
+      }
+    }
+  }
+}
+.mobile-version .activity-list-widget .accordion-body .message .comment {
+  padding-right: 0;
 }

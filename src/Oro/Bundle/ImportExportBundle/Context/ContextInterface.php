@@ -25,9 +25,9 @@ interface ContextInterface
     public function getFailureExceptions();
 
     /**
-     * @return void
+     * @param int $incrementBy
      */
-    public function incrementReadCount();
+    public function incrementReadCount($incrementBy = 1);
 
     /**
      * @return int
@@ -45,9 +45,9 @@ interface ContextInterface
     public function getReadOffset();
 
     /**
-     * @return void
+     * @param int $incrementBy
      */
-    public function incrementAddCount();
+    public function incrementAddCount($incrementBy = 1);
 
     /**
      * @return int
@@ -55,9 +55,9 @@ interface ContextInterface
     public function getAddCount();
 
     /**
-     * @return void
+     * @param int $incrementBy
      */
-    public function incrementUpdateCount();
+    public function incrementUpdateCount($incrementBy = 1);
 
     /**
      * @return int
@@ -65,9 +65,9 @@ interface ContextInterface
     public function getUpdateCount();
 
     /**
-     * @return void
+     * @param int $incrementBy
      */
-    public function incrementReplaceCount();
+    public function incrementReplaceCount($incrementBy = 1);
 
     /**
      * @return int
@@ -75,9 +75,9 @@ interface ContextInterface
     public function getReplaceCount();
 
     /**
-     * @return void
+     * @param int $incrementBy
      */
-    public function incrementDeleteCount();
+    public function incrementDeleteCount($incrementBy = 1);
 
     /**
      * @return int
@@ -85,9 +85,9 @@ interface ContextInterface
     public function getDeleteCount();
 
     /**
-     * @return void
+     * @param int $incrementBy
      */
-    public function incrementErrorEntriesCount();
+    public function incrementErrorEntriesCount($incrementBy = 1);
 
     /**
      * @return int

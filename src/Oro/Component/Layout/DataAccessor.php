@@ -65,7 +65,7 @@ class DataAccessor implements DataAccessorInterface
                 sprintf('Could not load the data provider "%s".', $name)
             );
         } elseif ($dataProvider instanceof DataProviderInterface) {
-            return $dataProvider->getData();
+            return $dataProvider->getData($this->context);
         } else {
             return $this->context->data()->get($name);
         }
@@ -104,8 +104,8 @@ class DataAccessor implements DataAccessorInterface
      *
      * @return mixed The returned values:
      *               DataProviderInterface if the data provider is loaded
-     *               string if data should be loaded from the layout context
-     *               bool if the requested data cannot be loaded
+     *               mixed if data should be loaded from the layout context
+     *               false if the requested data cannot be loaded
      */
     protected function getDataProvider($name)
     {
@@ -114,14 +114,10 @@ class DataAccessor implements DataAccessorInterface
         }
 
         $dataProvider = $this->registry->findDataProvider($name);
-        if ($dataProvider !== null) {
-            if ($dataProvider instanceof ContextAwareInterface) {
-                $dataProvider->setContext($this->context);
-            }
-        } elseif ($this->context->data()->has($name)) {
-            $dataProvider = $this->context->data()->getIdentifier($name);
-        } else {
-            $dataProvider = false;
+        if ($dataProvider === null) {
+            $dataProvider = $this->context->data()->has($name)
+                ? $this->context->data()->getIdentifier($name)
+                : false;
         }
         $this->dataProviders[$name] = $dataProvider;
 

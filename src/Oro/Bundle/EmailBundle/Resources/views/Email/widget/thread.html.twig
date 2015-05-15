@@ -13,7 +13,8 @@
 {% endif %}
 {% set threadViewOptions = {
     view: 'oroemail/js/app/views/email-thread-view',
-    actionPanelSelector: '.email-thread-action-panel'
+    actionPanelSelector: '.email-thread-action-panel',
+    name: 'email-thread'
 } %}
 {% set threadViewOptions = threadViewOptions|merge({isBaseView: not renderContexts}) %}
 <div class="widget-content thread-view"
