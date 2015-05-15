@@ -114,7 +114,7 @@
     {% import _self as oro_menu %}
     {% set extras = item.extras %}
 
-    {% if extras.dialog is defined %}
+    {% if extras.dialog is defined and extras.dialog %}
         {{
             UI.clientLink({
                 'dataUrl': path(extras.dialog_config.dataUrl),

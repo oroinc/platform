@@ -18,7 +18,7 @@
                 <tbody>
                 {% for action in actionsList if action.url %}
                     <tr>
-                        {% if action.dialog_config is defined %}
+                        {% if action.dialog is defined and action.dialog %}
                             <td>
                                 {{
                                     UI.clientLink({

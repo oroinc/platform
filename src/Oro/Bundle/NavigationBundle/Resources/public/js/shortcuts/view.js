@@ -83,7 +83,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'rou
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html('<i class="'+config.iCss+' hide-text">'+item.key+'</i> ' + that.highlighter(item.key));
+                                .html('<i class="'+config.iCss+' hide-text">'+item.key+'</i>' + that.highlighter(item.key));
                         } else {
                             i = $(that.options.item).attr('data-value', item.key);
                             i.find('a').html(that.highlighter(item.key));
