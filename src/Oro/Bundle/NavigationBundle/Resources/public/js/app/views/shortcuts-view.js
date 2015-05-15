@@ -72,8 +72,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                                             "width":config.widget.options.dialogOptions.width
                                         }
                                     },
-                                    "createOnEvent":"click"}
-                            ;
+                                    "createOnEvent":"click"};
 
                             i = $(that.options.item).attr('data-value', item.key);
                             i.find('a')
@@ -144,7 +143,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             return this;
         }
     });
-
 
     return ShortcutsView;
 });
