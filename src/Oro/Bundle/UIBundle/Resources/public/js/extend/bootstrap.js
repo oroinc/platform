@@ -64,21 +64,21 @@ define([
             });
     }
 
-    function Typeahead (element, options) {
-        this.$element = $(element);
-        this.options = $.extend({}, $.fn.typeahead.defaults, options);
-        this.matcher = this.options.matcher || this.matcher;
-        this.sorter = this.options.sorter || this.sorter;
-        this.highlighter = this.options.highlighter || this.highlighter;
-        this.updater = this.options.updater || this.updater;
-        this.render = this.options.render || this.render;
-        this.source = this.options.source;
-        this.$menu = $(this.options.menu);
-        this.shown = false;
-        this.listen();
-    }
+    /**
+     * This customization allows to define own render function for Typeahead
+     */
 
-    Typeahead.prototype = $.fn.typeahead.Constructor.prototype;
+    var Typeahead,
+        origTypeahead = $.fn.typeahead.Constructor,
+        origFnTypeahead = $.fn.typeahead;
+
+    Typeahead = function (element, options) {
+        origTypeahead.apply(this, arguments);
+        this.render = this.options.render || this.render;
+    };
+
+    Typeahead.prototype = origTypeahead.prototype;
+    Typeahead.prototype.constructor = Typeahead;
 
     $.fn.typeahead = function (option) {
         return this.each(function () {
@@ -88,15 +88,9 @@ define([
             if (!data) $this.data('typeahead', (data = new Typeahead(this, options)))
             if (typeof option == 'string') data[option]()
         })
-    }
+    };
 
-    $.fn.typeahead.defaults = {
-        source: []
-        , items: 8
-        , menu: '<ul class="typeahead dropdown-menu"></ul>'
-        , item: '<li><a href="#"></a></li>'
-        , minLength: 1
-    }
-
-    $.fn.typeahead.Constructor = Typeahead
+    $.fn.typeahead.defaults = origFnTypeahead.defaults;
+    $.fn.typeahead.Constructor = Typeahead;
+    $.fn.typeahead.noConflict = origFnTypeahead.noConflict;
 });
