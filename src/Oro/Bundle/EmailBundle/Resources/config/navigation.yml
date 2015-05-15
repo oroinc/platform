@@ -27,7 +27,7 @@ oro_menu_config:
                 dialog_config:
                     dataUrl: 'oro_email_email_create'
                     aCss: 'no-hash'
-                    iCss: 'icon-envelope'
+                    iCss: ''
                     label : 'oro.email.send_email'
                     widget :
                         type: 'dialog'
