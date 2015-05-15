@@ -7,9 +7,12 @@ datagrid:
                 select:
                     - partial e.{id, subject, sentAt, thread}
                 from:
-                    - { table: OroEmailBundle:Email, alias: e }
+                    - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
                     left:
+                        -
+                            join: eu.email
+                            alias: e
                         -
                             join: e.recipients
                             alias: r_to
@@ -104,8 +107,12 @@ datagrid:
                 select:
                     - partial e.{id, subject, receivedAt, sentAt}
                 from:
-                    - { table: OroEmailBundle:Email, alias: e }
+                    - { table: OroEmailBundle:Email, alias: eu }
                 join:
+                    left:
+                        -
+                            join: eu.email
+                            alias: e
                     inner:
                         - { join: e.folders, alias: f }
                         - { join: f.origin, alias: o }

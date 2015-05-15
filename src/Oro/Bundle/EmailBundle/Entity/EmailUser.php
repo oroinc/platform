@@ -2,18 +2,27 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Doctrine\ORM\Mapping as ORM;
+
+use JMS\Serializer\Annotation as JMS;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Email
+ * EmailUser
  *
  * @ORM\Table(
  *      name="oro_email_user",
  *      indexes={
- *          @ORM\Index(name="oro_email_is_head", columns={"is_head"})
+ *          @ORM\Index(name="oro_email_user_is_head", columns={"is_head"})
  *      }
  * )
+ * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  *
  * @Config(
@@ -105,6 +114,7 @@ class EmailUser
      * @var EmailFolder $folder
      *
      * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
+     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false)
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
      */
@@ -113,9 +123,10 @@ class EmailUser
     /**
      * @var Email $email
      *
-     * @ORM\ManyToOne(targetEntity="Email", inverserBy="emailUsers")
+     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false)
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\Email")
-     * @JSM\Exclude
+     * @JMS\Exclude
      */
     protected $email;
 

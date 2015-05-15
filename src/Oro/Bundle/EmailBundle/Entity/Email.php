@@ -12,8 +12,6 @@ use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Email
@@ -653,6 +651,14 @@ class Email extends ExtendEmail
     }
 
     /**
+     * @return ArrayCollection
+     */
+    public function getEmailUsers()
+    {
+        return $this->emailUsers;
+    }
+
+    /**
      * @param EmailUser $emailUser
      *
      * @return $this
@@ -678,5 +684,20 @@ class Email extends ExtendEmail
         }
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFolders()
+    {
+        $folders = [];
+
+        foreach ($this->getEmailUsers() as $emailUser) {
+            /** @var EmailUser $emailUser */
+            $folders[] = $emailUser->getFolder();
+        }
+
+        return $folders;
     }
 }

@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class RemoveOldRelation implements Migration
+class RemoveOldSchema implements Migration
 {
     /**
      * {@inheritDoc}
@@ -35,5 +35,20 @@ class RemoveOldRelation implements Migration
         if ($emailBodyTable->hasColumn('email_id')) {
             $emailBodyTable->dropColumn('email_id');
         }
+
+/*        $emailTable = $schema->getTable('oro_email');
+
+        $emailTable->removeForeignKey('FK_2A30C17132C8A3DE');
+        $emailTable->removeForeignKey('FK_2A30C1719EB185F9');
+
+        $emailTable->dropIndex('oro_email_is_head');
+        $emailTable->dropIndex('IDX_2A30C17132C8A3DE');
+        $emailTable->dropIndex('IDX_2A30C1719EB185F9');
+
+        $emailTable->dropColumn('organization_id');
+        $emailTable->dropColumn('user_owner_id,');
+        $emailTable->dropColumn('received');
+        $emailTable->dropColumn('is_head');
+        $emailTable->dropColumn('is_seen');*/
     }
 }

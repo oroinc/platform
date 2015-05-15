@@ -229,11 +229,13 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function processDuplicateEmails(EntityManager $em)
     {
+        // todo CRM-2480
         $existingEmails = $this->getExistingEmails($em);
         if (!empty($existingEmails)) {
             // add existing emails to new folders and remove these emails from the list
             foreach ($existingEmails as $existingEmail) {
                 foreach ($this->emails as $key => $email) {
+                    /** @var Email $email */
                     if ($this->areEmailsEqual($email, $existingEmail)) {
                         $folders = $email->getFolders();
                         foreach ($folders as $folder) {
