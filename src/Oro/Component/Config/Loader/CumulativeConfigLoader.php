@@ -52,13 +52,20 @@ class CumulativeConfigLoader
     {
         $result = [];
 
-        $bundles = CumulativeResourceManager::getInstance()->getBundles();
-        foreach ($bundles as $bundleClass) {
-            $reflection = new \ReflectionClass($bundleClass);
-            $bundleDir  = dirname($reflection->getFilename());
+        $resourceDir = '';
+        $bundles     = CumulativeResourceManager::getInstance()->getBundles();
+        $rootDir     = CumulativeResourceManager::getInstance()->getRootDir();
+
+        foreach ($bundles as $bundleName => $bundleClass) {
+            $reflection  = new \ReflectionClass($bundleClass);
+            $bundleDir   = dirname($reflection->getFileName());
+            if (is_dir($rootDir)) {
+                $resourceDir = $rootDir . '/Resources/' . $bundleName;
+            }
+
             /** @var CumulativeResourceLoader $resourceLoader */
             foreach ($this->resourceLoaders as $resourceLoader) {
-                $resource = $resourceLoader->load($bundleClass, $bundleDir);
+                $resource = $resourceLoader->load($bundleClass, $bundleDir, $resourceDir);
                 if (null !== $resource) {
                     if (is_array($resource)) {
                         foreach ($resource as $res) {

@@ -80,14 +80,13 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir)
+    public function load($bundleClass, $bundleDir, $resourceDir = '')
     {
-        $path = $bundleDir . $this->relativeFilePath;
-        if (!is_file($path)) {
-            return null;
-        }
+        $realPath = $this->getFilePath($bundleDir, $resourceDir);
 
-        $realPath = realpath($path);
+        if ($realPath === null) {
+            return [];
+        }
 
         return new CumulativeResourceInfo(
             $bundleClass,
@@ -95,6 +94,58 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
             $realPath,
             $this->loadFile($realPath)
         );
+    }
+
+    /**
+     * Returns realpath for source file if file exists or null if file does not exists
+     *
+     * @param string $bundleDir The bundle root directory
+     * @param string $resourceDir
+     * @return string|null
+     */
+    public function getFilePath($bundleDir, $resourceDir)
+    {
+        $path = $this->getResourcesFilePath($resourceDir);
+        if ($path === null) {
+            $path = $this->getBundleResourcesFilePath($bundleDir);
+        }
+        return $path;
+    }
+
+    /**
+     * Returns realpath for source file if file exists in the $resourceDir directory
+     *         or null if file does not exists
+     *
+     * @param string $resourceDir
+     * @return null|string
+     */
+    protected function getResourcesFilePath($resourceDir)
+    {
+        if (is_dir($resourceDir)) {
+            $path = $resourceDir . preg_replace('/Resources\//', '', $this->relativeFilePath, 1);
+            if (is_file($path)) {
+                return realpath($path);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns realpath for source file in the <Bundle> Resources directory if file exists
+     *         or null if file does not exists
+     *
+     * @param string $bundleDir The bundle root directory
+     * @return null|string
+     */
+    protected function getBundleResourcesFilePath($bundleDir)
+    {
+        $path = $bundleDir . $this->relativeFilePath;
+        if (is_file($path)) {
+            return realpath($path);
+        }
+
+        return null;
     }
 
     /**

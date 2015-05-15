@@ -24,9 +24,10 @@ interface CumulativeResourceLoader extends \Serializable
      *
      * @param string $bundleClass The full name of bundle class
      * @param string $bundleDir   The bundle root directory
+     * @param string $resourceDir Directory to the priority resource
      * @return CumulativeResourceInfo|CumulativeResourceInfo[]|null
      */
-    public function load($bundleClass, $bundleDir);
+    public function load($bundleClass, $bundleDir, $resourceDir = '');
 
     /**
      * Registers the resource located in the given bundle as found.

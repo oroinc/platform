@@ -67,14 +67,14 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir)
+    public function load($bundleClass, $bundleDir, $resourceDir = '')
     {
         $result = [];
 
         foreach ($this->fileResourceLoaders as $loader) {
             $split = $this->preparedRelativeFilePaths[(string)$loader->getResource()];
             if (!$split['folder']) {
-                $this->addLoadedResource($result, $loader->load($bundleClass, $bundleDir));
+                $this->addLoadedResource($result, $loader->load($bundleClass, $bundleDir, $resourceDir));
             } else {
                 $dir = $bundleDir . $split['baseDir'];
                 if (is_dir($dir)) {
@@ -88,7 +88,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
                                 $split['baseDir'] . DIRECTORY_SEPARATOR . $file->getFilename() . $split['relPath'];
                             try {
                                 $loader->setRelativeFilePath($currentRelativeFilePath);
-                                $this->addLoadedResource($result, $loader->load($bundleClass, $bundleDir));
+                                $this->addLoadedResource($result, $loader->load($bundleClass, $bundleDir, $resourceDir));
                             } catch (\Exception $e) {
                                 $loader->setRelativeFilePath($originalRelativeFilePath);
                                 throw $e;

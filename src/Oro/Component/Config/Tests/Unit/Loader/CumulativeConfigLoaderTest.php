@@ -137,10 +137,46 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
         );
         $expectedResource->addFound(
             get_class($bundle),
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/test.yml')
+            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/' . $resourceRelativePath)
         );
         $this->assertCount(1, $container->getResources());
         $this->assertEquals($expectedResource, $container->getResources()[0]);
+    }
+
+    public function testLoadWithPriorityDirectory()
+    {
+        $pathWithoutResources = '/config/test.yml';
+        $resourceRelativePath = 'Resources' . $pathWithoutResources;
+        $bundle               = new TestBundle1();
+        $bundleDir            = dirname((new \ReflectionClass($bundle))->getFileName());
+        $resourceDir          = realpath($bundleDir . '/../../app');
+        $resourceLoader       = new YamlCumulativeFileLoader($resourceRelativePath);
+
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles(['TestBundle1' => get_class($bundle)])
+            ->setRootDir($resourceDir);
+
+        $container = new ContainerBuilder();
+        $loader    = new CumulativeConfigLoader('test', $resourceLoader);
+        $result    = $loader->load($container);
+
+        $this->assertEquals(
+            [
+                new CumulativeResourceInfo(
+                    get_class($bundle),
+                    'test',
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $resourceDir . '/Resources/TestBundle1' . $pathWithoutResources
+                    ),
+                    ['test' => 456]
+                )
+            ],
+            $result
+        );
+        CumulativeResourceManager::getInstance()->setRootDir(null);
     }
 
     public function testLoadWithoutContainer()

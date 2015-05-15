@@ -37,7 +37,7 @@ class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir)
+    public function load($bundleClass, $bundleDir, $resourceDir = '')
     {
         $finder = $this->getFileFinder($bundleDir);
         if (!$finder) {

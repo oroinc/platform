@@ -125,13 +125,88 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir)
+    public function load($bundleClass, $bundleDir, $resourceDir = '')
     {
-        $dir      = $this->getDirectoryAbsolutePath($bundleDir);
-        $realPath = realpath($dir);
+        $dir     = $this->getDirectoryAbsolutePath($bundleDir);
+        $resData = [];
 
-        if (!is_dir($realPath)) {
+        if (is_dir($resourceDir)) {
+            $resDir  = $this->getResourcesDirectoryAbsolutePath($resourceDir);
+            $resData = $this->getData($resDir);
+        }
+
+        $data = $this->mergeArray($resData, $this->getData($dir), $resourceDir, $bundleDir);
+        if (empty($data)) {
             return null;
+        }
+
+        return new CumulativeResourceInfo($bundleClass, $this->getResource(), realpath($dir), $data);
+    }
+
+    /**
+     * Recursively merges two arrays into one. If files have the same location,
+     *                                         the priority remains for the array $a
+     *
+     * @param array $a            Array to merge
+     * @param array $b            Array, which merges with the previous one
+     * @param string $resourceDir Directory to the priority resource
+     * @param string $bundleDir   The bundle root directory
+     * @return array              Merged array
+     */
+    public function mergeArray(array $a, array $b, $resourceDir, $bundleDir)
+    {
+        foreach ($b as $k => $v) {
+            if (is_int($k)) {
+                foreach ($a as $val) {
+                    if ($this->isFilePathEquals($val, $v, $resourceDir, $bundleDir)) {
+                        continue 2;
+                    }
+                }
+                $a[] = $v;
+            } else {
+                if (is_array($v) && isset($a[$k]) && is_array($a[$k])) {
+                    $a[$k] = $this->mergeArray($a[$k], $v, $resourceDir, $bundleDir);
+                } else {
+                    $a[$k] = $v;
+                }
+            }
+        }
+
+        return $a;
+    }
+
+    /**
+     * Equals end of files names from $resourceDir and $bundleDir
+     *
+     * @param string $resourcesPath Path to the resource file from $resourceDir
+     * @param string $bundlePath    Path to the resource file from $bundlePath
+     * @param string $resourceDir   Directory to the priority resource
+     * @param string $bundleDir     The bundle root directory
+     *
+     * @return bool
+     */
+    protected function isFilePathEquals($resourcesPath, $bundlePath, $resourceDir, $bundleDir)
+    {
+        $a = str_replace($bundleDir . DIRECTORY_SEPARATOR . 'Resources', '', $bundlePath);
+        $b = str_replace($resourceDir, '', $resourcesPath);
+        if ($a === $b) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all data from the directory $dir
+     *
+     * @param $dir
+     * @return array
+     */
+    protected function getData($dir)
+    {
+        $realPath = realpath($dir);
+        if (!is_dir($realPath)) {
+            return [];
         }
 
         $data = [];
@@ -156,8 +231,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
                 }
             }
         }
-
-        return new CumulativeResourceInfo($bundleClass, $this->getResource(), $realPath, $data);
+        return $data;
     }
 
     /**
@@ -257,6 +331,18 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     protected function getDirectoryAbsolutePath($bundleDir)
     {
         return rtrim($bundleDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->relativeFolderPath;
+    }
+
+    /**
+     * @param string $resourceDir
+     *
+     * @return string
+     */
+    protected function getResourcesDirectoryAbsolutePath($resourceDir)
+    {
+        return rtrim($resourceDir, DIRECTORY_SEPARATOR) .
+        DIRECTORY_SEPARATOR .
+        preg_replace('/Resources\//', '', $this->relativeFolderPath, 1);
     }
 
     /**
