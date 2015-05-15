@@ -6,6 +6,8 @@ use FR3D\LdapBundle\Driver\ZendLdapDriver as BaseDriver;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
+use Zend\Ldap\Dn;
+
 class ZendLdapDriver extends BaseDriver
 {
     /** @var Ldap */
@@ -38,5 +40,14 @@ class ZendLdapDriver extends BaseDriver
     public function save($dn, array $entry)
     {
         $this->driver->save($dn, $entry);
+    }
+
+    /**
+     * @param string $from
+     * @param string $to
+     */
+    public function move($from, $to)
+    {
+        $this->driver->move($from, $to);
     }
 }

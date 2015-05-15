@@ -95,7 +95,17 @@ class LdapManager extends BaseManager
             $entry[$attribute['ldap_attr']] = $propertyAccessor->getValue($user, $attribute['user_field']);
         }
 
-        $this->driver->save($this->createDn($user), $entry);
+        $dn = $this->createDn($user);
+        if ($this->driver->exists($dn) && strpos($dn, $user->getUsername()) === false) {
+            $newDn = preg_replace('/(?<==).*?(?=,)/', $user->getUsername(), $dn, 1);
+            $this->driver->move($dn, $newDn);
+            $user->setDn($newDn);
+            $this->getUserEntityManager()->flush();
+
+            $dn = $newDn;
+        }
+
+        $this->driver->save($dn, $entry);
     }
 
     /**
@@ -258,6 +268,14 @@ class LdapManager extends BaseManager
         }
 
         return $attributes;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getUserEntityManager()
+    {
+        return $this->registry->getManagerForClass('OroUserBundle:User');
     }
 
     /**
