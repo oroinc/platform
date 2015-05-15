@@ -20,6 +20,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *      name="oro_email",
  *      indexes={
  *          @ORM\Index(name="IDX_email_message_id", columns={"message_id"}),
+ *          @ORM\Index(name="oro_email_user_is_head", columns={"is_head"})
  *      }
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository")
@@ -146,6 +147,15 @@ class Email extends ExtendEmail
      * @JMS\Type("DateTime")
      */
     protected $internalDate;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $head = true;
 
     /**
      * @var string
@@ -417,6 +427,30 @@ class Email extends ExtendEmail
     public function setInternalDate($internalDate)
     {
         $this->internalDate = $internalDate;
+
+        return $this;
+    }
+
+    /**
+     * Get if email is either first unread, or the last item in the thread
+     *
+     * @return bool
+     */
+    public function isHead()
+    {
+        return $this->head;
+    }
+
+    /**
+     * Set email is_head flag
+     *
+     * @param boolean $head
+     *
+     * @return self
+     */
+    public function setHead($head)
+    {
+        $this->head = (bool)$head;
 
         return $this;
     }

@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -85,7 +86,6 @@ class EmailEntityBuilder
             ->setFromName($from)
             ->setFromEmailAddress($this->address($from))
             ->setSentAt($sentAt)
-            ->setReceivedAt($receivedAt)
             ->setInternalDate($internalDate)
             ->setImportance($importance);
 
@@ -94,6 +94,46 @@ class EmailEntityBuilder
         $this->addRecipients($result, EmailRecipient::BCC, $bcc);
 
         $this->batch->addEmail($result);
+
+        return $result;
+    }
+
+    /**
+     * Create EmailUser entity object
+     *
+     * @param string               $subject      The email subject
+     * @param string $from                       The FROM email address,
+     *                                           for example: john@example.com or "John Smith" <john@example.c4m>
+     * @param string|string[]|null $to           The TO email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param \DateTime            $sentAt       The date/time when email sent
+     * @param \DateTime            $receivedAt   The date/time when email received
+     * @param \DateTime            $internalDate The date/time an email server returned in INTERNALDATE field
+     * @param integer $importance                The email importance flag.
+     *                                           Can be one of *_IMPORTANCE constants of Email class
+     * @param string|string[]|null $cc           The CC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param string|string[]|null $bcc          The BCC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     *
+     * @return EmailUser
+     */
+    public function emailUser(
+        $subject,
+        $from,
+        $to,
+        $sentAt,
+        $receivedAt,
+        $internalDate,
+        $importance = Email::NORMAL_IMPORTANCE,
+        $cc = null,
+        $bcc = null
+    ) {
+        $result = new EmailUser();
+
+        $email = $this->email($subject, $from, $to, $sentAt, $receivedAt, $internalDate, $importance, $cc, $bcc);
+        $result->setReceivedAt($receivedAt);
+        $result->setEmail($email);
 
         return $result;
     }

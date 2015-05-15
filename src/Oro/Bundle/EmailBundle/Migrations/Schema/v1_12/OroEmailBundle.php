@@ -53,13 +53,11 @@ class OroEmailBundle implements Migration
         $emailUserTable->addColumn('email_id', 'integer', ['notnull' => false]);
         $emailUserTable->addColumn('created', 'datetime');
         $emailUserTable->addColumn('received', 'datetime');
-        $emailUserTable->addColumn('is_head', 'boolean', ['default' => true]);
         $emailUserTable->addColumn('is_seen', 'boolean', ['default' => true]);
         $emailUserTable->setPrimaryKey(['id']);
 
         $emailUserTable->addIndex(['folder_id'], 'IDX_91F5CFF6162CB942');
         $emailUserTable->addIndex(['email_id'], 'IDX_91F5CFF6A832C1C9');
-        $emailUserTable->addIndex(['is_head'], 'oro_email_user_is_head');
 
         $emailUserTable->addForeignKeyConstraint(
             $schema->getTable('oro_email_folder'),

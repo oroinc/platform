@@ -97,7 +97,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $simple_user2 = $this->getReference('simple_user2');
             $origin = $this->mailerProcessor->getEmailOrigin($owner->getEmail());
 
-            $email = $this->emailEntityBuilder->email(
+            $emailUser = $this->emailEntityBuilder->emailUser(
                 $template['Subject'],
                 $owner->getEmail(),
                 $owner->getEmail(),
@@ -109,9 +109,9 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 "bcc{$index}@example.com"
             );
 
-            $email->addFolder($origin->getFolder(FolderType::SENT));
-            $email->addActivityTarget($owner);
-            $email->addActivityTarget($simple_user2);
+            $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+            $emailUser->getEmail()->addActivityTarget($owner);
+            $emailUser->getEmail()->addActivityTarget($simple_user2);
 
             $emailBody = $this->emailEntityBuilder->body(
                 "Hi,\n" . $template['Text'],
@@ -119,9 +119,9 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 true
             );
 
-            $email->setEmailBody($emailBody);
-            $email->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
-            $this->setReference('email_' . ($index + 1), $email);
+            $emailUser->getEmail()->setEmailBody($emailBody);
+            $emailUser->getEmail()->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
+            $this->setReference('email_' . ($index + 1), $emailUser);
             $this->setReference('emailBody_' . ($index + 1), $emailBody);
         }
         $this->emailEntityBuilder->getBatch()->persist($om);

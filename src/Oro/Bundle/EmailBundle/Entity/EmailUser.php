@@ -17,10 +17,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * EmailUser
  *
  * @ORM\Table(
- *      name="oro_email_user",
- *      indexes={
- *          @ORM\Index(name="oro_email_user_is_head", columns={"is_head"})
- *      }
+ *      name="oro_email_user"
  * )
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
@@ -91,16 +88,6 @@ class EmailUser
      */
     protected $receivedAt;
 
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
-     * @Soap\ComplexType("boolean")
-     * @JMS\Type("boolean")
-     */
-    protected $head = true;
-
     /**
      * @var bool
      *
@@ -123,7 +110,7 @@ class EmailUser
     /**
      * @var Email $email
      *
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers")
+     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false)
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\Email")
      * @JMS\Exclude
@@ -222,30 +209,6 @@ class EmailUser
     }
 
     /**
-     * Get if email is either first unread, or the last item in the thread
-     *
-     * @return bool
-     */
-    public function isHead()
-    {
-        return $this->head;
-    }
-
-    /**
-     * Set email is_head flag
-     *
-     * @param boolean $head
-     *
-     * @return self
-     */
-    public function setHead($head)
-    {
-        $this->head = (bool)$head;
-
-        return $this;
-    }
-
-    /**
      * Get if email is seen
      *
      * @return bool
@@ -313,6 +276,85 @@ class EmailUser
         $this->email = $email;
 
         return $this;
+    }
+
+    /**
+     * @param $subject
+     *
+     * @return $this
+     */
+    public function setSubject($subject)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setSubject($subject);
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getSubject();
+        }
+
+        return null;
+    }
+
+    public function setThread(EmailThread $thread)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setThread($thread);
+
+        return $this;
+    }
+
+    /**
+     * @return null|EmailThread
+     */
+    public function getThread()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getThread();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param bool $head
+     *
+     * @return $this
+     */
+    public function setHead($head)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setHead($head);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHead()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->isHead();
+        }
+
+        return false;
     }
 
     /**

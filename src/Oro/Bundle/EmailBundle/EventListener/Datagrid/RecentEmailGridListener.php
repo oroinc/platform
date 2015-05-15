@@ -36,8 +36,7 @@ class RecentEmailGridListener
             $parameters = $datagrid->getParameters();
             $userId = $parameters->get('userId');
 
-            // todo CRM-2480
-            //$this->emailGridHelper->updateDatasource($datasource, $userId);
+            $this->emailGridHelper->updateDatasource($datasource, $userId);
 
             $queryBuilder = $datasource->getQueryBuilder();
 

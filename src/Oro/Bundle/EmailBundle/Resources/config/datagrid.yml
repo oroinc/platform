@@ -5,7 +5,10 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial e.{id, subject, sentAt, thread}
+                    - e.id
+                    - e.subject
+                    - IDENTITY(e.thread)
+                    - e.sentAt
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:

@@ -30,11 +30,12 @@ class FillEmailUserTableQuery extends ParametrizedMigrationQuery
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         // do some stuff
-/*        $query = '';
+        $query = 'INSERT INTO oro_email_user (email_id, created, received, is_seen)
+            SELECT id, created, received, is_seen FROM oro_email';
 
         $this->logQuery($logger, $query);
         if (!$dryRun) {
             $this->connection->executeUpdate($query);
-        }*/
+        }
     }
 }

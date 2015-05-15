@@ -36,19 +36,36 @@ class RemoveOldSchema implements Migration
             $emailBodyTable->dropColumn('email_id');
         }
 
-/*        $emailTable = $schema->getTable('oro_email');
+        $emailTable = $schema->getTable('oro_email');
 
-        $emailTable->removeForeignKey('FK_2A30C17132C8A3DE');
-        $emailTable->removeForeignKey('FK_2A30C1719EB185F9');
+        if ($emailTable->hasForeignKey('FK_2A30C17132C8A3DE')) {
+            $emailTable->removeForeignKey('FK_2A30C17132C8A3DE');
+        }
+        if ($emailTable->hasForeignKey('FK_2A30C1719EB185F9')) {
+            $emailTable->removeForeignKey('FK_2A30C1719EB185F9');
+        }
 
-        $emailTable->dropIndex('oro_email_is_head');
-        $emailTable->dropIndex('IDX_2A30C17132C8A3DE');
-        $emailTable->dropIndex('IDX_2A30C1719EB185F9');
+        if ($emailTable->hasIndex('oro_email_is_head')) {
+            $emailTable->dropIndex('oro_email_is_head');
+        }
+        if ($emailTable->hasIndex('IDX_2A30C17132C8A3DE')) {
+            $emailTable->dropIndex('IDX_2A30C17132C8A3DE');
+        }
+        if ($emailTable->hasIndex('IDX_2A30C1719EB185F9')) {
+            $emailTable->dropIndex('IDX_2A30C1719EB185F9');
+        }
 
-        $emailTable->dropColumn('organization_id');
-        $emailTable->dropColumn('user_owner_id,');
-        $emailTable->dropColumn('received');
-        $emailTable->dropColumn('is_head');
-        $emailTable->dropColumn('is_seen');*/
+        if ($emailTable->hasColumn('organization_id')) {
+            $emailTable->dropColumn('organization_id');
+        }
+        if ($emailTable->hasColumn('user_owner_id')) {
+            $emailTable->dropColumn('user_owner_id');
+        }
+        if ($emailTable->hasColumn('received')) {
+            $emailTable->dropColumn('received');
+        }
+        if ($emailTable->hasColumn('is_seen')) {
+            $emailTable->dropColumn('is_seen');
+        }
     }
 }
