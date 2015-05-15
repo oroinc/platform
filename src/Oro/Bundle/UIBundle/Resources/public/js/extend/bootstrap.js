@@ -67,7 +67,6 @@ define([
     /**
      * This customization allows to define own render function for Typeahead
      */
-
     var Typeahead,
         origTypeahead = $.fn.typeahead.Constructor,
         origFnTypeahead = $.fn.typeahead;
