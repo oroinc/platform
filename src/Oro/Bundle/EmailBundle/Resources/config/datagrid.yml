@@ -24,7 +24,7 @@ datagrid:
                             conditionType: WITH
                             condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
                         -
-                            { join: e.folders, alias: f }
+                            { join: eu.folder, alias: f }
         columns:
             contacts:
                 type: twig
@@ -76,7 +76,7 @@ datagrid:
                 to:      { type: string,   data_name: r_to.name, label: oro.email.to.label }
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
-                folders: { type: string,   data_name: f.type, label: oro.email.folders.label }
+                folder:  { type: string,   data_name: f.type, label: oro.email.folders.label }
         views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:
@@ -105,16 +105,19 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial e.{id, subject, receivedAt, sentAt}
+                    - e.id
+                    - e.subject
+                    - e.sentAt
+                    - eu.receivedAt
                 from:
-                    - { table: OroEmailBundle:Email, alias: eu }
+                    - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
                     left:
                         -
                             join: eu.email
                             alias: e
                     inner:
-                        - { join: e.folders, alias: f }
+                        - { join: eu.folder, alias: f }
                         - { join: f.origin, alias: o }
                         - { join: e.fromEmailAddress, alias: a }
                 where:
@@ -154,7 +157,7 @@ datagrid:
         sorters:
             columns:
                 fromEmailExpression: { data_name: fromEmailExpression }
-                receivedAt:  { data_name: e.receivedAt }
+                receivedAt:  { data_name: eu.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
