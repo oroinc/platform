@@ -3,4 +3,6 @@
 {% set showImage = false %}
 
 {% set recordUrl = indexer_item.recordUrl %}
-{% set title = entity.name|default('N/A') %}
+{% set showImage = false %}
+{% set title = indexer_item.recordTitle|default('N/A') %}
+{% set entityType = 'Custom'|trans %}

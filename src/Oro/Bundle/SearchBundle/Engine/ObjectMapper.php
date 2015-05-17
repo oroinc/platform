@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Oro\Bundle\SearchBundle\Event\BeforeMapObjectEvent;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -26,7 +25,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getMappingConfig()
     {
-        return $this->mappingConfig;
+        return $this->mappingProvider->getMappingConfig();
     }
 
     /**
@@ -38,13 +37,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getEntitiesListAliases()
     {
-        $entities = [];
-
-        foreach ($this->mappingConfig as $class => $mappingEntity) {
-            $entities[$class] = isset($mappingEntity['alias']) ? $mappingEntity['alias'] : '';
-        }
-
-        return $entities;
+        return $this->mappingProvider->getEntitiesListAliases();
     }
 
     /**
@@ -56,7 +49,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getEntities($modeFilter = null)
     {
-        $entities = array_keys($this->mappingConfig);
+        $entities = $this->mappingProvider->getEntityClasses();
         if (null == $modeFilter) {
             return $entities;
         }
@@ -82,16 +75,8 @@ class ObjectMapper extends AbstractMapper
     public function mapObject($object)
     {
         $objectData = [];
-
-        /**
-         *  dispatch oro_search.before_map_object event
-         */
-        $event = new BeforeMapObjectEvent($this->mappingConfig, $object);
-        $this->dispatcher->dispatch(BeforeMapObjectEvent::EVENT_NAME, $event);
-        $this->mappingConfig = $event->getMappingConfig();
-
         $objectClass = ClassUtils::getRealClass($object);
-        if (is_object($object) && isset($this->mappingConfig[$objectClass])) {
+        if (is_object($object) && $this->mappingProvider->isFieldsMappingExists($objectClass)) {
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
             foreach ($this->getEntityMapParameter($objectClass, 'fields', array()) as $field) {
                 if (!isset($field['relation_type'])) {

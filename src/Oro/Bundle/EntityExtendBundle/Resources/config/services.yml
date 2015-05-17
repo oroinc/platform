@@ -38,6 +38,7 @@ parameters:
     oro_entity_extend.listener.extend_field_value_render.class:  Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
     oro_entity_extend.importexport.normalizer.enum.class:     Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
     oro_entity_extend.listener.before_map_object_search_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener
+    oro_entity_extend.listener.search_entity_config_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -329,4 +330,11 @@ services:
           arguments:
             - @oro_entity_config.config_manager
           tags:
-              - { name: kernel.event_listener, event: oro_search.before_map_object, method: prepareEntityMapEvent }
+              - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: prepareEntityMapEvent }
+
+    oro_entity_extend.listener.search_entity_config_listener:
+            class: %oro_entity_extend.listener.search_entity_config_listener.class%
+            arguments:
+                - @doctrine
+            tags:
+                - { name: kernel.event_listener, event: entity_config.persist.config, method: persistConfig, priority: -255 }

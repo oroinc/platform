@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Event\BeforeMapObjectEvent;
 
 class BeforeMapObjectSearchListener
 {
@@ -29,99 +29,44 @@ class BeforeMapObjectSearchListener
     }
 
     /**
-     * @param BeforeMapObjectEvent $event
+     * Process custom entities and fields. If entity or field marked as searchable - config of this custom
+     *  entity or field will bw added to the main search map.
+     *
+     * @param SearchMappingCollectEvent $event
      */
-    public function prepareEntityMapEvent(BeforeMapObjectEvent $event)
+    public function prepareEntityMapEvent(SearchMappingCollectEvent $event)
     {
-        $object        = $event->getEntity();
-        $className     = ClassUtils::getRealClass($object);
-        $searchConfigs = $this->configManager->getConfigs('search', $className);
+        $mapConfig = $event->getMappingConfig();
+        $configs   = $this->configManager->getProvider('extend')->getConfigs();
+        foreach ($configs as $config) {
+            if ($config->is('is_extend') && $config->get('state') === ExtendScope::STATE_ACTIVE) {
+                $className     = $config->getId()->getClassName();
+                $searchConfigs = $this->configManager->getConfigs('search', $className);
 
-        $mapConfig = $this->checkEntityIsSearchable($event->getMappingConfig(), $className);
-
-        if (isset($mapConfig[$className])) {
-            foreach ($searchConfigs as $searchConfig) {
-                /** @var FieldConfigId $fieldId */
-                $fieldId = $searchConfig->getId();
-
-                if (!$fieldId instanceof FieldConfigId) {
-                    continue;
-                }
-                $fieldName = $fieldId->getFieldName();
-
-                if ($searchConfig->is('title_field', true)) {
-                    $mapConfig[$className][self::TITLE_FIELDS_PATH] = array_merge(
-                        $mapConfig[$className][self::TITLE_FIELDS_PATH],
-                        [$fieldName]
-                    );
-                }
-
-                if ($searchConfig->is('searchable', true)) {
-                    $fieldType = $this->transformCustomType($fieldId->getFieldType());
-                    if (
-                        in_array(
-                            $fieldType,
-                            [
-                                Indexer::RELATION_ONE_TO_ONE,
-                                Indexer::RELATION_MANY_TO_ONE
-                            ]
+                $mapConfig = $this->checkEntityMapping($mapConfig, $config);
+                /**
+                 * $config->get('owner') === 'Custom' && $config->get('state') === 'Active'
+                 * // && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
+                 */
+                if (
+                    isset($mapConfig[$className])
+                    && (
+                        $config->get('owner') === 'System'
+                        || ($config->get('owner') === 'Custom' && $config->get('state') === 'Active'
+                            && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
                         )
-                    ) {
-                        $config = $this->configManager->getConfig($this->configManager->getId('extend', $className, $fieldName));
-                        $targetEntity = $config->get('target_entity');
-                        $targetField = $config->get('target_field');
-                        $targetType = $this->transformCustomType($this->configManager->getId('extend', $targetEntity, $targetField)->getFieldType());
-                        $field = [
-                            'name'          => $fieldName,
-                            'relation_type' => $fieldType,
-                            'relation_fields' => [
-                                [
-                                    'name'          => $targetField,
-                                    'target_type'   => $targetType,
-                                    'target_fields' => [$fieldName . '-' . $targetField]
-                                ]
-                            ]
-                        ];
-                    } elseif(
-                        in_array(
-                            $fieldType,
-                            [
-
-                                Indexer::RELATION_MANY_TO_MANY,
-                                Indexer::RELATION_ONE_TO_MANY
-                            ]
-                        )
-                    ) {
-                        $config = $this->configManager->getConfig($this->configManager->getId('extend', $className, $fieldName));
-                        $targetEntity = $config->get('target_entity');
-
-
-                        $targetFields = array_unique(array_merge($config->get('target_grid'), $config->get('target_title'), $config->get('target_detailed')));
-                        $fields = [];
-                        foreach ($targetFields as $targetField) {
-                            $targetType = $this->transformCustomType($this->configManager->getId('extend', $targetEntity, $targetField)->getFieldType());
-                            $fields[] = [
-                                'name'          => $targetField,
-                                'target_type'   => $targetType,
-                                'target_fields' => [$fieldName . '-' . $targetField]
-                            ];
+                    )
+                ) {
+                    foreach ($searchConfigs as $searchConfig) {
+                        /** @var FieldConfigId $fieldId */
+                        $fieldId = $searchConfig->getId();
+                        if (!$fieldId instanceof FieldConfigId) {
+                            continue;
                         }
 
-                        $field = [
-                            'name'          => $fieldName,
-                            'relation_type' => $fieldType,
-                            'relation_fields' => $fields
-                        ];
-
-                    } else {
-                        $field = [
-                            'name'          => $fieldName,
-                            'target_type'   => $fieldType,
-                            'target_fields' => [$fieldName]
-                        ];
+                        $this->processTitles($mapConfig, $searchConfig, $className, $fieldId->getFieldName());
+                        $this->processFields($mapConfig, $searchConfig, $fieldId, $className);
                     }
-
-                    $mapConfig[$className][self::FIELDS_PATH][] = $field;
                 }
             }
         }
@@ -129,28 +74,141 @@ class BeforeMapObjectSearchListener
     }
 
     /**
-     * @param array  $mapConfig
-     * @param string $className
-     * @return array
+     * Process field
+     *
+     * @param array           $mapConfig
+     * @param ConfigInterface $searchConfig
+     * @param FieldConfigId   $fieldId
+     * @param string          $className
      */
-    protected function checkEntityIsSearchable(array $mapConfig, $className)
+    protected function processFields(&$mapConfig, ConfigInterface $searchConfig, FieldConfigId $fieldId, $className)
     {
-        $config = $this->configManager->getConfig($this->configManager->getId('extend', $className));
-        if ($config->get('owner') === 'Custom' && $config->get('state') === 'Active') {
-            if ($this->configManager->getConfig($this->configManager->getId('search', $className))->is('searchable', true)) {
-                $mapConfig[$className] = [
-                    'alias' => $config->get('schema')['doctrine'][$className]['table'],
-                    'label' => $this->configManager->getConfig($this->configManager->getId('entity', $className))->get('label'),
-                    'search_template' => 'OroEntityExtendBundle:Search:result.html.twig',
-                    'route' => [
-                        'name' => 'oro_entity_view',
-                        'parameters' => [
-                            'id' => 'id',
-                            'entityName' => str_replace('\\', '_', $className)
+        $fieldName = $fieldId->getFieldName();
+        if ($searchConfig->is('searchable')) {
+            $fieldType = $this->transformCustomType($fieldId->getFieldType());
+            if (
+            in_array(
+                $fieldType,
+                [
+                    Indexer::RELATION_ONE_TO_ONE,
+                    Indexer::RELATION_MANY_TO_ONE
+                ]
+            )
+            ) {
+                $config       = $this->configManager->getConfig(
+                    $this->configManager->getId('extend', $className, $fieldName)
+                );
+                $targetEntity = $config->get('target_entity');
+                $targetField  = $config->get('target_field');
+                $targetType   = $this->transformCustomType(
+                    $this->configManager->getId('extend', $targetEntity, $targetField)->getFieldType()
+                );
+                $field        = [
+                    'name'            => $fieldName,
+                    'relation_type'   => $fieldType,
+                    'relation_fields' => [
+                        [
+                            'name'          => $targetField,
+                            'target_type'   => $targetType,
+                            'target_fields' => [strtolower($fieldName . '_' . $targetField)]
                         ]
                     ]
                 ];
+            } elseif (
+            in_array(
+                $fieldType,
+                [
+
+                    Indexer::RELATION_MANY_TO_MANY,
+                    Indexer::RELATION_ONE_TO_MANY
+                ]
+            )
+            ) {
+                $config       = $this->configManager->getConfig(
+                    $this->configManager->getId('extend', $className, $fieldName)
+                );
+                $targetEntity = $config->get('target_entity');
+
+
+                $targetFields = array_unique(array_merge($config->get('target_grid'),
+                    $config->get('target_title'), $config->get('target_detailed')));
+                $fields       = [];
+                foreach ($targetFields as $targetField) {
+                    $targetType = $this->transformCustomType(
+                        $this->configManager->getId('extend', $targetEntity, $targetField)
+                            ->getFieldType()
+                    );
+                    $fields[]   = [
+                        'name'          => $targetField,
+                        'target_type'   => $targetType,
+                        'target_fields' => [strtolower($fieldName . '_' . $targetField)]
+                    ];
+                }
+
+                $field = [
+                    'name'            => $fieldName,
+                    'relation_type'   => $fieldType,
+                    'relation_fields' => $fields
+                ];
+
+            } else {
+                $field = [
+                    'name'          => $fieldName,
+                    'target_type'   => $fieldType,
+                    'target_fields' => [strtolower($fieldName)]
+                ];
             }
+            $mapConfig[$className][self::FIELDS_PATH][] = $field;
+        }
+    }
+
+    /**
+     * Check if field marked as title_field, add this field to titles
+     *
+     * @param array           $mapConfig
+     * @param ConfigInterface $searchConfig
+     * @param string          $className
+     * @param string          $fieldName
+     */
+    protected function processTitles(&$mapConfig, ConfigInterface $searchConfig, $className, $fieldName)
+    {
+        if ($searchConfig->is('title_field')) {
+            $mapConfig[$className][self::TITLE_FIELDS_PATH] = array_merge(
+                $mapConfig[$className][self::TITLE_FIELDS_PATH],
+                [$fieldName]
+            );
+        }
+    }
+
+    /**
+     * Check custom entity. If it searchable - add mapping skeleton
+     *
+     * @param array           $mapConfig
+     * @param ConfigInterface $config
+     * @return array
+     */
+    protected function checkEntityMapping(array $mapConfig, ConfigInterface $config)
+    {
+        $className = $config->getId()->getClassName();
+        if ($config->get('owner') === 'Custom' && $config->get('state') === 'Active'
+            // && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
+        ) {
+            $label                 = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
+            $mapConfig[$className] = [
+                'alias'                 => $config->get('schema')['doctrine'][$className]['table'],
+                'label'                 => $label,
+                self::TITLE_FIELDS_PATH => [],
+                'route'                 => [
+                    'name'       => 'oro_entity_view',
+                    'parameters' => [
+                        'id'         => 'id',
+                        'entityName' => '@' . str_replace('\\', '_', $className) . '@'
+                    ]
+                ],
+                'search_template'       => 'OroEntityExtendBundle:Search:result.html.twig',
+                self::FIELDS_PATH       => [],
+                'mode'                  => 'normal'
+            ];
         }
 
         return $mapConfig;
@@ -170,7 +228,7 @@ class BeforeMapObjectSearchListener
             'money'                    => 'decimal',
             'percent'                  => 'decimal',
             'enum'                     => 'text',
-            'multiEnum'                => 'text',
+            'multiEnum'                => Indexer::RELATION_MANY_TO_MANY,
             'bigint'                   => 'text',
             'integer'                  => 'integer',
             'smallint'                 => 'integer',

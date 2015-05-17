@@ -478,3 +478,4 @@ services:
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
               - { name: kernel.event_listener, event: oro_search.before_search, method: beforeSearchEvent }
+              - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: collectEntityMapEvent, priority: -100 }

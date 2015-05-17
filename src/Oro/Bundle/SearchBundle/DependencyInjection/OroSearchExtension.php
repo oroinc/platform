@@ -21,7 +21,7 @@ class OroSearchExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         // load entity search configuration from search.yml files
-        $configPart          = array();
+        $configPart          = [];
         $ymlLoader           = new YamlCumulativeFileLoader('Resources/config/search.yml');
         $configurationLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
         $engineResources     = $configurationLoader->load($container);
@@ -45,21 +45,31 @@ class OroSearchExtension extends Extension
         $container->setParameter('oro_search.engine_parameters', $config['engine_parameters']);
         $container->setParameter('oro_search.log_queries', $config['log_queries']);
         $container->setParameter('oro_search.realtime_update', $config['realtime_update']);
-        $container->setParameter('oro_search.entities_config', $config['entities_config']);
+        $this->setEntitiesConfigParameter($container, $config['entities_config']);
         $container->setParameter('oro_search.twig.item_container_template', $config['item_container_template']);
 
         // load engine specific and general search services
         $serviceLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $serviceLoader->load('services.yml');
 
-        $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml');
-        $engineLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
+        $ymlLoader       = new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml');
+        $engineLoader    = new CumulativeConfigLoader('oro_search', $ymlLoader);
         $engineResources = $engineLoader->load($container);
 
         if (!empty($engineResources)) {
             $resource = end($engineResources);
             $serviceLoader->load($resource->path);
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @deprecated since 1.8 Please use oro_search.provider.search_mapping service for mapping config
+     */
+    protected function setEntitiesConfigParameter(ContainerBuilder $container, array $config)
+    {
+        $container->setParameter('oro_search.entities_config', $config);
     }
 
     /**

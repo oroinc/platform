@@ -487,6 +487,7 @@ oro_entity_config:
     search:
         entity:
             items:
+                # Indicates what custom entity can be searchable
                 searchable:
                     form:
                         type:               choice
@@ -497,6 +498,7 @@ oro_entity_config:
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
         field:
             items:
+                # Indicates what custom field could be searchable
                 searchable:
                     options:
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, oneToMany]
@@ -512,10 +514,10 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
-
+                # Indicates what custom text field is a part of search result title
                 title_field:
                     options:
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
+                        allowed_type:       [string]
                         required_property:
                             config_id:
                                 scope:      extend
