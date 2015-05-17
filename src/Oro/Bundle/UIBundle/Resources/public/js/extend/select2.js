@@ -1,7 +1,7 @@
 /*jshint browser:true, nomen:true*/
 /*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($, __) {
+define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($, __, Select2) {
     'use strict';
 
     /**
@@ -22,7 +22,8 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             selection = this.val();
 
         populate = function (results, container, depth, parentStack) {
-            var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted, subId, parent, resultId;
+            var i, l, result, selectable, disabled, compound, node, label, innerContainer,
+                formatted, subId, parent, resultId;
             results = opts.sortResults(results, container, query);
             parent = container.parent();
 
@@ -106,7 +107,11 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
 
     // Override methods of AbstractSelect2 class
     (function (prototype) {
-        var prepareOpts = prototype.prepareOpts;
+        var select2DropBelowClassName = 'select2-drop-below',
+            positionDropdown = prototype.positionDropdown,
+            close = prototype.close,
+            prepareOpts = prototype.prepareOpts,
+            init = prototype.init;
         prototype.prepareOpts = function (options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -118,17 +123,25 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
 
             var additionalRequestParams = options.element.data('select2_query_additional_params');
             if (additionalRequestParams && options.ajax !== undefined) {
-                options.ajax.url += (options.ajax.url.indexOf('?') == -1 ? '?' : '&') + $.param(additionalRequestParams);
+                options.ajax.url += (options.ajax.url.indexOf('?') < 0 ? '?' : '&') + $.param(additionalRequestParams);
             }
 
             return prepareOpts.call(this, options);
         };
-    }(window.Select2['class'].abstract.prototype));
 
-    (function (prototype) {
-        var init = prototype.init;
+        prototype.positionDropdown = function(){
+            var dialogIsBelow,
+                $container = this.container;
+            positionDropdown.apply(this, arguments);
+            dialogIsBelow = $container.hasClass('select2-dropdown-open') && !$container.hasClass('select2-drop-above');
+            $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
+        };
 
-        // abstract
+        prototype.close = function(){
+            close.apply(this, arguments);
+            this.container.parent().removeClass(select2DropBelowClassName);
+        };
+
         prototype.init = function () {
             init.apply(this, arguments);
             this.breadcrumbs = $('<ul class="select2-breadcrumbs"></ul>');
@@ -156,9 +169,8 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
                 });
             }
         };
-    }(window.Select2['class'].abstract.prototype));
+    }(Select2['class'].abstract.prototype));
 
-    // Override methods of SingleSelect2 class
     (function (prototype) {
         var onSelect = prototype.onSelect;
         var updateResults = prototype.updateResults;
@@ -193,7 +205,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             this.pagePath = '';
             clear.apply(this, arguments);
         };
-    }(window.Select2['class'].single.prototype));
+    }(Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
     // Fix is valid for version 3.4.1
@@ -203,8 +215,8 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
         prototype.resizeSearch = function() {
             resizeSearch.apply(this, arguments);
             this.search.width(Math.floor($(this.search).width()) - 1);
-        }
-    }(window.Select2['class'].multi.prototype));
+        };
+    }(Select2['class'].multi.prototype));
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
         formatSearching: function() { return __('Searching...'); },

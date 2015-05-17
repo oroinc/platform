@@ -30,14 +30,14 @@ You can access following variables in your expressions:
 | Variable name | Description |
 |------- |-------------|
 | `$context` | Refers to current [layout context](./layout_context.md) |
-| `$data` | Refers to [data accessor](./data_accessor.md) |
+| `$data` | Refers to [data accessor](./layout_data.md) |
 
 Encoders
 --------
 
 Out of the box the **Oro Platform** comes with `json` expression encoder, but encoders for other formats could be easily 
 added to the system using DI tagging mechanism. An encoder class should implements
-`Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderInterface` and be registered as a service with 
+[ConfigExpressionEncoderInterface](../../Layout/Encoder/ConfigExpressionEncoderInterface.php) and be registered as a service with 
 tag `oro_layout.expression.encoder` and tag attribute `format` is required.
 
 Examples
@@ -81,7 +81,7 @@ Developer reference
 
 Here is a list of key classes that work with layout expressions :
 
- - `\Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionContextConfigurator` - the **layout context configurator** 
+ - [ConfigExpressionContextConfigurator](../../Layout/Extension/ConfigExpressionContextConfigurator.php) - the **layout context configurator** 
     responsible for configuring `expressions_encoding` and `expressions_evaluate` options as known for context.
- - `\Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension` - the block type extension of `block` type.
+ - [ConfigExpressionExtension](../../Layout/Block/Extension/ConfigExpressionExtension.php) - the block type extension of `block` type.
     It finds, evaluates or encode *view variables* of all blocks.

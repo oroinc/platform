@@ -26,10 +26,17 @@ class ContextDataCollection
 
     /**
      * Returns an unique identifier of tied data.
+     * The identifier can be a url, route, some unique key or something else that uniquely identifies the data.
+     *
+     * Examples:
+     * * "/api/rest/products/$context.product_id"
+     * * array('route' => 'api_get_product', 'parameters' => array('id' => '$context.product_id'))
+     * Please note that in these examples "$context.product_id" means that the id of a product
+     * is received from the layout context.
      *
      * @param string $name The data item name
      *
-     * @return string
+     * @return mixed
      */
     public function getIdentifier($name)
     {
@@ -98,9 +105,9 @@ class ContextDataCollection
      * @param string $name      The data item name
      * @param mixed $identifier The the unique identifier of tied data or the callback method
      *                          to be used to get the unique identifier
-     *                          function (array|\ArrayAccess $options) : string
+     *                          function (array|\ArrayAccess $options) : mixed
      *                          where $options argument represents the context variables
-     * @param mixed $value      The default data item value ot the callback method
+     * @param mixed $value      The default data item value or the callback method
      *                          to be used to get the default value
      *                          function (array|\ArrayAccess $options) : mixed
      *                          where $options argument represents the context variables

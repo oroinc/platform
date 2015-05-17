@@ -32,7 +32,7 @@ Here is the list of available actions:
 | Action name | Description |
 |------- |-------------|
 | `add` | Add a new item to layout |
-| `addTree` | Add multiple items defined in tree hierarchy. [See expanded doc](#add-tree). |
+| `addTree` | Add multiple items defined in tree hierarchy. [See expanded doc](#addtree-action). |
 | `remove` | Remove the item from layout |
 | `move` | Change the layout item position. Could be used in order change parent item or ordering position. |
 | `addAlias` | Add alias for the layout item. Could be used for backward compatibility. |
