@@ -12,7 +12,7 @@ config:
         'jquery.form': 'bundles/oronavigation/lib/jquery.form.js'
         'url': 'bundles/oronavigation/lib/url.min.js'
         'oronavigation/js/content/grid-builder': 'bundles/oronavigation/js/content/grid-builder.js'
-        'oronavigation/js/shortcuts/view': 'bundles/oronavigation/js/shortcuts/view.js'
+        'oronavigation/js/app/views/shortcuts-view': 'bundles/oronavigation/js/app/views/shortcuts-view.js'
         'oronavigation/js/app/components/favorite-component': 'bundles/oronavigation/js/app/components/favorite-component.js'
         'oronavigation/js/app/components/pin-component': 'bundles/oronavigation/js/app/components/pin-component.js'
         'oronavigation/js/app/modules/views-module': 'bundles/oronavigation/js/app/modules/views-module.js'

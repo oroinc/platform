@@ -1,4 +1,6 @@
 {% extends 'OroNavigationBundle:Menu:menu_base.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroNavigationBundle::macros.html.twig' as Navigation %}
 
 {% macro attributes(attributes) %}
     {% for name, value in attributes %}
@@ -111,7 +113,17 @@
 
 {% block linkElement %}
     {% import _self as oro_menu %}
-    <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
+    {% set extras = item.extras %}
+
+    {% if extras.dialog is defined and extras.dialog %}
+        {{ Navigation.renderClientLink(extras.dialog_config, {
+            entityClass: oro_class_name(app.user, true),
+            entityId: app.user.id
+        }) }}
+    {%- else %}
+        <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
+    {% endif %}
+
 {% endblock %}
 
 {% block spanElement %}
