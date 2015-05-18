@@ -143,19 +143,19 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResource, $container->getResources()[0]);
     }
 
-    public function testLoadWithPriorityDirectory()
+    public function testLoadWithAppRootDirectory()
     {
         $pathWithoutResources = '/config/test.yml';
         $resourceRelativePath = 'Resources' . $pathWithoutResources;
         $bundle               = new TestBundle1();
         $bundleDir            = dirname((new \ReflectionClass($bundle))->getFileName());
-        $resourceDir          = realpath($bundleDir . '/../../app');
+        $appRootDir          = realpath($bundleDir . '/../../app');
         $resourceLoader       = new YamlCumulativeFileLoader($resourceRelativePath);
 
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles(['TestBundle1' => get_class($bundle)])
-            ->setRootDir($resourceDir);
+            ->setAppRootDir($appRootDir);
 
         $container = new ContainerBuilder();
         $loader    = new CumulativeConfigLoader('test', $resourceLoader);
@@ -169,14 +169,14 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
-                        $resourceDir . '/Resources/TestBundle1' . $pathWithoutResources
+                        $appRootDir . '/Resources/TestBundle1' . $pathWithoutResources
                     ),
                     ['test' => 456]
                 )
             ],
             $result
         );
-        CumulativeResourceManager::getInstance()->setRootDir(null);
+        CumulativeResourceManager::getInstance()->setAppRootDir(null);
     }
 
     public function testLoadWithoutContainer()

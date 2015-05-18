@@ -14,7 +14,7 @@ class CumulativeResourceManager
     /**
      * @var string
      */
-    private $rootDir;
+    private $appRootDir;
 
     /**
      * @var array
@@ -82,20 +82,20 @@ class CumulativeResourceManager
      *
      * @return string
      */
-    public function getRootDir()
+    public function getAppRootDir()
     {
-        return $this->rootDir;
+        return $this->appRootDir;
     }
 
     /**
      * Sets application root directory
      *
-     * @param string $rootDir
+     * @param string $appRootDir
      * @return CumulativeResourceManager
      */
-    public function setRootDir($rootDir)
+    public function setAppRootDir($appRootDir)
     {
-        $this->rootDir = $rootDir;
+        $this->appRootDir = $appRootDir;
 
         return $this;
     }

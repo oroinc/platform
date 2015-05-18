@@ -52,20 +52,24 @@ class CumulativeConfigLoader
     {
         $result = [];
 
-        $resourceDir = '';
         $bundles     = CumulativeResourceManager::getInstance()->getBundles();
-        $rootDir     = CumulativeResourceManager::getInstance()->getRootDir();
+        $appRootDir  = CumulativeResourceManager::getInstance()->getAppRootDir();
 
         foreach ($bundles as $bundleName => $bundleClass) {
-            $reflection  = new \ReflectionClass($bundleClass);
-            $bundleDir   = dirname($reflection->getFileName());
-            if (is_dir($rootDir)) {
-                $resourceDir = $rootDir . '/Resources/' . $bundleName;
+            $reflection   = new \ReflectionClass($bundleClass);
+            $bundleDir    = dirname($reflection->getFileName());
+            $bundleAppDir = '';
+
+            /**
+             * This case needs for tests(without app root directory).
+             */
+            if (is_dir($appRootDir)) {
+                $bundleAppDir = $appRootDir . '/Resources/' . $bundleName;
             }
 
             /** @var CumulativeResourceLoader $resourceLoader */
             foreach ($this->resourceLoaders as $resourceLoader) {
-                $resource = $resourceLoader->load($bundleClass, $bundleDir, $resourceDir);
+                $resource = $resourceLoader->load($bundleClass, $bundleDir, $bundleAppDir);
                 if (null !== $resource) {
                     if (is_array($resource)) {
                         foreach ($resource as $res) {
@@ -95,13 +99,25 @@ class CumulativeConfigLoader
     public function registerResources(ContainerBuilder $container)
     {
         $bundles  = CumulativeResourceManager::getInstance()->getBundles();
+        $appRootDir  = CumulativeResourceManager::getInstance()->getAppRootDir();
+
         $resource = new CumulativeResource($this->name, $this->resourceLoaders);
         /** @var CumulativeResourceLoader $resourceLoader */
         foreach ($this->resourceLoaders as $resourceLoader) {
-            foreach ($bundles as $bundleClass) {
+            foreach ($bundles as $bundleName => $bundleClass) {
                 $reflection = new \ReflectionClass($bundleClass);
                 $bundleDir  = dirname($reflection->getFilename());
-                $resourceLoader->registerFoundResource($bundleClass, $bundleDir, $resource);
+
+                $bundleAppDir = '';
+
+                /**
+                 * This case needs for tests(without app root directory).
+                 */
+                if (is_dir($appRootDir)) {
+                    $bundleAppDir = $appRootDir . '/Resources/' . $bundleName;
+                }
+
+                $resourceLoader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
             }
         }
         $container->addResource($resource);

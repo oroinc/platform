@@ -80,12 +80,12 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir, $resourceDir = '')
+    public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
-        $realPath = $this->getFilePath($bundleDir, $resourceDir);
+        $realPath = $this->getResourcePath($bundleAppDir, $bundleDir);
 
         if ($realPath === null) {
-            return [];
+            return null;
         }
 
         return new CumulativeResourceInfo(
@@ -97,32 +97,36 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     }
 
     /**
-     * Returns realpath for source file if file exists or null if file does not exists
+     * Returns realpath for source file if file exists or null if file does not exists.
+     * Priority loading remains for the $bundleAppDir.
      *
-     * @param string $bundleDir The bundle root directory
-     * @param string $resourceDir
+     * @param string $bundleAppDir The bundle directory inside the application resources directory
+     * @param string $bundleDir    The bundle root directory
+     *
      * @return string|null
      */
-    public function getFilePath($bundleDir, $resourceDir)
+    public function getResourcePath($bundleAppDir, $bundleDir)
     {
-        $path = $this->getResourcesFilePath($resourceDir);
+        $path = $this->getBundleAppResourceFilePath($bundleAppDir);
         if ($path === null) {
-            $path = $this->getBundleResourcesFilePath($bundleDir);
+            $path = $this->getBundleResourceFilePath($bundleDir);
         }
+
         return $path;
     }
 
     /**
-     * Returns realpath for source file if file exists in the $resourceDir directory
-     *         or null if file does not exists
+     * Returns realpath for source file in the $bundleAppDir directory if file exists
+     * or null if file does not exists
      *
-     * @param string $resourceDir
-     * @return null|string
+     * @param string $bundleAppDir
+     *
+     * @return string|null
      */
-    protected function getResourcesFilePath($resourceDir)
+    protected function getBundleAppResourceFilePath($bundleAppDir)
     {
-        if (is_dir($resourceDir)) {
-            $path = $resourceDir . preg_replace('/Resources\//', '', $this->relativeFilePath, 1);
+        if (is_dir($bundleAppDir)) {
+            $path = $bundleAppDir . preg_replace('/Resources\//', '', $this->relativeFilePath, 1);
             if (is_file($path)) {
                 return realpath($path);
             }
@@ -133,12 +137,13 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * Returns realpath for source file in the <Bundle> Resources directory if file exists
-     *         or null if file does not exists
+     * or null if file does not exists
      *
      * @param string $bundleDir The bundle root directory
-     * @return null|string
+     *
+     * @return string|null
      */
-    protected function getBundleResourcesFilePath($bundleDir)
+    protected function getBundleResourceFilePath($bundleDir)
     {
         $path = $bundleDir . $this->relativeFilePath;
         if (is_file($path)) {
@@ -151,27 +156,44 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function registerFoundResource($bundleClass, $bundleDir, CumulativeResource $resource)
+    public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
-        $path = $bundleDir . $this->relativeFilePath;
+        $path = $this->getBundleAppResourceFilePath($bundleAppDir);
         if (is_file($path)) {
             $resource->addFound($bundleClass, $path);
+        } else {
+            $path = $this->getBundleResourceFilePath($bundleDir);
+            if (is_file($path)) {
+                $resource->addFound($bundleClass, $path);
+            }
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isResourceFresh($bundleClass, $bundleDir, CumulativeResource $resource, $timestamp)
+    public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
+        if (is_dir($bundleAppDir)) {
+            $path = $bundleAppDir . preg_replace('/Resources\//', '', $this->relativeFilePath, 1);
+            if ($resource->isFound($bundleClass, $path)) {
+                // check exists and removed resource
+                return is_file($path) && filemtime($path) < $timestamp;
+            }
+            // check new resource
+            if (is_file($path)) {
+                return false;
+            }
+        }
+
         $path = $bundleDir . $this->relativeFilePath;
         if ($resource->isFound($bundleClass, $path)) {
             // check exists and removed resource
             return is_file($path) && filemtime($path) < $timestamp;
-        } else {
-            // check new resource
-            return !is_file($path);
         }
+
+        // check new resource
+        return !is_file($path);
     }
 
     /**
@@ -194,6 +216,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      * Loads a file
      *
      * @param string $file A real path to a file
+     *
      * @return array|null
      */
     abstract protected function loadFile($file);
