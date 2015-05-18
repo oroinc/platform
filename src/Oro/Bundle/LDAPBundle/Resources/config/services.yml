@@ -3,6 +3,7 @@ parameters:
     fr3d_ldap.ldap_driver.zend.class:                   Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver
     oro_ldap.provider.user.class:                       Oro\Bundle\LDAPBundle\Provider\UserProvider
     oro_ldap.provider.channel_type.class:               Oro\Bundle\LDAPBundle\Provider\ChannelType
+    oro_ldap.provider.connector.user.class:             Oro\Bundle\LDAPBundle\Provider\Connector\UserLdapConnector
     oro_ldap.provider.ldap_transport.class:             Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
     oro_ldap.form.type.ldap_transport_setting.class:    Oro\Bundle\LDAPBundle\Form\Type\LdapTransportSettingsFormType
     oro_ldap.manager.import.class:                      Oro\Bundle\LDAPBundle\Manager\ImportManager
@@ -52,6 +53,8 @@ services:
         tags:
             - { name: oro_integration.connector, type: user, channel_type: ldap }
         arguments: [@oro_importexport.context_registry, @oro_integration.logger.strategy, @oro_integration.provider.connector_context_mediator]
+        calls:
+            - [setManager, [@fr3d_ldap.ldap_manager.default]]
 
     oro_ldap.manager.import:
         class: %oro_ldap.manager.import.class%
@@ -88,6 +91,7 @@ services:
 
     oro_ldap.importexport.reader.ldap.user:
         class: %oro_ldap.importexport.reader.ldap.user.class%
+        arguments: [@oro_importexport.context_registry, @fr3d_ldap.ldap_manager]
 
     oro_ldap.importexport.writer.ldap.user:
         class: %oro_ldap.importexport.writer.ldap.user.class%

@@ -21,9 +21,6 @@ services:
         calls:
             - ["setSourceEntityName", [%oro_ldap.importexport.entity.user.class%]]
 
-    oro_ldap.importexport.reader.ldap.user:
-        class: %oro_ldap.importexport.reader.ldap.user.class%
-
     oro_ldap.importexport.writer.ldap.user:
         class: %oro_ldap.importexport.writer.ldap.user.class%
 
@@ -38,7 +35,6 @@ services:
             - [setDataConverter, [@oro_ldap.importexport.dataconverter.ldap.user]]
         tags:
             - { name: oro_importexport.processor, type: export, entity: %oro_ldap.importexport.entity.user.class%, alias: oro_ldap_user }
-
 
     oro_ldap.importexport.processor.import.user:
         class: %oro_importexport.processor.import_abstract.class%

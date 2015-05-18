@@ -4,32 +4,46 @@ namespace Oro\Bundle\LDAPBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderInterface;
+use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 
-class LdapUserReader implements ReaderInterface {
+class LdapUserReader extends AbstractReader
+{
 
-    /**
-     * Reads a piece of input data and advance to the next one. Implementations
-     * <strong>must</strong> return <code>null</code> at the end of the input
-     * data set.
-     *
-     * @throws InvalidItemException if there is a problem reading the current record
-     *                              (but the next one may still be valid)
-     * @throws \Exception           if an there is a non-specific error. (step execution will
-     *                              be stopped in that case)
-     *
-     * @return null|mixed
-     */
-    public function read()
+    /** @var LdapManager  */
+    protected $ldapManager;
+
+    /** @var \Iterator */
+    protected $users;
+
+    public function __construct(ContextRegistry $contextRegistry, LdapManager $manager)
     {
-        // TODO: Implement read() method.
+        parent::__construct($contextRegistry);
+        $this->ldapManager = $manager;
     }
 
     /**
-     * @param StepExecution $stepExecution
+     * {@inheritdoc}
      */
-    public function setStepExecution(StepExecution $stepExecution)
+    public function read()
     {
-        // TODO: Implement setStepExecution() method.
+        if (null === $this->users) {
+            $this->users = new \ArrayIterator($this->ldapManager->findUsers());
+        }
+        if (!$this->users->valid()) {
+            return null;
+        }
+        $user = $this->users->current();
+        $this->users->next();
+        return $user;
+    }
+
+    public function initializeFromContext(ContextInterface $context)
+    {
+
     }
 }

@@ -1,11 +1,4 @@
 <?php
-/**
- * LdapUserExportProcessor.php
- *
- * Project: crm-enterprise-dev
- * Author: Jakub Babiak <jakub@babiak.cz>
- * Created: 18/05/15 11:29
- */
 
 namespace Oro\Bundle\LDAPBundle\ImportExport;
 

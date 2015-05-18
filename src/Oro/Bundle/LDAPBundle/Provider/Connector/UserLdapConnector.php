@@ -1,26 +1,35 @@
 <?php
 namespace Oro\Bundle\LDAPBundle\Provider\Connector;
 
+use FR3D\LdapBundle\Ldap\LdapManager;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractConnector;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
 class UserLdapConnector extends AbstractConnector implements TwoWaySyncConnectorInterface
 {
 
-    /**
-     * Return source iterator to read from
-     *
-     * @return \Iterator
-     */
-    protected function getConnectorSource()
+    /** @var LdapManager */
+    protected $manager;
+
+    /** @var array */
+    private $users;
+
+    public function setManager(LdapManager $manager)
     {
-        // TODO: Implement getConnectorSource() method.
+        $this->manager = $manager;
     }
 
     /**
-     * Returns label for UI
-     *
-     * @return string
+     * {@inheritdoc}
+     */
+    protected function getConnectorSource()
+    {
+        $this->manager->findUsers();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getLabel()
     {
@@ -28,9 +37,7 @@ class UserLdapConnector extends AbstractConnector implements TwoWaySyncConnector
     }
 
     /**
-     * Returns entity name that will be used for matching "import processor"
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getImportEntityFQCN()
     {
@@ -38,9 +45,7 @@ class UserLdapConnector extends AbstractConnector implements TwoWaySyncConnector
     }
 
     /**
-     * Returns job name for import
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getImportJobName()
     {
@@ -48,9 +53,7 @@ class UserLdapConnector extends AbstractConnector implements TwoWaySyncConnector
     }
 
     /**
-     * Returns type name, the same as registered in service tag
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getType()
     {
@@ -58,10 +61,16 @@ class UserLdapConnector extends AbstractConnector implements TwoWaySyncConnector
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getExportJobName()
     {
         return "ldap_export_users";
+    }
+
+    public function initializeFromContext(ContextInterface $context)
+    {
+        parent::initializeFromContext($context);
+        $configuration = $context->getConfiguration();
     }
 }
