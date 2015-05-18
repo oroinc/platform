@@ -86,12 +86,10 @@ class Calendar extends Calendars
         )->value($username);
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[starts-with(@id,'oro_calendar_event_form_allDay')]//div[contains(., '{$username}')]",
+            "//div[@id='select2-drop']//div[contains(., '{$username}')]",
             "Guest user not found"
         );
-        $this->test->byXpath(
-            "//div[starts-with(@id,'oro_calendar_event_form_allDay')]//div[contains(., '{$username}')]"
-        )->click();
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$username}')]")->click();
 
         return $this;
     }
