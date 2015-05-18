@@ -4,6 +4,7 @@ namespace Oro\Bundle\LDAPBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class LdapTransportSettingsFormType extends AbstractType
 {
@@ -20,6 +21,9 @@ class LdapTransportSettingsFormType extends AbstractType
             [
                 'label' => 'oro.ldap.transport.ldap.fields.server_hostname.label',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(),
+                ],
             ]
         );
         $builder->add(
@@ -28,6 +32,9 @@ class LdapTransportSettingsFormType extends AbstractType
             [
                 'label' => 'oro.ldap.transport.ldap.fields.server_port.label',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(),
+                ],
             ]
         );
         $builder->add(
@@ -36,6 +43,9 @@ class LdapTransportSettingsFormType extends AbstractType
             [
                 'label' => 'oro.ldap.transport.ldap.fields.server_encryption.label',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(),
+                ],
             ]
         );
         $builder->add(
@@ -44,6 +54,9 @@ class LdapTransportSettingsFormType extends AbstractType
             [
                 'label' => 'oro.ldap.transport.ldap.fields.server_base_dn.label',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(),
+                ],
             ]
         );
         $builder->add(
