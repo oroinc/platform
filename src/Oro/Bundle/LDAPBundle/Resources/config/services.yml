@@ -3,6 +3,8 @@ parameters:
     fr3d_ldap.ldap_driver.zend.class:                 Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver
     oro_ldap.extension.user_type.class:               Oro\Bundle\LDAPBundle\Form\Extension\UserTypeExtension
     oro_ldap.provider.user.class:                     Oro\Bundle\LDAPBundle\Provider\UserProvider
+    oro_ldap.provider.channel_type.class:             Oro\Bundle\LDAPBundle\Provider\ChannelType
+    oro_ldap.provider.ldap_transport.class:           Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
     oro_ldap.manager.import.class:                    Oro\Bundle\LDAPBundle\Manager\ImportManager
     oro_ldap.manager.export.class:                    Oro\Bundle\LDAPBundle\Manager\ExportManager
 
@@ -36,6 +38,16 @@ services:
         class: %oro_ldap.provider.user.class%
         arguments:
             - @doctrine
+
+    oro_ldap.provider.channel_type:
+        class: %oro_ldap.provider.channel_type.class%
+        tags:
+            - { name: oro_integration.channel, type: ldap }
+
+    oro_ldap.provider.ldap.transport:
+        class: %oro_ldap.provider.ldap_transport.class%
+        tags:
+            - { name: oro_integration.transport, type: ldap, channel_type: ldap }
 
     oro_ldap.manager.import:
         class: %oro_ldap.manager.import.class%

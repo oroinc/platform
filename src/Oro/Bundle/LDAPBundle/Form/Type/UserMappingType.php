@@ -81,16 +81,6 @@ class UserMappingType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults([
-            'translation_domain' => false,
-        ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'oro_ldap_user_mapping';

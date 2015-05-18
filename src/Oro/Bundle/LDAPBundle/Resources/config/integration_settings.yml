@@ -1,0 +1,63 @@
+oro_integration:
+    form:
+        mapping_settings:
+            user_filter:
+                type: text
+                options:
+                    label:    oro.ldap.transport.ldap.fields.user_filter.label
+                    required: false
+                priority: 10
+                applicable: [ldap]
+            user_mapping:
+                type: oro_ldap_user_mapping
+                options:
+                    label:    oro.ldap.transport.ldap.fields.user_mapping.label
+                    required: true
+                applicable: [ldap]
+                priority: 20
+            role_filter:
+                type: text
+                options:
+                    label:    oro.ldap.transport.ldap.fields.role_filter.label
+                    required: true
+                applicable: [ldap]
+                priority: 30
+            role_id_attribute:
+                type: text
+                options:
+                    label:   oro.ldap.transport.ldap.fields.role_id_attribute.label
+                    required: true
+                applicable: [ldap]
+                priority: 40
+            role_user_id_attribute:
+                type: text
+                options:
+                    label:    oro.ldap.transport.ldap.fields.role_user_id_attribute.label
+                    required: true
+                applicable: [ldap]
+                priority: 50
+            role_mapping:
+                type: oro_collection
+                options:
+                    label:    oro.ldap.transport.ldap.fields.role_mapping.label
+                    type:     oro_ldap_role_mapping
+                    required: false
+                    handle_primary: false
+                    show_form_when_empty: false
+                applicable: [ldap]
+                priority: 60
+            export_user_base_dn:
+                type: text
+                options:
+                    label:    oro.ldap.transport.ldap.fields.export_user_base_dn.label
+                    required: true
+                applicable: [ldap]
+                priority: 70
+            export_user_class:
+                type: text
+                options:
+                    label:    oro.ldap.transport.ldap.fields.export_user_class.label
+                    required: true
+                applicable: [ldap]
+                priority: 80
+
