@@ -68,9 +68,9 @@ class TestListener implements \PHPUnit_Framework_TestListener
         if ($suite instanceof PHPUnit_Extensions_SeleniumTestSuite ||
             in_array('selenium', $groups)
         ) {
-            $this->setSeleniumCoverageFlag();
             $this->runPhantom();
         }
+
     }
 
     public function endTestSuite(\PHPUnit_Framework_TestSuite $suite)
@@ -104,7 +104,11 @@ class TestListener implements \PHPUnit_Framework_TestListener
     private function runPhantom()
     {
         if (strtolower(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER) == 'phantomjs') {
-            if (!$this->waitServerRun(1)) {
+            if (!$this->waitServerRun(
+                1,
+                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
+                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT
+            )) {
                 if (PHP_OS == 'WINNT') {
                     pclose(
                         popen(
@@ -122,31 +126,31 @@ class TestListener implements \PHPUnit_Framework_TestListener
                         " > /dev/null 2> /dev/null &"
                     );
                 }
+                $this->waitServerRun(
+                    60,
+                    PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
+                    PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT
+                );
             }
-            $this->waitServerRun(
-                5,
-                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
-                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT
-            );
         }
     }
 
     private function waitServerRun($timeOut = 5, $url = 'localhost', $port = '4444')
     {
-        $running = false;
-        $i = 0;
         do {
-            $fp = @fsockopen($url, intval($port));
-            $i++;
-            if ($i >= $timeOut) {
+            $fp = @fsockopen($url, (int)$port, $errno, $errstr, 1);
+            $timeOut--;
+            if ($timeOut <= 0) {
                 break;
             }
-            sleep(1);
+            if (!$fp) {
+                sleep(1);
+            }
         } while (!$fp);
-        if ($fp !== false) {
+
+        if ($result = is_resource($fp)) {
             fclose($fp);
-            $running = true;
         }
-        return $running;
+        return $result;
     }
 }
