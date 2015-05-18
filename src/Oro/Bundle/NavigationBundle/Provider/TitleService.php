@@ -365,7 +365,7 @@ class TitleService implements TitleServiceInterface
             // update existing system titles
             if ($entity->getIsSystem()) {
                 $entity->setShortTitle($this->getShortTitle($title, $route));
-                $title = $this->createTile($route, $title);
+                $title = $this->createTitle($route, $title);
                 if (!$title) {
                     $title = '';
                 }
@@ -378,7 +378,7 @@ class TitleService implements TitleServiceInterface
 
         // create title items for new routes
         foreach ($data as $route => $title) {
-            if ($fullTitle = $this->createTile($route, $title)) {
+            if ($fullTitle = $this->createTitle($route, $title)) {
                 $entity = new Title();
                 $entity->setShortTitle($this->getShortTitle($title, $route));
                 $entity->setTitle($fullTitle);
@@ -392,7 +392,7 @@ class TitleService implements TitleServiceInterface
         $this->em->flush();
     }
 
-    protected function createTile($route, $title)
+    protected function createTitle($route, $title)
     {
         if (!($title instanceof Route)) {
             $titleData = array();
