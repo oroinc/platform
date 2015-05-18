@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
@@ -355,6 +356,65 @@ class EmailUser
         }
 
         return false;
+    }
+
+    /**
+     * @return ArrayCollection|null
+     */
+    public function getContacts()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getContacts();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|EmailBody
+     */
+    public function getEmailBody()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getEmailBody();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param null $recipientType
+     *
+     * @return null|EmailRecipient[]
+     */
+    public function getRecipients($recipientType = null)
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getRecipients($recipientType);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAttachments()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->hasAttachments();
+        }
+
+        return false;
+    }
+
+    public function getSentAt()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getSentAt();
+        }
+
+        return null;
     }
 
     /**

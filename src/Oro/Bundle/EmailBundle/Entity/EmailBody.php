@@ -78,6 +78,14 @@ class EmailBody
      */
     protected $attachments;
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToOne(targetEntity="Email", mappedBy="emailBody")
+     * @JMS\Exclude
+     */
+    protected $email;
+
     public function __construct()
     {
         $this->bodyIsText = false;

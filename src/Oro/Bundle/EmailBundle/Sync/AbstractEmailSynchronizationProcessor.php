@@ -241,6 +241,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $email->getCcRecipients(),
             $email->getBccRecipients()
         );
+        // todo CRM-2480
         $emailEntity
             ->addFolder($folder)
             ->setMessageId($email->getMessageId())

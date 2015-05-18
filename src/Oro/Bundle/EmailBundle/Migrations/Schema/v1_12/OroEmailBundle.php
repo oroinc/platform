@@ -37,7 +37,7 @@ class OroEmailBundle implements Migration
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_2A30C17126A2754B'
         );
-        $emailTable->addIndex(['email_body_id'], 'IDX_2A30C17126A2754B');
+        $emailTable->addUniqueIndex(['email_body_id'], 'UNIQ_2A30C17126A2754B');
     }
 
     /**
@@ -49,7 +49,9 @@ class OroEmailBundle implements Migration
     {
         $emailUserTable = $schema->createTable('oro_email_user');
         $emailUserTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        // todo remove `notnull` flag after data migration
         $emailUserTable->addColumn('folder_id', 'integer', ['notnull' => false]);
+        // todo remove `notnull` flag after data migration
         $emailUserTable->addColumn('email_id', 'integer', ['notnull' => false]);
         $emailUserTable->addColumn('created', 'datetime');
         $emailUserTable->addColumn('received', 'datetime');

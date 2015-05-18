@@ -136,6 +136,7 @@ class Processor
             $model->getBcc()
         );
 
+        // todo CRM-2480
         $email->addFolder($origin->getFolder(FolderType::SENT));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);

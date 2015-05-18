@@ -5,10 +5,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - e.id
-                    - e.subject
-                    - IDENTITY(e.thread)
-                    - e.sentAt
+                    - partial eu.{id, email}
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -16,6 +13,12 @@ datagrid:
                         -
                             join: eu.email
                             alias: e
+                        -
+                            join: e.thread
+                            alias: thread
+                        -
+                            join: e.recipients
+                            alias: recipients
                         -
                             join: e.recipients
                             alias: r_to
@@ -121,11 +124,7 @@ datagrid:
                             alias: e
                     inner:
                         - { join: eu.folder, alias: f }
-                        - { join: f.origin, alias: o }
                         - { join: e.fromEmailAddress, alias: a }
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
         properties:
             id: ~
         options:

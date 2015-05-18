@@ -135,6 +135,8 @@ class EmailEntityBuilder
         $result->setReceivedAt($receivedAt);
         $result->setEmail($email);
 
+        $this->batch->addEmailUser($result);
+
         return $result;
     }
 

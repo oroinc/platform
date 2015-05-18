@@ -44,11 +44,12 @@ class EmailManager
      */
     public function setEmailSeen(Email $entity)
     {
-        if (!$entity->isSeen()) {
+        // todo CRM-2480
+/*        if (!$entity->isSeen()) {
             $entity->setSeen(true);
             $this->em->persist($entity);
             $this->em->flush();
-        }
+        }*/
     }
 
     /**

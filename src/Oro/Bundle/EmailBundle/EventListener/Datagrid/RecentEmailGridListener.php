@@ -30,7 +30,7 @@ class RecentEmailGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datagrid   = $event->getDatagrid();
+/*        $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
             $parameters = $datagrid->getParameters();
@@ -52,6 +52,6 @@ class RecentEmailGridListener
                 $originIds[] = $emailOrigin->getId();
             }
             $queryBuilder->setParameter('origin_ids', $originIds);
-        }
+        }*/
     }
 }

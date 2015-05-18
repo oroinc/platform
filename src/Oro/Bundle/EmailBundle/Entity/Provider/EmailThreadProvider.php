@@ -80,6 +80,7 @@ class EmailThreadProvider
         if ($thread) {
             $emails = new ArrayCollection($this->getThreadEmails($entityManager, $entity));
             $criteria = new Criteria();
+            // todo CRM-2480
             $criteria->andWhere($criteria->expr()->eq('seen', false));
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $criteria->setMaxResults(1);
