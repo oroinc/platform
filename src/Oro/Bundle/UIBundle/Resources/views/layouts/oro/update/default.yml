@@ -49,6 +49,7 @@ layout:
                         vars:
                             form_name: { @value: $context.form.name }
                             form_method: { @value: $context.form.method }
+                            form_id: { @value: $context.form.id }
                 nav_buttons:
                     blockType: container
                 nav_buttons_before:

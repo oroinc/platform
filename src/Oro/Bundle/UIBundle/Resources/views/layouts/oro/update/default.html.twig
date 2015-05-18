@@ -28,7 +28,7 @@
     <div class="pull-right title-buttons-container">
         {{ block_widget(block) }}
         {% if form_method is not same as('GET') %}
-            <input type="hidden" name="input_action" value="" data-form-id="{{ form_name }}"/>
+            <input type="hidden" name="input_action" value="" data-form-id="{{ form_id }}"/>
         {% endif %}
     </div>
 {% endblock %}

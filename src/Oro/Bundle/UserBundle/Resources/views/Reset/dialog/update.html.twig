@@ -60,7 +60,7 @@
         });
         </script>
         <div class="form-container">
-            <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="change-password-form">
+            <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="change-password-form">
                 {% if not form.vars.valid and form.vars.errors|length %}
                     <div class="alert alert-error">
                         <div class="message">

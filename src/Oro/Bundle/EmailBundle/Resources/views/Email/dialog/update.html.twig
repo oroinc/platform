@@ -32,7 +32,8 @@
             </div>
         {% endif %}
         <div class="form-container">
-            <form id="{{ form.vars.name }}" method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
+            <form id="{{ form.vars.id}}" name="{{ form.vars.name }}"
+                  method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
                 {%
                     set emailEditorOptions = {
                         entityId: entity.entityId,
