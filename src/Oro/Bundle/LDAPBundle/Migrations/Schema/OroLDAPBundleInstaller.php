@@ -26,7 +26,8 @@ class OroLDAPBundleInstaller implements Installation
         $userTable = $schema->getTable('oro_user');
         $userTable->addColumn('dn', 'text', [
             'oro_options' => [
-                'extend' => ['owner' => ExtendScope::OWNER_SYSTEM]
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+                'form'   => ['is_enabled' => false],
             ],
             'notnull' => false
         ]);
