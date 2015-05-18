@@ -67,9 +67,9 @@ class LdapTransport extends Transport
     public function __construct()
     {
         $this->serverHostname = '127.0.0.1';
-        $this->serverPort = 389;
-        $this->serverBaseDn = 'dc=domain,dc=com';
-        $this->adminDn = 'dn=admin,dc=domain,dc=com';
+        $this->serverPort = 636;
+        $this->serverEncryption = 'tls';
+        $this->serverBaseDn = 'dc=local';
     }
 
     /**

@@ -6,6 +6,7 @@ oro_integration:
                 options:
                     label:    oro.ldap.transport.ldap.fields.user_filter.label
                     required: false
+                    data: objectClass=inetOrgPerson
                 priority: 10
                 applicable: [ldap]
             user_mapping:
@@ -20,6 +21,9 @@ oro_integration:
                 options:
                     label:    oro.ldap.transport.ldap.fields.role_filter.label
                     required: true
+                    data: objectClass=groupOfNames
+                    constraints:
+                        - NotBlank: ~
                 applicable: [ldap]
                 priority: 30
             role_id_attribute:
@@ -27,6 +31,9 @@ oro_integration:
                 options:
                     label:   oro.ldap.transport.ldap.fields.role_id_attribute.label
                     required: true
+                    data: cn
+                    constraints:
+                        - NotBlank: ~
                 applicable: [ldap]
                 priority: 40
             role_user_id_attribute:
@@ -34,6 +41,9 @@ oro_integration:
                 options:
                     label:    oro.ldap.transport.ldap.fields.role_user_id_attribute.label
                     required: true
+                    data: member
+                    constraints:
+                        - NotBlank: ~
                 applicable: [ldap]
                 priority: 50
             role_mapping:
@@ -51,6 +61,9 @@ oro_integration:
                 options:
                     label:    oro.ldap.transport.ldap.fields.export_user_base_dn.label
                     required: true
+                    data: ou=users,dc=local
+                    constraints:
+                        - NotBlank: ~
                 applicable: [ldap]
                 priority: 70
             export_user_class:
@@ -58,6 +71,9 @@ oro_integration:
                 options:
                     label:    oro.ldap.transport.ldap.fields.export_user_class.label
                     required: true
+                    data: inetOrgPerson
+                    constraints:
+                        - NotBlank: ~
                 applicable: [ldap]
                 priority: 80
 
