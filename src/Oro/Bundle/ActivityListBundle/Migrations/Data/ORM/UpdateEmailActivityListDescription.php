@@ -58,15 +58,12 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
         $activityProvider = $this->container->get('oro_email.activity_list.provider');
 
         foreach ($iterator as $activity) {
-
             $email = $emailRepository->find($activity->getRelatedActivityId());
-
             if ($email) {
                 $itemsCount++;
                 $activity->setDescription($activityProvider->getDescription($email));
                 $entities[] = $activity;
             }
-
             if (0 === $itemsCount % self::BATCH_SIZE) {
                 $this->saveEntities($manager, $entities);
                 $entities = [];
