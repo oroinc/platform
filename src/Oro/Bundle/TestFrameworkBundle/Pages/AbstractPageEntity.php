@@ -205,12 +205,12 @@ abstract class AbstractPageEntity extends AbstractPage
             if (!$exist) {
                 $this->assertElementNotPresent(
                     "//div[@class='pull-right']//a[contains(., '{$action}')]",
-                    "Action {$actions} exists but not expected"
+                    "Action {$action} exists but not expected"
                 );
             } else {
                 $this->assertElementPresent(
                     "//div[@class='pull-right']//a[contains(., '{$action}')]",
-                    "Action {$actions} does not exist"
+                    "Action {$action} does not exist"
                 );
             }
         }
