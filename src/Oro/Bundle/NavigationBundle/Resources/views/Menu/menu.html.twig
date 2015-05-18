@@ -116,7 +116,7 @@
     {% set extras = item.extras %}
 
     {% if extras.dialog is defined and extras.dialog %}
-        {{ Navigation.renderClientLink(action.dialog_config, {
+        {{ Navigation.renderClientLink(extras.dialog_config, {
             entityClass: oro_class_name(app.user, true),
             entityId: app.user.id
         }) }}

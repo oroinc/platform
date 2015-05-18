@@ -10,7 +10,7 @@
                         <form>
                             <input type="text"
                                    placeholder="{{ 'oro.navigation.shortcuts.placeholder'|trans }}"
-                                   data-source={{ options.source|json_encode|raw }} class="input"
+                                   data-source-url={{ options.source|json_encode|raw }} class="input"
                                    data-entity-class="{{ oro_class_name(app.user, true) }}"
                                    data-entity-id="{{ app.user.id }}"
                             >

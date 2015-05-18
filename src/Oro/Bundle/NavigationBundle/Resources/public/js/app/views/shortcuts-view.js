@@ -22,14 +22,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
         cache: {},
 
-        sourceRoute: null,
+        sourceUrl: null,
         entityClass: '',
         entityId: 0,
 
         initialize: function(options) {
             var self = this;
             this.options = _.defaults(options || {}, this.options);
-            this.sourceRoute = this.$el.data('source') ? this.$el.data('source') : null;
+            this.sourceUrl = this.$el.data('source-url') ? this.$el.data('source-url') : null;
             this.entityClass = this.$el.data('entity-class') ? this.$el.data('entity-class') : null;
             this.entityId = this.$el.data('entity-id') ? this.$el.data('entity-id') : null;
 
@@ -116,14 +116,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
         source: function(query, process) {
             var self = this;
-            if (_.isArray(this.sourceRoute)) {
-                process(this.sourceRoute);
+            if (_.isArray(this.sourceUrl)) {
+                process(this.sourceUrl);
                 this.render();
             } else if (!_.isUndefined(this.cache[query])) {
                 process(this.cache[query]);
                 this.render();
             } else {
-                var url = routing.generate(this.sourceRoute, { 'query': query });
+                var url = routing.generate(this.sourceUrl, { 'query': query });
                 $.get(url, _.bind(function(data) {
                     this.data = data;
                     var result = [];
