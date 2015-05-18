@@ -96,11 +96,11 @@ class LdapManager extends BaseManager
         }
 
         $dn = $this->createDn($user);
+        $user->setDn($dn);
         if ($this->driver->exists($dn) && strpos($dn, $user->getUsername()) === false) {
             $newDn = preg_replace('/(?<==).*?(?=,)/', $user->getUsername(), $dn, 1);
             $this->driver->move($dn, $newDn);
             $user->setDn($newDn);
-            $this->getUserEntityManager()->flush();
 
             $dn = $newDn;
         }

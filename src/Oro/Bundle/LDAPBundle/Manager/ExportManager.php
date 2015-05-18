@@ -73,10 +73,14 @@ class ExportManager
                 }
 
                 if ($i % static::BATCH_SIZE === 0) {
+                    $this->userManager->getStorageManager()->flush();
                     $this->userManager->getStorageManager()->clear();
                 }
                 $i++;
             }
+
+            $this->userManager->getStorageManager()->flush();
+            $this->userManager->getStorageManager()->clear();
         } catch (Exception $ex) {
             $result['errors'][] = 'oro.ldap.export_users.error';
              $this->logger->error($ex->getMessage(), ['exception' => $ex]);
