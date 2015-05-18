@@ -456,6 +456,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->emailEntityBuilder->getBatch()->persist($this->em);
 
         // update references if needed
+        // todo CRM-2480
         $changes = $this->emailEntityBuilder->getBatch()->getChanges();
         foreach ($newImapEmails as $imapEmail) {
             foreach ($changes as $change) {

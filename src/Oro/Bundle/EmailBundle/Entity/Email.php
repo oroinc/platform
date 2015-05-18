@@ -208,6 +208,7 @@ class Email extends ExtendEmail
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailBody", inversedBy="email", cascade={"persist"})
      * @ORM\JoinColumn(name="email_body_id", referencedColumnName="id", onDelete="SET NULL")
+     * @JMS\Exclude
      */
     protected $emailBody;
 
@@ -216,7 +217,6 @@ class Email extends ExtendEmail
      *
      * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
      *      cascade={"persist", "remove"}, orphanRemoval=true)
-     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\Email")
      * @JMS\Exclude
      */
     protected $emailUsers;
@@ -725,11 +725,11 @@ class Email extends ExtendEmail
      */
     public function getFolders()
     {
-        $folders = [];
+        $folders = new ArrayCollection();
 
         foreach ($this->getEmailUsers() as $emailUser) {
             /** @var EmailUser $emailUser */
-            $folders[] = $emailUser->getFolder();
+            $folders->add($emailUser->getFolder());
         }
 
         return $folders;

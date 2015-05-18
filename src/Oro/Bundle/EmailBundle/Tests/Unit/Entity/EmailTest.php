@@ -84,16 +84,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bccRecipient === $recipients->first());
     }
 
-    public function testFolderGetterAndSetter()
-    {
-        $folder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
-
-        $entity = new Email();
-        $entity->addFolder($folder);
-
-        $this->assertTrue($folder === $entity->getFolders()->first());
-    }
-
     public function testEmailBodyGetterAndSetter()
     {
         $emailBody = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
@@ -155,7 +145,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         return [
             ['subject', 'testSubject'],
             ['fromName', 'testFromName'],
-            ['receivedAt', new \DateTime('now', new \DateTimeZone('UTC'))],
             ['sentAt', new \DateTime('now', new \DateTimeZone('UTC'))],
             ['importance', Email::HIGH_IMPORTANCE],
             ['internalDate', new \DateTime('now', new \DateTimeZone('UTC'))],
@@ -163,12 +152,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['xMessageId', 'testXMessageId'],
             ['thread', new EmailThread()],
             ['xThreadId', 'testxXThreadId'],
-            ['seen', true],
-            ['seen', ''],
-            ['seen', 0],
-            ['seen', 1],
-            ['organization', new Organization()],
-            ['owner', new User()],
         ];
     }
 

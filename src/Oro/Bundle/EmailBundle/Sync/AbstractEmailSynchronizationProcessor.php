@@ -243,12 +243,10 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         );
         // todo CRM-2480
         $emailEntity
-            ->addFolder($folder)
             ->setMessageId($email->getMessageId())
             ->setRefs($email->getRefs())
             ->setXMessageId($email->getXMessageId())
-            ->setXThreadId($email->getXThreadId())
-            ->setSeen($isSeen);
+            ->setXThreadId($email->getXThreadId());
 
         return $emailEntity;
     }

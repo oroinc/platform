@@ -47,6 +47,8 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
      */
     public function load(ObjectManager $manager)
     {
+        // todo CRM-2480 fix migration
+        return;
         $this->objectManager = $manager;
 
         /** @var AclManager $manager */

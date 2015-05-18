@@ -103,7 +103,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false)
-     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
      */
     protected $folder;
@@ -113,7 +112,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false)
-     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\Email")
      * @JMS\Exclude
      */
     protected $email;
@@ -248,7 +246,7 @@ class EmailUser
      *
      * @return Email
      */
-    public function setFolder(EmailFolder $folder)
+    public function setFolder($folder)
     {
         $this->folder = $folder;
 
