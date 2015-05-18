@@ -1,16 +1,14 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/transition/view/row'],
-function(_, Backbone, TransitionRowView) {
+define(['underscore', 'chaplin', 'jquery', 'oroworkflow/js/workflow-management/transition/view/row'],
+function(_, Chaplin, $, TransitionRowView) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/transition/view/list
      * @class   oro.WorkflowManagement.TransitionsListView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         options: {
             listElBodyEl: 'tbody',
             template: null,
@@ -56,7 +54,7 @@ function(_, Backbone, TransitionRowView) {
 
         remove: function() {
             this.resetView();
-            Backbone.View.prototype.remove.call(this);
+            Chaplin.View.prototype.remove.call(this);
         },
 
         resetView: function() {

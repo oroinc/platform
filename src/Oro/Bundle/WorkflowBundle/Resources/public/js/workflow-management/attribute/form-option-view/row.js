@@ -1,9 +1,13 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oroui/js/delete-confirmation'],
-function(_, __, Backbone, Confirmation) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    'chaplin',
+    'jquery',
+    'oroui/js/delete-confirmation'
+],
+function(_, __, Chaplin, $, Confirmation) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/attribute/form-option-view/row

@@ -1,23 +1,22 @@
 /* global define */
 define([
     'underscore',
-    'backbone',
+    'chaplin',
+    'jquery',
     'oroworkflow/js/workflow-management/helper',
     'orotranslation/js/translator',
     'oroentity/js/field-choice',
     'jquery.validate'
 ],
-function(_, Backbone, Helper, __) {
+function(_, Chaplin, $, Helper, __) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/attribute/form-option-view/edit
      * @class   oro.WorkflowManagement.AttributeFormOptionEditView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         attributes: {
             'class': 'widget-content'
         },

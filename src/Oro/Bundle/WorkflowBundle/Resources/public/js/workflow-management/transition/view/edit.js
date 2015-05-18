@@ -1,24 +1,24 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
+define(['underscore', 'orotranslation/js/translator', 'chaplin', 'jquery', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
     'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
     'oroworkflow/js/workflow-management/attribute/form-option-view/list',
     'oroui/js/mediator', 'jquery.validate'],
-function (_, __, Backbone, DialogWidget,
+function (_, __, Chaplin, $, DialogWidget,
          Helper,
          AttributeFormOptionEditView,
          AttributeFormOptionListView,
          mediator) {
     'use strict';
 
-    var $ = Backbone.$;
+    var $ = Chaplin.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/transition/view/edit
      * @class   oro.WorkflowManagement.TransitionEditView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -227,7 +227,7 @@ function (_, __, Backbone, DialogWidget,
             if (this.attributesList) {
                 this.attributesList.remove();
             }
-            Backbone.View.prototype.remove.call(this);
+            Chaplin.View.prototype.remove.call(this);
         },
 
         renderWidget: function() {

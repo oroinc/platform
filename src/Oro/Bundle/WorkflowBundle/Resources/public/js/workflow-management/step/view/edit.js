@@ -1,19 +1,17 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oroui/js/messenger', 'oro/dialog-widget',
+define(['underscore', 'orotranslation/js/translator', 'chaplin', 'jquery', 'oroui/js/messenger', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
     'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list', 'jquery.validate'
 ],
-function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, TransitionsListView) {
+function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, TransitionsListView) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/step/view/edit
      * @class   oro.WorkflowManagement.StepEditView
-     * @extends Backbone.View
+     * @extends Chaplin.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -62,7 +60,7 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             if (this.transitionsListView) {
                 this.transitionsListView.remove();
             }
-            Backbone.View.prototype.remove.call(this);
+            Chaplin.View.prototype.remove.call(this);
         },
 
         renderTransitions: function() {

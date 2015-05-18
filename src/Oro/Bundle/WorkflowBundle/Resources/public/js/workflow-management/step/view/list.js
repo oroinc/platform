@@ -1,16 +1,14 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/step/view/row'],
-function(_, Backbone, StepRowView) {
+define(['underscore', 'chaplin', 'jquery', 'oroworkflow/js/workflow-management/step/view/row'],
+function(_, Chaplin, $, StepRowView) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/step/view/list
      * @class   oro.WorkflowManagement.StepsListView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         options: {
             listElBodyEl: 'tbody',
             template: null,
