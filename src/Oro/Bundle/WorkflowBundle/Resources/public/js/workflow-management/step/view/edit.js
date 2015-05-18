@@ -22,9 +22,12 @@ function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, Transitio
             workflow: null
         },
 
+        listen: {
+            'destroy model': 'remove'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-            this.listenTo(this.model, 'destroy', this.remove);
 
             var template = this.options.template || $('#step-form-template').html();
             this.template = _.template(template);

@@ -21,13 +21,15 @@ function(_, Chaplin, $) {
             stepFrom: null
         },
 
+        listen: {
+            'destroy model': 'remove',
+            'change model': 'render'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-row-template').html();
             this.template = _.template(template);
-
-            this.listenTo(this.model, 'change', this.render);
-            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         triggerRemoveTransition: function(e) {

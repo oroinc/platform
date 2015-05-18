@@ -23,12 +23,15 @@ function(_, Chaplin, $, TransitionsShortListView) {
             template: null
         },
 
+        listen: {
+            'destroy model': 'remove'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
             this.transitionsListView = null;
-            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         triggerEditStep: function(e) {

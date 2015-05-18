@@ -3,15 +3,12 @@ define(['underscore', 'orotranslation/js/translator', 'chaplin', 'jquery', 'oro/
     'oroworkflow/js/workflow-management/helper',
     'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
     'oroworkflow/js/workflow-management/attribute/form-option-view/list',
-    'oroui/js/mediator', 'jquery.validate'],
+    'jquery.validate'],
 function (_, __, Chaplin, $, DialogWidget,
          Helper,
          AttributeFormOptionEditView,
-         AttributeFormOptionListView,
-         mediator) {
+         AttributeFormOptionListView) {
     'use strict';
-
-    var $ = Chaplin.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/transition/view/edit
@@ -73,9 +70,12 @@ function (_, __, Chaplin, $, DialogWidget,
             ]
         },
 
+        listen: {
+            'destroy model': 'remove'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-            this.listenTo(this.model, 'destroy', this.remove);
 
             var template = this.options.template || $('#transition-form-template').html();
             this.template = _.template(template);
