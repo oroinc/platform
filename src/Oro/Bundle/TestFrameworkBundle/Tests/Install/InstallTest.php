@@ -40,7 +40,7 @@ class InstallTest extends Selenium2TestCase
                     ->setPasswordSecond('admin')
                     ->setEmail('admin@example.com')
                     ->setFirstName('John')
-                    ->setlastName('Doe')
+                    ->setLastName('Doe')
                     ->setLoadFixtures();
 
         /** @var OroFinish $finish */
