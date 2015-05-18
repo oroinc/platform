@@ -297,4 +297,14 @@ class LdapManager extends BaseManager
 
         return $this->propertyAccessor;
     }
+
+    /**
+     * @return array
+     */
+    public function getSynchronizedFields()
+    {
+        return array_map(function ($attribute) {
+            return $attribute['user_field'];
+        }, $this->params['attributes']);
+    }
 }
