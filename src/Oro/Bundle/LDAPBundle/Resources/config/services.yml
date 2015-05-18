@@ -1,12 +1,13 @@
 parameters:
-    fr3d_ldap.security.authentication.provider.class: Oro\Bundle\LDAPBundle\Security\LdapProvider
-    fr3d_ldap.ldap_driver.zend.class:                 Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver
-    oro_ldap.extension.user_type.class:               Oro\Bundle\LDAPBundle\Form\Extension\UserTypeExtension
-    oro_ldap.provider.user.class:                     Oro\Bundle\LDAPBundle\Provider\UserProvider
-    oro_ldap.provider.channel_type.class:             Oro\Bundle\LDAPBundle\Provider\ChannelType
-    oro_ldap.provider.ldap_transport.class:           Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
-    oro_ldap.manager.import.class:                    Oro\Bundle\LDAPBundle\Manager\ImportManager
-    oro_ldap.manager.export.class:                    Oro\Bundle\LDAPBundle\Manager\ExportManager
+    fr3d_ldap.security.authentication.provider.class:   Oro\Bundle\LDAPBundle\Security\LdapProvider
+    fr3d_ldap.ldap_driver.zend.class:                   Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver
+    oro_ldap.provider.user.class:                       Oro\Bundle\LDAPBundle\Provider\UserProvider
+    oro_ldap.provider.channel_type.class:               Oro\Bundle\LDAPBundle\Provider\ChannelType
+    oro_ldap.provider.ldap_transport.class:             Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
+    oro_ldap.form.type.ldap_transport_setting.class:    Oro\Bundle\LDAPBundle\Form\Type\LdapTransportSettingsFormType
+    oro_ldap.manager.import.class:                      Oro\Bundle\LDAPBundle\Manager\ImportManager
+    oro_ldap.manager.export.class:                      Oro\Bundle\LDAPBundle\Manager\ExportManager
+    oro_ldap.event_listener.user_change_listener.class: Oro\Bundle\LDAPBundle\EventListener\UserChangeListener
 
 services:
     fr3d_ldap.security.authentication.provider:
@@ -69,3 +70,15 @@ services:
             - @logger
         tags:
             - { name: monolog.logger, channel: oro_distribution }
+
+    oro_ldap.ldap_manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_ldap.ldap.ldap_manager }
+
+    oro_ldap.event_listener.user_change_listener.class:
+        class:  %oro_ldap.event_listener.user_change_listener.class%
+        arguments:
+            - @oro_ldap.ldap_manager.link
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
