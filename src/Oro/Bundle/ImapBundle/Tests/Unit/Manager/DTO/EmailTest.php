@@ -67,10 +67,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $srcBody->expects($this->at(0))
             ->method('getContent')
-            ->with($this->equalTo(Body::FORMAT_HTML))
-            ->will($this->throwException(new InvalidBodyFormatException()));
-        $srcBody->expects($this->at(1))
-            ->method('getContent')
             ->with($this->equalTo(Body::FORMAT_TEXT))
             ->will($this->returnValue($srcBodyContent));
         $srcBodyContent->expects($this->once())

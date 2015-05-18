@@ -2,18 +2,14 @@
 
 namespace Oro\Component\Layout\Extension\Theme\DataProvider;
 
-use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class ThemeDataProvider implements DataProviderInterface, ContextAwareInterface
+class ThemeDataProvider implements DataProviderInterface
 {
     /** @var ThemeManager */
     protected $themeManager;
-
-    /** @var ContextInterface */
-    protected $context;
 
     /**
      * @param ThemeManager $themeManager
@@ -21,14 +17,6 @@ class ThemeDataProvider implements DataProviderInterface, ContextAwareInterface
     public function __construct(ThemeManager $themeManager)
     {
         $this->themeManager = $themeManager;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContext(ContextInterface $context)
-    {
-        $this->context = $context;
     }
 
     /**
@@ -44,8 +32,8 @@ class ThemeDataProvider implements DataProviderInterface, ContextAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function getData()
+    public function getData(ContextInterface $context)
     {
-        return $this->themeManager->getTheme($this->context->get('theme'));
+        return $this->themeManager->getTheme($context->get('theme'));
     }
 }

@@ -12,38 +12,38 @@ define(function (require) {
         messenger = require('oroui/js/messenger'),
         ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
-    function showField(fieldName) {
+    function showField(fieldName, $fieldset) {
         var field = fieldName.toLowerCase();
-        $('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'block');
-        $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').unbind('focusout');
-        $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').on('focusout', function(e) {
+        $fieldset.find('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'block');
+        $fieldset.find('#oro_email_email_' + field).parents('.controls').find('input.select2-input').unbind('focusout');
+        $fieldset.find('#oro_email_email_' + field).parents('.controls').find('input.select2-input').on('focusout', function(e) {
             setTimeout(function(){
-                if (!$('#oro_email_email_' + field).val()) {
-                    hideField(fieldName);
+                if (!$fieldset.find('#oro_email_email_' + field).val()) {
+                    hideField(fieldName, $fieldset);
                 }
             }, 200);
         });
-        $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').focus();
+        $fieldset.find('#oro_email_email_' + field).parents('.controls').find('input.select2-input').focus();
 
-        $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__('oro.email.to'));
+        $fieldset.find('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(__('oro.email.to'));
         addForgedAsterisk();
 
     }
 
-    function hideField(fieldName) {
+    function hideField(fieldName, $fieldset) {
         var field = fieldName.toLowerCase();
-        $('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'none');
+        $fieldset.find('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'none');
 
-        if ($('span#show' + fieldName).length > 0) {
+        if ($fieldset.find('span#show' + fieldName).length > 0) {
             return;
         }
 
-        $('#cc-bcc-holder').append('<span id="show' + fieldName + '">' + fieldName +  '</span>');
-        $('#show' + fieldName).on('click', function(e) {
+        $fieldset.find('#cc-bcc-holder').append('<span id="show' + fieldName + '">' + fieldName +  '</span>');
+        $fieldset.find('#show' + fieldName).on('click', function(e) {
             e.stopPropagation();
             var target = e.target || window.event.target;
             $(target).remove();
-            showField(fieldName);
+            showField(fieldName, $fieldset);
         });
     }
 
@@ -70,6 +70,7 @@ define(function (require) {
 
         init: function () {
             var self = this,
+                $fieldset = this.options._sourceElement,
                 $subject = this.options._sourceElement.find('[name$="[subject]"]'),
                 $body = this.options._sourceElement.find('[name$="[body]"]'),
                 $type = this.options._sourceElement.find('[name$="[type]"]'),
@@ -166,7 +167,7 @@ define(function (require) {
             });
 
             addForgedAsterisk();
-            this.bindFieldEvents();
+            this.bindFieldEvents($fieldset);
         },
 
         unbindEvents: function (e) {
@@ -184,7 +185,7 @@ define(function (require) {
             EmailEditorComponent.__super__.dispose.call(this);
         },
 
-        bindFieldEvents: function() {
+        bindFieldEvents: function($fieldset) {
             $('input.taggable-field').each(function(key, elem) {
                 var select2Config = {
                     containerCssClass: 'taggable-email',
@@ -198,15 +199,15 @@ define(function (require) {
                 $(elem).select2(select2Config);
             });
             if (!this.options.bcc.length || !this.options.cc.length) {
-                $('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
+                $fieldset.find('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
                     '<div id="cc-bcc-holder"/>'
                 );
             }
             if (!this.options.cc.length) {
-                hideField('Cc');
+                hideField('Cc', $fieldset);
             }
             if (!this.options.bcc.length) {
-                hideField('Bcc');
+                hideField('Bcc', $fieldset);
             }
         }
     });

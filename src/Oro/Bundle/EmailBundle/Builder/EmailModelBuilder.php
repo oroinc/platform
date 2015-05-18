@@ -389,7 +389,7 @@ class EmailModelBuilder
         $collection = new ArrayCollection($attachments);
         $fileNames = [];
 
-        $filtered = $collection->filter(function($entry) use (&$fileNames) {
+        $filtered = $collection->filter(function ($entry) use (&$fileNames) {
             /** @var EmailAttachment $entry */
             if (in_array($entry->getFileName(), $fileNames)) {
                 return false;

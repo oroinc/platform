@@ -12,6 +12,7 @@ config:
         'jquery.select2':
             deps:
                 - 'jquery'
+            exports: 'Select2'
         'jquery.simplecolorpicker':
             deps:
                 - 'jquery'
