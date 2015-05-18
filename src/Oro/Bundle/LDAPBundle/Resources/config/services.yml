@@ -5,8 +5,11 @@ parameters:
     oro_ldap.provider.user.class:                     Oro\Bundle\LDAPBundle\Provider\UserProvider
     oro_ldap.provider.channel_type.class:             Oro\Bundle\LDAPBundle\Provider\ChannelType
     oro_ldap.provider.ldap_transport.class:           Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
+    oro_ldap.provider.connector.user.class:           Oro\Bundle\LDAPBundle\Provider\Connector\UserLdapConnector
     oro_ldap.manager.import.class:                    Oro\Bundle\LDAPBundle\Manager\ImportManager
     oro_ldap.manager.export.class:                    Oro\Bundle\LDAPBundle\Manager\ExportManager
+    oro_ldap.importexport.reader.ldap.user.class:     Oro\Bundle\LDAPBundle\ImportExport\LdapUserReader
+    oro_ldap.importexport.writer.ldap.user.class:     Oro\Bundle\LDAPBundle\ImportExport\LdapUserWriter
 
 services:
     fr3d_ldap.security.authentication.provider:
@@ -49,6 +52,12 @@ services:
         tags:
             - { name: oro_integration.transport, type: ldap, channel_type: ldap }
 
+    oro_ldap.provider.connector.user:
+        class: %oro_ldap.provider.connector.user.class%
+        tags:
+            - { name: oro_integration.connector, type: user, channel_type: ldap }
+        arguments: [@oro_importexport.context_registry, @oro_integration.logger.strategy, @oro_integration.provider.connector_context_mediator]
+
     oro_ldap.manager.import:
         class: %oro_ldap.manager.import.class%
         arguments:
@@ -69,3 +78,9 @@ services:
             - @logger
         tags:
             - { name: monolog.logger, channel: oro_distribution }
+
+    oro_ldap.importexport.reader.ldap.user:
+        class: %oro_ldap.importexport.reader.ldap.user.class%
+
+    oro_ldap.importexport.writer.ldap.user:
+        class: %oro_ldap.importexport.writer.ldap.user.class%

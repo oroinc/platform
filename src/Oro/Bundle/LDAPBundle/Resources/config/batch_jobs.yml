@@ -1,0 +1,24 @@
+connector:
+    name: oro_importexport
+    jobs:
+        ldap_export_users:
+            title: "Export users to LDAP server"
+            type: export
+            steps:
+                export:
+                    title:     export
+                    services:
+                        reader:    oro_importexport.reader.entity
+                        processor: oro_importexport.processor.export_delegate
+                        writer:    oro_ldap.importexport.writer.ldap.user
+
+        ldap_import_users:
+            title: "Import users from LDAP server"
+            type: import
+            steps:
+                import:
+                    title:     import
+                    services:
+                        reader:    oro_ldap.importexport.reader.ldap.user
+                        processor: oro_importexport.processor.import_delegate
+                        writer:    oro_importexport.writer.entity
