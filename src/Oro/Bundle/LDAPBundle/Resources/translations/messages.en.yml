@@ -1,6 +1,6 @@
 oro:
     user:
-        dn.label: Dn
+        dn.label: Distinguished Name
     ldap:
         action:
             import_users: Import users from LDAP
@@ -30,8 +30,8 @@ oro:
                 server_hostname.label: Hostname
                 server_port.label: Port
                 server_encryption.label: Encryption
-                server_base_dn.label: Base Dn
-                admin_dn.label: Dn
+                server_base_dn.label: Base Distinguished Name
+                admin_dn.label: Distinguished Name
                 admin_password.label: Password
                 user_filter.label: Filter
                 user_mapping.label: Mapping
@@ -41,7 +41,7 @@ oro:
                 role_mapping.label: Mapping
                 role_ldap.label: LDAP Role
                 role_crm.label: CRM Roles
-                export_user_base_dn.label: Base Dn
+                export_user_base_dn.label: Base Distinguished Name
                 export_user_class.label: User class
         channel_type:
             label: LDAP
@@ -55,8 +55,8 @@ oro:
                   server_hostname.label: Server Hostname
                   server_port.label: Server Port
                   server_encryption.label: Server Encryption
-                  server_base_dn.label: Server Base Dn
-                  admin_dn.label: Admin Dn
+                  server_base_dn.label: Server Base Distinguished Name
+                  admin_dn.label: Admin Distinguished Name
                   admin_password.label: Admin Password
                   user_filter.label: User Filter
                   user_mapping.label: User Mapping
@@ -66,5 +66,5 @@ oro:
                   role_mapping.label: Role Mapping
                   role_ldap.label: LDAP Role
                   role_crm.label: CRM Roles
-                  export_user_base_dn.label: Export Base Dn
+                  export_user_base_dn.label: Export Base Distinguished Name
                   export_user_class.label: Export User class
