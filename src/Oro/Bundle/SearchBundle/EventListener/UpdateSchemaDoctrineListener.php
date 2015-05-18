@@ -50,13 +50,12 @@ class UpdateSchemaDoctrineListener
             }
         }
 
-        if ($event->getCommand() instanceof UpdateSchemaCommand)
-        {
+        if ($event->getCommand() instanceof UpdateSchemaCommand) {
             $entities = $this->registry->getRepository('OroSearchBundle:UpdateEntity')->findAll();
             if (count($entities)) {
                 $em = $this->registry->getManager();
                 foreach ($entities as $entity) {
-                    $job = new Job(ReindexCommand::COMMAND_NAME,  ['class' => $entity->getEntity()]);
+                    $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entity->getEntity()]);
                     $em->persist($job);
                     $em->remove($entity);
                 }
