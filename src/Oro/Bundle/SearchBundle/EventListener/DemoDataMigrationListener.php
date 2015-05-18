@@ -61,6 +61,7 @@ class DemoDataMigrationListener
     protected function isProcessingRequired(ConsoleEvent $event)
     {
         return $event->getCommand() instanceof LoadDataFixturesCommand
+            && $event->getInput()->hasOption('fixtures-type')
             && $event->getInput()->getOption('fixtures-type') == LoadDataFixturesCommand::DEMO_FIXTURES_TYPE;
     }
 }
