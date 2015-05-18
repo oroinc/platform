@@ -6,10 +6,11 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+
+use Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition;
 
 /**
  * Check For Active integration of given type
@@ -83,21 +84,5 @@ class HasActiveIntegration extends AbstractCondition implements ContextAccessorA
         }
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray()
-    {
-        return $this->convertToArray($this->type);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compile($factoryAccessor)
-    {
-        return $this->convertToPhpCode($this->type, $factoryAccessor);
     }
 }

@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\AbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
-use Oro\Bundle\WorkflowBundle\ConfigExpression\Configurable as ConfigurableCondition;
+
+use Oro\Bundle\WorkflowBundle\Model\AbstractAssembler;
+use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
 
 class ActionAssembler extends AbstractAssembler
 {

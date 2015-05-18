@@ -26,7 +26,7 @@ class ReplacePropertyPath implements ConfigurationPassInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function passConfiguration(array $data)
     {

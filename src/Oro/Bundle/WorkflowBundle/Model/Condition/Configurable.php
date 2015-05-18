@@ -1,10 +1,9 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\ConfigExpression;
+namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\ConfigExpression\ExpressionAssembler;
-use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 
@@ -46,35 +45,10 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
     /**
      * {@inheritdoc}
      */
-    public function toArray()
-    {
-        $params = [$this->configuration];
-        if ($this->condition !== null) {
-            $params[] = $this->condition->toArray();
-        }
-
-        return $this->convertToArray($params);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compile($factoryAccessor)
-    {
-        $params = [$this->configuration];
-        if ($this->condition !== null) {
-            $params[] = $this->condition->toArray();
-        }
-
-        return $this->convertToPhpCode($params, $factoryAccessor);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function initialize(array $options)
     {
         $this->configuration = $options;
+
         return $this;
     }
 
@@ -83,10 +57,18 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
      */
     public function isConditionAllowed($context)
     {
+        return $this->getCondition()->evaluate($context, $this->errors) ? true : false;
+    }
+
+    /**
+     * @return ExpressionInterface
+     */
+    protected function getCondition()
+    {
         if (!$this->condition) {
             $this->condition = $this->assembler->assemble($this->configuration);
         }
 
-        return $this->condition->evaluate($context, $this->errors) ? true : false;
+        return $this->condition;
     }
 }

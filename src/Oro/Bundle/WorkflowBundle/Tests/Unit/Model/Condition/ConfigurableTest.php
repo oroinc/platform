@@ -1,7 +1,8 @@
 <?php
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\ConfigExpression;
 
-use Oro\Bundle\WorkflowBundle\ConfigExpression\Configurable;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Condition;
+
+use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable;
 
 class ConfigurableTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,13 +23,15 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->condition = new Configurable($this->assembler);
     }
+
     public function testInitialize()
     {
         $this->assertInstanceOf(
             'Oro\Component\ConfigExpression\Condition\AbstractCondition',
-            $this->condition->initialize(array())
+            $this->condition->initialize([])
         );
     }
+
     public function testEvaluate()
     {
         $options = [];

@@ -4,22 +4,27 @@ namespace Oro\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
+use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
 
 class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {
     /** @var string */
     protected $path;
 
-    /** @var array */
-    protected $elements;
+    /**
+     * The elements of the property path.
+     *
+     * @var string[]
+     */
+    protected $elements = [];
 
     /**
      * Contains a Boolean for each property in $elements denoting whether this
      * element is an index. It is a property otherwise.
      *
-     * @var array
+     * @var bool[]
      */
-    private $isIndex = array();
+    private $isIndex = [];
 
     /**
      * @param string $path
@@ -42,23 +47,32 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             throw new Exception\InvalidPropertyPathException('The property path must not be empty.');
         }
 
-        $this->path     = $path;
-        $this->elements = [];
+        $this->path = $path;
 
         $remaining = $this->path;
         $pos       = 0;
 
         // first element is evaluated differently - no leading dot for properties
         if (preg_match('/^(([^\.\[]+)|\[([^\]]+)\])(.*)/', $remaining, $matches)) {
-            $this->elements[] = $matches[2] === '' ? $matches[3] : $matches[2];
-            $this->isIndex[]  = $matches[2] === '' ? true : false;
+            if ($matches[2] === '') {
+                $this->elements[] = $matches[3];
+                $this->isIndex[]  = true;
+            } else {
+                $this->elements[] = $matches[2];
+                $this->isIndex[]  = false;
+            }
 
             $pos       = strlen($matches[1]);
             $remaining = $matches[4];
             $pattern   = '/^(\.([^\.|\[]+)|\[([^\]]+)\])(.*)/';
             while (preg_match($pattern, $remaining, $matches)) {
-                $this->elements[] = $matches[2] === '' ? $matches[3] : $matches[2];
-                $this->isIndex[]  = $matches[2] === '' ? true : false;
+                if ($matches[2] === '') {
+                    $this->elements[] = $matches[3];
+                    $this->isIndex[]  = true;
+                } else {
+                    $this->elements[] = $matches[2];
+                    $this->isIndex[]  = false;
+                }
 
                 $pos += strlen($matches[1]);
                 $remaining = $matches[4];
@@ -89,14 +103,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getElements()
-    {
-        return $this->elements;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getLength()
     {
         return count($this->elements);
@@ -108,7 +114,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     public function getParent()
     {
         if ($this->getLength() <= 1) {
-            return;
+            return null;
         }
 
         $parent = clone $this;
@@ -128,6 +134,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     public function getIterator()
     {
         return new PropertyPathIterator($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getElements()
+    {
+        return $this->elements;
     }
 
     /**

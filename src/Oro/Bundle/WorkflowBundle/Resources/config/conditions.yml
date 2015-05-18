@@ -16,7 +16,7 @@ services:
             - [addExtension, [@oro_workflow.expression.extension]]
 
     oro_workflow.condition.configurable:
-        class: Oro\Bundle\WorkflowBundle\ConfigExpression\Configurable
+        class: Oro\Bundle\WorkflowBundle\Model\Condition\Configurable
         arguments:
             - @oro_workflow.expression.assembler
         tags:
@@ -103,4 +103,4 @@ services:
             - @oro_security.security_facade
             - @doctrine
         tags:
-            - { name: oro_workflow.condition, alias: acl_granted }
+            - { name: oro_workflow.condition, alias: acl|acl_granted }
