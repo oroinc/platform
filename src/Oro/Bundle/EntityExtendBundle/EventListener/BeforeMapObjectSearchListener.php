@@ -44,12 +44,7 @@ class BeforeMapObjectSearchListener
                 $searchConfigs = $this->configManager->getConfigs('search', $className);
 
                 $mapConfig = $this->checkEntityMapping($mapConfig, $config);
-                /**
-                 * $config->get('owner') === 'Custom' && $config->get('state') === 'Active'
-                 * // && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
-                 */
-                if (
-                    isset($mapConfig[$className])
+                if (isset($mapConfig[$className])
                     && (
                         $config->get('owner') === 'System'
                         || ($config->get('owner') === 'Custom' && $config->get('state') === 'Active'
@@ -86,14 +81,13 @@ class BeforeMapObjectSearchListener
         $fieldName = $fieldId->getFieldName();
         if ($searchConfig->is('searchable')) {
             $fieldType = $this->transformCustomType($fieldId->getFieldType());
-            if (
-            in_array(
-                $fieldType,
-                [
-                    Indexer::RELATION_ONE_TO_ONE,
-                    Indexer::RELATION_MANY_TO_ONE
-                ]
-            )
+            if (in_array(
+                    $fieldType,
+                    [
+                        Indexer::RELATION_ONE_TO_ONE,
+                        Indexer::RELATION_MANY_TO_ONE
+                    ]
+                )
             ) {
                 $config       = $this->configManager->getConfig(
                     $this->configManager->getId('extend', $className, $fieldName)
@@ -114,15 +108,14 @@ class BeforeMapObjectSearchListener
                         ]
                     ]
                 ];
-            } elseif (
-            in_array(
-                $fieldType,
-                [
+            } elseif (in_array(
+                    $fieldType,
+                    [
 
-                    Indexer::RELATION_MANY_TO_MANY,
-                    Indexer::RELATION_ONE_TO_MANY
-                ]
-            )
+                        Indexer::RELATION_MANY_TO_MANY,
+                        Indexer::RELATION_ONE_TO_MANY
+                    ]
+                )
             ) {
                 $config       = $this->configManager->getConfig(
                     $this->configManager->getId('extend', $className, $fieldName)
@@ -135,10 +128,9 @@ class BeforeMapObjectSearchListener
                 $fields       = [];
                 foreach ($targetFields as $targetField) {
                     $targetType = $this->transformCustomType(
-                        $this->configManager->getId('extend', $targetEntity, $targetField)
-                            ->getFieldType()
+                        $this->configManager->getId('extend', $targetEntity, $targetField)->getFieldType()
                     );
-                    $fields[]   = [
+                    $fields[] = [
                         'name'          => $targetField,
                         'target_type'   => $targetType,
                         'target_fields' => [strtolower($fieldName . '_' . $targetField)]
@@ -190,9 +182,7 @@ class BeforeMapObjectSearchListener
     protected function checkEntityMapping(array $mapConfig, ConfigInterface $config)
     {
         $className = $config->getId()->getClassName();
-        if ($config->get('owner') === 'Custom' && $config->get('state') === 'Active'
-            // && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
-        ) {
+        if ($config->get('owner') === 'Custom' && $config->get('state') === 'Active') {
             $label                 = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
             $mapConfig[$className] = [
                 'alias'                 => $config->get('schema')['doctrine'][$className]['table'],

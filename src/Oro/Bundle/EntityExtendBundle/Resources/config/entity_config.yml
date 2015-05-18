@@ -530,3 +530,4 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field
+                            tooltip:        oro.entity_extend.entity_config.search.field.items.title_field.tooltip
