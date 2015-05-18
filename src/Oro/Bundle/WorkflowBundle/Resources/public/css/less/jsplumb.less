@@ -1,0 +1,36 @@
+.workflow-step-editor {
+  margin-top: -28px;
+}
+.workflow-flowchart{
+  position: relative;
+  overflow: scroll;
+  min-height: 500px;
+  .jsplumb-box {
+    position: absolute;
+    border: 1px solid dodgerblue;
+    border-radius: 5px;
+    min-width: 100px;
+    min-height: 50px;
+    cursor: move;
+    background: lightblue;
+    &:hover {
+      background: lightskyblue;
+    }
+    .jsplumb-source {
+      background: yellow;
+      width: 30px;
+      height: 30px;
+      &:hover {
+        background: darkgoldenrod;
+        cursor: pointer;
+      }
+    }
+  }
+  .jsplumb-default-label {
+    background-color: white;
+    opacity: 0.8;
+    padding: 0.3em;
+    border-radius: 0.5em;
+    border: 1px solid #346789;
+  }
+}

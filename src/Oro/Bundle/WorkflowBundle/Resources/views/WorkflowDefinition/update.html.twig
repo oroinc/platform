@@ -481,14 +481,33 @@
 
     {% set stepsListWidget %}
     <div class="clearfix">
-        <div class="workflow-definition-buttons" style="margin-top: -36px;">
+        <div class="workflow-definition-buttons">
             <div class="pull-right">
                 <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
                 <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
             </div>
         </div>
     </div>
-    <div class="workflow-definition-steps-list-container"></div>
+
+    <div role="tabpanel" class="workflow-step-editor">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#chart-editor" aria-controls="chart-editor" role="tab" data-toggle="tab">Chart editor</a></li>
+            <li role="presentation"><a href="#table-editor" aria-controls="table" role="tab-editor" data-toggle="tab">Table editor</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="chart-editor">
+                <div class="workflow-flowchart clearfix"></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="table-editor">
+                <div class="workflow-definition-steps-list-container clearfix"></div>
+            </div>
+        </div>
+
+    </div>
     {% endset %}
 
     {% set dataBlocks = dataBlocks|merge([{

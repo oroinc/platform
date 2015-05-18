@@ -22,6 +22,7 @@ define(function (require) {
         TransitionEditFormView = require('oroworkflow/js/workflow-management/transition/view/edit'),
         StepEditView = require('oroworkflow/js/workflow-management/step/view/edit'),
         StepModel = require('oroworkflow/js/workflow-management/step/model'),
+        WorkflowFlowchartComponent = require('./workflow-flowchart-component'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
@@ -63,6 +64,13 @@ define(function (require) {
             });
 
             this.workflowManagementView.render();
+
+            if (options._sourceElement.find('.workflow-flowchart')) {
+                this.flowchartComponent = new WorkflowFlowchartComponent({
+                    _sourceElement: options._sourceElement.find('.workflow-flowchart'),
+                    workflowModel: this.model
+                });
+            }
         },
 
         /**
@@ -419,6 +427,7 @@ define(function (require) {
                 stepFrom
                     .getAllowedTransitions(this.model)
                     .add(transition);
+                stepFrom.trigger('change');
             }
         },
 

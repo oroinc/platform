@@ -103,6 +103,7 @@ config:
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
+        'tpl': 'bundles/oroui/js/requirejs/tpl.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
