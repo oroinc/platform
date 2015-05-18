@@ -19,6 +19,8 @@
 
         {% set firstContext = itemsArray[0] %}
         {% set options = params|merge({items: itemsArray, params: params}) %}
+        {% set contextCurrentTargetClassId = 'context-current-target-class-uid-' ~ random() %}
+        {% set contextCurrentTargetGridId = 'context-current-target-grid-uid-' ~ random() %}
 
         <script type="text/template" id="email-context-item">
             <li id="<%= entity.get('entityAlias') %>" class="context-item" data-cid="<%= entity.cid %>">
@@ -33,8 +35,8 @@
                 <span id="email-context-arrow" class="icon-caret-down"></span>
             </button>
             <ul id="context-items-dropdown" class="dropdown-menu"></ul>
-            <input type="hidden" id="context-current-target-class"/>
-            <input type="hidden" id="context-current-target-grid"/>
+            <input type="hidden" id="{{ contextCurrentTargetClassId }}"/>
+            <input type="hidden" id="{{ contextCurrentTargetGridId }}"/>
         </div>
 
         {{ oro_widget_render({
@@ -44,13 +46,13 @@
         }) }}
 
         <script type="text/javascript">
-            require(['orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator'],
-                    function(__, widgetManager, messenger, mediator) {
+            require(['jquery', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator'],
+                    function($, __, widgetManager, messenger, mediator) {
                         widgetManager.getWidgetInstanceByAlias('email-context-grid', function(widget) {
                             widget.on('grid-row-select', function(data) {
 
                                 var id = data.model.get('id');
-                                var contextTargetClass = $('#context-current-target-class').data('value');
+                                var contextTargetClass = $('#{{ contextCurrentTargetClassId }}').data('value');
                                 widget._showLoading();
 
                                 $.ajax({
