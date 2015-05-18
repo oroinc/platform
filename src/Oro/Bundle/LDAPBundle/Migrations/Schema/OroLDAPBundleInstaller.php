@@ -33,10 +33,18 @@ class OroLDAPBundleInstaller implements Installation
         ]);
 
         $transportTable = $schema->getTable('oro_integration_transport');
-        $transportTable->addColumn('oro_ldap_server_hostname', 'string');
-        $transportTable->addColumn('oro_ldap_server_port', 'integer');
-        $transportTable->addColumn('oro_ldap_server_encryption', 'string');
-        $transportTable->addColumn('oro_ldap_server_base_dn', 'string');
+        $transportTable->addColumn('oro_ldap_server_hostname', 'string', [
+            'notnull' => false
+        ]);
+        $transportTable->addColumn('oro_ldap_server_port', 'integer', [
+            'notnull' => false
+        ]);
+        $transportTable->addColumn('oro_ldap_server_encryption', 'string', [
+            'notnull' => false
+        ]);
+        $transportTable->addColumn('oro_ldap_server_base_dn', 'string', [
+            'notnull' => false
+        ]);
         $transportTable->addColumn('oro_ldap_admin_dn', 'string', [
             'notnull' => false
         ]);

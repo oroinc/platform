@@ -19,16 +19,24 @@ class OroLDAPBundle implements Migration
         $userTable->addColumn('dn', 'text', [
             'oro_options' => [
                 'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
-                'form'   => ['is_enabled' => false],
+                'form' => ['is_enabled' => false],
             ],
             'notnull' => false
         ]);
 
         $transportTable = $schema->getTable('oro_integration_transport');
-        $transportTable->addColumn('oro_ldap_server_hostname', 'string');
-        $transportTable->addColumn('oro_ldap_server_port', 'integer');
-        $transportTable->addColumn('oro_ldap_server_encryption', 'string');
-        $transportTable->addColumn('oro_ldap_server_base_dn', 'string');
+        $transportTable->addColumn('oro_ldap_server_hostname', 'string', [
+            'notnull' => false
+        ]);
+        $transportTable->addColumn('oro_ldap_server_port', 'integer', [
+            'notnull' => false
+        ]);
+        $transportTable->addColumn('oro_ldap_server_encryption', 'string', [
+            'notnull' => false
+        ]);
+        $transportTable->addColumn('oro_ldap_server_base_dn', 'string', [
+            'notnull' => false
+        ]);
         $transportTable->addColumn('oro_ldap_admin_dn', 'string', [
             'notnull' => false
         ]);
