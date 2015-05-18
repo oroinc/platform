@@ -30,11 +30,6 @@ services:
         calls:
             - [updateOroConfiguration, [@oro_config.global]]
 
-    oro_ldap.extension.user_type:
-        class: %oro_ldap.extension.user_type.class%
-        tags:
-            - { name: form.type_extension, alias: oro_user_user }
-
     oro_ldap.provider.user:
         class: %oro_ldap.provider.user.class%
         arguments:
