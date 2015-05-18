@@ -79,14 +79,7 @@ class BeforeMapObjectSearchListener
         $fieldName = $fieldId->getFieldName();
         if ($searchConfig->is('searchable')) {
             $fieldType = $this->transformCustomType($fieldId->getFieldType());
-            if (in_array(
-                    $fieldType,
-                    [
-                        Indexer::RELATION_ONE_TO_ONE,
-                        Indexer::RELATION_MANY_TO_ONE
-                    ]
-                )
-            ) {
+            if (in_array($fieldType, [Indexer::RELATION_ONE_TO_ONE, Indexer::RELATION_MANY_TO_ONE])) {
                 $config       = $this->configManager->getConfig(
                     $this->configManager->getId('extend', $className, $fieldName)
                 );
@@ -106,29 +99,26 @@ class BeforeMapObjectSearchListener
                         ]
                     ]
                 ];
-            } elseif (in_array(
-                    $fieldType,
-                    [
-
-                        Indexer::RELATION_MANY_TO_MANY,
-                        Indexer::RELATION_ONE_TO_MANY
-                    ]
-                )
-            ) {
+            } elseif (in_array($fieldType, [Indexer::RELATION_MANY_TO_MANY, Indexer::RELATION_ONE_TO_MANY])) {
                 $config       = $this->configManager->getConfig(
                     $this->configManager->getId('extend', $className, $fieldName)
                 );
                 $targetEntity = $config->get('target_entity');
 
 
-                $targetFields = array_unique(array_merge($config->get('target_grid'),
-                    $config->get('target_title'), $config->get('target_detailed')));
+                $targetFields = array_unique(
+                    array_merge(
+                        $config->get('target_grid'),
+                        $config->get('target_title'),
+                        $config->get('target_detailed')
+                    )
+                );
                 $fields       = [];
                 foreach ($targetFields as $targetField) {
                     $targetType = $this->transformCustomType(
                         $this->configManager->getId('extend', $targetEntity, $targetField)->getFieldType()
                     );
-                    $fields[] = [
+                    $fields[]   = [
                         'name'          => $targetField,
                         'target_type'   => $targetType,
                         'target_fields' => [strtolower($fieldName . '_' . $targetField)]
@@ -140,7 +130,6 @@ class BeforeMapObjectSearchListener
                     'relation_type'   => $fieldType,
                     'relation_fields' => $fields
                 ];
-
             } else {
                 $field = [
                     'name'          => $fieldName,
