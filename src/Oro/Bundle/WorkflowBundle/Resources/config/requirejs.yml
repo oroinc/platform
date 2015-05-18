@@ -1,5 +1,6 @@
 config:
     paths:
+        'jsplumb':                                                             'bundles/components/jsplumb/dom.jsPlumb.js'
         'oroworkflow/js/transition-handler':                                   'bundles/oroworkflow/js/transition-handler.js'
         'oroworkflow/js/save-and-transit-handler':                             'bundles/oroworkflow/js/save-and-transit-handler.js'
         'oroworkflow/js/transition-executor':                                  'bundles/oroworkflow/js/transition-executor.js'
