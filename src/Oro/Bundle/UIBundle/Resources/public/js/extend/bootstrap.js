@@ -83,10 +83,14 @@ define([
         return this.each(function () {
             var $this = $(this)
                 , data = $this.data('typeahead')
-                , options = typeof option == 'object' && option
-            if (!data) $this.data('typeahead', (data = new Typeahead(this, options)))
-            if (typeof option == 'string') data[option]()
-        })
+                , options = typeof option == 'object' && option;
+            if (!data) {
+                $this.data('typeahead', (data = new Typeahead(this, options)));
+            }
+            if (typeof option == 'string') {
+                data[option]();
+            }
+        });
     };
 
     $.fn.typeahead.defaults = origFnTypeahead.defaults;

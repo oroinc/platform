@@ -17,6 +17,7 @@ oro_menu_config:
             extras:
                 position: 15
 
+        # if exist option "dialog", then you need to add dialog_config options
         shortcut_compose_email:
             label: 'oro.email.menu.shortcut_compose_email.label'
             route: 'oro_email_email_create'
@@ -28,15 +29,16 @@ oro_menu_config:
                     dataUrl: 'oro_email_email_create'
                     aCss: 'no-hash'
                     iCss: ''
-                    label : 'oro.email.menu.shortcut_compose_email.label'
-                    widget :
+                    label: 'oro.email.menu.shortcut_compose_email.label'
+                    widget:
                         type: 'dialog'
-                        multiple : true
+                        multiple: true
                         refreshWidgetAlias: 'activity-list-widget'
-                        options :
+                        reloadGridName: 'user-email-grid'
+                        options:
                             alias: 'email-dialog'
-                            dialogOptions :
-                                title : 'oro.email.menu.shortcut_compose_email.label'
+                            dialogOptions:
+                                title: 'oro.email.menu.shortcut_compose_email.label'
                                 allowMaximize: true
                                 allowMinimize: true
                                 dblclick: 'maximize'

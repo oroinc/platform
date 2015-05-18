@@ -68,6 +68,7 @@ class ShortcutController extends Controller
 
     /**
      * @param $item ItemInterface
+     *
      * @return array
      */
     protected function getData($item)

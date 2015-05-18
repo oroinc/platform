@@ -21,7 +21,10 @@
                     <tr>
                         {% if action.dialog is defined and action.dialog %}
                             <td>
-                                {{ Navigation.renderClientLink(action.dialog_config) }}
+                                {{ Navigation.renderClientLink(action.dialog_config, {
+                                    entityClass: oro_class_name(app.user, true),
+                                    entityId: app.user.id
+                                }) }}
                             </td>
                             <td>{{ action.description|trans }}</td>
                         {% else %}

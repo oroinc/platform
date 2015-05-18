@@ -11,8 +11,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
      */
     ShortcutsView = BaseView.extend({
         options: {
-            el: '.shortcuts .input-large',
-            source: null
+            el: '.shortcuts .input-large'
         },
 
         events: {
@@ -23,10 +22,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
         cache: {},
 
+        sourceRoute: null,
+        entityClass: '',
+        entityId: 0,
+
         initialize: function(options) {
+            var self = this;
             this.options = _.defaults(options || {}, this.options);
+            this.sourceRoute = this.$el.data('source') ? this.$el.data('source') : null;
+            this.entityClass = this.$el.data('entity-class') ? this.$el.data('entity-class') : null;
+            this.entityId = this.$el.data('entity-id') ? this.$el.data('entity-id') : null;
+
             this.$el.val('');
-            this.options.source = this.$el.data('source') ? this.$el.data('source') : null;
 
             this.$el.typeahead({
                 source:_.bind(this.source, this),
@@ -57,11 +64,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                         var view;
 
                         if (item.item.dialog) {
-                            var config = item.item.dialog_config;
-                            var options = {
+                            var config = item.item.dialog_config,
+                                options = {
                                     "type": config.widget.type,
                                     "multiple":config.widget.multiple,
                                     "refresh-widget-alias": config.widget.refreshWidgetAlias,
+                                    'reload-grid-name': config.widget.reloadGridName,
                                     "options":{
                                         "alias":config.widget.options.alias,
                                         "dialogOptions":{
@@ -73,13 +81,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                                             "width":config.widget.options.dialogOptions.width
                                         }
                                     },
-                                    "createOnEvent":"click"};
+                                    "createOnEvent":"click"},
+                                dataUrl = routing.generate(config.dataUrl,
+                                    {
+                                        entityClass: self.entityClass,
+                                        entityId: self.entityId
+                                    });
 
                             view = $(that.options.item).attr('data-value', item.key);
                             view.find('a')
                                 .attr('href', 'javascript: void(0);')
                                 .attr('class', config.aCss)
-                                .attr('data-url', routing.generate(config.dataUrl))
+                                .attr('data-url', dataUrl)
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
@@ -103,14 +116,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
         source: function(query, process) {
             var self = this;
-            if (_.isArray(this.options.source)) {
-                process(this.options.source);
+            if (_.isArray(this.sourceRoute)) {
+                process(this.sourceRoute);
                 this.render();
             } else if (!_.isUndefined(this.cache[query])) {
                 process(this.cache[query]);
                 this.render();
             } else {
-                var url = routing.generate(this.options.source, { 'query': query });
+                var url = routing.generate(this.sourceRoute, { 'query': query });
                 $.get(url, _.bind(function(data) {
                     this.data = data;
                     var result = [];

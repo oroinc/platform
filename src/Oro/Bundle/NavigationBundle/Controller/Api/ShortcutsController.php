@@ -79,6 +79,7 @@ class ShortcutsController extends FOSRestController
 
     /**
      * @param $item ItemInterface
+     *
      * @return array
      */
     protected function getData($item)

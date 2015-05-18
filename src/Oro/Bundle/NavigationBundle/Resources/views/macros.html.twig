@@ -1,8 +1,8 @@
-{% macro renderClientLink(config) %}
+{% macro renderClientLink(config, urlParameters) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {{
         UI.clientLink({
-            'dataUrl': path(config.dataUrl),
+            'dataUrl': path(config.dataUrl, urlParameters),
             'aCss': config.aCss,
             'iCss': config.iCss,
             'label' : config.label|trans,
@@ -10,6 +10,7 @@
                 'type' : config.widget.type,
                 'multiple' : config.widget.multiple,
                 'refresh-widget-alias': config.widget.refreshWidgetAlias,
+                'reload-grid-name': config.widget.reloadGridName,
                 'options' : {
                     'alias': config.widget.options.alias,
                     'dialogOptions' : {

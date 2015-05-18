@@ -116,7 +116,10 @@
     {% set extras = item.extras %}
 
     {% if extras.dialog is defined and extras.dialog %}
-        {{ Navigation.renderClientLink(extras.dialog_config) }}
+        {{ Navigation.renderClientLink(action.dialog_config, {
+            entityClass: oro_class_name(app.user, true),
+            entityId: app.user.id
+        }) }}
     {%- else %}
         <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
     {% endif %}
