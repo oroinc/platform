@@ -57,8 +57,6 @@ class GuestCalendarTest extends Selenium2TestCase
             ->assertTitle('My Calendar - John Doe')
             ->addEvent()
             ->setTitle($eventName)
-            ->setStartDate('Apr 9, 2014 11:00 PM')
-            ->setEndDate('Apr 9, 2015 12:00 PM')
             ->setAllDayEventOff()
             ->setGuestUser($username)
             ->setReminder('Flash message', '1', 'days')
