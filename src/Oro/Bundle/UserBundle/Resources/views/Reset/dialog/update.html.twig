@@ -23,11 +23,12 @@
             'orotranslation/js/translator'
         ],
         function($, __) {
-            $('#oro_set_password_form_password').after(
+            var $passwordInput= $('[id^=oro_set_password_form_password]');
+            $passwordInput.after(
                     '<span class="icon-eye-close" id="show-hide-pass" style="cursor: pointer; font-size: 16px;" ' +
                     ' title="' + __("oro.user.show_hide_password.label") + '"/>'
             );
-            $('#oro_set_password_form_password').parent().after(
+            $passwordInput.parent().after(
                 '<div class="controls" style="margin-top: 5px;">' +
                     '<a href="#" id="generate-pass">' + __("oro.user.suggest_password.label") + '</a>' +
                 '</div>'
@@ -40,18 +41,18 @@
                 for (var i = 0, n = charset.length; i < length; ++i) {
                     pass += charset.charAt(Math.floor(Math.random() * n));
                 }
-                $('#oro_set_password_form_password').val(pass);
+                $passwordInput.val(pass);
                 return false;
             });
 
             $('#show-hide-pass').on('click', function(e){
                 var target = e.target || window.event.target;
                 if($(target).hasClass('icon-eye-open')) {
-                    $('#oro_set_password_form_password').attr('type', 'password');
+                    $passwordInput.attr('type', 'password');
                     $(target).removeClass('icon-eye-open');
                     $(target).addClass('icon-eye-close');
                 } else {
-                    $('#oro_set_password_form_password').attr('type', 'text');
+                    $passwordInput.attr('type', 'text');
                     $(target).removeClass('icon-eye-close');
                     $(target).addClass('icon-eye-open');
                 }
