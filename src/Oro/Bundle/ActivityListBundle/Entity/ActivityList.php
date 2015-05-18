@@ -94,7 +94,7 @@ class ActivityList extends ExtendActivityList
     /**
      * @var string
      *
-     * @ORM\Column(name="description", type="text")
+     * @ORM\Column(name="description", type="text", nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $description;
