@@ -2,39 +2,65 @@
 
 namespace Oro\Bundle\LDAPBundle\ImportExport;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
-class LdapUserWriter implements ItemWriterInterface, ContextAwareInterface
+class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
-    /** @var ContextInterface */
-    protected $context;
+    /** @var LdapManager */
+    protected $ldapManager;
+
+    /** @var UserManager */
+    protected $userManager;
+
+    /** @var ContextRegistry */
+    protected $contextRegistry;
+
+    /** @var StepExecution */
+    protected $stepExecution;
 
     /**
-     * @param ContextInterface $context
+     * @param LdapManager $ldapManager
+     * @param UserManager $userManager
+     * @param ContextRegistry $contextRegistry
      */
-    public function setImportExportContext(ContextInterface $context)
+    public function __construct(LdapManager $ldapManager, UserManager $userManager, ContextRegistry $contextRegistry)
     {
-        $this->context = $context;
+        $this->ldapManager = $ldapManager;
+        $this->userManager = $userManager;
+        $this->contextRegistry = $contextRegistry;
     }
 
     /**
-     * Process the supplied data element. Will not be called with any null items
-     * in normal operation.
-     *
-     * @param array $items The list of items to write
-     *
-     * FIXME: array is not maybe the best structure to hold the items. Investigate this point.
-     *
-     * @throw InvalidItemException if there is a warning, step execution will continue to the
-     * next item.
-     * @throws \Exception if there are errors. The framework will catch the
-     *                    exception and convert or rethrow it as appropriate.
+     * {@inheritdoc}
      */
     public function write(array $items)
     {
-        // TODO: Implement write() method.
+        $context = $this->contextRegistry->getByStepExecution($this->stepExecution);
+
+        foreach ($items as $user) {
+            if ($this->ldapManager->exists($user)) {
+                $context->incrementUpdateCount();
+            } else {
+                $context->incrementAddCount();
+            }
+
+            $this->ldapManager->save($user);
+        }
+
+        $this->userManager->getStorageManager()->flush();
+    }
+
+    /**
+     * @param StepExecution $stepExecution
+     */
+    public function setStepExecution(StepExecution $stepExecution)
+    {
+        $this->stepExecution = $stepExecution;
     }
 }

@@ -4,6 +4,7 @@ parameters:
 
     oro_importexport.processor.export_abstract.class: Oro\Bundle\ImportExportBundle\Processor\ExportProcessor
     oro_importexport.processor.import_abstract.class: Oro\Bundle\ImportExportBundle\Processor\ImportProcessor
+    oro_importexport.processor.null.class:            Oro\Bundle\ImportExportBundle\Processor\NullProcessor
 
 services:
     # Processor registry
@@ -52,3 +53,6 @@ services:
             - @oro_importexport.processor.registry
             - "import_validation"
             - @oro_importexport.context_registry
+
+    oro_importexport.processor.null:
+        class: %oro_importexport.processor.null.class%
