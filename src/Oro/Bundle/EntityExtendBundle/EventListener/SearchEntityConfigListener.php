@@ -14,14 +14,10 @@ use Oro\Bundle\SearchBundle\Entity\UpdateEntity;
 
 class SearchEntityConfigListener
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /**  @var ManagerRegistry*/
     protected $registry;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager*/
     protected $configManager;
 
     /**

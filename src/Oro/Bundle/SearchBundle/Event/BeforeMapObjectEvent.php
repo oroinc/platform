@@ -8,16 +8,16 @@ class BeforeMapObjectEvent extends Event
 {
     const EVENT_NAME = 'oro_search.before_map_object';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $mappingConfig;
 
-    /**
-     * @var object
-     */
+    /** @var object */
     protected $entity;
 
+    /**
+     * @param array  $mappingConfig
+     * @param object $entity
+     */
     public function __construct(array $mappingConfig, $entity)
     {
         $this->mappingConfig = $mappingConfig;

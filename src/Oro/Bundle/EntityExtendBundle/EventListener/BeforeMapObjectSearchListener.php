@@ -15,9 +15,7 @@ class BeforeMapObjectSearchListener
     const TITLE_FIELDS_PATH = 'title_fields';
     const FIELDS_PATH = 'fields';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
     /**

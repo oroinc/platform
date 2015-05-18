@@ -11,10 +11,7 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class SearchResultProperty extends TwigTemplateProperty
 {
-    /**
-     * @var SearchMappingProvider
-     *
-     */
+    /**  @var SearchMappingProvider */
     protected $mappingProvider;
 
     /**
