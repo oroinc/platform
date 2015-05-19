@@ -5,10 +5,11 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oro/filter/datetime-filter',
+    'oro/filter/choice-filter',
     'oro/filter/multiselect-filter',
     'oroentity/js/field-choice',
     'oroquerydesigner/js/field-condition'
-], function($, _, __, DateTimeFilter, MultiSelectFilter) {
+], function($, _, __, DateTimeFilter, ChoiceFilter, MultiSelectFilter) {
     'use strict';
 
     $.widget('oroactivity.activityCondition', {
@@ -16,7 +17,7 @@ define([
             listOption: {},
             filters: {},
             entitySelector: null,
-            activityTpl: _.template($('#template-activity-condition-select').html())
+            filterContainer: '<span class="active-filter">'
         },
 
         _create: function () {
@@ -30,12 +31,18 @@ define([
                 }
             }, this.element.data('value'));
 
-            var activityChoice = this.options.activityTpl({
-                selected: data.criterion.data.filterType,
-                hasActivityLabel: 'Has activity',
-                hasNotActivityLabel: 'Has not activity'
+            this.activityFilter = new ChoiceFilter({
+                caret: '',
+                templateSelector: '#simple-choice-filter-template-embedded',
+                choices: {
+                    hasActivity: __('oro.activityCondition.hasActivity'),
+                    hasNotActivity: __('oro.activityCondition.hasNotActivity')
+                }
             });
-            this.$activityChoice = $(activityChoice);
+            this.activityFilter.setValue({
+                type: data.criterion.data.filterType
+            });
+            this.$activityChoice = $(this.options.filterContainer).html(this.activityFilter.render().$el);
 
             var listOption = JSON.parse(this.options.listOption);
             var typeChoices = {};
@@ -43,11 +50,10 @@ define([
                 typeChoices[id] = options.label;
             });
             this.typeFilter = new MultiSelectFilter({
-                label: __('oro.activitylist.widget.filter.activity.title'),
+                label: __('oro.activityCondition.listOfActivityTypes'),
                 choices: typeChoices
             });
-            this.$typeChoice = $('<span class="active-filter"></span>')
-                .html(this.typeFilter.render().$el);
+            this.$typeChoice = $(this.options.filterContainer).html(this.typeFilter.render().$el);
             this.typeFilter.setValue(data.criterion.data.activityType);
             var filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
@@ -57,14 +63,9 @@ define([
             }
             this.rangeFilter = new (DateTimeFilter.extend(filterOptions))();
             this.rangeFilter.value = data.criterion.data.dateRange;
-            this.$dateRangeChoice = $('<div><span class="active-filter"></span></div>');
-            this.$dateRangeChoice.find('.active-filter').html(this.rangeFilter.render().$el);
+            this.$dateRangeChoice = $(this.options.filterContainer).html(this.rangeFilter.render().$el);
 
-            this.element.append(this.$activityChoice, this.$typeChoice, this.$dateRangeChoice);
-            var $activitySelect = this.$activityChoice.find('select');
-            $activitySelect.select2({
-                minimumResultsForSearch: -1
-            });
+            this.element.append(this.$activityChoice, '-', this.$typeChoice, '-', this.$dateRangeChoice);
 
             this._on(this.element.children(), {
                 change: this._onChange
@@ -74,6 +75,8 @@ define([
         _onChange: function () {
             this.rangeFilter.applyValue();
             this.typeFilter.applyValue();
+            this.activityFilter.applyValue();
+
             var value = {
                 columnName: $(this.options.entitySelector).val(),
                 criterion: this._getFilterCriterion()
@@ -87,7 +90,7 @@ define([
             return {
                 filter: 'activityList',
                 data: {
-                    filterType: this.$activityChoice.find('select').val(),
+                    filterType: this.$activityChoice.find(':input').val(),
                     dateRange: this.rangeFilter.getValue(),
                     activityType: this.typeFilter.getValue()
                 }

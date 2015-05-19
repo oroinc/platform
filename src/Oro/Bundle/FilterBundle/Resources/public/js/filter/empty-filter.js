@@ -56,6 +56,18 @@ define([
         updateSelectorEmptyClass: 'filter-update-empty',
 
         /**
+         * @property {String}
+         */
+        caret: '<span class="caret"></span>',
+
+        initialize: function (options) {
+            var opts = _.pick(options || {}, 'caret');
+            _.extend(this, opts);
+
+            EmptyFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
          * Set raw value to filter
          *
          * @param value
@@ -89,7 +101,7 @@ define([
             var criteriaValues = this.$(this.criteriaValueSelectors.type).val(type);
             this.fixSelects();
             criteriaValues.trigger('change');
-            choiceName += '<span class="caret"></span>';
+            choiceName += this.caret;
             parentDiv.find('.dropdown-toggle').html(choiceName);
 
             this._handleEmptyFilter(type);
