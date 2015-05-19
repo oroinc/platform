@@ -1,7 +1,9 @@
 define(function (require) {
     var _ = require('underscore'),
-        JsplubmBaseView = require('./jsplumb-base'),
-        JsplumbAreaView = require('./jsplumb-area'),
+        JsplubmBaseView = require('./jsplumb/base'),
+        JsplumbAreaView = require('./jsplumb/area'),
+        TransitionOverlayView = require('./transition-overlay'),
+        JsplumbOverlayAdapter = require('./jsplumb/overlay-backbone-view-adapter'),
         JsplumbTransitionView;
 
     JsplumbTransitionView = JsplubmBaseView.extend({
@@ -66,6 +68,7 @@ define(function (require) {
                 connection = this.connections[i];
                 if (connection.stale) {
                     this.areaView.jsPlumbInstance.detach(connection.jsplumbConnection);
+                    connection.jsplumbConnection.view.dispose();
                     this.connections.splice(i, 1);
                     i--;
                 }
@@ -83,10 +86,10 @@ define(function (require) {
         },
 
         createOrRemoveStaleMark: function (startStep, endStep) {
-            var i,
-                connection = this.findConnectionByStartStep(startStep),
+            var connection = this.findConnectionByStartStep(startStep),
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep),
+                transitionModel = this.model,
                 loopbackRadius = 30;
 
             if (connection) {
@@ -99,13 +102,16 @@ define(function (require) {
                         target: endEl,
                         loopbackRadius: loopbackRadius,
                         overlays: [
-                            [
-                                'Label',
-                                {
-                                    label: this.model.get('label'),
-                                    cssClass: 'jsplumb-default-label'
-                                }
-                            ]
+                            ['Custom', {
+                                create: function(component) {
+                                    this.view = new TransitionOverlayView({
+                                        model: transitionModel
+                                    });
+                                    this.view.render();
+                                    return this.view.$el;
+                                },
+                                location: 0.5
+                            }]
                         ]
                     })
                 });

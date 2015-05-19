@@ -1,7 +1,8 @@
 define(function (require) {
-    var JsplubmAreaView = require('./jsplumb-area'),
-        JsplumbWorkflowStepView = require('./jsplumb-workflow-step'),
-        JsplubmTransitionView = require('./jsplumb-transition'),
+    var _ = require('underscore'),
+        JsplubmAreaView = require('./jsplumb/area'),
+        JsplumbWorkflowStepView = require('./step'),
+        JsplubmTransitionView = require('./transition'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
         WorkflowFlowchartView;
 

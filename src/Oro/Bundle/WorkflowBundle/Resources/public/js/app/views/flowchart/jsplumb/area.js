@@ -1,5 +1,5 @@
 define(function (require) {
-    var JsplubmBaseView = require('./jsplumb-base'),
+    var JsplubmBaseView = require('./base'),
         $ = require('jquery'),
         jsPlumb = require('jsplumb'),
         JsplubmAreaView;
@@ -15,8 +15,9 @@ define(function (require) {
                 [ 'Arrow', {
                     location: 1,
                     id: 'arrow',
-                    length: 14,
-                    foldback: 0.8
+                    length: 12,
+                    width: 10,
+                    foldback: 0.7
                 } ]
             ]
         },

@@ -7,6 +7,10 @@ define(function (require) {
             this.$el.attr('id', this.cid);
         },
 
+        cleanup: function () {
+            // empty
+        },
+
         dispose: function () {
             this.cleanup();
             JsplubmBaseView.__super__.dispose.apply(this, arguments);
