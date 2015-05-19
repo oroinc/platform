@@ -36,6 +36,7 @@ define(function (require) {
             var instance = this.areaView.jsPlumbInstance;
             this.ensureId();
             if (!this.isConnected) {
+                this.isConnected = true;
                 if (this.model.get('position')) {
                     this.$el.css({
                         top: this.model.get('position')[1],
