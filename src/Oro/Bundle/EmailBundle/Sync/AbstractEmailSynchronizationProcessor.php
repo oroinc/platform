@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -226,11 +227,11 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      * @param EmailFolder $folder
      * @param bool        $isSeen
      *
-     * @return EmailEntity
+     * @return EmailUser
      */
     protected function addEmail(EmailHeader $email, EmailFolder $folder, $isSeen = false)
     {
-        $emailEntity = $this->emailEntityBuilder->email(
+        $emailUser = $this->emailEntityBuilder->emailUser(
             $email->getSubject(),
             $email->getFrom(),
             $email->getToRecipients(),
@@ -241,16 +242,16 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $email->getCcRecipients(),
             $email->getBccRecipients()
         );
-        // todo CRM-2480
-        $emailEntity
-            ->addFolder($folder)
+
+        $emailUser
+            ->setFolder($folder)
             ->setMessageId($email->getMessageId())
             ->setRefs($email->getRefs())
             ->setXMessageId($email->getXMessageId())
             ->setXThreadId($email->getXThreadId())
             ->setSeen($isSeen);
 
-        return $emailEntity;
+        return $emailUser;
     }
 
     /**

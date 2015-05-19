@@ -5,7 +5,9 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailManager
 {
@@ -40,16 +42,14 @@ class EmailManager
     /**
      * Set email as seen
      *
-     * @param Email $entity
+     * @param EmailUser $entity
      */
-    public function setEmailSeen(Email $entity)
+    public function setEmailSeen(EmailUser $entity)
     {
-        // todo CRM-2480
-/*        if (!$entity->isSeen()) {
+        if (!$entity->isSeen()) {
             $entity->setSeen(true);
-            $this->em->persist($entity);
             $this->em->flush();
-        }*/
+        }
     }
 
     /**

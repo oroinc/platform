@@ -22,6 +22,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * )
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository")
  *
  * @Config(
  *      defaultValues={
@@ -101,7 +102,7 @@ class EmailUser
     /**
      * @var EmailFolder $folder
      *
-     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
+     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false)
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
@@ -152,7 +153,7 @@ class EmailUser
      * Set organization
      *
      * @param Organization $organization
-     * @return Email
+     * @return $this
      */
     public function setOrganization(Organization $organization = null)
     {
@@ -176,7 +177,7 @@ class EmailUser
      *
      * @param User $owningUser
      *
-     * @return Email
+     * @return $this
      */
     public function setOwner($owningUser)
     {
@@ -200,7 +201,7 @@ class EmailUser
      *
      * @param \DateTime $receivedAt
      *
-     * @return Email
+     * @return $this
      */
     public function setReceivedAt($receivedAt)
     {
@@ -224,7 +225,7 @@ class EmailUser
      *
      * @param boolean $seen
      *
-     * @return self
+     * @return $this
      */
     public function setSeen($seen)
     {
@@ -246,7 +247,7 @@ class EmailUser
     /**
      * @param EmailFolder $folder
      *
-     * @return Email
+     * @return $this
      */
     public function setFolder(EmailFolder $folder)
     {
@@ -371,6 +372,22 @@ class EmailUser
     }
 
     /**
+     * @param EmailBody $emailBody
+     *
+     * @return $this
+     */
+    public function setEmailBody(EmailBody $emailBody)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setEmailBody($emailBody);
+
+        return $this;
+    }
+
+    /**
      * @return null|EmailBody
      */
     public function getEmailBody()
@@ -408,6 +425,9 @@ class EmailUser
         return false;
     }
 
+    /**
+     * @return \DateTime|null
+     */
     public function getSentAt()
     {
         if ($this->getEmail()) {
@@ -415,6 +435,118 @@ class EmailUser
         }
 
         return null;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getMessageId()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getMessageId();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $messageId
+     *
+     * @return $this
+     */
+    public function setMessageId($messageId)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setMessageId($messageId);
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getXMessageId()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getXMessageId();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $xMessageId
+     *
+     * @return $this
+     */
+    public function setXMessageId($xMessageId)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setXMessageId($xMessageId);
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getXThreadId()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getXThreadId();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $xThreadId
+     *
+     * @return $this
+     */
+    public function setXThreadId($xThreadId)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setXThreadId($xThreadId);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRefs()
+    {
+        if ($this->getEmail()) {
+            return $this->getEmail()->getRefs();
+        }
+
+        return [];
+    }
+
+    /**
+     * @param $refs
+     *
+     * @return $this
+     */
+    public function setRefs($refs)
+    {
+        if (!$this->getEmail()) {
+            $this->setEmail(new Email());
+        }
+
+        $this->getEmail()->setRefs($refs);
+
+        return $this;
     }
 
     /**

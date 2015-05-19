@@ -93,10 +93,11 @@ datagrid:
 
         properties:
             id: ~
+            email.id: ~
             view_thread_link:
                 type: url
                 route: oro_email_thread_view
-                params: [ id ]
+                params: { id: email.id }
 
         actions:
             view_thread:

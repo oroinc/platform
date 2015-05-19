@@ -426,7 +426,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 try {
                     $imapEmail       = $this->createImapEmail(
                         $email->getId()->getUid(),
-                        $this->addEmail($email, $folder, $email->hasFlag("\\Seen")),
+                        $this->addEmail($email, $folder, $email->hasFlag("\\Seen"))->getEmail(),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;
