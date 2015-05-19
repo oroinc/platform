@@ -109,8 +109,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                     items.first().addClass('active');
                     this.$menu.html(items);
                     return this
-                }
-                , 'click': function (e) {
+                }, 'click': function (e) {
                     e.stopPropagation();
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
