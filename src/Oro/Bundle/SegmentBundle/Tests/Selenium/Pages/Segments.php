@@ -14,12 +14,13 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
 class Segments extends AbstractPageFilteredGrid
 {
     const URL = 'segment';
+    protected $redirectUrl = self::URL;
 
-    public function __construct($testCase, $redirect = true)
-    {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
+    //public function __construct($testCase, $redirect = true)
+    //{
+    //    $this->redirectUrl = self::URL;
+    //    parent::__construct($testCase, $redirect);
+    //}
 
     public function open($entityData = array())
     {
