@@ -274,6 +274,9 @@ function (_, __, Chaplin, $, DialogWidget,
             var data = this.model.toJSON();
             var steps = this.options.workflow.get('steps').models;
             data.stepFrom = this.options.step_from;
+            if (!data.step_to) {
+                data.step_to = this.options.step_to ? this.options.step_to.get('name') : undefined;
+            }
             data.allowedButtonStyles = _.sortBy(this.options.allowed_button_styles, 'label');
             data.buttonIcon = this._getFrontendOption('icon');
             data.buttonStyle = this._getFrontendOption('class');

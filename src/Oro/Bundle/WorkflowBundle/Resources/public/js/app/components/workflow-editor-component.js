@@ -121,10 +121,11 @@ define(function (require) {
          * Opens a "Add transition" dialog
          *
          * @param {StepModel} stepFrom
+         * @param {StepModel=} stepTo
          */
-        addNewStepTransition: function (stepFrom) {
+        addNewStepTransition: function (stepFrom, stepTo) {
             var transition = new TransitionModel();
-            this.openManageTransitionForm(transition, stepFrom);
+            this.openManageTransitionForm(transition, stepFrom, stepTo);
         },
 
         /**
@@ -132,8 +133,9 @@ define(function (require) {
          *
          * @param {TransitionModel} transition
          * @param {StepModel=} stepFrom
+         * @param {StepModel=} stepTo
          */
-        openManageTransitionForm: function (transition, stepFrom) {
+        openManageTransitionForm: function (transition, stepFrom, stepTo) {
             if (this.model.get('steps').length === 1) {
                 this._showModalMessage(__('At least one step should be added to add transition.'), __('Warning'));
                 return;
@@ -147,6 +149,7 @@ define(function (require) {
                 'model': transition,
                 'workflow': this.model,
                 'step_from': stepFrom,
+                'step_to': stepTo,
                 'entity_select_el': this.workflowManagementView.getEntitySelect(),
                 'workflowContainer': this.workflowManagementView.$el
             });
