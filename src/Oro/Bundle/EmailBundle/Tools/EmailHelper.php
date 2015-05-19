@@ -4,10 +4,10 @@ namespace Oro\Bundle\EmailBundle\Tools;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
-
 class EmailHelper
 {
+    const MAX_DESCRIPTION_LENGTH = 500;
+
     /**
      * @var string
      */
@@ -33,32 +33,13 @@ class EmailHelper
     }
 
     /**
-     * If body is html, get content before first quote div, otherwise return body as it is
-     *
-     * @param EmailBody $body
-     * @return string
-     */
-    public function getOnlyLastAnswer(EmailBody $body)
-    {
-        if (!$body->getBodyIsText()) {
-            preg_match('/(.+)(<div class="(quote|gmail_extra)">)/siU', $body->getBodyContent(), $match);
-
-            if (isset($match[1])) {
-                return trim($match[1]);
-            }
-        }
-
-        return $body->getBodyContent();
-    }
-
-    /**
      * Get shorter email body
      *
      * @param string $content
      * @param int $maxLength
      * @return string
      */
-    public function getShortBody($content, $maxLength = 60)
+    public function getShortBody($content, $maxLength = self::MAX_DESCRIPTION_LENGTH)
     {
         if (mb_strlen($content) > $maxLength) {
             $content = mb_substr($content, 0, $maxLength);
@@ -66,7 +47,6 @@ class EmailHelper
             if ($lastOccurrencePos !== false) {
                 $content = mb_substr($content, 0, $lastOccurrencePos);
             }
-            $content .= '...';
         }
 
         return $content;

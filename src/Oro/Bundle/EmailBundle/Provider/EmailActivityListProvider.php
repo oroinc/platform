@@ -27,7 +27,6 @@ class EmailActivityListProvider implements
     CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
-    const MAX_DESCRIPTION_LENGTH = 80;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -125,10 +124,9 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         if ($entity->getEmailBody()) {
-            $body = $entity->getEmailBody();
-            $content = $this->emailHelper->getOnlyLastAnswer($body);
-            $content = $this->emailHelper->getStrippedBody($content);
-            $content = $this->emailHelper->getShortBody($content, self::MAX_DESCRIPTION_LENGTH);
+            $body = $entity->getEmailBody()->getBodyContent();
+            $content = $this->emailHelper->getStrippedBody($body);
+            $content = $this->emailHelper->getShortBody($content);
 
             return $content;
         }

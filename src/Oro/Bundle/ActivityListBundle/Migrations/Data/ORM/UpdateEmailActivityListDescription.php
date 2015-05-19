@@ -42,11 +42,8 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
      */
     public function updateEmailActivityDescription(ObjectManager $manager)
     {
-        $criteria = new Criteria();
-        $criteria->where($criteria->expr()->eq('relatedActivityClass', Email::ENTITY_CLASS));
         /** @var QueryBuilder $activityListBuilder */
         $activityListBuilder = $manager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('e');
-        $activityListBuilder->addCriteria($criteria);
 
         $iterator = new BufferedQueryResultIterator($activityListBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);
