@@ -9,8 +9,6 @@ parameters:
     oro_ldap.manager.import.class:                      Oro\Bundle\LDAPBundle\Manager\ImportManager
     oro_ldap.manager.export.class:                      Oro\Bundle\LDAPBundle\Manager\ExportManager
     oro_ldap.event_listener.user_change_listener.class: Oro\Bundle\LDAPBundle\EventListener\UserChangeListener
-    oro_ldap.importexport.reader.ldap.user.class:       Oro\Bundle\LDAPBundle\ImportExport\LdapUserReader
-    oro_ldap.importexport.writer.ldap.user.class:       Oro\Bundle\LDAPBundle\ImportExport\LdapUserWriter
 
 services:
     fr3d_ldap.security.authentication.provider:
@@ -52,9 +50,6 @@ services:
         class: %oro_ldap.provider.connector.user.class%
         tags:
             - { name: oro_integration.connector, type: user, channel_type: ldap }
-        arguments: [@oro_importexport.context_registry, @oro_integration.logger.strategy, @oro_integration.provider.connector_context_mediator]
-        calls:
-            - [setManager, [@fr3d_ldap.ldap_manager.default]]
 
     oro_ldap.manager.import:
         class: %oro_ldap.manager.import.class%
@@ -88,10 +83,3 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-
-    oro_ldap.importexport.reader.ldap.user:
-        class: %oro_ldap.importexport.reader.ldap.user.class%
-        arguments: [@oro_importexport.context_registry, @fr3d_ldap.ldap_manager]
-
-    oro_ldap.importexport.writer.ldap.user:
-        class: %oro_ldap.importexport.writer.ldap.user.class%

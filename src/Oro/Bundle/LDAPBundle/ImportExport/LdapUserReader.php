@@ -2,13 +2,8 @@
 
 namespace Oro\Bundle\LDAPBundle\ImportExport;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
-use Oro\Bundle\ImportExportBundle\Reader\ReaderInterface;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 
 class LdapUserReader extends AbstractReader
@@ -31,19 +26,25 @@ class LdapUserReader extends AbstractReader
      */
     public function read()
     {
+        // If users are not loaded yet ...
         if (null === $this->users) {
-            $this->users = new \ArrayIterator($this->ldapManager->findUsers());
+            // Get array of users ...
+            $users = $this->ldapManager->findUsers();
+            unset($users['count']);
+
+            // Create iterator
+            $this->users = new \ArrayIterator($users);
         }
+
+        // If there are no more valid users ...
         if (!$this->users->valid()) {
             return null;
         }
+
         $user = $this->users->current();
         $this->users->next();
+        $this->getContext()->incrementReadCount();
+
         return $user;
-    }
-
-    public function initializeFromContext(ContextInterface $context)
-    {
-
     }
 }

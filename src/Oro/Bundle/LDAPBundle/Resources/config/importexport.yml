@@ -1,12 +1,6 @@
 parameters:
-    #entities
-    oro_ldap.importexport.entity.user.class:                Oro\Bundle\UserBundle\Entity\User
-
     #processors
-    oro_ldap.importexport.processor.export.user.class:      Oro\Bundle\LDAPBundle\ImportExport\LdapUserExportProcessor
-
-    #converters
-    oro_ldap.importexport.dataconverter.ldap.user.class:    Oro\Bundle\LDAPBundle\ImportExport\LdapUserDataConverter
+    oro_ldap.importexport.processor.import.user.class:      Oro\Bundle\LDAPBundle\ImportExport\LdapUserImportProcessor
 
     #writers
     oro_ldap.importexport.writer.ldap.user.class:           Oro\Bundle\LDAPBundle\ImportExport\LdapUserWriter
@@ -15,11 +9,9 @@ parameters:
     oro_ldap.importexport.reader.ldap.user.class:           Oro\Bundle\LDAPBundle\ImportExport\LdapUserReader
 
 services:
-    oro_ldap.importexport.reader.entity.user:
-        class: %oro_importexport.reader.entity.class%
-        arguments: [@oro_importexport.context_registry, @doctrine, @oro_security.owner.ownership_metadata_provider]
-        calls:
-            - ["setSourceEntityName", [%oro_ldap.importexport.entity.user.class%]]
+    oro_ldap.importexport.reader.ldap.user:
+        class: %oro_ldap.importexport.reader.ldap.user.class%
+        arguments: [@oro_importexport.context_registry, @fr3d_ldap.ldap_manager]
 
     oro_ldap.importexport.writer.ldap.user:
         arguments:
@@ -28,21 +20,10 @@ services:
             - @oro_importexport.context_registry
         class: %oro_ldap.importexport.writer.ldap.user.class%
 
-    oro_ldap.importexport.dataconverter.ldap.user:
-        class: %oro_ldap.importexport.dataconverter.ldap.user.class%
-
-    oro_ldap.importexport.processor.export.user:
-        class: %oro_ldap.importexport.processor.export.user.class%
-        parent: oro_importexport.processor.export_abstract
-        calls:
-            - [setEntityName, [%oro_ldap.importexport.entity.user.class%]]
-            - [setDataConverter, [@oro_ldap.importexport.dataconverter.ldap.user]]
-        tags:
-            - { name: oro_importexport.processor, type: export, entity: %oro_ldap.importexport.entity.user.class%, alias: oro_ldap_user }
-
     oro_ldap.importexport.processor.import.user:
-        class: %oro_importexport.processor.import_abstract.class%
-        parent: oro_importexport.processor.import_abstract
-        calls:
-            - [setDataConverter, [@oro_ldap.importexport.dataconverter.ldap.user]]
-            - [setEntityName, [%oro_ldap.importexport.entity.user.class%]]
+        class: %oro_ldap.importexport.processor.import.user.class%
+        arguments:
+            - @oro_ldap.ldap.ldap_manager
+            - @oro_user.manager
+            - @oro_importexport.context_registry
+            - @oro_integration.provider.connector_context_mediator

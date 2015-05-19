@@ -61,7 +61,7 @@ class LdapManager extends BaseManager
      */
     private function findRolesForUser($userDn)
     {
-        return $this->driver->search(
+        $roles = $this->driver->search(
             $this->params['baseDn'],
             sprintf(
                 '(&(%s)(%s=%s))',
@@ -71,6 +71,10 @@ class LdapManager extends BaseManager
             ),
             [$this->params['role_id_attribute']]
         );
+
+        unset($roles['count']);
+
+        return $roles;
     }
 
     /**
