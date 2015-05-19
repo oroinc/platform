@@ -6,6 +6,7 @@ define(function (require) {
         template: require('tpl!oroworkflow/templates/flowchart/step.html'),
 
         events: {
+            'dblclick': 'triggerEditStep',
             'click .workflow-step-edit': 'triggerEditStep',
             'click .workflow-step-clone': 'triggerCloneStep',
             'click .workflow-step-delete': 'triggerRemoveStep'

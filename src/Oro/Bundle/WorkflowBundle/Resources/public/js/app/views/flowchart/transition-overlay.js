@@ -17,6 +17,7 @@ define(function (require) {
         },
 
         events: {
+            'dblclick': 'triggerEditTransition',
             'click .workflow-step-edit': 'triggerEditTransition',
             'click .workflow-step-clone': 'triggerCloneTransition',
             'click .workflow-step-delete': 'triggerDeleteTransition'
