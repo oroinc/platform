@@ -125,7 +125,6 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         if ($entity->getEmailBody()) {
-
             $body = $entity->getEmailBody();
             $content = $this->emailHelper->getOnlyLastAnswer($body);
             $content = $this->emailHelper->getStrippedBody($content);
