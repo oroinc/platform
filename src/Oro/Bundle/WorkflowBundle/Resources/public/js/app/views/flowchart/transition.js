@@ -91,8 +91,7 @@ define(function (require) {
                 areaView = this.areaView,
                 connection = this.findConnectionByStartStep(startStep),
                 endEl = this.findElByStep(endStep),
-                startEl = this.findElByStep(startStep),
-                loopbackRadius = 30;
+                startEl = this.findElByStep(startStep);
 
             if (connection) {
                 delete connection.stale;
@@ -102,7 +101,6 @@ define(function (require) {
                     jsplumbConnection: this.areaView.jsPlumbInstance.connect({
                         source: startEl,
                         target: endEl,
-                        loopbackRadius: loopbackRadius,
                         overlays: [
                             ['Custom', {
                                 create: function (component) {

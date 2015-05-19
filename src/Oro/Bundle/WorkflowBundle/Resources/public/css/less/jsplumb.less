@@ -1,4 +1,4 @@
-._jsPlumb_drag_select * {
+._jsPlumb_drag_select *, .jsplumb-box, [data-role=transition-overlay], .workflow-flowchart {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -52,6 +52,9 @@
     border: 1px solid #346789;
     &._jsPlumb_hover {
       z-index: 1;
+      .dropdown-menu{
+        z-index: 2;
+      }
     }
   }
 }
