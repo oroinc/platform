@@ -1,6 +1,6 @@
 define(function (require) {
     var JsplubmAreaView = require('./jsplumb-area'),
-        JsplubmBoxView = require('./jsplumb-box'),
+        JsplumbWorkflowStepView = require('./jsplumb-workflow-step'),
         JsplubmTransitionView = require('./jsplumb-transition'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
         WorkflowFlowchartView;
@@ -24,7 +24,7 @@ define(function (require) {
                         options = _.extend({
                             areaView: that
                         }, options);
-                        return new JsplubmBoxView(options);
+                        return new JsplumbWorkflowStepView(options);
                     },
                     autoRender: true
                 }),

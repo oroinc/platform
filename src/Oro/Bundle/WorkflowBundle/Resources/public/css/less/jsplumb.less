@@ -1,3 +1,11 @@
+._jsPlumb_drag_select * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 .workflow-step-editor {
   margin-top: -28px;
 }
@@ -13,6 +21,10 @@
     min-height: 50px;
     cursor: move;
     background: #ADC5E7;
+    .dropdown-toggle {
+      cursor: pointer;
+      font-size: 14px;
+    }
     &._jsPlumb_source_hover {
       background: #E0EFD4;
     }
