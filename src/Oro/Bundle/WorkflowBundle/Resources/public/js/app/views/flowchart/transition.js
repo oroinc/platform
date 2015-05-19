@@ -31,10 +31,10 @@ define(function (require) {
         trackChanges: function () {
             this.isListening = true;
             var debouncedUpdate = _.debounce(_.bind(this.updateStepTransitions, this), 50);
-            this.model.on('change', debouncedUpdate);
-            this.stepCollection.on('add', debouncedUpdate);
-            this.stepCollection.on('change', debouncedUpdate);
-            this.stepCollection.on('remove', debouncedUpdate);
+            this.listenTo(this.model, 'change', debouncedUpdate);
+            this.listenTo(this.stepCollection, 'add', debouncedUpdate);
+            this.listenTo(this.stepCollection, 'change', debouncedUpdate);
+            this.listenTo(this.stepCollection, 'remove', debouncedUpdate);
         },
 
         findElByStep: function (step) {
@@ -67,7 +67,9 @@ define(function (require) {
                 connection = this.connections[i];
                 if (connection.stale) {
                     this.areaView.jsPlumbInstance.detach(connection.jsplumbConnection);
-                    connection.jsplumbConnection.view.dispose();
+                    if (connection.jsplumbConnection.view) {
+                        connection.jsplumbConnection.view.dispose();
+                    }
                     this.connections.splice(i, 1);
                     i--;
                 }
@@ -85,10 +87,11 @@ define(function (require) {
         },
 
         createOrRemoveStaleMark: function (startStep, endStep) {
-            var connection = this.findConnectionByStartStep(startStep),
+            var transitionModel = this.model,
+                areaView = this.areaView,
+                connection = this.findConnectionByStartStep(startStep),
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep),
-                transitionModel = this.model,
                 loopbackRadius = 30;
 
             if (connection) {
@@ -102,9 +105,11 @@ define(function (require) {
                         loopbackRadius: loopbackRadius,
                         overlays: [
                             ['Custom', {
-                                create: function(component) {
+                                create: function (component) {
                                     this.view = new TransitionOverlayView({
-                                        model: transitionModel
+                                        model: transitionModel,
+                                        areaView: areaView,
+                                        stepFrom: startStep
                                     });
                                     this.view.render();
                                     return this.view.$el;

@@ -22,10 +22,6 @@ define(function (require) {
             ]
         },
 
-        initialize: function () {
-            JsplubmAreaView.__super__.initialize.apply(this, arguments);
-        },
-
         render: function () {
             var options;
             if (!this.jsPlumbInstance) {
@@ -35,10 +31,6 @@ define(function (require) {
                 this.jsPlumbInstance = jsPlumb.getInstance(options);
             }
             return this;
-        },
-
-        cleanup: function () {
-
         }
     });
 
