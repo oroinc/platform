@@ -112,7 +112,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 , 'click': function (e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    if (this.$menu.find('active').attr('data-dialog')) {
+                    if (!this.$menu.find('.active').attr('data-dialog')) {
                         this.select();
                         this.$element.focus()
                     }
