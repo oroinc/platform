@@ -11,39 +11,61 @@ define(function (require) {
             WorkflowFlowchartView.__super__.initialize.apply(this, arguments);
         },
 
+        findStepModelByElement: function (el) {
+            var stepCollectionView = this.stepCollectionView;
+            return this.model.get('steps').find(function (model) {
+                return stepCollectionView.getItemView(model).el === el;
+            });
+        },
+
         render: function () {
             WorkflowFlowchartView.__super__.render.apply(this, arguments);
 
-            var that = this,
-                steps = this.model.get('steps'),
-                stepCollectionView = new BaseCollectionView({
-                    el: this.$el,
-                    collection: steps,
-                    animationDuration: 0,
-                    // pass areaView to each model
-                    itemView: function (options) {
-                        options = _.extend({
-                            areaView: that
-                        }, options);
-                        return new JsplumbWorkflowStepView(options);
-                    },
-                    autoRender: true
-                }),
-                transitionCollectionView = new BaseCollectionView({
-                    el: this.$el,
-                    collection: this.model.get('transitions'),
-                    animationDuration: 0,
-                    // pass areaView to each model
-                    itemView: function (options) {
-                        options = _.extend({
-                            areaView: that,
-                            stepCollection: steps,
-                            stepCollectionView: stepCollectionView
-                        }, options);
-                        return new JsplubmTransitionView(options);
-                    },
-                    autoRender: true
-                });
+            var stepCollectionView,
+                that = this,
+                steps = this.model.get('steps');
+            this.stepCollectionView = stepCollectionView = new BaseCollectionView({
+                el: this.$el,
+                collection: steps,
+                animationDuration: 0,
+                // pass areaView to each model
+                itemView: function (options) {
+                    options = _.extend({
+                        areaView: that
+                    }, options);
+                    return new JsplumbWorkflowStepView(options);
+                },
+                autoRender: true
+            });
+            this.transitionCollectionView = new BaseCollectionView({
+                el: this.$el,
+                collection: this.model.get('transitions'),
+                animationDuration: 0,
+                // pass areaView to each model
+                itemView: function (options) {
+                    options = _.extend({
+                        areaView: that,
+                        stepCollection: steps,
+                        stepCollectionView: stepCollectionView
+                    }, options);
+                    return new JsplubmTransitionView(options);
+                },
+                autoRender: true
+            });
+
+            this.jsPlumbInstance.bind('beforeDrop', _.bind(function (data) {
+                var stepFrom = this.findStepModelByElement(data.connection.source),
+                    stepTo = this.findStepModelByElement(data.connection.target);
+                if (data.connection.suspendedElement) {
+                    console.log('old');
+                    debugger;
+                } else {
+                    this.model.trigger('requestAddTransition', stepFrom, stepTo);
+                }
+                // never allow jsplumb just draw new connections, create connection model instead
+                return false;
+            }, this));
+
         }
     });
 
