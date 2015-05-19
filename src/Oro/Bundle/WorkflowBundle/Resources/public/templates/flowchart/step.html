@@ -1,10 +1,10 @@
 <%= label %>
 <div class="jsplumb-source"></div>
-<div class="dropdown">
-    <span class="dropdown-toggle" data-toggle="dropdown" title="Show details">
-        <i class="fa fa-caret-square-o-down"></i>
-    </span>
-    <% if (!_is_start) { %>
+<% if (!_is_start) { %>
+    <div class="dropdown">
+        <span class="dropdown-toggle" data-toggle="dropdown" title="Show details">
+            <i class="fa fa-caret-square-o-down"></i>
+        </span>
         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
             <li class="first">
                 <a class="workflow-step-edit" href="#edit-step"><i class="icon icon-edit" aria-hidden="true"></i><%= _.__('Edit') %></a>
@@ -16,5 +16,5 @@
                 <a class="workflow-step-delete" href="#delete-step"><i class="icon icon-trash" aria-hidden="true"></i><%= _.__('Delete') %></a>
             </li>
         </ul>
-    <% } %>
-</div>
+    </div>
+<% } %>

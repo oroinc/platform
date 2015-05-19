@@ -11,6 +11,10 @@ define(function (require) {
 
         isConnected: false,
 
+        listen: {
+            'change model': 'render'
+        },
+
         initialize: function (options) {
             if (!(options.areaView instanceof JsplumbAreaView)) {
                 throw new Error('areaView options is required and must be a JsplumbAreaView');
