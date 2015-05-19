@@ -72,8 +72,10 @@ define([
         origFnTypeahead = $.fn.typeahead;
 
     Typeahead = function (element, options) {
+        var opts = $.extend({}, $.fn.typeahead.defaults, options);
+        this.click = opts.click || this.click;
+        this.render = opts.render || this.render;
         origTypeahead.apply(this, arguments);
-        this.render = this.options.render || this.render;
     };
 
     Typeahead.prototype = origTypeahead.prototype;
