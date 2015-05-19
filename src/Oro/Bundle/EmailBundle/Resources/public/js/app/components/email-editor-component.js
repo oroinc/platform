@@ -16,15 +16,16 @@ define(function (require) {
         var field = fieldName.toLowerCase(),
             $field = $fieldset.find('[id^=oro_email_email_' + field + ']');
         $field.parents('.control-group.taggable-field').css('display', 'block');
-        $field.parents('.controls').find('input.select2-input').unbind('focusout');
-        $field.parents('.controls').find('input.select2-input').on('focusout', function(e) {
-            setTimeout(function(){
-                if (!$field.val()) {
-                    hideField(fieldName, $fieldset);
-                }
-            }, 200);
-        });
-        $field.parents('.controls').find('input.select2-input').focus();
+        $field.parents('.controls').find('input.select2-input')
+            .unbind('focusout')
+            .on('focusout', function(e) {
+                setTimeout(function(){
+                    if (!$field.val()) {
+                        hideField(fieldName, $fieldset);
+                    }
+                }, 200);
+            })
+            .focus();
 
         $fieldset.find('[id^=oro_email_email_to]')
             .parents('.control-group.taggable-field')

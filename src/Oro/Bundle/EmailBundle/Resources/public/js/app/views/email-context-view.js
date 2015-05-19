@@ -40,8 +40,8 @@ define(function (require) {
 
             this.collection.on('add', function(model) {
                 var gridUrl = self.options.params.grid_path + '/' + model.attributes.className,
-                    $contextCurrentTargetClass =  self.$('[id^=context-current-target-class]'),
-                    $contextCurrentTargetGrid =  self.$('[id^=context-current-target-grid]'),
+                    $contextCurrentTargetClass = self.$('[id^=context-current-target-class]'),
+                    $contextCurrentTargetGrid = self.$('[id^=context-current-target-grid]'),
                     view = self.template({
                         entity: model
                     }),
