@@ -23,6 +23,7 @@ class CumulativeConfigLoader
     /**
      * @param string                                              $name The unique name of a configuration resource
      * @param CumulativeResourceLoader|CumulativeResourceLoader[] $resourceLoader
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct($name, $resourceLoader)
@@ -46,26 +47,22 @@ class CumulativeConfigLoader
      * @param ContainerBuilder|null $container The container builder
      *                                         If NULL the loaded resources will not be registered in the container
      *                                         and as result will not be monitored for changes
+     *
      * @return CumulativeResourceInfo[]
      */
     public function load(ContainerBuilder $container = null)
     {
         $result = [];
 
-        $bundles     = CumulativeResourceManager::getInstance()->getBundles();
-        $appRootDir  = CumulativeResourceManager::getInstance()->getAppRootDir();
+        $bundles    = CumulativeResourceManager::getInstance()->getBundles();
+        $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
 
         foreach ($bundles as $bundleName => $bundleClass) {
             $reflection   = new \ReflectionClass($bundleClass);
             $bundleDir    = dirname($reflection->getFileName());
-            $bundleAppDir = '';
-
-            /**
-             * This case needs for tests(without app root directory).
-             */
-            if (is_dir($appRootDir)) {
-                $bundleAppDir = $appRootDir . '/Resources/' . $bundleName;
-            }
+            $bundleAppDir = !empty($appRootDir) && is_dir($appRootDir)
+                ? $appRootDir . '/Resources/' . $bundleName
+                : ''; // this case needs for tests (without app root directory)
 
             /** @var CumulativeResourceLoader $resourceLoader */
             foreach ($this->resourceLoaders as $resourceLoader) {
@@ -94,28 +91,23 @@ class CumulativeConfigLoader
      * These objects will be used to monitor whether resources are up-to-date or not.
      *
      * @param ContainerBuilder $container
+     *
      * @throws \RuntimeException if the container builder was not specified
      */
     public function registerResources(ContainerBuilder $container)
     {
-        $bundles  = CumulativeResourceManager::getInstance()->getBundles();
-        $appRootDir  = CumulativeResourceManager::getInstance()->getAppRootDir();
+        $bundles    = CumulativeResourceManager::getInstance()->getBundles();
+        $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
 
         $resource = new CumulativeResource($this->name, $this->resourceLoaders);
         /** @var CumulativeResourceLoader $resourceLoader */
         foreach ($this->resourceLoaders as $resourceLoader) {
             foreach ($bundles as $bundleName => $bundleClass) {
-                $reflection = new \ReflectionClass($bundleClass);
-                $bundleDir  = dirname($reflection->getFilename());
-
-                $bundleAppDir = '';
-
-                /**
-                 * This case needs for tests(without app root directory).
-                 */
-                if (is_dir($appRootDir)) {
-                    $bundleAppDir = $appRootDir . '/Resources/' . $bundleName;
-                }
+                $reflection   = new \ReflectionClass($bundleClass);
+                $bundleDir    = dirname($reflection->getFilename());
+                $bundleAppDir = !empty($appRootDir) && is_dir($appRootDir)
+                    ? $appRootDir . '/Resources/' . $bundleName
+                    : ''; // this case needs for tests (without app root directory)
 
                 $resourceLoader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
             }

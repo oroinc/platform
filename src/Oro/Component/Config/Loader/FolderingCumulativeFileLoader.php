@@ -46,13 +46,12 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      */
     public function __construct($folderPlaceholder, $folderPattern, $fileResourceLoader)
     {
-        $this->folderPlaceholder = $folderPlaceholder;
-        $this->folderPattern     = $folderPattern;
-        if (is_array($fileResourceLoader)) {
-            $this->fileResourceLoaders = $fileResourceLoader;
-        } else {
-            $this->fileResourceLoaders = [$fileResourceLoader];
-        }
+        $this->folderPlaceholder   = $folderPlaceholder;
+        $this->folderPattern       = $folderPattern;
+        $this->fileResourceLoaders = is_array($fileResourceLoader)
+            ? $fileResourceLoader
+            : [$fileResourceLoader];
+
         $this->initialize();
     }
 
@@ -243,6 +242,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * @param string $relativeFilePath
+     *
      * @return array
      */
     protected function splitRelativeFilePath($relativeFilePath)
@@ -290,6 +290,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      *
      * @param \DirectoryIterator $file
      * @param string             $folderPattern
+     *
      * @return bool
      */
     protected function isApplicableFolder(\DirectoryIterator $file, $folderPattern)
@@ -304,6 +305,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      * Returns a regular expression pattern which can be used to check if a folder can contain a resource
      *
      * @param string $folder
+     *
      * @return string
      */
     protected function getFolderPattern($folder)

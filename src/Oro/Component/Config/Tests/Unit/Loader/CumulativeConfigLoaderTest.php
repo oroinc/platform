@@ -149,7 +149,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
         $resourceRelativePath = 'Resources' . $pathWithoutResources;
         $bundle               = new TestBundle1();
         $bundleDir            = dirname((new \ReflectionClass($bundle))->getFileName());
-        $appRootDir          = realpath($bundleDir . '/../../app');
+        $appRootDir           = realpath($bundleDir . '/../../app');
         $resourceLoader       = new YamlCumulativeFileLoader($resourceRelativePath);
 
         CumulativeResourceManager::getInstance()

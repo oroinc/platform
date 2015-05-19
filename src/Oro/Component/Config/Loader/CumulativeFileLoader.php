@@ -107,9 +107,9 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     public function getResourcePath($bundleAppDir, $bundleDir)
     {
-        $path = $this->getBundleAppResourceFilePath($bundleAppDir);
+        $path = $this->getBundleAppResourcePath($bundleAppDir);
         if ($path === null) {
-            $path = $this->getBundleResourceFilePath($bundleDir);
+            $path = $this->getBundleResourcePath($bundleDir);
         }
 
         return $path;
@@ -123,7 +123,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      *
      * @return string|null
      */
-    protected function getBundleAppResourceFilePath($bundleAppDir)
+    protected function getBundleAppResourcePath($bundleAppDir)
     {
         if (is_dir($bundleAppDir)) {
             $path = $bundleAppDir . preg_replace('/Resources\//', '', $this->relativeFilePath, 1);
@@ -143,7 +143,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      *
      * @return string|null
      */
-    protected function getBundleResourceFilePath($bundleDir)
+    protected function getBundleResourcePath($bundleDir)
     {
         $path = $bundleDir . $this->relativeFilePath;
         if (is_file($path)) {
@@ -158,11 +158,11 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
-        $path = $this->getBundleAppResourceFilePath($bundleAppDir);
+        $path = $this->getBundleAppResourcePath($bundleAppDir);
         if (is_file($path)) {
             $resource->addFound($bundleClass, $path);
         } else {
-            $path = $this->getBundleResourceFilePath($bundleDir);
+            $path = $this->getBundleResourcePath($bundleDir);
             if (is_file($path)) {
                 $resource->addFound($bundleClass, $path);
             }

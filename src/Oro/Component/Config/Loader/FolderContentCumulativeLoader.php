@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Config\Loader;
 
-use Oro\Component\Config\CumulativeResource;
-use Oro\Component\Config\CumulativeResourceInfo;
-
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+use Oro\Component\Config\CumulativeResource;
+use Oro\Component\Config\CumulativeResourceInfo;
 
 /**
  * Loader that returns folder content as a list of found files, works recursively as deep
@@ -127,12 +127,12 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
-        $dir     = $this->getDirectoryAbsolutePath($bundleDir);
+        $dir           = $this->getDirectoryAbsolutePath($bundleDir);
         $bundleAppData = [];
 
         if (is_dir($bundleAppDir)) {
-            $resDir  = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
-            $bundleAppData = $this->getData($resDir);
+            $appDir        = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
+            $bundleAppData = $this->getData($appDir);
         }
 
         $data = $this->mergeArray($bundleAppData, $this->getData($dir), $bundleAppDir, $bundleDir);
