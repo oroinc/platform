@@ -88,7 +88,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                                         entityId: self.entityId
                                     });
 
-                            view = $(that.options.item).attr('data-value', item.key);
+                            view = $(that.options.item).attr('data-value', item.key).attr('data-dialog', item.item.dialog);
                             view.find('a')
                                 .attr('href', 'javascript: void(0);')
                                 .attr('class', config.aCss)
@@ -99,7 +99,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                                 .html('<i class="'+config.iCss+' hide-text">'+item.key+'</i>' + that.highlighter(item.key));
                         } else {
                             view = $(that.options.item).attr('data-value', item.key);
-                            view.find('a').html(that.highlighter(item.key));
+                            view.find('a')  .html(that.highlighter(item.key));
                         }
 
                         return view[0];
@@ -108,6 +108,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                     items.first().addClass('active');
                     this.$menu.html(items);
                     return this
+                }
+                , 'click': function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (this.$menu.find('active').attr('data-dialog')) {
+                        this.select();
+                        this.$element.focus()
+                    }
                 }
             });
             this.$form = this.$el.closest('form');
