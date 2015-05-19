@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\CommaSeparatedParameterFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -52,8 +52,7 @@ class EmailController extends RestGetController
      *     name="messageId",
      *     requirements=".+",
      *     nullable=true,
-     *     array=true,
-     *     description="The email 'Message-ID' attribute."
+     *     description="The email 'Message-ID' attribute. One or several message ids separated by comma."
      * )
      * @ApiDoc(
      *      description="Get all emails",
@@ -68,7 +67,7 @@ class EmailController extends RestGetController
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
         $filterParameters = [
-            'messageId' => new CommaSeparatedParameterFilter()
+            'messageId' => new StringToArrayParameterFilter()
         ];
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters(__FUNCTION__), $filterParameters);
 
