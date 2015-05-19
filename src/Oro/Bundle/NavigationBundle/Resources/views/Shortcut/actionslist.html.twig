@@ -1,4 +1,6 @@
 {% extends bap.layout %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroNavigationBundle::macros.html.twig' as Navigation %}
 
 {% block title %}{% trans %}Shortcut Actions List{% endtrans %}{% endblock %}
 {% block content %}
@@ -17,8 +19,19 @@
                 <tbody>
                 {% for action in actionsList if action.url %}
                     <tr>
-                        <td><a href="{{ action.url }}" target="_blank">{{ action.label|trans }}</a></td>
-                        <td>{{ action.description|trans }}</td>
+                        {% if action.dialog is defined and action.dialog %}
+                            <td>
+                                {{ Navigation.renderClientLink(action.dialog_config, {
+                                    entityClass: oro_class_name(app.user, true),
+                                    entityId: app.user.id
+                                }) }}
+                            </td>
+                            <td>{{ action.description|trans }}</td>
+                        {% else %}
+                            <td><a href="{{ action.url }}" target="_blank">{{ action.label|trans }}</a></td>
+                            <td>{{ action.description|trans }}</td>
+                        {% endif %}
+
                     </tr>
                 {% endfor %}
                 </tbody>
