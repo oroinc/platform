@@ -148,6 +148,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 dataItem = this.data[key];
                 if (!dataItem.dialog) {
                     this.$form.attr("action", dataItem.url).submit();
+                } else {
+                    this.$el.parent().find('li.active > a')[0].click();
                 }
             }
         },
