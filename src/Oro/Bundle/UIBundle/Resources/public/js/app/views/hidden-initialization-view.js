@@ -30,7 +30,10 @@ define(function (require) {
          * @constructor
          * @inheritDoc
          */
-        initialize: function () {
+
+        autoRender: true,
+
+        render: function () {
             this.$el.addClass('invisible');
             mediator.execute('layout:init', this.$el, this).done(_.bind( function () {
                 this.$el.removeClass('invisible');
