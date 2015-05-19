@@ -19,7 +19,7 @@ class ActivityEvent extends Event
     public function __construct($activity, $target)
     {
         $this->activity = $activity;
-        $this->target = $target;
+        $this->target   = $target;
     }
 
     /**

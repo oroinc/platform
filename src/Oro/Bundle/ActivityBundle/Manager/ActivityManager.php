@@ -5,10 +5,10 @@ namespace Oro\Bundle\ActivityBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
-use Oro\Bundle\ActivityBundle\Event\Events;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
+use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

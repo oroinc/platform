@@ -8,7 +8,7 @@ class ActivityEventTest extends \PHPUnit_Framework_TestCase
 {
     public function testEvent()
     {
-        $target  = new \stdClass();
+        $target   = new \stdClass();
         $activity = new \stdClass();
 
         $event = new ActivityEvent($activity, $target);
