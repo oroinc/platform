@@ -258,11 +258,19 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 $expr = $exprBuilder->lte($paramName, $value);
                 break;
             case '<>':
-                $expr = $exprBuilder->neq($paramName, $value);
+                if (is_array($value)) {
+                    $expr = $exprBuilder->notIn($paramName, $value);
+                } else {
+                    $expr = $exprBuilder->neq($paramName, $value);
+                }
                 break;
             case '=':
             default:
-                $expr = $exprBuilder->eq($paramName, $value);
+                if (is_array($value)) {
+                    $expr = $exprBuilder->in($paramName, $value);
+                } else {
+                    $expr = $exprBuilder->eq($paramName, $value);
+                }
                 break;
         }
 
