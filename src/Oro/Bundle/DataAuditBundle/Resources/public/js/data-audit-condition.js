@@ -44,7 +44,7 @@ define([
                 criterion: {
                     data: {
                         auditFilter: {
-                            type: 'change'
+                            type: 'changed'
                         }
                     }
                 }
@@ -55,11 +55,6 @@ define([
                 changedLabel: __('oro.dataaudit.data_audit_condition.changed'),
                 changedToValueLabel: __('oro.dataaudit.data_audit_condition.changed_to_value')
             }));
-            this.$fieldChoice.after(this.$changeStateChoice);
-            var $select = this.$changeStateChoice.find('select');
-            $select.select2({
-                minimumResultsForSearch: -1
-            });
 
             var filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
@@ -69,14 +64,27 @@ define([
                 throw new Error('Cannot find filter "datetime"');
             }
 
+            filterOptions.criteriaValueSelectors = {};
+            $.extend(filterOptions.criteriaValueSelectors, DateTimeFilter.prototype.criteriaValueSelectors, {
+                date_type: 'select[name=datetime]'
+            });
+
             this.auditFilter = new (DateTimeFilter.extend(filterOptions))();
             this.auditFilter.value = data.criterion.data.auditFilter.data;
             this.auditFilter.on('update', _.bind(this._onUpdate, this));
 
-            this.$changeStateChoice.find('.active-filter').html(this.auditFilter.render().$el);
-            this._on(this.$changeStateChoice, {
+            this.$fieldChoice.after($('<div class="active-filter">').html(this.auditFilter.render().$el));
+            this.auditFilter.$el.find('.dropdown:first').after(this.$changeStateChoice);
+            var $select = this.$changeStateChoice.find('select');
+            this.$filterContainer.css('display', 'block');
+
+            this._on(this.auditFilter.$el, {
                 change: function () {
                     this.auditFilter.applyValue();
+                }
+            });
+            this._on(this.$changeStateChoice, {
+                change: function () {
                     this._onUpdate();
                 }
             });
@@ -88,7 +96,7 @@ define([
             onChangeCb[$select.val()].apply(this);
 
             $select.on('change', _.bind(function (e) {
-                onChangeCb[e.val].apply(this);
+                onChangeCb[$(e.currentTarget).val()].apply(this);
             }, this));
 
             this.element.data('value', data);
