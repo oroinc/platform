@@ -192,15 +192,26 @@ abstract class AbstractPageEntity extends AbstractPage
         return trim($element->selectedLabel());
     }
 
-    public function checkActionInGroup($actions = array(), $false = true)
+    /**
+     * @param array $actions
+     * @param bool $exist
+     * @return $this
+     */
+    public function checkActionInGroup(array $actions, $exist = true)
     {
         foreach ($actions as $action) {
-            $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+            $this->test->byXPath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
             $this->waitForAjax();
-            if (!$false) {
-                $this->assertElementNotPresent("//div[@class='pull-right']//a[contains(., '{$action}')]");
+            if (!$exist) {
+                $this->assertElementNotPresent(
+                    "//div[@class='pull-right']//a[contains(., '{$action}')]",
+                    "Action {$action} exists but not expected"
+                );
             } else {
-                $this->assertElementPresent("//div[@class='pull-right']//a[contains(., '{$action}')]");
+                $this->assertElementPresent(
+                    "//div[@class='pull-right']//a[contains(., '{$action}')]",
+                    "Action {$action} does not exist"
+                );
             }
         }
 
@@ -209,9 +220,9 @@ abstract class AbstractPageEntity extends AbstractPage
 
     public function runActionInGroup($action)
     {
-        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+        $this->test->byXPath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
         $this->waitForAjax();
-        $this->test->byXpath("//div[@class='pull-right']//a[contains(., '{$action}')]")->click();
+        $this->test->byXPath("//div[@class='pull-right']//a[contains(., '{$action}')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 

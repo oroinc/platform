@@ -112,9 +112,18 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
 
             $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
             $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
-            $type        = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
-            $recipients  = $notification->getRecipientEmails();
-            foreach ((array)$recipients as $email) {
+            if ($notification instanceof SenderAwareEmailNotificationInterface && $notification->getSenderEmail()) {
+                $senderEmail = $notification->getSenderEmail();
+                $senderName = $notification->getSenderName();
+            }
+
+            if ($emailTemplate->getType() == 'txt') {
+                $type = 'text/plain';
+            } else {
+                $type = 'text/html';
+            }
+
+            foreach ((array)$notification->getRecipientEmails() as $email) {
                 $message = \Swift_Message::newInstance()
                     ->setSubject($subjectRendered)
                     ->setFrom($senderEmail, $senderName)
