@@ -25,6 +25,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *
  * @Config(
  *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE;EDIT",
+ *              "group_name"=""
+ *          },
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",

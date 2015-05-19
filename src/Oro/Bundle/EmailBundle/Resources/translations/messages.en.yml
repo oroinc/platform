@@ -188,6 +188,10 @@ oro:
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
 
+        emailuser:
+            entity_label:             Email
+            entity_plural_label:      Emails
+
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
 "Sent": "Sent"

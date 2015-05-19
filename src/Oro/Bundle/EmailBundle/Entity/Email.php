@@ -31,11 +31,6 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          "entity"={
  *              "icon"="icon-envelope"
  *          },
- *          "security"={
- *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT",
- *              "group_name"=""
- *          },
  *          "grouping"={
  *              "groups"={"activity"}
  *          },
