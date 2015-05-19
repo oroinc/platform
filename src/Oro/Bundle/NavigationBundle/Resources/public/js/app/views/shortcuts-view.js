@@ -67,28 +67,29 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                             var config = item.item.dialog_config,
                                 options = {
                                     "type": config.widget.type,
-                                    "multiple":config.widget.multiple,
+                                    "multiple": config.widget.multiple,
                                     "refresh-widget-alias": config.widget.refreshWidgetAlias,
                                     'reload-grid-name': config.widget.reloadGridName,
-                                    "options":{
-                                        "alias":config.widget.options.alias,
-                                        "dialogOptions":{
+                                    "options": {
+                                        "alias": config.widget.options.alias,
+                                        "dialogOptions": {
                                             "title": __(config.widget.options.dialogOptions.title),
                                             "allowMaximize": config.widget.options.dialogOptions.allowMaximize,
-                                            "allowMinimize":config.widget.options.dialogOptions.allowMinimize,
-                                            "dblclick":config.widget.options.dialogOptions.dblclick,
-                                            "maximizedHeightDecreaseBy":config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
-                                            "width":config.widget.options.dialogOptions.width
+                                            "allowMinimize": config.widget.options.dialogOptions.allowMinimize,
+                                            "dblclick": config.widget.options.dialogOptions.dblclick,
+                                            "maximizedHeightDecreaseBy": config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
+                                            "width": config.widget.options.dialogOptions.width
                                         }
                                     },
-                                    "createOnEvent":"click"},
+                                    "createOnEvent": "click"
+                                },
                                 dataUrl = routing.generate(config.dataUrl,
                                     {
                                         entityClass: self.entityClass,
                                         entityId: self.entityId
                                     });
 
-                            view = $(that.options.item).attr('data-value', item.key).attr('data-dialog', item.item.dialog);
+                            view = $(that.options.item).attr('data-value', item.key).data('isDialog', item.item.dialog);
                             view.find('a')
                                 .attr('href', 'javascript: void(0);')
                                 .attr('class', config.aCss)
@@ -96,10 +97,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html('<i class="'+config.iCss+' hide-text">'+item.key+'</i>' + that.highlighter(item.key));
+                                .html('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>' + that.highlighter(item.key));
                         } else {
                             view = $(that.options.item).attr('data-value', item.key);
-                            view.find('a')  .html(that.highlighter(item.key));
+                            view.find('a').html(that.highlighter(item.key));
                         }
 
                         return view[0];
@@ -112,7 +113,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 , 'click': function (e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    if (!this.$menu.find('.active').attr('data-dialog')) {
+                    if (!this.$menu.find('.active').data('isDialog')) {
                         this.select();
                         this.$element.focus()
                     }

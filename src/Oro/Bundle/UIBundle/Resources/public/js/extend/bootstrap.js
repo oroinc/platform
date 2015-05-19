@@ -72,20 +72,10 @@ define([
         origFnTypeahead = $.fn.typeahead;
 
     Typeahead = function (element, options) {
-        this.$element = $(element);
-        this.options = $.extend({}, $.fn.typeahead.defaults, options);
-        this.matcher = this.options.matcher || this.matcher;
-        this.sorter = this.options.sorter || this.sorter;
-        this.highlighter = this.options.highlighter || this.highlighter;
-        this.updater = this.options.updater || this.updater;
-        this.source = this.options.source;
-        this.$menu = $(this.options.menu);
-        this.shown = false;
-
-        this.render = this.options.render || this.render;
-        this.click = this.options.click || this.click;
-
-        this.listen();
+        var opts = $.extend({}, $.fn.typeahead.defaults, options);
+        this.click = opts.click || this.click;
+        this.render = opts.render || this.render;
+        origTypeahead.apply(this, arguments);
     };
 
     Typeahead.prototype = origTypeahead.prototype;
