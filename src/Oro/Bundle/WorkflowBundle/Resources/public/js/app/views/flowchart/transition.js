@@ -3,7 +3,6 @@ define(function (require) {
         JsplubmBaseView = require('./jsplumb/base'),
         JsplumbAreaView = require('./jsplumb/area'),
         TransitionOverlayView = require('./transition-overlay'),
-        JsplumbOverlayAdapter = require('./jsplumb/overlay-backbone-view-adapter'),
         JsplumbTransitionView;
 
     JsplumbTransitionView = JsplubmBaseView.extend({

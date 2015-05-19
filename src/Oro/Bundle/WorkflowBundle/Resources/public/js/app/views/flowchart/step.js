@@ -5,6 +5,10 @@ define(function (require) {
     JsplumbWorkflowStepView = JsplubmBoxView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/step.html'),
 
+        listen: {
+            'change model': 'render'
+        },
+
         events: {
             'click .workflow-step-edit': 'triggerEditStep',
             'click .workflow-step-clone': 'triggerCloneStep',

@@ -6,6 +6,10 @@ define(function (require) {
     TransitionOverlayView = BaseView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/transition.html'),
 
+        listen: {
+            'change model': 'render'
+        },
+
         ensureAttributes: function () {
             // css class is updated by jsPlumb, use attribute instead
             this.$el.attr('data-role', 'transition-overlay');
