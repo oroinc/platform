@@ -26,6 +26,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *
  * @Config(
  *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE;EDIT",
+ *              "group_name"=""
+ *          },
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
@@ -104,7 +109,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false)
-     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
      */
     protected $folder;
@@ -114,7 +118,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false)
-     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\Email")
      * @JMS\Exclude
      */
     protected $email;
@@ -249,7 +252,7 @@ class EmailUser
      *
      * @return $this
      */
-    public function setFolder(EmailFolder $folder)
+    public function setFolder($folder)
     {
         $this->folder = $folder;
 

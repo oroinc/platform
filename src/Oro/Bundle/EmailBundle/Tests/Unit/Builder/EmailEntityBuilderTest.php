@@ -75,7 +75,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('"Test" <test@example.com>', $email->getFromName());
         $this->assertEquals('test@example.com', $email->getFromEmailAddress()->getEmail());
         $this->assertEquals($date, $email->getSentAt());
-        $this->assertEquals($date, $email->getReceivedAt());
+
         $this->assertEquals($date, $email->getInternalDate());
         $this->assertEquals(Email::NORMAL_IMPORTANCE, $email->getImportance());
         $to = $email->getRecipients(EmailRecipient::TO);

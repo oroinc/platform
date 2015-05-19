@@ -209,7 +209,6 @@ class EmailBody
     /**
      * Get email attachments
      *
-     *
      * @return ArrayCollection|EmailAttachment[]
      */
     public function getAttachments()

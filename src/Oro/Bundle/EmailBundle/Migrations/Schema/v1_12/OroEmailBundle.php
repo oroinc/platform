@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_12;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -16,6 +17,7 @@ class OroEmailBundle implements Migration
     {
         self::changeEmailToEmailBodyRelation($schema);
         self::splitEmailEntity($schema);
+        self::updateEmailSecurity($queries);
         self::addPostQueries($queries);
     }
 
@@ -74,6 +76,29 @@ class OroEmailBundle implements Migration
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_91F5CFF6A832C1C9'
+        );
+    }
+
+    /**
+     * @param QueryBag $queries
+     */
+    public static function updateEmailSecurity(QueryBag $queries)
+    {
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\EmailBundle\Entity\Email',
+                'security',
+                'permissions',
+                null
+            )
+        );
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\EmailBundle\Entity\EmailUser',
+                'security',
+                'permissions',
+                'VIEW;CREATE;EDIT'
+            )
         );
     }
 

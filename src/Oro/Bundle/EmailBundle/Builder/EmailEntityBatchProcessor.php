@@ -268,7 +268,8 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                     if ($this->areEmailsEqual($email, $existingEmail)) {
                         $folders = $email->getFolders();
                         foreach ($folders as $folder) {
-                            $existingEmail->addFolder($folder);
+                            // todo CRM-2480 replace line with emailUser creation
+//                            $existingEmail->addFolder($folder);
                         }
                         $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
                         unset($this->emails[$key]);
@@ -393,9 +394,9 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     {
         foreach ($this->emails as $obj) {
             // todo CRM-3324
-            if ($obj->hasFolder($old)) {
-                $obj->removeFolder($old)->addFolder($new);
-            }
+//            if ($obj->hasFolder($old)) {
+//                $obj->removeFolder($old)->addFolder($new);
+//            }
         }
     }
 }

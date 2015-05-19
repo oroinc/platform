@@ -222,7 +222,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
             ->disableOriginalConstructor()
             ->getMock();
-        $origin->expects($this->once())
+        $origin->expects($this->any())
             ->method('getFolder')
             ->with(FolderType::SENT)
             ->will($this->returnValue($folder));

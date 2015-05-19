@@ -135,7 +135,7 @@ class Processor
             $model->getCc(),
             $model->getBcc()
         );
-
+        
         $emailUser->setFolder($origin->getFolder(FolderType::SENT));
         $emailUser->setEmailBody(
             $this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true)
