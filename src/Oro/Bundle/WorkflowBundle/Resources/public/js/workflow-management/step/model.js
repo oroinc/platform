@@ -31,7 +31,11 @@ function(_, Backbone, TransitionCollection) {
             this.workflow = workflow;
         },
 
-        getAllowedTransitions: function(workflowModel) {
+        getAllowedTransitions: function (workflowModel) {
+            if (!workflowModel) {
+                workflowModel = this.workflow;
+            }
+
             // Initialize allowedTransitions as Backbone.Collection instance.
             // allowed_transitions transition attribute should contain only names
             if (this.allowedTransitions === null) {

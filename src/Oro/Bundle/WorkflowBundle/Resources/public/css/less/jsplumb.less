@@ -7,21 +7,27 @@
   min-height: 500px;
   .jsplumb-box {
     position: absolute;
-    border: 1px solid dodgerblue;
+    border: 1px solid #0066B3;
     border-radius: 5px;
     min-width: 100px;
     min-height: 50px;
     cursor: move;
-    background: lightblue;
+    background: #ADC5E7;
+    &._jsPlumb_source_hover {
+      background: #E0EFD4;
+    }
+    &._jsPlumb_target_hover {
+      background: #ADD58A;
+    }
     &:hover {
-      background: lightskyblue;
+      background: #7DA7D8;
     }
     .jsplumb-source {
-      background: yellow;
+      background: #FFF9AE;
       width: 30px;
       height: 30px;
       &:hover {
-        background: darkgoldenrod;
+        background: #FFF685;
         cursor: pointer;
       }
     }
@@ -32,5 +38,8 @@
     padding: 0.3em;
     border-radius: 0.5em;
     border: 1px solid #346789;
+    &._jsPlumb_hover {
+      z-index: 1;
+    }
   }
 }

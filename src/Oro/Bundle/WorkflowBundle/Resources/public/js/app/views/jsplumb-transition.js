@@ -83,9 +83,11 @@ define(function (require) {
         },
 
         createOrRemoveStaleMark: function (startStep, endStep) {
-            var connection = this.findConnectionByStartStep(startStep),
+            var i,
+                connection = this.findConnectionByStartStep(startStep),
                 endEl = this.findElByStep(endStep),
-                startEl = this.findElByStep(startStep);
+                startEl = this.findElByStep(startStep),
+                loopbackRadius = 30;
 
             if (connection) {
                 delete connection.stale;
@@ -95,6 +97,7 @@ define(function (require) {
                     jsplumbConnection: this.areaView.jsPlumbInstance.connect({
                         source: startEl,
                         target: endEl,
+                        loopbackRadius: loopbackRadius,
                         overlays: [
                             [
                                 'Label',
@@ -110,11 +113,8 @@ define(function (require) {
         },
 
         cleanup: function () {
-
-        },
-
-        dispose: function () {
-
+            this.addStaleMark();
+            this.removeStaleConnections();
         }
     });
 
