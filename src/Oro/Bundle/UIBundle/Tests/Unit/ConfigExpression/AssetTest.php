@@ -4,8 +4,9 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\ConfigExpression;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\UIBundle\ConfigExpression\Asset;
 
@@ -248,7 +249,7 @@ class AssetTest extends \PHPUnit_Framework_TestCase
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'asset\', ['
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
-                    . '\'data.theme.icon\', [\'data\', \'theme\', \'icon\'])'
+                    . '\'data.theme.icon\', [\'data\', \'theme\', \'icon\'], [false, false, false])'
                     . ', \'package\'])->setMessage(\'Test\')'
             ]
         ];

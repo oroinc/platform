@@ -130,20 +130,13 @@ abstract class AbstractExpression implements ExpressionInterface
                 if (null === $param) {
                     $compiledParams[] = 'null';
                 } elseif ($param instanceof PropertyPathInterface) {
-                    $compiledPathElements = implode(
-                        ', ',
-                        array_map(
-                            function ($val) {
-                                return '\'' . $val . '\'';
-                            },
-                            $param->getElements()
-                        )
-                    );
-                    $compiledParams[]     =
+                    $compiledParams[] =
                         'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\''
                         . str_replace('\'', '\\\'', (string)$param)
                         . '\', ['
-                        . $compiledPathElements
+                        . $this->compilePathElements($param)
+                        . '], ['
+                        . $this->compilePathIndexes($param)
                         . '])';
                 } elseif ($param instanceof ExpressionInterface) {
                     $compiledParams[] = $param->compile($factoryAccessor);
@@ -171,5 +164,47 @@ abstract class AbstractExpression implements ExpressionInterface
         }
 
         return $compiled;
+    }
+
+    /**
+     * @param PropertyPathInterface $propertyPath
+     *
+     * @return string
+     */
+    protected function compilePathElements(PropertyPathInterface $propertyPath)
+    {
+        return implode(
+            ', ',
+            array_map(
+                function ($val) {
+                    return '\'' . $val . '\'';
+                },
+                $propertyPath->getElements()
+            )
+        );
+    }
+
+    /**
+     * @param PropertyPathInterface $propertyPath
+     *
+     * @return string
+     */
+    protected function compilePathIndexes(PropertyPathInterface $propertyPath)
+    {
+        $indexes = [];
+        $count   = count($propertyPath->getElements());
+        for ($i = 0; $i < $count; $i++) {
+            $indexes[] = $propertyPath->isIndex($i);
+        }
+
+        return implode(
+            ', ',
+            array_map(
+                function ($val) {
+                    return $val ? 'true' : 'false';
+                },
+                $indexes
+            )
+        );
     }
 }

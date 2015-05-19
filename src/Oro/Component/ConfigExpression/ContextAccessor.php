@@ -2,9 +2,10 @@
 
 namespace Oro\Component\ConfigExpression;
 
-use Oro\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class ContextAccessor implements ContextAccessorInterface
 {
