@@ -4,8 +4,9 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\ConfigExpression;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\UIBundle\ConfigExpression\EncodeClass;
 
@@ -160,7 +161,7 @@ class EncodeClassTest extends \PHPUnit_Framework_TestCase
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'encode_class\', ['
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
-                    . '\'context.entity_class\', [\'context\', \'entity_class\'])'
+                    . '\'context.entity_class\', [\'context\', \'entity_class\'], [false, false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];

@@ -18,7 +18,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->assembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionAssembler')
+        $this->assembler = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionAssembler')
             ->disableOriginalConstructor()
             ->getMock();
         $this->condition = new Configurable($this->assembler);
@@ -27,34 +27,30 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
     public function testInitialize()
     {
         $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface',
-            $this->condition->initialize(array())
+            'Oro\Component\ConfigExpression\Condition\AbstractCondition',
+            $this->condition->initialize([])
         );
     }
 
-    public function testIsAllowed()
+    public function testEvaluate()
     {
-        $options = array();
-
+        $options = [];
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
             ->getMock();
         $errors = $this->getMockForAbstractClass('Doctrine\Common\Collections\Collection');
-
-        $realCondition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface')
+        $realCondition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
             ->getMockForAbstractClass();
         $realCondition->expects($this->exactly(2))
-            ->method('isAllowed')
+            ->method('evaluate')
             ->with($workflowItem, $errors)
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
         $this->assembler->expects($this->once())
             ->method('assemble')
             ->with($options)
-            ->will($this->returnValue($realCondition));
-
+            ->willReturn($realCondition);
         $this->condition->initialize($options);
-        $this->assertTrue($this->condition->isAllowed($workflowItem, $errors));
-        $this->assertTrue($this->condition->isAllowed($workflowItem, $errors));
+        $this->assertTrue($this->condition->evaluate($workflowItem, $errors));
+        $this->assertTrue($this->condition->evaluate($workflowItem, $errors));
     }
 }

@@ -2,10 +2,11 @@
 
 namespace Oro\Component\ConfigExpression\Condition;
 
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
-use Oro\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Checks whether the value exists in the context.
