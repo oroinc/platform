@@ -47,6 +47,9 @@ class RandomIdExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(empty($view->vars['id']));
         } else {
             $this->assertEquals($equal, $view->vars['id'] === self::ID);
+            if (!$equal) {
+                $this->assertEquals($view->vars['attr']['data-ftid'], self::ID);
+            }
         }
     }
 

@@ -31,6 +31,8 @@ class RandomIdExtension extends AbstractTypeExtension
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!empty($options['random_id']) && isset($view->vars['id'])) {
+            $view->vars['attr'] = isset($view->vars['attr']) ? $view->vars['attr'] : [];
+            $view->vars['attr']['data-ftid'] = $view->vars['id'];
             $view->vars['id'] .= uniqid('-uid-');
         }
     }
