@@ -13,7 +13,27 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 class BeforeMapObjectSearchListener
 {
     const TITLE_FIELDS_PATH = 'title_fields';
-    const FIELDS_PATH = 'fields';
+    const FIELDS_PATH       = 'fields';
+
+    /** @var array */
+    protected $customTypesMap = [
+        'string'                   => 'text',
+        'text'                     => 'text',
+        'money'                    => 'decimal',
+        'percent'                  => 'decimal',
+        'enum'                     => 'text',
+        'multiEnum'                => Indexer::RELATION_MANY_TO_MANY,
+        'bigint'                   => 'text',
+        'integer'                  => 'integer',
+        'smallint'                 => 'integer',
+        'datetime'                 => 'datetime',
+        'date'                     => 'datetime',
+        'float'                    => 'decimal',
+        'decimal'                  => 'decimal',
+        RelationType::ONE_TO_MANY  => Indexer::RELATION_ONE_TO_MANY,
+        RelationType::MANY_TO_ONE  => Indexer::RELATION_MANY_TO_ONE,
+        RelationType::MANY_TO_MANY => Indexer::RELATION_MANY_TO_MANY,
+    ];
 
     /** @var ConfigManager */
     protected $configManager;
@@ -34,22 +54,16 @@ class BeforeMapObjectSearchListener
      */
     public function prepareEntityMapEvent(SearchMappingCollectEvent $event)
     {
-        $mapConfig = $event->getMappingConfig();
-        $configs   = $this->configManager->getProvider('extend')->getConfigs();
-        foreach ($configs as $config) {
-            if ($config->is('is_extend') && $config->get('state') === ExtendScope::STATE_ACTIVE) {
-                $className     = $config->getId()->getClassName();
+        $mapConfig            = $event->getMappingConfig();
+        $extendConfigs        = $this->configManager->getProvider('extend')->getConfigs();
+        foreach ($extendConfigs as $extendConfig) {
+            if ($extendConfig->is('is_extend') && $extendConfig->get('state') === ExtendScope::STATE_ACTIVE) {
+                $className     = $extendConfig->getId()->getClassName();
                 $searchConfigs = $this->configManager->getConfigs('search', $className);
 
-                $mapConfig = $this->checkEntityMapping($mapConfig, $config);
-                if (isset($mapConfig[$className])
-                    && (
-                        $config->get('owner') === 'System'
-                        || ($config->get('owner') === 'Custom' && $config->get('state') === 'Active'
-                            && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
-                        )
-                    )
-                ) {
+                $mapConfig = $this->checkEntityMapping($mapConfig, $extendConfig);
+
+                if (isset($mapConfig[$className])) {
                     foreach ($searchConfigs as $searchConfig) {
                         /** @var FieldConfigId $fieldId */
                         $fieldId = $searchConfig->getId();
@@ -76,13 +90,12 @@ class BeforeMapObjectSearchListener
      */
     protected function processFields(&$mapConfig, ConfigInterface $searchConfig, FieldConfigId $fieldId, $className)
     {
-        $fieldName = $fieldId->getFieldName();
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $fieldName            = $fieldId->getFieldName();
         if ($searchConfig->is('searchable')) {
             $fieldType = $this->transformCustomType($fieldId->getFieldType());
             if (in_array($fieldType, [Indexer::RELATION_ONE_TO_ONE, Indexer::RELATION_MANY_TO_ONE])) {
-                $config       = $this->configManager->getConfig(
-                    $this->configManager->getId('extend', $className, $fieldName)
-                );
+                $config       = $extendConfigProvider->getConfig($className, $fieldName);
                 $targetEntity = $config->get('target_entity');
                 $targetField  = $config->get('target_field');
                 $targetType   = $this->transformCustomType(
@@ -100,9 +113,7 @@ class BeforeMapObjectSearchListener
                     ]
                 ];
             } elseif (in_array($fieldType, [Indexer::RELATION_MANY_TO_MANY, Indexer::RELATION_ONE_TO_MANY])) {
-                $config       = $this->configManager->getConfig(
-                    $this->configManager->getId('extend', $className, $fieldName)
-                );
+                $config       = $extendConfigProvider->getConfig($className, $fieldName);
                 $targetEntity = $config->get('target_entity');
 
 
@@ -199,25 +210,6 @@ class BeforeMapObjectSearchListener
      */
     protected function transformCustomType($type)
     {
-        $customTypesMap = [
-            'string'                   => 'text',
-            'text'                     => 'text',
-            'money'                    => 'decimal',
-            'percent'                  => 'decimal',
-            'enum'                     => 'text',
-            'multiEnum'                => Indexer::RELATION_MANY_TO_MANY,
-            'bigint'                   => 'text',
-            'integer'                  => 'integer',
-            'smallint'                 => 'integer',
-            'datetime'                 => 'datetime',
-            'date'                     => 'datetime',
-            'float'                    => 'decimal',
-            'decimal'                  => 'decimal',
-            RelationType::ONE_TO_MANY  => Indexer::RELATION_ONE_TO_MANY,
-            RelationType::MANY_TO_ONE  => Indexer::RELATION_MANY_TO_ONE,
-            RelationType::MANY_TO_MANY => Indexer::RELATION_MANY_TO_MANY,
-        ];
-
-        return isset($customTypesMap[$type]) ? $customTypesMap[$type] : $type;
+        return $this->customTypesMap[$type];
     }
 }
