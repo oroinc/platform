@@ -4,9 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Component\ConfigExpression\ExpressionInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
 
 class Transition
@@ -27,12 +28,12 @@ class Transition
     protected $label;
 
     /**
-     * @var ConditionInterface|null
+     * @var ExpressionInterface|null
      */
     protected $condition;
 
     /**
-     * @var ConditionInterface|null
+     * @var ExpressionInterface|null
      */
     protected $preCondition;
 
@@ -116,10 +117,10 @@ class Transition
     /**
      * Set condition.
      *
-     * @param ConditionInterface $condition
+     * @param ExpressionInterface $condition
      * @return Transition
      */
-    public function setCondition(ConditionInterface $condition = null)
+    public function setCondition(ExpressionInterface $condition = null)
     {
         $this->condition = $condition;
         return $this;
@@ -128,7 +129,7 @@ class Transition
     /**
      * Get condition.
      *
-     * @return ConditionInterface|null
+     * @return ExpressionInterface|null
      */
     public function getCondition()
     {
@@ -138,7 +139,7 @@ class Transition
     /**
      * Set pre-condition.
      *
-     * @param ConditionInterface|null $condition
+     * @param ExpressionInterface|null $condition
      * @return Transition
      */
     public function setPreCondition($condition)
@@ -150,7 +151,7 @@ class Transition
     /**
      * Get pre-condition.
      *
-     * @return ConditionInterface|null
+     * @return ExpressionInterface|null
      */
     public function getPreCondition()
     {
@@ -236,7 +237,7 @@ class Transition
             return true;
         }
 
-        return $this->condition->isAllowed($workflowItem, $errors);
+        return $this->condition->evaluate($workflowItem, $errors) ? true : false;
     }
 
     /**
@@ -252,7 +253,7 @@ class Transition
             return true;
         }
 
-        return $this->preCondition->isAllowed($workflowItem, $errors);
+        return $this->preCondition->evaluate($workflowItem, $errors) ? true : false;
     }
 
     /**

@@ -32,7 +32,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configurationPass = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface'
+            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
         )->getMockForAbstractClass();
 
         $this->assembler = new FormOptionsAssembler($this->actionFactory);

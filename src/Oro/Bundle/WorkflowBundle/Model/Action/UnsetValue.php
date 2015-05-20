@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class UnsetValue extends AbstractAction
 {
@@ -45,7 +45,7 @@ class UnsetValue extends AbstractAction
     /**
      * {@inheritdoc}
      */
-    public function setCondition(ConditionInterface $condition)
+    public function setCondition(ExpressionInterface $condition)
     {
         $this->assignValueAction->setCondition($condition);
     }

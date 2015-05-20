@@ -36,7 +36,9 @@ abstract class OroKernel extends Kernel
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
-        CumulativeResourceManager::getInstance()->setBundles($bundles);
+
+        CumulativeResourceManager::getInstance()->setBundles($bundles)
+                                                ->setAppRootDir($this->rootDir);
     }
 
     /**
