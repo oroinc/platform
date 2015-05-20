@@ -2,7 +2,11 @@
 
 namespace Oro\Component\PropertyAccess;
 
+use Symfony\Component\PropertyAccess\Exception;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\StringUtil;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Writes and reads values to/from an object/array graph.
@@ -16,7 +20,7 @@ use Symfony\Component\PropertyAccess\StringUtil;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class PropertyAccessor
+class PropertyAccessor implements PropertyAccessorInterface
 {
     const VALUE = 0;
     const IS_REF = 1;
@@ -59,7 +63,7 @@ class PropertyAccessor
      * @param string|PropertyPathInterface $property The property path to modify
      * @param mixed                        $value    The value to set at the end of the property path
      *
-     * @throws Exception\InvalidArgumentException If an object or a property path has invalid type.
+     * @throws Exception\InvalidPropertyPathException If an object or a property path has invalid type.
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
     public function setValue(&$object, $property, $value)
@@ -67,10 +71,10 @@ class PropertyAccessor
         if (is_string($property)) {
             $property = new PropertyPath($property);
         } elseif (!$property instanceof PropertyPathInterface) {
-            throw new Exception\InvalidArgumentException(
+            throw new Exception\InvalidPropertyPathException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )
@@ -136,7 +140,7 @@ class PropertyAccessor
      * @param object|array                 $object   The object or array to modify
      * @param string|PropertyPathInterface $property The property path to modify
      *
-     * @throws Exception\InvalidArgumentException If an object or a property path has invalid type.
+     * @throws Exception\InvalidPropertyPathException If an object or a property path has invalid type.
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
     public function remove(&$object, $property)
@@ -144,10 +148,10 @@ class PropertyAccessor
         if (is_string($property)) {
             $property = new PropertyPath($property);
         } elseif (!$property instanceof PropertyPathInterface) {
-            throw new Exception\InvalidArgumentException(
+            throw new Exception\InvalidPropertyPathException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )
@@ -228,7 +232,7 @@ class PropertyAccessor
      *
      * @return mixed The value at the end of the property path
      *
-     * @throws Exception\InvalidArgumentException If an object or a property path has invalid type.
+     * @throws Exception\InvalidPropertyPathException If an object or a property path has invalid type.
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
     public function getValue($object, $property)
@@ -236,10 +240,10 @@ class PropertyAccessor
         if (is_string($property)) {
             $property = new PropertyPath($property);
         } elseif (!$property instanceof PropertyPathInterface) {
-            throw new Exception\InvalidArgumentException(
+            throw new Exception\InvalidPropertyPathException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
-                    '"Oro\Component\PropertyAccess\PropertyPathInterface". ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
                     is_object($property) ? get_class($property) : gettype($property)
                 )

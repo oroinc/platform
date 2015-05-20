@@ -8,6 +8,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -34,11 +35,11 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Constructor
      */
-    public function __construct(array $data = array())
+    public function __construct(array $data = [])
     {
         $this->data = $data;
         $this->modified = false;
-        $this->mapping = array();
+        $this->mapping = [];
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -58,12 +59,12 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Get mapped field path by field name.
      *
-     * @param string|PropertyPath $propertyPath
+     * @param string|PropertyPathInterface $propertyPath
      * @return null|string
      */
     protected function getMappedPath($propertyPath)
     {
-        if ($propertyPath instanceof PropertyPath) {
+        if ($propertyPath instanceof PropertyPathInterface) {
             return $propertyPath;
         }
 
@@ -175,13 +176,13 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param array $names Optional list of names of values that should be filtered
      * @return array
      */
-    public function getValues(array $names = array())
+    public function getValues(array $names = [])
     {
         if (!$names) {
             return $this->data;
         }
 
-        $result = array();
+        $result = [];
 
         /** @var Attribute $attribute */
         foreach ($names as $name) {
