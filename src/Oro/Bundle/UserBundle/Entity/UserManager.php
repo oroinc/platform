@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
@@ -13,6 +14,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\UserInterface as OroUserInterface;
 
 class UserManager implements UserProviderInterface
 {
@@ -90,9 +92,9 @@ class UserManager implements UserProviderInterface
     /**
      * Updates a user password if a plain password is set
      *
-     * @param User $user
+     * @param OroUserInterface $user
      */
-    public function updatePassword(User $user)
+    public function updatePassword(OroUserInterface $user)
     {
         if (0 !== strlen($password = $user->getPlainPassword())) {
             $encoder = $this->getEncoder($user);
@@ -105,9 +107,9 @@ class UserManager implements UserProviderInterface
     /**
      * Deletes a user
      *
-     * @param User $user
+     * @param object $user
      */
-    public function deleteUser(User $user)
+    public function deleteUser($user)
     {
         $this->getStorageManager()->remove($user);
         $this->getStorageManager()->flush();
@@ -185,9 +187,9 @@ class UserManager implements UserProviderInterface
     /**
      * Reloads a user
      *
-     * @param User $user
+     * @param object $user
      */
-    public function reloadUser(User $user)
+    public function reloadUser($user)
     {
         $this->getStorageManager()->refresh($user);
     }
@@ -265,7 +267,11 @@ class UserManager implements UserProviderInterface
         return $class === $this->getClass();
     }
 
-    protected function getEncoder(User $user)
+    /**
+     * @param UserInterface|string $user
+     * @return PasswordEncoderInterface
+     */
+    protected function getEncoder($user)
     {
         return $this->encoderFactory->getEncoder($user);
     }

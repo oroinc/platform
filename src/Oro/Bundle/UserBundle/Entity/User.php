@@ -71,7 +71,7 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  * @JMS\ExclusionPolicy("ALL")
  */
 class User extends ExtendUser implements
-    AdvancedUserInterface,
+    UserInterface,
     \Serializable,
     Taggable,
     EmailOwnerInterface,
@@ -79,7 +79,8 @@ class User extends ExtendUser implements
     FullNameInterface,
     NotificationEmailInterface,
     AdvancedApiUserInterface,
-    OrganizationAwareInterface
+    OrganizationAwareInterface,
+    LoginInfoInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -892,9 +893,7 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  string $username New username
-     *
-     * @return User
+     * {@inheritdoc}
      */
     public function setUsername($username)
     {
@@ -1031,9 +1030,7 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  string $password New password as plain string
-     *
-     * @return User
+     * {@inheritdoc}
      */
     public function setPlainPassword($password)
     {
