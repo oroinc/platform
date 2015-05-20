@@ -1,7 +1,8 @@
 define(function (require) {
     'use strict';
-    var BaseView = require('oroui/js/app/views/base/view'),
-        OverlayView;
+    var OverlayView,
+        BaseView = require('oroui/js/app/views/base/view'),
+        JsplumbAreaView = require('./jsplumb/area');
 
     OverlayView = BaseView.extend({
         listen: {
