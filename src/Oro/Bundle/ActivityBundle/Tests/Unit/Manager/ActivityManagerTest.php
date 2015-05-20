@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -32,6 +33,9 @@ class ActivityManagerTest extends OrmTestCase
 
     /** @var ActivityManager */
     protected $manager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
 
     protected function setUp()
     {
@@ -82,6 +86,12 @@ class ActivityManagerTest extends OrmTestCase
             $this->entityConfigProvider,
             $this->extendConfigProvider
         );
+
+        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->manager->setEventDispatcher($this->eventDispatcher);
     }
 
     public function testHasActivityAssociations()
@@ -217,6 +227,9 @@ class ActivityManagerTest extends OrmTestCase
             ->method('addActivityTarget')
             ->with($this->identicalTo($targetEntity))
             ->will($this->returnValue($activityEntity));
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::ADD_ACTIVITY);
 
         $this->assertTrue(
             $this->manager->addActivityTarget($activityEntity, $targetEntity)
@@ -365,6 +378,9 @@ class ActivityManagerTest extends OrmTestCase
             ->method('removeActivityTarget')
             ->with($this->identicalTo($targetEntity))
             ->will($this->returnValue($activityEntity));
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::REMOVE_ACTIVITY);
 
         $this->assertTrue(
             $this->manager->removeActivityTarget($activityEntity, $targetEntity)

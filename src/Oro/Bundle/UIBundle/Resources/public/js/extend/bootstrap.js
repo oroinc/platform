@@ -63,4 +63,39 @@ define([
                 }
             });
     }
+
+    /**
+     * This customization allows to define own render function for Typeahead
+     */
+    var Typeahead,
+        origTypeahead = $.fn.typeahead.Constructor,
+        origFnTypeahead = $.fn.typeahead;
+
+    Typeahead = function (element, options) {
+        var opts = $.extend({}, $.fn.typeahead.defaults, options);
+        this.click = opts.click || this.click;
+        this.render = opts.render || this.render;
+        origTypeahead.apply(this, arguments);
+    };
+
+    Typeahead.prototype = origTypeahead.prototype;
+    Typeahead.prototype.constructor = Typeahead;
+
+    $.fn.typeahead = function (option) {
+        return this.each(function () {
+            var $this = $(this)
+                , data = $this.data('typeahead')
+                , options = typeof option == 'object' && option;
+            if (!data) {
+                $this.data('typeahead', (data = new Typeahead(this, options)));
+            }
+            if (typeof option == 'string') {
+                data[option]();
+            }
+        });
+    };
+
+    $.fn.typeahead.defaults = origFnTypeahead.defaults;
+    $.fn.typeahead.Constructor = Typeahead;
+    $.fn.typeahead.noConflict = origFnTypeahead.noConflict;
 });

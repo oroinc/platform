@@ -12,43 +12,33 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
 class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $entityName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $scope;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $code;
 
-    /**
-     * @var string
-     */
+    /** @var string|array */
     protected $value;
 
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     protected $connection;
 
     /**
-     * @param string $entityName
-     * @param string $scope
-     * @param string $code
-     * @param string $value
+     * @param string       $entityName
+     * @param string       $scope
+     * @param string       $code
+     * @param string|array $value
      */
     public function __construct($entityName, $scope, $code, $value)
     {
         $this->entityName = $entityName;
-        $this->scope = $scope;
-        $this->code = $code;
-        $this->value = $value;
+        $this->scope      = $scope;
+        $this->code       = $code;
+        $this->value      = $value;
     }
 
     /**
@@ -73,7 +63,7 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
     public function execute(LoggerInterface $logger)
     {
         // update field itself
-        $sql =
+        $sql        =
             "UPDATE oro_entity_config_index_value
             SET value = ?
             WHERE
@@ -83,33 +73,33 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
                 code = ?
             ";
         $parameters = [$this->value, $this->entityName, $this->scope, $this->code];
-        $statement = $this->connection->prepare($sql);
+        $statement  = $this->connection->prepare($sql);
         $statement->execute($parameters);
         $this->logQuery($logger, $sql, $parameters);
 
         $logger->debug($sql);
 
         // update entity config cached data
-        $sql = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';
+        $sql        = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';
         $parameters = [$this->entityName];
-        $data = $this->connection->fetchColumn($sql, $parameters);
+        $data       = $this->connection->fetchColumn($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
 
-        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $data                            = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
         $data[$this->scope][$this->code] = $this->value;
-        $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+        $data                            = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
 
-        $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
+        $sql        = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
         $parameters = [$data, $this->entityName];
-        $statement = $this->connection->prepare($sql);
+        $statement  = $this->connection->prepare($sql);
         $statement->execute($parameters);
         $this->logQuery($logger, $sql, $parameters);
     }
 
     /**
      * @param LoggerInterface $logger
-     * @param string $sql
-     * @param array $parameters
+     * @param string          $sql
+     * @param array           $parameters
      */
     protected function logQuery(LoggerInterface $logger, $sql, array $parameters)
     {
