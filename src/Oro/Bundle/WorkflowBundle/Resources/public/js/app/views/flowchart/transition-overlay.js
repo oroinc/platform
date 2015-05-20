@@ -8,10 +8,6 @@ define(function (require) {
         template: require('tpl!oroworkflow/templates/flowchart/transition.html'),
 
         initialize: function (options) {
-            if (!(options.areaView instanceof JsplumbAreaView)) {
-                throw new Error('areaView options is required and must be a JsplumbAreaView');
-            }
-            this.areaView = options.areaView;
             this.stepFrom = options.stepFrom;
             TransitionOverlayView.__super__.initialize.apply(this, arguments);
         },

@@ -1,4 +1,5 @@
 define(function (require) {
+    'use strict';
     var _ = require('underscore'),
         JsplubmAreaView = require('./jsplumb/area'),
         JsplumbWorkflowStepView = require('./step'),

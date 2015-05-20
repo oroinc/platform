@@ -1,4 +1,5 @@
 define(function (require) {
+    'use strict';
     var JsplubmBaseView = require('./base'),
         $ = require('jquery'),
         jsPlumb = require('jsplumb'),
@@ -12,13 +13,13 @@ define(function (require) {
             Endpoint: ['Dot', {radius: 2}],
             HoverPaintStyle: {strokeStyle: '#1e8151', lineWidth: 2 },
             ConnectionOverlays: [
-                [ 'Arrow', {
+                ['Arrow', {
                     location: 1,
                     id: 'arrow',
                     length: 12,
                     width: 10,
                     foldback: 0.7
-                } ]
+                }]
             ]
         },
 
