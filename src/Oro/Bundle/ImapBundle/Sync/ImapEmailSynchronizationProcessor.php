@@ -23,6 +23,7 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
+use Rhumsaa\Uuid\Console\Exception;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -424,7 +425,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
                 try {
-                    $imapEmail       = $this->createImapEmail(
+                    $imapEmail = $this->createImapEmail(
                         $email->getId()->getUid(),
                         $this->addEmail($email, $folder, $email->hasFlag("\\Seen"))->getEmail(),
                         $imapFolder
@@ -456,7 +457,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->emailEntityBuilder->getBatch()->persist($this->em);
 
         // update references if needed
-        // todo CRM-2480
         $changes = $this->emailEntityBuilder->getBatch()->getChanges();
         foreach ($newImapEmails as $imapEmail) {
             foreach ($changes as $change) {
@@ -554,6 +554,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
+        // todo CRM-2480
         $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
         $imapEmail->getEmail()->addFolder($newImapFolder->getFolder());
         $imapEmail->setImapFolder($newImapFolder);

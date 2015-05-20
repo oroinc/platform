@@ -102,7 +102,7 @@ class Email extends ExtendEmail
     /**
      * @var EmailAddress
      *
-     * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER", cascade={"persist"})
      * @ORM\JoinColumn(name="from_email_address_id", referencedColumnName="id", nullable=false)
      * @JMS\Exclude
      */

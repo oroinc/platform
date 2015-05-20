@@ -21,7 +21,8 @@ class ImapEmailRepository extends EntityRepository
     {
         return $this->createQueryBuilder('imap_email')
             ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.folders', 'folder')
+            ->innerJoin('email.emailUsers', 'email_users')
+            ->innerJoin('email_users.folder', 'folder')
             ->where('folder = :folder AND imap_email.uid IN (:uids)')
             ->setParameter('folder', $folder)
             ->setParameter('uids', $uids);
@@ -59,7 +60,8 @@ class ImapEmailRepository extends EntityRepository
         return $this->createQueryBuilder('imap_email')
             ->innerJoin('imap_email.imapFolder', 'imap_folder')
             ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.folders', 'folder')
+            ->innerJoin('email.emailUsers', 'email_users')
+            ->innerJoin('email_users.folder', 'folder')
             ->where('folder.origin = :origin AND email.messageId IN (:messageIds)')
             ->setParameter('origin', $origin)
             ->setParameter('messageIds', $messageIds);
@@ -74,7 +76,7 @@ class ImapEmailRepository extends EntityRepository
     public function getEmailsByMessageIds(EmailOrigin $origin, array $messageIds)
     {
         $rows = $this->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)
-            ->select('imap_email, email, imap_folder, folder')
+            ->select('imap_email, email, email_users, imap_folder, folder')
             ->getQuery()
             ->getResult();
 
@@ -90,7 +92,7 @@ class ImapEmailRepository extends EntityRepository
     public function getOutdatedEmailsByMessageIds(EmailOrigin $origin, array $messageIds)
     {
         $rows = $this->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)
-            ->select('imap_email, email, imap_folder, folder')
+            ->select('imap_email, email, email_users, imap_folder, folder')
             ->andWhere('folder.outdatedAt IS NOT NULL')
             ->getQuery()
             ->getResult();
