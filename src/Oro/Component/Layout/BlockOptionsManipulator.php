@@ -2,9 +2,10 @@
 
 namespace Oro\Component\Layout;
 
-use Oro\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\PropertyAccess\PropertyAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
 {
