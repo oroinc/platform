@@ -39,11 +39,11 @@ define(function (require) {
             $field = $fieldset.find('[id^=oro_email_email_' + field + ']');
         $field.parents('.control-group.taggable-field').css('display', 'none');
 
-        if ($fieldset.find('span#show' + fieldName).length > 0) {
+        if ($fieldset.find('span.show' + fieldName).length > 0) {
             return;
         }
-        $fieldset.find('#cc-bcc-holder').append('<span id="show' + fieldName + '">' + fieldName +  '</span>');
-        $fieldset.find('#show' + fieldName).on('click', function(e) {
+        $fieldset.find('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldName +  '</span>');
+        $fieldset.find('.show' + fieldName).on('click', function(e) {
             e.stopPropagation();
             var target = e.target || window.event.target;
             $(target).remove();
@@ -204,7 +204,7 @@ define(function (require) {
             });
             if (!this.options.bcc.length || !this.options.cc.length) {
                 $fieldset.find('[id^=oro_email_email_to]').parents('.controls').find('ul.select2-choices').after(
-                    '<div id="cc-bcc-holder"/>'
+                    '<div class="cc-bcc-holder"/>'
                 );
             }
             if (!this.options.cc.length) {

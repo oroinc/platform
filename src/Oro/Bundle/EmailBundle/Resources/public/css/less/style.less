@@ -94,17 +94,17 @@
     padding-right: 60px;
   }
 }
-#cc-bcc-holder {
+.cc-bcc-holder {
   position: absolute;
   top: 5px;
   right: 0;
-}
-#showCc, #showBcc {
-  cursor:pointer;
-  padding: 0 5px;
-}
-#showCc:hover, #showBcc:hover {
-  text-decoration: underline;
+  .showCc, .showBcc {
+    cursor:pointer;
+    padding: 0 5px;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 .activity-list-widget {
   .email-info, .email-load-more {
