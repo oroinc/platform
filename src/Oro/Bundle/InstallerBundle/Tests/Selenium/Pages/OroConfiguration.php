@@ -15,15 +15,15 @@ class OroConfiguration extends AbstractPage
     {
         parent::__construct($testCase, $redirect);
         $this->host = $this->test
-            ->byXpath("//*[starts-with(@id,'oro_installer_configuration_database_oro_installer_database_host')]");
+            ->byXpath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_host']");
         $this->port = $this->test
-            ->byXpath("//*[starts-with(@id,'oro_installer_configuration_database_oro_installer_database_port')]");
+            ->byXpath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_port']");
         $this->password = $this->test
-            ->byXpath("//*[starts-with(@id,'oro_installer_configuration_database_oro_installer_database_password')]");
+            ->byXpath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_password']");
         $this->user = $this->test
-            ->byXpath("//*[starts-with(@id,'oro_installer_configuration_database_oro_installer_database_user')]");
+            ->byXpath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_user']");
         $this->database = $this->test
-            ->byXpath("//*[starts-with(@id,'oro_installer_configuration_database_oro_installer_database_name')]");
+            ->byXpath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_name']");
     }
 
     public function next()

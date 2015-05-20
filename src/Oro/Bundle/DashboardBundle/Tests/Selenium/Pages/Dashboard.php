@@ -22,14 +22,14 @@ class Dashboard extends AbstractPageEntity
     public function __construct($testCase, $redirect = true)
     {
         parent::__construct($testCase, $redirect);
-        $this->label = $this->test->byXpath("//*[starts-with(@id,'oro_dashboard_label')]");
+        $this->label = $this->test->byXpath("//*[@data-ftid='oro_dashboard_label']");
         $this->owner = $this->test->byXpath("//div[starts-with(@id,'s2id_oro_dashboard_owner')]/a");
     }
 
     public function init()
     {
         $this->clone = $this->test
-            ->select($this->test->byXpath("//*[starts-with(@id,'oro_dashboard_startDashboard')]"));
+            ->select($this->test->byXpath("//*[@data-ftid='oro_dashboard_startDashboard']"));
         return $this;
     }
 

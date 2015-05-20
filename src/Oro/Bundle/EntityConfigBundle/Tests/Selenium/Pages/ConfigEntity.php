@@ -22,11 +22,11 @@ class ConfigEntity extends CustomEntity
     public function init($new = false)
     {
         if ($new) {
-            $this->name = $this->test->byXpath("//*[starts-with(@id,'oro_entity_config_type_model_className')]");
+            $this->name = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_model_className']");
         }
-        $this->label = $this->test->byXpath("//*[starts-with(@id,'oro_entity_config_type_entity_label')]");
-        $this->pluralLabel = $this->test->byXpath("//*[starts-with(@id,'oro_entity_config_type_entity_plural_label')]");
-        $this->description = $this->test->byXpath("//*[starts-with(@id,'oro_entity_config_type_entity_description')]");
+        $this->label = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_entity_label']");
+        $this->pluralLabel = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_entity_plural_label']");
+        $this->description = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_entity_description']");
 
         return $this;
     }
@@ -89,7 +89,7 @@ class ConfigEntity extends CustomEntity
 
     public function setFieldName($fieldName)
     {
-        $field = $this->test->byXpath("//*[starts-with(@id,'oro_entity_extend_field_type_fieldName')]");
+        $field = $this->test->byXpath("//*[@data-ftid='oro_entity_extend_field_type_fieldName']");
         $field->clear();
         $field->value($fieldName);
         return $this;
@@ -97,7 +97,7 @@ class ConfigEntity extends CustomEntity
 
     public function setType($type)
     {
-        $field = $this->test->select($this->test->byXpath("//*[starts-with(@id,'oro_entity_extend_field_type_type')]"));
+        $field = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_entity_extend_field_type_type']"));
         $field->selectOptionByLabel($type);
         return $this;
     }
@@ -105,7 +105,7 @@ class ConfigEntity extends CustomEntity
     public function setStorageType($type)
     {
         $field = $this->test
-            ->select($this->test->byXpath("//*[starts-with(@id,'oro_entity_extend_field_type_is_serialized')]"));
+            ->select($this->test->byXpath("//*[@data-ftid='oro_entity_extend_field_type_is_serialized']"));
         $field->selectOptionByLabel($type);
         return $this;
     }
@@ -117,7 +117,7 @@ class ConfigEntity extends CustomEntity
     public function enableNotes($value = 'Yes')
     {
         $field = $this->test
-            ->select($this->test->byXpath("//*[starts-with(@id,'oro_entity_config_type_note_enabled')]"));
+            ->select($this->test->byXpath("//*[@data-ftid='oro_entity_config_type_note_enabled']"));
         $field->selectOptionByLabel($value);
         return $this;
     }
@@ -130,7 +130,7 @@ class ConfigEntity extends CustomEntity
     public function setActivitiesOn($activities = array())
     {
         foreach ($activities as $activity) {
-            $xpath = "//div[starts-with(@id,'oro_entity_config_type_activity_activities')]" .
+            $xpath = "//div[@data-ftid='oro_entity_config_type_activity_activities']" .
                 "//label[contains(., '{$activity}')]";
             if (!($this->isElementPresent($xpath."/preceding-sibling::input[@checked='checked']"))) {
                 $this->test->byXPath($xpath."/preceding-sibling::input")->click();

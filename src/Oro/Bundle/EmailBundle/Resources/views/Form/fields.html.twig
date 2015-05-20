@@ -51,7 +51,7 @@
                     var selectorEl = '{{ form.vars.id }}';
                     var emailLinkToScopeEl = $('#' + selectorEl);
                     var enableAttachmentEl = $(emailLinkToScopeEl).closest('form')
-                            .find('[id^=oro_entity_config_type_attachment_enabled]');
+                            .find('[data-ftid=oro_entity_config_type_attachment_enabled]');
                     initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
                     $(enableAttachmentEl).on('change', function() {
                         initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);

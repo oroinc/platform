@@ -25,7 +25,7 @@ class Notes extends AbstractPageEntity
             $this->runActionInGroup('Add note');
         } else {
             $this->test->byXPath(
-                "//div[@class='pull-right title-buttons-container']//a[starts-with(@id,'add-entity-note-button')]"
+                "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']"
             )->click();
             $this->waitForAjax();
             $this->assertElementPresent(
@@ -86,7 +86,7 @@ class Notes extends AbstractPageEntity
             $this->checkActionInGroup(['Add note']);
         } else {
             $this->assertElementPresent(
-                "//div[@class='pull-right title-buttons-container']//a[starts-with(@id,'add-entity-note-button')]",
+                "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
                 'Add Note button not available'
             );
         }
@@ -103,7 +103,7 @@ class Notes extends AbstractPageEntity
             $this->checkActionInGroup(['Add note'], false);
         } else {
             $this->assertElementNotPresent(
-                "//div[@class='pull-right title-buttons-container']//a[starts-with(@id,'add-entity-note-button')]",
+                "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
                 'Add Note button is available'
             );
         }

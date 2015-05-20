@@ -23,13 +23,13 @@ class TransactionEmail extends AbstractPageEntity
     {
         parent::__construct($testCase, $redirect);
         $this->entityName = $this->test
-            ->select($this->test->byXpath("//*[starts-with(@id,'emailnotification_entityName')]"));
-        $this->event = $this->test->select($this->test->byXpath("//*[starts-with(@id,'emailnotification_event')]"));
+            ->select($this->test->byXpath("//*[@data-ftid='emailnotification_entityName']"));
+        $this->event = $this->test->select($this->test->byXpath("//*[@data-ftid='emailnotification_event']"));
         $this->template = $this->test->byXpath("//div[starts-with(@id,'s2id_emailnotification_template')]/a");
         $this->user
             = $this->test->byXpath("//div[starts-with(@id,'s2id_emailnotification_recipientList_users')]//input");
-        $this->groups = $this->test->byXpath("//*[starts-with(@id,'emailnotification_recipientList_groups')]");
-        $this->email = $this->test->byXpath("//*[starts-with(@id,'emailnotification_recipientList_email')]");
+        $this->groups = $this->test->byXpath("//*[@data-ftid='emailnotification_recipientList_groups']");
+        $this->email = $this->test->byXpath("//*[@data-ftid='emailnotification_recipientList_email']");
     }
 
     /**

@@ -14,11 +14,11 @@ class Login extends AbstractPage
         parent::__construct($testCase);
 
         if (array_key_exists('remember', $args)) {
-            $this->test->byXpath("//*[starts-with(@id,'remember_me')]")->click();
+            $this->test->byId('remember_me')->click();
         }
 
-        $this->username = $this->test->byXpath("//*[starts-with(@id,'prependedInput')]");
-        $this->password = $this->test->byXpath("//*[starts-with(@id,'prependedInput2')]");
+        $this->username = $this->test->byId('prependedInput');
+        $this->password = $this->test->byId('prependedInput2');
     }
 
     public function setUsername($value)
@@ -37,7 +37,7 @@ class Login extends AbstractPage
 
     public function submit()
     {
-        $this->test->byXpath("//*[starts-with(@id,'_submit')]")->click();
+        $this->test->byId('_submit')->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;

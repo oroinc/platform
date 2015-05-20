@@ -56,22 +56,22 @@ class User extends AbstractPageEntity
 
     public function init($new = false)
     {
-        $this->username = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_username')]");
+        $this->username = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_username']");
         if ($new) {
             $this->firstPassword = $this->test
-                ->byXpath("//*[starts-with(@id,'oro_user_user_form_plainPassword_first')]");
+                ->byXpath("//*[@data-ftid='oro_user_user_form_plainPassword_first']");
             $this->secondPassword = $this->test
-                ->byXpath("//*[starts-with(@id,'oro_user_user_form_plainPassword_second')]");
+                ->byXpath("//*[@data-ftid='oro_user_user_form_plainPassword_second']");
         }
         $this->enabled = $this->test
-            ->select($this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_enabled')]"));
-        $this->firstName = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_firstName')]");
-        $this->lastName = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_lastName')]");
-        $this->email = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_email')]");
-        $this->groups = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_groups')]");
-        $this->roles = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_roles')]");
-        $this->owner = $this->test->select($this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_owner')]"));
-        $this->inviteUser = $this->test->byXpath("//*[starts-with(@id,'oro_user_user_form_inviteUser')]");
+            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_enabled']"));
+        $this->firstName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_firstName']");
+        $this->lastName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_lastName']");
+        $this->email = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_email']");
+        $this->groups = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_groups']");
+        $this->roles = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_roles']");
+        $this->owner = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_owner']"));
+        $this->inviteUser = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_inviteUser']");
 
         return $this;
     }
@@ -285,7 +285,7 @@ class User extends AbstractPageEntity
     {
         foreach ($businessUnits as $businessUnit) {
             $this->test->byXpath(
-                "//div[starts-with(@id,'oro_user_user_form_organizations')]//label[contains(., '{$businessUnit}')]".
+                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]".
                 "/preceding-sibling::input"
             )->click();
         }
@@ -328,7 +328,7 @@ class User extends AbstractPageEntity
         $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit profile']")->click();
         $this->waitPageToLoad();
         $this->assertElementPresent(
-            "//div[starts-with(@id,'oro_user_user_form_roles')]//input[@checked='checked' and @disabled='disabled']",
+            "//div[@data-ftid='oro_user_user_form_roles']//input[@checked='checked' and @disabled='disabled']",
             'Role selector are not disabled for user'
         );
     }

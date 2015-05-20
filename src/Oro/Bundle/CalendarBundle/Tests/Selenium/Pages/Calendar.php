@@ -19,7 +19,7 @@ class Calendar extends Calendars
      */
     public function setTitle($title)
     {
-        $this->$title = $this->test->byXpath("//*[starts-with(@id,'oro_calendar_event_form_title')]");
+        $this->$title = $this->test->byXpath("//*[@data-ftid='oro_calendar_event_form_title']");
         $this->$title->clear();
         $this->$title->value($title);
 
@@ -121,8 +121,8 @@ class Calendar extends Calendars
      */
     public function setAllDayEventOff()
     {
-        if ($this->isElementPresent("//input[starts-with(@id,'oro_calendar_event_form_allDay')][@value='1']")) {
-            $this->test->byXPath("//input[starts-with(@id,'oro_calendar_event_form_allDay')]")->click();
+        if ($this->isElementPresent("//input[@data-ftid='oro_calendar_event_form_allDay'][@value='1']")) {
+            $this->test->byXPath("//input[@data-ftid='oro_calendar_event_form_allDay']")->click();
         }
 
         return $this;

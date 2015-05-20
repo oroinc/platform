@@ -14,7 +14,7 @@ define(function (require) {
 
     function showField(fieldName, $fieldset) {
         var field = fieldName.toLowerCase(),
-            $field = $fieldset.find('[id^=oro_email_email_' + field + ']');
+            $field = $fieldset.find('[data-ftid=oro_email_email_' + field + ']');
         $field.parents('.control-group.taggable-field').css('display', 'block');
         $field.parents('.controls').find('input.select2-input')
             .unbind('focusout')
@@ -27,7 +27,7 @@ define(function (require) {
             })
             .focus();
 
-        $fieldset.find('[id^=oro_email_email_to]')
+        $fieldset.find('[data-ftid=oro_email_email_to]')
             .parents('.control-group.taggable-field')
             .find('label').html(__('oro.email.to'));
         addForgedAsterisk();
@@ -36,7 +36,7 @@ define(function (require) {
 
     function hideField(fieldName, $fieldset) {
         var field = fieldName.toLowerCase(),
-            $field = $fieldset.find('[id^=oro_email_email_' + field + ']');
+            $field = $fieldset.find('[data-ftid=oro_email_email_' + field + ']');
         $field.parents('.control-group.taggable-field').css('display', 'none');
 
         if ($fieldset.find('span.show' + fieldName).length > 0) {

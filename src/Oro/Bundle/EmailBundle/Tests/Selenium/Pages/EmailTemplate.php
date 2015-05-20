@@ -26,13 +26,13 @@ class EmailTemplate extends AbstractPageEntity
     {
         parent::__construct($testCase, $redirect);
         $this->entityName = $this->test
-            ->select($this->test->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_entityName')]"));
-        $this->name = $this->test->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_name')]");
-        $this->type = $this->test->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_type')]");
+            ->select($this->test->byXpath("//*[@data-ftid='oro_email_emailtemplate_entityName']"));
+        $this->name = $this->test->byXpath("//*[@data-ftid='oro_email_emailtemplate_name']");
+        $this->type = $this->test->byXpath("//*[@data-ftid='oro_email_emailtemplate_type']");
         $this->subject = $this->test
-            ->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_translations_defaultLocale_en_subject')]");
+            ->byXpath("//*[@data-ftid='oro_email_emailtemplate_translations_defaultLocale_en_subject']");
         $this->content = $this->test
-            ->byXpath("//*[starts-with(@id,'oro_email_emailtemplate_translations_defaultLocale_en_content')]");
+            ->byXpath("//*[@data-ftid='oro_email_emailtemplate_translations_defaultLocale_en_content']");
     }
 
     /**
@@ -81,7 +81,7 @@ class EmailTemplate extends AbstractPageEntity
     public function getType()
     {
         return $this->test->byXpath(
-            "//div[starts-with(@id,'oro_email_emailtemplate_type')]/div[input[@checked = 'checked']]/label"
+            "//div[@data-ftid='oro_email_emailtemplate_type']/div[input[@checked = 'checked']]/label"
         )->text();
     }
 

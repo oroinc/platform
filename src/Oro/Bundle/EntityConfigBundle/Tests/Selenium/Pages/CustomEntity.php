@@ -13,7 +13,7 @@ class CustomEntity extends AbstractPageEntity
 {
     public function setTargetEntity($entity)
     {
-        $target = $this->test->byXpath("//*[starts-with(@id,'oro_entity_config_type_extend_relation_target_entity')]");
+        $target = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_entity']");
         $target = $this->test->select($target);
         $target->selectOptionByLabel($entity);
         $this->waitForAjax();
@@ -22,7 +22,7 @@ class CustomEntity extends AbstractPageEntity
 
     public function setTargetField($field)
     {
-        $target = $this->test->byXpath("//*[starts-with(@id,'oro_entity_config_type_extend_relation_target_field')]");
+        $target = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_field']");
         $target = $this->test->select($target);
         $target->selectOptionByLabel($field);
         $this->waitForAjax();
@@ -116,7 +116,7 @@ class CustomEntity extends AbstractPageEntity
         $flag = 0;
         foreach ($options as $option) {
             $field = $this->test
-                ->byXpath("//*[starts-with(@id,'oro_entity_config_type_extend_set_options_{$flag}_label')]");
+                ->byXpath("//*[@data-ftid='oro_entity_config_type_extend_set_options_{$flag}_label']");
             $field->clear();
             $field->value($option);
             if ($flag < count($options)-1) {

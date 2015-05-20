@@ -23,7 +23,7 @@
             'orotranslation/js/translator'
         ],
         function($, __) {
-            var $passwordInput= $('[id^=oro_set_password_form_password]');
+            var $passwordInput= $('[data-ftid=oro_set_password_form_password]');
             $passwordInput.after(
                     '<span class="icon-eye-close" id="show-hide-pass" style="cursor: pointer; font-size: 16px;" ' +
                     ' title="' + __("oro.user.show_hide_password.label") + '"/>'

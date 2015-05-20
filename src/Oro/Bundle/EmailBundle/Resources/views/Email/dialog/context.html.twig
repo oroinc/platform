@@ -19,8 +19,10 @@
 
         {% set firstContext = itemsArray[0] %}
         {% set options = params|merge({items: itemsArray, params: params}) %}
-        {% set contextCurrentTargetClassId = 'context-current-target-class-uid-' ~ random() %}
-        {% set contextCurrentTargetGridId = 'context-current-target-grid-uid-' ~ random() %}
+        {% set contextCurrentTargetClassFtId = 'context-current-target-class' %}
+        {% set contextCurrentTargetClassId = contextCurrentTargetClassFtId ~ '-uid-' ~ random() %}
+        {% set contextCurrentTargetGridFtId = 'context-current-target-grid' %}
+        {% set contextCurrentTargetGridId = contextCurrentTargetGridFtId ~ '-uid-' ~ random() %}
 
         <script type="text/template" id="email-context-item">
             <li id="<%= entity.get('entityAlias') %>" class="context-item" data-cid="<%= entity.cid %>">
@@ -35,8 +37,8 @@
                 <span id="email-context-arrow" class="icon-caret-down"></span>
             </button>
             <ul id="context-items-dropdown" class="dropdown-menu"></ul>
-            <input type="hidden" id="{{ contextCurrentTargetClassId }}"/>
-            <input type="hidden" id="{{ contextCurrentTargetGridId }}"/>
+            <input type="hidden" id="{{ contextCurrentTargetClassId }}" data-ftid="{{ contextCurrentTargetClassFtId }}"/>
+            <input type="hidden" id="{{ contextCurrentTargetGridId }}" data-ftid="{{ contextCurrentTargetGridFtId }}"/>
         </div>
 
         {{ oro_widget_render({

@@ -66,8 +66,8 @@ class LoginFormTest extends Selenium2TestCase
         $this->url('user/login');
         $this->waitPageToLoad();
 
-        $username = $this->byXpath("//*[starts-with(@id,'prependedInput')]");
-        $password = $this->byXpath("//*[starts-with(@id,'prependedInput2')]");
+        $username = $this->byId('prependedInput');
+        $password = $this->byId('prependedInput2');
 
         //check that username and password is empty field
         $this->assertEquals('', $username->value());
@@ -79,10 +79,10 @@ class LoginFormTest extends Selenium2TestCase
         $this->url('user/login');
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->clear();
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN);
-        $this->byXpath("//*[starts-with(@id,'prependedInput2')]")->clear();
-        $this->byXpath("//*[starts-with(@id,'prependedInput2')]")->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS);
+        $this->byId('prependedInput')->clear();
+        $this->byId('prependedInput')->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN);
+        $this->byId('prependedInput2')->clear();
+        $this->byId('prependedInput2')->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS);
         $this->clickOnElement('_submit');
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -104,10 +104,10 @@ class LoginFormTest extends Selenium2TestCase
         $this->url('user/login');
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->clear();
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->value($login);
-        $this->byXpath("//*[starts-with(@id,'prependedInput2')]")->clear();
-        $this->byXpath("//*[starts-with(@id,'prependedInput2')]")->value($password);
+        $this->byId('prependedInput')->clear();
+        $this->byId('prependedInput')->value($login);
+        $this->byId('prependedInput2')->clear();
+        $this->byId('prependedInput2')->value($password);
         $this->clickOnElement('_submit');
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -133,8 +133,8 @@ class LoginFormTest extends Selenium2TestCase
         $this->url('user/login');
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $usernameAttribute = $this->byXpath("//*[starts-with(@id,'prependedInput')]")->attribute('required');
-        $passwordAttribute = $this->byXpath("//*[starts-with(@id,'prependedInput2')]")->attribute('required');
+        $usernameAttribute = $this->byId('prependedInput')->attribute('required');
+        $passwordAttribute = $this->byId('prependedInput2')->attribute('required');
 
         //check that username and password is empty field
         $this->assertEquals('true', $usernameAttribute);
@@ -151,7 +151,7 @@ class LoginFormTest extends Selenium2TestCase
         $this->waitForAjax();
         $this->assertEquals('Forgot Password', $this->title());
 
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->value('123test123');
+        $this->byId('prependedInput')->value('123test123');
         $this->byXPath("//button[contains(.,'Request')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -159,7 +159,7 @@ class LoginFormTest extends Selenium2TestCase
         $messageExpect = "The username or email address \"123test123\" does not exist.";
         $this->assertEquals($messageExpect, $messageActual);
 
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->value('admin@example.com');
+        $this->byId('prependedInput')->value('admin@example.com');
         $this->byXPath("//button[contains(.,'Request')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -176,11 +176,11 @@ class LoginFormTest extends Selenium2TestCase
         $this->url('user/login');
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->clear();
-        $this->byXpath("//*[starts-with(@id,'prependedInput')]")->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN);
-        $this->byXpath("//*[starts-with(@id,'prependedInput2')]")->clear();
-        $this->byXpath("//*[starts-with(@id,'prependedInput2')]")->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS);
-        $this->byXpath("//*[starts-with(@id,'remember_me')]")->click();
+        $this->byId('prependedInput')->clear();
+        $this->byId('prependedInput')->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN);
+        $this->byId('prependedInput2')->clear();
+        $this->byId('prependedInput2')->value(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS);
+        $this->byId('remember_me')->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->clickOnElement('_submit');

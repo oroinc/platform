@@ -90,12 +90,12 @@ class Search extends AbstractPage
         if (!is_null($filter)) {
             $result = $this->test->elements(
                 $this->test->using("xpath")->value(
-                    "//div[starts-with(@id,'search-result-grid')]//tr//h1/a[normalize-space(.) = '{$filter}']"
+                    "//div[@id='search-result-grid']//tr//h1/a[normalize-space(.) = '{$filter}']"
                 )
             );
         } else {
             $result = $this->test->elements(
-                $this->test->using("xpath")->value("//div[starts-with(@id,'search-result-grid')]//tr//h1/a")
+                $this->test->using("xpath")->value("//div[@id='search-result-grid']//tr//h1/a")
             );
         }
 
