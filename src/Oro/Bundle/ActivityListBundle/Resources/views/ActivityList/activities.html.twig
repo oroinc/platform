@@ -1,14 +1,17 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set widgetContent %}
+    {% set entityClass = oro_class_name(entity, true) %}
+    {% placeholder oro_activity_list_before with {entity: entity, entityClass: entityClass} %}
     {{ oro_widget_render({
         'widgetType': 'block',
         'url': path('oro_activity_list_widget_activities', {
-            entityClass: oro_class_name(entity, true),
+            entityClass: entityClass,
             entityId: entity.id
         }),
         'title': '',
         'alias': 'activity-list-widget',
         'cssClass': 'list-widget activity-list-widget standard-action-buttons',
     }) }}
+    {% placeholder oro_activity_list_after with {entity: entity, entityClass: entityClass} %}
 {% endset %}
 {{ UI.scrollSubblock(null, [widgetContent]) }}
