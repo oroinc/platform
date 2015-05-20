@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\AbstractQuery;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
