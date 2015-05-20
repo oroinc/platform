@@ -206,6 +206,7 @@ class ActivityListManager
             'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
+            'description'          => $entity->getDescription(),
             'data'                 => $data,
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
