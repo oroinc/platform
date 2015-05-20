@@ -22,7 +22,7 @@ define(function (require) {
         TransitionEditFormView = require('oroworkflow/js/workflow-management/transition/view/edit'),
         StepEditView = require('oroworkflow/js/workflow-management/step/view/edit'),
         StepModel = require('oroworkflow/js/workflow-management/step/model'),
-        WorkflowFlowchartComponent = require('./workflow-flowchart-component'),
+        WorkflowFlowchartComponent = require('./workflow-flowchart-editor-component'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**

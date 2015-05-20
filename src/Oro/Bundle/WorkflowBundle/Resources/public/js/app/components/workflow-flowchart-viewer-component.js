@@ -5,7 +5,7 @@ define(function (require) {
 
     var WorkflowFlowchartComponent,
         BaseComponent = require('oroui/js/app/components/base/component'),
-        WorkflowFlowchartView = require('../views/flowchart/workflow'),
+        WorkflowFlowchartView = require('../views/flowchart/viewer/workflow'),
         flowchartTools = require('oroworkflow/js/tools/flowchart-tools');
 
     /**
