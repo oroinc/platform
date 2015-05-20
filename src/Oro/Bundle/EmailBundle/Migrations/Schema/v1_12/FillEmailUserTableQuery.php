@@ -29,9 +29,11 @@ class FillEmailUserTableQuery extends ParametrizedMigrationQuery
 
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        // do some stuff
-        $query = 'INSERT INTO oro_email_user (email_id, created, received, is_seen)
-            SELECT id, created, received, is_seen FROM oro_email';
+        $query = <<<SQL
+INSERT INTO oro_email_user (folder_id, email_id, created, received, is_seen)
+  SELECT f.emailfolder_id, e.id, e.created, e.received, e.is_seen
+  FROM oro_email e left join oro_email_to_folder f on f.email_id = e.id
+SQL;
 
         $this->logQuery($logger, $query);
         if (!$dryRun) {
