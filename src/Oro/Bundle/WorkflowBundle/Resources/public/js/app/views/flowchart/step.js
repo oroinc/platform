@@ -8,6 +8,7 @@ define(function (require) {
 
         events: {
             'dblclick': 'triggerEditStep',
+            'click .jsplumb-source': 'triggerAddStep',
             'click .workflow-step-edit': 'triggerEditStep',
             'click .workflow-step-clone': 'triggerCloneStep',
             'click .workflow-step-delete': 'triggerRemoveStep'
@@ -26,6 +27,10 @@ define(function (require) {
         triggerCloneStep: function (e) {
             e.preventDefault();
             this.areaView.model.trigger('requestCloneStep', this.model);
+        },
+
+        triggerAddStep: function () {
+            this.areaView.model.trigger('requestAddTransition', this.model);
         }
     });
 

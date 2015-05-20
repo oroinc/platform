@@ -43,6 +43,10 @@ define(function (require) {
         },
 
         updateStepTransitions: function () {
+            if (!this.model) {
+                console.warn('model is undefined');
+                return;
+            }
             var i, startStep,
                 startSteps = this.model.getStartingSteps(),
                 endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
@@ -68,8 +72,8 @@ define(function (require) {
                 connection = this.connections[i];
                 if (connection.stale) {
                     this.areaView.jsPlumbInstance.detach(connection.jsplumbConnection);
-                    if (connection.jsplumbConnection.view) {
-                        connection.jsplumbConnection.view.dispose();
+                    if (connection.jsplumbConnection.overlayView) {
+                        connection.jsplumbConnection.overlayView.dispose();
                     }
                     this.connections.splice(i, 1);
                     i--;
@@ -88,35 +92,40 @@ define(function (require) {
         },
 
         createOrRemoveStaleMark: function (startStep, endStep) {
-            var transitionModel = this.model,
+            var jsplumbConnection,
+                overlayView,
+                transitionModel = this.model,
                 areaView = this.areaView,
                 connection = this.findConnectionByStartStep(startStep),
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep);
 
-            if (connection) {
+            if (connection && connection.endStep === endStep) {
                 delete connection.stale;
             } else {
+                jsplumbConnection = this.areaView.jsPlumbInstance.connect({
+                    source: startEl,
+                    target: endEl,
+                    overlays: [
+                        ['Custom', {
+                            create: function () {
+                                overlayView = new TransitionOverlayView({
+                                    model: transitionModel,
+                                    areaView: areaView,
+                                    stepFrom: startStep
+                                });
+                                overlayView.render();
+                                return overlayView.$el;
+                            },
+                            location: 0.5
+                        }]
+                    ]
+                });
+                jsplumbConnection.overlayView = overlayView;
                 this.connections.push({
                     startStep: startStep,
-                    jsplumbConnection: this.areaView.jsPlumbInstance.connect({
-                        source: startEl,
-                        target: endEl,
-                        overlays: [
-                            ['Custom', {
-                                create: function (component) {
-                                    this.view = new TransitionOverlayView({
-                                        model: transitionModel,
-                                        areaView: areaView,
-                                        stepFrom: startStep
-                                    });
-                                    this.view.render();
-                                    return this.view.$el;
-                                },
-                                location: 0.5
-                            }]
-                        ]
-                    })
+                    endStep: endStep,
+                    jsplumbConnection: jsplumbConnection
                 });
             }
         },
@@ -124,6 +133,8 @@ define(function (require) {
         cleanup: function () {
             this.addStaleMark();
             this.removeStaleConnections();
+            this.stopListening();
+            this.isListening = false;
         }
     });
 

@@ -21,6 +21,9 @@
   *[dropdown-state=opened] {
     z-index: 700;
   }
+  ._jsPlumb_endpoint {
+    z-index: 100;
+  }
   .jsplumb-box {
     z-index: 100;
     position: absolute;
@@ -81,6 +84,14 @@
       &:hover {
         background: #DEC581;
         cursor: pointer;
+        &:before {
+          content: "+";
+          line-height: 1em;
+          font-size: @source-radius * 2;
+          text-align: center;
+          width: @source-radius * 2;
+          display: block;
+        }
       }
     }
   }

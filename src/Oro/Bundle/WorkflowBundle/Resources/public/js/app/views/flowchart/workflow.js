@@ -55,11 +55,26 @@ define(function (require) {
             });
 
             this.jsPlumbInstance.bind('beforeDrop', _.bind(function (data) {
-                var stepFrom = this.findStepModelByElement(data.connection.source),
+                var transitionModel, startingSteps, suspendedStep, suspendedStepTransitions,
+                    stepFrom = this.findStepModelByElement(data.connection.source),
                     stepTo = this.findStepModelByElement(data.connection.target);
                 if (data.connection.suspendedElement) {
-                    console.log('old');
-                    debugger;
+                    transitionModel = data.connection.overlayView.model;
+                    startingSteps = transitionModel.getStartingSteps();
+                    console.log('old', transitionModel);
+                    if (stepTo.get('name') !== transitionModel.get('step_to')) {
+                        // stepTo changed
+                        transitionModel.set({
+                            step_to: stepTo.get('name')
+                        });
+                    }
+                    if (startingSteps.indexOf(stepFrom) === -1) {
+                        suspendedStep = this.findStepModelByElement(data.connection.suspendedElement);
+                        stepFrom.getAllowedTransitions().add(transitionModel);
+                        suspendedStep.getAllowedTransitions().remove(transitionModel);
+                        stepFrom.trigger('change');
+                        suspendedStep.trigger('change');
+                    }
                 } else {
                     this.model.trigger('requestAddTransition', stepFrom, stepTo);
                 }
