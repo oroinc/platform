@@ -47,7 +47,7 @@ abstract class AbstractDriver implements DriverInterface
                 eval('?>' . $this->doGenerate($className, $file));
             } else {
                 // write cache to file, refresh cache if source file fresher then cached one in debug mode
-                if (!is_file($cache) || ($this->isDebug() && filemtime($file) > filemtime($file))) {
+                if (!is_file($cache) || ($this->isDebug() && filemtime($file) > filemtime($cache))) {
                     $this->writeCacheFile($cache, $this->doGenerate($className, $file));
                 }
 

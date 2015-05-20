@@ -2,7 +2,8 @@
 
 namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Oro\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClass;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicCall;
@@ -64,7 +65,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
     public function testGetValueThrowsExceptionForInvalidPropertyPathType()
     {
@@ -73,7 +74,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
@@ -82,7 +83,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($objectOrArray, $path)
     {
@@ -91,7 +92,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -113,7 +114,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueDoesNotReadMagicCallByDefault()
     {
@@ -143,7 +144,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -154,7 +155,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -165,7 +166,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -176,7 +177,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
      */
     // @codingStandardsIgnoreEnd
@@ -196,7 +197,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
     public function testSetValueThrowsExceptionForInvalidPropertyPathType()
     {
@@ -205,7 +206,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
@@ -223,7 +224,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -231,7 +232,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
     public function testSetValueThrowsExceptionIfThereIsInvalidItemInGraph()
     {
@@ -251,7 +252,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfThereAreMissingParameters()
     {
@@ -259,7 +260,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueDoesNotUpdateMagicCallByDefault()
     {
@@ -281,7 +282,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -294,7 +295,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -307,7 +308,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -320,7 +321,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
      */
     // @codingStandardsIgnoreEnd
@@ -352,7 +353,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
     public function testRemoveThrowsExceptionForInvalidPropertyPathType()
     {
@@ -361,7 +362,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
@@ -387,7 +388,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveThrowsExceptionIfNotArrayAccess()
     {
@@ -395,7 +396,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveThrowsExceptionIfThereIsInvalidItemInGraph()
     {
@@ -415,7 +416,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveThrowsExceptionIfThereAreMissingParameters()
     {
@@ -423,7 +424,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveThrowsExceptionIfPublicPropertyHasNoUnsetter()
     {
@@ -431,7 +432,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveThrowsExceptionIfProtectedProperty()
     {
@@ -439,7 +440,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveThrowsExceptionIfPrivateProperty()
     {
@@ -447,7 +448,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testRemoveDoesNotUpdateMagicCallByDefault()
     {
@@ -469,7 +470,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -482,7 +483,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -495,7 +496,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     // @codingStandardsIgnoreEnd
@@ -508,7 +509,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
      */
     // @codingStandardsIgnoreEnd
@@ -561,7 +562,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(array('%!@$§.' => 'John'), '[%!@$§.]', 'John'),
             array(array('index' => array('%!@$§.' => 'John')), 'index[%!@$§.]', 'John'),
             array((object)array('%!@$§' => 'John'), '%!@$§', 'John'),
-            array((object)array('property' => (object)array('%!@$§' => 'John')), 'property.%!@$§', 'John'),
         );
     }
 
