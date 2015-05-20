@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Config\Loader;
 
-use Oro\Component\Config\CumulativeResource;
-use Oro\Component\Config\CumulativeResourceInfo;
-
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+use Oro\Component\Config\CumulativeResource;
+use Oro\Component\Config\CumulativeResourceInfo;
 
 /**
  * Loader that returns folder content as a list of found files, works recursively as deep
@@ -125,13 +125,87 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir)
+    public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
-        $dir      = $this->getDirectoryAbsolutePath($bundleDir);
-        $realPath = realpath($dir);
+        $dir           = $this->getDirectoryAbsolutePath($bundleDir);
+        $bundleAppData = [];
 
-        if (!is_dir($realPath)) {
+        if (is_dir($bundleAppDir)) {
+            $appDir        = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
+            $bundleAppData = $this->getData($appDir);
+        }
+
+        $data = $this->mergeArray($bundleAppData, $this->getData($dir), $bundleAppDir, $bundleDir);
+        if (empty($data)) {
             return null;
+        }
+
+        return new CumulativeResourceInfo($bundleClass, $this->getResource(), realpath($dir), $data);
+    }
+
+    /**
+     * Recursively merges two arrays into one. If files have the same location,
+     * the priority remains for the array $a
+     *
+     * @param array  $a            Array to merge
+     * @param array  $b            Array, which merges with the previous one
+     * @param string $bundleAppDir The bundle directory inside the application resources directory
+     * @param string $bundleDir    The bundle root directory
+     *
+     * @return array              Merged array
+     */
+    protected function mergeArray(array $a, array $b, $bundleAppDir, $bundleDir)
+    {
+        foreach ($b as $k => $v) {
+            if (is_int($k)) {
+                foreach ($a as $val) {
+                    if ($this->isFilePathEquals($val, $v, $bundleAppDir, $bundleDir)) {
+                        continue 2;
+                    }
+                }
+                $a[] = $v;
+            } else {
+                if (is_array($v) && isset($a[$k]) && is_array($a[$k])) {
+                    $a[$k] = $this->mergeArray($a[$k], $v, $bundleAppDir, $bundleDir);
+                } else {
+                    $a[$k] = $v;
+                }
+            }
+        }
+
+        return $a;
+    }
+
+    /**
+     * Equals end of files names from $bundleAppDir and $bundleDir
+     *
+     * @param string $bundleAppPath Path to the resource file from $resourceDir
+     * @param string $bundlePath    Path to the resource file from $bundlePath
+     * @param string $bundleAppDir  Directory to the priority resource
+     * @param string $bundleDir     The bundle root directory
+     *
+     * @return bool
+     */
+    protected function isFilePathEquals($bundleAppPath, $bundlePath, $bundleAppDir, $bundleDir)
+    {
+        $a = str_replace($bundleDir . DIRECTORY_SEPARATOR . 'Resources', '', $bundlePath);
+        $b = str_replace($bundleAppDir, '', $bundleAppPath);
+
+        return $a === $b;
+    }
+
+    /**
+     * Get all data from the directory $dir
+     *
+     * @param $dir
+     *
+     * @return array
+     */
+    protected function getData($dir)
+    {
+        $realPath = realpath($dir);
+        if (!is_dir($realPath)) {
+            return [];
         }
 
         $data = [];
@@ -157,57 +231,79 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
             }
         }
 
-        return new CumulativeResourceInfo($bundleClass, $this->getResource(), $realPath, $data);
+        return $data;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function registerFoundResource($bundleClass, $bundleDir, CumulativeResource $resource)
+    public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
-        $dir      = $this->getDirectoryAbsolutePath($bundleDir);
-        $realPath = realpath($dir);
-
+        $dir           = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
+        $realPath      = realpath($dir);
+        $bundleAppData = [];
         if (is_dir($realPath)) {
-            foreach ($this->getDirectoryContentsArray($realPath) as $filename) {
-                $resource->addFound($bundleClass, $filename);
-            }
+            $bundleAppData = $this->getDirectoryContentsArray($realPath);
+        }
+
+        $dir        = $this->getDirectoryAbsolutePath($bundleDir);
+        $realPath   = realpath($dir);
+        $bundleData = [];
+        if (is_dir($realPath)) {
+            $bundleData = $this->getDirectoryContentsArray($realPath);
+        }
+
+        foreach ($this->mergeArray($bundleAppData, $bundleData, $bundleAppDir, $bundleDir) as $filename) {
+            $resource->addFound($bundleClass, $filename);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isResourceFresh($bundleClass, $bundleDir, CumulativeResource $resource, $timestamp)
+    public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
         $registeredFiles = $resource->getFound($bundleClass);
         $registeredFiles = array_flip($registeredFiles);
-        $dir             = $this->getDirectoryAbsolutePath($bundleDir);
-        $realPath        = realpath($dir);
 
-        $result = true;
+        // Check and remove data from $bundleAppDir resources directory
+        if (is_dir($bundleAppDir)) {
+            $dir      = $this->getResourcesDirectoryAbsolutePath($bundleAppDir);
+            $realPath = realpath($dir);
+            if (is_dir($realPath)) {
+                $currentContents = $this->getDirectoryContentsArray($realPath);
+
+                foreach ($currentContents as $filename) {
+                    if (!$resource->isFound($bundleClass, $filename)) {
+                        return false;
+                    }
+
+                    unset($registeredFiles[$filename]);
+                }
+            }
+        }
+
+        // Check and remove data from $bundleDir resources directory
+        $dir      = $this->getDirectoryAbsolutePath($bundleDir);
+        $realPath = realpath($dir);
         if (is_dir($realPath)) {
             $currentContents = $this->getDirectoryContentsArray($realPath);
 
             foreach ($currentContents as $filename) {
                 if (!$resource->isFound($bundleClass, $filename)) {
-                    $result = false;
-                    break;
+                    return false;
                 }
 
                 unset($registeredFiles[$filename]);
             }
-
-            // case when some file was removed
-            if (count($registeredFiles) > 0) {
-                $result = false;
-            }
-        } elseif (!empty($registeredFiles)) {
-            // case when entire dir was removed
-            $result = false;
         }
 
-        return $result;
+        // case when entire dir was removed or some file was removed
+        if (!empty($registeredFiles)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -257,6 +353,19 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     protected function getDirectoryAbsolutePath($bundleDir)
     {
         return rtrim($bundleDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->relativeFolderPath;
+    }
+
+    /**
+     * @param string $bundleAppDir
+     *
+     * @return string
+     */
+    protected function getResourcesDirectoryAbsolutePath($bundleAppDir)
+    {
+        return
+            rtrim($bundleAppDir, DIRECTORY_SEPARATOR) .
+            DIRECTORY_SEPARATOR .
+            preg_replace('/Resources\//', '', $this->relativeFolderPath, 1);
     }
 
     /**

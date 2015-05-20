@@ -61,7 +61,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('assemble'))
             ->getMock();
 
-        $this->conditionFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory')
+        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
         $this->actionFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory')
@@ -406,7 +406,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function createCondition()
     {
-        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface')
+        return $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
             ->getMockForAbstractClass();
     }
 

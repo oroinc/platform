@@ -2,10 +2,11 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class GetValueTest extends \PHPUnit_Framework_TestCase
 {
@@ -172,29 +173,29 @@ class GetValueTest extends \PHPUnit_Framework_TestCase
                 'options'  => [new PropertyPath('foo')],
                 'message'  => null,
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
                     . '])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), null],
                 'message'  => null,
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
                     . ', null])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
-                    . ', new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . ', new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false])'
                     . '])'
             ],
             [
                 'options'  => [new PropertyPath('foo')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];
