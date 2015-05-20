@@ -47,14 +47,14 @@ In general terms, the layout goes through the stages outlined in the following t
 
 | Stage | Description |
 |------ |-------------|
-| **create the layout context** | The layout context should be created manually by calling the constructor of the [LayoutContext](./LayoutContext.php) class. If needed an additional variables can be added to the context at this stage. |
+| **create the layout context** | The layout context should be created manually by calling the constructor of the [LayoutContext](./LayoutContext.php) class. If needed, additional variables can be added to the context at this stage. |
 | **configure the layout context** | At this stage the `configureContext` method of all registered [layout configurators](./ContextConfiguratorInterface.php) is called. |
-| **resolve the layout context** | After this stage adding new variables to the layout context is not possible, but it is still possible to change a value of existing variables. |
+| **resolve the layout context** | After this stage adding new variables to the layout context is not possible, but it is still possible to change the value of existing variables. |
 | **add `root` block** | The root block should be added manually to start executing of the layout update chain. See description of the next stage for more details. | 
 | **execute layout updates** | The layout updates are linked to the layout blocks, so they are executed after a block is added to the layout. If a block is not specified for an layout update it is linked to the root block. |
-| **build blocks** | A block hierarchy is build starting from a parent block. The `buildBlock` method of the base block type is called at the first, then the `buildBlock` method of all registered extensions of the base block type is called; next the `buildBlock` method of the inherited block type and its extensions is called, etc. |
-| **build block views** | A block view hierarchy is build starting from a parent block. The `buildView` method of the base block type is called at the first, then the `buildView` method of all registered extensions of the base block type is called; next the `buildView` method of the inherited block type and its extensions is called, etc. The `buildView` method is called before children views are built, so it is not possible to access child views there. |
-| **finish building of block views** | At the first a parent view is finishing building. The `finishView` method of the base block type is called at the first, then the `finishView` method of all registered extensions of the base block type is called; next the `finishView` method of the inherited block type and its extensions is called, etc. The `finishView` method is called after children views are built, but before children view are finished building. |
+| **build blocks** | A block hierarchy is build starting from a parent block. The `buildBlock` method of the base block type is called at first, then the `buildBlock` method of all registered extensions of the base block type is called; next the `buildBlock` method of the inherited block type and its extensions is called, etc. |
+| **build block views** | A block view hierarchy is build starting from a parent block. The `buildView` method of the base block type is called at first, then the `buildView` method of all registered extensions of the base block type is called; next the `buildView` method of the inherited block type and its extensions is called, etc. The `buildView` method is called before child views are built, so it is not possible to access child views there. |
+| **finish building of block views** | At first a parent view is finishing building. The `finishView` method of the base block type is called at first, then the `finishView` method of all registered extensions of the base block type is called; next the `finishView` method of the inherited block type and its extensions is called, etc. The `finishView` method is called after child views are built, but before child view are finished building. |
 | **render the layout** | the layout rendering is the same as in Symfony Forms. See [How to Customize Form Rendering](http://symfony.com/doc/current/cookbook/form/form_customization.html) for more details. |
 
 
@@ -76,7 +76,7 @@ $layout = $layoutFactory->createLayoutBuilder()
 echo $layout->render();
 ```
 
-For more deep understanding how the layout works you can investigate [Layouts](./Layouts.php) class, the `getLayout` method of [LayoutBuilder](./LayoutBuilder.php) class and [BlockFactory](./BlockFactory.php) class. Also pay attention on the `postExecuteAction` method of [DeferredLayoutManipulator](./DeferredLayoutManipulator.php) class and [LayoutRegistry](./LayoutRegistry.php) class.
+For deeper understanding of how the layout works you can investigate [Layouts](./Layouts.php) class, the `getLayout` method of [LayoutBuilder](./LayoutBuilder.php) class and [BlockFactory](./BlockFactory.php) class. Also pay attention to the `postExecuteAction` method of [DeferredLayoutManipulator](./DeferredLayoutManipulator.php) class and [LayoutRegistry](./LayoutRegistry.php) class.
 
 
 Developer reference
@@ -95,5 +95,5 @@ Here is a list of most important classes of Oro Layout component:
  - [BlockTypeInterface](./BlockTypeInterface.php) provides an interface for all block types.
  - [AbstractType](./Block/Type/AbstractType.php) can be used as a base class for all **block** block types.
  - [AbstractContainerType](./Block/Type/AbstractContainerType.php) can be used as a base class for all **container** block types.
- - [BlockFactory](./BlockFactory.php) implements a logic for build layout blocks and its views.
- - [DataProviderInterface](./DataProviderInterface.php) provides an interface for all data providers.
+ - [BlockFactory](./BlockFactory.php) implements the logic for building layout blocks and their views.
+ - [DataProviderInterface](./DataProviderInterface.php) provides the interface for all data providers.
