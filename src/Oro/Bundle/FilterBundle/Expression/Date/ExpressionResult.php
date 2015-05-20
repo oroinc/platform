@@ -142,6 +142,10 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
+                case DateModifierInterface::VAR_SOW:
+                case DateModifierInterface::VAR_SOM:
+                case DateModifierInterface::VAR_SOQ:
+                case DateModifierInterface::VAR_SOY:
                     $dateValue->addDays($value->getValue());
                     break;
                 case DateModifierInterface::VAR_THIS_WEEK:
@@ -187,6 +191,10 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
+                case DateModifierInterface::VAR_SOW:
+                case DateModifierInterface::VAR_SOM:
+                case DateModifierInterface::VAR_SOQ:
+                case DateModifierInterface::VAR_SOY:
                     $dateValue->subDays($value->getValue());
                     break;
                 case DateModifierInterface::VAR_THIS_WEEK:
@@ -211,6 +219,10 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
+                case DateModifierInterface::VAR_SOW:
+                case DateModifierInterface::VAR_SOM:
+                case DateModifierInterface::VAR_SOQ:
+                case DateModifierInterface::VAR_SOY:
                     $this->value -= $value->getValue()->day;
                     break;
                 case DateModifierInterface::VAR_THIS_WEEK:
