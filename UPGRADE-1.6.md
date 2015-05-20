@@ -36,3 +36,6 @@ UPGRADE FROM 1.5 to 1.6
 ####OroUserBundle:
 - Added `oro_user_organization_acl_select` form type which selects users by assigned organizations, not by owned organization.    
 - Added `oro_user_organization_acl_multiselect` multi select form type which selects users by assigned organizations, not by owned organization.   
+
+####OroReminderBundle:
+- Added parameter `NameFormatter $nameFormatter` to constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailNotification`
