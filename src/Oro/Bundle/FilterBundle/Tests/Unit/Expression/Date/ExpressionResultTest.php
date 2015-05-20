@@ -162,47 +162,6 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, (int)$result->year);
     }
 
-    /**
-     * @dataProvider variableProvider
-     * @expectedException \Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException
-     *
-     * @param int    $variable
-     * @param string $operation
-     */
-    public function testDeniedVariables($variable, $operation)
-    {
-        $expression = new ExpressionResult(new Token(Token::TYPE_VARIABLE, $variable));
-
-        $expression->{$operation}(new ExpressionResult(1));
-    }
-
-    /**
-     * @dataProvider variableProvider
-     * @expectedException \Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException
-     *
-     * @param int    $variable
-     * @param string $operation
-     */
-    public function testDeniedReverseVariables($variable, $operation)
-    {
-        $expression       = new ExpressionResult(123);
-        $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, $variable));
-
-        $expression->{$operation}($expressionModify);
-    }
-
-    public function variableProvider()
-    {
-        return [
-            [DateModifierInterface::VAR_SOM, 'add'],
-            [DateModifierInterface::VAR_SOM, 'subtract'],
-            [DateModifierInterface::VAR_SOQ, 'add'],
-            [DateModifierInterface::VAR_SOQ, 'subtract'],
-            [DateModifierInterface::VAR_SOY, 'add'],
-            [DateModifierInterface::VAR_SOY, 'subtract'],
-        ];
-    }
-
     public function testReverseAddition()
     {
         $expression = new ExpressionResult(2);
@@ -286,5 +245,62 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $result        = $expression->getValue();
         $expectedWeek = 200 - (int)$dateTime->format('W');
         $this->assertSame($expectedWeek, (int)$result);
+    }
+
+    public function provider()
+    {
+        return [
+            [DateModifierInterface::VAR_SOW, 'monday this week', '+3 days', '-2 days'],
+            [DateModifierInterface::VAR_SOM, 'first day of this month', '+72 hours', '-48 hours'],
+            [DateModifierInterface::VAR_SOY, 'first day of january ' . date('Y'), '+72 hours', '-48 hours']
+        ];
+    }
+
+    /**
+     * @dataProvider provider
+     */
+    public function testStartOfSmthModifier($day, $toTime, $plus3daysSuffix, $minus2daysSuffix)
+    {
+        $expression = new ExpressionResult(new Token(Token::TYPE_VARIABLE, $day));
+        $result     = $expression->getValue();
+
+        $expectedResult = date('d', strtotime($toTime));
+        $this->assertSame((int)$expectedResult, (int)$result->day);
+
+        $expression->add(new ExpressionResult(3));
+
+        $expectedResult = date('d', strtotime($toTime . ' ' . $plus3daysSuffix));
+        $this->assertSame((int)$expectedResult, (int)$result->day);
+
+        $expression->subtract(new ExpressionResult(5));
+
+        $expectedResult = date('d', strtotime($toTime . ' ' . $minus2daysSuffix));
+        $this->assertSame((int)$expectedResult, (int)$result->day);
+    }
+
+    /**
+     * @dataProvider provider
+     */
+    public function testReverseStartOfSmthModifier($day, $toTime)
+    {
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, $day));
+
+        $expression = new ExpressionResult(33);
+        $expression->subtract($expressionModify);
+
+        $result      = $expression->getValue();
+        $expectedDay = 33 - date('d', strtotime($toTime));
+
+        $this->assertSame($expectedDay, (int) $result);
+
+        $expression = new ExpressionResult(1);
+        $expression->add($expressionModify);
+
+        $result      = $expression->getValue();
+        $expectedDay = 1 + date('d', strtotime($toTime));
+
+        $this->assertSame($expectedDay, $result->day);
     }
 }
