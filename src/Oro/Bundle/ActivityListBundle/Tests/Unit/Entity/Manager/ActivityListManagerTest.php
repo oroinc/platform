@@ -219,6 +219,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $testItem->setUpdatedAt(new \DateTime('2014-01-01', new \DateTimeZone('UTC')));
         $testItem->setVerb(ActivityList::VERB_UPDATE);
         $testItem->setSubject('test_subject');
+        $testItem->setDescription('test_description');
         $testItem->setRelatedActivityClass('Acme\TestBundle\Entity\TestEntity');
         $testItem->setRelatedActivityId(127);
 
@@ -252,6 +253,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'editor_id'            => 142,
                 'verb'                 => 'update',
                 'subject'              => 'test_subject',
+                'description'          => 'test_description',
                 'data'                 => ['test_data'],
                 'relatedActivityClass' => 'Acme\TestBundle\Entity\TestEntity',
                 'relatedActivityId'    => 127,
