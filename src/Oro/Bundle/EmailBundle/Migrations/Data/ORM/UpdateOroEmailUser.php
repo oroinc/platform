@@ -36,25 +36,20 @@ class UpdateOroEmailUser extends AbstractFixture implements DependentFixtureInte
             ->select('e');
         $iterator = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);
-        $iterator->setHydrationMode(AbstractQuery::HYDRATE_OBJECT);
 
         $itemsCount = 0;
         $entities   = [];
 
-        foreach ($iterator as $result) {
+        foreach ($iterator as $entity) {
             /** @var EmailUser $emailUser */
-            $emailUser = $manager->getRepository('OroEmailBundle:EmailUser')->findOneBy(['email' => $result]);
-            if ($itemsCount === 0) {
-                $folder = $emailUser->getFolder();
-                $email = $emailUser->getEmail();
-                $owner = $email->getFromEmailAddress()->getOwner();
-            }
-            if ($owner instanceof User) {
-                $owner = $manager->getRepository('OroUserBundle:User')->find($owner->getId());
-                $emailUser->setFolder($folder);
-                $emailUser->setEmail($email);
-                $emailUser->setOwner($owner);
-                $emailUser->setOrganization($owner->getOrganization());
+            $emailUser = $manager->getRepository('OroEmailBundle:EmailUser')->findOneBy(['email' => $entity]);
+            $folder = $emailUser->getFolder();
+            $email = $emailUser->getEmail();
+            $baseOwner = $email->getFromEmailAddress()->getOwner();
+
+            if ($baseOwner instanceof User) {
+                $emailUser->setOwner($baseOwner);
+                $emailUser->setOrganization($baseOwner->getOrganization());
                 $itemsCount++;
                 $entities[] = $emailUser;
             }
@@ -77,9 +72,6 @@ class UpdateOroEmailUser extends AbstractFixture implements DependentFixtureInte
             if (0 === $itemsCount % self::BATCH_SIZE) {
                 $this->saveEntities($manager, $entities);
                 $entities = [];
-                $folder = $manager->getRepository('OroEmailBundle:EmailFolder')->find($emailUser->getFolder()->getId());
-                $email = $manager->getRepository('OroEmailBundle:Email')->find($emailUser->getEmail()->getId());
-                $owner = $email->getFromEmailAddress()->getOwner();
             }
         }
 
