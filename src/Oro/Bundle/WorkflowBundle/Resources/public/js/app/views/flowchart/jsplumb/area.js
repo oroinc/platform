@@ -10,8 +10,9 @@ define(function (require) {
         jsPlumbInstance: null,
 
         defaultOptions: {
-            Endpoint: ['Dot', {radius: 2}],
-            HoverPaintStyle: {strokeStyle: '#1e8151', lineWidth: 2 },
+            Endpoint: ['Dot', {radius: 3}],
+            EndpointStyle: {fillStyle: '#4F719A'},
+            HoverPaintStyle: {strokeStyle: '#1e8151', lineWidth: 2},
             ConnectionOverlays: [
                 ['Arrow', {
                     location: 1,

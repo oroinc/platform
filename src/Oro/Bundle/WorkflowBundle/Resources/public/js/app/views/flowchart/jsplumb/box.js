@@ -66,10 +66,10 @@ define(function (require) {
                         anchor: 'Continuous',
                         connector: [ 'StateMachine', { curviness: 20 } ],
                         connectorStyle: {
-                            strokeStyle: '#5c96bc',
+                            strokeStyle: '#4F719A',
                             lineWidth: 2,
                             outlineColor: 'transparent',
-                            outlineWidth: 4
+                            outlineWidth: 7
                         },
                         maxConnections: 50,
                         onMaxConnections: function (info, e) {

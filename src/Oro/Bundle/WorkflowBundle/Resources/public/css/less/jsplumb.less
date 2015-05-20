@@ -1,3 +1,7 @@
+@box-width: 160px;
+@source-radius: 10px;
+@proportion: 1.618 * 1.5;
+
 ._jsPlumb_drag_select *, .jsplumb-box, [data-role=transition-overlay], .workflow-flowchart {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -11,19 +15,48 @@
 }
 .workflow-flowchart{
   position: relative;
-  overflow: scroll;
-  min-height: 500px;
+  overflow-x: auto;
+  height: 500px;
+  overflow-y: hidden;
   .jsplumb-box {
+    z-index: 1;
     position: absolute;
     border: 1px solid #4F719A;
     border-radius: 5px;
-    min-width: 100px;
-    min-height: 50px;
+    width: @box-width;
+    height: @box-width / @proportion;
     cursor: move;
     background: #B0CAEC;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    .step-label {
+      text-align: center;
+      position: relative;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+      font-size: 14px;
+    }
+    .dropdown {
+      text-align: left;
+      display: inline;
+      margin-left: -5px;
+    }
     .dropdown-toggle {
       cursor: pointer;
       font-size: 14px;
+      :hover {
+        color: #555;
+      }
+      > i {
+        margin: 0;
+      }
     }
     &._jsPlumb_source_hover {
       background: #D1E2BC;
@@ -36,25 +69,29 @@
     }
     .jsplumb-source {
       background: #EED591;
-      width: 30px;
-      height: 30px;
+      width: @source-radius * 2;
+      height: @source-radius * 2;
+      border-radius: @source-radius;
+      position: absolute;
+      margin-top: @box-width / @proportion - @source-radius;
+      margin-left: @box-width / 2 - @source-radius;
       &:hover {
         background: #DEC581;
         cursor: pointer;
       }
     }
   }
-  [data-role=transition-overlay] {
+  &[data-role=transition-overlay] {
     background-color: white;
     opacity: 0.8;
     padding: 0.3em;
     border-radius: 0.5em;
     border: 1px solid #346789;
-    &._jsPlumb_hover {
-      z-index: 1;
-      .dropdown-menu{
-        z-index: 2;
-      }
+    &:hover, &_jsplumb_hover {
+      z-index: 2;
+    }
+    &[dropdown-state=opened] {
+      z-index: 2;
     }
   }
 }

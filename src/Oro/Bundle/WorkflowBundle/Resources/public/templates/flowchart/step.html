@@ -1,20 +1,19 @@
-<%= label %>
 <div class="jsplumb-source"></div>
-<% if (!_is_start) { %>
-    <div class="dropdown">
-        <span class="dropdown-toggle" data-toggle="dropdown">
-            <i class="fa fa-caret-square-o-down"></i>
-        </span>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-            <li class="first">
-                <a class="workflow-step-edit" href="#edit-step"><i class="icon icon-edit" aria-hidden="true"></i><%= _.__('Edit') %></a>
-            </li>
-            <li>
-                <a class="workflow-step-clone" href="#clone-step"><i class="icon icon-copy" aria-hidden="true"></i><%= _.__('Clone') %></a>
-            </li>
-            <li>
-                <a class="workflow-step-delete" href="#delete-step"><i class="icon icon-trash" aria-hidden="true"></i><%= _.__('Delete') %></a>
-            </li>
-        </ul>
-    </div>
-<% } %>
+<div class="step-label">    <%= label %><% if (!_is_start) { %>&nbsp;<% /* &nbsp; is required before dropdown */ %><div class="dropdown">
+            <span class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-caret-square-o-down"></i>
+            </span>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                <li class="first">
+                    <a class="workflow-step-edit" href="#edit-step"><i class="icon icon-edit" aria-hidden="true"></i><%= _.__('Edit') %></a>
+                </li>
+                <li>
+                    <a class="workflow-step-clone" href="#clone-step"><i class="icon icon-copy" aria-hidden="true"></i><%= _.__('Clone') %></a>
+                </li>
+                <li>
+                    <a class="workflow-step-delete" href="#delete-step"><i class="icon icon-trash" aria-hidden="true"></i><%= _.__('Delete') %></a>
+                </li>
+            </ul>
+        </div>
+    <% } %>
+</div>
