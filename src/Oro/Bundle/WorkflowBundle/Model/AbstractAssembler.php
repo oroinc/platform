@@ -3,7 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
-use Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface;
+
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 abstract class AbstractAssembler
 {

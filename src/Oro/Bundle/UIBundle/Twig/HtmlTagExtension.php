@@ -49,7 +49,7 @@ class HtmlTagExtension extends \Twig_Extension
     }
 
     /**
-     * Filter is inteded to purify script, style etc tags and content of them
+     * Filter is intended to purify script, style etc tags and content of them
      *
      * @param string $string
      * @return string

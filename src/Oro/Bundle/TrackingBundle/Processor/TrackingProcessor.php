@@ -40,6 +40,9 @@ class TrackingProcessor implements LoggerAwareInterface
     /** Max retries to identify tracking visit */
     const MAX_RETRIES = 100;
 
+    /** The maximum execution time (in minutes) */
+    const MAX_EXEC_TIME_IN_MIN = 30;
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -61,6 +64,12 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var DeviceDetectorFactory */
     protected $deviceDetector;
 
+    /** @var \DateTime start time */
+    protected $startTime = null;
+
+    /** @var \DateInterval|bool  */
+    protected $maxExecTimeout = false;
+
     /**
      * @param ManagerRegistry                     $doctrine
      * @param TrackingEventIdentificationProvider $trackingIdentification
@@ -70,6 +79,11 @@ class TrackingProcessor implements LoggerAwareInterface
         $this->doctrine               = $doctrine;
         $this->trackingIdentification = $trackingIdentification;
         $this->deviceDetector         = new DeviceDetectorFactory();
+
+        $this->startTime              = $this->getCurrentUtcDateTime();
+        $this->maxExecTimeout         = self::MAX_EXEC_TIME_IN_MIN > 0
+            ? new \DateInterval('PT' . self::MAX_EXEC_TIME_IN_MIN . 'M')
+            : false;
     }
 
     /**
@@ -77,9 +91,7 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     public function process()
     {
-        /**
-         *  To avoid memory leaks, we turn off doctrine logger
-         */
+        /** To avoid memory leaks, we turn off doctrine logger */
         $this->getEntityManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->logger === null) {
@@ -107,21 +119,51 @@ class TrackingProcessor implements LoggerAwareInterface
                         date('Y-m-d H:i:s')
                     )
                 );
+
+                if ($this->checkMaxExecutionTime()) {
+                    return;
+                }
             }
         }
 
         $this->logger->notice('Recheck previous visit identifiers...');
         while ($this->identifyPrevVisits()) {
+            if ($this->checkMaxExecutionTime()) {
+                return;
+            }
+
             $this->logger->notice('Try to process Next batch');
         }
 
         $this->logger->notice('Recheck previous visit events...');
         $this->skipList = [];
         while ($this->identifyPrevVisitEvents()) {
+            if ($this->checkMaxExecutionTime()) {
+                return;
+            }
+
             $this->logger->notice('Try to process Next batch');
         }
 
         $this->logger->notice('<info>Done</info>');
+    }
+
+    /**
+     * Checks of process max execution time
+     *
+     * @return bool
+     */
+    protected function checkMaxExecutionTime()
+    {
+        if ($this->maxExecTimeout !== false) {
+            $date = $this->getCurrentUtcDateTime();
+            if ($date->sub($this->maxExecTimeout) >= $this->startTime) {
+                $this->logger->notice('<comment>Exit because allocated time frame elapsed.</comment>');
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -570,5 +612,15 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         return $em;
+    }
+
+    /**
+     * Gets a DateTime object that is set to the current date and time in UTC.
+     *
+     * @return \DateTime
+     */
+    protected function getCurrentUtcDateTime()
+    {
+        return new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }
