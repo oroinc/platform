@@ -43,25 +43,33 @@ class UpdateOroEmailUser extends AbstractFixture implements DependentFixtureInte
 
         foreach ($iterator as $result) {
             /** @var EmailUser $emailUser */
-            $emailUser = $manager->getRepository('OroEmailBundle:EmailUser')->findBy(['email' => $result]);
-            /** @var Email $result */
-            $owner = $result->getFromEmailAddress()->getOwner();
+            $emailUser = $manager->getRepository('OroEmailBundle:EmailUser')->findOneBy(['email' => $result]);
+            if ($itemsCount === 0) {
+                $folder = $emailUser->getFolder();
+                $email = $emailUser->getEmail();
+                $owner = $email->getFromEmailAddress()->getOwner();
+            }
             if ($owner instanceof User) {
+                $owner = $manager->getRepository('OroUserBundle:User')->find($owner->getId());
+                $emailUser->setFolder($folder);
+                $emailUser->setEmail($email);
                 $emailUser->setOwner($owner);
                 $emailUser->setOrganization($owner->getOrganization());
+                $itemsCount++;
                 $entities[] = $emailUser;
             }
 
-            foreach ($result->getRecipients() as $recipient) {
+            foreach ($email->getRecipients() as $recipient) {
                 $owner = $recipient->getEmailAddress()->getOwner();
                 if ($owner instanceof User) {
                     $newEmailUser = new EmailUser();
-                    $newEmailUser->setFolder($emailUser->getFolder());
-                    $newEmailUser->setEmail($emailUser->getEmail());
+                    $newEmailUser->setFolder($folder);
+                    $newEmailUser->setEmail($email);
                     $newEmailUser->setReceivedAt($emailUser->getReceivedAt());
                     $newEmailUser->setSeen($emailUser->isSeen());
                     $newEmailUser->setOwner($owner);
                     $newEmailUser->setOrganization($owner->getOrganization());
+                    $itemsCount++;
                     $entities[] = $newEmailUser;
                 }
             }
@@ -69,6 +77,9 @@ class UpdateOroEmailUser extends AbstractFixture implements DependentFixtureInte
             if (0 === $itemsCount % self::BATCH_SIZE) {
                 $this->saveEntities($manager, $entities);
                 $entities = [];
+                $folder = $manager->getRepository('OroEmailBundle:EmailFolder')->find($emailUser->getFolder()->getId());
+                $email = $manager->getRepository('OroEmailBundle:Email')->find($emailUser->getEmail()->getId());
+                $owner = $email->getFromEmailAddress()->getOwner();
             }
         }
 
