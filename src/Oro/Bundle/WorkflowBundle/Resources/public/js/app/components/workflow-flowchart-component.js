@@ -1,4 +1,4 @@
-/*global define, console*/
+/* global define */
 /** @exports WorkflowFlowchartComponent */
 define(function (require) {
     'use strict';
