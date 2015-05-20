@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
@@ -67,7 +67,7 @@ class AssignActiveUser extends AbstractAction
         if (!isset($options['attribute'])) {
             throw new InvalidParameterException('Attribute must be defined');
         }
-        if (!$options['attribute'] instanceof PropertyPath) {
+        if (!$options['attribute'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Attribute must be valid property definition');
         }
 

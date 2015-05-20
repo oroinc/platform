@@ -3,7 +3,7 @@
 }
 
 .ajax-loading {
-    position: absolute;
+    position: block;
     display: none;
 }
 
