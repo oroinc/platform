@@ -26,11 +26,6 @@ define(function (require) {
      * @augments BaseView
      */
     HiddenInitializationView = BaseView.extend(/** @lends HiddenInitializationView.prototype */{
-        /**
-         * @constructor
-         * @inheritDoc
-         */
-
         autoRender: true,
 
         render: function () {
