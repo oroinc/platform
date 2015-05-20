@@ -68,13 +68,30 @@ class ShortcutsController extends FOSRestController
             if ($this->isItemAllowed($item)) {
                 $key = $translator->trans($item->getLabel());
                 if (strpos(strtolower($key), strtolower($query)) !== false) {
-                    $result[$key] = ['url' => $item->getUri()];
                     $this->uris[] = $item->getUri();
+                    $result[$key] = $this->getData($item);
                 }
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param $item ItemInterface
+     *
+     * @return array
+     */
+    protected function getData($item)
+    {
+        $data = ['url' => $item->getUri()];
+
+        if ($item->getExtra('dialog')) {
+            $data['dialog'] = $item->getExtra('dialog');
+            $data['dialog_config'] = $item->getExtra('dialog_config');
+        }
+
+        return $data;
     }
 
     /**

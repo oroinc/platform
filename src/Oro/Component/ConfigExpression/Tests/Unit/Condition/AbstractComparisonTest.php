@@ -4,9 +4,10 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
 {

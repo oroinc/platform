@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
@@ -97,12 +98,12 @@ class AttributeGuesser
 
     /**
      * @param string $rootClass
-     * @param string|PropertyPath $propertyPath
+     * @param string|PropertyPathInterface $propertyPath
      * @return array|null
      */
     public function guessMetadataAndField($rootClass, $propertyPath)
     {
-        if (!$propertyPath instanceof PropertyPath) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
         }
 
@@ -137,7 +138,7 @@ class AttributeGuesser
 
     /**
      * @param string $rootClass
-     * @param string|PropertyPath $propertyPath
+     * @param string|PropertyPathInterface $propertyPath
      * @return array|null
      */
     public function guessAttributeParameters($rootClass, $propertyPath)

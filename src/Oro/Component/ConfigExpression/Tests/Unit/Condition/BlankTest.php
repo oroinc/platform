@@ -4,9 +4,10 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class BlankTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,7 +52,7 @@ class BlankTest extends \PHPUnit_Framework_TestCase
                 'context'        => ['foo' => null],
                 'expectedResult' => true
             ],
-            'no_value' => [
+            'no_value'         => [
                 'options'        => [new PropertyPath('foo')],
                 'context'        => [],
                 'expectedResult' => true
@@ -155,6 +156,14 @@ class BlankTest extends \PHPUnit_Framework_TestCase
                 'options'  => ['value'],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'empty\', [\'value\'])->setMessage(\'Test\')'
+            ],
+            [
+                'options'  => [new PropertyPath('foo[bar].baz')],
+                'message'  => null,
+                'expected' => '$factory->create(\'empty\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
+                    . '\'foo[bar].baz\', [\'foo\', \'bar\', \'baz\'], [false, true, false])'
+                    . '])'
             ]
         ];
     }

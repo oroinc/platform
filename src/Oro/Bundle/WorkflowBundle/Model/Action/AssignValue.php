@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AssignValue extends AbstractAction
 {
     /**
      * @var array
      */
-    protected $assigns = array();
+    protected $assigns = [];
 
     /**
      * {@inheritdoc}
@@ -80,7 +81,7 @@ class AssignValue extends AbstractAction
         if (!array_key_exists('value', $options) && !array_key_exists(1, $options)) {
             throw new InvalidParameterException('Value must be defined.');
         }
-        if (!($this->getAttribute($options) instanceof PropertyPath)) {
+        if (!($this->getAttribute($options) instanceof PropertyPathInterface)) {
             throw new InvalidParameterException('Attribute must be valid property definition.');
         }
 
