@@ -37,6 +37,14 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     /**
      * {@inheritdoc}
      */
+    public function getDescription($entity)
+    {
+        return $entity->description;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getTemplate()
     {
         return 'test_template.js.twig';
