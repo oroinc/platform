@@ -20,6 +20,7 @@
         "oro/user-bundle": "@dev",
         "oro/ui-bundle": "@dev",
         "oro/security-bundle": "@dev",
+        "oro/config-expression": "dev-master",
         "oro/jsplumb": "~1.7"
     },
     "autoload": {

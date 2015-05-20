@@ -2,9 +2,10 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Condition;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class GreaterThanTest extends \PHPUnit_Framework_TestCase
 {
@@ -113,14 +114,14 @@ class GreaterThanTest extends \PHPUnit_Framework_TestCase
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => null,
                 'expected' => '$factory->create(\'gt\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
                     . ', 123])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'gt\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
                     . ', 123])->setMessage(\'Test\')'
             ]
         ];

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class Configurable implements ActionInterface
 {
@@ -57,7 +57,7 @@ class Configurable implements ActionInterface
      *
      * {@inheritDoc}
      */
-    public function setCondition(ConditionInterface $condition)
+    public function setCondition(ExpressionInterface $condition)
     {
     }
 }
