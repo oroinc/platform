@@ -62,7 +62,7 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = $this->createLoader($relativeFilePath);
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $expectedResource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $expectedResource->addFound(
@@ -84,9 +84,9 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loadTime = filemtime($bundleDir . '/' . $relativeFilePath) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
-        $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
+        $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
     public function testIsResourceFreshNoFile()
@@ -101,9 +101,9 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loadTime = filemtime($bundleDir) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
-        $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
+        $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
     public function testIsResourceFreshExistingFileWasChanged()
@@ -118,9 +118,9 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loadTime = filemtime($bundleDir . '/' . $relativeFilePath) - 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
-        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
+        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
     public function testIsResourceFreshNewFileWasAdded()
@@ -135,11 +135,11 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loadTime = filemtime($bundleDir) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $filePath = $bundleDir . '/' . $relativeFilePath;
         file_put_contents($filePath, 'test');
-        $result = $loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime);
+        $result = $loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime);
         unlink($filePath);
         $this->assertFalse($result);
     }
@@ -158,10 +158,10 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         file_put_contents($filePath, 'test');
         $loadTime = filemtime($bundleDir . '/' . $relativeFilePath) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
         unlink($filePath);
 
-        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
+        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
     public function filePathProvider()

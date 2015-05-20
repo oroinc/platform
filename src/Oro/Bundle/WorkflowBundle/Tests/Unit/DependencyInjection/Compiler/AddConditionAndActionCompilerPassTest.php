@@ -66,7 +66,7 @@ class AddConditionAndActionCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         // factory definitions
         $factoryExpectations = array(
-            AddConditionAndActionCompilerPass::CONDITION_FACTORY_SERVICE   => $this->conditionTypes,
+            AddConditionAndActionCompilerPass::EXTENSION_SERVICE      => $this->conditionTypes,
             AddConditionAndActionCompilerPass::ACTION_FACTORY_SERVICE => $this->actionTypes,
         );
         foreach ($factoryExpectations as $factoryServiceId => $factoryTypes) {
@@ -93,7 +93,7 @@ class AddConditionAndActionCompilerPassTest extends \PHPUnit_Framework_TestCase
                 )
             );
         $tagMap = array(
-            AddConditionAndActionCompilerPass::CONDITION_TAG   => $this->conditionServices,
+            AddConditionAndActionCompilerPass::EXPRESSION_TAG => $this->conditionServices,
             AddConditionAndActionCompilerPass::ACTION_TAG => $this->actionServices,
         );
         $containerBuilder->expects($this->any())

@@ -2,9 +2,10 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class NotEqualToTest extends \PHPUnit_Framework_TestCase
@@ -139,14 +140,14 @@ class NotEqualToTest extends \PHPUnit_Framework_TestCase
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => null,
                 'expected' => '$factory->create(\'neq\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
                     . ', 123])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), 'test'],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'neq\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
                     . ', \'test\'])->setMessage(\'Test\')'
             ]
         ];

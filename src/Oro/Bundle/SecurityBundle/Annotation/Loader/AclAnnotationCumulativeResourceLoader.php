@@ -37,7 +37,7 @@ class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir)
+    public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
         $finder = $this->getFileFinder($bundleDir);
         if (!$finder) {
@@ -64,7 +64,7 @@ class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function registerFoundResource($bundleClass, $bundleDir, CumulativeResource $resource)
+    public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
         $finder = $this->getFileFinder($bundleDir);
         if ($finder) {
@@ -78,7 +78,7 @@ class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function isResourceFresh($bundleClass, $bundleDir, CumulativeResource $resource, $timestamp)
+    public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
         // check exist and removed resources
         $found = $resource->getFound($bundleClass);
