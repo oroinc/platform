@@ -118,7 +118,7 @@ oro:
                 field:
                     items:
                         searchable: "Searchable"
-                        title_field: "Title field"
+                        title_field: "The search result title"
 
         config_grid:
             entities: Entities

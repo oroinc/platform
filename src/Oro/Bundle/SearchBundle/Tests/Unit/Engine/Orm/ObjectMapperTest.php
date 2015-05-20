@@ -3,6 +3,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 
@@ -32,81 +33,81 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    private $mappingConfig = array(
-        self::ENTITY_MANUFACTURER => array(
-            'fields' => array(
-                array(
+    private $mappingConfig = [
+        self::ENTITY_MANUFACTURER => [
+            'fields' => [
+                [
                     'name'            => 'products',
                     'relation_type'   => 'one-to-many',
-                    'relation_fields' => array(
-                        array(
+                    'relation_fields' => [
+                        [
                             'name'        => 'name',
                             'target_type' => 'text',
-                        )
-                    )
-                ),
-                array(
+                        ]
+                    ]
+                ],
+                [
                     'name'            => 'parent',
                     'relation_type'   => 'one-to-many',
-                    'relation_fields' => array(
-                        array()
-                    )
-                )
-            )
-        ),
-        self::ENTITY_PRODUCT => array(
+                    'relation_fields' => [
+                        []
+                    ]
+                ]
+            ]
+        ],
+        self::ENTITY_PRODUCT => [
             'alias'            => 'test_product',
             'label'            => 'test product',
-            'title_fields'     => array('name'),
-            'route'            => array(
+            'title_fields'     => ['name'],
+            'route'            => [
                 'name'       => 'test_route',
-                'parameters' => array(
+                'parameters' => [
                     'id' => 'id'
-                )
-            ),
-            'fields'           => array(
-                array(
+                ]
+            ],
+            'fields'           => [
+                [
                     'name'          => 'name',
                     'target_type'   => 'text',
-                    'target_fields' => array(
+                    'target_fields' => [
                         'name',
                         'all_data'
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     'name'          => 'description',
                     'target_type'   => 'text',
-                    'target_fields' => array(
+                    'target_fields' => [
                         'description',
                         'all_data'
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     'name'          => 'price',
                     'target_type'   => 'decimal',
-                    'target_fields' => array('price')
-                ),
-                array(
+                    'target_fields' => ['price']
+                ],
+                [
                     'name'        => 'count',
                     'target_type' => 'integer',
-                ),
-                array(
+                ],
+                [
                     'name'            => 'manufacturer',
                     'relation_type'   => 'one-to-one',
-                    'relation_fields' => array(
-                        array(
+                    'relation_fields' => [
+                        [
                             'name'          => 'name',
                             'target_type'   => 'text',
-                            'target_fields' => array(
+                            'target_fields' => [
                                 'manufacturer',
                                 'all_data'
-                            )
-                        )
-                    )
-                ),
-            ),
-        )
-    );
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+        ]
+    ];
 
     protected function setUp()
     {
@@ -125,7 +126,12 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
+        $mapperProvider = new SearchMappingProvider($eventDispatcher);
+        $mapperProvider->setMappingConfig($this->mappingConfig);
         $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
+        $this->mapper->setMappingProvider($mapperProvider);
     }
 
     public function testMapObject()
@@ -135,33 +141,33 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
         $manufacturerName = $this->product->getManufacturer()->getName();
         $allTextData = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
 
-        $productMapping = array(
-            'text' => array(
+        $productMapping = [
+            'text' => [
                 'name' => $productName,
                 'description' => $productDescription,
                 'manufacturer' => $manufacturerName,
                 'all_data' => $allTextData,
                 Indexer::TEXT_ALL_DATA_FIELD => $allTextData,
-            ),
-            'decimal' => array(
+            ],
+            'decimal' => [
                 'price' => $this->product->getPrice(),
-            ),
-            'integer' => array(
+            ],
+            'integer' => [
                 'count' => $this->product->getCount(),
-            )
-        );
+            ]
+        ];
         $this->assertEquals($productMapping, $this->mapper->mapObject($this->product));
 
         $manufacturer = new Manufacturer();
         $manufacturer->setName('reebok');
         $manufacturer->addProduct($this->product);
 
-        $manufacturerMapping = array(
-            'text' => array(
+        $manufacturerMapping = [
+            'text' => [
                 'products' => $productName,
                 Indexer::TEXT_ALL_DATA_FIELD => $productName
-            )
-        );
+            ]
+        ];
         $this->assertEquals($manufacturerMapping, $this->mapper->mapObject($manufacturer));
     }
 
