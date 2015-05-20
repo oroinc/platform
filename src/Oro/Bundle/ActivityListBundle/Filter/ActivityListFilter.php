@@ -66,7 +66,7 @@ class ActivityListFilter extends EntityFilter
         $qb = $ds->getQueryBuilder();
 
         $em = $qb->getEntityManager();
-        $metadata = $em->getClassMetadata($this->getClassName());
+        $metadata = $em->getClassMetadata($data['entityClassName']);
         if ($metadata->isIdentifierComposite) {
             throw new \LogicException('Composite identifiers are not supported.');
         }
@@ -104,7 +104,7 @@ class ActivityListFilter extends EntityFilter
             '%s.%s',
             $this->activityListAlias,
             ExtendHelper::buildAssociationName(
-                $this->getClassName(),
+                $activityFilter['entityClassName'],
                 ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
             )
         );
@@ -119,7 +119,17 @@ class ActivityListFilter extends EntityFilter
                 ->andWhere(sprintf('%s.id = %s.%s', $this->activityAlias, $this->getEntityAlias(), $entityIdField))
                 ->setMaxResults(1);
 
-        $this->activityListFilterHelper->addFiltersToQuery($activityQb, $activityFilter, $this->activityListAlias);
+        $entityField = $this->getEntityField();
+        $dateRangeField = strpos($entityField, '$') === 0 ? substr($entityField, 1) : null;
+        if ($dateRangeField) {
+            $activityFilter['dateRange'] = $activityFilter['filter']['data'];
+        }
+        $this->activityListFilterHelper->addFiltersToQuery(
+            $activityQb,
+            $activityFilter,
+            $dateRangeField,
+            $this->activityListAlias
+        );
 
         return $activityQb;
     }
@@ -137,11 +147,11 @@ class ActivityListFilter extends EntityFilter
     /**
      * @return string
      */
-    protected function getClassName()
+    protected function getEntityField()
     {
-        list(, $className) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
+        list(, $field) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
 
-        return $className;
+        return $field;
     }
 
     /**

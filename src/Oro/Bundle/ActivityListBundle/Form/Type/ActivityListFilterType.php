@@ -20,7 +20,8 @@ class ActivityListFilterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('dateRange')
+            ->add('filter')
+            ->add('entityClassName')
             ->add('activityType', null, [
                 'constraints' => [
                     new Assert\Collection([

@@ -582,7 +582,9 @@ define(function (require) {
             $activityCondition = $criteria.find('[data-criteria=condition-activity]');
             if (!_.isEmpty($activityCondition)) {
                 $.extend(true, $activityCondition.data('options'), {
-                    filters: metadata.filters
+                    fieldChoice: this.options.fieldChoiceOptions,
+                    filters: metadata.filters,
+                    hierarchy: metadata.hierarchy
                 });
             }
 

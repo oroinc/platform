@@ -225,7 +225,7 @@ define(function (require) {
                 }
             });
 
-            if (!_.isEmpty(path)) {
+            if (path.indexOf('+') !== -1) {
                 results.push({
                     id: path,
                     text: __('oro.entity.field_choice.none')

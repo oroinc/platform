@@ -2,6 +2,12 @@
     {% set activityConditionOptions = {
         listOption: render(path('oro_api_get_activitylist_activity_list_option')),
         entitySelector: '#' ~ params.entity_choice_id,
+        fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity',
+        fieldChoice: {
+            select2: {
+                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
+            },
+        },
     } %}
 
     {% set fieldConditionOptions = {

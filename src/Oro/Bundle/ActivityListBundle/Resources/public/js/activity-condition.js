@@ -4,15 +4,13 @@ define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
-    'oro/filter/datetime-filter',
     'oro/filter/choice-filter',
     'oro/filter/multiselect-filter',
-    'oroentity/js/field-choice',
     'oroquerydesigner/js/field-condition'
-], function($, _, __, DateTimeFilter, ChoiceFilter, MultiSelectFilter) {
+], function($, _, __, ChoiceFilter, MultiSelectFilter) {
     'use strict';
 
-    $.widget('oroactivity.activityCondition', {
+    $.widget('oroactivity.activityCondition', $.oroquerydesigner.fieldCondition, {
         options: {
             listOption: {},
             filters: {},
@@ -21,11 +19,17 @@ define([
         },
 
         _create: function () {
+            var data = this.element.data('value');
+            this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
+
+            this.element.data('value', {});
+            this._superApply(arguments);
+            this.element.data('value', data);
+
             var data = $.extend(true, {
                 criterion: {
                     data: {
                         filterType: 'hasActivity',
-                        dateRange: {},
                         activityType: {}
                     }
                 }
@@ -61,40 +65,200 @@ define([
             if (!filterOptions) {
                 throw new Error('Cannot find filter "datetime"');
             }
-            this.rangeFilter = new (DateTimeFilter.extend(filterOptions))();
-            this.rangeFilter.value = data.criterion.data.dateRange;
-            this.$dateRangeChoice = $(this.options.filterContainer).html(this.rangeFilter.render().$el);
 
-            this.element.append(this.$activityChoice, '-', this.$typeChoice, '-', this.$dateRangeChoice);
+            this.element.prepend(this.$activityChoice, '-', this.$typeChoice, '-');
 
-            this._on(this.element.children(), {
-                change: this._onChange
+            this._updateFieldChoice();
+            if (data && data.columnName) {
+                this.element.one('changed', _.bind(function () {
+                    this.filter.setValue(data.criterion.data.filter.data);
+                }, this));
+                this.selectField(data.columnName);
+            }
+
+            this.activityFilter.on('update', _.bind(this._onUpdate, this));
+            this.typeFilter.on('update', _.bind(this._onUpdate, this));
+
+            this._on(this.$activityChoice, {
+                change: function () {
+                    this.activityFilter.applyValue();
+                }
+            });
+
+            this._on(this.$typeChoice, {
+                change: function (e) {
+                    this.typeFilter.applyValue();
+
+                    var oldEntity = this.$fieldChoice.data('entity');
+                    var newEntity = this._getTypeChoiceEntity();
+
+                    if (oldEntity !== newEntity) {
+                        this.$fieldChoice.fieldChoice('setValue', '');
+                        this.$filterContainer.empty();
+                        if (this.filter) {
+                            this.filter.reset();
+                        }
+                    }
+
+                    this.$fieldChoice.fieldChoice('updateData', newEntity, this.$fieldsLoader.data('fields'));
+                }
             });
         },
 
-        _onChange: function () {
-            this.rangeFilter.applyValue();
-            this.typeFilter.applyValue();
-            this.activityFilter.applyValue();
+        _getTypeChoiceEntity: function () {
+            var entity = '$activity';
 
-            var value = {
-                columnName: $(this.options.entitySelector).val(),
-                criterion: this._getFilterCriterion()
+            var first = _.first(this.typeFilter.value.value);
+            if (this.typeFilter.value.value.length === 1 && !_.isEmpty(first)) {
+                entity = first.replace(/_/g, '\\');
+            }
+
+            return entity;
+        },
+
+        _updateFieldChoice: function () {
+            this._on(this.$fieldsLoader, {
+                fieldsloaderupdate: function (e, data) {
+                    this.$fieldChoice.fieldChoice('setValue', '');
+                    this.$fieldChoice.fieldChoice('updateData', this._getTypeChoiceEntity(), data);
+                }
+            });
+            this._updateFieldsLoader();
+            this.$fieldChoice.fieldChoice('updateData', this._getTypeChoiceEntity(), this.$fieldsLoader.data('fields'));
+
+            var fieldChoice = this.$fieldChoice.fieldChoice().data('oroentity-fieldChoice');
+            var originalSelect2Data = fieldChoice._select2Data;
+            fieldChoice._select2Data = function (path) {
+                var results = originalSelect2Data.apply(this, arguments);
+                if (_.isEmpty(results)) {
+                    return results;
+                }
+
+                var fields = _.first(results).children;
+                var activities = _.filter(fields, function (item) {
+                    return item.id[0] === '$';
+                });
+                fields = _.reject(fields, function (item) {
+                    return item.id[0] === '$';
+                });
+
+                _.first(results).children = fields;
+                if (_.isEmpty(fields)) {
+                    results.shift();
+                }
+                results.unshift({
+                    text: 'Activity',
+                    children: activities
+                });
+
+                return results;
             };
 
-            this.element.data('value', value);
-            this.element.trigger('changed');
+            var originalGetApplicableConditions = fieldChoice.getApplicableConditions;
+            fieldChoice.getApplicableConditions = function (fieldId) {
+                var result = originalGetApplicableConditions.apply(this, arguments);
+                if (_.isEmpty(result) && _.contains(['createdAt', 'updatedAt'], fieldId)) {
+                    result = {
+                        parent_entity: null,
+                        entity: null,
+                        field: fieldId,
+                        type: 'datetime'
+                    };
+                }
+
+                return result;
+            };
+        },
+
+        _updateFieldsLoader: function () {
+            if (this.$fieldsLoader.data('activityFieldsUpdated')) {
+                return;
+            }
+
+            var classNames = _.map(this.typeFilter.choices, function (item) {
+                return item.value.replace(/_/g, '\\');
+            });
+            var data = this.$fieldsLoader.data('fields');
+            _.each(classNames, function (className) {
+                var entity = data[className];
+                var fields = [
+                    {
+                        label: 'Created At',
+                        name: '$createdAt',
+                        type: 'datetime',
+                        entity: entity
+                    },
+                    {
+                        label: 'Updated At',
+                        name: '$updatedAt',
+                        type: 'datetime',
+                        entity: entity
+                    }
+                ];
+                entity.fieldsIndex['$createdAt'] = fields[0];
+                entity.fieldsIndex['$updatedAt'] = fields[1];
+
+                data[className].fields.push(fields[0], fields[1]);
+            });
+            data['$activity'] = {
+                fields: [],
+                fieldsIndex: {},
+                label: '',
+                name: '$activity',
+                plural_label: ''
+            };
+            var fields = [
+                {
+                    label: 'Created At',
+                    name: '$createdAt',
+                    type: 'datetime',
+                    entity: data['$activity']
+                },
+                {
+                    label: 'Updated At',
+                    name: '$updatedAt',
+                    type: 'datetime',
+                    entity: data['$activity']
+                }
+            ];
+            data['$activity'].fieldsIndex['$createdAt'] = fields[0];
+            data['$activity'].fieldsIndex['$updatedAt'] = fields[1];
+
+            data['$activity'].fields.push(fields[0], fields[1]);
+
+            this.$fieldsLoader.data('fields', data);
+            this.$fieldsLoader.data('activityFieldsUpdated', true);
         },
 
         _getFilterCriterion: function () {
+            var filter = {
+                filter: this.filter.name,
+                data: this.filter.getValue()
+            };
+
+            if (this.filter.filterParams) {
+                filter.params = this.filter.filterParams;
+            }
+
             return {
                 filter: 'activityList',
                 data: {
                     filterType: this.$activityChoice.find(':input').val(),
-                    dateRange: this.rangeFilter.getValue(),
-                    activityType: this.typeFilter.getValue()
+                    activityType: this.typeFilter.getValue(),
+                    filter: filter,
+                    entityClassName: $(this.options.entitySelector).val()
                 }
             };
+        },
+
+        _destroy: function () {
+            this._superApply(arguments);
+
+            this.activityFilter.dispose();
+            delete this.activityFilter;
+
+            this.typeFilter.dispose();
+            delete this.typeFilter;
         }
     });
 });
