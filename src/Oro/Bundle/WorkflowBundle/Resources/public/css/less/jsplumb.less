@@ -18,8 +18,11 @@
   overflow-x: auto;
   height: 500px;
   overflow-y: hidden;
+  *[dropdown-state=opened] {
+    z-index: 700;
+  }
   .jsplumb-box {
-    z-index: 1;
+    z-index: 100;
     position: absolute;
     border: 1px solid #4F719A;
     border-radius: 5px;
@@ -62,7 +65,7 @@
       background: #D1E2BC;
     }
     &._jsPlumb_target_hover {
-      background: #B1C29A;
+      background: #D1E2BC;
     }
     &:hover {
       background: #7C99BE;
@@ -81,21 +84,18 @@
       }
     }
   }
-  &[data-role=transition-overlay] {
+  [data-role=transition-overlay] {
     background-color: white;
-    opacity: 0.8;
+    opacity: 0.85;
     padding: 0.3em;
     border-radius: 0.5em;
-    border: 1px solid #346789;
+    border: 1px solid #4F719A;
     -webkit-transform-style: preserve-3d;
     -moz-transform-style: preserve-3d;
     transform-style: preserve-3d;
 
-    &:hover, &_jsplumb_hover {
-      z-index: 2;
-    }
-    &[dropdown-state=opened] {
-      z-index: 2;
+    &:hover, &._jsplumb_hover {
+      z-index: 200;
     }
   }
 }
