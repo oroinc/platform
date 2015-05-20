@@ -1,8 +1,8 @@
 define(function (require) {
     'use strict';
     var _ = require('underscore'),
-        JsplubmBaseView = require('./jsplumb/base'),
-        JsplumbAreaView = require('./jsplumb/area'),
+        JsplubmBaseView = require('../jsplumb/base'),
+        JsplumbAreaView = require('../jsplumb/area'),
         TransitionOverlayView = require('./transition-overlay'),
         JsplumbTransitionView;
 

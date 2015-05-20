@@ -1,6 +1,6 @@
 define(function (require) {
     'use strict';
-    var JsplubmBoxView = require('./jsplumb/box'),
+    var JsplubmBoxView = require('../jsplumb/box'),
         JsplumbWorkflowStepView;
 
     JsplumbWorkflowStepView = JsplubmBoxView.extend({

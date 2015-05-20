@@ -1,6 +1,6 @@
 define(function (require) {
     'use strict';
-    var BaseView = require('./jsplumb/overlay'),
+    var BaseView = require('../jsplumb/overlay'),
         TransitionOverlayView;
 
     TransitionOverlayView = BaseView.extend({

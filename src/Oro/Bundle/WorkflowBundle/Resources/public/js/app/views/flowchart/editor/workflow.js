@@ -1,7 +1,7 @@
 define(function (require) {
     'use strict';
     var _ = require('underscore'),
-        JsplubmAreaView = require('./jsplumb/area'),
+        JsplubmAreaView = require('../jsplumb/area'),
         JsplumbWorkflowStepView = require('./step'),
         JsplubmTransitionView = require('./transition'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
