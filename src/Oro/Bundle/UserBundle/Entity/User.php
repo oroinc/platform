@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -28,7 +26,6 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
@@ -79,7 +76,7 @@ class User extends ExtendUser implements
     FullNameInterface,
     NotificationEmailInterface,
     AdvancedApiUserInterface,
-    OrganizationAwareInterface,
+    OrganizationAwareUserInterface,
     LoginInfoInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
@@ -1564,10 +1561,7 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Get User Organizations
-     *
-     * @param  bool $onlyActive Returns enabled organizations only
-     * @return ArrayCollection Organization[]
+     * {@inheritdoc}
      */
     public function getOrganizations($onlyActive = false)
     {
