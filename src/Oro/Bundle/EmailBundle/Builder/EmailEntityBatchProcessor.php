@@ -207,7 +207,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
-     * Removes all objects from this batch processor
+     * {@inhericDoc}
      */
     public function clear()
     {
