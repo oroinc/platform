@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
@@ -35,7 +35,7 @@ class FormatString extends AbstractAction
         if (empty($options['attribute'])) {
             throw new InvalidParameterException('Attribute name parameter is required');
         }
-        if (!$options['attribute'] instanceof PropertyPath) {
+        if (!$options['attribute'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Attribute must be valid property definition');
         }
 
@@ -45,9 +45,9 @@ class FormatString extends AbstractAction
 
         if (!empty($options['arguments'])
             && !is_array($options['arguments'])
-            && !$options['arguments'] instanceof PropertyPath
+            && !$options['arguments'] instanceof PropertyPathInterface
         ) {
-            throw new InvalidParameterException('Argument parameter must be either array or PropertyPath');
+            throw new InvalidParameterException('Argument parameter must be either array or PropertyPathInterface');
         }
 
         $this->options = $options;
@@ -71,14 +71,14 @@ class FormatString extends AbstractAction
      */
     protected function getArguments($context)
     {
-        $arguments = $this->getOption($this->options, 'arguments', array());
+        $arguments = $this->getOption($this->options, 'arguments', []);
         $arguments = $this->contextAccessor->getValue($context, $arguments);
 
         if (!is_array($arguments) && !$arguments instanceof \Traversable) {
             throw new InvalidParameterException('Argument parameter must be traversable');
         }
 
-        $result = array();
+        $result = [];
         foreach ($arguments as $key => $value) {
             $result['%' . $key . '%'] = $this->contextAccessor->getValue($context, $value);
         }
