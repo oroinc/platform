@@ -44,7 +44,7 @@ define(function (require) {
                         left: this.model.get('position')[0]
                     });
                 }
-
+/*
                 instance.batch(_.bind(function () {
                     // add element as source to jsplumb
                     if (this.model.get('draggable') !== false) {
@@ -76,7 +76,7 @@ define(function (require) {
                             alert('Maximum connections (' + info.maxConnections + ') reached');
                         }
                     });
-                }, this));
+                }, this));*/
             }
         },
 

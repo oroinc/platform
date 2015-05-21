@@ -4,7 +4,7 @@ define(function (require) {
         JsplumbWorkflowStepView;
 
     JsplumbWorkflowStepView = JsplubmBoxView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/step.html'),
+        template: require('tpl!oroworkflow/templates/flowchart/editor/step.html'),
 
         events: {
             'dblclick': 'triggerEditStep',

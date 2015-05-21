@@ -3,7 +3,6 @@ define(function (require) {
     var _ = require('underscore'),
         JsplubmBaseView = require('../jsplumb/base'),
         JsplumbAreaView = require('../jsplumb/area'),
-        TransitionOverlayView = require('./transition-overlay'),
         JsplumbTransitionView;
 
     JsplumbTransitionView = JsplubmBaseView.extend({
@@ -19,6 +18,7 @@ define(function (require) {
             this.areaView = options.areaView;
             this.stepCollection = options.stepCollection;
             this.stepCollectionView = options.stepCollectionView;
+            this.transitionOverlayView = options.transitionOverlayView;
             JsplumbTransitionView.__super__.initialize.apply(this, arguments);
         },
 
@@ -108,15 +108,15 @@ define(function (require) {
                     target: endEl,
                     overlays: [
                         ['Custom', {
-                            create: function () {
-                                overlayView = new TransitionOverlayView({
+                            create: _.bind(function () {
+                                overlayView = new this.transitionOverlayView({
                                     model: transitionModel,
                                     areaView: areaView,
                                     stepFrom: startStep
                                 });
                                 overlayView.render();
                                 return overlayView.$el;
-                            },
+                            }, this),
                             location: 0.5
                         }]
                     ]

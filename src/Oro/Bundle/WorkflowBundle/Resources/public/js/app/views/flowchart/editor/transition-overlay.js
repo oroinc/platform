@@ -4,7 +4,7 @@ define(function (require) {
         TransitionOverlayView;
 
     TransitionOverlayView = BaseView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/transition.html'),
+        template: require('tpl!oroworkflow/templates/flowchart/editor/transition.html'),
 
         initialize: function (options) {
             this.stepFrom = options.stepFrom;

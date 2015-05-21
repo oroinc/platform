@@ -31,7 +31,6 @@
     border-radius: 5px;
     width: @box-width;
     height: @box-width / @proportion;
-    cursor: move;
     background: #B0CAEC;
     -webkit-transform-style: preserve-3d;
     -moz-transform-style: preserve-3d;
@@ -70,9 +69,6 @@
     &._jsPlumb_target_hover {
       background: #D1E2BC;
     }
-    &:hover {
-      background: #7C99BE;
-    }
     .jsplumb-source {
       background: #EED591;
       width: @source-radius * 2;
@@ -107,6 +103,15 @@
 
     &:hover, &._jsplumb_hover {
       z-index: 200;
+    }
+  }
+
+  &.workflow-flowchart-editor {
+    .jsplumb-box {
+      cursor: move;
+      &:hover {
+        background: #7C99BE;
+      }
     }
   }
 }
