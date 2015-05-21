@@ -34,14 +34,11 @@ define(function (require) {
         },
 
         initEvents: function() {
-            var self = this;
-            var dropdown = this.$('#context-items-dropdown');
-            var firstItem = this.$('#email-context-current-item');
-
+            var self = this,
+                dropdown = this.$('.context-items-dropdown'),
+                firstItem = this.$('.email-context-current-item');
             this.collection.on('add', function(model) {
                 var gridUrl = self.options.params.grid_path + '/' + model.attributes.className,
-                    $contextCurrentTargetClass = self.$('[data-ftid=context-current-target-class]'),
-                    $contextCurrentTargetGrid = self.$('[data-ftid=context-current-target-grid]'),
                     view = self.template({
                         entity: model
                     }),
@@ -49,14 +46,12 @@ define(function (require) {
 
                 if (model.attributes.first) {
                     firstItem.html(model.attributes.label);
-                    $contextCurrentTargetClass.data('value', model.attributes.className);
-                    $contextCurrentTargetGrid.data('value', model.attributes.gridName);
+                    self.currentTargetClass(model.attributes.className);
                 }
 
                 dropdown.append($view);
                 dropdown.find('.context-item:last').click(function() {
-                    $contextCurrentTargetClass.data('value', model.attributes.className);
-                    $contextCurrentTargetGrid.data('value', model.attributes.gridName);
+                    self.currentTargetClass(model.attributes.className);
                     dropdown.find('> .context-item').each(function() {
                         $(this).removeClass('active');
                     });
@@ -70,6 +65,20 @@ define(function (require) {
                     });
                 });
             });
+        },
+
+        /**
+         * Getter/Setter for current target className
+         *
+         * @param {string=} value
+         */
+        currentTargetClass: function (value) {
+            if (_.isUndefined(value)) {
+                value = this._currentTargetClass;
+            } else {
+                this._currentTargetClass = value;
+            }
+            return value;
         }
     });
 
