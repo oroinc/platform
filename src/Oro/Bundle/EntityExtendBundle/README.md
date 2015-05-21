@@ -407,8 +407,9 @@ Custom fields and entities in search
 
 During creation or editing custom entity or field, user can set parameter 'searchable'. If this parameter will be set to true, this custom entity or field will be indexed by search engine.
 
-For the custom entity, search alias will be the same as table name. For example, if user creates new entity with the name 'myentity', 'oro_ext_myentity' will be set for this entity as search entity alias.
+For string field type, user can set additional parameter `title_field`. If this parameter is set to true, value of this field will be included into the search result title.
 
-During indexation, for entity field will be created search field with the name of this field. Additionally, for text form types (string, text, etc), this field data will be added to the `all_data` field.
+For the custom entity, search alias will be the same as table name. For example, if user creates new entity with the name 'myentity', 
+it's table name will be 'oro_ext_myentity', and this name will be set search entity alias.
 
-For string field type, user can set additional parameter `The search result title`. If this parameter is set to true, value of this field will be included into the search result title.
+During indexation, for entity field will be created search field in search index with the same name.

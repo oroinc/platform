@@ -42,12 +42,11 @@ class SearchListener
     {
         $mapConfig = $event->getMappingConfig();
         foreach (array_keys($mapConfig) as $className) {
-            $mapConfig[$className]['fields'][] =
-                [
-                    'name' => 'organization',
-                    'target_type' => 'integer',
-                    'target_fields' => ['organization']
-                ];
+            $mapConfig[$className]['fields'][] = [
+                'name' => 'organization',
+                'target_type' => 'integer',
+                'target_fields' => ['organization']
+            ];
         }
 
         $event->setMappingConfig($mapConfig);

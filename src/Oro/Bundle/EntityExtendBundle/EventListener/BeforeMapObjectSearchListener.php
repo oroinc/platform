@@ -13,7 +13,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 class BeforeMapObjectSearchListener
 {
     const TITLE_FIELDS_PATH = 'title_fields';
-    const FIELDS_PATH       = 'fields';
+    const FIELDS_PATH = 'fields';
 
     /** @var array */
     protected $customTypesMap = [
@@ -54,14 +54,16 @@ class BeforeMapObjectSearchListener
      */
     public function prepareEntityMapEvent(SearchMappingCollectEvent $event)
     {
-        $mapConfig            = $event->getMappingConfig();
-        $extendConfigs        = $this->configManager->getProvider('extend')->getConfigs();
+        $mapConfig     = $event->getMappingConfig();
+        $extendConfigs = $this->configManager->getProvider('extend')->getConfigs();
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('is_extend') && $extendConfig->get('state') === ExtendScope::STATE_ACTIVE) {
                 $className     = $extendConfig->getId()->getClassName();
                 $searchConfigs = $this->configManager->getConfigs('search', $className);
 
-                $mapConfig = $this->checkEntityMapping($mapConfig, $extendConfig);
+                if ($extendConfig->get('owner') === ExtendScope::OWNER_CUSTOM) {
+                    $mapConfig = $this->addCustomEntityMapping($mapConfig, $extendConfig);
+                }
 
                 if (isset($mapConfig[$className])) {
                     foreach ($searchConfigs as $searchConfig) {
@@ -115,7 +117,6 @@ class BeforeMapObjectSearchListener
             } elseif (in_array($fieldType, [Indexer::RELATION_MANY_TO_MANY, Indexer::RELATION_ONE_TO_MANY])) {
                 $config       = $extendConfigProvider->getConfig($className, $fieldName);
                 $targetEntity = $config->get('target_entity');
-
 
                 $targetFields = array_unique(
                     array_merge(
@@ -171,33 +172,31 @@ class BeforeMapObjectSearchListener
     }
 
     /**
-     * Check custom entity. If it searchable - add mapping skeleton
+     * Add custom entity mapping skeleton
      *
      * @param array           $mapConfig
      * @param ConfigInterface $config
      * @return array
      */
-    protected function checkEntityMapping(array $mapConfig, ConfigInterface $config)
+    protected function addCustomEntityMapping(array $mapConfig, ConfigInterface $config)
     {
-        $className = $config->getId()->getClassName();
-        if ($config->get('owner') === 'Custom' && $config->get('state') === 'Active') {
-            $label                 = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
-            $mapConfig[$className] = [
-                'alias'                 => $config->get('schema')['doctrine'][$className]['table'],
-                'label'                 => $label,
-                self::TITLE_FIELDS_PATH => [],
-                'route'                 => [
-                    'name'       => 'oro_entity_view',
-                    'parameters' => [
-                        'id'         => 'id',
-                        'entityName' => '@' . str_replace('\\', '_', $className) . '@'
-                    ]
-                ],
-                'search_template'       => 'OroEntityExtendBundle:Search:result.html.twig',
-                self::FIELDS_PATH       => [],
-                'mode'                  => 'normal'
-            ];
-        }
+        $className             = $config->getId()->getClassName();
+        $label                 = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
+        $mapConfig[$className] = [
+            'alias'                 => $config->get('schema')['doctrine'][$className]['table'],
+            'label'                 => $label,
+            self::TITLE_FIELDS_PATH => [],
+            'route'                 => [
+                'name'       => 'oro_entity_view',
+                'parameters' => [
+                    'id'         => 'id',
+                    'entityName' => '@' . str_replace('\\', '_', $className) . '@'
+                ]
+            ],
+            'search_template'       => 'OroEntityExtendBundle:Search:result.html.twig',
+            self::FIELDS_PATH       => [],
+            'mode'                  => 'normal'
+        ];
 
         return $mapConfig;
     }

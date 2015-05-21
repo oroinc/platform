@@ -39,17 +39,14 @@ class SearchEntityConfigListener
         if ($eventConfigId->getScope() !== 'search') {
             return;
         }
-        $event->getConfigManager()->calculateConfigChangeSet($eventConfig);
-        $change = $event->getConfigManager()->getConfigChangeSet($eventConfig);
+        $configManager = $event->getConfigManager();
+        $configManager->calculateConfigChangeSet($eventConfig);
+        $change = $configManager->getConfigChangeSet($eventConfig);
         if (empty($change) || !array_key_exists('searchable', $change)) {
             return;
         }
         $class = $eventConfigId->getClassName();
-        if ($event->getConfigManager()
-                ->getProvider('extend')
-                ->getConfig($class)
-                ->get('state') === ExtendScope::STATE_ACTIVE
-        ) {
+        if ($configManager->getProvider('extend')->getConfig($class)->get('state') === ExtendScope::STATE_ACTIVE) {
             $this->addReindexJob($eventConfigId->getClassName());
         } else {
             $this->addPostponeJob($eventConfigId->getClassName());
