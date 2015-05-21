@@ -19,9 +19,10 @@ services:
     oro_ldap.importexport.writer.ldap.user:
         class: %oro_ldap.importexport.writer.ldap.user.class%
         arguments:
-            - @fr3d_ldap.ldap_manager
+            - @oro_ldap.ldap.factory.ldap_manager
             - @oro_user.manager
             - @oro_importexport.context_registry
+            - @oro_integration.provider.connector_context_mediator
 
     oro_ldap.importexport.processor.import.user:
         class: %oro_ldap.importexport.processor.import.user.class%

@@ -6,14 +6,17 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
+use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
-    /** @var LdapManager */
-    protected $ldapManager;
+    /** @var LdapManagerFactory */
+    protected $ldapManagerFactory;
 
     /** @var UserManager */
     protected $userManager;
@@ -24,16 +27,25 @@ class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
     /** @var StepExecution */
     protected $stepExecution;
 
-    /**
-     * @param LdapManager $ldapManager
-     * @param UserManager $userManager
-     * @param ContextRegistry $contextRegistry
-     */
-    public function __construct(LdapManager $ldapManager, UserManager $userManager, ContextRegistry $contextRegistry)
-    {
-        $this->ldapManager = $ldapManager;
+    /** @var ContextInterface */
+    protected $context;
+
+    /** @var LdapManager */
+    protected $ldapManager;
+
+    /** @var ConnectorContextMediator */
+    private $connectorContextMediator;
+
+    public function __construct(
+        LdapManagerFactory $ldapManagerFactory,
+        UserManager $userManager,
+        ContextRegistry $contextRegistry,
+        ConnectorContextMediator $connectorContextMediator
+    ) {
+        $this->ldapManagerFactory = $ldapManagerFactory;
         $this->userManager = $userManager;
         $this->contextRegistry = $contextRegistry;
+        $this->connectorContextMediator = $connectorContextMediator;
     }
 
     /**
@@ -41,19 +53,32 @@ class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
      */
     public function write(array $items)
     {
-        $context = $this->contextRegistry->getByStepExecution($this->stepExecution);
 
         foreach ($items as $user) {
-            if ($this->ldapManager->exists($user)) {
-                $context->incrementUpdateCount();
+            if ($this->getLdapManager()->exists($user)) {
+                $this->context->incrementUpdateCount();
             } else {
-                $context->incrementAddCount();
+                $this->context->incrementAddCount();
             }
 
-            $this->ldapManager->save($user);
+            $this->getLdapManager()->save($user);
         }
 
         $this->userManager->getStorageManager()->flush();
+    }
+
+    /**
+     * Returns LdapManager of this channel.
+     *
+     * @return LdapManager
+     *
+     * @throws \Exception
+     */
+    private function getLdapManager()
+    {
+        return $this->ldapManager === null ? $this->ldapManager = $this->ldapManagerFactory->getInstanceForChannel(
+            $this->connectorContextMediator->getChannel($this->context)
+        ) : $this->ldapManager;
     }
 
     /**
@@ -62,5 +87,6 @@ class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
+        $this->context = $this->contextRegistry->getByStepExecution($this->stepExecution);
     }
 }
