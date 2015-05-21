@@ -39,7 +39,7 @@ class LayoutTestCase extends WebTestCase
         //        title="some title" >
         // will be converted to
         // <label for="element" class="test" title="some title">
-        $html = preg_replace('/\"\s+(\w+=)/', '" ${1}', $html);
+        $html = preg_replace('/\"\s+([\w\-]+=)/', '" ${1}', $html);
         $html = preg_replace('/(\<\w+)\s+/', '${1} ', $html);
         $html = preg_replace('/\s+([\/]*\>)/', '${1}', $html);
 
