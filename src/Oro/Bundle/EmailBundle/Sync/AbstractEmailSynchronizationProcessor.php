@@ -291,7 +291,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             'Oro\Bundle\ConfigBundle\Entity\Config',
             'Oro\Bundle\ConfigBundle\Entity\ConfigValue',
             'Oro\Bundle\EmailBundle\Entity\EmailOrigin',
-            'Oro\Bundle\EmailBundle\Entity\EmailFolder'
+            'Oro\Bundle\EmailBundle\Entity\EmailFolder',
         ];
     }
 
@@ -307,6 +307,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      */
     protected function cleanUp($isFolderSyncComplete = false, $folder = null)
     {
+        $this->emailEntityBuilder->getBatch()->clear();
+
         /**
          * Entities which should NOT be cleared.
          */
