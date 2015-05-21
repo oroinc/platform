@@ -33,8 +33,10 @@ class Calendar extends Calendars
      */
     public function setStartDate($date)
     {
-        $startDate = $this->test->byXpath("//*[starts-with(@id,'date_selector_oro_calendar_event_form_start')]");
-        $startTime = $this->test->byXpath("//*[starts-with(@id,'time_selector_oro_calendar_event_form_start')]");
+        $startDate = $this->test->byXpath("//*[@data-ftid='oro_calendar_event_form_start']/..".
+            "/following-sibling::*//input[contains(@class,'datepicker-input')]");
+        $startTime = $this->test->byXpath("//*[@data-ftid='oro_calendar_event_form_start']/..".
+            "/following-sibling::*//input[contains(@class,'timepicker-input')]");
         $startDate->clear();
         $startTime->clear();
         if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $dueDateParts)) {
@@ -57,16 +59,18 @@ class Calendar extends Calendars
      */
     public function setEndDate($date)
     {
-        $startDate = $this->test->byXpath("//*[starts-with(@id,'date_selector_oro_calendar_event_form_end')]");
-        $startTime = $this->test->byXpath("//*[starts-with(@id,'time_selector_oro_calendar_event_form_end')]");
-        $startDate->clear();
-        $startTime->clear();
+        $endDate = $this->test->byXpath("//*[@data-ftid='oro_calendar_event_form_end']/..".
+            "/following-sibling::*//input[contains(@class,'datepicker-input')]");
+        $endTime = $this->test->byXpath("//*[@data-ftid='oro_calendar_event_form_end']/..".
+            "/following-sibling::*//input[contains(@class,'timepicker-input')]");
+        $endDate->clear();
+        $endTime->clear();
         if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $dueDateParts)) {
-            $startDate->click(); // focus
-            $startDate->value($dueDateParts[1]);
-            $startTime->click(); // focus
-            $startTime->clear();
-            $startTime->value($dueDateParts[2]);
+            $endDate->click(); // focus
+            $endDate->value($dueDateParts[1]);
+            $endTime->click(); // focus
+            $endTime->clear();
+            $endTime->value($dueDateParts[2]);
         } else {
             throw new \Exception("Value {$date} is not a valid date");
         }
