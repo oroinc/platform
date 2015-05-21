@@ -392,6 +392,8 @@ services:
 
     oro_email.listener.datagrid.email:
         class: %oro_email.listener.datagrid.email.class%
+        arguments:
+            - @oro_security.acl_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
