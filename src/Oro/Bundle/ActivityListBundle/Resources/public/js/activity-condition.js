@@ -73,7 +73,7 @@ define([
                 this.element.one('changed', _.bind(function () {
                     this.filter.setValue(data.criterion.data.filter.data);
                 }, this));
-                this.selectField(data.columnName);
+                this.selectField(base64_decode(data.columnName));
             }
 
             this.activityFilter.on('update', _.bind(this._onUpdate, this));
@@ -249,6 +249,22 @@ define([
                     entityClassName: $(this.options.entitySelector).val()
                 }
             };
+        },
+
+        _onUpdate: function () {
+            var value;
+
+            if (this.filter && !this.filter.isEmptyValue()) {
+                value = {
+                    columnName: base64_encode(this.element.find('input.select').select2('val')),
+                    criterion: this._getFilterCriterion()
+                };
+            } else {
+                value = {};
+            }
+
+            this.element.data('value', value);
+            this.element.trigger('changed');
         },
 
         _destroy: function () {

@@ -126,5 +126,8 @@ services:
             - @form.factory
             - @oro_filter.filter_utility
             - @oro_activity_list.filter.helper
+            - @oro_query_designer.query_designer.manager
+            - @oro_query_designer.grid.datagrid_configuration_builder
+            - @oro_datagrid.datagrid.builder
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: activityList }
