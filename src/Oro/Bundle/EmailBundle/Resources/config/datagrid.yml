@@ -60,7 +60,6 @@ datagrid:
                 sentAt:   { data_name: e.sentAt }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
-            skip_acl_check: true
             entityHint: email
 
     simplified-email-grid:
