@@ -47,11 +47,13 @@ class LdapManager extends BaseManager
             $userAttributes[] = $attribute['ldap_attr'];
         }
 
-        return $this->driver->search(
+        $users = $this->driver->search(
             $this->params['baseDn'],
             $this->params['filter'],
             $userAttributes
         );
+        unset($users['count']);
+        return $users;
     }
 
     /**
@@ -233,7 +235,7 @@ class LdapManager extends BaseManager
 
         $this->params['role_mapping'] = $roles;
 
-        $attributes = $this->getAttributes($cm);
+        $attributes = $this->getAttributes($cm->get('oro_ldap.user_mapping'));
         if ($attributes) {
             $this->params['attributes'] = $attributes;
             $this->ldapAttributes = [];
@@ -246,13 +248,12 @@ class LdapManager extends BaseManager
     }
 
     /**
-     * @param ConfigManager $cm
+     * @param array $mapping
      *
      * @return array
      */
-    private function getAttributes(ConfigManager $cm)
+    private function getAttributes($mapping)
     {
-        $mapping = $cm->get('oro_ldap.user_mapping');
         $definedMapping = array_filter($mapping, 'strlen');
         if (!isset($definedMapping['username'])) {
             return [];

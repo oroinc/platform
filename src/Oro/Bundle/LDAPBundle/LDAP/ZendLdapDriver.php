@@ -4,7 +4,7 @@ namespace Oro\Bundle\LDAPBundle\LDAP;
 
 use FR3D\LdapBundle\Driver\ZendLdapDriver as BaseDriver;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 use Zend\Ldap\Dn;
 

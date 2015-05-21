@@ -1,13 +1,17 @@
 parameters:
+    #fr3ed
     fr3d_ldap.security.authentication.provider.class:   Oro\Bundle\LDAPBundle\Security\LdapProvider
     fr3d_ldap.ldap_driver.zend.class:                   Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver
+    #providers
     oro_ldap.provider.user.class:                       Oro\Bundle\LDAPBundle\Provider\UserProvider
+    #integration
     oro_ldap.provider.channel_type.class:               Oro\Bundle\LDAPBundle\Provider\ChannelType
     oro_ldap.provider.connector.user.class:             Oro\Bundle\LDAPBundle\Provider\Connector\UserLdapConnector
-    oro_ldap.provider.ldap_transport.class:             Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
-    oro_ldap.form.type.ldap_transport_setting.class:    Oro\Bundle\LDAPBundle\Form\Type\LdapTransportSettingsFormType
+    oro_ldap.provider.transport.ldap.class:             Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
+    #managers
     oro_ldap.manager.import.class:                      Oro\Bundle\LDAPBundle\Manager\ImportManager
     oro_ldap.manager.export.class:                      Oro\Bundle\LDAPBundle\Manager\ExportManager
+    #event listeners
     oro_ldap.event_listener.user_change_listener.class: Oro\Bundle\LDAPBundle\EventListener\UserChangeListener
 
 services:
@@ -31,6 +35,13 @@ services:
         calls:
             - [updateOroConfiguration, [@oro_config.global]]
 
+    oro_ldap.ldap.factory.ldap_manager:
+        class: Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory
+        arguments:
+            - @doctrine
+            - @fr3d_ldap.user_manager
+            - @logger
+
     oro_ldap.provider.user:
         class: %oro_ldap.provider.user.class%
         arguments:
@@ -42,7 +53,7 @@ services:
             - { name: oro_integration.channel, type: ldap }
 
     oro_ldap.provider.ldap.transport:
-        class: %oro_ldap.provider.ldap_transport.class%
+        class: %oro_ldap.provider.transport.ldap.class%
         tags:
             - { name: oro_integration.transport, type: ldap, channel_type: ldap }
 

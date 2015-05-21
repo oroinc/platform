@@ -10,6 +10,8 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Processor\StepExecutionAwareProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
+use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
+use Oro\Bundle\LDAPBundle\LDAP\Ldap;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -21,9 +23,6 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
 
     /** @var ContextRegistry */
     private $contextRegistry;
-
-    /** @var LdapManager */
-    private $ldapManager;
 
     /** @var UserManager */
     private $userManager;
@@ -37,16 +36,19 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
     /** @var Channel */
     private $channel;
 
+    /** @var LdapManagerFactory */
+    private $ldapManagerFactory;
+
     public function __construct(
-        LdapManager $ldapManager,
+        LdapManagerFactory $ldapManagerFactory,
         UserManager $userManager,
         ContextRegistry $contextRegistry,
         ConnectorContextMediator $connectorContextMediator
     ) {
         $this->contextRegistry = $contextRegistry;
-        $this->ldapManager = $ldapManager;
         $this->userManager = $userManager;
         $this->connectorContextMediator = $connectorContextMediator;
+        $this->ldapManagerFactory = $ldapManagerFactory;
     }
 
     /**
@@ -56,12 +58,12 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
      *
      * @return \Oro\Bundle\UserBundle\Entity\User
      */
-    protected function createUser($item)
+    private function createUser($item)
     {
         /** @var User $user */
         $user = $this->userManager->createUser();
 
-        $this->ldapManager->hydrate($user, $item);
+        $this->getLdapManager()->hydrate($user, $item);
 
         // Set organization of user to same as on channel.
         $user->setOrganization($this->getChannel()->getOrganization());
@@ -76,15 +78,27 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
     }
 
     /**
+     * @return LdapManager
+     */
+    private function getLdapManager()
+    {
+        return $this->ldapManagerFactory->getInstanceForChannel(
+            $this->getChannel()
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process($item)
     {
         try {
-            $user = $this->userManager->findUserByUsername($item[$this->ldapManager->getUsernameAttr()]);
+            $user = $this->userManager->findUserByUsername(
+                $item[$this->getLdapManager()->getUsernameAttr()]
+            );
 
             if ($user !== null) {
-                $this->ldapManager->hydrate($user, $item);
+                $this->getLdapManager()->hydrate($user, $item);
                 $this->getContext()->incrementUpdateCount();
             } else {
                 $user = $this->createUser($item);

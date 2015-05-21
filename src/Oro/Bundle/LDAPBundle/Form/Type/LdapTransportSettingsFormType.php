@@ -17,7 +17,7 @@ class LdapTransportSettingsFormType extends AbstractType
     {
         $builder->add(
             'server_hostname',
-            'url',
+            'text',
             [
                 'label' => 'oro.ldap.transport.ldap.fields.server_hostname.label',
                 'required' => true,

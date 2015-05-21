@@ -11,19 +11,22 @@ parameters:
 services:
     oro_ldap.importexport.reader.ldap.user:
         class: %oro_ldap.importexport.reader.ldap.user.class%
-        arguments: [@oro_importexport.context_registry, @fr3d_ldap.ldap_manager]
+        arguments:
+            - @oro_integration.provider.connector_context_mediator
+            - @oro_importexport.context_registry
+            - @oro_ldap.ldap.factory.ldap_manager
 
     oro_ldap.importexport.writer.ldap.user:
+        class: %oro_ldap.importexport.writer.ldap.user.class%
         arguments:
             - @fr3d_ldap.ldap_manager
             - @oro_user.manager
             - @oro_importexport.context_registry
-        class: %oro_ldap.importexport.writer.ldap.user.class%
 
     oro_ldap.importexport.processor.import.user:
         class: %oro_ldap.importexport.processor.import.user.class%
         arguments:
-            - @oro_ldap.ldap.ldap_manager
+            - @oro_ldap.ldap.factory.ldap_manager
             - @oro_user.manager
             - @oro_importexport.context_registry
             - @oro_integration.provider.connector_context_mediator

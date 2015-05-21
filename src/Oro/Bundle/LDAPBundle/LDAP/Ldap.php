@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LDAPBundle\LDAP;
 
+use Zend\Ldap\Exception\LdapException;
 use Zend\Ldap\Ldap as BaseLdap;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;

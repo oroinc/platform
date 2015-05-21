@@ -130,7 +130,7 @@ class ImportManager
     {
         $ldapUsers = [];
         $usernameAttr = $this->ldapManager->getUsernameAttr();
-        for ($i = 0; $i < $ldapResults['count']; $i++) {
+        for ($i = 0; $i < count($ldapResults); $i++) {
             $ldapUsers[$ldapResults[$i][$usernameAttr][0]] = $ldapResults[$i];
         }
 
