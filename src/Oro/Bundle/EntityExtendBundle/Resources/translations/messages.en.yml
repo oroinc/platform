@@ -114,6 +114,12 @@ oro:
                         set_options: "Options"
                         is_deleted: "Deleted"
 
+            search:
+                field:
+                    items:
+                        searchable: "Searchable"
+                        title_field: "The search result title"
+
         config_grid:
             entities: Entities
             new_entity: New entity
