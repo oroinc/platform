@@ -70,7 +70,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($input) {
-                        if ($input === SystemConfigurationPass::CONFIG_PROVIDER_TAG_NAME) {
+                        if ($input === SystemConfigurationPass::CONFIG_BAG_SERVICE) {
                             return [
                                 'provider_service' => [
                                     ['scope' => 'app']

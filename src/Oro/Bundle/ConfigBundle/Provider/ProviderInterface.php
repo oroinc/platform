@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Oro\Bundle\ConfigBundle\Model\Data\Transformer\TransformerInterface;
 
 interface ProviderInterface
 {
@@ -52,4 +53,13 @@ interface ProviderInterface
      * @return array
      */
     public function chooseActiveGroups($activeGroup, $activeSubGroup);
+
+    /**
+     * Returns specified data transformer
+     *
+     * @param string $key
+     *
+     * @return TransformerInterface|null
+     */
+    public function getDataTransformer($key);
 }

@@ -16,6 +16,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class SystemConfigurationPass implements CompilerPassInterface
 {
+    const CONFIG_BAG_SERVICE            = 'oro_config.config_bag';
     const CONFIG_DEFINITION_BAG_SERVICE = 'oro_config.config_definition_bag';
     const CONFIG_PROVIDER_TAG_NAME      = 'oro_config.configuration_provider';
 
@@ -40,7 +41,7 @@ class SystemConfigurationPass implements CompilerPassInterface
             $this->getDeclaredVariableNames($settings)
         );
         $config         = $this->loadConfig($container, $processor);
-        $taggedServices = $container->findTaggedServiceIds(self::CONFIG_PROVIDER_TAG_NAME);
+        $taggedServices = $container->findTaggedServiceIds(self::CONFIG_BAG_SERVICE);
         if ($taggedServices) {
             $config = $processor->process($config);
 

@@ -1,4 +1,5 @@
 parameters:
+    oro_config.config_bag.class:                                                 Oro\Bundle\ConfigBundle\Config\ConfigBag
     oro_config.config_definition_bag.class:                                      Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag
     oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
     oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserScopeManager
@@ -16,9 +17,17 @@ parameters:
     oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
 
     oro_config.manager.class:                                                    Oro\Bundle\ConfigBundle\Config\ConfigManager
-    oro_config.user_config_manager.class:                                      Oro\Bundle\ConfigBundle\Manager\UserConfigManager
+    oro_config.user_config_manager.class:                                        Oro\Bundle\ConfigBundle\Manager\UserConfigManager
 
 services:
+    oro_config.config_bag:
+        class: %oro_config.config_bag.class%
+        arguments:
+            - []
+            - @service_container
+        tags:
+             - { name: oro_config.config_bag }
+
     oro_config.config_definition_bag:
         class: %oro_config.config_definition_bag.class%
         arguments:
@@ -56,11 +65,11 @@ services:
     oro_config.provider.system_configuration.form_provider:
         class:                        %oro_config.provider.system_configuration.form_provider.class%
         arguments:
-            - []
+            - @oro_config.config_bag
             - @form.factory
             - @oro_security.security_facade
         tags:
-            -  { name: oro_config.configuration_provider }
+            - { name: oro_config.configuration_provider }
         lazy: true
 
     oro_config.form.config_subscriber:
