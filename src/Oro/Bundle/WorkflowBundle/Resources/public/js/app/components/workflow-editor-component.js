@@ -1,5 +1,5 @@
 /* global define */
-/** @exports WorkflowFlowchartComponent */
+/** @exports WorkflowEditorComponent */
 define(function (require) {
     'use strict';
 
