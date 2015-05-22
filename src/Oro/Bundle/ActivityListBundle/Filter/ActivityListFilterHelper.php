@@ -56,7 +56,10 @@ class ActivityListFilterHelper
     ) {
         $dataSourceAdapter = new OrmFilterDatasourceAdapter($qb);
         if (isset($filterData['dateRange'])) {
-            $this->dateTimeRangeFilter->init($rangeField, ['data_name' => sprintf('%s.%s', $activityListAlias, $rangeField)]);
+            $this->dateTimeRangeFilter->init(
+                $rangeField,
+                ['data_name' => sprintf('%s.%s', $activityListAlias, $rangeField)]
+            );
             $datetimeForm = $this->dateTimeRangeFilter->getForm();
             if (!$datetimeForm->isSubmitted()) {
                 $datetimeForm->submit($filterData['dateRange']);
