@@ -30,7 +30,10 @@ datagrid:
                             conditionType: WITH
                             condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
                         -
-                            { join: eu.folder, alias: f }
+                            join: eu.folder
+                            alias: f
+                            conditionType: WITH
+                            condition: f.type = '%oro_email.email_folder.model.class%::INBOX' OR f.type = '%oro_email.email_folder.model.class%::SEND'
         columns:
             contacts:
                 type: twig
