@@ -70,7 +70,7 @@ class EmailFolder
     /**
      * @var ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Email", mappedBy="folder", cascade={"persist", "remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emails;

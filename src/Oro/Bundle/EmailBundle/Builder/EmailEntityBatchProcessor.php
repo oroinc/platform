@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 
@@ -26,27 +27,32 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * @var array
      */
-    protected $changes = array();
+    protected $changes = [];
 
     /**
      * @var Email[]
      */
-    protected $emails = array();
+    protected $emails = [];
+
+    /**
+     * @var EmailUser[]
+     */
+    protected $emailUsers = [];
 
     /**
      * @var EmailAddress[]
      */
-    protected $addresses = array();
+    protected $addresses = [];
 
     /**
      * @var EmailFolder[]
      */
-    protected $folders = array();
+    protected $folders = [];
 
     /**
      * @var EmailOrigin[]
      */
-    protected $origins = array();
+    protected $origins = [];
 
     /**
      * Constructor
@@ -68,6 +74,16 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     public function addEmail(Email $obj)
     {
         $this->emails[] = $obj;
+    }
+
+    /**
+     * Register EmailUser object
+     *
+     * @param EmailUser $obj
+     */
+    public function addEmailUser(EmailUser $obj)
+    {
+        $this->emailUsers[] = $obj;
     }
 
     /**
@@ -176,6 +192,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         $this->persistFolders($em);
         $this->persistAddresses($em);
         $this->persistEmails($em);
+        $this->persistEmailUsers($em);
     }
 
     /**
@@ -190,15 +207,16 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
-     * Removes all objects from this batch processor
+     * {@inhericDoc}
      */
     public function clear()
     {
-        $this->changes = array();
-        $this->emails = array();
-        $this->folders = array();
-        $this->origins = array();
-        $this->addresses = array();
+        $this->changes = [];
+        $this->emails = [];
+        $this->emailUsers = [];
+        $this->folders = [];
+        $this->origins = [];
+        $this->addresses = [];
     }
 
     /**
@@ -206,7 +224,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     public function removeEmails()
     {
-        $this->emails = array();
+        $this->emails = [];
     }
 
     /**
@@ -216,9 +234,21 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function persistEmails(EntityManager $em)
     {
-        $this->processDuplicateEmails($em);
+        $this->processDuplicateEmails($em); // todo CRM-2480
         foreach ($this->emails as $email) {
             $em->persist($email);
+        }
+    }
+
+    /**
+     * Persist EmailUser objects
+     *
+     * @param EntityManager $em
+     */
+    protected function persistEmailUsers(EntityManager $em)
+    {
+        foreach ($this->emailUsers as $emailUser) {
+            $em->persist($emailUser);
         }
     }
 
@@ -234,10 +264,12 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
             // add existing emails to new folders and remove these emails from the list
             foreach ($existingEmails as $existingEmail) {
                 foreach ($this->emails as $key => $email) {
+                    /** @var Email $email */
                     if ($this->areEmailsEqual($email, $existingEmail)) {
                         $folders = $email->getFolders();
                         foreach ($folders as $folder) {
-                            $existingEmail->addFolder($folder);
+                            // todo CRM-2480
+                            //$existingEmail->addFolder($folder);
                         }
                         $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
                         unset($this->emails[$key]);
@@ -272,7 +304,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         }
 
         return $em->getRepository('OroEmailBundle:Email')
-            ->findBy(array('messageId' => array_values($messageIds)));
+            ->findBy(['messageId' => array_values($messageIds)]);
     }
 
     /**
@@ -297,7 +329,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         $repository = $this->emailAddressManager->getEmailAddressRepository($em);
         foreach ($this->addresses as $key => $obj) {
             /** @var EmailAddress $dbObj */
-            $dbObj = $repository->findOneBy(array('email' => $obj->getEmail()));
+            $dbObj = $repository->findOneBy(['email' => $obj->getEmail()]);
             if ($dbObj === null) {
                 $obj->setOwner($this->emailOwnerProvider->findEmailOwner($em, $obj->getEmail()));
                 $em->persist($obj);
@@ -321,7 +353,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                 continue;
             }
             /** @var EmailFolder $dbObj */
-            $dbObj = $repository->findOneBy(array('fullName' => $obj->getFullName(), 'type' => $obj->getType()));
+            $dbObj = $repository->findOneBy(['fullName' => $obj->getFullName(), 'type' => $obj->getType()]);
             if ($dbObj === null) {
                 $em->persist($obj);
             } else {
@@ -361,9 +393,10 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateFolderReferences(EmailFolder $old, EmailFolder $new)
     {
         foreach ($this->emails as $obj) {
-            if ($obj->hasFolder($old)) {
-                $obj->removeFolder($old)->addFolder($new);
-            }
+            // todo CRM-3324
+//            if ($obj->hasFolder($old)) {
+//                $obj->removeFolder($old)->addFolder($new);
+//            }
         }
     }
 }

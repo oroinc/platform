@@ -1,6 +1,6 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{% set folders = record.getValue('folders') %}
+{% set folder = record.getValue('folder') %}
 {% set thread = record.getValue('thread') %}
 {% if thread is not null  %}
     {% set recipients = oro_get_email_thread_recipients(thread) %}
@@ -9,8 +9,7 @@
 {% endif %}
 
 <span class="nowrap">
-{% if folders|length > 0 %}
-    {% set folder = folders[0] %}
+{% if folder is not null %}
     {% if folder.type == 'sent' %}
         <span class="icon grid">
             <i class="icon-signout"></i>

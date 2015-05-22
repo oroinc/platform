@@ -124,7 +124,7 @@ class Processor
         $origin = $this->getEmailOrigin($model->getFrom());
         $this->emailEntityBuilder->setOrigin($origin);
 
-        $email = $this->emailEntityBuilder->email(
+        $emailUser = $this->emailEntityBuilder->emailUser(
             $model->getSubject(),
             $model->getFrom(),
             $model->getTo(),
@@ -136,31 +136,33 @@ class Processor
             $model->getBcc()
         );
 
-        $email->addFolder($origin->getFolder(FolderType::SENT));
-        $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
-        $email->setMessageId($messageId);
-        $email->setSeen(true);
+        $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+        $emailUser->setEmailBody(
+            $this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true)
+        );
+        $emailUser->setMessageId($messageId);
+        $emailUser->setSeen(true);
         if ($parentMessageId) {
-            $email->setRefs($parentMessageId);
+            $emailUser->setRefs($parentMessageId);
         }
 
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
-        $this->persistAttachments($model, $email);
+        $this->persistAttachments($model, $emailUser->getEmail());
 
         // associate the email with the target entity if exist
         $contexts = $model->getContexts();
         foreach ($contexts as $context) {
-            $this->emailActivityManager->addAssociation($email, $context);
+            $this->emailActivityManager->addAssociation($emailUser->getEmail(), $context);
         }
 
         // flush all changes to the database
         $this->getEntityManager()->flush();
 
-        $event = new EmailBodyAdded($email);
+        $event = new EmailBodyAdded($emailUser->getEmail());
         $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
-        return $email;
+        return $emailUser;
     }
 
     /**

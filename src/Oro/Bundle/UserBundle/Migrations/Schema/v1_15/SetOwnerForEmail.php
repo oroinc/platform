@@ -25,26 +25,26 @@ class SetOwnerForEmail implements Migration
      */
     public static function addOwnerToOroEmail(Schema $schema)
     {
-        $table = $schema->getTable('oro_email');
+        $table = $schema->getTable('oro_email_user');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
 
-        $table->addIndex(['organization_id'], 'IDX_2A30C17132C8A3DE');
-        $table->addIndex(['user_owner_id'], 'IDX_2A30C1719EB185F9');
+        $table->addIndex(['organization_id'], 'IDX_91F5CFF632C8A3DE');
+        $table->addIndex(['user_owner_id'], 'IDX_91F5CFF69EB185F9');
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
-            'FK_2A30C17132C8A3DE'
+            'FK_91F5CFF632C8A3DE'
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_owner_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
-            'FK_2A30C1719EB185F9'
+            'FK_91F5CFF69EB185F9'
         );
     }
 }

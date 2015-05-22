@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_12;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -14,8 +15,10 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addEmailReference($schema);
-        self::addPostQuery($queries);
+        self::changeEmailToEmailBodyRelation($schema);
+        self::splitEmailEntity($schema);
+        self::updateEmailSecurity($queries);
+        self::addPostQueries($queries);
     }
 
     /**
@@ -23,7 +26,7 @@ class OroEmailBundle implements Migration
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public static function addEmailReference(Schema $schema)
+    public static function changeEmailToEmailBodyRelation(Schema $schema)
     {
         $emailTable = $schema->getTable('oro_email');
         $emailBodyTable = $schema->getTable('oro_email_body');
@@ -36,13 +39,75 @@ class OroEmailBundle implements Migration
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_2A30C17126A2754B'
         );
-        $emailTable->addIndex(['email_body_id'], 'IDX_2A30C17126A2754B');
+        $emailTable->addUniqueIndex(['email_body_id'], 'UNIQ_2A30C17126A2754B');
     }
 
-    public static function addPostQuery(QueryBag $queries)
+    /**
+     * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function splitEmailEntity(Schema $schema)
     {
-        $queries->addPostQuery(
-            new UpdateEmailBodyRelationQuery()
+        $emailUserTable = $schema->createTable('oro_email_user');
+        $emailUserTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        // todo remove `notnull` flag after data migration
+        $emailUserTable->addColumn('folder_id', 'integer', ['notnull' => false]);
+        // todo remove `notnull` flag after data migration
+        $emailUserTable->addColumn('email_id', 'integer', ['notnull' => false]);
+        $emailUserTable->addColumn('created', 'datetime');
+        $emailUserTable->addColumn('received', 'datetime');
+        $emailUserTable->addColumn('is_seen', 'boolean', ['default' => true]);
+        $emailUserTable->setPrimaryKey(['id']);
+
+        $emailUserTable->addIndex(['folder_id'], 'IDX_91F5CFF6162CB942');
+        $emailUserTable->addIndex(['email_id'], 'IDX_91F5CFF6A832C1C9');
+
+        $emailUserTable->addForeignKeyConstraint(
+            $schema->getTable('oro_email_folder'),
+            ['folder_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null],
+            'FK_91F5CFF6162CB942'
         );
+        $emailUserTable->addForeignKeyConstraint(
+            $schema->getTable('oro_email'),
+            ['email_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null],
+            'FK_91F5CFF6A832C1C9'
+        );
+    }
+
+    /**
+     * @param QueryBag $queries
+     */
+    public static function updateEmailSecurity(QueryBag $queries)
+    {
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\EmailBundle\Entity\Email',
+                'security',
+                'permissions',
+                null
+            )
+        );
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\EmailBundle\Entity\EmailUser',
+                'security',
+                'permissions',
+                'VIEW;CREATE;EDIT'
+            )
+        );
+    }
+
+    /**
+     * @param QueryBag $queries
+     */
+    public static function addPostQueries(QueryBag $queries)
+    {
+        $queries->addPostQuery(new UpdateEmailBodyRelationQuery());
+        $queries->addPostQuery(new FillEmailUserTableQuery());
     }
 }

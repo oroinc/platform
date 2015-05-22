@@ -1,10 +1,11 @@
 {#
     Available variables:
-    * entity       - email entity Oro\Bundle\EmailBundle\Entity\Email
+    * entity       - email entity Oro\Bundle\EmailBundle\Entity\EmailUser
     * indexer_item - indexer item Oro\Bundle\SearchBundle\Query\Result\Item
 #}
 {% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
-{% import 'OroUserBundle::macros.html.twig' as UI %}
+
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
 {% set iconType = 'envelope' %}
@@ -15,7 +16,8 @@
 {% set entityType = 'oro.email.entity_label'|trans %}
 
 {% set entityInfo = [
-    {'title': 'oro.email.sent_at.label'|trans, 'value': entity.sentAt|oro_format_datetime},
-    {'title': 'oro.email.from_name.label'|trans, 'value': EA.email_address(entity.fromEmailAddress, entity.fromName)},
-    {'title': 'To'|trans, 'value': EA.recipient_email_addresses(entity.recipients('to'))},
+    {'title': 'oro.email.sent_at.label'|trans, 'value': entity.email.sentAt|oro_format_datetime},
+    {'title': 'oro.email.from_name.label'|trans, 'value': EA.email_address(entity.email.fromEmailAddress, entity.email.fromName)},
+    {'title': 'oro.email.from_email_address.label'|trans, 'value': EA.recipient_email_addresses(entity.email.recipients('to'))},
+    {'title': 'oro.email.emailuser.owner.label'|trans, 'value': UI.entityOwnerLink(entity)},
 ] %}

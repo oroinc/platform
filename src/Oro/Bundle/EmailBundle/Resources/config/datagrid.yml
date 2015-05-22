@@ -5,11 +5,20 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial e.{id, subject, sentAt, thread}
+                    - partial eu.{id, email}
                 from:
-                    - { table: OroEmailBundle:Email, alias: e }
+                    - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
                     left:
+                        -
+                            join: eu.email
+                            alias: e
+                        -
+                            join: e.thread
+                            alias: thread
+                        -
+                            join: e.recipients
+                            alias: recipients
                         -
                             join: e.recipients
                             alias: r_to
@@ -21,7 +30,7 @@ datagrid:
                             conditionType: WITH
                             condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
                         -
-                            { join: e.folders, alias: f }
+                            { join: eu.folder, alias: f }
         columns:
             contacts:
                 type: twig
@@ -73,7 +82,7 @@ datagrid:
                 to:      { type: string,   data_name: r_to.name, label: oro.email.to.label }
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
-                folders: { type: string,   data_name: f.type, label: oro.email.folders.label }
+                folder:  { type: string,   data_name: f.type, label: oro.email.folders.label }
         views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:
@@ -84,10 +93,11 @@ datagrid:
 
         properties:
             id: ~
+            email.id: ~
             view_thread_link:
                 type: url
                 route: oro_email_thread_view
-                params: [ id ]
+                params: { id: email.id }
 
         actions:
             view_thread:
@@ -102,14 +112,18 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial e.{id, subject, receivedAt, sentAt}
+                    - partial e.{ id, subject, sentAt }
+                    - partial eu.{ id, receivedAt, email }
                 from:
-                    - { table: OroEmailBundle:Email, alias: e }
+                    - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
+                    left:
+                        -
+                            join: eu.email
+                            alias: e
                     inner:
-                        - { join: e.folders, alias: f }
+                        - { join: eu.folder, alias: f }
                         - { join: f.origin, alias: o }
-                        - { join: e.fromEmailAddress, alias: a }
                 where:
                     and:
                         - o.id IN (:origin_ids)
@@ -147,7 +161,7 @@ datagrid:
         sorters:
             columns:
                 fromEmailExpression: { data_name: fromEmailExpression }
-                receivedAt:  { data_name: e.receivedAt }
+                receivedAt:  { data_name: eu.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
@@ -162,7 +176,7 @@ datagrid:
             sentAt:
                 label: oro.email.sent_at.label
                 frontend_type: datetime
-            recipients:
+            email:
                 type: twig
                 label: oro.email.recipients.label
                 frontend_type: html

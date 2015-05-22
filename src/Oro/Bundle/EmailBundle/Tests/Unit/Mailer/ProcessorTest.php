@@ -222,7 +222,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
             ->disableOriginalConstructor()
             ->getMock();
-        $origin->expects($this->once())
+        $origin->expects($this->any())
             ->method('getFolder')
             ->with(FolderType::SENT)
             ->will($this->returnValue($folder));
@@ -243,11 +243,19 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('setOrigin')
             ->with($origin);
 
+        $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
+            ->setMethods(['setFolder'])
+            ->getMock();
+        $emailUser->expects($this->once())
+            ->method('setFolder');
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();
+        $emailUser->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($email);
         $this->emailEntityBuilder->expects($this->once())
-            ->method('email')
+            ->method('emailUser')
             ->with(
                 $data['subject'],
                 $data['from'],
@@ -259,7 +267,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                 $data['cc'],
                 $data['bcc']
             )
-            ->will($this->returnValue($email));
+            ->willReturn($emailUser);
 
         $body = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
             ->disableOriginalConstructor()
@@ -290,12 +298,12 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($targetEntity));
             $this->emailActivityManager->expects($this->exactly(0))
                 ->method('addAssociation')
-                ->with($this->identicalTo($email), $this->identicalTo($targetEntity));
+                ->with($this->identicalTo($emailUser), $this->identicalTo($targetEntity));
         } else {
         }
 
         $model = $this->createEmailModel($data);
-        $this->assertSame($email, $this->emailProcessor->process($model));
+        $this->assertSame($emailUser, $this->emailProcessor->process($model));
     }
 
     public function messageDataProvider()
@@ -427,13 +435,21 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->em, 'test_user@test.com')
             ->will($this->returnValue($user));
 
+        $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
+            ->setMethods(['setFolder'])
+            ->getMock();
+        $emailUser->expects($this->once())
+            ->method('setFolder');
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();
+        $emailUser->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($email);
         $this->emailEntityBuilder->expects($this->once())
-            ->method('email')
+            ->method('emailUser')
             ->with('test', 'Test User <test_user@test.com>', ['test2@test.com'])
-            ->will($this->returnValue($email));
+            ->will($this->returnValue($emailUser));
         $body = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
             ->disableOriginalConstructor()
             ->getMock();

@@ -64,7 +64,7 @@ class UpdateEmailAccessLevels extends AbstractFixture implements ContainerAwareI
         foreach ($roles as $roleName) {
             $sid = $manager->getSid($this->getRole($roleName));
 
-            $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
+            $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\EmailUser');
             $maskBuilder = $manager->getMaskBuilder($oid)
                 ->add('VIEW_BASIC')
                 ->add('CREATE_BASIC')
