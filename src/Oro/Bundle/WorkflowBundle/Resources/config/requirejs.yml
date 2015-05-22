@@ -7,32 +7,5 @@ config:
         'oroworkflow/js/activation-handler':                                   'bundles/oroworkflow/js/activation-handler.js'
 
         'oroworkflow/js/app/components/workflow-editor-component':             'bundles/oroworkflow/js/app/components/workflow-editor-component.js'
-
-        'oroworkflow/js/workflow-management':                                  'bundles/oroworkflow/js/workflow-management/workflow-management.js'
         'oroworkflow/js/workflow-management/helper':                           'bundles/oroworkflow/js/workflow-management/helper'
-#        'oroworkflow/js/workflow-management/workflow/model':                   'bundles/oroworkflow/js/workflow-management/workflow/model.js'
-
-#        'oroworkflow/js/workflow-management/attribute/model':                  'bundles/oroworkflow/js/workflow-management/attribute/model.js'
-#        'oroworkflow/js/workflow-management/attribute/collection':             'bundles/oroworkflow/js/workflow-management/attribute/collection.js'
-        'oroworkflow/js/workflow-management/attribute/form-option-view/list':  'bundles/oroworkflow/js/workflow-management/attribute/form-option-view/list.js'
-        'oroworkflow/js/workflow-management/attribute/form-option-view/row':   'bundles/oroworkflow/js/workflow-management/attribute/form-option-view/row.js'
-        'oroworkflow/js/workflow-management/attribute/form-option-view/edit':  'bundles/oroworkflow/js/workflow-management/attribute/form-option-view/edit.js'
-
-#        'oroworkflow/js/workflow-management/step/model':                       'bundles/oroworkflow/js/workflow-management/step/model.js'
-#        'oroworkflow/js/workflow-management/step/collection':                  'bundles/oroworkflow/js/workflow-management/step/collection.js'
-        'oroworkflow/js/workflow-management/step/view/list':                   'bundles/oroworkflow/js/workflow-management/step/view/list.js'
-        'oroworkflow/js/workflow-management/step/view/row':                    'bundles/oroworkflow/js/workflow-management/step/view/row.js'
-        'oroworkflow/js/workflow-management/step/view/edit':                   'bundles/oroworkflow/js/workflow-management/step/view/edit.js'
-
-#        'oroworkflow/js/workflow-management/transition/model':                 'bundles/oroworkflow/js/workflow-management/transition/model.js'
-#        'oroworkflow/js/workflow-management/transition/collection':            'bundles/oroworkflow/js/workflow-management/transition/collection.js'
-        'oroworkflow/js/workflow-management/transition/view/list':             'bundles/oroworkflow/js/workflow-management/transition/view/list.js'
-        'oroworkflow/js/workflow-management/transition/view/row':              'bundles/oroworkflow/js/workflow-management/transition/view/row.js'
-        'oroworkflow/js/workflow-management/transition/view/list-short':       'bundles/oroworkflow/js/workflow-management/transition/view/list-short.js'
-        'oroworkflow/js/workflow-management/transition/view/row-short':        'bundles/oroworkflow/js/workflow-management/transition/view/row-short.js'
-        'oroworkflow/js/workflow-management/transition/view/edit':             'bundles/oroworkflow/js/workflow-management/transition/view/edit.js'
-
-#        'oroworkflow/js/workflow-management/transition-definition/model':      'bundles/oroworkflow/js/workflow-management/transition-definition/model.js'
-#        'oroworkflow/js/workflow-management/transition-definition/collection': 'bundles/oroworkflow/js/workflow-management/transition-definition/collection.js'
-
         'oro/datagrid/action/workflow-activate-action':             'bundles/oroworkflow/js/datagrid/action/workflow-activate-action.js'

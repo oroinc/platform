@@ -1,14 +1,13 @@
 /* global define */
-define(['underscore', 'chaplin', 'oroworkflow/js/workflow-management/transition/view/row-short'],
-function(_, Chaplin, TransitionsShortRowView) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/transition/view/list-short
-     * @class   oro.WorkflowManagement.TransitionsShortListView
-     * @extends Backbone.View
-     */
-    return Chaplin.View.extend({
+    var TransitionsShortListView,
+        _ = require('underscore'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        TransitionsShortRowView = require('./transition-row-short-view');
+
+    TransitionsShortListView = BaseView.extend({
         tagName: 'ul',
 
         attributes: {
@@ -49,7 +48,7 @@ function(_, Chaplin, TransitionsShortRowView) {
 
         remove: function() {
             this.resetView();
-            Chaplin.View.prototype.remove.call(this);
+            TransitionsShortListView.__super__.remove.call(this);
         },
 
         resetView: function() {
@@ -64,4 +63,6 @@ function(_, Chaplin, TransitionsShortRowView) {
             return this;
         }
     });
+
+    return TransitionsShortListView;
 });

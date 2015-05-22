@@ -1,17 +1,17 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'chaplin', 'jquery', 'oroui/js/messenger', 'oro/dialog-widget',
-    'oroworkflow/js/workflow-management/helper',
-    'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list', 'jquery.validate'
-],
-function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, TransitionsListView) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/step/view/edit
-     * @class   oro.WorkflowManagement.StepEditView
-     * @extends Chaplin.View
-     */
-    return Chaplin.View.extend({
+    var StepEditView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        __ = require('orotranslation/js/translator'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        DialogWidget = require('oro/dialog-widget'),
+        Helper = require('oroworkflow/js/workflow-management/helper'),
+        TransitionsListView = require('../transition/transition-list-view');
+
+    StepEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -63,7 +63,7 @@ function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, Transitio
             if (this.transitionsListView) {
                 this.transitionsListView.remove();
             }
-            Chaplin.View.prototype.remove.call(this);
+            StepEditView.__super__.remove.call(this);
         },
 
         renderTransitions: function() {
@@ -130,4 +130,6 @@ function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, Transitio
             return this;
         }
     });
+
+    return StepEditView;
 });

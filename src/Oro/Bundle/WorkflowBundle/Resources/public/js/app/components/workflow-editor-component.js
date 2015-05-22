@@ -12,15 +12,15 @@ define(function (require) {
         routing = require('routing'),
         helper = require('oroworkflow/js/workflow-management/helper'),
         BaseComponent = require('oroui/js/app/components/base/component'),
-        WorkflowManagementView = require('oroworkflow/js/workflow-management'),
+        WorkflowManagementView = require('../views/workflow-management-view'),
         WorkflowModel = require('../models/workflow-model'),
         StepCollection = require('../models/step-collection'),
         TransitionModel = require('../models/transition-model'),
         TransitionCollection = require('../models/transition-collection'),
         TransitionDefinitionCollection = require('../models/transition-definition-collection'),
         AttributeCollection = require('../models/attribute-collection'),
-        TransitionEditFormView = require('oroworkflow/js/workflow-management/transition/view/edit'),
-        StepEditView = require('oroworkflow/js/workflow-management/step/view/edit'),
+        TransitionEditFormView = require('../views/transition/transition-edit-view'),
+        StepEditView = require('../views/step/step-edit-view'),
         StepModel = require('../models/step-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 

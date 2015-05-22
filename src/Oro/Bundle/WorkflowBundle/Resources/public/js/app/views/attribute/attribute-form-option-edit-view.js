@@ -1,22 +1,17 @@
 /* global define */
-define([
-    'underscore',
-    'chaplin',
-    'jquery',
-    'oroworkflow/js/workflow-management/helper',
-    'orotranslation/js/translator',
-    'oroentity/js/field-choice',
-    'jquery.validate'
-],
-function(_, Chaplin, $, Helper, __) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/attribute/form-option-view/edit
-     * @class   oro.WorkflowManagement.AttributeFormOptionEditView
-     * @extends Backbone.View
-     */
-    return Chaplin.View.extend({
+    var AttributeFormOptionEditView,
+        _ = require('underscore'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        $ = require('jquery'),
+        helper = require('oroworkflow/js/workflow-management/helper'),
+        __ = require('orotranslation/js/translator');
+    require('oroentity/js/field-choice');
+    require('jquery.validate');
+
+    AttributeFormOptionEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -49,7 +44,7 @@ function(_, Chaplin, $, Helper, __) {
         },
 
         onAdd: function() {
-            var formData = Helper.getFormData(this.form);
+            var formData = helper.getFormData(this.form);
 
             formData.property_path = this.options.workflow.getPropertyPathByFieldId(formData.property_path);
             formData.required = formData.hasOwnProperty('required');
@@ -110,4 +105,6 @@ function(_, Chaplin, $, Helper, __) {
             return this;
         }
     });
+
+    return AttributeFormOptionEditView;
 });
