@@ -1,6 +1,7 @@
 parameters:
     oro_cron.job_daemon.class:        Oro\Bundle\CronBundle\Job\Daemon
     oro_cron.job_manager.class:       Oro\Bundle\CronBundle\Entity\Manager\JobManager
+    oro_cron.jms_job_helper.class:    Oro\Bundle\CronBundle\Helper\JmsJobHelper
 
 services:
     oro_cron.job_daemon:
@@ -15,3 +16,8 @@ services:
         class:                        %oro_cron.job_manager.class%
         arguments:
             - "@doctrine.orm.entity_manager"
+
+    oro_cron.jms_job_helper:
+        class: %oro_cron.jms_job_helper.class%
+        arguments:
+            - @doctrine
