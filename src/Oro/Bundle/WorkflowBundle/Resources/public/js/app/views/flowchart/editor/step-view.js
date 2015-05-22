@@ -65,7 +65,7 @@ define(function (require) {
                     onMaxConnections: function (info, e) {
                         mediator.execute(
                             'showErrorMessage',
-                            __('Maximum connections') + ' (' + info.maxConnections + ') ' + __('reached'),
+                            __('Maximum connections ({0}) reached', info.maxConnections),
                             e
                         );
                     }

@@ -5,10 +5,19 @@ define(function (require) {
         FlowchartViewerTransitionView;
 
     FlowchartViewerTransitionView = FlowchartJsPlubmBaseView.extend({
+        /**
+         * @type {FlowchartJsPlubmAreaView}
+         */
         areaView: null,
 
+        /**
+         * @type {Array}
+         */
         connections: null,
 
+        /**
+         * @type {Object}
+         */
         connectorStyle: {
             strokeStyle: '#4F719A',
             lineWidth: 2,
@@ -16,6 +25,9 @@ define(function (require) {
             outlineWidth: 7
         },
 
+        /**
+         * @type {Object}
+         */
         connectorHoverStyle: {
 
         },

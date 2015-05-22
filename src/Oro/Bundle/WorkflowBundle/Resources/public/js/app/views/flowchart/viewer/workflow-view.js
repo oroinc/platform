@@ -9,13 +9,32 @@ define(function (require) {
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
+        /**
+         * @type {Constructor.<FlowchartJsPlumbOverlayView>}
+         */
         transitionOverlayView: FlowchartViewerTransitionOverlayView,
+
+        /**
+         * @type {Constructor.<FlowchartJsPlumbBoxView>}
+         */
         stepView: FlowchartViewerStepView,
+
+        /**
+         * @type {Constructor.<FlowchartViewerTransitionView>}
+         */
         transitionView: FlowchartViewerTransitionView,
+
+        /**
+         * @type {BaseCollectionView<FlowchartJsPlumbBoxView>}
+         */
         stepCollectionView: null,
+
+        /**
+         * @type {BaseCollectionView<FlowchartViewerTransitionView>}
+         */
         transitionCollectionView: null,
 
-        className: "workflow-flowchart-viewer",
+        className: 'workflow-flowchart-viewer',
 
         findStepModelByElement: function (el) {
             var stepCollectionView = this.stepCollectionView;
