@@ -225,13 +225,6 @@ define(function (require) {
                 }
             });
 
-            if (path.indexOf('+') !== -1) {
-                results.push({
-                    id: path,
-                    text: __('oro.entity.field_choice.none')
-                });
-            }
-
             if (!_.isEmpty(fields)) {
                 results.push({
                     text: __("oro.entity.field_choice.fields"),
