@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LDAPBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -11,7 +10,6 @@ use Oro\Bundle\ImportExportBundle\Processor\StepExecutionAwareProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
-use Oro\Bundle\LDAPBundle\LDAP\Ldap;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -64,8 +62,10 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
         $user = $this->userManager->createUser();
 
         $this->getLdapManager()->hydrate($user, $item);
+        $user->setLdapIntegrationChannel($this->getChannel());
 
         // Set organization of user to same as on channel.
+        $user->getOrganizations()->add($this->getChannel()->getOrganization());
         $user->setOrganization($this->getChannel()->getOrganization());
 
         if (!$user->getPassword()) {
@@ -99,6 +99,8 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
 
             if ($user !== null) {
                 $this->getLdapManager()->hydrate($user, $item);
+                $user->setLdapIntegrationChannel($this->getChannel());
+
                 $this->getContext()->incrementUpdateCount();
             } else {
                 $user = $this->createUser($item);

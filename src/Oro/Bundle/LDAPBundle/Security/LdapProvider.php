@@ -2,48 +2,46 @@
 
 namespace Oro\Bundle\LDAPBundle\Security;
 
-use FR3D\LdapBundle\Ldap\LdapManagerInterface;
-use FR3D\LdapBundle\Security\Authentication\LdapAuthenticationProvider;
-
+use Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
 use Oro\Bundle\LDAPBundle\Model\User;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
-class LdapProvider extends LdapAuthenticationProvider
+class LdapProvider extends UserAuthenticationProvider
 {
-    /** @var LdapManagerInterface */
-    protected $ldapManager;
+    /** @var LdapManagerFactory */
+    protected $ldapManagerFactory;
 
-    /** @var ConfigManager */
-    protected $cm;
+    /** @var UserProviderInterface  */
+    protected $userProvider;
 
     /**
      * @param UserCheckerInterface  $userChecker
      * @param string                $providerKey
      * @param UserProviderInterface $userProvider
-     * @param LdapManagerInterface  $ldapManager
-     * @param ConfigManager         $cm
+     * @param LdapManagerFactory    $ldapManagerFactory
      * @param boolean               $hideUserNotFoundExceptions
      */
     public function __construct(
         UserCheckerInterface $userChecker,
         $providerKey,
         UserProviderInterface $userProvider,
-        LdapManagerInterface $ldapManager,
-        ConfigManager $cm,
+        LdapManagerFactory $ldapManagerFactory,
         $hideUserNotFoundExceptions = true
     ) {
-        parent::__construct($userChecker, $providerKey, $userProvider, $ldapManager, $hideUserNotFoundExceptions);
-        $this->ldapManager = $ldapManager;
-        $this->cm          = $cm;
+        parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
+        $this->ldapManagerFactory = $ldapManagerFactory;
+        $this->userProvider = $userProvider;
     }
 
     /**
@@ -51,10 +49,6 @@ class LdapProvider extends LdapAuthenticationProvider
      */
     public function authenticate(TokenInterface $token)
     {
-        if (!$this->cm->get('oro_ldap.server_enable_login')) {
-            throw new BadCredentialsException('Bad credentials');
-        }
-
         $guesser = new UserOrganizationGuesser();
         $parentAuthenticatedToken = parent::authenticate($token);
 
@@ -96,9 +90,39 @@ class LdapProvider extends LdapAuthenticationProvider
             }
 
             $ldapUser = User::createFromUser($user);
-            if (!$this->ldapManager->bind($ldapUser, $presentedPassword)) {
+            if (!$this->ldapManagerFactory->getInstanceForChannel(
+                $user->getLdapIntegrationChannel()
+            )->bind($ldapUser, $presentedPassword)) {
                 throw new BadCredentialsException('The presented password is invalid.');
             }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function retrieveUser($username, UsernamePasswordToken $token)
+    {
+        $user = $token->getUser();
+        if ($user instanceof UserInterface) {
+            return $user;
+        }
+
+        try {
+            $user = $this->userProvider->loadUserByUsername($username);
+
+            return $user;
+        } catch (UsernameNotFoundException $notFound) {
+            throw $notFound;
+        } catch (\Exception $repositoryProblem) {
+            $e = new AuthenticationServiceException(
+                $repositoryProblem->getMessage(),
+                (int) $repositoryProblem->getCode(),
+                $repositoryProblem
+            );
+            $e->setToken($token);
+
+            throw $e;
         }
     }
 }

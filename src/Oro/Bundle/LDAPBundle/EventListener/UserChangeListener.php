@@ -7,13 +7,14 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserChangeListener
 {
     /** @var ServiceLink */
-    protected $ldapManagerLink;
+    protected $ldapManagerFactoryLink;
 
     /** @var array */
     protected $synchronizedFields = [];
@@ -22,11 +23,11 @@ class UserChangeListener
     protected $entitiesToUpdate = [];
 
     /**
-     * @param ServiceLink $ldapManagerLink
+     * @param ServiceLink $ldapManagerFactoryLink
      */
-    public function __construct(ServiceLink $ldapManagerLink)
+    public function __construct(ServiceLink $ldapManagerFactoryLink)
     {
-        $this->ldapManagerLink = $ldapManagerLink;
+        $this->ldapManagerFactoryLink = $ldapManagerFactoryLink;
     }
 
     /**
@@ -34,7 +35,9 @@ class UserChangeListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        array_map([$this->getLdapManager(), 'save'], $this->entitiesToUpdate);
+        array_map(function ($entity) {
+            $this->getLdapManager($entity->getLdapIntegrationChannel())->save($entity);
+        }, $this->entitiesToUpdate);
         $this->entitiesToUpdate = [];
     }
 
@@ -65,7 +68,7 @@ class UserChangeListener
         }
 
         $changedFields = array_keys($uow->getEntityChangeSet($entity));
-        if (!array_intersect($this->getSynchronizedFields(), $changedFields)) {
+        if (!array_intersect($this->getSynchronizedFields($entity->getLdapIntegrationChannel()), $changedFields)) {
             return;
         }
 
@@ -73,22 +76,25 @@ class UserChangeListener
     }
 
     /**
+     * @param Channel $channel
      * @return array
      */
-    protected function getSynchronizedFields()
+    protected function getSynchronizedFields(Channel $channel)
     {
         if (!$this->synchronizedFields) {
-            $this->synchronizedFields = $this->getLdapManager()->getSynchronizedFields();
+            $this->synchronizedFields = $this->getLdapManager($channel)->getSynchronizedFields();
         }
 
         return $this->synchronizedFields;
     }
 
     /**
+     * @param Channel $channel
      * @return LdapManager
+     * @throws \Exception
      */
-    protected function getLdapManager()
+    protected function getLdapManager(Channel $channel)
     {
-        return $this->ldapManagerLink->getService();
+        return $this->ldapManagerFactoryLink->getService()->getInstanceForChannel($channel);
     }
 }
