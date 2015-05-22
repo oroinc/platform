@@ -10,6 +10,8 @@ define(function (require) {
         StepCollection = require('oroworkflow/js/workflow-management/step/collection'),
         TransitionCollection = require('oroworkflow/js/workflow-management/transition/collection'),
         TransitionDefinitionCollection = require('oroworkflow/js/workflow-management/transition-definition/collection'),
+        StepModel = require('oroworkflow/js/workflow-management/step/model'),
+        __ = require('orotranslation/js/translator'),
         AttributeCollection = require('oroworkflow/js/workflow-management/attribute/collection');
 
     /**
@@ -25,8 +27,37 @@ define(function (require) {
          * @inheritDoc
          */
         initialize: function (options) {
+            console.log(options);
             this.model = this.createWorkflowModel(options);
             this.addStartingStep();
+        },
+
+        /**
+         * Adds a starting step to workflow model
+         */
+        addStartingStep: function () {
+            this.model.get('steps').add(this._createStartingStep());
+        },
+
+        /**
+         * Creates a starting step
+         *
+         * @returns {StepModel}
+         * @private
+         */
+        _createStartingStep: function () {
+            var startStepModel = new StepModel({
+                name: 'step:starting_point',
+                label: __('(Start)'),
+                order: -1,
+                _is_start: true
+            });
+
+            startStepModel
+                .getAllowedTransitions(this.model)
+                .reset(this.model.getStartTransitions());
+
+            return startStepModel;
         },
 
         /**

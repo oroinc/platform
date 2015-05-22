@@ -83,10 +83,22 @@ class WorkflowDefinitionController extends Controller
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
+        return array(
+            'form' => $form->createView(),
+            'entity' => $workflowDefinition,
+            'entityConfiguration' => $this->prepareConfiguration($workflowDefinition),
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
+            'delete_allowed' => true,
+        );
+    }
 
-        /*
-         * Translate attribute labels
-         */
+    /**
+     * Prepares workflow configuration to display. Translates attribute labels.
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    protected function prepareConfiguration(WorkflowDefinition $workflowDefinition) {
         /** @var TranslatorInterface $translator */
         $translator = $this->get('translator');
         $configuration = $workflowDefinition->getConfiguration();
@@ -95,14 +107,7 @@ class WorkflowDefinitionController extends Controller
                 $configuration['attributes'][$attrName]['translated_label'] = $translator->trans($attrConfig['label']);
             }
         }
-
-        return array(
-            'form' => $form->createView(),
-            'entity' => $workflowDefinition,
-            'entityConfiguration' => $configuration,
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
-            'delete_allowed' => true,
-        );
+        return $configuration;
     }
 
     /**
@@ -148,7 +153,9 @@ class WorkflowDefinitionController extends Controller
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
         return array(
-            'entity' => $workflowDefinition
+            'entity' => $workflowDefinition,
+            'entityConfiguration' => $this->prepareConfiguration($workflowDefinition),
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
         );
     }
 

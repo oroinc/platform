@@ -218,34 +218,6 @@ define(function (require) {
         },
 
         /**
-         * Adds a starting step to workflow model
-         */
-        addStartingStep: function () {
-            this.model.get('steps').add(this._createStartingStep());
-        },
-
-        /**
-         * Creates a starting step
-         *
-         * @returns {StepModel}
-         * @private
-         */
-        _createStartingStep: function () {
-            var startStepModel = new StepModel({
-                name: 'step:starting_point',
-                label: __('(Start)'),
-                order: -1,
-                _is_start: true
-            });
-
-            startStepModel
-                .getAllowedTransitions(this.model)
-                .reset(this.model.getStartTransitions());
-
-            return startStepModel;
-        },
-
-        /**
          * Returns a starting step
          *
          * @returns {StepModel}
