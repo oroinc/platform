@@ -59,7 +59,7 @@ class OroLDAPBundleInstaller implements Installation, ExtendExtensionAwareInterf
             ]
         );
 
-        /*$transportTable = $schema->getTable('oro_integration_transport');
+        $transportTable = $schema->getTable('oro_integration_transport');
         $transportTable->addColumn('oro_ldap_server_hostname', 'string', [
             'notnull' => false
         ]);
@@ -77,6 +77,6 @@ class OroLDAPBundleInstaller implements Installation, ExtendExtensionAwareInterf
         ]);
         $transportTable->addColumn('oro_ldap_admin_password', 'string', [
             'notnull' => false
-        ]);*/
+        ]);
     }
 }
