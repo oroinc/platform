@@ -95,14 +95,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     {
         $queries->addQuery(
             new UpdateEntityConfigEntityValueQuery(
-                'Oro\Bundle\EmailBundle\Entity\Email',
-                'security',
-                'permissions',
-                null
-            )
-        );
-        $queries->addQuery(
-            new UpdateEntityConfigEntityValueQuery(
                 'Oro\Bundle\EmailBundle\Entity\EmailUser',
                 'security',
                 'permissions',
@@ -118,5 +110,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     {
         $queries->addPostQuery(new UpdateEmailBodyRelationQuery());
         $queries->addPostQuery(new FillEmailUserTableQuery());
+        $queries->addPostQuery(new DeleteEmailPermissionConfig());
     }
 }
