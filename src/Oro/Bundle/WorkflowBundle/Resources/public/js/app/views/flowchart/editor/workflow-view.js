@@ -39,7 +39,7 @@ define(function (require) {
                     stepFrom.trigger('change');
                     suspendedStep.trigger('change');
                 }
-            } else {
+            } else if (!stepTo.get('_is_start')) {
                 this.model.trigger('requestAddTransition', stepFrom, stepTo);
             }
             // never allow jsplumb just draw new connections, create connection model instead

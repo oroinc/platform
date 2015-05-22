@@ -52,7 +52,11 @@ define(function (require) {
         },
 
         connect: function () {
-            var debouncedUpdate = _.debounce(_.bind(this.updateStepTransitions, this), 50);
+            var debouncedUpdate = _.debounce(_.bind(function () {
+                if (!this.disposed) {
+                    this.updateStepTransitions();
+                }
+            }, this), 50);
             this.listenTo(this.model, 'change', debouncedUpdate);
             this.listenTo(this.stepCollection, 'add', debouncedUpdate);
             this.listenTo(this.stepCollection, 'change', debouncedUpdate);
