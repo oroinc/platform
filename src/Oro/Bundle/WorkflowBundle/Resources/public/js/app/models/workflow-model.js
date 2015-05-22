@@ -34,6 +34,8 @@ define(function(require) {
         entityFieldUtil: null,
         entityFieldsInitialized: false,
 
+        positionIncrementPx: 35,
+
         initialize: function() {
             if (this.get('steps') === null) {
                 this.set('steps', new StepCollection());
@@ -113,6 +115,12 @@ define(function(require) {
             cloned.label = __('Copy of') + ' ' + cloned.label;
             if (doNotAddToCollection) {
                 cloned._is_clone = true;
+            }
+            if (cloned.position) {
+                cloned.position = [
+                    cloned.position[0] + this.positionIncrementPx,
+                    cloned.position[1] + this.positionIncrementPx
+                ]
             }
 
             var clonedModel = new StepModel(cloned);

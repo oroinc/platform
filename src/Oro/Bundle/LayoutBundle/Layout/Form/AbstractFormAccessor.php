@@ -35,6 +35,14 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
     /**
      * {@inheritdoc}
      */
+    public function getId()
+    {
+        return $this->getView()->vars['id'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAction()
     {
         $this->ensureParamsInitialized();

@@ -37,14 +37,14 @@ class OroAdministration extends AbstractPage
     {
         parent::__construct($testCase, $redirect);
 
-        $this->organization = $this->test->byId("oro_installer_setup_organization_name");
-        $this->username = $this->test->byId("oro_installer_setup_username");
-        $this->passwordFirst = $this->test->byId("oro_installer_setup_plainPassword_first");
-        $this->passwordSecond = $this->test->byId("oro_installer_setup_plainPassword_second");
-        $this->email = $this->test->byId("oro_installer_setup_email");
-        $this->firstName = $this->test->byId("oro_installer_setup_firstName");
-        $this->lastName = $this->test->byId("oro_installer_setup_lastName");
-        $this->loadFixtures = $this->test->byId("oro_installer_setup_loadFixtures");
+        $this->organization = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_organization_name']");
+        $this->username = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_username']");
+        $this->passwordFirst = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_plainPassword_first']");
+        $this->passwordSecond = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_plainPassword_second']");
+        $this->email = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_email']");
+        $this->firstName = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_firstName']");
+        $this->lastName = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_lastName']");
+        $this->loadFixtures = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_loadFixtures']");
     }
 
     public function next()

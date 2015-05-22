@@ -1,9 +1,12 @@
-/*global define, console*/
+/* global define */
 /** @exports WorkflowEditorComponent */
 define(function (require) {
     'use strict';
 
     var WorkflowEditorComponent,
+        WorkflowViewerComponent = require('./workflow-viewer-component'),
+        FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
+        flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
         mediator = require('oroui/js/mediator'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
@@ -11,26 +14,41 @@ define(function (require) {
         tools = require('oroui/js/tools'),
         routing = require('routing'),
         helper = require('oroworkflow/js/workflow-management/helper'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
         WorkflowManagementView = require('../views/workflow-management-view'),
-        WorkflowModel = require('../models/workflow-model'),
-        StepCollection = require('../models/step-collection'),
         TransitionModel = require('../models/transition-model'),
-        TransitionCollection = require('../models/transition-collection'),
-        TransitionDefinitionCollection = require('../models/transition-definition-collection'),
-        AttributeCollection = require('../models/attribute-collection'),
         TransitionEditFormView = require('../views/transition/transition-edit-view'),
         StepEditView = require('../views/step/step-edit-view'),
         StepModel = require('../models/step-model'),
+        workflowModelFactory = require('../../tools/workflow-model-factory'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
      * Builds workflow editor UI.
      *
      * @class WorkflowEditorComponent
-     * @augments BaseComponent
+     * @augments WorkflowViewerComponent
      */
-    WorkflowEditorComponent = BaseComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
+    WorkflowEditorComponent = WorkflowViewerComponent.extend(
+        /** @lends WorkflowEditorComponent.prototype */{
+
+        initViews: function () {
+            flowchartTools.checkPositions(this.model);
+
+            this.workflowManagementView = new WorkflowManagementView({
+                el: this._sourceElement,
+                stepsEl: '.workflow-definition-steps-list-container',
+                model: this.model
+            });
+
+            this.workflowManagementView.render();
+
+            this.flowchartView = new FlowchartEditorWorkflowView({
+                el: this._sourceElement.find('.workflow-flowchart'),
+                model: this.model
+            });
+
+            this.flowchartView.render();
+        },
 
         /**
          * @inheritDoc
@@ -49,74 +67,14 @@ define(function (require) {
         },
 
         /**
-         * @constructor
-         * @inheritDoc
-         */
-        initialize: function (options) {
-            this.model = this.createWorkflowModel(options);
-            this.addStartingStep();
-
-            this.workflowManagementView = new WorkflowManagementView({
-                el: options._sourceElement,
-                stepsEl: '.workflow-definition-steps-list-container',
-                model: this.model
-            });
-
-            this.workflowManagementView.render();
-        },
-
-        /**
-         * Helper function. Callback for _.map;
-         *
-         * @param {Object} config
-         * @param {string} name
-         * @returns {Object}
-         * @private
-         */
-        _mergeName: function (config, name) {
-            config.name = name;
-            return config;
-        },
-
-        /**
-         * Creates workflow model
-         *
-         * @param {Object} options
-         * @returns {WorkflowModel}
-         */
-        createWorkflowModel: function (options) {
-            var workflowModel, configuration;
-
-            configuration = options.entity.configuration;
-            configuration.steps = new StepCollection(_.map(configuration.steps, this._mergeName));
-            configuration.transitions = new TransitionCollection(_.map(configuration.transitions, this._mergeName));
-            configuration.transition_definitions = new TransitionDefinitionCollection(
-                _.map(configuration.transition_definitions, this._mergeName));
-            configuration.attributes = new AttributeCollection(_.map(configuration.attributes, this._mergeName));
-
-            configuration.name = options.entity.name;
-            configuration.label = options.entity.label;
-            configuration.entity = options.entity.entity;
-            configuration.entity_attribute = options.entity.entity_attribute;
-            configuration.start_step = options.entity.startStep;
-            configuration.steps_display_ordered = options.entity.stepsDisplayOrdered;
-
-            workflowModel = new WorkflowModel(configuration);
-            workflowModel.setSystemEntities(options.system_entities);
-
-            workflowModel.url = options._sourceElement.attr('action');
-
-            return workflowModel;
-        },
-
-        /**
          * Opens a "Add transition" dialog
          *
          * @param {StepModel} stepFrom
+         * @param {StepModel=} stepTo
          */
-        addNewStepTransition: function (stepFrom) {
+        addNewStepTransition: function (stepFrom, stepTo) {
             var transition = new TransitionModel();
-            this.openManageTransitionForm(transition, stepFrom);
+            this.openManageTransitionForm(transition, stepFrom, stepTo);
         },
 
         /**
@@ -124,8 +82,9 @@ define(function (require) {
          *
          * @param {TransitionModel} transition
          * @param {StepModel=} stepFrom
+         * @param {StepModel=} stepTo
          */
-        openManageTransitionForm: function (transition, stepFrom) {
+        openManageTransitionForm: function (transition, stepFrom, stepTo) {
             if (this.model.get('steps').length === 1) {
                 this._showModalMessage(__('At least one step should be added to add transition.'), __('Warning'));
                 return;
@@ -139,6 +98,7 @@ define(function (require) {
                 'model': transition,
                 'workflow': this.model,
                 'step_from': stepFrom,
+                'step_to': stepTo,
                 'entity_select_el': this.workflowManagementView.getEntitySelect(),
                 'workflowContainer': this.workflowManagementView.$el
             });
@@ -250,35 +210,7 @@ define(function (require) {
             resetCollection(this.model.get('transition_definitions'));
             resetCollection(this.model.get('transitions'));
 
-            this.addStartingStep();
-        },
-
-        /**
-         * Adds a starting step to workflow model
-         */
-        addStartingStep: function () {
-            this.model.get('steps').add(this._createStartingStep());
-        },
-
-        /**
-         * Creates a starting step
-         *
-         * @returns {StepModel}
-         * @private
-         */
-        _createStartingStep: function () {
-            var startStepModel = new StepModel({
-                name: 'step:starting_point',
-                label: __('(Start)'),
-                order: -1,
-                _is_start: true
-            });
-
-            startStepModel
-                .getAllowedTransitions(this.model)
-                .reset(this.model.getStartTransitions());
-
-            return startStepModel;
+            workflowModelFactory.addStartingStep(this.model);
         },
 
         /**
@@ -419,6 +351,7 @@ define(function (require) {
                 stepFrom
                     .getAllowedTransitions(this.model)
                     .add(transition);
+                stepFrom.trigger('change');
             }
         },
 
