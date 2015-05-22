@@ -182,26 +182,8 @@ define([
             });
             var data = this.$fieldsLoader.data('fields');
             _.each(classNames, function (className) {
-                var entity = data[className];
-                var fields = [
-                    {
-                        label: 'Created At',
-                        name: '$createdAt',
-                        type: 'datetime',
-                        entity: entity
-                    },
-                    {
-                        label: 'Updated At',
-                        name: '$updatedAt',
-                        type: 'datetime',
-                        entity: entity
-                    }
-                ];
-                entity.fieldsIndex['$createdAt'] = fields[0];
-                entity.fieldsIndex['$updatedAt'] = fields[1];
-
-                data[className].fields.push(fields[0], fields[1]);
-            });
+                this._updateEntityWithActivityFields(data[className]);
+            }, this);
             data['$activity'] = {
                 fields: [],
                 fieldsIndex: {},
@@ -209,27 +191,31 @@ define([
                 name: '$activity',
                 plural_label: ''
             };
-            var fields = [
-                {
-                    label: 'Created At',
-                    name: '$createdAt',
-                    type: 'datetime',
-                    entity: data['$activity']
-                },
-                {
-                    label: 'Updated At',
-                    name: '$updatedAt',
-                    type: 'datetime',
-                    entity: data['$activity']
-                }
-            ];
-            data['$activity'].fieldsIndex['$createdAt'] = fields[0];
-            data['$activity'].fieldsIndex['$updatedAt'] = fields[1];
-
-            data['$activity'].fields.push(fields[0], fields[1]);
+            this._updateEntityWithActivityFields(data['$activity']);
 
             this.$fieldsLoader.data('fields', data);
             this.$fieldsLoader.data('activityFieldsUpdated', true);
+        },
+
+        _updateEntityWithActivityFields: function (entity) {
+            var fields = [
+                {
+                    label: __('oro.activitylist.created_at.label'),
+                    name: '$createdAt',
+                    type: 'datetime',
+                    entity: entity
+                },
+                {
+                    label: __('oro.activitylist.updated_at.label'),
+                    name: '$updatedAt',
+                    type: 'datetime',
+                    entity: entity
+                }
+            ];
+            entity.fieldsIndex['$createdAt'] = fields[0];
+            entity.fieldsIndex['$updatedAt'] = fields[1];
+
+            entity.fields.push(fields[0], fields[1]);
         },
 
         _getFilterCriterion: function () {

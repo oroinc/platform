@@ -18,6 +18,8 @@ oro:
                 activity.title: Activity Type
         comment:
             quantity_label: Comments quantity
+        created_at.label: Created at
+        updated_at.label: Updated at
     activityCondition:
         hasActivity: Has activity
         hasNotActivity: Has not activity
