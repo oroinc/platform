@@ -30,8 +30,6 @@ class RecentEmailGridListener
             $parameters = $datagrid->getParameters();
             $userId = $parameters->get('userId');
 
-            $this->emailGridHelper->updateDatasource($datasource, $userId);
-
             $queryBuilder = $datasource->getQueryBuilder();
 
             // bind 'origin_ids' parameter

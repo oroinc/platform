@@ -75,7 +75,6 @@ class EmailGridHelper
      */
     public function updateDatasource($datasource, $entityId, $entityClass = null)
     {
-        return; // fixme CRM-2480
         // apply activity filter
         $this->activityManager->addFilterByTargetEntity(
             $datasource->getQueryBuilder(),
