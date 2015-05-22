@@ -5,7 +5,7 @@ define(function (require) {
 
     var WorkflowFlowchartViewerComponent,
         BaseComponent = require('oroui/js/app/components/base/component'),
-        WorkflowFlowchartView = require('../views/flowchart/viewer/workflow-view'),
+        FlowchartViewerWorkflowView = require('../views/flowchart/viewer/workflow-view'),
         flowchartTools = require('oroworkflow/js/tools/flowchart-tools');
 
     /**
@@ -22,7 +22,7 @@ define(function (require) {
         initialize: function (options) {
             this.model = options.workflowModel;
             flowchartTools.checkPositions(this.model);
-            this.view = new WorkflowFlowchartView({
+            this.view = new FlowchartViewerWorkflowView({
                 el: options._sourceElement,
                 model: this.model
             });
