@@ -1,24 +1,21 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
+define(['underscore', 'orotranslation/js/translator', 'chaplin', 'jquery', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
     'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
     'oroworkflow/js/workflow-management/attribute/form-option-view/list',
-    'oroui/js/mediator', 'jquery.validate'],
-function (_, __, Backbone, DialogWidget,
+    'jquery.validate'],
+function (_, __, Chaplin, $, DialogWidget,
          Helper,
          AttributeFormOptionEditView,
-         AttributeFormOptionListView,
-         mediator) {
+         AttributeFormOptionListView) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/transition/view/edit
      * @class   oro.WorkflowManagement.TransitionEditView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -73,9 +70,12 @@ function (_, __, Backbone, DialogWidget,
             ]
         },
 
+        listen: {
+            'destroy model': 'remove'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-            this.listenTo(this.model, 'destroy', this.remove);
 
             var template = this.options.template || $('#transition-form-template').html();
             this.template = _.template(template);
@@ -227,7 +227,7 @@ function (_, __, Backbone, DialogWidget,
             if (this.attributesList) {
                 this.attributesList.remove();
             }
-            Backbone.View.prototype.remove.call(this);
+            Chaplin.View.prototype.remove.call(this);
         },
 
         renderWidget: function() {
@@ -274,6 +274,9 @@ function (_, __, Backbone, DialogWidget,
             var data = this.model.toJSON();
             var steps = this.options.workflow.get('steps').models;
             data.stepFrom = this.options.step_from;
+            if (!data.step_to) {
+                data.step_to = this.options.step_to ? this.options.step_to.get('name') : undefined;
+            }
             data.allowedButtonStyles = _.sortBy(this.options.allowed_button_styles, 'label');
             data.buttonIcon = this._getFrontendOption('icon');
             data.buttonStyle = this._getFrontendOption('class');

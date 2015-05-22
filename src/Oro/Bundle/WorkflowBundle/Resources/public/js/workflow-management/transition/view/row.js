@@ -1,16 +1,14 @@
 /* global define */
-define(['underscore', 'backbone'],
-function(_, Backbone) {
+define(['underscore', 'backbone', 'jquery'],
+function(_, Chaplin, $) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/transition/view/row
      * @class   oro.WorkflowManagement.TransitionRowView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         tagName: 'tr',
 
         events: {
@@ -23,13 +21,15 @@ function(_, Backbone) {
             stepFrom: null
         },
 
+        listen: {
+            'destroy model': 'remove',
+            'change model': 'render'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-row-template').html();
             this.template = _.template(template);
-
-            this.listenTo(this.model, 'change', this.render);
-            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         triggerRemoveTransition: function(e) {

@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/transition/view/row-short'],
-function(_, Backbone, TransitionsShortRowView) {
+define(['underscore', 'chaplin', 'oroworkflow/js/workflow-management/transition/view/row-short'],
+function(_, Chaplin, TransitionsShortRowView) {
     'use strict';
 
     /**
@@ -8,7 +8,7 @@ function(_, Backbone, TransitionsShortRowView) {
      * @class   oro.WorkflowManagement.TransitionsShortListView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         tagName: 'ul',
 
         attributes: {
@@ -49,7 +49,7 @@ function(_, Backbone, TransitionsShortRowView) {
 
         remove: function() {
             this.resetView();
-            Backbone.View.prototype.remove.call(this);
+            Chaplin.View.prototype.remove.call(this);
         },
 
         resetView: function() {

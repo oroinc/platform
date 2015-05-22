@@ -1,16 +1,14 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/transition/view/list-short'],
-function(_, Backbone, TransitionsShortListView) {
+define(['underscore',  'chaplin', 'jquery', 'oroworkflow/js/workflow-management/transition/view/list-short'],
+function(_, Chaplin, $, TransitionsShortListView) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroworkflow/js/workflow-management/step/view/row
      * @class   oro.WorkflowManagement.StepRowView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         tagName: 'tr',
 
         events: {
@@ -25,12 +23,15 @@ function(_, Backbone, TransitionsShortListView) {
             template: null
         },
 
+        listen: {
+            'destroy model': 'remove'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
             this.transitionsListView = null;
-            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         triggerEditStep: function(e) {
@@ -57,7 +58,7 @@ function(_, Backbone, TransitionsShortListView) {
             if (this.transitionsListView) {
                 this.transitionsListView.remove();
             }
-            Backbone.View.prototype.remove.call(this);
+            Chaplin.View.prototype.remove.call(this);
         },
 
         render: function() {
