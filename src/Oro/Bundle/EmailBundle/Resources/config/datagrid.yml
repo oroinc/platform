@@ -148,11 +148,6 @@ datagrid:
             receivedAt:
                 label: oro.email.received_at.label
                 frontend_type: datetime
-            fromEmailExpression:
-                type: twig
-                label: oro.email.from_name.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
@@ -160,7 +155,6 @@ datagrid:
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
         sorters:
             columns:
-                fromEmailExpression: { data_name: fromEmailExpression }
                 receivedAt:  { data_name: eu.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
