@@ -2,8 +2,8 @@
 define(function (require) {
     'use strict';
 
-    var BaseComponent = require('oroui/js/app/components/base/component'),
-        $ = require('jquery'),
+    var EmailAttachmentComponent,
+        BaseComponent = require('oroui/js/app/components/base/component'),
         EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view'),
         EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection'),
         EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
@@ -11,61 +11,100 @@ define(function (require) {
     /**
      * @exports EmailAttachmentComponent
      */
-    return BaseComponent.extend({
+    EmailAttachmentComponent = BaseComponent.extend({
+        /**
+         * @type {EmailAttachmentCollection}
+         */
         collection: null,
+
+        /**
+         * @type {EmailAttachmentCollectionView}
+         */
         collectionView: null,
 
+        /**
+         * @type {EmailAttachmentSelectView}
+         */
         popupView: null,
+
+        /**
+         * @type {EmailAttachmentCollection}
+         */
         popupCollection: null,
 
+        /**
+         * @type {jQuery}
+         */
+        $uploadNewButton: null,
+
+        /**
+         * @type {jQuery}
+         */
+        $popupSelectButton: null,
+
+        /**
+         * @type {jQuery}
+         */
+        $popupContentEl: null,
+
         initialize: function(options) {
-            this.collection = new EmailAttachmentCollection();
+            this.popupCollection = new EmailAttachmentCollection(options.attachmentsAvailable || []);
+            this.collection = new EmailAttachmentCollection(options.entityAttachments || []);
             this.collectionView = new EmailAttachmentCollectionView({
                 collection: this.collection,
                 el: options._sourceElement,
-                listSelector: '#' + options.container,
+                listSelector: '#' + options.containerId,
                 inputName: options.inputName
             });
 
-            if (options.popupTriggerButton && options.popupContentEl) {
-                this.initPopup(options);
+            this.$uploadNewButton = this.findControlElement(options._sourceElement, options.uploadNewButton);
+            this.$popupSelectButton = this.findControlElement(options._sourceElement, options.popupTriggerButton);
+            this.$popupContentEl = this.findControlElement(options._sourceElement, options.popupContentEl);
+            if (this.$popupSelectButton.length && this.$popupContentEl.length) {
+                this.bindEvents();
             }
-
-            var models = options.entityAttachments == 'undefined' ? [] : options.entityAttachments;
-            this.collection.add(models);
         },
 
-        initPopup: function(options) {
-            var self = this;
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this.$uploadNewButton.off('.' + this.cid);
+            this.$popupSelectButton.off('.' + this.cid);
+            return EmailAttachmentComponent.__super__.dispose.call(this);
+        },
 
-            var $popupSelectButton = $(options.popupTriggerButton);
-            $popupSelectButton.click(function() {
-                var popupView = self.getPopupView(options);
+        /**
+         * Binds handlers to control elements
+         */
+        bindEvents: function() {
+            var self = this;
+            this.$popupSelectButton.on('click.' + this.cid, function() {
+                var popupView = self.getPopupView();
                 if (popupView.isShowed) {
                     popupView.hide();
                 } else {
                     popupView.show();
                 }
             });
-
-            var $uploadNewButton = $(options.uploadNewButton);
-            $uploadNewButton.click(function() {
+            this.$uploadNewButton.on('click.' + this.cid, function() {
                 self.collection.add({});
             });
         },
 
-        getPopupView: function(options) {
+        /**
+         *
+         * @returns {EmailAttachmentSelectView}
+         */
+        getPopupView: function() {
             if (!this.popupView) {
-                this.popupCollection = new EmailAttachmentCollection();
-
                 this.popupView = new EmailAttachmentSelectView({
-                    popupTriggerButton: options.popupTriggerButton,
-                    el: options.popupContentEl,
+                    el: this.$popupContentEl,
                     collection: this.popupCollection
                 });
-
-                var models = typeof options.attachmentsAvailable == 'undefined' ? [] : options.attachmentsAvailable;
-                this.popupCollection.add(models);
                 this.popupView.showHideFilter();
                 this.popupView.showHideGroups();
 
@@ -83,6 +122,19 @@ define(function (require) {
             }
 
             return this.popupView;
+        },
+
+        /**
+         * Looks for the control element relatively from the source element
+         * 
+         * @param {jQuery} $sourceElement
+         * @param {string} selector
+         * @returns {jQuery}
+         */
+        findControlElement: function ($sourceElement, selector) {
+            return $sourceElement.parent().find(selector);
         }
     });
+
+    return EmailAttachmentComponent;
 });

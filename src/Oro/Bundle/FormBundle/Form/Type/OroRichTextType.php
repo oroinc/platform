@@ -103,7 +103,6 @@ class OroRichTextType extends AbstractType
         ];
 
         $defaults = [
-            'random_id' => true,
             'wysiwyg_enabled' => (bool)$this->configManager->get('oro_form.wysiwyg_enabled'),
             'wysiwyg_options' => $defaultWysiwygOptions,
             'page-component' => [

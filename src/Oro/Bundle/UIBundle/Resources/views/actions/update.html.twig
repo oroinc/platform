@@ -28,14 +28,9 @@
     {% if addQueryParameters is not defined or addQueryParameters == true %}
         {% set formAction = oro_url_add_query(formAction) %}
     {% endif %}
-    <form
-            id="{{ form.vars.name }}"
-            action="{{ formAction }}"
-            {{ form_enctype(form) }}
-            method="{{ form.vars.method }}"
-            data-collect="true"
-            {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}
-        >
+    <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
+          method="{{ form.vars.method }}" data-collect="true"
+          {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         {% if isWidgetContext %}
             <div class="widget-actions">
                 <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
