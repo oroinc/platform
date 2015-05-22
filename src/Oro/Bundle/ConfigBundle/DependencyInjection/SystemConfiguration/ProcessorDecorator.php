@@ -182,6 +182,7 @@ class ProcessorDecorator
                     ->arrayNode('options')
                         ->prototype('variable')->end()
                     ->end()
+                    ->scalarNode('data_transformer')->end()
                     ->scalarNode('acl_resource')->end()
                     ->integerNode('priority')->end()
                     ->booleanNode('ui_only')->end()
