@@ -1,7 +1,6 @@
 datagrid:
     base-email-grid:
         source:
-            acl_resource: oro_email_email_user_view
             type: orm
             query:
                 select:
