@@ -6,6 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
+use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -32,6 +33,23 @@ class SearchListener
     {
         $this->metadataProvider = $metadataProvider;
         $this->securityFacade = $securityFacade;
+    }
+
+    /**
+     * Add organization field to the entities
+     */
+    public function collectEntityMapEvent(SearchMappingCollectEvent $event)
+    {
+        $mapConfig = $event->getMappingConfig();
+        foreach (array_keys($mapConfig) as $className) {
+            $mapConfig[$className]['fields'][] = [
+                'name' => 'organization',
+                'target_type' => 'integer',
+                'target_fields' => ['organization']
+            ];
+        }
+
+        $event->setMappingConfig($mapConfig);
     }
 
     /**

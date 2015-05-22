@@ -35,7 +35,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
@@ -66,6 +66,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $this->createOroSearchIndexDatetimeTable($schema);
         $this->createOroSearchItemTable($schema);
         $this->createOroSearchIndexTextTable($schema);
+        $this->createOroSearchUpdateTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroSearchIndexDecimalForeignKeys($schema);
@@ -248,5 +249,17 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
             ['id'],
             ['onUpdate' => null, 'onDelete' => null]
         );
+    }
+
+    /**
+     * Create oro_search_update table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroSearchUpdateTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_search_update');
+        $table->addColumn('entity', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['entity']);
     }
 }
