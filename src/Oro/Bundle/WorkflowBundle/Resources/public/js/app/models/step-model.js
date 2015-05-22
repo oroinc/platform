@@ -11,11 +11,11 @@ define(function(require) {
         defaults: {
             name: null,
             label: null,
-            'is_final': false,
+            is_final: false,
             order: 0,
-            'allowed_transitions': null,
-            '_is_start': false,
-            '_is_clone': false
+            allowed_transitions: null,
+            _is_start: false,
+            _is_clone: false
         },
 
         initialize: function() {

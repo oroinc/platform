@@ -6,7 +6,7 @@ define(function(require) {
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         BaseModel = require('oroui/js/app/models/base/model'),
-        Helper = require('oroworkflow/js/workflow-management/helper'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
         StepCollection = require('./step-collection'),
         TransitionCollection = require('./transition-collection'),
         TransitionDefinitionCollection = require('./transition-definition-collection'),
@@ -83,8 +83,8 @@ define(function(require) {
                 cloned.transition_definition = transitionDefinition.get('name');
             }
 
-            cloned.frontend_options = Helper.deepClone(cloned.frontend_options);
-            cloned.form_options = Helper.deepClone(cloned.form_options);
+            cloned.frontend_options = helper.deepClone(cloned.frontend_options);
+            cloned.form_options = helper.deepClone(cloned.form_options);
             cloned.label = __('Copy of') + ' ' + cloned.label;
             if (doNotAddToCollection) {
                 cloned._is_clone = true;
@@ -135,7 +135,7 @@ define(function(require) {
 
         _getClonedItem: function(item) {
             var cloned = _.clone(item.toJSON());
-            cloned.name += '_clone_' + Helper.getRandomId();
+            cloned.name += '_clone_' + helper.getRandomId();
 
             return cloned;
         },

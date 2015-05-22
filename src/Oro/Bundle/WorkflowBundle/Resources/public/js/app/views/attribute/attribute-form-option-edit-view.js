@@ -6,7 +6,7 @@ define(function (require) {
         _ = require('underscore'),
         BaseView = require('oroui/js/app/views/base/view'),
         $ = require('jquery'),
-        helper = require('oroworkflow/js/workflow-management/helper'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
         __ = require('orotranslation/js/translator');
     require('oroentity/js/field-choice');
     require('jquery.validate');

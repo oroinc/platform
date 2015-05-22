@@ -8,9 +8,9 @@ define(function(require) {
     TransitionDefinitionModel = BaseModel.extend({
         defaults: {
             name: null,
-            'pre_conditions': null,
+            pre_conditions: null,
             conditions: null,
-            'post_actions': null
+            post_actions: null
         },
 
         initialize: function() {

@@ -8,7 +8,7 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         BaseView = require('oroui/js/app/views/base/view'),
         DialogWidget = require('oro/dialog-widget'),
-        Helper = require('oroworkflow/js/workflow-management/helper'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
         TransitionsListView = require('../transition/transition-list-view');
 
     StepEditView = BaseView.extend({
@@ -35,11 +35,11 @@ define(function (require) {
         },
 
         onStepAdd: function() {
-            var formData = Helper.getFormData(this.widget.form);
+            var formData = helper.getFormData(this.widget.form);
             var order = parseInt(formData.order);
 
             if (!this.model.get('name')) {
-                this.model.set('name', Helper.getNameByString(formData.label, 'step_'));
+                this.model.set('name', helper.getNameByString(formData.label, 'step_'));
             }
             this.model.set('order', order > 0 ? order : 0);
             this.model.set('is_final', formData.hasOwnProperty('is_final'));

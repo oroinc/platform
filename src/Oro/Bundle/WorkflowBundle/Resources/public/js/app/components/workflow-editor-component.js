@@ -13,7 +13,7 @@ define(function (require) {
         messenger = require('oroui/js/messenger'),
         tools = require('oroui/js/tools'),
         routing = require('routing'),
-        helper = require('oroworkflow/js/workflow-management/helper'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
         WorkflowManagementView = require('../views/workflow-management-view'),
         TransitionModel = require('../models/transition-model'),
         TransitionEditFormView = require('../views/transition/transition-edit-view'),

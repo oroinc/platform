@@ -8,7 +8,7 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         BaseView = require('oroui/js/app/views/base/view'),
         DialogWidget = require('oro/dialog-widget'),
-        Helper = require('oroworkflow/js/workflow-management/helper'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
         AttributeFormOptionEditView = require('../attribute/attribute-form-option-edit-view'),
         AttributeFormOptionListView = require('../attribute/attribute-form-option-list-view');
     require('jquery.validate');
@@ -82,7 +82,7 @@ define(function (require) {
         },
 
         updateExampleView: function() {
-            var formData = Helper.getFormData(this.widget.form);
+            var formData = helper.getFormData(this.widget.form);
             formData.transition_prototype_icon = formData.transition_prototype_icon ||
                 this._getFrontendOption('icon');
             if (formData.transition_prototype_icon || formData.label) {
@@ -93,9 +93,9 @@ define(function (require) {
         },
 
         onTransitionAdd: function() {
-            var formData = Helper.getFormData(this.widget.form);
+            var formData = helper.getFormData(this.widget.form);
             if (!this.model.get('name')) {
-                this.model.set('name', Helper.getNameByString(formData.label, 'transition_'));
+                this.model.set('name', helper.getNameByString(formData.label, 'transition_'));
             }
             this.model.set('label', formData.label);
             this.model.set('step_to', formData.step_to);

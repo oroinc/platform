@@ -9,9 +9,9 @@ define(function(require) {
         defaults: {
             name: null,
             label: null,
-            'translated_label': null,
+            translated_label: null,
             type: null,
-            'property_path': null,
+            property_path: null,
             options: null
         },
 

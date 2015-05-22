@@ -10,14 +10,14 @@ define(function(require) {
         defaults: {
             name: null,
             label: null,
-            'display_type': 'dialog',
-            'step_to': null,
-            'is_start': false,
-            'form_options': null,
+            display_type: 'dialog',
+            step_to: null,
+            is_start: false,
+            form_options: null,
             message: null,
-            'is_unavailable_hidden': true,
-            'transition_definition': null,
-            '_is_clone': false
+            is_unavailable_hidden: true,
+            transition_definition: null,
+            _is_clone: false
         },
 
         initialize: function () {

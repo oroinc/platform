@@ -1,12 +1,11 @@
 config:
     paths:
-        'jsplumb':                                                             'bundles/components/jsplumb/dom.jsPlumb.js'
-        'oroworkflow/js/transition-handler':                                   'bundles/oroworkflow/js/transition-handler.js'
-        'oroworkflow/js/save-and-transit-handler':                             'bundles/oroworkflow/js/save-and-transit-handler.js'
-        'oroworkflow/js/transition-executor':                                  'bundles/oroworkflow/js/transition-executor.js'
-        'oroworkflow/js/reset-handler':                                        'bundles/oroworkflow/js/reset-handler.js'
-        'oroworkflow/js/activation-handler':                                   'bundles/oroworkflow/js/activation-handler.js'
+        'jsplumb':                                                  'bundles/components/jsplumb/dom.jsPlumb.js'
+        'oroworkflow/js/transition-handler':                        'bundles/oroworkflow/js/transition-handler.js'
+        'oroworkflow/js/save-and-transit-handler':                  'bundles/oroworkflow/js/save-and-transit-handler.js'
+        'oroworkflow/js/transition-executor':                       'bundles/oroworkflow/js/transition-executor.js'
+        'oroworkflow/js/reset-handler':                             'bundles/oroworkflow/js/reset-handler.js'
+        'oroworkflow/js/activation-handler':                        'bundles/oroworkflow/js/activation-handler.js'
 
-        'oroworkflow/js/app/components/workflow-editor-component':             'bundles/oroworkflow/js/app/components/workflow-editor-component.js'
-        'oroworkflow/js/workflow-management/helper':                           'bundles/oroworkflow/js/workflow-management/helper'
+        'oroworkflow/js/app/components/workflow-editor-component':  'bundles/oroworkflow/js/app/components/workflow-editor-component.js'
         'oro/datagrid/action/workflow-activate-action':             'bundles/oroworkflow/js/datagrid/action/workflow-activate-action.js'
