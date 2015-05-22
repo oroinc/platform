@@ -199,6 +199,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: postPersist }
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%

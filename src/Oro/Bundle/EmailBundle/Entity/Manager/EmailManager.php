@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailManager
 {
@@ -78,5 +78,10 @@ class EmailManager
         }
         $this->em->persist($entity);
         $this->em->flush();
+    }
+
+    public function handleOnPersist( $event)
+    {
+
     }
 }
