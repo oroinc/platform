@@ -264,13 +264,19 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         if (!empty($existingEmails)) {
             // add existing emails to new folders and remove these emails from the list
             foreach ($existingEmails as $existingEmail) {
-                foreach ($this->emails as $key => $email) {
-                    /** @var Email $email */
+                foreach ($this->emailUsers as $key => $emailUser) {
+                    $email = $emailUser->getEmail();
+
                     if ($this->areEmailsEqual($email, $existingEmail)) {
+                        $emailUser->setEmail($existingEmail);
                         $folders = $email->getFolders();
                         foreach ($folders as $folder) {
-                            // todo CRM-2480
-                            //$existingEmail->addFolder($folder);
+                            if ($folder != $emailUser->getFolder()) {
+                                $eu = clone $emailUser;
+                                $eu->setFolder($folder);
+
+                                $em->persist($eu);
+                            }
                         }
                         $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
                         unset($this->emails[$key]);
