@@ -3,7 +3,7 @@
 define(function (require) {
     'use strict';
 
-    var WorkflowFlowchartComponent,
+    var WorkflowFlowchartEditorComponent,
         BaseComponent = require('oroui/js/app/components/base/component'),
         WorkflowFlowchartView = require('../views/flowchart/editor/workflow-view'),
         flowchartTools = require('oroworkflow/js/tools/flowchart-tools');
@@ -11,10 +11,10 @@ define(function (require) {
     /**
      * Builds workflow editor UI.
      *
-     * @class WorkflowFlowchartComponent
+     * @class WorkflowFlowchartEditorComponent
      * @augments BaseComponent
      */
-    WorkflowFlowchartComponent = BaseComponent.extend(/** @lends WorkflowFlowchartComponent.prototype */{
+    WorkflowFlowchartEditorComponent = BaseComponent.extend(/** @lends WorkflowFlowchartEditorComponent.prototype */{
         /**
          * @constructor
          * @inheritDoc
@@ -31,5 +31,5 @@ define(function (require) {
         }
     });
 
-    return WorkflowFlowchartComponent;
+    return WorkflowFlowchartEditorComponent;
 });
