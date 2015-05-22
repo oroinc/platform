@@ -5,9 +5,10 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oro/filter/datetime-filter',
+    'oro/filter/choice-filter',
     'oroentity/js/field-choice',
     'oroquerydesigner/js/field-condition'
-], function($, _, __, DateTimeFilter) {
+], function($, _, __, DateTimeFilter, ChoiceFilter) {
     'use strict';
 
     $.widget('oroauditquerydesigner.dataAuditCondition', $.oroquerydesigner.fieldCondition, {
@@ -50,11 +51,22 @@ define([
                 }
             }, this.element.data('value'));
 
-            this.$changeStateChoice = $(this.options.changeStateTpl({
-                selected: data.criterion.data.auditFilter.type,
-                changedLabel: __('oro.dataaudit.data_audit_condition.changed'),
-                changedToValueLabel: __('oro.dataaudit.data_audit_condition.changed_to_value')
-            }));
+            this.auditTypeFilter = new ChoiceFilter({
+                caret: '',
+                templateSelector: '#simple-choice-filter-template-embedded',
+                choices: {
+                    changed: __('oro.dataaudit.data_audit_condition.changed'),
+                    changed_to_value: __('oro.dataaudit.data_audit_condition.changed_to_value')
+                }
+            });
+            this.auditTypeFilter.setValue({
+                type: data.criterion.data.auditFilter.type
+            });
+            this.auditTypeFilter.on('update', _.bind(this._onUpdate, this));
+
+            this.$changeStateChoice = $('<span>')
+                .css('display', 'inline-block')
+                .html(this.auditTypeFilter.render().$el);
 
             var filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
@@ -73,41 +85,39 @@ define([
             this.auditFilter.value = data.criterion.data.auditFilter.data;
             this.auditFilter.on('update', _.bind(this._onUpdate, this));
 
-            this.$fieldChoice.after($('<div class="active-filter">').html(this.auditFilter.render().$el));
-            this.auditFilter.$el.find('.dropdown:first').after(this.$changeStateChoice);
-            var $select = this.$changeStateChoice.find('select');
-            this.$filterContainer.css('display', 'block');
+            this.$auditFilterContainer = $('<div class="active-filter">').html(this.auditFilter.render().$el);
+            this.$filterContainer.after(this.$auditFilterContainer);
 
             this._on(this.auditFilter.$el, {
                 change: function () {
                     this.auditFilter.applyValue();
                 }
             });
-            this._on(this.$changeStateChoice, {
-                change: function () {
-                    this._onUpdate();
-                }
-            });
-
             var onChangeCb = {
                 'changed': this._renderChangedChoice,
                 'changed_to_value': this._renderChangedToValueChoice
             };
-            onChangeCb[$select.val()].apply(this);
-
-            $select.on('change', _.bind(function (e) {
-                onChangeCb[$(e.currentTarget).val()].apply(this);
-            }, this));
+            this._on(this.auditTypeFilter.$el, {
+                change: function () {
+                    this.auditTypeFilter.applyValue();
+                    onChangeCb[this.auditTypeFilter.value.type].apply(this);
+                }
+            });
+            onChangeCb[this.auditTypeFilter.value.type].apply(this);
 
             this.element.data('value', data);
         },
 
         _renderChangedChoice: function () {
             this.$filterContainer.hide();
+            this.$auditFilterContainer.css('display', 'inline');
+            this.auditFilter.$el.find('> .dropdown:last').before(this.$changeStateChoice);
         },
 
         _renderChangedToValueChoice: function () {
             this.$filterContainer.show();
+            this.$auditFilterContainer.css('display', 'block');
+            this.filter.$el.find('> .dropdown:last').before(this.$changeStateChoice);
         },
 
         _getFilterCriterion: function () {
@@ -130,7 +140,7 @@ define([
                 }
             }
             if (this.$changeStateChoice) {
-                auditFilter.type = this.$changeStateChoice.find('select').val();
+                auditFilter.type = this.auditTypeFilter.value.type;
             }
 
             return {
