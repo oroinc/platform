@@ -85,9 +85,16 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSubject()
     {
-        $testEntity          = new \stdClass();
+        $testEntity = new \stdClass();
         $testEntity->subject = 'test';
         $this->assertEquals('test', $this->provider->getSubject($testEntity));
+    }
+
+    public function testGetDescription()
+    {
+        $testEntity = new \stdClass();
+        $testEntity->description = 'test';
+        $this->assertEquals('test', $this->provider->getDescription($testEntity));
     }
 
     public function testGetEmptySubject()
@@ -98,7 +105,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTargetEntityClasses()
     {
-        $correctTarget    = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
+        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
         $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
         $this->configManager->expects($this->once())
             ->method('getIds')
@@ -128,7 +135,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
-        $configId     = new EntityConfigId('entity', 'Test\Entity');
+        $configId = new EntityConfigId('entity', 'Test\Entity');
         $entityConfig = new Config($configId);
         $userConfig = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
@@ -170,6 +177,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
         $testEntity = new \stdClass();
         $testEntity->subject = 'testSubject';
+        $testEntity->description = 'testDescription';
 
         $this->testActivityProvider->setTargets([new \stdClass()]);
         $this->doctrineHelper->expects($this->any())
