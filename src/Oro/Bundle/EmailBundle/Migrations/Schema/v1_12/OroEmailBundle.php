@@ -26,7 +26,7 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     {
         self::changeEmailToEmailBodyRelation($schema);
         self::splitEmailEntity($schema);
-        self::updateEmailSecurity($queries);
+        self::updateEntityConfigs($queries);
         self::addPostQueries($queries);
     }
 
@@ -91,7 +91,7 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     /**
      * @param QueryBag $queries
      */
-    public static function updateEmailSecurity(QueryBag $queries)
+    public static function updateEntityConfigs(QueryBag $queries)
     {
         $queries->addQuery(
             new UpdateEntityConfigEntityValueQuery(
@@ -99,6 +99,14 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
                 'security',
                 'permissions',
                 'VIEW;CREATE;EDIT'
+            )
+        );
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\EmailBundle\Entity\Email',
+                'activity',
+                'route',
+                'oro_email_activity_view'
             )
         );
     }

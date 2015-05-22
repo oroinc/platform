@@ -1,0 +1,17 @@
+oro_email_email_user_view:
+    type: entity
+    class: OroEmailBundle:EmailUser
+    permission: VIEW
+    group_name: ""
+
+oro_email_email_user_create:
+    type: entity
+    class: OroEmailBundle:EmailUser
+    permission: CREATE
+    group_name: ""
+
+oro_email_email_user_edit:
+    type: entity
+    class: OroEmailBundle:EmailUser
+    permission: EDIT
+    group_name: ""
