@@ -5,8 +5,6 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 class ConfigBagTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -23,31 +21,13 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
         unset($this->container);
     }
 
-    /**
-     * @dataProvider propertiesDataProvider
-     *
-     * @param string $property
-     * @param array  $value
-     */
-    public function testSettersAndGetters($property, $value)
+    public function testGetConfig()
     {
-        $obj = new ConfigBag([], $this->container);
+        $config = ['key' => 'value'];
 
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $accessor->setValue($obj, $property, $value);
-        $this->assertEquals($value, $accessor->getValue($obj, $property));
-    }
+        $configBag = new ConfigBag($config, $this->container);
 
-    public function propertiesDataProvider()
-    {
-        return [
-            [
-                'config',
-                [
-                    'key' => 'value'
-                ],
-            ]
-        ];
+        $this->assertEquals($config, $configBag->getConfig());
     }
 
     public function testGetNullDataTransformer()
@@ -66,7 +46,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataTransformer()
     {
-        $transformer = $this->getMock('Oro\Bundle\ConfigBundle\Model\Data\Transformer\TransformerInterface');
+        $transformer = $this->getMock('Oro\Bundle\ConfigBundle\Config\DataTransformerInterface');
         $this->container->expects($this->once())
             ->method('get')
             ->with('test.service')
@@ -84,15 +64,16 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($transformer, $configBag->getDataTransformer('test_key'));
     }
 
+    /**
+     * @expectedException \Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\ConfigBundle\Config\DataTransformerInterface"
+     */
     public function testGetDataTransformerWithUnexpectedType()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
-
-        $transformer = $this->getMock('Oro\Bundle\ConfigBundle\Tests\Unit\Model\Data\Transformer');
         $this->container->expects($this->once())
             ->method('get')
             ->with('test.service')
-            ->will($this->returnValue($transformer));
+            ->will($this->returnValue(new \stdClass()));
         $config    = [
             'fields' => [
                 'test_key' => [

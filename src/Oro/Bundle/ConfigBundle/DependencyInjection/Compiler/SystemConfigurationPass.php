@@ -16,11 +16,11 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class SystemConfigurationPass implements CompilerPassInterface
 {
-    const CONFIG_BAG_SERVICE            = 'oro_config.config_bag';
+    const CONFIG_BAG_SERVICE = 'oro_config.config_bag';
     const CONFIG_DEFINITION_BAG_SERVICE = 'oro_config.config_definition_bag';
-    const CONFIG_PROVIDER_TAG_NAME      = 'oro_config.configuration_provider';
+    const CONFIG_PROVIDER_TAG_NAME = 'oro_config.configuration_provider';
 
-    const SCOPE_MANAGER_TAG_NAME  = 'oro_config.scope';
+    const SCOPE_MANAGER_TAG_NAME = 'oro_config.scope';
     const MAIN_MANAGER_SERVICE_ID = 'oro_config.manager';
 
     const API_MANAGER_SERVICE_ID = 'oro_config.manager.api';
@@ -40,17 +40,9 @@ class SystemConfigurationPass implements CompilerPassInterface
             new Processor(),
             $this->getDeclaredVariableNames($settings)
         );
-        $config         = $this->loadConfig($container, $processor);
-        $taggedServices = $container->findTaggedServiceIds(self::CONFIG_BAG_SERVICE);
-        if ($taggedServices) {
-            $config = $processor->process($config);
-
-            foreach ($taggedServices as $id => $attributes) {
-                $container
-                    ->getDefinition($id)
-                    ->replaceArgument(0, $config);
-            }
-        }
+        $config    = $this->loadConfig($container, $processor);
+        $config    = $processor->process($config);
+        $container->getDefinition(self::CONFIG_BAG_SERVICE)->replaceArgument(0, $config);
 
         // find managers
         $managers       = [];
@@ -124,6 +116,7 @@ class SystemConfigurationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder   $container
      * @param ProcessorDecorator $processor
+     *
      * @return array
      */
     protected function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor)

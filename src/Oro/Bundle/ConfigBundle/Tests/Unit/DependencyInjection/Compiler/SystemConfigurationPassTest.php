@@ -31,7 +31,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $bundle  = new TestBundle();
-        $bundles = array($bundle->getName() => get_class($bundle));
+        $bundles = [$bundle->getName() => get_class($bundle)];
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles);
@@ -59,44 +59,30 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $bagServiceDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $bagServiceDef       = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-        $providerServiceDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $configBagServiceDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->container->expects($this->exactly(2))
+        $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
             ->will(
-                $this->returnCallback(
-                    function ($input) {
-                        if ($input === SystemConfigurationPass::CONFIG_BAG_SERVICE) {
-                            return [
-                                'provider_service' => [
-                                    ['scope' => 'app']
-                                ]
-                            ];
-                        }
-
-                        if ($input === SystemConfigurationPass::SCOPE_MANAGER_TAG_NAME) {
-                            return [
-                                'first_scope_service' => [
-                                    ['scope' => 'app', 'priority' => 100]
-                                ],
-                                'second_scope_service' => [
-                                    ['scope' => 'user', 'priority' => -100]
-                                ]
-                            ];
-                        }
-
-                        return [];
-                    }
+                $this->returnValue(
+                    [
+                        'first_scope_service'  => [
+                            ['scope' => 'app', 'priority' => 100]
+                        ],
+                        'second_scope_service' => [
+                            ['scope' => 'user', 'priority' => -100]
+                        ]
+                    ]
                 )
             );
-        $apiManagerServiceDef     = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $apiManagerServiceDef    = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-        $configManagerServiceDef     = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $configManagerServiceDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
         $this->container->expects($this->exactly(4))
@@ -105,9 +91,9 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         [SystemConfigurationPass::CONFIG_DEFINITION_BAG_SERVICE, $bagServiceDef],
-                        ['provider_service', $providerServiceDef],
-                        [SystemConfigurationPass::MAIN_MANAGER_SERVICE_ID, $configManagerServiceDef],
+                        [SystemConfigurationPass::CONFIG_BAG_SERVICE, $configBagServiceDef],
                         [SystemConfigurationPass::API_MANAGER_SERVICE_ID, $apiManagerServiceDef],
+                        [SystemConfigurationPass::MAIN_MANAGER_SERVICE_ID, $configManagerServiceDef],
                     ]
                 )
             );
@@ -117,7 +103,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $bagServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'));
-        $providerServiceDef->expects($this->once())
+        $configBagServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'));
         $this->compiler->process($this->container);

@@ -3,10 +3,9 @@
 namespace Oro\Bundle\ConfigBundle\Config;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-use Oro\Bundle\ConfigBundle\Model\Data\Transformer\TransformerInterface;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 
 class ConfigBag
 {
@@ -17,10 +16,10 @@ class ConfigBag
     protected $container;
 
     /**
-     * @param ContainerInterface $container
      * @param array              $config
+     * @param ContainerInterface $container
      */
-    public function __construct(array $config = [], ContainerInterface $container = null)
+    public function __construct(array $config, ContainerInterface $container)
     {
         $this->config    = $config;
         $this->container = $container;
@@ -37,39 +36,26 @@ class ConfigBag
     }
 
     /**
-     * Sets config
-     *
-     * @param array $config
-     *
-     * @return self
-     */
-    public function setConfig(array $config)
-    {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    /**
      * Returns specified data transformer
      *
      * @param $key
      *
-     * @return TransformerInterface|null
+     * @return DataTransformerInterface|null
      *
-     * @throws UnexpectedTypeException if transformer is not instance of TransformerInterface
+     * @throws UnexpectedTypeException if transformer is not instance of DataTransformerInterface
      */
     public function getDataTransformer($key)
     {
-        $transformer = null;
-        if (!empty($this->config['fields'][$key]['data_transformer'])) {
-            $transformer = $this->container->get($this->config['fields'][$key]['data_transformer']);
-            if ($transformer !== null && !$transformer instanceof TransformerInterface) {
-                throw new UnexpectedTypeException(
-                    $transformer,
-                    'Oro\Bundle\ConfigBundle\Model\Data\Transformer\TransformerInterface'
-                );
-            }
+        if (!isset($this->config['fields'][$key]['data_transformer'])) {
+            return null;
+        }
+
+        $transformer = $this->container->get($this->config['fields'][$key]['data_transformer']);
+        if ($transformer !== null && !$transformer instanceof DataTransformerInterface) {
+            throw new UnexpectedTypeException(
+                $transformer,
+                'Oro\Bundle\ConfigBundle\Config\DataTransformerInterface'
+            );
         }
 
         return $transformer;
