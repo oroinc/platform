@@ -21,7 +21,7 @@ define(function (require) {
             initialize: function (options) {
                 WorkflowViewerComponent.__super__.initialize.apply(this, arguments);
                 this._sourceElement = options._sourceElement;
-                this.model = workflowModelFactory.create(options);
+                this.model = workflowModelFactory.createWorkflowModel(options);
                 this.initViews();
             },
 

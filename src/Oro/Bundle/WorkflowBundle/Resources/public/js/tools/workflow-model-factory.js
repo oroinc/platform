@@ -20,53 +20,12 @@ define(function (require) {
          * Creates workflow model
          *
          * @param {Object} options
-         * @returns {WorkflowModel|*}
+         * @returns {WorkflowModel}
          */
-        create: function (options) {
-            this.model = this.createWorkflowModel(options);
-            this.addStartingStep();
-            return this.model;
-        },
-
-        /**
-         * Adds a starting step to workflow model
-         */
-        addStartingStep: function () {
-            this.model.get('steps').add(this._createStartingStep());
-        },
-
-        /**
-         * Creates a starting step
-         *
-         * @returns {StepModel}
-         * @private
-         */
-        _createStartingStep: function () {
-            var startStepModel = new StepModel({
-                name: 'step:starting_point',
-                label: __('(Start)'),
-                order: -1,
-                _is_start: true
-            });
-
-            startStepModel
-                .getAllowedTransitions(this.model)
-                .reset(this.model.getStartTransitions());
-
-            return startStepModel;
-        },
-
-        /**
-         * Helper function. Callback for _.map;
-         *
-         * @param {Object} config
-         * @param {string} name
-         * @returns {Object}
-         * @private
-         */
-        _mergeName: function (config, name) {
-            config.name = name;
-            return config;
+        createWorkflowModel: function (options) {
+            var model = this._createWorkflowModel(options);
+            this.addStartingStep(model);
+            return model;
         },
 
         /**
@@ -74,8 +33,9 @@ define(function (require) {
          *
          * @param {Object} options
          * @returns {WorkflowModel}
+         * @private
          */
-        createWorkflowModel: function (options) {
+        _createWorkflowModel: function (options) {
             var workflowModel, configuration;
 
             configuration = options.entity.configuration;
@@ -98,6 +58,49 @@ define(function (require) {
             workflowModel.url = options._sourceElement.attr('action');
 
             return workflowModel;
+        },
+
+        /**
+         * Adds a starting step to workflow model
+         * @param {WorkflowModel} model
+         */
+        addStartingStep: function (model) {
+            model.get('steps').add(this._createStartingStep(model));
+        },
+
+        /**
+         * Creates a starting step
+         *
+         * @param {WorkflowModel} model
+         * @returns {StepModel}
+         * @private
+         */
+        _createStartingStep: function (model) {
+            var startStepModel = new StepModel({
+                name: 'step:starting_point',
+                label: __('(Start)'),
+                order: -1,
+                _is_start: true
+            });
+
+            startStepModel
+                .getAllowedTransitions(model)
+                .reset(model.getStartTransitions());
+
+            return startStepModel;
+        },
+
+        /**
+         * Helper function. Callback for _.map;
+         *
+         * @param {Object} config
+         * @param {string} name
+         * @returns {Object}
+         * @private
+         */
+        _mergeName: function (config, name) {
+            config.name = name;
+            return config;
         }
     };
 });

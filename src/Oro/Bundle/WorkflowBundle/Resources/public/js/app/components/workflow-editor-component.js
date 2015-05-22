@@ -19,6 +19,7 @@ define(function (require) {
         TransitionEditFormView = require('oroworkflow/js/workflow-management/transition/view/edit'),
         StepEditView = require('oroworkflow/js/workflow-management/step/view/edit'),
         StepModel = require('oroworkflow/js/workflow-management/step/model'),
+        workflowModelFactory = require('../../tools/workflow-model-factory'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
@@ -209,7 +210,7 @@ define(function (require) {
             resetCollection(this.model.get('transition_definitions'));
             resetCollection(this.model.get('transitions'));
 
-            this.addStartingStep();
+            workflowModelFactory.addStartingStep(this.model);
         },
 
         /**
