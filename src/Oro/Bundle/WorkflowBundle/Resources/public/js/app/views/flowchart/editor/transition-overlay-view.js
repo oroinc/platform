@@ -42,7 +42,7 @@ define(function (require) {
         },
 
         updateAttributes: function () {
-            console.log('I\'m in');
+            // console.log('I\'m in');
         }
 
     });
