@@ -6,8 +6,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProvidersPass;
-use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\AfterWidgetProviderPass;
-use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\BeforeWidgetProviderPass;
 
 class OroActivityListBundle extends Bundle
 {
@@ -18,7 +16,6 @@ class OroActivityListBundle extends Bundle
     {
         parent::build($container);
 
-        $container
-            ->addCompilerPass(new ActivityListProvidersPass());
+        $container->addCompilerPass(new ActivityListProvidersPass());
     }
 }
