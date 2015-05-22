@@ -3,8 +3,7 @@ define(function() {
     'use strict';
 
     /**
-     * @export  oroworkflow/js/workflow-management/helper
-     * @class   oro.WorkflowManagement.Helper
+     * @export  oroworkflow/js/tools/workflow-helper
      */
     return {
         getNameByString: function(str, prefix) {

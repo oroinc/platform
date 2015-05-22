@@ -1,17 +1,17 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'chaplin', 'jquery', 'oroui/js/messenger', 'oro/dialog-widget',
-    'oroworkflow/js/workflow-management/helper',
-    'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list', 'jquery.validate'
-],
-function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, TransitionsListView) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/step/view/edit
-     * @class   oro.WorkflowManagement.StepEditView
-     * @extends Chaplin.View
-     */
-    return Chaplin.View.extend({
+    var StepEditView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        __ = require('orotranslation/js/translator'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        DialogWidget = require('oro/dialog-widget'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
+        TransitionsListView = require('../transition/transition-list-view');
+
+    StepEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -35,11 +35,11 @@ function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, Transitio
         },
 
         onStepAdd: function() {
-            var formData = Helper.getFormData(this.widget.form);
+            var formData = helper.getFormData(this.widget.form);
             var order = parseInt(formData.order);
 
             if (!this.model.get('name')) {
-                this.model.set('name', Helper.getNameByString(formData.label, 'step_'));
+                this.model.set('name', helper.getNameByString(formData.label, 'step_'));
             }
             this.model.set('order', order > 0 ? order : 0);
             this.model.set('is_final', formData.hasOwnProperty('is_final'));
@@ -63,7 +63,7 @@ function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, Transitio
             if (this.transitionsListView) {
                 this.transitionsListView.remove();
             }
-            Chaplin.View.prototype.remove.call(this);
+            StepEditView.__super__.remove.call(this);
         },
 
         renderTransitions: function() {
@@ -130,4 +130,6 @@ function(_, __, Chaplin, $, messenger, DialogWidget, Helper, mediator, Transitio
             return this;
         }
     });
+
+    return StepEditView;
 });

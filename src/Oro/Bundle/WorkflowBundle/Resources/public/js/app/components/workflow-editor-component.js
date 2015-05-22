@@ -13,12 +13,12 @@ define(function (require) {
         messenger = require('oroui/js/messenger'),
         tools = require('oroui/js/tools'),
         routing = require('routing'),
-        helper = require('oroworkflow/js/workflow-management/helper'),
-        WorkflowManagementView = require('oroworkflow/js/workflow-management'),
-        TransitionModel = require('oroworkflow/js/workflow-management/transition/model'),
-        TransitionEditFormView = require('oroworkflow/js/workflow-management/transition/view/edit'),
-        StepEditView = require('oroworkflow/js/workflow-management/step/view/edit'),
-        StepModel = require('oroworkflow/js/workflow-management/step/model'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
+        WorkflowManagementView = require('../views/workflow-management-view'),
+        TransitionModel = require('../models/transition-model'),
+        TransitionEditFormView = require('../views/transition/transition-edit-view'),
+        StepEditView = require('../views/step/step-edit-view'),
+        StepModel = require('../models/step-model'),
         workflowModelFactory = require('../../tools/workflow-model-factory'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 

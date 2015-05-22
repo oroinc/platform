@@ -1,14 +1,13 @@
 /* global define */
-define(['underscore', 'backbone', 'jquery'],
-function(_, Chaplin, $) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/transition/view/row
-     * @class   oro.WorkflowManagement.TransitionRowView
-     * @extends Backbone.View
-     */
-    return Chaplin.View.extend({
+    var TransitionRowView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        BaseView = require('oroui/js/app/views/base/view');
+
+    TransitionRowView = BaseView.extend({
         tagName: 'tr',
 
         events: {
@@ -48,4 +47,6 @@ function(_, Chaplin, $) {
             return this;
         }
     });
+
+    return TransitionRowView;
 });

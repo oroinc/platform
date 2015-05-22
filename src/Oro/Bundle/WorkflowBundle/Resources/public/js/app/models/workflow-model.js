@@ -1,35 +1,23 @@
 /* global define */
-define(['underscore', 'jquery', 'backbone', 'oroworkflow/js/workflow-management/helper',
-    'orotranslation/js/translator',
-    'oroworkflow/js/workflow-management/step/collection',
-    'oroworkflow/js/workflow-management/transition/collection',
-    'oroworkflow/js/workflow-management/transition-definition/collection',
-    'oroworkflow/js/workflow-management/attribute/collection',
-    'oroworkflow/js/workflow-management/step/model',
-    'oroworkflow/js/workflow-management/transition/model',
-    'oroworkflow/js/workflow-management/transition-definition/model',
-    'oroworkflow/js/workflow-management/attribute/model',
-    'oroentity/js/entity-fields-util'
-],
-function(_, $, Backbone, Helper, __,
-     StepCollection,
-     TransitionCollection,
-     TransitionDefinitionCollection,
-     AttributeCollection,
-     StepModel,
-     TransitionModel,
-     TransitionDefinitionModel,
-     AttributeModel,
-     EntityFieldsUtil
-) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/workflow/model
-     * @class   oro.workflowManagement.WorkflowModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var WorkflowModel,
+        _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
+        BaseModel = require('oroui/js/app/models/base/model'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
+        StepCollection = require('./step-collection'),
+        TransitionCollection = require('./transition-collection'),
+        TransitionDefinitionCollection = require('./transition-definition-collection'),
+        AttributeCollection = require('./attribute-collection'),
+        StepModel = require('./step-model'),
+        TransitionModel = require('./transition-model'),
+        TransitionDefinitionModel = require('oroworkflow/js/app/models/transition-definition-model'),
+        AttributeModel = require('./attribute-model'),
+        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+
+    WorkflowModel = BaseModel.extend({
         defaults: {
             name: '',
             label: '',
@@ -95,8 +83,8 @@ function(_, $, Backbone, Helper, __,
                 cloned.transition_definition = transitionDefinition.get('name');
             }
 
-            cloned.frontend_options = Helper.deepClone(cloned.frontend_options);
-            cloned.form_options = Helper.deepClone(cloned.form_options);
+            cloned.frontend_options = helper.deepClone(cloned.frontend_options);
+            cloned.form_options = helper.deepClone(cloned.form_options);
             cloned.label = __('Copy of') + ' ' + cloned.label;
             if (doNotAddToCollection) {
                 cloned._is_clone = true;
@@ -147,7 +135,7 @@ function(_, $, Backbone, Helper, __,
 
         _getClonedItem: function(item) {
             var cloned = _.clone(item.toJSON());
-            cloned.name += '_clone_' + Helper.getRandomId();
+            cloned.name += '_clone_' + helper.getRandomId();
 
             return cloned;
         },
@@ -222,4 +210,6 @@ function(_, $, Backbone, Helper, __,
             return _.first(this.get(item).where({'name': name}));
         }
     });
+
+    return WorkflowModel;
 });

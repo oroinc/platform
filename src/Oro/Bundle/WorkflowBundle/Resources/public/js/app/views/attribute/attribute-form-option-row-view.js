@@ -1,20 +1,15 @@
 /* global define */
-define([
-    'underscore',
-    'orotranslation/js/translator',
-    'chaplin',
-    'jquery',
-    'oroui/js/delete-confirmation'
-],
-function(_, __, Chaplin, $, Confirmation) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/attribute/form-option-view/row
-     * @class   oro.WorkflowManagement.AttributeFormOptionRowView
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
+    var AttributeFormOptionRowView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        __ = require('orotranslation/js/translator'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        Confirmation = require('oroui/js/delete-confirmation');
+
+    AttributeFormOptionRowView = BaseView.extend({
         tagName: 'tr',
 
         events: {
@@ -64,4 +59,6 @@ function(_, __, Chaplin, $, Confirmation) {
             return this;
         }
     });
+
+    return AttributeFormOptionRowView;
 });

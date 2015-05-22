@@ -1,22 +1,22 @@
 /* global define */
-define([
-    'underscore', 'chaplin', 'jquery', 'orotranslation/js/translator',
-    'oroworkflow/js/workflow-management/step/view/list',
-    'oroui/js/delete-confirmation',
-    'oroentity/js/fields-loader'
-],
-function (_, Chaplin, $, __,
-     StepsListView,
-     Confirmation
-) {
+define(function (require) {
     'use strict';
+
+    var WorkflowManagementView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        __ = require('orotranslation/js/translator'),
+        Confirmation = require('oroui/js/delete-confirmation'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        StepsListView = require('./step/step-list-view');
+    require('oroentity/js/fields-loader');
 
     /**
      * @export  oroworkflow/js/workflow-management
      * @class   oro.WorkflowManagement
      * @extends Backbone.View
      */
-    return Chaplin.View.extend({
+    WorkflowManagementView = BaseView.extend({
         events: {
             'click .add-step-btn': 'addNewStep',
             'click .add-transition-btn': 'addNewTransition',
@@ -182,4 +182,6 @@ function (_, Chaplin, $, __,
             return this.$el.valid();
         }
     });
+
+    return WorkflowManagementView;
 });

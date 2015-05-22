@@ -1,14 +1,13 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/transition/collection'],
-function(_, Backbone, TransitionCollection) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/step/model
-     * @class   oro.workflowManagement.StepModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var StepModel,
+        _ = require('underscore'),
+        TransitionCollection = require('oroworkflow/js/app/models/transition-collection'),
+        BaseModel = require('oroui/js/app/models/base/model');
+
+    StepModel = BaseModel.extend({
         defaults: {
             name: null,
             label: null,
@@ -92,7 +91,9 @@ function(_, Backbone, TransitionCollection) {
                 removeTransitions(this.workflow.get('transitions').where({'step_to': this.get('name')}));
             }
 
-            Backbone.Model.prototype.destroy.call(this, options);
+            StepModel.__super__.destroy.call(this, options);
         }
     });
+
+    return StepModel;
 });

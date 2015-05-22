@@ -1,21 +1,19 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'chaplin', 'jquery', 'oro/dialog-widget',
-    'oroworkflow/js/workflow-management/helper',
-    'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
-    'oroworkflow/js/workflow-management/attribute/form-option-view/list',
-    'jquery.validate'],
-function (_, __, Chaplin, $, DialogWidget,
-         Helper,
-         AttributeFormOptionEditView,
-         AttributeFormOptionListView) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/transition/view/edit
-     * @class   oro.WorkflowManagement.TransitionEditView
-     * @extends Backbone.View
-     */
-    return Chaplin.View.extend({
+    var TransitionEditView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        __ = require('orotranslation/js/translator'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        DialogWidget = require('oro/dialog-widget'),
+        helper = require('oroworkflow/js/tools/workflow-helper'),
+        AttributeFormOptionEditView = require('../attribute/attribute-form-option-edit-view'),
+        AttributeFormOptionListView = require('../attribute/attribute-form-option-list-view');
+    require('jquery.validate');
+
+    TransitionEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -84,7 +82,7 @@ function (_, __, Chaplin, $, DialogWidget,
         },
 
         updateExampleView: function() {
-            var formData = Helper.getFormData(this.widget.form);
+            var formData = helper.getFormData(this.widget.form);
             formData.transition_prototype_icon = formData.transition_prototype_icon ||
                 this._getFrontendOption('icon');
             if (formData.transition_prototype_icon || formData.label) {
@@ -95,9 +93,9 @@ function (_, __, Chaplin, $, DialogWidget,
         },
 
         onTransitionAdd: function() {
-            var formData = Helper.getFormData(this.widget.form);
+            var formData = helper.getFormData(this.widget.form);
             if (!this.model.get('name')) {
-                this.model.set('name', Helper.getNameByString(formData.label, 'transition_'));
+                this.model.set('name', helper.getNameByString(formData.label, 'transition_'));
             }
             this.model.set('label', formData.label);
             this.model.set('step_to', formData.step_to);
@@ -169,7 +167,7 @@ function (_, __, Chaplin, $, DialogWidget,
         renderAttributesList: function(el) {
             this.attributesList = new AttributeFormOptionListView({
                 el: el.find('.transition-attributes-list-container'),
-                collection: this.getFormOptions(),
+                items: this.getFormOptions(),
                 fields_selector_el: this.attributesFormView.getFieldSelector(),
                 workflow: this.options.workflow
             });
@@ -227,7 +225,7 @@ function (_, __, Chaplin, $, DialogWidget,
             if (this.attributesList) {
                 this.attributesList.remove();
             }
-            Chaplin.View.prototype.remove.call(this);
+            TransitionEditView.__super__.remove.call(this);
         },
 
         renderWidget: function() {
@@ -305,4 +303,6 @@ function (_, __, Chaplin, $, DialogWidget,
             return this;
         }
     });
+
+    return TransitionEditView;
 });

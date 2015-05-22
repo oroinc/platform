@@ -1,14 +1,12 @@
 /* global define */
-define(['underscore', 'backbone'],
-function(_, Backbone) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/transition/model
-     * @class   oro.workflowManagement.TransitionModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var TransitionModel,
+        _ = require('underscore'),
+        BaseModel = require('oroui/js/app/models/base/model');
+
+    TransitionModel = BaseModel.extend({
         defaults: {
             name: null,
             label: null,
@@ -58,7 +56,9 @@ function(_, Backbone) {
                 transitionDefinition.destroy();
             }
 
-            Backbone.Model.prototype.destroy.call(this, options);
+            TransitionModel.__super__.destroy.call(this, options);
         }
     });
+
+    return TransitionModel;
 });

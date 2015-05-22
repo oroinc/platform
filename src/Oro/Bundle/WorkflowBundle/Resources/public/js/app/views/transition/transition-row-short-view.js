@@ -1,14 +1,13 @@
 /* global define */
-define(['underscore', 'chaplin', 'jquery'],
-function(_, Chaplin) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/transition/view/row-short
-     * @class   oro.WorkflowManagement.TransitionsShortRowView
-     * @extends Backbone.View
-     */
-    return Chaplin.View.extend({
+    var TransitionsShortRowView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        BaseView = require('oroui/js/app/views/base/view');
+
+    TransitionsShortRowView = BaseView.extend({
         tagName: 'li',
 
         events: {
@@ -59,4 +58,6 @@ function(_, Chaplin) {
             return this;
         }
     });
+
+    return TransitionsShortRowView;
 });

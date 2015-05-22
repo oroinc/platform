@@ -1,14 +1,11 @@
 /* global define */
-define(['backbone'],
-function(Backbone) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/attribute/model
-     * @class   oro.workflowManagement.AttributeModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var AttributeModel,
+        BaseModel = require('oroui/js/app/models/base/model');
+
+    AttributeModel = BaseModel.extend({
         defaults: {
             name: null,
             label: null,
@@ -24,4 +21,6 @@ function(Backbone) {
             }
         }
     });
+
+    return AttributeModel;
 });

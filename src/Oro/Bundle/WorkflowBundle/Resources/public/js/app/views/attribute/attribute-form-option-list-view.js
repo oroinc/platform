@@ -1,26 +1,21 @@
 /* global define */
-define([
-    'underscore',
-    'chaplin',
-    'jquery',
-    'oroworkflow/js/workflow-management/attribute/form-option-view/row'
-],
-function(_, Chaplin, $, AttributeFormOptionRowView) {
+define(function (require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/attribute/form-option-view/list
-     * @class   oro.WorkflowManagement.AttributeFormOptionListView
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
+    var AttributeFormOptionListView,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        AttributeFormOptionRowView = require('./attribute-form-option-row-view');
+
+    AttributeFormOptionListView = BaseView.extend({
         options: {
             listElBodyEl: 'tbody',
             template: null,
-            fields_selector_el: null,
+            'fields_selector_el': null,
             workflow: null,
-            collection: [],
-            entity_field_template: null
+            items: [],
+            'entity_field_template': null
         },
 
         initialize: function (options) {
@@ -116,12 +111,12 @@ function(_, Chaplin, $, AttributeFormOptionRowView) {
         },
 
         getCollection: function() {
-            return this.options.collection;
+            return this.options.items;
         },
 
         remove: function() {
             this.resetView();
-            Backbone.View.prototype.remove.call(this);
+            AttributeFormOptionListView.__super__.remove.call(this);
         },
 
         resetView: function() {
@@ -144,4 +139,6 @@ function(_, Chaplin, $, AttributeFormOptionRowView) {
             return this;
         }
     });
+
+    return AttributeFormOptionListView;
 });
