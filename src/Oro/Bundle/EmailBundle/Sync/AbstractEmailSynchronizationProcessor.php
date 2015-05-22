@@ -5,17 +5,17 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
+use Oro\Bundle\UserBundle\Entity\User;
 
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
@@ -81,7 +81,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         ) {
             return $this->emailOriginUsers[$origin->getId()];
         }
-
         $this->logger->notice(sprintf('Finding an user for email origin "%s" ...', (string)$origin));
         $qb = $this->em->getRepository('Oro\Bundle\UserBundle\Entity\User')
             ->createQueryBuilder('u')
@@ -90,7 +89,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             ->where('o.id = :originId')
             ->setParameter('originId', $origin->getId())
             ->setMaxResults(1);
-
         $result = $qb->getQuery()->getArrayResult();
         $userId = !empty($result) ? $result[0]['id'] : null;
         if ($userId === null) {
@@ -229,7 +227,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      *
      * @return EmailUser
      */
-    protected function addEmail(EmailHeader $email, EmailFolder $folder, $isSeen = false)
+    protected function addEmailUser(EmailHeader $email, EmailFolder $folder, $isSeen = false)
     {
         $emailUser = $this->emailEntityBuilder->emailUser(
             $email->getSubject(),

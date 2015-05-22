@@ -224,6 +224,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     public function removeEmails()
     {
+        $this->emailUsers = [];
         $this->emails = [];
     }
 
@@ -234,7 +235,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function persistEmails(EntityManager $em)
     {
-        $this->processDuplicateEmails($em); // todo CRM-2480
+        $this->processDuplicateEmails($em);
         foreach ($this->emails as $email) {
             $em->persist($email);
         }
