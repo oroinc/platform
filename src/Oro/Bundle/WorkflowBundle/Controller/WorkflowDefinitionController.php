@@ -98,7 +98,8 @@ class WorkflowDefinitionController extends Controller
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      */
-    protected function prepareConfiguration(WorkflowDefinition $workflowDefinition) {
+    protected function prepareConfiguration(WorkflowDefinition $workflowDefinition)
+    {
         /** @var TranslatorInterface $translator */
         $translator = $this->get('translator');
         $configuration = $workflowDefinition->getConfiguration();
