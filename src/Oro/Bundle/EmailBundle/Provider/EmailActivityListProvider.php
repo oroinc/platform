@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\EmailBundle\Tools\EmailHelper;
 
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
@@ -46,6 +47,11 @@ class EmailActivityListProvider implements
     protected $emailThreadProvider;
 
     /**
+     * @var EmailHelper
+     */
+    protected $emailHelper;
+
+    /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
      * @param ServiceLink         $nameFormatterLink
@@ -59,7 +65,8 @@ class EmailActivityListProvider implements
         ServiceLink $nameFormatterLink,
         Router $router,
         ConfigManager $configManager,
-        EmailThreadProvider $emailThreadProvider
+        EmailThreadProvider $emailThreadProvider,
+        EmailHelper $emailHelper
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -67,6 +74,7 @@ class EmailActivityListProvider implements
         $this->router               = $router;
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
+        $this->emailHelper          = $emailHelper;
     }
 
     /**
@@ -107,6 +115,23 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         return $entity->getSubject();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription($entity)
+    {
+        /** @var $entity Email */
+        if ($entity->getEmailBody()) {
+            $body = $entity->getEmailBody()->getBodyContent();
+            $content = $this->emailHelper->getStrippedBody($body);
+            $content = $this->emailHelper->getShortBody($content);
+
+            return $content;
+        }
+
+        return null;
     }
 
     /**
