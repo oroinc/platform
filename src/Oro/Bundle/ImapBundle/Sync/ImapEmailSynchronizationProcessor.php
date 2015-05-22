@@ -23,7 +23,8 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
-use Rhumsaa\Uuid\Console\Exception;
+
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -317,6 +318,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {
                 $invalid++;
+                $invalid++;
                 $this->logger->error(
                     sprintf('Error occurred while trying to process email: %s', $e->getMessage()),
                     ['exception' => $e]
@@ -427,7 +429,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 try {
                     $imapEmail = $this->createImapEmail(
                         $email->getId()->getUid(),
-                        $this->addEmail($email, $folder, $email->hasFlag("\\Seen"))->getEmail(),
+                        $this->addEmailUser($email, $folder, $email->hasFlag("\\Seen"))->getEmail(),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;
@@ -576,6 +578,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $imapEmail->getImapFolder()->getFolder()->getFullName()
             )
         );
+
+        // todo CRM-2480
         $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
         $this->em->remove($imapEmail);
     }
