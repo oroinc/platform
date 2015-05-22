@@ -85,22 +85,24 @@ define([
                 }
             });
 
+            this.typeFilter.on('update', _.bind(function () {
+                var oldEntity = this.$fieldChoice.data('entity');
+                var newEntity = this._getTypeChoiceEntity();
+
+                if (oldEntity !== newEntity) {
+                    this.$fieldChoice.fieldChoice('setValue', '');
+                    this.$filterContainer.empty();
+                    if (this.filter) {
+                        this.filter.reset();
+                    }
+                }
+
+                this.$fieldChoice.fieldChoice('updateData', newEntity, this.$fieldsLoader.data('fields'));
+            }, this));
+
             this._on(this.$typeChoice, {
                 change: function (e) {
                     this.typeFilter.applyValue();
-
-                    var oldEntity = this.$fieldChoice.data('entity');
-                    var newEntity = this._getTypeChoiceEntity();
-
-                    if (oldEntity !== newEntity) {
-                        this.$fieldChoice.fieldChoice('setValue', '');
-                        this.$filterContainer.empty();
-                        if (this.filter) {
-                            this.filter.reset();
-                        }
-                    }
-
-                    this.$fieldChoice.fieldChoice('updateData', newEntity, this.$fieldsLoader.data('fields'));
                 }
             });
         },
