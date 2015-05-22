@@ -4,7 +4,7 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         $ = require('jquery'),
         _ = require('underscore'),
-        __ = require('translator'),
+        __ = require('orotranslation/js/translator'),
         FlowchartEditorStepView;
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({
@@ -65,7 +65,7 @@ define(function (require) {
                     onMaxConnections: function (info, e) {
                         mediator.execute(
                             'showErrorMessage',
-                            __('Maximum connections ({0}) reached', info.maxConnections),
+                            __('Maximum connections ({{ maxConnections }}) reached', info),
                             e
                         );
                     }

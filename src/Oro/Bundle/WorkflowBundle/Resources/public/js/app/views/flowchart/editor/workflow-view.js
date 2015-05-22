@@ -2,6 +2,8 @@ define(function (require) {
     'use strict';
     var FlowchartEditorWorkflowView,
         _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
+        mediator = require('oroui/js/mediator'),
         FlowchartViewerWorkflowView = require('../viewer/workflow-view'),
         FlowChartEditorTransitionOverlayView = require('./transition-overlay-view'),
         FlowchartEditorStepView = require('./step-view');
@@ -23,7 +25,7 @@ define(function (require) {
             var transitionModel, startingSteps, suspendedStep,
                 stepFrom = this.findStepModelByElement(data.connection.source),
                 stepTo = this.findStepModelByElement(data.connection.target);
-            if (data.connection.suspendedElement) {
+            if (data.connection.suspendedElement && !stepTo.get('_is_start')) {
                 transitionModel = data.connection.overlayView.model;
                 startingSteps = transitionModel.getStartingSteps();
                 if (stepTo.get('name') !== transitionModel.get('step_to')) {
@@ -41,6 +43,14 @@ define(function (require) {
                 }
             } else if (!stepTo.get('_is_start')) {
                 this.model.trigger('requestAddTransition', stepFrom, stepTo);
+            } else {
+                mediator.execute(
+                    'showFlashMessage',
+                    'error',
+                    __(
+                        'Cannot set end step to <i>(Start)</i> step. Please select another one'
+                    )
+                );
             }
             // never allow jsplumb just draw new connections, create connection model instead
             return false;
