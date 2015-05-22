@@ -10,6 +10,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class IndexListener implements OptionalListenerInterface
 {
@@ -30,8 +31,14 @@ class IndexListener implements OptionalListenerInterface
 
     /**
      * @var array
+     * @deprecated since 1.8 Please use mappingProvider for mapping config
      */
     protected $entitiesConfig = [];
+
+    /**
+     * @var SearchMappingProvider
+     */
+    protected $mappingProvider;
 
     /**
      * @var array
@@ -76,10 +83,19 @@ class IndexListener implements OptionalListenerInterface
 
     /**
      * @param array $entities
+     * @deprecated since 1.8 Please use mappingProvider for mapping config
      */
     public function setEntitiesConfig(array $entities)
     {
         $this->entitiesConfig = $entities;
+    }
+
+    /**
+     * @param SearchMappingProvider $mappingProvider
+     */
+    public function setMappingProvider(SearchMappingProvider $mappingProvider)
+    {
+        $this->mappingProvider = $mappingProvider;
     }
 
     /**
@@ -173,7 +189,7 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function isSupported($entity)
     {
-        return isset($this->entitiesConfig[ClassUtils::getClass($entity)]);
+        return $this->mappingProvider->isClassSupported(ClassUtils::getClass($entity));
     }
 
     /**

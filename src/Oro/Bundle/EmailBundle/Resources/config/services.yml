@@ -54,7 +54,6 @@ parameters:
     oro_email.twig.email_security_policy.class: Twig_Sandbox_SecurityPolicy
 
     oro_email.helper.datagrid.emails.class:           Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper
-    oro_email.datagrid_query_factory.class:           Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
     oro_email.emailfolder.datagrid_view_list.class:   Oro\Bundle\EmailBundle\Datagrid\EmailFolderViewList
@@ -63,7 +62,6 @@ parameters:
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
-    oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
     oro_email.listener.datagrid.context.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\ContextGridListener
 
     # Email Action for workflows
@@ -330,12 +328,6 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
 
-    oro_email.datagrid_query_factory:
-        class: %oro_email.datagrid_query_factory.class%
-        arguments:
-            - @oro_email.email.owner.provider.storage
-            - @oro_locale.dql.formatter.name
-
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
         arguments:
@@ -400,8 +392,6 @@ services:
 
     oro_email.listener.datagrid.email:
         class: %oro_email.listener.datagrid.email.class%
-        arguments:
-            - @oro_email.datagrid_query_factory
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
@@ -413,18 +403,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
 
-    oro_email.listener.datagrid.user_emails.main:
-        class: %oro_email.listener.datagrid.user_emails.main.class%
-        arguments:
-            - @oro_email.helper.datagrid.emails
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
-
     oro_email.listener.datagrid.recent_emails.inbox:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
             - @oro_email.helper.datagrid.emails
-            - @oro_email.datagrid_query_factory
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
 

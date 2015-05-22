@@ -6,10 +6,19 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEmailBundle implements Migration
+class OroEmailBundle implements Migration, OrderedMigrationInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 1;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -86,14 +95,6 @@ class OroEmailBundle implements Migration
     {
         $queries->addQuery(
             new UpdateEntityConfigEntityValueQuery(
-                'Oro\Bundle\EmailBundle\Entity\Email',
-                'security',
-                'permissions',
-                null
-            )
-        );
-        $queries->addQuery(
-            new UpdateEntityConfigEntityValueQuery(
                 'Oro\Bundle\EmailBundle\Entity\EmailUser',
                 'security',
                 'permissions',
@@ -109,5 +110,6 @@ class OroEmailBundle implements Migration
     {
         $queries->addPostQuery(new UpdateEmailBodyRelationQuery());
         $queries->addPostQuery(new FillEmailUserTableQuery());
+        $queries->addPostQuery(new DeleteEmailPermissionConfig());
     }
 }
