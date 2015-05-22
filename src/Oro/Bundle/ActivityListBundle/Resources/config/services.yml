@@ -120,6 +120,10 @@ services:
             - @oro_entity.routing_helper
             - @oro_activity_list.provider.chain
 
+    oro_activity_list.datagrid.builder.link:
+        tags:
+            - { name: oro_service_link,  service: oro_datagrid.datagrid.builder }
+
     oro_activity_list.filter.activity_list:
         class: %oro_activity_list.filter.activity_list.class%
         arguments:
@@ -128,6 +132,6 @@ services:
             - @oro_activity_list.filter.helper
             - @oro_query_designer.query_designer.manager
             - @oro_query_designer.grid.datagrid_configuration_builder
-            - @oro_datagrid.datagrid.builder
+            - @oro_activity_list.datagrid.builder.link
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: activityList }

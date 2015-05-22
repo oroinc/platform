@@ -13,9 +13,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -44,8 +44,8 @@ class ActivityListFilter extends EntityFilter
     /** @var DatagridConfigurationBuilder */
     protected $datagridConfigurationBuilder;
 
-    /** @var Builder */
-    protected $gridBuilder;
+    /** @var ServiceLink */
+    protected $gridBuilderLink;
 
     /**
      * @param FormFactoryInterface $factory
@@ -53,7 +53,7 @@ class ActivityListFilter extends EntityFilter
      * @param ActivityListFilterHelper $activityListFilterHelper
      * @param Manager $queryDesignerManager
      * @param DatagridConfigurationBuilder $datagridConfigurationBuilder
-     * @param Builder $gridBuilder
+     * @param ServiceLink $gridBuilderLink
      */
     public function __construct(
         FormFactoryInterface $factory,
@@ -61,13 +61,13 @@ class ActivityListFilter extends EntityFilter
         ActivityListFilterHelper $activityListFilterHelper,
         Manager $queryDesignerManager,
         DatagridConfigurationBuilder $datagridConfigurationBuilder,
-        Builder $gridBuilder
+        ServiceLink $gridBuilderLink
     ) {
         parent::__construct($factory, $util);
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->queryDesignerManager = $queryDesignerManager;
         $this->datagridConfigurationBuilder = $datagridConfigurationBuilder;
-        $this->gridBuilder = $gridBuilder;
+        $this->gridBuilderLink = $gridBuilderLink;
     }
 
     /**
@@ -243,7 +243,7 @@ class ActivityListFilter extends EntityFilter
         $this->datagridConfigurationBuilder->setSource($source);
         $config = $this->datagridConfigurationBuilder->getConfiguration();
 
-        return $this->gridBuilder->build($config, new ParameterBag());
+        return $this->gridBuilderLink->getService()->build($config, new ParameterBag());
     }
 
     /**
