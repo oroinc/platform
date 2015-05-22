@@ -1,32 +1,31 @@
 define(function (require) {
     'use strict';
-    var OverlayView,
+    var FlowchartJsPlubmOverlayView,
         BaseView = require('oroui/js/app/views/base/view'),
-        JsplumbAreaView = require('./area');
+        FlowchartJsPlubmAreaView = require('./area-view');
 
-    OverlayView = BaseView.extend({
+    FlowchartJsPlubmOverlayView = BaseView.extend({
         listen: {
             'change model': 'render'
         },
 
         initialize: function (options) {
-            if (!(options.areaView instanceof JsplumbAreaView)) {
+            if (!(options.areaView instanceof FlowchartJsPlubmAreaView)) {
                 throw new Error('areaView options is required and must be a JsplumbAreaView');
             }
             this.areaView = options.areaView;
-            OverlayView.__super__.initialize.apply(this, arguments);
+            FlowchartJsPlubmOverlayView.__super__.initialize.apply(this, arguments);
         },
 
         ensureAttributes: function () {
-            // css class is updated by jsPlumb, use attribute instead
-            this.$el.attr('data-role', 'transition-overlay');
+            // empty
         },
 
         render: function () {
-            OverlayView.__super__.render.apply(this, arguments);
+            FlowchartJsPlubmOverlayView.__super__.render.apply(this, arguments);
             this.ensureAttributes();
         }
     });
 
-    return OverlayView;
+    return FlowchartJsPlubmOverlayView;
 });

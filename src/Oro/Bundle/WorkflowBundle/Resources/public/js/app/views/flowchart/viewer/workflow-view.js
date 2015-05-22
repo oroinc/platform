@@ -1,19 +1,22 @@
 define(function (require) {
     'use strict';
-    var _ = require('underscore'),
-        JsplubmAreaView = require('../jsplumb/area'),
-        JsplumbWorkflowStepView = require('./step'),
-        JsplubmTransitionView = require('./transition'),
-        JsplubmTransitionOverlayView = require('./transition-overlay'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
-        WorkflowFlowchartView;
+    var FlowchartViewerWorkflowView,
+        _ = require('underscore'),
+        FlowchartJsPlumbAreaView = require('../jsplumb/area-view'),
+        FlowchartViewerStepView = require('./step-view'),
+        FlowchartViewerTransitionView = require('./transition-view'),
+        FlowchartViewerTransitionOverlayView = require('./transition-overlay-view'),
+        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
-    WorkflowFlowchartView = JsplubmAreaView.extend({
-
-        transitionOverlayView: JsplubmTransitionOverlayView,
+    FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
+        transitionOverlayView: FlowchartViewerTransitionOverlayView,
+        stepView: FlowchartViewerStepView,
+        transitionView: FlowchartViewerTransitionView,
+        stepCollectionView: null,
+        transitionCollectionView: null,
 
         initialize: function () {
-            WorkflowFlowchartView.__super__.initialize.apply(this, arguments);
+            FlowchartViewerWorkflowView.__super__.initialize.apply(this, arguments);
         },
 
         findStepModelByElement: function (el) {
@@ -24,7 +27,7 @@ define(function (require) {
         },
 
         render: function () {
-            WorkflowFlowchartView.__super__.render.apply(this, arguments);
+            FlowchartViewerWorkflowView.__super__.render.apply(this, arguments);
 
             this.$el.addClass('workflow-flowchart-viewer');
 
@@ -34,6 +37,8 @@ define(function (require) {
         initCollectionViews: function () {
             var stepCollectionView,
                 transitionOverlayView = this.transitionOverlayView,
+                StepView = this.stepView,
+                TransitionView = this.transitionView,
                 that = this,
                 steps = this.model.get('steps');
             this.stepCollectionView = stepCollectionView = new BaseCollectionView({
@@ -45,7 +50,7 @@ define(function (require) {
                     options = _.extend({
                         areaView: that
                     }, options);
-                    return new JsplumbWorkflowStepView(options);
+                    return new StepView(options);
                 },
                 autoRender: true
             });
@@ -61,12 +66,12 @@ define(function (require) {
                         stepCollectionView: stepCollectionView,
                         transitionOverlayView: transitionOverlayView
                     }, options);
-                    return new JsplubmTransitionView(options);
+                    return new TransitionView(options);
                 },
                 autoRender: true
             });
         }
     });
 
-    return WorkflowFlowchartView;
+    return FlowchartViewerWorkflowView;
 });

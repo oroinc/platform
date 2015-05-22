@@ -1,13 +1,13 @@
 define(function (require) {
     'use strict';
     var BaseView = require('oroui/js/app/views/base/view'),
-        JsplubmBaseView;
+        FlowchartJsPlubmBaseView;
 
-    JsplubmBaseView = BaseView.extend({
+    FlowchartJsPlubmBaseView = BaseView.extend({
 
         initialize: function (options) {
             this.cid = 'jsplumb-' + this.cid;
-            JsplubmBaseView.__super__.initialize.apply(this, arguments);
+            FlowchartJsPlubmBaseView.__super__.initialize.apply(this, arguments);
         },
         ensureId: function () {
             this.$el.attr('id', this.cid);
@@ -22,9 +22,9 @@ define(function (require) {
                 return;
             }
             this.cleanup();
-            JsplubmBaseView.__super__.dispose.apply(this, arguments);
+            FlowchartJsPlubmBaseView.__super__.dispose.apply(this, arguments);
         }
     });
 
-    return JsplubmBaseView;
+    return FlowchartJsPlubmBaseView;
 });

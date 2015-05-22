@@ -1,14 +1,14 @@
 define(function (require) {
     'use strict';
-    var BaseView = require('../jsplumb/overlay'),
-        TransitionOverlayView;
+    var FlowchartViewerOverlayView = require('../viewer/transition-overlay-view'),
+        FlowChartEditorTransitionOverlayView;
 
-    TransitionOverlayView = BaseView.extend({
+    FlowChartEditorTransitionOverlayView = FlowchartViewerOverlayView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/editor/transition.html'),
 
         initialize: function (options) {
             this.stepFrom = options.stepFrom;
-            TransitionOverlayView.__super__.initialize.apply(this, arguments);
+            FlowChartEditorTransitionOverlayView.__super__.initialize.apply(this, arguments);
         },
 
         events: {
@@ -21,7 +21,7 @@ define(function (require) {
         },
 
         render: function () {
-            TransitionOverlayView.__super__.render.apply(this, arguments);
+            FlowChartEditorTransitionOverlayView.__super__.render.apply(this, arguments);
             this.$('.dropdown').on('show.bs.dropdown', console.log.bind(console));
             this.$('.dropdown').on('hidden', console.log.bind(console));
         },
@@ -47,5 +47,5 @@ define(function (require) {
 
     });
 
-    return TransitionOverlayView;
+    return FlowChartEditorTransitionOverlayView;
 });

@@ -1,20 +1,20 @@
 define(function (require) {
     'use strict';
-    var _ = require('underscore'),
-        WorkflowViewerFlowchartView = require('../viewer/workflow'),
-        JsplubmTransitionOverlayView = require('./transition-overlay'),
-        WorkflowFlowchartView;
+    var FlowchartEditorWorkflowView,
+        _ = require('underscore'),
+        FlowchartViewerWorkflowView = require('../viewer/workflow-view'),
+        FlowChartEditorTransitionOverlayView = require('./transition-overlay-view'),
+        FlowchartEditorStepView = require('./step-view');
 
-    WorkflowFlowchartView = WorkflowViewerFlowchartView.extend({
+    FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
 
-        transitionOverlayView: JsplubmTransitionOverlayView,
+        transitionOverlayView: FlowChartEditorTransitionOverlayView,
+        stepView: FlowchartEditorStepView,
 
         render: function () {
-            WorkflowFlowchartView.__super__.render.apply(this, arguments);
+            FlowchartEditorWorkflowView.__super__.render.apply(this, arguments);
 
             this.$el.addClass('workflow-flowchart-editor');
-
-            this.initCollectionViews();
 
             this.jsPlumbInstance.bind('beforeDrop', _.bind(function (data) {
                 var transitionModel, startingSteps, suspendedStep,
@@ -23,7 +23,6 @@ define(function (require) {
                 if (data.connection.suspendedElement) {
                     transitionModel = data.connection.overlayView.model;
                     startingSteps = transitionModel.getStartingSteps();
-                    console.log('old', transitionModel);
                     if (stepTo.get('name') !== transitionModel.get('step_to')) {
                         // stepTo changed
                         transitionModel.set({
@@ -46,5 +45,5 @@ define(function (require) {
         }
     });
 
-    return WorkflowFlowchartView;
+    return FlowchartEditorWorkflowView;
 });

@@ -1,15 +1,16 @@
 define(function (require) {
     'use strict';
-    var JsplubmBaseView = require('./base'),
-        $ = require('jquery'),
+    var $ = require('jquery'),
+        _ = require('underscore'),
         jsPlumb = require('jsplumb'),
-        JsplubmAreaView;
+        FlowchartJsPlubmBaseView = require('./base-view'),
+        FlowchartJsPlubmAreaView;
 
-    JsplubmAreaView = JsplubmBaseView.extend({
+    FlowchartJsPlubmAreaView = FlowchartJsPlubmBaseView.extend({
 
         jsPlumbInstance: null,
 
-        defaultOptions: {
+        defaults: {
             Endpoint: ['Dot', {radius: 3}],
             EndpointStyle: {fillStyle: '#4F719A'},
             HoverPaintStyle: {strokeStyle: '#1e8151', lineWidth: 2},
@@ -28,7 +29,7 @@ define(function (require) {
             var options;
             if (!this.jsPlumbInstance) {
                 this.ensureId();
-                options = $.extend(true, {}, this.defaultOptions);
+                options = $.extend(true, {}, _.result(this, 'defaults'));
                 options.Container = this.cid;
                 this.jsPlumbInstance = jsPlumb.getInstance(options);
             }
@@ -36,5 +37,5 @@ define(function (require) {
         }
     });
 
-    return JsplubmAreaView;
+    return FlowchartJsPlubmAreaView;
 });
