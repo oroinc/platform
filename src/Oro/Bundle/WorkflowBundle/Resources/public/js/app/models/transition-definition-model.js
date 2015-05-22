@@ -1,19 +1,16 @@
 /* global define */
-define(['backbone'],
-function(Backbone) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/transition-definition/model
-     * @class   oro.workflowManagement.TransitionDefinitionModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var TransitionDefinitionModel,
+        BaseModel = require('oroui/js/app/models/base/model');
+
+    TransitionDefinitionModel = BaseModel.extend({
         defaults: {
             name: null,
-            pre_conditions: null,
+            'pre_conditions': null,
             conditions: null,
-            post_actions: null
+            'post_actions': null
         },
 
         initialize: function() {
@@ -28,4 +25,6 @@ function(Backbone) {
             }
         }
     });
+
+    return TransitionDefinitionModel;
 });

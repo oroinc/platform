@@ -1,25 +1,23 @@
 /* global define */
-define(['underscore', 'backbone'],
-function(_, Backbone) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  oroworkflow/js/workflow-management/transition/model
-     * @class   oro.workflowManagement.TransitionModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var TransitionModel,
+        _ = require('underscore'),
+        BaseModel = require('oroui/js/app/models/base/model');
+
+    TransitionModel = BaseModel.extend({
         defaults: {
             name: null,
             label: null,
-            display_type: 'dialog',
-            step_to: null,
-            is_start: false,
-            form_options: null,
+            'display_type': 'dialog',
+            'step_to': null,
+            'is_start': false,
+            'form_options': null,
             message: null,
-            is_unavailable_hidden: true,
-            transition_definition: null,
-            _is_clone: false
+            'is_unavailable_hidden': true,
+            'transition_definition': null,
+            '_is_clone': false
         },
 
         initialize: function() {
@@ -51,7 +49,9 @@ function(_, Backbone) {
                 transitionDefinition.destroy();
             }
 
-            Backbone.Model.prototype.destroy.call(this, options);
+            TransitionModel.__super__.destroy.call(this, options);
         }
     });
+
+    return TransitionModel;
 });
