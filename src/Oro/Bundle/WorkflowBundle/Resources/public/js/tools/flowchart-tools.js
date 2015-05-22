@@ -4,8 +4,8 @@ define(function (require) {
     return {
         xPadding: 15,
         yPadding: 15,
-        xIncrement: 200,
-        yIncrement: 75,
+        xIncrement: 400,
+        yIncrement: 125,
         checkPositions: function (workflow) {
             var i, j, step, key,
                 steps = workflow.get('steps').filter(function (item) {

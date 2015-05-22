@@ -26,7 +26,7 @@ define(function (require) {
 
         connect: function () {
             FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
-
+            this.$el.addClass(this.className);
             var stepCollectionView,
                 transitionOverlayView = this.transitionOverlayView,
                 StepView = this.stepView,
