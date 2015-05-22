@@ -268,7 +268,6 @@ class EmailController extends Controller
     /**
      * @Route("/widget", name="oro_email_widget_emails")
      * @Template
-     * @AclAncestor("oro_email_email_user_view")
      *
      * @param Request $request
      * @return array
@@ -283,7 +282,6 @@ class EmailController extends Controller
     /**
      * @Route("/base-widget", name="oro_email_widget_base_emails")
      * @Template
-     * @AclAncestor("oro_email_email_user_view")
      *
      * @param Request $request
      * @return array
@@ -297,7 +295,6 @@ class EmailController extends Controller
 
     /**
      * @Route("/user-emails", name="oro_email_user_emails")
-     * @AclAncestor("oro_email_email_user_view")
      * @Template
      */
     public function userEmailsAction()
@@ -331,7 +328,6 @@ class EmailController extends Controller
 
     /**
      * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
-     * @AclAncestor("oro_email_email_user_view")
      * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
      * @param string $entityClass
      * @param string $activityId
