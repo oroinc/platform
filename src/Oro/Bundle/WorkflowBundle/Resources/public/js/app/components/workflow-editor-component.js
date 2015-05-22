@@ -1,9 +1,12 @@
-/*global define, console*/
-/** @exports WorkflowEditorComponent */
+/* global define */
+/** @exports WorkflowFlowchartComponent */
 define(function (require) {
     'use strict';
 
     var WorkflowEditorComponent,
+        WorkflowBaseComponent = require('./workflow-base-component'),
+        FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
+        flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
         mediator = require('oroui/js/mediator'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
@@ -11,27 +14,45 @@ define(function (require) {
         tools = require('oroui/js/tools'),
         routing = require('routing'),
         helper = require('oroworkflow/js/workflow-management/helper'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
         WorkflowManagementView = require('oroworkflow/js/workflow-management'),
-        WorkflowModel = require('oroworkflow/js/workflow-management/workflow/model'),
-        StepCollection = require('oroworkflow/js/workflow-management/step/collection'),
         TransitionModel = require('oroworkflow/js/workflow-management/transition/model'),
-        TransitionCollection = require('oroworkflow/js/workflow-management/transition/collection'),
-        TransitionDefinitionCollection = require('oroworkflow/js/workflow-management/transition-definition/collection'),
-        AttributeCollection = require('oroworkflow/js/workflow-management/attribute/collection'),
         TransitionEditFormView = require('oroworkflow/js/workflow-management/transition/view/edit'),
         StepEditView = require('oroworkflow/js/workflow-management/step/view/edit'),
         StepModel = require('oroworkflow/js/workflow-management/step/model'),
-        WorkflowFlowchartComponent = require('./workflow-flowchart-editor-component'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
      * Builds workflow editor UI.
      *
      * @class WorkflowEditorComponent
-     * @augments BaseComponent
+     * @augments WorkflowBaseComponent
      */
-    WorkflowEditorComponent = BaseComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
+    WorkflowEditorComponent = WorkflowBaseComponent.extend(
+        /** @lends WorkflowEditorComponent.prototype */{
+        /**
+         * @constructor
+         * @inheritDoc
+         */
+        initialize: function (options) {
+            WorkflowEditorComponent.__super__.initialize.apply(this, arguments);
+
+            flowchartTools.checkPositions(this.model);
+
+            this.workflowManagementView = new WorkflowManagementView({
+                el: options._sourceElement,
+                stepsEl: '.workflow-definition-steps-list-container',
+                model: this.model
+            });
+
+            this.workflowManagementView.render();
+
+            this.flowchartView = new FlowchartEditorWorkflowView({
+                el: options._sourceElement.find('.workflow-flowchart'),
+                model: this.model
+            });
+
+            this.flowchartView.render();
+        },
 
         /**
          * @inheritDoc
@@ -47,74 +68,6 @@ define(function (require) {
             'requestEditTransition model': 'openManageTransitionForm',
             'change:entity model': 'resetWorkflow',
             'saveWorkflow model': 'saveConfiguration'
-        },
-
-        /**
-         * @constructor
-         * @inheritDoc
-         */
-        initialize: function (options) {
-            this.model = this.createWorkflowModel(options);
-            this.addStartingStep();
-
-            this.workflowManagementView = new WorkflowManagementView({
-                el: options._sourceElement,
-                stepsEl: '.workflow-definition-steps-list-container',
-                model: this.model
-            });
-
-            this.workflowManagementView.render();
-
-            if (options._sourceElement.find('.workflow-flowchart')) {
-                this.flowchartComponent = new WorkflowFlowchartComponent({
-                    _sourceElement: options._sourceElement.find('.workflow-flowchart'),
-                    workflowModel: this.model
-                });
-            }
-        },
-
-        /**
-         * Helper function. Callback for _.map;
-         *
-         * @param {Object} config
-         * @param {string} name
-         * @returns {Object}
-         * @private
-         */
-        _mergeName: function (config, name) {
-            config.name = name;
-            return config;
-        },
-
-        /**
-         * Creates workflow model
-         *
-         * @param {Object} options
-         * @returns {WorkflowModel}
-         */
-        createWorkflowModel: function (options) {
-            var workflowModel, configuration;
-
-            configuration = options.entity.configuration;
-            configuration.steps = new StepCollection(_.map(configuration.steps, this._mergeName));
-            configuration.transitions = new TransitionCollection(_.map(configuration.transitions, this._mergeName));
-            configuration.transition_definitions = new TransitionDefinitionCollection(
-                _.map(configuration.transition_definitions, this._mergeName));
-            configuration.attributes = new AttributeCollection(_.map(configuration.attributes, this._mergeName));
-
-            configuration.name = options.entity.name;
-            configuration.label = options.entity.label;
-            configuration.entity = options.entity.entity;
-            configuration.entity_attribute = options.entity.entity_attribute;
-            configuration.start_step = options.entity.startStep;
-            configuration.steps_display_ordered = options.entity.stepsDisplayOrdered;
-
-            workflowModel = new WorkflowModel(configuration);
-            workflowModel.setSystemEntities(options.system_entities);
-
-            workflowModel.url = options._sourceElement.attr('action');
-
-            return workflowModel;
         },
 
         /**
