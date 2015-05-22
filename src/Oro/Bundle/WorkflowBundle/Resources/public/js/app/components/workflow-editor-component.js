@@ -4,7 +4,7 @@ define(function (require) {
     'use strict';
 
     var WorkflowEditorComponent,
-        WorkflowBaseComponent = require('./workflow-base-component'),
+        WorkflowViewerComponent = require('./workflow-viewer-component'),
         FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
         flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
         mediator = require('oroui/js/mediator'),
@@ -25,21 +25,16 @@ define(function (require) {
      * Builds workflow editor UI.
      *
      * @class WorkflowEditorComponent
-     * @augments WorkflowBaseComponent
+     * @augments WorkflowViewerComponent
      */
-    WorkflowEditorComponent = WorkflowBaseComponent.extend(
+    WorkflowEditorComponent = WorkflowViewerComponent.extend(
         /** @lends WorkflowEditorComponent.prototype */{
-        /**
-         * @constructor
-         * @inheritDoc
-         */
-        initialize: function (options) {
-            WorkflowEditorComponent.__super__.initialize.apply(this, arguments);
 
+        initViews: function () {
             flowchartTools.checkPositions(this.model);
 
             this.workflowManagementView = new WorkflowManagementView({
-                el: options._sourceElement,
+                el: this._sourceElement,
                 stepsEl: '.workflow-definition-steps-list-container',
                 model: this.model
             });
@@ -47,7 +42,7 @@ define(function (require) {
             this.workflowManagementView.render();
 
             this.flowchartView = new FlowchartEditorWorkflowView({
-                el: options._sourceElement.find('.workflow-flowchart'),
+                el: this._sourceElement.find('.workflow-flowchart'),
                 model: this.model
             });
 

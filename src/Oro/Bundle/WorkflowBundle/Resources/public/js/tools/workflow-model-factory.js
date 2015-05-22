@@ -3,9 +3,7 @@
 define(function (require) {
     'use strict';
 
-    var WorkflowBaseComponent,
-        _ = require('underscore'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
+    var _ = require('underscore'),
         WorkflowModel = require('oroworkflow/js/workflow-management/workflow/model'),
         StepCollection = require('oroworkflow/js/workflow-management/step/collection'),
         TransitionCollection = require('oroworkflow/js/workflow-management/transition/collection'),
@@ -15,20 +13,19 @@ define(function (require) {
         AttributeCollection = require('oroworkflow/js/workflow-management/attribute/collection');
 
     /**
-     * Builds workflow editor UI.
-     *
-     * @class WorkflowBaseComponent
-     * @augments BaseComponent
+     * Builds workflow model.
      */
-    WorkflowBaseComponent = BaseComponent.extend(/** @lends WorkflowBaseComponent.prototype */{
-
+    return {
         /**
-         * @constructor
-         * @inheritDoc
+         * Creates workflow model
+         *
+         * @param {Object} options
+         * @returns {WorkflowModel|*}
          */
-        initialize: function (options) {
+        create: function (options) {
             this.model = this.createWorkflowModel(options);
             this.addStartingStep();
+            return this.model;
         },
 
         /**
@@ -102,7 +99,5 @@ define(function (require) {
 
             return workflowModel;
         }
-    });
-
-    return WorkflowBaseComponent;
+    };
 });
