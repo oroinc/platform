@@ -15,15 +15,6 @@ define(function (require) {
             }
             this.areaView = options.areaView;
             FlowchartJsPlubmOverlayView.__super__.initialize.apply(this, arguments);
-        },
-
-        ensureAttributes: function () {
-            // empty
-        },
-
-        render: function () {
-            FlowchartJsPlubmOverlayView.__super__.render.apply(this, arguments);
-            this.ensureAttributes();
         }
     });
 

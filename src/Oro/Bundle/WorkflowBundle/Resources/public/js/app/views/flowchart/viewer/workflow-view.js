@@ -15,9 +15,7 @@ define(function (require) {
         stepCollectionView: null,
         transitionCollectionView: null,
 
-        initialize: function () {
-            FlowchartViewerWorkflowView.__super__.initialize.apply(this, arguments);
-        },
+        className: "workflow-flowchart-viewer",
 
         findStepModelByElement: function (el) {
             var stepCollectionView = this.stepCollectionView;
@@ -26,15 +24,9 @@ define(function (require) {
             });
         },
 
-        render: function () {
-            FlowchartViewerWorkflowView.__super__.render.apply(this, arguments);
+        connect: function () {
+            FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
 
-            this.$el.addClass('workflow-flowchart-viewer');
-
-            this.initCollectionViews();
-        },
-
-        initCollectionViews: function () {
             var stepCollectionView,
                 transitionOverlayView = this.transitionOverlayView,
                 StepView = this.stepView,
@@ -70,6 +62,9 @@ define(function (require) {
                 },
                 autoRender: true
             });
+
+            this.subview('stepCollectionView', this.stepCollectionView);
+            this.subview('transitionCollectionView', this.transitionCollectionView);
         }
     });
 

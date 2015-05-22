@@ -23,13 +23,11 @@ define(function (require) {
 
         initialize: function (options) {
             this.connections = [];
-            if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {
-                throw new Error('areaView options is required and must be a JsplumbAreaView');
+            var optionKeysToCopy = ['areaView', 'stepCollection', 'stepCollectionView', 'transitionOverlayView'];
+            if (optionKeysToCopy.length !== _.intersection(optionKeysToCopy, _.keys(options)).length) {
+                throw new Error(optionKeysToCopy.join(', ') + ' options are required');
             }
-            this.areaView = options.areaView;
-            this.stepCollection = options.stepCollection;
-            this.stepCollectionView = options.stepCollectionView;
-            this.transitionOverlayView = options.transitionOverlayView;
+            _.extend(this, _.pick(options, optionKeysToCopy));
             FlowchartViewerTransitionView.__super__.initialize.apply(this, arguments);
         },
 
@@ -38,6 +36,7 @@ define(function (require) {
                 this.trackChanges();
             }
             this.updateStepTransitions();
+            return this;
         },
 
         trackChanges: function () {
@@ -64,10 +63,6 @@ define(function (require) {
         },
 
         updateStepTransitions: function () {
-            if (!this.model) {
-                console.warn('model is undefined');
-                return;
-            }
             var i, startStep, connection,
                 startSteps = this.model.getStartingSteps(),
                 endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});

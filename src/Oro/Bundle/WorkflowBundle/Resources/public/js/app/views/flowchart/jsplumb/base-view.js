@@ -4,13 +4,22 @@ define(function (require) {
         FlowchartJsPlubmBaseView;
 
     FlowchartJsPlubmBaseView = BaseView.extend({
-
-        initialize: function (options) {
-            this.cid = 'jsplumb-' + this.cid;
-            FlowchartJsPlubmBaseView.__super__.initialize.apply(this, arguments);
+        id: function () {
+            return 'jsplumb-' + this.cid;
         },
-        ensureId: function () {
-            this.$el.attr('id', this.cid);
+
+        render: function () {
+            FlowchartJsPlubmBaseView.__super__.render.apply(this, arguments);
+
+            if (!this.isConnected) {
+                this.isConnected = true;
+                this.connect();
+            }
+            return this;
+        },
+
+        connect: function () {
+            // fill with stuff what should be done once element is rendered
         },
 
         cleanup: function () {

@@ -26,14 +26,18 @@ define(function (require) {
         },
 
         render: function () {
-            var options;
-            if (!this.jsPlumbInstance) {
-                this.ensureId();
-                options = $.extend(true, {}, _.result(this, 'defaults'));
-                options.Container = this.cid;
-                this.jsPlumbInstance = jsPlumb.getInstance(options);
+            // do nothing except connect()
+            if (!this.isConnected) {
+                this.isConnected = true;
+                this.connect();
             }
             return this;
+        },
+
+        connect: function () {
+            var options = $.extend(true, {}, _.result(this, 'defaults'));
+            options.Container = this.id();
+            this.jsPlumbInstance = jsPlumb.getInstance(options);
         }
     });
 

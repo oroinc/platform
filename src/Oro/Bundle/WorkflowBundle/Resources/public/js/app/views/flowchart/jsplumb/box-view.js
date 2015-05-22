@@ -1,7 +1,6 @@
 define(function (require) {
     'use strict';
     var FlowchartJsPlubmBaseView = require('./base-view'),
-        _ = require('underscore'),
         FlowchartJsPlubmAreaView = require('./area-view'),
         FlowchartJsPlubmBoxView;
 
@@ -27,25 +26,15 @@ define(function (require) {
             this.areaView.$el.append(this.$el);
         },
 
-        render: function () {
-            FlowchartJsPlubmBoxView.__super__.render.apply(this, arguments);
-
-            if (!this.isConnected) {
-                this.isConnected = true;
-                this.connect();
-            }
-        },
-
         connect: function () {
-            this.ensureId();
-            if (!this.isConnected) {
-                this.isConnected = true;
-                if (this.model.get('position')) {
-                    this.$el.css({
-                        top: this.model.get('position')[1],
-                        left: this.model.get('position')[0]
-                    });
-                }
+            // set position once, right after render
+            // all other changes should be done by jsPlumb
+            // or jsPlumb.redraw must be called
+            if (this.model.get('position')) {
+                this.$el.css({
+                    top: this.model.get('position')[1],
+                    left: this.model.get('position')[0]
+                });
             }
         },
 

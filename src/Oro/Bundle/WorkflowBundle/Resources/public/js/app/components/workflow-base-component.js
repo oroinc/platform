@@ -27,7 +27,6 @@ define(function (require) {
          * @inheritDoc
          */
         initialize: function (options) {
-            console.log(options);
             this.model = this.createWorkflowModel(options);
             this.addStartingStep();
         },
