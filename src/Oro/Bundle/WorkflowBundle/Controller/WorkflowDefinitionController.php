@@ -90,8 +90,10 @@ class WorkflowDefinitionController extends Controller
         /** @var TranslatorInterface $translator */
         $translator = $this->get('translator');
         $configuration = $workflowDefinition->getConfiguration();
-        foreach ($configuration['attributes'] as $attrName => $attrConfig) {
-            $configuration['attributes'][$attrName]['translated_label'] = $translator->trans($attrConfig['label']);
+        if (isset($configuration['attributes'])) {
+            foreach ($configuration['attributes'] as $attrName => $attrConfig) {
+                $configuration['attributes'][$attrName]['translated_label'] = $translator->trans($attrConfig['label']);
+            }
         }
 
         return array(
