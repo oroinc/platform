@@ -18,6 +18,8 @@ parameters:
     oro_search.extension.orm_pager.class:          Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
     oro_search.extension.pager.search.pager.class: Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
 
+    oro_search.provider.search_mapping.class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
+
     # services used only for ORM search engine
     oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
     oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
@@ -54,6 +56,7 @@ services:
         calls:
             - [setRealTimeUpdate, [%oro_search.realtime_update%]]
             - [setEntitiesConfig, [%oro_search.entities_config%]]
+            - [setMappingProvider, [@oro_search.provider.search_mapping]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -67,6 +70,8 @@ services:
     oro_search.mapper:
         class:                        %oro_search.mapper.class%
         arguments:                    [@event_dispatcher, %oro_search.entities_config%]
+        calls:
+            - [setMappingProvider, [@oro_search.provider.search_mapping]]
 
     oro_search.provider.result_statistics_provider:
         class:                        %oro_search.provider.result_statistics_provider.class%
@@ -94,6 +99,8 @@ services:
         arguments:
             - @twig
             - %oro_search.entities_config%
+        calls:
+            - [setMappingProvider, [@oro_search.provider.search_mapping]]
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: search-result }
 
@@ -140,7 +147,7 @@ services:
         class: %oro_search.event_listener.update_schema_listener.class%
         arguments:
             - @oro_search.fulltext_index_manager
-            - @service_container
+            - @doctrine
         tags:
             - { name: kernel.event_listener, event: console.terminate }
 
@@ -159,3 +166,11 @@ services:
             - %database_driver%
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
+
+    oro_search.provider.search_mapping:
+        class: %oro_search.provider.search_mapping.class%
+        arguments:
+            - @event_dispatcher
+        calls:
+            - [setMappingConfig, [%oro_search.entities_config%]]
+
