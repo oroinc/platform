@@ -15,15 +15,7 @@ define(function (require) {
             'dblclick': 'triggerEditTransition',
             'click .workflow-step-edit': 'triggerEditTransition',
             'click .workflow-step-clone': 'triggerCloneTransition',
-            'click .workflow-step-delete': 'triggerDeleteTransition',
-            'hidden .dropdown': 'updateAttributes',
-            'shown .dropdown': 'updateAttributes'
-        },
-
-        render: function () {
-            FlowChartEditorTransitionOverlayView.__super__.render.apply(this, arguments);
-            this.$('.dropdown').on('show.bs.dropdown', console.log.bind(console));
-            this.$('.dropdown').on('hidden', console.log.bind(console));
+            'click .workflow-step-delete': 'triggerDeleteTransition'
         },
 
         triggerDeleteTransition: function (e) {
@@ -39,10 +31,6 @@ define(function (require) {
         triggerCloneTransition: function (e) {
             e.preventDefault();
             this.areaView.model.trigger('requestCloneTransition', this.model, this.stepFrom);
-        },
-
-        updateAttributes: function () {
-            // console.log('I\'m in');
         }
 
     });
