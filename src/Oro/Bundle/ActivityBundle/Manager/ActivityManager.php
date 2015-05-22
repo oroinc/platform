@@ -182,6 +182,50 @@ class ActivityManager
     }
 
     /**
+     * Returns the list of fields responsible to store activity associations for the given activity entity type
+     *
+     * @param string $activityClassName
+     *
+     * @return array [target_entity_class => field_name]
+     */
+    public function getActivityTargets($activityClassName)
+    {
+        $result = [];
+
+        $extendConfig = $this->extendConfigProvider->getConfig($activityClassName);
+        $relations    = $extendConfig->get('relation', false, []);
+        foreach ($relations as $key => $relation) {
+            if (!$relation['owner']) {
+                continue;
+            }
+            $targetEntityClass = $relation['target_entity'];
+            $associationName   = ExtendHelper::buildAssociationName(
+                $targetEntityClass,
+                ActivityScope::ASSOCIATION_KIND
+            );
+            $relationKey       = ExtendHelper::buildRelationKey(
+                $activityClassName,
+                $associationName,
+                RelationType::MANY_TO_MANY,
+                $targetEntityClass
+            );
+            if ($key !== $relationKey) {
+                continue;
+            }
+            $activityClassNames = $this->activityConfigProvider
+                ->getConfig($targetEntityClass)
+                ->get('activities', false, []);
+            if (!in_array($activityClassName, $activityClassNames, true)) {
+                continue;
+            }
+
+            $result[$targetEntityClass] = $associationName;
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns an array contains info about all activity associations for the given entity type
      *
      * @param string $entityClass
