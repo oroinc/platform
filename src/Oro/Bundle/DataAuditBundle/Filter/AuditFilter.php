@@ -86,18 +86,19 @@ class AuditFilter extends EntityFilter
             ->select('1')
             ->andWhere(sprintf('%s.objectClass = :%s', $this->auditAlias, $this->objectClassParam))
             ->andWhere(sprintf('%s.objectId = %s.%s', $this->auditAlias, $objectAlias, $identifier))
-            ->join(
-                sprintf('%s.fields', $this->auditAlias),
-                $this->auditFieldAlias,
-                Expr\Join::WITH,
-                sprintf('%s.field = :%s', $this->auditFieldAlias, $this->fieldParam)
-            )
+            ->setParameter($this->objectClassParam, $objectClass)
             ->setMaxResults(1);
 
-        $qb
-            ->setParameter($this->objectClassParam, $objectClass)
-            ->setParameter($this->fieldParam, $fieldName)
-        ;
+        if ($data['auditFilter']['type'] === static::TYPE_CHANGED_TO_VALUE) {
+            $auditQb
+                ->join(
+                    sprintf('%s.fields', $this->auditAlias),
+                    $this->auditFieldAlias,
+                    Expr\Join::WITH,
+                    sprintf('%s.field = :%s', $this->auditFieldAlias, $this->fieldParam)
+                )
+                ->setParameter($this->fieldParam, $fieldName);
+        }
 
         $auditDs = new OrmFilterDatasourceAdapter($auditQb);
         $this->applyFilter(
@@ -177,12 +178,12 @@ class AuditFilter extends EntityFilter
      */
     protected function getClass($columnName, array $rootEntities)
     {
-        if (strpos($columnName, '::') === false) {
+        if (strpos($columnName, '+') === false) {
             return reset($rootEntities);
         }
 
         $matches = [];
-        preg_match_all('/(?<=\+)[^\+]+(?=::)/', $columnName, $matches);
+        preg_match_all('/(?<=\+)[^\+:]+/', $columnName, $matches);
 
         return end($matches[0]);
     }

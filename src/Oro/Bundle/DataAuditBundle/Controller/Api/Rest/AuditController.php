@@ -163,7 +163,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
             }
 
             $auditableEntities[$entityClass] = $entityData;
-            unset($auditableEntities[$entityClass]['fields']);
+            $auditableEntities[$entityClass]['fields'] = [];
 
             foreach ($entityData['fields'] as $fieldData) {
                 $class = $entityClass;
