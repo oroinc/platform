@@ -2,7 +2,6 @@ define(function (require) {
     'use strict';
     var _ = require('underscore'),
         FlowchartJsPlubmBaseView = require('../jsplumb/base-view'),
-        FlowchartJsPlumbAreaView = require('../jsplumb/area-view'),
         FlowchartViewerTransitionView;
 
     FlowchartViewerTransitionView = FlowchartJsPlubmBaseView.extend({
@@ -32,15 +31,15 @@ define(function (require) {
         },
 
         render: function () {
-            if (!this.isListening) {
-                this.trackChanges();
-            }
             this.updateStepTransitions();
+            if (!this.isConnected) {
+                this.isConnected = true;
+                this.connect();
+            }
             return this;
         },
 
-        trackChanges: function () {
-            this.isListening = true;
+        connect: function () {
             var debouncedUpdate = _.debounce(_.bind(this.updateStepTransitions, this), 50);
             this.listenTo(this.model, 'change', debouncedUpdate);
             this.listenTo(this.stepCollection, 'add', debouncedUpdate);
@@ -142,7 +141,6 @@ define(function (require) {
             this.addStaleMark();
             this.removeStaleConnections();
             this.stopListening();
-            this.isListening = false;
         }
     });
 
