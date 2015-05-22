@@ -30,10 +30,13 @@ define(function (require) {
         render: function () {
             FlowchartJsPlubmBoxView.__super__.render.apply(this, arguments);
 
-            this.checkConnected();
+            if (!this.isConnected) {
+                this.isConnected = true;
+                this.connect();
+            }
         },
 
-        checkConnected: function () {
+        connect: function () {
             this.ensureId();
             if (!this.isConnected) {
                 this.isConnected = true;

@@ -31,8 +31,8 @@ define(function (require) {
             maxConnections: 100
         },
 
-        checkConnected: function () {
-            FlowchartEditorStepView.__super__.checkConnected.apply(this, arguments);
+        connect: function () {
+            FlowchartEditorStepView.__super__.connect.apply(this, arguments);
             var instance = this.areaView.jsPlumbInstance;
 
             instance.batch(_.bind(function () {
