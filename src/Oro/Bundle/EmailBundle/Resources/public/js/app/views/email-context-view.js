@@ -3,6 +3,7 @@ define(function (require) {
     'use strict';
 
     var EmailContextView,
+        _ = require('underscore'),
         $ = require('jquery'),
         EmailContextCollection = require('oroemail/js/app/models/email-context-collection'),
         BaseView = require('oroui/js/app/views/base/view'),
@@ -25,7 +26,7 @@ define(function (require) {
         },
 
         render: function() {
-            if (this.collection.models.length == 0) {
+            if (this.collection.models.length === 0) {
                 this.$el.hide();
             } else {
                 this.$el.show();
@@ -33,28 +34,27 @@ define(function (require) {
         },
 
         initEvents: function() {
-            var self = this;
-            var dropdown = this.$el.find('#context-items-dropdown');
-            var firstItem = this.$el.find('#email-context-current-item');
-
+            var self = this,
+                dropdown = this.$('.context-items-dropdown'),
+                firstItem = this.$('.email-context-current-item');
             this.collection.on('add', function(model) {
-                var gridUrl = self.options.params.grid_path + '/' + model.attributes.className;
-                var view = self.template({
-                    entity: model
-                });
-                var $view = $(view);
+                var gridUrl = self.options.params.grid_path + '/' + model.attributes.className,
+                    view = self.template({
+                        entity: model
+                    }),
+                    $view = $(view);
 
                 if (model.attributes.first) {
                     firstItem.html(model.attributes.label);
-                    $('#context-current-target-class').data('value', model.attributes.className);
-                    $('#context-current-target-grid').data('value', model.attributes.gridName);
+                    self.currentTargetClass(model.attributes.className);
                 }
 
                 dropdown.append($view);
                 dropdown.find('.context-item:last').click(function() {
-                    $('#context-current-target-class').data('value', model.attributes.className);
-                    $('#context-current-target-grid').data('value', model.attributes.gridName);
-                    dropdown.find('> .context-item').each(function() {$(this).removeClass('active')})
+                    self.currentTargetClass(model.attributes.className);
+                    dropdown.find('> .context-item').each(function() {
+                        $(this).removeClass('active');
+                    });
                     var item = $(this);
                     firstItem.html(item.html());
                     item.addClass('active');
@@ -65,6 +65,20 @@ define(function (require) {
                     });
                 });
             });
+        },
+
+        /**
+         * Getter/Setter for current target className
+         *
+         * @param {string=} value
+         */
+        currentTargetClass: function (value) {
+            if (_.isUndefined(value)) {
+                value = this._currentTargetClass;
+            } else {
+                this._currentTargetClass = value;
+            }
+            return value;
         }
     });
 

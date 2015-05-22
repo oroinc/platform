@@ -28,7 +28,7 @@
     {% if addQueryParameters is not defined or addQueryParameters == true %}
         {% set formAction = oro_url_add_query(formAction) %}
     {% endif %}
-    <form id="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
+    <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
           method="{{ form.vars.method }}" data-collect="true">
         {% if isWidgetContext %}
             <div class="widget-actions">
@@ -97,7 +97,7 @@
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
                             {% if form.vars.method != 'GET' %}
-                                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
+                                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
                             {% endif %}
                         </div>
                         <div class="pull-right user-info-state">

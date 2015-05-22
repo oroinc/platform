@@ -39,12 +39,15 @@ class LayoutTestCase extends WebTestCase
         //        title="some title" >
         // will be converted to
         // <label for="element" class="test" title="some title">
-        $html = preg_replace('/\"\s+(\w+=)/', '" ${1}', $html);
+        $html = preg_replace('/\"\s+([\w\-]+=)/', '" ${1}', $html);
         $html = preg_replace('/(\<\w+)\s+/', '${1} ', $html);
         $html = preg_replace('/\s+([\/]*\>)/', '${1}', $html);
 
         // remove spaces at the begin of a line
         $html = preg_replace('/^\s+/m', '', $html);
+
+        // replace uid from id attributes, see RandomIdExtension
+        $html = preg_replace('/="(\w+)-uid-[a-z0-9]+"/', '="${1}"', $html);
 
         $html = rtrim($html);
 
