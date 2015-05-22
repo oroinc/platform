@@ -34,7 +34,8 @@ class MainUserEmailGridListener
             $parameters = $datagrid->getParameters();
             $userId     = $parameters->get('userId');
             $this->emailGridHelper->updateDatasource($datasource, $userId);
-            $this->emailGridHelper->handleRefresh($parameters, $userId);
+            // Todo: CRM-2480
+//            $this->emailGridHelper->handleRefresh($parameters, $userId);
         }
     }
 }

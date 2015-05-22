@@ -151,8 +151,8 @@ oro:
         sent_at.label:            Sent at
         sent_by.label:            sent by {{ user }}
         subject:
-            label:            Subject
-            no_subject.label: (no subject)
+            label:                Subject
+            no_subject.label:     (no subject)
         to.label:                 To
         cc_bcc.label:             Cc/Bcc
         x_message_id.label:       xMessage Id
@@ -178,6 +178,7 @@ oro:
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
+        email_users.label:        User Emails
 
         entity_config:
             email:
@@ -194,6 +195,13 @@ oro:
         emailuser:
             entity_label:             Email
             entity_plural_label:      Emails
+            email.label:              Email
+            folder.label:             Folder
+            id.label:                 Id
+            organization.label:       Organization
+            owner.label:              Owner
+            received_at.label:        Received At
+            seen.label:               Seen
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
