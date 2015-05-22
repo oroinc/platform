@@ -15,12 +15,14 @@
  * });
  * ```
  */
-define(['underscore'], function (_) {
-    return {
-        load: function (name, parentRequire, onLoad) {
-            parentRequire(['text!' + name], function (text) {
+define({
+    load: function (name, parentRequire, onLoad) {
+        parentRequire(['text!' + name, 'underscore'], function (text, _) {
+            if (_) {
                 onLoad(_.template(text));
-            });
-        }
-    };
+            } else {
+                onLoad();
+            }
+        });
+    }
 });
