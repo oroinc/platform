@@ -1,16 +1,16 @@
-/*global define, console*/
+/* global define */
 /** @exports WorkflowEditorComponent */
 define(function (require) {
     'use strict';
 
     var _ = require('underscore'),
-        WorkflowModel = require('oroworkflow/js/workflow-management/workflow/model'),
-        StepCollection = require('oroworkflow/js/workflow-management/step/collection'),
-        TransitionCollection = require('oroworkflow/js/workflow-management/transition/collection'),
-        TransitionDefinitionCollection = require('oroworkflow/js/workflow-management/transition-definition/collection'),
-        StepModel = require('oroworkflow/js/workflow-management/step/model'),
         __ = require('orotranslation/js/translator'),
-        AttributeCollection = require('oroworkflow/js/workflow-management/attribute/collection');
+        AttributeCollection = require('oroworkflow/js/app/models/attribute-collection'),
+        StepCollection = require('oroworkflow/js/app/models/step-collection'),
+        StepModel = require('oroworkflow/js/app/models/step-model'),
+        TransitionCollection = require('oroworkflow/js/app/models/transition-collection'),
+        TransitionDefinitionCollection = require('oroworkflow/js/app/models/transition-definition-collection'),
+        WorkflowModel = require('oroworkflow/js/app/models/workflow-model');
 
     /**
      * Builds workflow model.
