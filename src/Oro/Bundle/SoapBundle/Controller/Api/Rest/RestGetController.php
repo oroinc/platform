@@ -22,6 +22,9 @@ use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\EntitySerializerManagerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
 {
     const ITEMS_PER_PAGE = 10;
@@ -117,7 +120,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function getPreparedItems($entities, $resultFields = [])
     {
-        $result = array();
+        $result = [];
         foreach ($entities as $entity) {
             $result[] = $this->getPreparedItem($entity, $resultFields);
         }
@@ -138,7 +141,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {
             $entity->__load();
         }
-        $result = array();
+        $result = [];
         if ($entity) {
             /** @var UnitOfWork $uow */
             $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
@@ -147,7 +150,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                     continue;
                 }
 
-                $accessors = array('get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field));
+                $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
                 foreach ($accessors as $accessor) {
                     if (method_exists($entity, $accessor)) {
                         $value = $entity->$accessor();
@@ -186,7 +189,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     }
 
     /**
-     * @param array $filters           valid parameters that can be passed
+     * @param array $filters           filter values. [filterName => [operator, value], ...]
      * @param array $filterParameters  assoc array with filter params, like closure
      *                                 [filterName => [closure => \Closure(...), ...]]
      *                                 or [filterName => ParameterFilterInterface]
