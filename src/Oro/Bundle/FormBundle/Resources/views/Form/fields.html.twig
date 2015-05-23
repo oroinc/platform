@@ -467,7 +467,7 @@
     require(['jquery', 'jquery.validate'],
     function ($) {
         var options = {{ js_options ? js_options|json_encode|raw : '{}' }};
-        $('#{{ form.vars.name }}').validate(options);
+        $('#{{ form.vars.id }}').validate(options);
     });
 </script>
 {% endblock %}

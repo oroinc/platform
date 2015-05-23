@@ -1,0 +1,114 @@
+@box-width: 160px;
+@source-radius: 10px;
+@proportion: 1.618 * 1.5;
+
+._jsPlumb_drag_select *, .jsplumb-box, [data-role=transition-overlay], .workflow-flowchart {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.workflow-step-editor {
+  margin-top: -28px;
+}
+.workflow-flowchart{
+  position: relative;
+  overflow-x: auto;
+  height: 700px;
+  overflow-y: hidden;
+  *[dropdown-state=opened] {
+    z-index: 700;
+  }
+  ._jsPlumb_endpoint {
+    z-index: 100;
+  }
+  .jsplumb-box {
+    z-index: 100;
+    position: absolute;
+    border: 1px solid #4F719A;
+    border-radius: 5px;
+    width: @box-width;
+    height: @box-width / @proportion;
+    background: #B0CAEC;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    .step-label {
+      text-align: center;
+      position: relative;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+      font-size: 14px;
+    }
+    .dropdown {
+      text-align: left;
+      display: inline;
+      margin-left: -5px;
+    }
+    .dropdown-toggle {
+      cursor: pointer;
+      font-size: 14px;
+      :hover {
+        color: #555;
+      }
+      > i {
+        margin: 0;
+      }
+    }
+    &._jsPlumb_source_hover, &._jsPlumb_target_hover , &.jsplumb-drag-hover {
+      background: #D1E2BC;
+    }
+    .jsplumb-source {
+      background: #EED591;
+      width: @source-radius * 2;
+      height: @source-radius * 2;
+      border-radius: @source-radius;
+      position: absolute;
+      margin-top: @box-width / @proportion - @source-radius;
+      margin-left: @box-width / 2 - @source-radius;
+      &:hover {
+        background: #DEC581;
+        cursor: pointer;
+        &:before {
+          content: "+";
+          line-height: 1em;
+          font-size: @source-radius * 2;
+          text-align: center;
+          width: @source-radius * 2;
+          display: block;
+        }
+      }
+    }
+  }
+  [data-role=transition-overlay] {
+    background-color: white;
+    opacity: 0.85;
+    padding: 0.3em;
+    border-radius: 0.5em;
+    border: 1px solid #4F719A;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+
+    &:hover, &._jsplumb_hover {
+      z-index: 200;
+    }
+  }
+
+  &.workflow-flowchart-editor {
+    .jsplumb-box {
+      cursor: move;
+      &:hover {
+        background: #7C99BE;
+      }
+    }
+  }
+}
