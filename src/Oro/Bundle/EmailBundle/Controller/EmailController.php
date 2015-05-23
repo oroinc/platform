@@ -54,7 +54,7 @@ class EmailController extends Controller
         // set email as seen
         $em = $this->getDoctrine()->getManager();
         $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
-        if ($entity) {
+        if ($emailUser) {
             $this->getEmailManager()->setEmailSeen($emailUser);
         }
 
