@@ -29,7 +29,8 @@
         {% set formAction = oro_url_add_query(formAction) %}
     {% endif %}
     <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
-          method="{{ form.vars.method }}" data-collect="true">
+          method="{{ form.vars.method }}" data-collect="true"
+          {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         {% if isWidgetContext %}
             <div class="widget-actions">
                 <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
@@ -97,7 +98,7 @@
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
                             {% if form.vars.method != 'GET' %}
-                                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
+                                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
                             {% endif %}
                         </div>
                         <div class="pull-right user-info-state">
