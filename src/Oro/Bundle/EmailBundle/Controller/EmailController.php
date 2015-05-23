@@ -54,7 +54,9 @@ class EmailController extends Controller
         // set email as seen
         $em = $this->getDoctrine()->getManager();
         $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
-        $this->getEmailManager()->setEmailSeen($emailUser);
+        if ($entity) {
+            $this->getEmailManager()->setEmailSeen($emailUser);
+        }
 
         return [
             'entity' => $entity,
@@ -239,15 +241,7 @@ class EmailController extends Controller
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
-        $email = $emailAttachment->getEmailBody()->getEmail();
-        $isGranted = false;
-        foreach ($email->getEmailUsers() as $emailUser) {
-            if ($this->getSecurityFacade()->isGranted('EDIT', $emailUser)) {
-                $isGranted = true;
-                break;
-            }
-        }
-        if (!$isGranted) {
+        if (!$this->isEmailGranted('EDIT', $emailAttachment->getEmailBody()->getEmail())) {
             throw new AccessDeniedException();
         }
 
@@ -353,14 +347,15 @@ class EmailController extends Controller
     }
 
     /**
+     * @param string $action
      * @param Email $entity
      * @return bool
      */
-    protected function isEmailViewGranted(Email $entity)
+    protected function isEmailGranted($action, Email $entity)
     {
         $isGranted = false;
         foreach ($entity->getEmailUsers() as $emailUser) {
-            if ($this->getSecurityFacade()->isGranted('VIEW', $emailUser)) {
+            if ($this->getSecurityFacade()->isGranted($action, $emailUser)) {
                 $isGranted = true;
                 break;
             }
@@ -374,7 +369,7 @@ class EmailController extends Controller
      */
     protected function assertEmailViewGranted(Email $entity)
     {
-        if (!$this->isEmailViewGranted($entity)) {
+        if (!$this->isEmailGranted('VIEW', $entity)) {
             throw new AccessDeniedException();
         }
     }

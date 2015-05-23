@@ -6,12 +6,14 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Email
@@ -713,6 +715,32 @@ class Email extends ExtendEmail
         }
 
         return $this;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return EmailUser|bool
+     */
+    public function getEmailUser(User $user)
+    {
+        if (!$this->emailUsers) {
+            return false;
+        }
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->in('owner', [$user]));
+        $criteria->where(Criteria::expr()->in('organization', [$user->getOrganization()]));
+        $userEmails = $this->emailUsers->matching($criteria);
+        if (count($userEmails) > 0) {
+            return $userEmails->first();
+        }
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->in('organization', [$user->getOrganization()]));
+        $userEmails = $this->emailUsers->matching($criteria);
+        if (count($userEmails) > 0) {
+            return $userEmails->first();
+        }
+        return $this->getEmailUsers()->first();
     }
 
     /**
