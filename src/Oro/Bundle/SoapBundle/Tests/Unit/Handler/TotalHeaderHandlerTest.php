@@ -36,6 +36,22 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         unset($this->handler, $this->optimizer);
     }
 
+    public function testSupportsWithTotalCountAndAction()
+    {
+        $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_LIST);
+        $context->set('totalCount', 22);
+
+        $this->assertTrue($this->handler->supports($context));
+    }
+
+    public function testDoesNotSupportWithOtherThenListActions()
+    {
+        $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_READ);
+        $context->set('totalCount', 22);
+
+        $this->assertFalse($this->handler->supports($context));
+    }
+
     public function testSupportsWithValidQueryAndAction()
     {
         $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_LIST);
@@ -44,7 +60,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->supports($context));
     }
 
-    public function testDoesNotSupportWithAnotherThenListActions()
+    public function testDoesNotSupportWithOtherThenListActionsButValidQuery()
     {
         $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_READ);
         $context->set('query', $this->getMockForAbstractClass('Doctrine\ORM\AbstractQuery', [], '', false));
@@ -74,6 +90,21 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertFalse($this->handler->supports($context));
+    }
+
+    public function testHandleWithTotalCount()
+    {
+        $testCount = 22;
+
+        $this->handler->expects($this->never())->method('calculateCount');
+
+        $context = $this->createContext();
+        $context->set('totalCount', $testCount);
+
+        $this->handler->handle($context);
+
+        $response = $context->getResponse();
+        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
     public function testHandleWithQueryBuilder()
@@ -163,6 +194,17 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->createContext();
         $context->set('query', false);
+
+        $this->handler->handle($context);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testHandleWithInvalidTotalCountValueThrowException()
+    {
+        $context = $this->createContext();
+        $context->set('totalCount', false);
 
         $this->handler->handle($context);
     }
