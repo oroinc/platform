@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -50,11 +50,11 @@ class StartWorkflow extends AbstractAction
         if (empty($options['attribute'])) {
             throw new InvalidParameterException('Attribute name parameter is required');
         }
-        if (!$options['attribute'] instanceof PropertyPath) {
+        if (!$options['attribute'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Attribute must be valid property definition');
         }
 
-        if (!empty($options['entity']) && !$options['entity'] instanceof PropertyPath) {
+        if (!empty($options['entity']) && !$options['entity'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Entity must be valid property definition');
         }
 
@@ -88,7 +88,7 @@ class StartWorkflow extends AbstractAction
     }
 
     /**
-     * @return PropertyPath
+     * @return PropertyPathInterface
      */
     protected function getAttribute()
     {

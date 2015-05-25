@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 abstract class AbstractMapper
@@ -16,8 +17,22 @@ abstract class AbstractMapper
 
     /**
      * @var array
+     * @deprecated since 1.8 Please use mappingProvider for mapping config
      */
     protected $mappingConfig;
+
+    /**
+     * @var SearchMappingProvider
+     */
+    protected $mappingProvider;
+
+    /**
+     * @param SearchMappingProvider $mappingProvider
+     */
+    public function setMappingProvider(SearchMappingProvider $mappingProvider)
+    {
+        $this->mappingProvider = $mappingProvider;
+    }
 
     /**
      * Get object field value
@@ -49,13 +64,7 @@ abstract class AbstractMapper
      */
     public function getEntityMapParameter($entity, $parameter, $defaultValue = false)
     {
-        $entityConfig = $this->getEntityConfig($entity);
-
-        if ($entityConfig && isset($entityConfig[$parameter])) {
-            return $entityConfig[$parameter];
-        }
-
-        return $defaultValue;
+        return $this->mappingProvider->getEntityMapParameter($entity, $parameter, $defaultValue);
     }
 
     /**
@@ -67,11 +76,7 @@ abstract class AbstractMapper
      */
     public function getEntityConfig($entity)
     {
-        if (isset($this->mappingConfig[(string)$entity])) {
-            return $this->mappingConfig[(string)$entity];
-        }
-
-        return false;
+        return $this->mappingProvider->getEntityConfig($entity);
     }
 
     /**
