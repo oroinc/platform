@@ -4,12 +4,12 @@
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
             },
-            fieldsLoaderSelector: '#' ~ params.entity_choice_id
+            fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']'
         }
     } %}
     {% set conditionBuilderOptions = {
         criteriaListSelector: '#' ~ params.criteria_list_id,
-        entityChoiceSelector: '#' ~ params.entity_choice_id,
+        entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
         onFieldsUpdate: {
             toggleCriteria: ['condition-item', 'conditions-group']
         }
@@ -160,7 +160,7 @@
         {% if ('column' in showItems) %}
         {{ form_row(form.name, {
             'label': 'oro.query_designer.form.column',
-            'entity_choice_selector': '#' ~ params.entity_choice_id,
+            'entity_choice_selector': '[data-ftid=' ~ params.entity_choice_id ~ ']',
             'attr': {
                 'data-purpose': 'column-selector',
                 'data-validation': { NotBlank: null }|json_encode
@@ -225,7 +225,7 @@
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {{ form_row(form.columnNames, {
             'label': 'oro.query_designer.form.grouping_columns',
-            'entity_choice_selector': '#' ~ params.entity_choice_id,
+            'entity_choice_selector': '[data-ftid=' ~ params.entity_choice_id ~ ']',
             'attr': {
                 'data-purpose': 'column-selector',
                 'data-validation': { NotBlank: null }|json_encode

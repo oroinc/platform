@@ -214,6 +214,22 @@ class ActivityListChainProvider
     }
 
     /**
+     * @param object $entity
+     *
+     * @return string|null
+     */
+    public function getDescription($entity)
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider->isApplicable($entity)) {
+                return $provider->getDescription($entity);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get activity list provider for given activity entity
      *
      * @param $activityEntity
@@ -257,6 +273,7 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
+            $list->setDescription($provider->getDescription($entity));
             if ($this->hasCustomDate($provider)) {
                 $list->setCreatedAt($provider->getDate($entity));
                 $list->setUpdatedAt($provider->getDate($entity));
