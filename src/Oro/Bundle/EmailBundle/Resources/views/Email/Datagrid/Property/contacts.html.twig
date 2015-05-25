@@ -1,11 +1,11 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
 {% set folder = record.getValue('folder') %}
-{% set thread = record.getValue('thread') %}
+{% set thread = record.getValue('email.thread') %}
 {% if thread is not null  %}
     {% set recipients = oro_get_email_thread_recipients(thread) %}
 {% else %}
-    {% set recipients = record.getValue('recipients') %}
+    {% set recipients = record.getValue('email.recipients') %}
 {% endif %}
 
 <span class="nowrap">

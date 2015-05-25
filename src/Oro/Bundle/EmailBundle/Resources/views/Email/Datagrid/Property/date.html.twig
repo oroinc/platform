@@ -1,6 +1,6 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{% set date = record.getValue('sentAt') %}
+{% set date = record.getValue('email.sentAt') %}
 
 <span class="nowrap">
     {{ EA.date_smart_format(date) }}

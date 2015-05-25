@@ -137,13 +137,13 @@ class Processor
         );
 
         $emailUser->setFolder($origin->getFolder(FolderType::SENT));
-        $emailUser->setEmailBody(
+        $emailUser->getEmail()->setEmailBody(
             $this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true)
         );
-        $emailUser->setMessageId($messageId);
+        $emailUser->getEmail()->setMessageId($messageId);
         $emailUser->setSeen(true);
         if ($parentMessageId) {
-            $emailUser->setRefs($parentMessageId);
+            $emailUser->getEmail()->setRefs($parentMessageId);
         }
 
         // persist the email and all related entities such as folders, email addresses etc.
