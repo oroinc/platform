@@ -6,12 +6,14 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Email
@@ -36,7 +38,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          },
  *          "activity"={
  *              "route"="oro_email_activity_view",
- *              "acl"="oro_email_view",
+ *              "acl"="oro_email_email_user_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
  *          },

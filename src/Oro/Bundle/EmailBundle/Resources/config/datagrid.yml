@@ -1,7 +1,6 @@
 datagrid:
     base-email-grid:
         source:
-            acl_resource: oro_email_view
             type: orm
             query:
                 select:
@@ -32,8 +31,6 @@ datagrid:
                         -
                             join: eu.folder
                             alias: f
-                            conditionType: WITH
-                            condition: f.type = '%oro_email.email_folder.model.class%::INBOX' OR f.type = '%oro_email.email_folder.model.class%::SEND'
         columns:
             contacts:
                 type: twig
@@ -79,6 +76,7 @@ datagrid:
                 where:
                     and:
                         - e.head = true
+                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::SENT')
         filters:
             columns:
                 subject: { type: string,   data_name: e.subject }

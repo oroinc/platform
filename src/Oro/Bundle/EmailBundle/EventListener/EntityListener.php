@@ -59,11 +59,12 @@ class EntityListener
 
     public function postPersist(LifecycleEventArgs $eventArgs)
     {
+        // todo: move to crmpro
         $emailUser = $eventArgs->getObject();
 
         if ($emailUser instanceof EmailUser
-            && $emailUser->getOwner() == null
-            && $emailUser->getOrganization() == null
+            && $emailUser->getOwner() === null
+            && $emailUser->getOrganization() === null
         ) {
             $em = $eventArgs->getObjectManager();
 
@@ -81,19 +82,20 @@ class EntityListener
             $user = $qb->getQuery()->getSingleResult();
             $organizations = $user->getOrganizations();
 
-            $length = sizeof($organizations);
+            $length = count($organizations);
             for ($i = 0; $i < $length; $i++) {
                 $organization = $organizations[$i];
+                if (!$organization->getIsGlobal()) {
+                    if ($i === 0) {
+                        $emailUser->setOwner($user);
+                        $emailUser->setOrganization($organization);
+                    } else {
+                        $eu = clone $emailUser;
+                        $eu->setOwner($user);
+                        $eu->setOrganization($organization);
 
-                if ($i == 0) {
-                    $emailUser->setOwner($user);
-                    $emailUser->setOrganization($organization);
-                } else {
-                    $eu = clone $emailUser;
-                    $eu->setOwner($user);
-                    $eu->setOrganization($organization);
-
-                    $em->persist($eu);
+                        $em->persist($eu);
+                    }
                 }
             }
         }

@@ -79,7 +79,7 @@ class EmailBody
     protected $attachments;
 
     /**
-     * @var ArrayCollection
+     * @var Email
      *
      * @ORM\OneToOne(targetEntity="Email", mappedBy="emailBody")
      * @JMS\Exclude
@@ -229,6 +229,25 @@ class EmailBody
         $this->attachments[] = $attachment;
 
         $attachment->setEmailBody($this);
+
+        return $this;
+    }
+
+    /**
+     * @return Email
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param Email $email
+     * @return $this
+     */
+    public function setEmail(Email $email)
+    {
+        $this->email = $email;
 
         return $this;
     }
