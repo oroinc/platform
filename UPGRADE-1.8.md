@@ -17,3 +17,17 @@ UPGRADE FROM 1.7 to 1.8
 
 ####FormBundle
  - `Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension` by default adds unique suffix to id attribute of each form type
+
+####SyncBundle
+Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. Instead the following websocket configuration is used:
+``` yaml
+    websocket_bind_address:  0.0.0.0
+    websocket_bind_port:     8080
+    websocket_frontend_host: "*"
+    websocket_frontend_port: 8080
+    websocket_backend_host:  "*"
+    websocket_backend_port:  8080
+```
+- `websocket_bind_port` and `websocket_bind_address` specify port and address to which the Clank server binds on startup and waits for incoming requests. By default (0.0.0.0), it listens to all addresses on the machine
+- `websocket_backend_port` and `websocket_backend_host` specify port and address to which the application should connect (PHP). By default ("*"), it connects to 127.0.0.1 address.
+- `websocket_frontend_port` and `websocket_frontend_host` specify port and address to which the browser should connect (JS). By default ("*"), it connects to host specified in the browser.
