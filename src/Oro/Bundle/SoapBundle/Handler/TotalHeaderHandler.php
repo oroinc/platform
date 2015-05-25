@@ -32,8 +32,11 @@ class TotalHeaderHandler implements IncludeHandlerInterface
     {
         $controller = $context->getController();
 
-        return ($controller instanceof EntityManagerAwareInterface || $context->has('query'))
-            && $context->isAction(RestApiReadInterface::ACTION_LIST);
+        return (
+            $context->has('totalCount')
+            || $context->has('query')
+            || $controller instanceof EntityManagerAwareInterface
+        ) && $context->isAction(RestApiReadInterface::ACTION_LIST);
     }
 
     /**
@@ -41,6 +44,21 @@ class TotalHeaderHandler implements IncludeHandlerInterface
      */
     public function handle(Context $context)
     {
+        if ($context->has('totalCount')) {
+            $totalCount = $context->get('totalCount');
+            if (!is_int($totalCount)) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Expected integer, "%s" given',
+                        is_object($totalCount) ? get_class($totalCount) : gettype($totalCount)
+                    )
+                );
+            }
+            $context->getResponse()->headers->set(self::HEADER_NAME, $totalCount);
+
+            return;
+        }
+
         if ($context->has('query')) {
             $value = $context->get('query');
 
