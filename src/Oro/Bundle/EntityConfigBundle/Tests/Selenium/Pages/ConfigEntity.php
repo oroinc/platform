@@ -231,4 +231,21 @@ class ConfigEntity extends CustomEntity
 
         return $this;
     }
+
+    /**
+     * @param $fieldName
+     * @param array $options
+     * @return $this
+     */
+    public function setMultiSelectField($fieldName, $options = array())
+    {
+        foreach ($options as $option) {
+            $this->test->byXPath(
+                "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
+                "//following-sibling::div//label[contains(., '{$option}')]"
+            )->click();
+        }
+
+        return $this;
+    }
 }

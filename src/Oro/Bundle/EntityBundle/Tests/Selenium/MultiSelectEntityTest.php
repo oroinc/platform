@@ -2,24 +2,27 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Selenium;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntity;
+use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
-class OptionSetEntityTest extends Selenium2TestCase
+class MultiSelectEntityTest extends Selenium2TestCase
 {
     /**
      * @return array
      */
-    public function testCreateOptionSetEntity()
+    public function testCreateMultiSelectEntity()
     {
         $entityData = array(
-            'entityName' => 'optionset'.mt_rand(),
+            'entityName' => 'multiSelect'.mt_rand(),
             'stringField' => 'string_field',
-            'optionSetField' => 'option_set'
+            'multiSelectField' => 'multiSelect',
+            'options' =>  array('first','second','third','fourth','fifth')
         );
 
-        $options = array('1','2','3','4','5','6','7','8','9');
-
         $login = $this->login();
+        /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
             ->assertTitle('New Entity - Entity Management - Entities - System')
@@ -36,11 +39,11 @@ class OptionSetEntityTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Field saved')
             ->createField()
-            ->setFieldName($entityData['optionSetField'])
+            ->setFieldName($entityData['multiSelectField'])
             ->setStorageType('Table column')
-            ->setType('Option Set (deprecated)')
+            ->setType('Multi-Select')
             ->proceed()
-            ->addOptions($options)
+            ->addMultiSelectOptions($entityData['options'])
             ->save()
             ->assertMessage('Field saved')
             ->updateSchema()
@@ -51,22 +54,22 @@ class OptionSetEntityTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testCreateOptionSetEntity
+     * @depends testCreateMultiSelectEntity
      * @param $entityData
      */
-    public function testCreateNewOptionSetEntityRecord($entityData)
+    public function testCreateNewMultiSelectEntityRecord($entityData)
     {
-        $this->markTestIncomplete('Due to BAP-2966');
         $login = $this->login();
+        /** @var Navigation $login */
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
-            ->menu($entityData['entityName'])
-            ->open()
-            ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
+            ->menu($entityData['entityName']);
+        /** @var ConfigEntity $login */
+        $login->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
             ->setStringField($entityData['stringField'], 'Some test text')
-            ->setOptionSetField()
+            ->setMultiSelectField($entityData['multiSelectField'], $entityData['options'])
             ->save()
             ->assertMessage('Entity saved');
     }
