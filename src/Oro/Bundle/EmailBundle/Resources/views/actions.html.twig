@@ -111,7 +111,16 @@
 {% endmacro -%}
 
 {% macro addContextButton(emailEntity, parameters) -%}
-    {% if resource_granted('oro_email_email_user_edit', emailEntity.emailUser(app.user)) %}
+    {% set grant = false %}
+    {% if emailEntity.emailUsers|length %}
+        {% for emailUser in emailEntity.emailUsers %}
+            {% if resource_granted('oro_email_email_user_edit', emailUser) %}
+                {% set grant = true %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if grant %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(

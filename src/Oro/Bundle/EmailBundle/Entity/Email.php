@@ -718,32 +718,6 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @param User $user
-     *
-     * @return EmailUser|bool
-     */
-    public function getEmailUser(User $user)
-    {
-        if (!$this->emailUsers) {
-            return false;
-        }
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->in('owner', [$user]));
-        $criteria->where(Criteria::expr()->in('organization', [$user->getOrganization()]));
-        $userEmails = $this->emailUsers->matching($criteria);
-        if (count($userEmails) > 0) {
-            return $userEmails->first();
-        }
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->in('organization', [$user->getOrganization()]));
-        $userEmails = $this->emailUsers->matching($criteria);
-        if (count($userEmails) > 0) {
-            return $userEmails->first();
-        }
-        return $this->getEmailUsers()->first();
-    }
-
-    /**
      * @return array
      */
     public function getFolders()
