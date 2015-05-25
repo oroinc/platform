@@ -22,7 +22,8 @@
     {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
 
     <form
-        id="{{ form.vars.name }}"
+        id="{{ form.vars.id }}"
+        name="{{ form.vars.name }}"
         {{ form_enctype(form) }}
         action="{{ formAction }}"
         method="post"
@@ -40,7 +41,7 @@
         function ($, __, Mediator, Messenger, FormDefault, Modal) {
             'use strict';
 
-            $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
+            $('#{{ form.vars.id }} :input[type=reset]').click(function (e) {
                 var $form = $(this).closest('form'),
                     $checkboxes = $form.find('.parent-scope-checkbox input'),
                     confirm = new Modal({
@@ -61,7 +62,7 @@
             });
 
             {% if pageReload %}
-                $('#{{ form.vars.name }}').submit(function() {
+                $('#{{ form.vars.id }}').submit(function() {
                     Mediator.once('page:update', function() {
                         Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
                         // force reload without hash navigation
