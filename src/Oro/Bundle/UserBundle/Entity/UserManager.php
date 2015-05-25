@@ -62,11 +62,11 @@ class UserManager implements UserProviderInterface
     /**
      * Updates a user
      *
-     * @param  User              $user
+     * @param  OroUserInterface  $user
      * @param  bool              $flush Whether to flush the changes (default true)
      * @throws \RuntimeException
      */
-    public function updateUser(User $user, $flush = true)
+    public function updateUser(OroUserInterface $user, $flush = true)
     {
         $this->updatePassword($user);
 
@@ -214,7 +214,7 @@ class UserManager implements UserProviderInterface
             throw new UnsupportedUserException('Account is not supported');
         }
 
-        if (!$user instanceof User) {
+        if (!$user instanceof OroUserInterface) {
             throw new UnsupportedUserException(
                 sprintf('Expected an instance of Oro\Bundle\UserBundle\Entity\User, but got "%s"', get_class($user))
             );
@@ -268,7 +268,7 @@ class UserManager implements UserProviderInterface
     }
 
     /**
-     * @param UserInterface|string $user
+     * @param OroUserInterface|string $user
      * @return PasswordEncoderInterface
      */
     protected function getEncoder($user)
