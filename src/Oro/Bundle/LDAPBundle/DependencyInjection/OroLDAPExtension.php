@@ -14,14 +14,10 @@ class OroLDAPExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
-
         $serviceLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $serviceLoader->load('services.yml');
         $serviceLoader->load('form.yml');
         $serviceLoader->load('importexport.yml');
-
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**

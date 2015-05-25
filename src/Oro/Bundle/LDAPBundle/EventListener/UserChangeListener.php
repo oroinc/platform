@@ -67,6 +67,10 @@ class UserChangeListener
             return;
         }
 
+        if (($entity->getDn() === null) || ($entity->getLdapIntegrationChannel() === null)) {
+            return;
+        }
+
         $changedFields = array_keys($uow->getEntityChangeSet($entity));
         if (!array_intersect($this->getSynchronizedFields($entity->getLdapIntegrationChannel()), $changedFields)) {
             return;

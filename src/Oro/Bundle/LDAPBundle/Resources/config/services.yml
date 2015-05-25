@@ -8,9 +8,6 @@ parameters:
     oro_ldap.provider.channel_type.class:               Oro\Bundle\LDAPBundle\Provider\ChannelType
     oro_ldap.provider.connector.user.class:             Oro\Bundle\LDAPBundle\Provider\Connector\UserLdapConnector
     oro_ldap.provider.transport.ldap.class:             Oro\Bundle\LDAPBundle\Provider\Transport\LdapTransport
-    #managers
-    oro_ldap.manager.import.class:                      Oro\Bundle\LDAPBundle\Manager\ImportManager
-    oro_ldap.manager.export.class:                      Oro\Bundle\LDAPBundle\Manager\ExportManager
     #event listeners
     oro_ldap.event_listener.user_change_listener.class: Oro\Bundle\LDAPBundle\EventListener\UserChangeListener
 
@@ -23,16 +20,6 @@ services:
             - ""
             - @oro_ldap.ldap.factory.ldap_manager
             - %security.authentication.hide_user_not_found%
-
-    oro_ldap.ldap.ldap_manager:
-        class: Oro\Bundle\LDAPBundle\LDAP\LdapManager
-        arguments:
-            - @doctrine
-            - @fr3d_ldap.ldap_driver
-            - @fr3d_ldap.user_manager
-            - %fr3d_ldap.ldap_manager.parameters%
-        calls:
-            - [updateOroConfiguration, [@oro_config.global]]
 
     oro_ldap.ldap.factory.ldap_manager:
         class: Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory
@@ -60,27 +47,6 @@ services:
         class: %oro_ldap.provider.connector.user.class%
         tags:
             - { name: oro_integration.connector, type: user, channel_type: ldap }
-
-    oro_ldap.manager.import:
-        class: %oro_ldap.manager.import.class%
-        arguments:
-            - @fr3d_ldap.ldap_manager
-            - @oro_user.manager
-            - @doctrine
-            - @oro_ldap.provider.user
-            - @logger
-        tags:
-            - { name: monolog.logger, channel: oro_distribution }
-
-    oro_ldap.manager.export:
-        class: %oro_ldap.manager.export.class%
-        arguments:
-            - @fr3d_ldap.ldap_manager
-            - @oro_user.manager
-            - @oro_ldap.provider.user
-            - @logger
-        tags:
-            - { name: monolog.logger, channel: oro_distribution }
 
     oro_ldap.ldap_manager_factory.link:
         tags:

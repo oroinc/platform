@@ -32,7 +32,7 @@ class RoleMappingType extends AbstractType
     {
         $builder
             ->add('ldapName', 'text', [
-                'label' => 'oro.ldap.system_configuration.fields.role_ldap.label',
+                'label' => 'oro.ldap.transport.ldap.fields.role_ldap.label',
             ])
             ->add(
                 $builder->create(
@@ -42,7 +42,7 @@ class RoleMappingType extends AbstractType
                         'class'    => 'OroUserBundle:Role',
                         'property' => 'label',
                         'multiple' => true,
-                        'label' => 'oro.ldap.system_configuration.fields.role_crm.label',
+                        'label' => 'oro.ldap.transport.ldap.fields.role_crm.label',
                     ]
                 )
                     ->addModelTransformer(new RolesToIdsTransformer($this->getRoleManager(), static::ROLE_CLASS))

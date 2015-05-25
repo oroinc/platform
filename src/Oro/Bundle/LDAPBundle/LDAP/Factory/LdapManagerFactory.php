@@ -6,8 +6,9 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Psr\Log\LoggerInterface;
 
+use Zend\Ldap\Ldap;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\LDAPBundle\LDAP\Ldap;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver;
 use Oro\Bundle\LDAPBundle\Provider\ChannelType;

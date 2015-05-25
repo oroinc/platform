@@ -85,6 +85,12 @@ class LdapProvider extends UserAuthenticationProvider
                 throw new BadCredentialsException('The credentials were changed from another session.');
             }
         } else {
+            if (($user->getDn() === null) || ($user->getLdapIntegrationChannel() === null)) {
+                throw new BadCredentialsException(
+                    'User has no DN or there is no Integration channel to authenticate against.'
+                );
+            }
+
             if ('' === ($presentedPassword = $token->getCredentials())) {
                 throw new BadCredentialsException('The presented password cannot be empty.');
             }

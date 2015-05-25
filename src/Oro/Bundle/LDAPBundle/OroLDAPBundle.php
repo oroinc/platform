@@ -14,6 +14,5 @@ class OroLDAPBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new LdapConfigurationCompilerPass());
     }
 }

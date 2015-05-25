@@ -7,6 +7,7 @@ use FR3D\LdapBundle\Driver\ZendLdapDriver as BaseDriver;
 use Psr\Log\LoggerInterface;
 
 use Zend\Ldap\Dn;
+use Zend\Ldap\Ldap;
 
 class ZendLdapDriver extends BaseDriver
 {

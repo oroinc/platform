@@ -1,4 +1,1 @@
-oro_ldap_bundle:
-    resource: "@OroLDAPBundle/Controller"
-    type:     annotation
-    prefix:   "/ldap"
+

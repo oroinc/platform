@@ -1,4 +1,0 @@
-oro:
-    ldap:
-        import_users_success: Users imported successfully
-        export_users_success: Users exported successfully
