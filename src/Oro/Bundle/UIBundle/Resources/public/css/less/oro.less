@@ -128,6 +128,9 @@ label, input, button, select, textarea { font-size:13px;}
         padding-top:7px;
         width: 100%;
         word-wrap: break-word;
+        &.html-content {
+          overflow: auto;
+        }
       }
       label.control-label {
         width: auto;
@@ -2720,9 +2723,11 @@ label.radio.error {
   }
   .box-content {
     padding: 20px 15px;
-    background: url("../../img/vertical-separator.png") repeat-y 50% 0;
-    .responsive-small &, .responsive-big & {
-      background: none;
+    > .responsive-block + .responsive-block {
+      background: url("../../img/vertical-separator.png") repeat-y 0 0;
+      .responsive-small &, .responsive-big & {
+        background-image: none;
+      }
     }
   }
   .list-inline {
