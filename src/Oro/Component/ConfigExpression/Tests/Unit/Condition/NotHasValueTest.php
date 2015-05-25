@@ -2,9 +2,10 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class NotHasValueTest extends \PHPUnit_Framework_TestCase
 {
@@ -118,14 +119,14 @@ class NotHasValueTest extends \PHPUnit_Framework_TestCase
                 'options'  => [new PropertyPath('value')],
                 'message'  => null,
                 'expected' => '$factory->create(\'not_has\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'], [false])'
                     . '])'
             ],
             [
                 'options'  => [new PropertyPath('value')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'not_has\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'], [false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];

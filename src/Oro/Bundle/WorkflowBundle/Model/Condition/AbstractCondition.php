@@ -2,75 +2,23 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
-use Doctrine\Common\Collections\Collection;
+use Oro\Component\ConfigExpression\Condition\AbstractCondition as BaseAbstractCondition;
 
-abstract class AbstractCondition implements ConditionInterface
+abstract class AbstractCondition extends BaseAbstractCondition
 {
     /**
-     * @var string
-     */
-    protected $message;
-
-    /**
      * {@inheritdoc}
      */
-    public function setMessage($message)
+    public function toArray()
     {
-        $this->message = $message;
-
-        return $this;
+        throw new \BadMethodCallException('Not implemented');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getMessage()
+    public function compile($factoryAccessor)
     {
-        return $this->message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAllowed($context, Collection $errors = null)
-    {
-        $isAllowed = $this->isConditionAllowed($context);
-        if (!$isAllowed) {
-            $this->addError($context, $errors);
-        }
-
-        return $isAllowed;
-    }
-
-    /**
-     * @param mixed $context
-     * @param Collection|null $errors
-     */
-    protected function addError($context, Collection $errors = null)
-    {
-        if ($errors && $this->getMessage()) {
-            $messageParameters = $this->getMessageParameters($context);
-            $errors->add(array('message' => $this->getMessage(), 'parameters' => $messageParameters));
-        }
-    }
-
-    /**
-     * @param mixed $context
-     * @return array
-     */
-    protected function getMessageParameters($context)
-    {
-        return array();
-    }
-
-    /**
-     * This method should be overridden in descendant classes
-     *
-     * @param mixed $context
-     * @return boolean
-     */
-    protected function isConditionAllowed($context)
-    {
-        return false;
+        throw new \BadMethodCallException('Not implemented');
     }
 }

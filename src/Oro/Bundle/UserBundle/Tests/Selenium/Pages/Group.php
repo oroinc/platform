@@ -19,8 +19,8 @@ class Group extends AbstractPageEntity
     public function __construct($testCase, $redirect = true)
     {
         parent::__construct($testCase, $redirect);
-        $this->name = $this->test->byId('oro_user_group_form_name');
-        $this->owner = $this->test->select($this->test->byId('oro_user_group_form_owner'));
+        $this->name = $this->test->byXpath("//*[@data-ftid='oro_user_group_form_name']");
+        $this->owner = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_user_group_form_owner']"));
     }
 
     public function setName($name)

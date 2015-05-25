@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -66,6 +67,11 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
             $this->config
         );
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
+        $mapperProvider = new SearchMappingProvider($eventDispatcher);
+        $mapperProvider->setMappingConfig($this->config);
+        $this->mapper->setMappingProvider($mapperProvider);
 
         $this->securityProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Security\SecurityProvider')
             ->disableOriginalConstructor()->getMock();
@@ -110,7 +116,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $select = $this->indexService->select();
 
         $resultItem = new Item($this->entityManager);
-        $searchResults = array($resultItem);
+        $searchResults = [$resultItem];
 
         $this->engine->expects($this->once())
             ->method('search')
@@ -132,66 +138,66 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
      */
     public function simpleSearchDataProvider()
     {
-        return array(
-            'no extra parameters'             => array(
+        return [
+            'no extra parameters'             => [
                 'expectedQuery' => 'select from * where and((text)all_text ~ qwerty)',
                 'string'        => 'qwerty',
-            ),
-            'custom offset'                   => array(
+            ],
+            'custom offset'                   => [
                 'expectedQuery' => 'select from * where and((text)all_text ~ qwerty) offset 10',
                 'string'        => 'qwerty',
                 'offset'        => 10,
-            ),
-            'custom offset custom maxResults' => array(
+            ],
+            'custom offset custom maxResults' => [
                 'expectedQuery' => 'select from * where and((text)all_text ~ qwerty) limit 200 offset 10',
                 'string'        => 'qwerty',
                 'offset'        => 10,
                 'maxResults'    => 200,
-            ),
-            'custom from'                     => array(
+            ],
+            'custom from'                     => [
                 'expectedQuery' => 'select from test_customer where and((text)all_text ~ qwerty)',
                 'string'        => 'qwerty',
                 'offset'        => 0,
                 'maxResults'    => 0,
                 'from'          => 'test_customer',
-            ),
-            'all custom parameters'           => array(
+            ],
+            'all custom parameters'           => [
                 'expectedQuery' => 'select from test_customer where and((text)all_text ~ qwerty) limit 200 offset 400',
                 'string'        => 'qwerty',
                 'offset'        => 10,
                 'maxResults'    => 200,
                 'from'          => 'test_customer',
                 'page'          => 3,
-            ),
-            'search by inherited entity'      => array(
+            ],
+            'search by inherited entity'      => [
                 'expectedQuery' => 'select from concrete_customer where and((text)all_text ~ qwerty)',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'concrete_customer',
-            ),
-            'search by superclass entity, mode including descendants'     => array(
+            ],
+            'search by superclass entity, mode including descendants'     => [
                 'expectedQuery' => 'select from customer, concrete_customer where and((text)all_text ~ qwerty)',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'customer',
-            ),
-            'search by abstract entity, mode descendants only'     => array(
+            ],
+            'search by abstract entity, mode descendants only'     => [
                 'expectedQuery' => 'select from repeatable_task, scheduled_task where and((text)all_text ~ qwerty)',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'task',
-            ),
-            'unknown from'                    => array(
+            ],
+            'unknown from'                    => [
                 'expectedQuery' => 'select where and((text)all_text ~ qwerty)',
                 'string'        => 'qwerty',
                 'offset'        => 0,
                 'maxResults'    => 0,
                 'from'          => 'unknown_entity',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -205,7 +211,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSimpleSearch($expectedQuery, $string, $offset = 0, $maxResults = 0, $from = null, $page = 0)
     {
-        $searchResults = array('one', 'two', 'three');
+        $searchResults = ['one', 'two', 'three'];
 
         $this->engine->expects($this->any())
             ->method('search')
@@ -232,7 +238,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
     public function testAdvancedSearch()
     {
-        $searchResults = array('one', 'two', 'three');
+        $searchResults = ['one', 'two', 'three'];
 
         $this->engine->expects($this->any())
             ->method('search')
@@ -273,7 +279,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $fromString .=  ' from ' . implode(', ', $query->getFrom());
         }
 
-        $whereParts = array();
+        $whereParts = [];
         foreach ($query->getOptions() as $whereOptions) {
             if (is_array($whereOptions['fieldValue'])) {
                 $whereOptions['fieldValue'] = '(' . implode(', ', $whereOptions['fieldValue']) . ')';

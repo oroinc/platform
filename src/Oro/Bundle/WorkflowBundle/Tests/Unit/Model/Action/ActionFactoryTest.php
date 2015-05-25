@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class ActionFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -85,8 +85,8 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $condition = null;
         if ($isCondition) {
-            /** @var ConditionInterface $condition */
-            $condition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface')
+            /** @var ExpressionInterface $condition */
+            $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
                 ->disableOriginalConstructor()
                 ->getMockForAbstractClass();
             $action->expects($this->once())

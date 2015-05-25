@@ -483,3 +483,51 @@ oro_entity_config:
                             required:       false
                             label:          oro.entity_extend.enum_options
                             tooltip:        oro.entity_extend.enum_options.tooltip
+
+    search:
+        entity:
+            items:
+                # Indicates what custom entity can be searchable
+                searchable:
+                    form:
+                        type:               choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          oro.entity_extend.entity_config.search.field.items.searchable
+        field:
+            items:
+                # Indicates what custom field could be searchable
+                searchable:
+                    options:
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, oneToMany]
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
+                    form:
+                        type:               choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          oro.entity_extend.entity_config.search.field.items.searchable
+                # Indicates what custom text field is a part of search result title
+                title_field:
+                    options:
+                        allowed_type:       [string]
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
+                    form:
+                        type:               choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          oro.entity_extend.entity_config.search.field.items.title_field
+                            tooltip:        oro.entity_extend.entity_config.search.field.items.title_field.tooltip
