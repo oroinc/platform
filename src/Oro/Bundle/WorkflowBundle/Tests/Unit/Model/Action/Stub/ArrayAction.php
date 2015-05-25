@@ -4,14 +4,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Component\ConfigExpression\ExpressionInterface;
+
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 
 class ArrayAction extends ArrayCollection implements ActionInterface
 {
     /**
-     * @var ConditionInterface
+     * @var ExpressionInterface
      */
     protected $condition;
 
@@ -36,16 +37,16 @@ class ArrayAction extends ArrayCollection implements ActionInterface
     }
 
     /**
-     * @param ConditionInterface $condition
+     * @param ExpressionInterface $condition
      * @return mixed
      */
-    public function setCondition(ConditionInterface $condition)
+    public function setCondition(ExpressionInterface $condition)
     {
         $this->condition = $condition;
     }
 
     /**
-     * @return ConditionInterface
+     * @return ExpressionInterface
      */
     public function getCondition()
     {

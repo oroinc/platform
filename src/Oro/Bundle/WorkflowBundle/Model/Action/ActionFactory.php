@@ -3,7 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
+
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class ActionFactory
 {
@@ -30,11 +31,11 @@ class ActionFactory
     /**
      * @param string $type
      * @param array $options
-     * @param ConditionInterface $condition
+     * @param ExpressionInterface $condition
      * @throws \RunTimeException
      * @return ActionInterface
      */
-    public function create($type, array $options = array(), ConditionInterface $condition = null)
+    public function create($type, array $options = array(), ExpressionInterface $condition = null)
     {
         if (!$type) {
             throw new \RunTimeException('The action type must be defined');

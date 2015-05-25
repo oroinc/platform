@@ -1,0 +1,6 @@
+{% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
+
+{% set recordUrl = indexer_item.recordUrl %}
+{% set showImage = false %}
+{% set title = indexer_item.recordTitle|default('N/A') %}
+{% set entityType = 'Custom'|trans %}
