@@ -24,6 +24,13 @@ interface FormAccessorInterface extends ContextItemInterface
     public function getName();
 
     /**
+     * Returns the id of the form.
+     *
+     * @return string
+     */
+    public function getId();
+
+    /**
      * Returns the submit action of the form.
      *
      * @return FormAction
