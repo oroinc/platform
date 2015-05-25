@@ -13,7 +13,8 @@ class CustomEntity extends AbstractPageEntity
 {
     public function setTargetEntity($entity)
     {
-        $target = $this->test->select($this->test->byId('oro_entity_config_type_extend_relation_target_entity'));
+        $target = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_entity']");
+        $target = $this->test->select($target);
         $target->selectOptionByLabel($entity);
         $this->waitForAjax();
         return $this;
@@ -21,7 +22,8 @@ class CustomEntity extends AbstractPageEntity
 
     public function setTargetField($field)
     {
-        $target = $this->test->select($this->test->byId('oro_entity_config_type_extend_relation_target_field'));
+        $target = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_field']");
+        $target = $this->test->select($target);
         $target->selectOptionByLabel($field);
         $this->waitForAjax();
         return $this;
@@ -113,7 +115,8 @@ class CustomEntity extends AbstractPageEntity
         // $flag used for counting adding new options to Multi Select field
         $flag = 0;
         foreach ($options as $option) {
-            $field = $this->test->byId("oro_entity_config_type_enum_enum_options_{$flag}_label");
+            $field = $this->test
+                ->byXpath("//*[@data-ftid='oro_entity_config_type_enum_enum_options_{$flag}_label']");
             $field->clear();
             $field->value($option);
             if ($flag < count($options)-1) {
