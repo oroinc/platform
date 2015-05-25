@@ -4,3 +4,4 @@ oro.entity_extend.enum_public.tooltip: Public option sets can be reused in other
 oro.entity_extend.enum_options.tooltip: Deleting an option will remove it from all records that use it.
 oro.entity_extend.enum_options.priority.tooltip: Click and drag to reorder.
 oro.entity_extend.enum_options.default.tooltip: If marked, this option will be selected by default for new records.
+oro.entity_extend.entity_config.search.field.items.title_field.tooltip: Field value will be included into the search result title
