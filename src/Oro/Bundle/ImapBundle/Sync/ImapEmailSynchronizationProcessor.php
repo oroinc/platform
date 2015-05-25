@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
@@ -556,9 +557,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
-        // todo CRM-2480
-        $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
-        $imapEmail->getEmail()->addFolder($newImapFolder->getFolder());
+        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        if ($emailUser != null) {
+            $emailUser->setFolder($newImapFolder->getFolder());
+        }
         $imapEmail->setImapFolder($newImapFolder);
         $imapEmail->setUid($newUid);
     }
@@ -579,8 +581,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
-        // todo CRM-2480
-        $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
+        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        if ($emailUser != null) {
+            $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+        }
         $this->em->remove($imapEmail);
     }
 

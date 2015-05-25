@@ -394,16 +394,15 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Make sure that all objects in this batch have correct EmailFolder references
      *
-     * @param EmailFolder $old
-     * @param EmailFolder $new
+     * @param EmailFolder $oldFolder
+     * @param EmailFolder $newFolder
      */
-    protected function updateFolderReferences(EmailFolder $old, EmailFolder $new)
+    protected function updateFolderReferences(EmailFolder $oldFolder, EmailFolder $newFolder)
     {
-        foreach ($this->emails as $obj) {
-            // todo CRM-3324
-//            if ($obj->hasFolder($old)) {
-//                $obj->removeFolder($old)->addFolder($new);
-//            }
+        foreach ($this->emailUsers as $emailUser) {
+            if ($emailUser->getFolder() == $oldFolder) {
+                $emailUser->setFolder($newFolder);
+            }
         }
     }
 }

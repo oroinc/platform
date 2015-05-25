@@ -680,11 +680,29 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|EmailUser[]
      */
     public function getEmailUsers()
     {
         return $this->emailUsers;
+    }
+
+    /**
+     * @param EmailFolder $emailFolder
+     *
+     * @return EmailUser|null
+     */
+    public function getEmailUserByFolder(EmailFolder $emailFolder)
+    {
+        $emailUsers = $this->getEmailUsers()->filter(function($entry) use ($emailFolder) {
+            /** @var EmailUser $entry */
+            return $entry->getFolder() == $emailFolder;
+        });
+        if ($emailUsers != null && count($emailUsers) > 0) {
+            return $emailUsers->get(0);
+        }
+
+        return null;
     }
 
     /**
