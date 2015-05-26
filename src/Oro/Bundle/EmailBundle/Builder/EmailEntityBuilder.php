@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -37,28 +34,20 @@ class EmailEntityBuilder
     private $emailAddressHelper;
 
     /**
-     * @var EventDispatcher
-     */
-    private $eventDispatcher;
-
-    /**
      * Constructor
      *
      * @param EmailEntityBatchProcessor $batch
      * @param EmailAddressManager       $emailAddressManager
      * @param EmailAddressHelper        $emailAddressHelper
-     * @param EventDispatcher           $eventDispatcher
      */
     public function __construct(
         EmailEntityBatchProcessor $batch,
         EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper,
-        EventDispatcher $eventDispatcher
+        EmailAddressHelper $emailAddressHelper
     ) {
         $this->batch               = $batch;
         $this->emailAddressManager = $emailAddressManager;
         $this->emailAddressHelper  = $emailAddressHelper;
-        $this->eventDispatcher     = $eventDispatcher;
     }
 
     /**
@@ -154,7 +143,6 @@ class EmailEntityBuilder
         }
 
         $this->batch->addEmailUser($emailUser);
-        $this->eventDispatcher->dispatch(EmailUserAdded::NAME, new EmailUserAdded($emailUser));
 
         return $emailUser;
     }

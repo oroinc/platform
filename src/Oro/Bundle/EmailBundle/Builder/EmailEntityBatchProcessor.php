@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -11,6 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
 
 class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 {
@@ -23,6 +26,11 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      * @var EmailOwnerProvider
      */
     protected $emailOwnerProvider;
+
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
 
     /**
      * @var array
@@ -59,11 +67,16 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      *
      * @param EmailAddressManager $emailAddressManager
      * @param EmailOwnerProvider $emailOwnerProvider
+     * @param EventDispatcher $eventDispatcher
      */
-    public function __construct(EmailAddressManager $emailAddressManager, EmailOwnerProvider $emailOwnerProvider)
-    {
+    public function __construct(
+        EmailAddressManager $emailAddressManager,
+        EmailOwnerProvider $emailOwnerProvider,
+        EventDispatcher $eventDispatcher
+    ) {
         $this->emailAddressManager = $emailAddressManager;
         $this->emailOwnerProvider = $emailOwnerProvider;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -250,6 +263,8 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     {
         foreach ($this->emailUsers as $emailUser) {
             $em->persist($emailUser);
+
+            $this->eventDispatcher->dispatch(EmailUserAdded::NAME, new EmailUserAdded($emailUser));
         }
     }
 
@@ -278,7 +293,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                                 $em->persist($eu);
                             }
                         }
-                        $this->changes[] = ['old' => $this->emailUsers[$key], 'new' => $existingEmail];
+                        $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
                         unset($this->emails[$key]);
                     }
                 }
