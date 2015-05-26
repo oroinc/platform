@@ -17,7 +17,7 @@ config:
             'moment': 'moment'
 
     paths:
-        'moment': 'bundles/orolocale/lib/moment.js'
+        'moment': 'bundles/orolocale/lib/moment/moment.js'
         'numeral': 'bundles/orolocale/lib/numeral.js'
         'orolocale/js/locale-settings': 'bundles/orolocale/js/locale-settings.js'
         'orolocale/js/locale-settings/data': '../js/oro.locale_data.js'
