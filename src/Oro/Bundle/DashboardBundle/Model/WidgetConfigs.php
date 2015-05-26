@@ -146,7 +146,6 @@ class WidgetConfigs
         $widgetOptions = $this->getWidgetOptions($widgetId);
 
         $items = isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [];
-        $items = $this->filterWidgets($items, true, $widgetOptions->get('subWidgets', []));
 
         foreach ($items as $itemName => $config) {
             $items[$itemName]['value'] = $this->resolver->resolve(
