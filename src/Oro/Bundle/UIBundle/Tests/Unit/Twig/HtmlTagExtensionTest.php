@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
 
 class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
@@ -13,15 +13,15 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
     protected $extension;
 
     /**
-     * @var HtmlTagProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var HtmlTagHelper|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $htmlTagProvider;
+    protected $htmlTagHelper;
 
     protected function setUp()
     {
-        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $this->htmlTagHelper = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagHelper');
 
-        $this->extension = new HtmlTagExtension($this->htmlTagProvider);
+        $this->extension = new HtmlTagExtension($this->htmlTagHelper);
     }
 
     public function testGetName()

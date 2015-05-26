@@ -1,18 +1,22 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Tools\EmailHelper;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
-class EmailHelperTest extends \PHPUnit_Framework_TestCase
+class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var EmailHelper */
+    /** @var HtmlTagHelper */
     protected $helper;
+
+    /** @var HtmlTagProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagProvider;
 
     protected function setUp()
     {
-        $this->helper = new EmailHelper();
+        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $this->helper = new HtmlTagHelper($this->htmlTagProvider);
     }
 
     public function testGetStrippedBody()
@@ -20,7 +24,7 @@ class EmailHelperTest extends \PHPUnit_Framework_TestCase
         $actualString = '<style type="text/css">H1 {border-width: 1;}</style><div class="new">test</div>';
         $expectedString = 'test';
 
-        $this->assertEquals($expectedString, $this->helper->getStrippedBody($actualString));
+        $this->assertEquals($expectedString, $this->helper->getStripped($actualString));
     }
 
     /**
@@ -28,7 +32,7 @@ class EmailHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetShortBody($expected, $actual, $maxLength)
     {
-        $shortBody = $this->helper->getShortBody($actual, $maxLength);
+        $shortBody = $this->helper->getShort($actual, $maxLength);
         $this->assertEquals($expected, $shortBody);
     }
 

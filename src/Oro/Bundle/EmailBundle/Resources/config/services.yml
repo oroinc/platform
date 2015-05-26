@@ -4,7 +4,7 @@ parameters:
     oro_email.email_folder.model.class:           Oro\Bundle\EmailBundle\Model\FolderType
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
     oro_email.email_holder_helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
-    oro_email.email_helper.class:                 Oro\Bundle\EmailBundle\Tools\EmailHelper
+#    oro_email.email_helper.class:                 Oro\Bundle\EmailBundle\Tools\EmailHelper
     oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
@@ -114,11 +114,6 @@ services:
         class: %oro_email.email_holder_helper.class%
         arguments:
             - @oro_entity_config.provider.extend
-
-    oro_email.email_helper:
-        class: %oro_email.email_helper.class%
-        arguments:
-            - %kernel.cache_dir%
 
     oro_email.email.address.helper:
         class: %oro_email.email.address.helper.class%
@@ -497,7 +492,7 @@ services:
            - @router
            - @oro_entity_config.config_manager
            - @oro_email.email.thread.provider
-           - @oro_email.email_helper
+           - @oro_ui.html_tag_helper
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 
