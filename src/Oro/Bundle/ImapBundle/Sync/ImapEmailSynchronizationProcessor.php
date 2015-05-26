@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
@@ -345,7 +346,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $invalid = 0;
             }
 
-            if (!$this->isApplicableEmail($email, $folderType, $userId)) {
+            if (!$this->isApplicableEmail($email, $folderType, (int) $userId)) {
                 continue;
             }
 
@@ -356,13 +357,21 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $count++;
             $batch[] = $email;
             if ($count === self::DB_BATCH_SIZE) {
-                $this->saveEmails($batch, $imapFolder);
+                $this->saveEmails(
+                    $batch,
+                    $imapFolder,
+                    $this->em->getReference('Oro\Bundle\UserBundle\Entity\User', $userId)
+                );
                 $count = 0;
                 $batch = [];
             }
         }
         if ($count > 0) {
-            $this->saveEmails($batch, $imapFolder);
+            $this->saveEmails(
+                $batch,
+                $imapFolder,
+                $this->em->getReference('Oro\Bundle\UserBundle\Entity\User', $userId)
+            );
         }
 
         $totalInvalid += $invalid;
@@ -380,8 +389,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
+     * @param User            $owner
      */
-    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
+    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder, User $owner)
     {
         $this->emailEntityBuilder->removeEmails();
 
@@ -429,7 +439,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 try {
                     $imapEmail = $this->createImapEmail(
                         $email->getId()->getUid(),
-                        $this->addEmailUser($email, $folder, $email->hasFlag("\\Seen"))->getEmail(),
+                        $this->addEmailUser(
+                            $email,
+                            $folder,
+                            $email->hasFlag("\\Seen"),
+                            $owner
+                        )->getEmail(),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;
@@ -556,9 +571,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
-        // todo CRM-2480
-        $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
-        $imapEmail->getEmail()->addFolder($newImapFolder->getFolder());
+        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        if ($emailUser != null) {
+            $emailUser->setFolder($newImapFolder->getFolder());
+        }
         $imapEmail->setImapFolder($newImapFolder);
         $imapEmail->setUid($newUid);
     }
@@ -579,8 +595,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
-        // todo CRM-2480
-        $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
+        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        if ($emailUser != null) {
+            $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+        }
         $this->em->remove($imapEmail);
     }
 

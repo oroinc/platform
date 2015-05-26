@@ -54,6 +54,7 @@ parameters:
     oro_email.twig.email_security_policy.class: Twig_Sandbox_SecurityPolicy
 
     oro_email.helper.datagrid.emails.class:           Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper
+    oro_email.datagrid_query_factory.class:           Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
     oro_email.emailfolder.datagrid_view_list.class:   Oro\Bundle\EmailBundle\Datagrid\EmailFolderViewList
@@ -188,6 +189,7 @@ services:
         arguments:
             - @oro_email.email.address.manager
             - @oro_email.email.owner.provider
+            - @event_dispatcher
 
     oro_email.listener.entity_listener:
         class: %oro_email.listener.entity_listener.class%
@@ -198,7 +200,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: doctrine.event_listener, event: postPersist }
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%
@@ -329,6 +330,12 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
 
+    oro_email.datagrid_query_factory:
+        class: %oro_email.datagrid_query_factory.class%
+        arguments:
+            - @oro_email.email.owner.provider.storage
+            - @oro_locale.dql.formatter.name
+
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
         arguments:
@@ -408,6 +415,7 @@ services:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
             - @oro_email.helper.datagrid.emails
+            - @oro_email.datagrid_query_factory
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
 

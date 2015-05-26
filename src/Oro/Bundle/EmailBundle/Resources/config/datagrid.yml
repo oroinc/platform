@@ -33,21 +33,25 @@ datagrid:
                             alias: f
         columns:
             contacts:
+                data_name: email.contacts
                 type: twig
                 label: oro.email.contact.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/contacts.html.twig
             subject:
+                data_name: email.subject
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
             attachments:
+                data_name: email.attachments
                 type: twig
                 label:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
             sentAt:
+                data_name: email.sentAt
                 type: twig
                 label: oro.email.date.label
                 frontend_type: html
@@ -115,6 +119,7 @@ datagrid:
                 select:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
+                    - a
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -125,6 +130,7 @@ datagrid:
                     inner:
                         - { join: eu.folder, alias: f }
                         - { join: f.origin, alias: o }
+                        - { join: e.fromEmailAddress, alias: a }
                 where:
                     and:
                         - o.id IN (:origin_ids)
@@ -149,7 +155,13 @@ datagrid:
             receivedAt:
                 label: oro.email.received_at.label
                 frontend_type: datetime
+            fromEmailExpression:
+                type: twig
+                label: oro.email.from_name.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
             subject:
+                data_name: email.subject
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
@@ -169,14 +181,17 @@ datagrid:
                         - f.type = '%oro_email.email_folder.model.class%::SENT'
         columns:
             sentAt:
+                data_name: email.sentAt
                 label: oro.email.sent_at.label
                 frontend_type: datetime
-            email:
+            recipients:
+                data_name: email.recipients
                 type: twig
                 label: oro.email.recipients.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             subject:
+                data_name: email.subject
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
