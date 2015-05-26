@@ -5,7 +5,7 @@ define(['moment', 'orotranslation/js/translator', './locale-settings'
 
     var locale = localeSettings.getLocale();
 
-    moment.lang(locale, {
+    moment.locale(locale, {
         months : localeSettings.getCalendarMonthNames('wide', true),
         monthsShort : localeSettings.getCalendarMonthNames('abbreviated', true),
         weekdays : localeSettings.getCalendarDayOfWeekNames('wide', true),
