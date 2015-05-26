@@ -6,6 +6,8 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
@@ -46,6 +48,9 @@ class ActivityListManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
      * @param Registry                  $doctrine
      * @param SecurityFacade            $securityFacade
@@ -56,6 +61,7 @@ class ActivityListManager
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param CommentApiManager         $commentManager
      * @param DoctrineHelper            $doctrineHelper
+     * @param HtmlTagHelper             $htmlTagHelper
      */
     public function __construct(
         Registry $doctrine,
@@ -66,7 +72,8 @@ class ActivityListManager
         ActivityListChainProvider $provider,
         ActivityListFilterHelper $activityListFilterHelper,
         CommentApiManager $commentManager,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
@@ -77,6 +84,7 @@ class ActivityListManager
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->commentManager           = $commentManager;
         $this->doctrineHelper           = $doctrineHelper;
+        $this->htmlTagHelper            = $htmlTagHelper;
     }
 
     /**
@@ -211,7 +219,9 @@ class ActivityListManager
             'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
-            'description'          => $entity->getDescription(),
+            'description'          => $this->htmlTagHelper->getStripped(
+                $this->htmlTagHelper->getPurify($entity->getDescription())
+            ),
             'data'                 => $data,
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
