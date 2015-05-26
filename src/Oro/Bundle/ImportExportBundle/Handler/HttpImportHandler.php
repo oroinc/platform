@@ -92,6 +92,7 @@ class HttpImportHandler extends AbstractImportHandler
             'errorsUrl'      => $errorsUrl,
             'errors'         => $errorsAndExceptions,
             'entityName'     => $entityName,
+            'options'        => $options
         ];
     }
 

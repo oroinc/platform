@@ -153,7 +153,7 @@
             WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                 var backAction = $('<button type="button" class="btn">{{ 'Back'|trans }}</button>');
                 backAction.on('click', function(e) {
-                    widget.setUrl({{ path('oro_importexport_import_form', {entity: entityName})|json_encode|raw }});
+                    widget.setUrl({{ path('oro_importexport_import_form', {entity: entityName, options: options})|json_encode|raw }});
                     widget.loadContent();
                 });
                 widget.addAction('back', 'adopted', backAction);
@@ -167,7 +167,7 @@
                         );
 
                         widget.trigger('beforeContentLoad', widget);
-                        $.getJSON({{ path('oro_importexport_import_process', {processorAlias: processorAlias})|json_encode|raw }}, function(data) {
+                        $.getJSON({{ path('oro_importexport_import_process', {processorAlias: processorAlias, options: options})|json_encode|raw }}, function(data) {
                             widget.trigger('contentLoad', '', widget);
                             widget.trigger('importComplete', data);
                             var message = data.message;
