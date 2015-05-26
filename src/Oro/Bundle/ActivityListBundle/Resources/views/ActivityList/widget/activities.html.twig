@@ -1,8 +1,6 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
-{% set entityClass = oro_class_name(entity, true) %}
 <div class="widget-content activity-list {{ containerExtraClass }}">
-    {% placeholder oro_activity_list_before with {entityClass: entityClass, entityId: entity.id} %}
     {% set pager = {
         current: 1,
         pagesize: oro_config_value('oro_activity_list.per_page'),
@@ -10,6 +8,9 @@
         count: 1
     } %}
     {% block widget_content %}
+
+        {% placeholder oro_activity_list_before with {entityClass: oro_class_name(entity, true), entityId: entity.id} %}
+
         {% block widget_actions %}
         <div class="grid-toolbar">
             <div class="filter-box oro-clearfix-width">
@@ -93,6 +94,8 @@
             {% endfor %}
             {% include 'OroCommentBundle:Comment/js:list.js.twig' with {'id': 'template-activity-item-comment'} %}
         {% endblock %}
+
+        {% placeholder oro_activity_list_after with {entityClass: oro_class_name(entity, true), entityId: entity.id} %}
+
     {% endblock %}
-    {% placeholder oro_activity_list_after with {entityClass: entityClass, entityId: entity.id} %}
 </div>
