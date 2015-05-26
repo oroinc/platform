@@ -346,7 +346,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $invalid = 0;
             }
 
-            if (!$this->isApplicableEmail($email, $folderType, $userId)) {
+            if (!$this->isApplicableEmail($email, $folderType, (int) $userId)) {
                 continue;
             }
 

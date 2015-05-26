@@ -73,7 +73,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      *
      * @param EmailOrigin $origin
      *
-     * @return User|null
+     * @return int|null
      */
     protected function getUserId(EmailOrigin $origin)
     {
