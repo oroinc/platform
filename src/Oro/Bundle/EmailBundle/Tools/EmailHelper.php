@@ -5,16 +5,15 @@ namespace Oro\Bundle\EmailBundle\Tools;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailHelper
 {
     const MAX_DESCRIPTION_LENGTH = 500;
 
     /**
-     * @var SecurityFacade
+     * @var ServiceLink
      */
-    protected $securityFacade;
+    protected $securityFacadeLink;
 
     /**
      * @var string
@@ -27,7 +26,7 @@ class EmailHelper
      */
     public function __construct(ServiceLink $securityFacadeLink, $cacheDir = null)
     {
-        $this->securityFacade = $securityFacadeLink->getService();
+        $this->securityFacadeLink = $securityFacadeLink;
         $this->cacheDir = $cacheDir;
     }
 
@@ -89,7 +88,7 @@ class EmailHelper
     {
         $isGranted = false;
         foreach ($entity->getEmailUsers() as $emailUser) {
-            if ($this->securityFacade->isGranted($action, $emailUser)) {
+            if ($this->securityFacadeLink->getService()->isGranted($action, $emailUser)) {
                 $isGranted = true;
                 break;
             }
