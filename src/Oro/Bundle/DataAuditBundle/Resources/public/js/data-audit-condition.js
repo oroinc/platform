@@ -175,7 +175,15 @@ define([
                 this.element.data('value', {});
             }
 
+            if (this.$changeStateChoice) {
+                this.$changeStateChoice.detach();
+            }
+
             this._superApply(arguments);
+
+            if (this.auditTypeFilter) {
+                this.auditTypeFilter.$el.trigger('change');
+            }
 
             this.element.data('value', data);
         },
