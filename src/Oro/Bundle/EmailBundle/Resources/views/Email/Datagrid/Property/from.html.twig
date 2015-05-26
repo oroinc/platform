@@ -1,10 +1,11 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
 {# Fetch mode is EAGER so no additional request peformed here #}
-{% set emailAddress = record.getValue('fromEmailAddress') %}
+{% set email = record.getValue('email') %}
+{% set fromEmailAddress = email.fromEmailAddress %}
 
-{% if emailAddress.owner is null -%}
+{% if fromEmailAddress.owner is null -%}
     {{ value }}
 {%- else -%}
-    {{ EA.email_address_link(emailAddress, value) }}
+    {{ EA.email_address_link(fromEmailAddress, value) }}
 {% endif %}

@@ -115,6 +115,7 @@ datagrid:
                 select:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
+                    - a
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -125,6 +126,7 @@ datagrid:
                     inner:
                         - { join: eu.folder, alias: f }
                         - { join: f.origin, alias: o }
+                        - { join: e.fromEmailAddress, alias: a }
                 where:
                     and:
                         - o.id IN (:origin_ids)
@@ -149,6 +151,11 @@ datagrid:
             receivedAt:
                 label: oro.email.received_at.label
                 frontend_type: datetime
+            fromEmailExpression:
+                type: twig
+                label: oro.email.from_name.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
