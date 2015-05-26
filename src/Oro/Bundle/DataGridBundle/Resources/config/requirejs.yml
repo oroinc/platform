@@ -6,16 +6,6 @@ config:
                 - 'underscore'
                 - 'backbone'
             exports: 'Backgrid'
-        'backgrid/moment':
-            deps:
-                - 'jquery'
-                - 'underscore'
-                - 'backbone'
-                - 'backgrid'
-                - 'moment'
-        'moment':
-            exports:
-                - 'moment'
     paths:
         'backbone-pageable-collection': 'bundles/orodatagrid/lib/backbone-pageable.js'
         'backgrid': 'bundles/orodatagrid/lib/backgrid/backgrid.js'
