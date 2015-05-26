@@ -53,7 +53,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->with(
                 [
                     'tooltip' => false,
-                    'random_id' => true,
                     'configs' => [
                         'placeholder'        => 'oro.email.contexts.placeholder',
                         'allowClear'         => true,
