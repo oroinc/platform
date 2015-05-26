@@ -6,7 +6,8 @@
     <div class="form-container">
         <form method="post"
               data-nohash="true"
-              id="{{ form.vars.name }}"
+              id="{{ form.vars.id }}"
+              name="{{ form.vars.name }}"
               action="{{ path('oro_importexport_import_form', {entity: entityName}) }}"
               class="form-horizontal"
               {{ form_enctype(form) }}>
@@ -26,6 +27,7 @@
                 <button class="btn btn-primary" type="submit">{{ 'Submit'|trans }}</button>
             </div>
         </form>
+        {{ oro_form_js_validation(form) }}
     </div>
 
     <script type="text/javascript">

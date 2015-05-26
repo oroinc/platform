@@ -22,7 +22,7 @@ class Integration extends AbstractPageEntity
      */
     public function setName($name)
     {
-        $field = $this->test->byId('oro_integration_channel_form_name');
+        $field = $this->test->byXpath("//*[@data-ftid='oro_integration_channel_form_name']");
         $field->clear();
         $field->value($name);
 
@@ -35,7 +35,7 @@ class Integration extends AbstractPageEntity
      */
     public function setType($type)
     {
-        $field = $this->test->select($this->test->byId('oro_integration_channel_form_type'));
+        $field = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_integration_channel_form_type']"));
         $field->selectOptionByValue($type);
 
         return $this;
