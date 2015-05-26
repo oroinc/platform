@@ -83,7 +83,7 @@ class User implements LdapUserInterface, UserInterface
     /**
      * @param OroUser $oroUser
      *
-     * @return this
+     * @return $this
      */
     public static function createFromUser(OroUser $oroUser)
     {

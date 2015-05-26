@@ -22,15 +22,15 @@ class LdapProvider extends UserAuthenticationProvider
     /** @var LdapManagerFactory */
     protected $ldapManagerFactory;
 
-    /** @var UserProviderInterface  */
+    /** @var UserProviderInterface */
     protected $userProvider;
 
     /**
-     * @param UserCheckerInterface  $userChecker
-     * @param string                $providerKey
+     * @param UserCheckerInterface $userChecker
+     * @param string $providerKey
      * @param UserProviderInterface $userProvider
-     * @param LdapManagerFactory    $ldapManagerFactory
-     * @param boolean               $hideUserNotFoundExceptions
+     * @param LdapManagerFactory $ldapManagerFactory
+     * @param boolean $hideUserNotFoundExceptions
      */
     public function __construct(
         UserCheckerInterface $userChecker,
@@ -52,8 +52,8 @@ class LdapProvider extends UserAuthenticationProvider
         $guesser = new UserOrganizationGuesser();
         $parentAuthenticatedToken = parent::authenticate($token);
 
-        $user         = $parentAuthenticatedToken->getUser();
-        $organization = $guesser->guess($user, $token);
+        $user = $parentAuthenticatedToken->getUser();
+            $organization = $guesser->guess($user, $token);
 
         if (!$organization) {
             throw new BadCredentialsException("You don't have active organization assigned.");
@@ -81,26 +81,81 @@ class LdapProvider extends UserAuthenticationProvider
     {
         $currentUser = $token->getUser();
         if ($currentUser instanceof UserInterface) {
-            if ($user->getDn() !== $currentUser->getDn()) {
-                throw new BadCredentialsException('The credentials were changed from another session.');
-            }
+            $this->checkAuthAgainstCurrentUser($user, $currentUser);
         } else {
-            if (($user->getDn() === null) || ($user->getLdapIntegrationChannel() === null)) {
-                throw new BadCredentialsException(
-                    'User has no DN or there is no Integration channel to authenticate against.'
-                );
-            }
+            $this->checkAuthAgainstLdap($user, $token);
+        }
+    }
 
-            if ('' === ($presentedPassword = $token->getCredentials())) {
-                throw new BadCredentialsException('The presented password cannot be empty.');
-            }
+    /**
+     * Checks authentication against current user.
+     *
+     * @param UserInterface $user
+     * @param UserInterface $currentUser
+     *
+     * @throws BadCredentialsException
+     */
+    protected function checkAuthAgainstCurrentUser(UserInterface $user, UserInterface $currentUser)
+    {
+        // Get mappings for users
+        $userMapping = (array)$user->getLdapMappings();
+        $currentMapping = (array)$currentUser->getLdapMappings();
 
-            $ldapUser = User::createFromUser($user);
-            if (!$this->ldapManagerFactory->getInstanceForChannel(
-                $user->getLdapIntegrationChannel()
-            )->bind($ldapUser, $presentedPassword)) {
-                throw new BadCredentialsException('The presented password is invalid.');
+        // If any mapping is empty, there is nothing to authenticate against.
+        if (empty($userMapping) || empty($currentMapping)) {
+            throw new BadCredentialsException('There is no LDAP Integration to authenticate against.');
+        }
+
+        $commonMapping = array_intersect_key($userMapping, $currentMapping);
+        if (empty($commonMapping)) {
+            throw new BadCredentialsException('The credentials were changed from another session.');
+        }
+
+        $matched = false;
+        foreach ($commonMapping as $mapping) {
+            if ($userMapping[$mapping] == $currentMapping[$mapping]) {
+                $matched = true;
+                break;
             }
+        }
+
+        if (!$matched) {
+            throw new BadCredentialsException('The credentials were changed from another session.');
+        }
+    }
+
+    /**
+     * Checks authentication against LDAP.
+     *
+     * @param UserInterface $user
+     * @param UsernamePasswordToken $token
+     *
+     * @throws BadCredentialsException
+     */
+    protected function checkAuthAgainstLdap(UserInterface $user, UsernamePasswordToken $token)
+    {
+        $mappings = (array)$user->getLdapMappings();
+        if (empty($mappings)) {
+            throw new BadCredentialsException('There is no LDAP Integration to authenticate against.');
+        }
+
+        if ('' === ($presentedPassword = $token->getCredentials())) {
+            throw new BadCredentialsException('The presented password cannot be empty.');
+        }
+
+        $ldapUser = User::createFromUser($user);
+
+        $bound = false;
+        foreach ($mappings as $channelId) {
+            $manager = $this->ldapManagerFactory->getInstanceForChannelId($channelId);
+            if ($manager->bind($ldapUser, $presentedPassword)) {
+                $bound = true;
+                break;
+            }
+        }
+
+        if (!$bound) {
+            throw new BadCredentialsException('The presented password is invalid.');
         }
     }
 

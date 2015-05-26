@@ -48,14 +48,18 @@ services:
         tags:
             - { name: oro_integration.connector, type: user, channel_type: ldap }
 
-    oro_ldap.ldap_manager_factory.link:
+    oro_ldap.ldap_channel_manager.link:
         tags:
-            - { name: oro_service_link,  service: oro_ldap.ldap.factory.ldap_manager }
+            - { name: oro_service_link,  service: oro_ldap.ldap.ldap_channel_manager }
+
+    oro_ldap.ldap.ldap_channel_manager:
+        class: Oro\Bundle\LdapBundle\LDAP\LdapChannelManager
+        arguments: [@doctrine, @oro_ldap.ldap.factory.ldap_manager]
 
     oro_ldap.event_listener.user_change_listener.class:
         class:  %oro_ldap.event_listener.user_change_listener.class%
         arguments:
-            - @oro_ldap.ldap_manager_factory.link
+            - @oro_ldap.ldap_channel_manager.link
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }

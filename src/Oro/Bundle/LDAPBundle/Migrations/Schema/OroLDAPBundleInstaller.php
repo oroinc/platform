@@ -37,27 +37,14 @@ class OroLDAPBundleInstaller implements Installation, ExtendExtensionAwareInterf
     public function up(Schema $schema, QueryBag $queries)
     {
         $userTable = $schema->getTable('oro_user');
-        $userTable->addColumn('dn', 'text', [
+        $userTable->addColumn('ldap_mappings', 'array', [
             'oro_options' => [
                 'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
-                'form'   => ['is_enabled' => false],
+                'form' => ['is_enabled' => false],
+                'datagrid' => ['is_visible' => false],
             ],
             'notnull' => false
         ]);
-
-        $this->extendExtension->addManyToOneRelation(
-            $schema,
-            $userTable,
-            'ldap_integration_channel',
-            'oro_integration_channel',
-            'id',
-            [
-                'oro_options' => [
-                    'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
-                    'form' => ['is_enabled' => false],
-                ]
-            ]
-        );
 
         $transportTable = $schema->getTable('oro_integration_transport');
         $transportTable->addColumn('oro_ldap_server_hostname', 'string', [

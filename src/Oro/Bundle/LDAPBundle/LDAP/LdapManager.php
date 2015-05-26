@@ -89,54 +89,55 @@ class LdapManager extends BaseManager
 
     /**
      * @param UserInterface $user
+     *
+     * @param string $dn
+     * @return string Dn
      */
-    public function save(UserInterface $user)
+    public function save(UserInterface $user, $dn = null)
     {
         $propertyAccessor = $this->getPropertyAccessor();
 
-        $entry = array(
-            'objectClass' => [$this->params['export_class']],
-        );
+        $entry = ['objectClass' => [$this->params['export_class']]];
         foreach ($this->params['attributes'] as $attribute) {
             $entry[$attribute['ldap_attr']] = $propertyAccessor->getValue($user, $attribute['user_field']);
         }
 
-        $dn = $this->createDn($user);
-        $user->setDn($dn);
+        if (!$dn) {
+            $dn = $this->createDn($user->getUsername());
+        }
+
         if ($this->driver->exists($dn) && strpos($dn, $user->getUsername()) === false) {
             $newDn = preg_replace('/(?<==).*?(?=,)/', $user->getUsername(), $dn, 1);
             $this->driver->move($dn, $newDn);
-            $user->setDn($newDn);
-
             $dn = $newDn;
         }
 
         $this->driver->save($dn, $entry);
+
+        return $dn;
     }
 
     /**
+     * Checks if user exists.
+     *
      * @param UserInterface $user
+     * @param string $dn Optional Dn of user.
      *
      * @return bool
      */
-    public function exists(UserInterface $user)
+    public function exists(UserInterface $user, $dn = null)
     {
-        return $this->driver->exists($this->createDn($user));
+        return $this->driver->exists($dn ? $dn : $this->createDn($user->getUsername()));
     }
 
     /**
-     * @param UserInterface $user
+     * @param string $username
      *
      * @return string
      */
-    private function createDn(UserInterface $user)
+    private function createDn($username)
     {
-        $dn = $user->getDn();
-        if (!$dn) {
-            $dn = sprintf('%s=%s,%s', $this->ldapUsernameAttr, $user->getUsername(), $this->params['export_dn']);
-        }
-
-        return $dn;
+        return sprintf('%s=%s,%s', $this->ldapUsernameAttr, $username, $this->params['export_dn']);
     }
 
     /**
@@ -149,9 +150,8 @@ class LdapManager extends BaseManager
         $result = parent::hydrate($user, $entry);
 
         $user->setPassword($originalPassword);
-        $user->setDn($entry['dn']);
 
-        $roles = $this->findRolesForUser($user->getDn());
+        $roles = $this->findRolesForUser($entry['dn']);
         $this->updateRoles($user, $roles);
 
         return $result;

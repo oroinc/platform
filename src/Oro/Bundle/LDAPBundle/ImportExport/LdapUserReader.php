@@ -2,32 +2,39 @@
 
 namespace Oro\Bundle\LDAPBundle\ImportExport;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
+use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
 
 class LdapUserReader extends IteratorBasedReader
 {
-    /** @var ConnectorContextMediator */
-    private $connectorContextMediator;
+    use HasChannel;
 
-    /** @var LdapManagerFactory */
-    protected $ldapManagerFactory;
-
-    /** @var Channel */
-    protected $channel;
+    /** @var LdapChannelManager */
+    private $channelManager;
 
     public function __construct(
-        ConnectorContextMediator $connectorContextMediator,
         ContextRegistry $contextRegistry,
-        LdapManagerFactory $ldapManagerFactory
+        ConnectorContextMediator $connectorContextMediator,
+        LdapChannelManager $channelManager
     ) {
         parent::__construct($contextRegistry);
+        $this->setConnectorContextMediator($connectorContextMediator);
+        $this->channelManager = $channelManager;
+    }
 
-        $this->ldapManagerFactory = $ldapManagerFactory;
-        $this->connectorContextMediator = $connectorContextMediator;
+    /**
+     * {@inheritdoc}
+     */
+    public function setStepExecution(StepExecution $stepExecution)
+    {
+        $this->setContext($this->contextRegistry->getByStepExecution($stepExecution));
+        parent::setStepExecution($stepExecution);
     }
 
     /**
@@ -35,23 +42,6 @@ class LdapUserReader extends IteratorBasedReader
      */
     public function initialize()
     {
-        $this->setSourceIterator(new \ArrayIterator(
-            $this->ldapManagerFactory->getInstanceForChannel($this->getChannel())->findUsers()
-        ));
-    }
-
-
-    /**
-     * Returns integration channel.
-     *
-     * @return Channel
-     */
-    protected function getChannel()
-    {
-        if ($this->channel === null || $this->getContext()->getOption('channel') !== $this->channel->getId()) {
-            $this->channel = $this->connectorContextMediator->getChannel($this->getContext());
-        }
-
-        return $this->channel;
+        $this->setSourceIterator(new \ArrayIterator($this->channelManager->findUsers($this->getChannel())));
     }
 }
