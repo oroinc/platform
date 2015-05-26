@@ -189,6 +189,7 @@ services:
         arguments:
             - @oro_email.email.address.manager
             - @oro_email.email.owner.provider
+            - @event_dispatcher
 
     oro_email.listener.entity_listener:
         class: %oro_email.listener.entity_listener.class%
@@ -199,7 +200,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: doctrine.event_listener, event: postPersist }
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%

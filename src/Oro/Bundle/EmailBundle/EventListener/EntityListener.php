@@ -56,48 +56,4 @@ class EntityListener
         $this->emailThreadManager->handlePostFlush($event);
         $this->emailActivityManager->handlePostFlush($event);
     }
-
-    public function postPersist(LifecycleEventArgs $eventArgs)
-    {
-        // todo: move to crmpro
-        $emailUser = $eventArgs->getObject();
-
-        if ($emailUser instanceof EmailUser
-            && $emailUser->getOwner() === null
-            && $emailUser->getOrganization() === null
-        ) {
-            $em = $eventArgs->getObjectManager();
-
-            $origin = $emailUser->getFolder()->getOrigin();
-
-            $qb = $em->getRepository('Oro\Bundle\UserBundle\Entity\User')
-                ->createQueryBuilder('u')
-                ->select('u')
-                ->innerJoin('u.emailOrigins', 'o')
-                ->where('o.id = :originId')
-                ->setParameter('originId', $origin->getId())
-                ->setMaxResults(1);
-
-            /** @var User $user */
-            $user = $qb->getQuery()->getSingleResult();
-            $organizations = $user->getOrganizations();
-
-            $length = count($organizations);
-            for ($i = 0; $i < $length; $i++) {
-                $organization = $organizations[$i];
-                if (!$organization->getIsGlobal()) {
-                    if ($i === 0) {
-                        $emailUser->setOwner($user);
-                        $emailUser->setOrganization($organization);
-                    } else {
-                        $eu = clone $emailUser;
-                        $eu->setOwner($user);
-                        $eu->setOrganization($organization);
-
-                        $em->persist($eu);
-                    }
-                }
-            }
-        }
-    }
 }
