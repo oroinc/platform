@@ -112,6 +112,8 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $emailUser->setFolder($origin->getFolder(FolderType::SENT));
             $emailUser->getEmail()->addActivityTarget($owner);
             $emailUser->getEmail()->addActivityTarget($simple_user2);
+            $emailUser->setOrganization($owner->getOrganization());
+            $emailUser->setOwner($owner);
 
             $emailBody = $this->emailEntityBuilder->body(
                 "Hi,\n" . $template['Text'],
@@ -121,7 +123,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
             $emailUser->getEmail()->setEmailBody($emailBody);
             $emailUser->getEmail()->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
-            $this->setReference('email_' . ($index + 1), $emailUser);
+            $this->setReference('email_' . ($index + 1), $emailUser->getEmail());
             $this->setReference('emailBody_' . ($index + 1), $emailBody);
         }
         $this->emailEntityBuilder->getBatch()->persist($om);

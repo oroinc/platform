@@ -278,7 +278,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                                 $em->persist($eu);
                             }
                         }
-                        $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
+                        $this->changes[] = ['old' => $this->emailUsers[$key], 'new' => $existingEmail];
                         unset($this->emails[$key]);
                     }
                 }
