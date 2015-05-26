@@ -2,11 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class EmailHelper
 {
     const MAX_DESCRIPTION_LENGTH = 500;
+
+    /**
+     * @var ServiceLink
+     */
+    protected $securityFacadeLink;
 
     /**
      * @var string
@@ -14,10 +21,12 @@ class EmailHelper
     protected $cacheDir;
 
     /**
+     * @param ServiceLink $securityFacadeLink
      * @param string|null $cacheDir
      */
-    public function __construct($cacheDir = null)
+    public function __construct(ServiceLink $securityFacadeLink, $cacheDir = null)
     {
+        $this->securityFacadeLink = $securityFacadeLink;
         $this->cacheDir = $cacheDir;
     }
 
@@ -50,5 +59,41 @@ class EmailHelper
         }
 
         return $content;
+    }
+
+    /**
+     * @param Email $entity
+     * @return bool
+     */
+    public function isEmailViewGranted(Email $entity)
+    {
+        return $this->isEmailActionGranted('VIEW', $entity);
+    }
+
+    /**
+     * @param Email $entity
+     * @return bool
+     */
+    public function isEmailEditGranted(Email $entity)
+    {
+        return $this->isEmailActionGranted('EDIT', $entity);
+    }
+
+    /**
+     * @param string $action
+     * @param Email $entity
+     * @return bool
+     */
+    public function isEmailActionGranted($action, Email $entity)
+    {
+        $isGranted = false;
+        foreach ($entity->getEmailUsers() as $emailUser) {
+            if ($this->securityFacadeLink->getService()->isGranted($action, $emailUser)) {
+                $isGranted = true;
+                break;
+            }
+        }
+
+        return $isGranted;
     }
 }

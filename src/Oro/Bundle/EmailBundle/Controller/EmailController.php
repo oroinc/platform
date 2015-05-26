@@ -23,9 +23,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EmailBundle\Tools\EmailHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Class EmailController
@@ -115,7 +115,7 @@ class EmailController extends Controller
         }
         $this->loadEmailBody($emails);
 
-        $items = array_filter($emails, [$this, 'isEmailViewGranted']);
+        $items = array_filter($emails, [$this->getEmailHelper(), 'isEmailViewGranted']);
 
         return [
             'items' => $items,
@@ -241,7 +241,7 @@ class EmailController extends Controller
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
-        if (!$this->isEmailGranted('EDIT', $emailAttachment->getEmailBody()->getEmail())) {
+        if (!$this->getEmailHelper()->isEmailEditGranted($emailAttachment->getEmailBody()->getEmail())) {
             throw new AccessDeniedException();
         }
 
@@ -339,37 +339,21 @@ class EmailController extends Controller
     }
 
     /**
-     * @return SecurityFacade
+     * @return EmailHelper
      */
-    protected function getSecurityFacade()
+    protected function getEmailHelper()
     {
-        return $this->get('oro_security.security_facade');
-    }
-
-    /**
-     * @param string $action
-     * @param Email $entity
-     * @return bool
-     */
-    protected function isEmailGranted($action, Email $entity)
-    {
-        $isGranted = false;
-        foreach ($entity->getEmailUsers() as $emailUser) {
-            if ($this->getSecurityFacade()->isGranted($action, $emailUser)) {
-                $isGranted = true;
-                break;
-            }
-        }
-
-        return $isGranted;
+        return $this->get('oro_email.email_helper');
     }
 
     /**
      * @param Email $entity
+     *
+     * @throws AccessDeniedException
      */
     protected function assertEmailViewGranted(Email $entity)
     {
-        if (!$this->isEmailGranted('VIEW', $entity)) {
+        if (!$this->getEmailHelper()->isEmailViewGranted($entity)) {
             throw new AccessDeniedException();
         }
     }
@@ -509,7 +493,7 @@ class EmailController extends Controller
                 $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
             }
         }
-        $createGrant = $this->getSecurityFacade()
+        $createGrant = $this->get('oro_security.security_facade')
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;

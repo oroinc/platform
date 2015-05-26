@@ -110,13 +110,13 @@ class CustomEntity extends AbstractPageEntity
      *
      * @return $this
      */
-    public function addOptions($options = array())
+    public function addMultiSelectOptions($options = array())
     {
-        // $flag used for counting adding new options to Option Set field
+        // $flag used for counting adding new options to Multi Select field
         $flag = 0;
         foreach ($options as $option) {
             $field = $this->test
-                ->byXpath("//*[@data-ftid='oro_entity_config_type_extend_set_options_{$flag}_label']");
+                ->byXpath("//*[@data-ftid='oro_entity_config_type_enum_enum_options_{$flag}_label']");
             $field->clear();
             $field->value($option);
             if ($flag < count($options)-1) {
@@ -126,10 +126,5 @@ class CustomEntity extends AbstractPageEntity
             }
         }
         return $this;
-    }
-
-    public function setOptionSetField()
-    {
-
     }
 }

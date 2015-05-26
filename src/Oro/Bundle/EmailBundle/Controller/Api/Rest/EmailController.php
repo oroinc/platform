@@ -23,6 +23,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Tools\EmailHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
@@ -63,6 +64,20 @@ class EmailController extends RestGetController
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [], $joins = [])
+    {
+        $manager = $this->getManager();
+        $qb = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
+
+        $entities = array_filter($qb->getQuery()->getResult(), [$this->getEmailHelper(), 'isEmailViewGranted']);
+        $result = $this->getPreparedItems($entities);
+
+        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
+    }
+
+    /**
      * @param integer $entityId Entity id
      *
      * @ApiDoc(
@@ -85,6 +100,10 @@ class EmailController extends RestGetController
 
         if (!$entity) {
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
+        if (!$this->getEmailHelper()->isEmailViewGranted($entity)) {
+            return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
         }
 
         $associations = $entity->getActivityTargetEntities();
@@ -115,6 +134,10 @@ class EmailController extends RestGetController
         $entity = $this->getManager()->find($entityId);
         if (!$entity) {
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
+        if (!$this->getEmailHelper()->isEmailViewGranted($entity)) {
+            return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
         }
 
         /** @var $entityRoutingHelper EntityRoutingHelper */
@@ -213,6 +236,13 @@ class EmailController extends RestGetController
             ], Codes::HTTP_NOT_FOUND));
         }
 
+        if (!$this->getEmailHelper()->isEmailEditGranted($entity)) {
+            return $this->handleView($this->view([
+                'status'  => 'error',
+                'message' => $translator->trans('oro.email.forbidden', ['%id%'=>$entityId])
+            ], Codes::HTTP_FORBIDDEN));
+        }
+
         try {
             if ($entity->supportActivityTarget($targetClassName)) {
                 $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
@@ -270,6 +300,13 @@ class EmailController extends RestGetController
             ], Codes::HTTP_NOT_FOUND));
         }
 
+        if (!$this->getEmailHelper()->isEmailEditGranted($entity)) {
+            return $this->handleView($this->view([
+                'status'  => 'error',
+                'message' => $translator->trans('oro.email.forbidden', ['%id%'=>$entityId])
+            ], Codes::HTTP_FORBIDDEN));
+        }
+
         try {
             $entityRoutingHelper = $this->get('oro_entity.routing_helper');
             $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
@@ -302,6 +339,34 @@ class EmailController extends RestGetController
     public function getAction($id)
     {
         return $this->handleGetRequest($id);
+    }
+
+    /**
+     * GET single item
+     *
+     * @param  mixed $id
+     *
+     * @return Response
+     */
+    public function handleGetRequest($id)
+    {
+        $manager = $this->getManager();
+
+        $result = $manager->find($id);
+        if ($result) {
+            if (!$this->getEmailHelper()->isEmailViewGranted($result)) {
+                return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
+            }
+
+            $result = $this->getPreparedItem($result);
+        }
+
+        return $this->buildResponse(
+            $result ?: '',
+            self::ACTION_READ,
+            ['result' => $result],
+            $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
+        );
     }
 
     /**
@@ -379,5 +444,13 @@ class EmailController extends RestGetController
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email.api');
+    }
+
+    /**
+     * @return EmailHelper
+     */
+    protected function getEmailHelper()
+    {
+        return $this->get('oro_email.email_helper');
     }
 }
