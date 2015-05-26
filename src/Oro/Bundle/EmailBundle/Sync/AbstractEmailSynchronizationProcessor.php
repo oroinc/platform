@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+use Doctrine\ORM\UnexpectedResultException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -68,11 +69,11 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     abstract public function process(EmailOrigin $origin, $syncStartTime);
 
     /**
-     * Returns the id of a user the given email origin belongs to.
+     * Returns the user the given email origin belongs to
      *
      * @param EmailOrigin $origin
      *
-     * @return int|null
+     * @return User|null
      */
     protected function getUserId(EmailOrigin $origin)
     {
@@ -89,8 +90,14 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             ->where('o.id = :originId')
             ->setParameter('originId', $origin->getId())
             ->setMaxResults(1);
-        $result = $qb->getQuery()->getArrayResult();
-        $userId = !empty($result) ? $result[0]['id'] : null;
+
+        $userId = null;
+        try {
+            $userId = $qb->getQuery()->getSingleScalarResult();
+        } catch (UnexpectedResultException $e) {
+            $this->logger->notice($e->getMessage());
+        }
+
         if ($userId === null) {
             $this->logger->notice('The user was not found.');
         } else {
@@ -224,10 +231,11 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      * @param EmailHeader $email
      * @param EmailFolder $folder
      * @param bool        $isSeen
+     * @param User        $owner
      *
      * @return EmailUser
      */
-    protected function addEmailUser(EmailHeader $email, EmailFolder $folder, $isSeen = false)
+    protected function addEmailUser(EmailHeader $email, EmailFolder $folder, $isSeen = false, User $owner = null)
     {
         $emailUser = $this->emailEntityBuilder->emailUser(
             $email->getSubject(),
@@ -238,7 +246,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $email->getInternalDate(),
             $email->getImportance(),
             $email->getCcRecipients(),
-            $email->getBccRecipients()
+            $email->getBccRecipients(),
+            $owner
         );
 
         $emailUser

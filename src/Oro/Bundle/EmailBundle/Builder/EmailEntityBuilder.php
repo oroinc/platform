@@ -14,6 +14,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailEntityBuilder
 {
@@ -115,6 +116,7 @@ class EmailEntityBuilder
      *                                           Example of email address see in description of $from parameter
      * @param string|string[]|null $bcc          The BCC email address(es).
      *                                           Example of email address see in description of $from parameter
+     * @param User|null $owner                   Owner of the email
      *
      * @return EmailUser
      */
@@ -127,17 +129,22 @@ class EmailEntityBuilder
         $internalDate,
         $importance = Email::NORMAL_IMPORTANCE,
         $cc = null,
-        $bcc = null
+        $bcc = null,
+        $owner = null
     ) {
-        $result = new EmailUser();
+        $emailUser = new EmailUser();
 
         $email = $this->email($subject, $from, $to, $sentAt, $receivedAt, $internalDate, $importance, $cc, $bcc);
-        $result->setReceivedAt($receivedAt);
-        $result->setEmail($email);
+        $emailUser->setReceivedAt($receivedAt);
+        $emailUser->setEmail($email);
+        if ($owner != null) {
+            $emailUser->setOwner($owner);
+            $emailUser->setOrganization($owner->getOrganization());
+        }
 
-        $this->batch->addEmailUser($result);
+        $this->batch->addEmailUser($emailUser);
 
-        return $result;
+        return $emailUser;
     }
 
     /**

@@ -357,13 +357,21 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $count++;
             $batch[] = $email;
             if ($count === self::DB_BATCH_SIZE) {
-                $this->saveEmails($batch, $imapFolder);
+                $this->saveEmails(
+                    $batch,
+                    $imapFolder,
+                    $this->em->getReference('Oro\Bundle\UserBundle\Entity\User', $userId)
+                );
                 $count = 0;
                 $batch = [];
             }
         }
         if ($count > 0) {
-            $this->saveEmails($batch, $imapFolder);
+            $this->saveEmails(
+                $batch,
+                $imapFolder,
+                $this->em->getReference('Oro\Bundle\UserBundle\Entity\User', $userId)
+            );
         }
 
         $totalInvalid += $invalid;
@@ -381,8 +389,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
+     * @param User            $owner
      */
-    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
+    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder, User $owner)
     {
         $this->emailEntityBuilder->removeEmails();
 
@@ -430,7 +439,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 try {
                     $imapEmail = $this->createImapEmail(
                         $email->getId()->getUid(),
-                        $this->addEmailUser($email, $folder, $email->hasFlag("\\Seen"))->getEmail(),
+                        $this->addEmailUser(
+                            $email,
+                            $folder,
+                            $email->hasFlag("\\Seen"),
+                            $owner
+                        )->getEmail(),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;
