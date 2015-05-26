@@ -168,6 +168,7 @@ services:
             - @oro_email.email.entity.batch_processor
             - @oro_email.email.address.manager
             - @oro_email.email.address.helper
+            - @event_dispatcher
 
     oro_email.email.model.builder:
       class: %oro_email.email.model.builder.class%
