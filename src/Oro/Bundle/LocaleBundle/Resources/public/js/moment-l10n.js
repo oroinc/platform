@@ -1,9 +1,12 @@
 /*global define*/
-define(['moment', 'orotranslation/js/translator', './locale-settings'
-    ], function (moment, __, localeSettings) {
+define(function (require) {
     'use strict';
 
-    var locale = localeSettings.getLocale();
+    var moment = require('moment'),
+        __ = require('orotranslation/js/translator'),
+        localeSettings = require('./locale-settings'),
+        locale = localeSettings.getLocale();
+    require('moment-timezone');
 
     moment.locale(locale, {
         months : localeSettings.getCalendarMonthNames('wide', true),
