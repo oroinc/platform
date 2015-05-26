@@ -19,5 +19,5 @@
     {'title': 'oro.email.sent_at.label'|trans, 'value': entity.email.sentAt|oro_format_datetime},
     {'title': 'oro.email.from_name.label'|trans, 'value': EA.email_address(entity.email.fromEmailAddress, entity.email.fromName)},
     {'title': 'oro.email.to.label'|trans, 'value': EA.recipient_email_addresses(entity.email.recipients('to'))},
-    {'title': 'oro.email.emailuser.owner.label'|trans, 'value': UI.entityOwnerLink(entity)},
+    {'title': 'oro.email.emailuser.owner.label'|trans, 'value': UI.entityOwnerLink(entity, false)},
 ] %}

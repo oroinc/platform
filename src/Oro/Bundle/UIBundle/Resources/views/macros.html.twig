@@ -835,8 +835,9 @@
     Render link to entity owner
     Parameters:
         entity - entity record
+        renderLabel - need render default label
 #}
-{% macro entityOwnerLink(entity) %}
+{% macro entityOwnerLink(entity, renderLabel = true) %}
     {%- if entity.owner is defined and entity.owner %}
         {% if resource_granted('VIEW', entity.owner)  %}
             {% set ownerType = oro_get_owner_type(entity) %}
@@ -850,7 +851,9 @@
                 {% set ownerName = entity.owner.name %}
             {% endif %}
             {% if ownerName is defined %}
-                {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
+                {% if renderLabel %}
+                    {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
+                {% endif %}
                 {% if ownerPath is defined %}
                     <a href="{{ ownerPath }}">{{ ownerName }}</a>
                 {% else %}
