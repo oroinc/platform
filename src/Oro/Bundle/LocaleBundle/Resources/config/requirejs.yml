@@ -15,9 +15,12 @@ config:
             'moment': 'orolocale/js/moment-l10n'
         'orolocale/js/moment-l10n':
             'moment': 'moment'
+        'moment-timezone':
+            'moment': 'moment'
 
     paths:
         'moment': 'bundles/orolocale/lib/moment/moment.js'
+        'moment-timezone': 'bundles/components/moment-timezone/builds/moment-timezone-with-data.min.js'
         'numeral': 'bundles/orolocale/lib/numeral.js'
         'orolocale/js/locale-settings': 'bundles/orolocale/js/locale-settings.js'
         'orolocale/js/locale-settings/data': '../js/oro.locale_data.js'
