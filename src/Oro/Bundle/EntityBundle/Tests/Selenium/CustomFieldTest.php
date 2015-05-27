@@ -29,7 +29,7 @@ class CustomFieldTest extends Selenium2TestCase
         array('type' => 'Text', 'value' => 'Some text value')
     );
 
-    public function testAddSerializedField()
+    public function testAddTableColumnField()
     {
         $login = $this->login();
         /** @var ConfigEntities $login */
@@ -50,7 +50,7 @@ class CustomFieldTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testAddSerializedField
+     * @depends testAddTableColumnField
      */
     public function testEntityFieldsAvailability()
     {

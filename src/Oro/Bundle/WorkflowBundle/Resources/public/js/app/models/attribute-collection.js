@@ -4,7 +4,7 @@ define(function(require) {
 
     var AttributeCollection,
         BaseCollection = require('oroui/js/app/models/base/collection'),
-        AttributeModel = require('oroworkflow/js/app/models/attribute-model');
+        AttributeModel = require('./attribute-model');
 
     AttributeCollection = BaseCollection.extend({
         model: AttributeModel
