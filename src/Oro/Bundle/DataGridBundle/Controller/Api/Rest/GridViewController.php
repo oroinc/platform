@@ -109,7 +109,7 @@ class GridViewController extends RestController
             return;
         }
 
-        if ($this->getSecurityFacade()->isGranted('oro_datagrid_gridview_edit_public')) {
+        if ($this->getSecurityFacade()->isGranted('oro_datagrid_gridview_update_public')) {
             return;
         }
 

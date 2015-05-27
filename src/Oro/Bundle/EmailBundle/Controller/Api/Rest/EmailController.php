@@ -118,7 +118,7 @@ class EmailController extends RestGetController
      *          404="Activity association was not found",
      *      }
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_update")
      * @return Response
      */
     public function getAssociationsDataAction($entityId)
@@ -198,7 +198,7 @@ class EmailController extends RestGetController
      *      description="Add new association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_update")
      */
     public function postAssociationsAction()
     {
@@ -262,7 +262,7 @@ class EmailController extends RestGetController
      *      description="Delete Association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_update")
      *
      * @Delete("/emails/{entityId}/associations/{targetClassName}/{targetId}")
      *
