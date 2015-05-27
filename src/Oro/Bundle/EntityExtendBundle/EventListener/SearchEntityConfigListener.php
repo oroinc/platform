@@ -78,10 +78,9 @@ class SearchEntityConfigListener
             ->select('job')
             ->where('job.command = :command')
             ->andWhere('job.args = :args')
-            ->andWhere('job.state = :state')
+            ->andWhere('job.state in (\'pending\', \'running\')')
             ->setParameter('command', ReindexCommand::COMMAND_NAME)
             ->setParameter('args', ['class' => $entityClass], Type::JSON_ARRAY)
-            ->setParameter('state', 'pending')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
