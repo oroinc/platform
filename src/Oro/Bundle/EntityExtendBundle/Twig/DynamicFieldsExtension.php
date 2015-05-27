@@ -90,14 +90,13 @@ class DynamicFieldsExtension extends \Twig_Extension
             $fieldName = $fieldConfigId->getFieldName();
 
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
+            $fieldType = $fieldConfigId->getFieldType();
 
             $event = new ValueRenderEvent($entity, $value, $fieldConfigId);
             $this->eventDispatcher->dispatch(
                 EntityExtendEvents::BEFORE_VALUE_RENDER,
                 $event
             );
-
-            $fieldType = $fieldConfigId->getFieldType();
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
             $dynamicRow[$fieldName] = [
