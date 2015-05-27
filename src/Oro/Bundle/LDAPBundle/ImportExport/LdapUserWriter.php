@@ -42,15 +42,13 @@ class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
     public function write(array $items)
     {
         foreach ($items as $user) {
-            if ($this->channelManager->exists($this->getChannel(), $user)) {
+            if ($this->channelManager->existsInChannel($this->getChannel(), $user)) {
                 $this->context->incrementUpdateCount();
             } else {
                 $this->context->incrementAddCount();
             }
 
-            $this->channelManager->save($user, $this->getChannel());
-
-            $this->userManager->updateUser($user, false);
+            $this->channelManager->exportThroughChannel($this->getChannel(), $user);
         }
 
         $this->userManager->getStorageManager()->flush();

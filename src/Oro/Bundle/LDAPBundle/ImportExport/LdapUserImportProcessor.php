@@ -6,14 +6,10 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Processor\StepExecutionAwareProcessor;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
-use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
 use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
-use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -75,16 +71,10 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
      */
     protected function hydrate(UserInterface $user, array $entry)
     {
-        $this->channelManager->hydrate(
+        $this->channelManager->hydrateThroughChannel(
             $this->getChannel(),
             $user,
             $entry
-        );
-
-        $this->channelManager->setUserDn(
-            $this->getChannel(),
-            $user,
-            $entry['dn']
         );
     }
 
@@ -95,7 +85,7 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
     {
         try {
             $user = $this->userManager->findUserByUsername(
-                $item[$this->channelManager->getLdapManager($this->getChannel())->getUsernameAttr()]
+                $item[$this->channelManager->getChannelUsernameAttr($this->getChannel())]
             );
 
             if ($user !== null) {

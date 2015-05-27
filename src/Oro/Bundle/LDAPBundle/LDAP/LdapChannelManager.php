@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\LDAPBundle\Model\User as LdapUser;
 
 /**
  * Class LdapChannelManager
@@ -36,82 +37,13 @@ class LdapChannelManager
     /**
      * Returns all users from integration channel.
      *
-     * @param integer|Channel $channel
+     * @param Channel $channel
      *
      * @return array Array of users from LDAP server
      */
-    public function findUsers($channel)
+    public function findUsersThroughChannel(Channel $channel)
     {
-        $channel = $this->getChannel($channel);
-
         return $this->managerFactory->getInstanceForChannel($channel)->findUsers();
-    }
-
-    /**
-     * Saves user to channel
-     *
-     * @param user $user
-     * @param Channel|integer|array $channels
-     */
-    public function save(User $user, $channels = null)
-    {
-        if ($channels === null) {
-            $channels = array_keys((array)$user->getLdapMappings());
-        }
-
-        if (!is_array($channels)) {
-            $channels = [$channels];
-        }
-
-        foreach ($channels as $channel) {
-            $channel = $this->getChannel($channel);
-            $this->saveToChannel($channel, $user);
-        }
-    }
-
-    /**
-     * Retrieves and returns channel if necessary.
-     *
-     * @param Channel|integer $channel
-     * @return Channel
-     */
-    protected function getChannel($channel)
-    {
-        if ($channel instanceof Channel) {
-            if (!isset($this->channels[$channel->getId()])) {
-                $this->channels[$channel->getId()] = $channel;
-            }
-
-            return $channel;
-        }
-
-        if (isset($this->channels[$channel])) {
-            return $this->channels[$channel];
-        }
-
-        $channelRepository = $this->registry->getRepository('OroIntegrationBundle:Channel');
-
-        return $this->channels[$channel] = $channelRepository->find($channel);
-    }
-
-    /**
-     * Saves a User to single, specified channel.
-     * There may be changes to $user instance after this operation.
-     * They should be persisted.
-     *
-     * @param Channel $channel
-     * @param User $user
-     */
-    protected function saveToChannel(Channel $channel, User $user)
-    {
-        $manager = $this->managerFactory->getInstanceForChannel($channel);
-        $dn = $this->getUserDn($channel, $user);
-
-        $newDn = $manager->save($user, $dn);
-
-        if ($dn != $newDn) {
-            $this->setUserDn($channel, $user, $newDn);
-        }
     }
 
     /**
@@ -149,22 +81,154 @@ class LdapChannelManager
      * @param User $user
      * @param $dn
      */
-    public function setUserDn(Channel $channel, User $user, $dn)
+    protected function setUserDn(Channel $channel, User $user, $dn)
     {
         $user->setLdapMappings(((array)$user->getLdapMappings()) + [$channel->getId() => $dn]);
     }
 
     /**
-     * Checks if user has mapping in provided channel and if it exists in LDAP.
+     * Hydrates user with data from channel.
      *
-     * @param Channel|integer $channel
+     * @param Channel $channel
+     * @param User $user
+     * @param array $entry
+     *
+     * @return UserInterface
+     */
+    public function hydrateThroughChannel(Channel $channel, User $user, array $entry)
+    {
+        $manager = $this->managerFactory->getInstanceForChannel($channel);
+
+        $result =  $manager->hydrate($user, $entry);
+
+        $this->setUserDn($channel, $user, $entry['dn']);
+
+        return $result;
+    }
+
+    /**
+     * Returns all LDAP channels.
+     *
+     * @return Channel[]
+     */
+    protected function getAllChannels()
+    {
+        return $this->registry->getRepository('OroIntegrationBundle:Channel')->findBy(['type' => 'ldap']);
+    }
+
+    /**
+     * Returns array of integration channels with provided ids.
+     *
+     * @param array $channelIds
+     * @return Channel[]
+     */
+    public function getChannels(array $channelIds)
+    {
+        return $this->registry->getRepository('OroIntegrationBundle:Channel')->findBy(['id' => $channelIds]);
+    }
+
+    /**
+     * Checks if changed fields from change set are synchronized through provided channel.
+     * Returns true if at least one field is synchronized. False if none.
+     *
+     * @param Channel $channel
+     * @param array $changeSet
+     * @return bool
+     */
+    protected function checkValidChangeSet(Channel $channel, array $changeSet)
+    {
+        $fields = $this->managerFactory->getInstanceForChannel($channel)->getSynchronizedFields();
+        $changeSet = array_keys($changeSet);
+
+        return !empty(array_intersect(
+            $fields,
+            $changeSet
+        ));
+    }
+
+    /**
+     * Exports user through channel. Dn of that user entity is automatically updated.
+     *
+     * @param Channel $channel
+     * @param User $user
+     */
+    public function exportThroughChannel(Channel $channel, User $user)
+    {
+        $manager = $this->managerFactory->getInstanceForChannel($channel);
+        $dn = $this->getUserDn($channel, $user);
+
+        $newDn = $manager->save($user, $dn);
+
+        if ($dn != $newDn) {
+            $this->storeUserDn($channel, $user, $newDn);
+        }
+    }
+
+    /**
+     * Exports user through channels he has mapped to it.
+     *
+     * @param User $user
+     * @param array|null $changeSet If provided, checks if change set is valid for each channel.
+     * Does not export if it is not.
+     * @param bool $onlyEnabled Export only through enabled channels.
+     */
+    public function exportThroughUsersChannels(User $user, $changeSet = null, $onlyEnabled = true)
+    {
+        $mappings = (array)$user->getLdapMappings();
+
+        $channels = $this->getChannels(array_keys($mappings));
+
+        foreach ($channels as $channel) {
+            if ($onlyEnabled && !$channel->isEnabled()) {
+                continue;
+            }
+
+            if (($changeSet !== null) && !$this->checkValidChangeSet($channel, $changeSet)) {
+                continue;
+            }
+
+            $this->exportThroughChannel($channel, $user);
+        }
+    }
+
+    /**
+     * Exports user through all channels.
+     *
+     * @param array|null $changeSet If provided, checks if change set is valid for each channel.
+     * Does not export if it is not.
+     * @param bool $onlyEnabled Export only through enabled channels.
+     * @param bool $onlyNewEnabled Export only when option to export new users is enabled.
+     */
+    public function exportThroughAllChannels(User $user, $changeSet = null, $onlyEnabled = true, $onlyNewEnabled = true)
+    {
+        $channels = $this->getAllChannels();
+
+        foreach ($channels as $channel) {
+            if ($onlyEnabled && !$channel->isEnabled()) {
+                continue;
+            }
+
+            if ($onlyNewEnabled && !$channel->getMappingSettings()->offsetGet('export_auto_enable')) {
+                continue;
+            }
+
+            if (($changeSet !== null) && !$this->checkValidChangeSet($channel, $changeSet)) {
+                continue;
+            }
+
+            $this->exportThroughChannel($channel, $user);
+        }
+    }
+
+    /**
+     * Checks if user exists in channel.
+     *
+     * @param Channel $channel
      * @param User $user
      * @return bool
-     * @throws \Exception
      */
-    public function exists($channel, User $user)
+    public function existsInChannel(Channel $channel, User $user)
     {
-        $channel = $this->getChannel($channel);
         $manager = $this->managerFactory->getInstanceForChannel($channel);
         $dn = $this->getUserDn($channel, $user);
 
@@ -172,88 +236,43 @@ class LdapChannelManager
     }
 
     /**
-     * Hydrates user with data from channel.
+     * Returns username attribute of provided channel.
      *
-     * @param Channel|integer $channel
-     * @param User $user
-     * @param array $entry
-     *
-     * @return UserInterface
+     * @param Channel $channel
+     * @return string
      */
-    public function hydrate($channel, User $user, array $entry)
+    public function getChannelUsernameAttr(Channel $channel)
     {
-        $manager = $this->managerFactory->getInstanceForChannel($channel);
-
-        return $manager->hydrate($user, $entry);
+        return $this->managerFactory->getInstanceForChannel($channel)->getUsernameAttr();
     }
 
     /**
-     * Checks credentials against LDAP Channel(s).
+     * Checks credentials against users' channels.
+     * Returns true if it is successful against at least one.
      *
-     * @param Channel|integer|array $channels
-     * @param User $user
+     * @param UserInterface $user
      * @param $password
-     *
-     * @return boolean
+     * @param bool $onlyEnabled
+     * @return bool|Channel false if failed, Channel if successful against it.
      */
-    public function bind(User $user, $password, $channels = null)
+    public function checkAuthAgainstUsersChannels(UserInterface $user, $password, $onlyEnabled = true)
     {
-        if ($channels === null) {
-            $channels = array_keys((array)$user->getLdapMappings());
-        }
-
-        if (!is_array($channels)) {
-            $channels = [$channels];
-        }
+        $mappings = (array)$user->getLdapMappings();
+        $channels = $this->getChannels(array_keys($mappings));
 
         foreach ($channels as $channel) {
-            $channel = $this->getChannel($channel);
-            if ($this->bindToChannel($channel, $user, $password)) {
-                return true;
+            if ($onlyEnabled && !$channel->isEnabled()) {
+                continue;
+            }
+
+            $manager = $this->managerFactory->getInstanceForChannel($channel);
+            $ldapUser = LdapUser::createFromUser($user, $channel->getId());
+
+            if ($manager->bind($ldapUser, $password)) {
+                return $channel;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Checks credentials against LDAP Channel.
-     *
-     * @param Channel|integer $channel
-     * @param User $user
-     * @param $password
-     *
-     * @return boolean
-     */
-    protected function bindToChannel(Channel $channel, User $user, $password)
-    {
-        $mappings = (array)$user->getLdapMappings();
-
-        // If user has no mapping in channel
-        if (false === array_search($channel->getId(), array_keys($mappings))) {
-            return false;
-        }
-
-        // If integration is disabled, return false.
-        if (!$channel->isEnabled()) {
-            return false;
-        }
-
-        // Continue with binding to single channel.
-        $manager = $this->managerFactory->getInstanceForChannel($channel);
-
-        return $manager->bind($user, $password);
-    }
-
-    /**
-     * @param Channel|integer $channel
-     * @return LdapManager
-     * @throws \Exception
-     */
-    public function getLdapManager($channel)
-    {
-        $channel = $this->getChannel($channel);
-
-        return $this->managerFactory->getInstanceForChannel($channel);
     }
 }

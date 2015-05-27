@@ -1,6 +1,6 @@
 oro:
     user:
-        dn.label: Distinguished Name
+        ldap_mappings.label: Distinguished Names
     ldap:
         oro_ldap_encryption:
             none: None
@@ -29,5 +29,6 @@ oro:
                   role_mapping.label: Role Mapping
                   role_ldap.label: LDAP Role
                   role_crm.label: CRM Roles
+                  export_auto_enable.label: Auto-export new users
                   export_user_base_dn.label: Export Base Distinguished Name
                   export_user_class.label: Export User class

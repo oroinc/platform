@@ -88,7 +88,6 @@ class DynamicFieldsExtension extends \Twig_Extension
             $fieldConfigId = $field->getId();
 
             $fieldName = $fieldConfigId->getFieldName();
-            $fieldType = $fieldConfigId->getFieldType();
 
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
@@ -97,6 +96,8 @@ class DynamicFieldsExtension extends \Twig_Extension
                 EntityExtendEvents::BEFORE_VALUE_RENDER,
                 $event
             );
+
+            $fieldType = $fieldConfigId->getFieldType();
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
             $dynamicRow[$fieldName] = [

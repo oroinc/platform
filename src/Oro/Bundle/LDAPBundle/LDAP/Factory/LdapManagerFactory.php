@@ -63,9 +63,7 @@ class LdapManagerFactory
      *
      * @param Channel $channel
      *
-     * @return LdapManager
-     *
-     * @throws \Exception
+     * @return LdapManager|null Returns null if channel is not of LDAP type.
      */
     public function getInstanceForChannel(Channel $channel)
     {
@@ -74,7 +72,7 @@ class LdapManagerFactory
         }
 
         if ($channel->getType() != ChannelType::TYPE) {
-            throw new \Exception("Channel {" . $channel->getType() . "} must be of type: " . ChannelType::TYPE . ".");
+            return null;
         }
 
         $settings = iterator_to_array($channel->getTransport()->getSettingsBag());

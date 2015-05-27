@@ -31,7 +31,7 @@ class OroLDAPBundle implements Migration, ExtendExtensionAwareInterface
         $userTable = $schema->getTable('oro_user');
         $userTable->addColumn('ldap_mappings', 'array', [
             'oro_options' => [
-                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+                'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
                 'form' => ['is_enabled' => false],
                 'datagrid' => ['is_visible' => false],
             ],

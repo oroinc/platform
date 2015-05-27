@@ -81,14 +81,19 @@ class User implements LdapUserInterface, UserInterface
     }
 
     /**
+     * Creates model user from Oro user.
+     *
      * @param OroUser $oroUser
+     * @param integer $channelId
      *
      * @return $this
      */
-    public static function createFromUser(OroUser $oroUser)
+    public static function createFromUser(OroUser $oroUser, $channelId)
     {
+        $mappings = (array)$oroUser->getLdapMappings();
+
         $user = new static();
-        $user->dn       = $oroUser->getDn();
+        $user->dn       = isset($mappings[$channelId]) ? $mappings[$channelId] : null;
         $user->username = $oroUser->getUsername();
         $user->roles    = $oroUser->getRoles();
         $user->salt     = $oroUser->getSalt();

@@ -37,6 +37,8 @@ class LdapManager extends BaseManager
     }
 
     /**
+     * Returns all users from ldap.
+     *
      * @return array
      */
     public function findUsers()
@@ -131,6 +133,8 @@ class LdapManager extends BaseManager
     }
 
     /**
+     * Returns new Dn for export.
+     *
      * @param string $username
      *
      * @return string

@@ -6,9 +6,7 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
-use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
 use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
 
 class LdapUserReader extends IteratorBasedReader
@@ -42,6 +40,8 @@ class LdapUserReader extends IteratorBasedReader
      */
     public function initialize()
     {
-        $this->setSourceIterator(new \ArrayIterator($this->channelManager->findUsers($this->getChannel())));
+        $this->setSourceIterator(
+            new \ArrayIterator($this->channelManager->findUsersThroughChannel($this->getChannel()))
+        );
     }
 }

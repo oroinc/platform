@@ -7,6 +7,8 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserChangeListener
@@ -15,15 +17,40 @@ class UserChangeListener
     /** @var ServiceLink */
     private $channelManagerLink;
 
-    /** @var array */
-    protected $synchronizedFields = [];
+    /** @var User[] */
+    protected $newUsers = [];
 
-    /** @var array */
-    protected $entitiesToUpdate = [];
+    /** @var User[] */
+    protected $updatedUsers = [];
 
     public function __construct(ServiceLink $channelManagerLink)
     {
         $this->channelManagerLink = $channelManagerLink;
+    }
+
+    protected function processNew(array &$users, UnitOfWork $uow)
+    {
+        /** @var LdapChannelManager $manager */
+        $manager = $this->channelManagerLink->getService();
+
+        foreach ($users as $user) {
+            $manager->exportThroughAllChannels($user);
+        }
+
+        $users = [];
+    }
+
+    protected function processUpdated(array &$users, UnitOfWork $uow)
+    {
+        /** @var LdapChannelManager $manager */
+        $manager = $this->channelManagerLink->getService();
+
+        foreach ($users as $user) {
+            $changedFields = $uow->getEntityChangeSet($user);
+            $manager->exportThroughUsersChannels($user, $changedFields);
+        }
+
+        $users = [];
     }
 
     /**
@@ -33,26 +60,11 @@ class UserChangeListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        /** @var UnitOfWork $uow */
         $uow = $args->getEntityManager()->getUnitOfWork();
 
-        foreach ($this->entitiesToUpdate as $entity) {
-            $mappings = (array)$entity->getLdapMappings();
+        $this->processUpdated($this->updatedUsers, $uow);
 
-            foreach ($mappings as $channel => $dn) {
-                $changedFields = array_keys($uow->getEntityChangeSet($entity));
-                if (!array_intersect(
-                    $this->channelManagerLink->getService()->getLdapManager($channel)->getSynchronizedFields(),
-                    $changedFields
-                )) {
-                    continue;
-                }
-
-                $this->channelManagerLink->getService()->save($entity, $channel);
-            }
-        }
-
-        $this->entitiesToUpdate = [];
+        $this->processNew($this->newUsers, $uow);
     }
 
     /**
@@ -65,29 +77,24 @@ class UserChangeListener
         $uow = $args->getEntityManager()->getUnitOfWork();
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            $this->processEntity($entity);
+            if ($this->isValidUser($entity)) {
+                $this->newUsers[] = $entity;
+            }
         }
 
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            $this->processEntity($entity);
+            if ($this->isValidUser($entity)) {
+                $this->updatedUsers[] = $entity;
+            }
         }
     }
 
-    /**
-     * Processes entity. Makes it available for export after it gets flushed.
-     *
-     * @param object $entity
-     */
-    public function processEntity($entity)
+    protected function isValidUser($entity)
     {
-        if (!$entity instanceof User) {
-            return;
+        if ($entity instanceof User) {
+            return true;
         }
 
-        if (empty($entity->getLdapMappings())) {
-            return;
-        }
-
-        $this->entitiesToUpdate[] = $entity;
+        return false;
     }
 }

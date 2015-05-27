@@ -12,36 +12,34 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-use Oro\Bundle\LDAPBundle\LDAP\Factory\LdapManagerFactory;
-use Oro\Bundle\LDAPBundle\Model\User;
+use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class LdapProvider extends UserAuthenticationProvider
 {
-    /** @var LdapManagerFactory */
-    protected $ldapManagerFactory;
-
     /** @var UserProviderInterface */
     protected $userProvider;
+    /** @var LdapChannelManager */
+    private $channelManager;
 
     /**
      * @param UserCheckerInterface $userChecker
      * @param string $providerKey
      * @param UserProviderInterface $userProvider
-     * @param LdapManagerFactory $ldapManagerFactory
+     * @param LdapChannelManager $channelManager
      * @param boolean $hideUserNotFoundExceptions
      */
     public function __construct(
         UserCheckerInterface $userChecker,
         $providerKey,
         UserProviderInterface $userProvider,
-        LdapManagerFactory $ldapManagerFactory,
+        LdapChannelManager $channelManager,
         $hideUserNotFoundExceptions = true
     ) {
         parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
-        $this->ldapManagerFactory = $ldapManagerFactory;
         $this->userProvider = $userProvider;
+        $this->channelManager = $channelManager;
     }
 
     /**
@@ -143,18 +141,7 @@ class LdapProvider extends UserAuthenticationProvider
             throw new BadCredentialsException('The presented password cannot be empty.');
         }
 
-        $ldapUser = User::createFromUser($user);
-
-        $bound = false;
-        foreach ($mappings as $channelId) {
-            $manager = $this->ldapManagerFactory->getInstanceForChannelId($channelId);
-            if ($manager->bind($ldapUser, $presentedPassword)) {
-                $bound = true;
-                break;
-            }
-        }
-
-        if (!$bound) {
+        if (false === $this->channelManager->checkAuthAgainstUsersChannels($user, $presentedPassword)) {
             throw new BadCredentialsException('The presented password is invalid.');
         }
     }

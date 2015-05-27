@@ -52,6 +52,12 @@ oro_integration:
                     show_form_when_empty: false
                 applicable: [ldap]
                 priority: 60
+            export_auto_enable:
+                type: checkbox
+                options:
+                    required: false
+                    label:   oro.ldap.transport.ldap.fields.export_auto_enable.label
+                priority: 70
             export_user_base_dn:
                 type: text
                 options:
@@ -60,7 +66,7 @@ oro_integration:
                     constraints:
                         - NotBlank: ~
                 applicable: [ldap]
-                priority: 70
+                priority: 80
             export_user_class:
                 type: text
                 options:
@@ -69,5 +75,5 @@ oro_integration:
                     constraints:
                         - NotBlank: ~
                 applicable: [ldap]
-                priority: 80
+                priority: 90
 
