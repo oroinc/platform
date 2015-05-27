@@ -18,6 +18,13 @@ define(function (require) {
         /**
          * @type {Object}
          */
+        connectionDefaults: {
+            detachable: false
+        },
+
+        /**
+         * @type {Object}
+         */
         connectorStyle: {
             strokeStyle: '#4F719A',
             lineWidth: 2,
@@ -39,6 +46,9 @@ define(function (require) {
                 throw new Error(optionKeysToCopy.join(', ') + ' options are required');
             }
             _.extend(this, _.pick(options, optionKeysToCopy));
+            if (options.connectionDefaults) {
+                _.extend(this.connectionDefaults, options.connectionDefaults);
+            }
             FlowchartViewerTransitionView.__super__.initialize.apply(this, arguments);
         },
 
@@ -125,26 +135,29 @@ define(function (require) {
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep);
 
-            jsplumbConnection = this.areaView.jsPlumbInstance.connect({
-                source: startEl,
-                target: endEl,
-                paintStyle: _.result(this, 'connectorStyle'),
-                hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
-                overlays: [
-                    ['Custom', {
-                        create: _.bind(function () {
-                            overlayView = new this.transitionOverlayView({
-                                model: transitionModel,
-                                areaView: areaView,
-                                stepFrom: startStep
-                            });
-                            overlayView.render();
-                            return overlayView.$el;
-                        }, this),
-                        location: 0.5
-                    }]
-                ]
-            });
+            jsplumbConnection = this.areaView.jsPlumbInstance.connect(_.extend(
+                {
+                    source: startEl,
+                    target: endEl,
+                    paintStyle: _.result(this, 'connectorStyle'),
+                    hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
+                    overlays: [
+                        ['Custom', {
+                            create: _.bind(function () {
+                                overlayView = new this.transitionOverlayView({
+                                    model: transitionModel,
+                                    areaView: areaView,
+                                    stepFrom: startStep
+                                });
+                                overlayView.render();
+                                return overlayView.$el;
+                            }, this),
+                            location: 0.5
+                        }]
+                    ]
+                },
+                this.connectionDefaults
+            ));
             jsplumbConnection.overlayView = overlayView;
             this.connections.push({
                 startStep: startStep,

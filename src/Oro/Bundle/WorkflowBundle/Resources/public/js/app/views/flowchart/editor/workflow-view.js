@@ -16,6 +16,10 @@ define(function (require) {
         stepView: FlowchartEditorStepView,
         className: 'workflow-flowchart-editor',
 
+        connectionDefaults: {
+            detachable: true
+        },
+
         connect: function () {
             FlowchartEditorWorkflowView.__super__.connect.apply(this, arguments);
             this.jsPlumbInstance.bind('beforeDrop', _.bind(this.onBeforeConnectionDrop, this));
