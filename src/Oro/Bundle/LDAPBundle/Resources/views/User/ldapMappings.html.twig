@@ -1,0 +1,9 @@
+{% if data.mappings is not empty %}
+    <ul>
+        {% for channel,dn in data.mappings %}
+            <li>{{ channel }}:&nbsp;{{ dn }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {{ 'N/A'|trans }}
+{% endif %}
