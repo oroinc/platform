@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\ORM\Internal\Hydration\ArrayHydrator;
 use Doctrine\Common\Collections\Criteria;
 
 use FOS\RestBundle\Util\Codes;
@@ -17,6 +18,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
@@ -39,6 +41,8 @@ abstract class RestGetController extends FOSRestController implements EntityMana
 
         if ($manager instanceof EntitySerializerManagerInterface) {
             $result = $manager->serialize($qb);
+        } elseif ($qb instanceof SqlQueryBuilder) {
+            $result = $this->getPreparedItems($qb->getQuery()->getResult());
         } else {
             $result = $this->getPreparedItems($qb->getQuery()->getResult());
         }
@@ -143,21 +147,28 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
         $result = [];
         if ($entity) {
-            /** @var UnitOfWork $uow */
-            $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
-            foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
-                if ($resultFields && !in_array($field, $resultFields)) {
-                    continue;
+            if (is_array($entity)) {
+                foreach ($entity as $field => $value) {
+                    $this->transformEntityField($field, $value);
+                    $result[$field] = $value;
                 }
+            } else {
+                /** @var UnitOfWork $uow */
+                $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
+                foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
+                    if ($resultFields && !in_array($field, $resultFields)) {
+                        continue;
+                    }
 
-                $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
-                foreach ($accessors as $accessor) {
-                    if (method_exists($entity, $accessor)) {
-                        $value = $entity->$accessor();
+                    $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
+                    foreach ($accessors as $accessor) {
+                        if (method_exists($entity, $accessor)) {
+                            $value = $entity->$accessor();
 
-                        $this->transformEntityField($field, $value);
-                        $result[$field] = $value;
-                        break;
+                            $this->transformEntityField($field, $value);
+                            $result[$field] = $value;
+                            break;
+                        }
                     }
                 }
             }

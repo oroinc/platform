@@ -7,6 +7,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Bundle\EntityBundle\ORM\SqlQuery;
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 
@@ -30,13 +32,13 @@ class TotalHeaderHandler implements IncludeHandlerInterface
      */
     public function supports(Context $context)
     {
-        $controller = $context->getController();
-
-        return (
-            $context->has('totalCount')
-            || $context->has('query')
-            || $controller instanceof EntityManagerAwareInterface
-        ) && $context->isAction(RestApiReadInterface::ACTION_LIST);
+        return
+            $context->isAction(RestApiReadInterface::ACTION_LIST)
+            && (
+                $context->has('query')
+                || $context->has('totalCount')
+                || $context->getController() instanceof EntityManagerAwareInterface
+            );
     }
 
     /**
@@ -46,51 +48,67 @@ class TotalHeaderHandler implements IncludeHandlerInterface
     {
         if ($context->has('totalCount')) {
             $totalCount = $context->get('totalCount');
-            if (!is_int($totalCount)) {
+            if (!is_callable($totalCount)) {
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Expected integer, "%s" given',
+                        'Expected callable for totalCount, "%s" given',
                         is_object($totalCount) ? get_class($totalCount) : gettype($totalCount)
                     )
                 );
             }
-            $context->getResponse()->headers->set(self::HEADER_NAME, $totalCount);
-
-            return;
-        }
-
-        if ($context->has('query')) {
-            $value = $context->get('query');
-
-            if ($value instanceof QueryBuilder) {
-                $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($value);
-                $query   = $countQb->getQuery();
-            } elseif ($value instanceof Query) {
-                $query = clone $value;
-                $query->setMaxResults(null)->setFirstResult(null);
-            } else {
+            $totalCount = call_user_func($totalCount);
+            if (!is_int($totalCount)) {
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Expected instance of QueryBuilder or Query, "%s" given',
-                        is_object($value) ? get_class($value) : gettype($value)
+                        'Expected integer as result of totalCount callable, "%s" given',
+                        is_object($totalCount) ? get_class($totalCount) : gettype($totalCount)
                     )
                 );
             }
         } else {
-            $qb    = $context->getController()->getManager()->getRepository()->createQueryBuilder('e');
-            $query = $qb->getQuery();
+            if ($context->has('query')) {
+                $value = $context->get('query');
+
+                if ($value instanceof QueryBuilder) {
+                    $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($value);
+                    $query   = $countQb->getQuery();
+                } elseif ($value instanceof Query) {
+                    $query = clone $value;
+                    $query->setMaxResults(null)->setFirstResult(null);
+                } elseif ($value instanceof SqlQueryBuilder) {
+                    $query = clone $value;
+                    $query->setMaxResults(null)->setFirstResult(null);
+                    $query = $query->getQuery();
+                } elseif ($value instanceof SqlQuery) {
+                    $query = clone $value;
+                    $query->getQueryBuilder()->setMaxResults(null)->setFirstResult(null);
+                } else {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query'
+                            . ', Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder'
+                            . ' or Oro\Bundle\EntityBundle\ORM\SqlQuery, "%s" given',
+                            is_object($value) ? get_class($value) : gettype($value)
+                        )
+                    );
+                }
+            } else {
+                $qb    = $context->getController()->getManager()->getRepository()->createQueryBuilder('e');
+                $query = $qb->getQuery();
+            }
+
+            $totalCount = $this->calculateCount($query);
         }
 
-        $totalCount = $this->calculateCount($query);
         $context->getResponse()->headers->set(self::HEADER_NAME, $totalCount);
     }
 
     /**
-     * @param Query $query
+     * @param mixed $query
      *
      * @return int
      */
-    protected function calculateCount(Query $query)
+    protected function calculateCount($query)
     {
         return QueryCountCalculator::calculateCount($query);
     }

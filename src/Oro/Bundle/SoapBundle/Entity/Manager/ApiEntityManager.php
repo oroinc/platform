@@ -12,6 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
@@ -167,7 +168,7 @@ class ApiEntityManager
      * @param null  $orderBy
      * @param array $joins
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder|SqlQueryBuilder
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {

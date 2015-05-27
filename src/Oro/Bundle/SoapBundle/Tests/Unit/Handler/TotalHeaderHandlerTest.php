@@ -4,6 +4,8 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\EntityBundle\ORM\SqlQuery;
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
@@ -92,14 +94,19 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->handler->supports($context));
     }
 
-    public function testHandleWithTotalCount()
+    public function testHandleWithTotalCountCallback()
     {
         $testCount = 22;
 
         $this->handler->expects($this->never())->method('calculateCount');
 
         $context = $this->createContext();
-        $context->set('totalCount', $testCount);
+        $context->set(
+            'totalCount',
+            function () use ($testCount) {
+                return $testCount;
+            }
+        );
 
         $this->handler->handle($context);
 
@@ -135,6 +142,92 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $query = new Query($this->getMock('Doctrine\ORM\EntityManager', [], [], '', false));
         $this->handler->expects($this->once())->method('calculateCount')
             ->with($this->isInstanceOf('Doctrine\ORM\Query'))
+            ->willReturn($testCount);
+
+        $context = $this->createContext();
+        $context->set('query', $query);
+
+        $this->handler->handle($context);
+
+        $response = $context->getResponse();
+        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+    }
+
+    public function testHandleWithSqlQueryBuilder()
+    {
+        $testCount = 22;
+
+        $dbalQb = $this->getMock(
+            'Doctrine\DBAL\Query\QueryBuilder',
+            ['setMaxResults', 'setFirstResult'],
+            [],
+            '',
+            false
+        );
+        $conn   = $this->getMock(
+            'Doctrine\DBAL\Connection',
+            ['createQueryBuilder'],
+            [],
+            '',
+            false
+        );
+        $em     = $this->getMock(
+            'Doctrine\ORM\EntityManager',
+            ['getConnection'],
+            [],
+            '',
+            false
+        );
+        $em->expects($this->once())->method('getConnection')
+            ->will($this->returnValue($conn));
+        $conn->expects($this->once())->method('createQueryBuilder')
+            ->will($this->returnValue($dbalQb));
+
+        $qb = new SqlQueryBuilder($em, $this->getMock('Doctrine\ORM\Query\ResultSetMapping', [], [], '', false));
+
+        $dbalQb->expects($this->once())->method('setMaxResults')
+            ->with($this->identicalTo(null))
+            ->will($this->returnSelf());
+        $dbalQb->expects($this->once())->method('setFirstResult')
+            ->with($this->identicalTo(null))
+            ->will($this->returnSelf());
+
+        $this->handler->expects($this->once())->method('calculateCount')
+            ->with($this->isInstanceOf('Oro\Bundle\EntityBundle\ORM\SqlQuery'))
+            ->willReturn($testCount);
+
+        $context = $this->createContext();
+        $context->set('query', $qb);
+
+        $this->handler->handle($context);
+
+        $response = $context->getResponse();
+        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+    }
+
+    public function testHandleWithSqlQuery()
+    {
+        $testCount = 22;
+
+        $query  = new SqlQuery($this->getMock('Doctrine\ORM\EntityManager', [], [], '', false));
+        $dbalQb = $this->getMock(
+            'Doctrine\DBAL\Query\QueryBuilder',
+            ['setMaxResults', 'setFirstResult'],
+            [],
+            '',
+            false
+        );
+        $query->setQueryBuilder($dbalQb);
+
+        $dbalQb->expects($this->once())->method('setMaxResults')
+            ->with($this->identicalTo(null))
+            ->will($this->returnSelf());
+        $dbalQb->expects($this->once())->method('setFirstResult')
+            ->with($this->identicalTo(null))
+            ->will($this->returnSelf());
+
+        $this->handler->expects($this->once())->method('calculateCount')
+            ->with($this->isInstanceOf('Oro\Bundle\EntityBundle\ORM\SqlQuery'))
             ->willReturn($testCount);
 
         $context = $this->createContext();
@@ -204,7 +297,23 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleWithInvalidTotalCountValueThrowException()
     {
         $context = $this->createContext();
-        $context->set('totalCount', false);
+        $context->set('totalCount', 22);
+
+        $this->handler->handle($context);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testHandleWithInvalidTotalCountCallbackThrowException()
+    {
+        $context = $this->createContext();
+        $context->set(
+            'totalCount',
+            function () {
+                return false;
+            }
+        );
 
         $this->handler->handle($context);
     }
