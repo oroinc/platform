@@ -318,7 +318,6 @@ class DashboardController extends Controller
      *      name="oro_dashboard_grid",
      *      requirements={"gridName"="[\w\:-]+"}
      * )
-     * @Template("OroDashboardBundle:Dashboard:grid.html.twig")
      *
      * @param string  $widget
      * @param string  $gridName
@@ -328,21 +327,25 @@ class DashboardController extends Controller
      */
     public function gridAction($widget, $gridName, Request $request)
     {
-        $params = $request->get('params', []);
+        $params       = $request->get('params', []);
         $renderParams = $request->get('renderParams', []);
+        $template     = $request->get('template', 'OroDashboardBundle:Dashboard:grid.html.twig');
 
         $viewId = $this->getWidgetConfigs()->getWidgetOptions()->get('gridView');
         if ($viewId && null !== $view = $this->findView($viewId)) {
-            $params = array_merge($params, [
-                ParameterBag::ADDITIONAL_PARAMETERS => [
-                    GridViewsExtension::VIEWS_PARAM_KEY => $viewId
-                ],
-                '_filter' => $view->getFiltersData(),
-                '_sort_by' => $view->getSortersData(),
-            ]);
+            $params = array_merge(
+                $params,
+                [
+                    ParameterBag::ADDITIONAL_PARAMETERS => [
+                        GridViewsExtension::VIEWS_PARAM_KEY => $viewId
+                    ],
+                    '_filter'                           => $view->getFiltersData(),
+                    '_sort_by'                          => $view->getSortersData(),
+                ]
+            );
         }
 
-        return array_merge(
+        $parameters = array_merge(
             [
                 'gridName'     => $gridName,
                 'params'       => $params,
@@ -350,6 +353,8 @@ class DashboardController extends Controller
             ],
             $this->getWidgetConfigs()->getWidgetAttributesForTwig($widget)
         );
+
+        return $this->render($template, $parameters);
     }
 
     /**
