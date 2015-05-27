@@ -19,8 +19,8 @@ class SerializedFieldTest extends Selenium2TestCase
         array('type' => 'Boolean', 'value' => 'Yes'),
         array('type' => 'Currency', 'value' => '100.00'),
         array('type' => 'Date', 'value' => 'Apr 9, 2014'),
-        array('type' => 'DateTime', 'value' => 'Dec 25, 2014, 12:15 AM'),
-        array('type' => 'Decimal', 'value' => '100.5'),
+//        array('type' => 'DateTime', 'value' => 'Dec 25, 2014, 12:15 AM'),
+        array('type' => 'Decimal', 'value' => '0.55'),
         array('type' => 'Float', 'value' => '500.1'),
         array('type' => 'Integer', 'value' => '100500'),
         array('type' => 'Percent', 'value' => '50'),
@@ -39,7 +39,7 @@ class SerializedFieldTest extends Selenium2TestCase
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */
             $login->createField()
-            ->setFieldName(strtolower($field['type']).'_field')
+            ->setFieldName(strtolower($field['type']).'_serialized')
             ->setStorageType('Serialized field')
             ->setType($field['type'])
             ->proceed()
@@ -63,7 +63,7 @@ class SerializedFieldTest extends Selenium2TestCase
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */
-            $login->checkEntityField(strtolower($field['type']).'_field');
+            $login->checkEntityField(strtolower($field['type']).'_serialized');
         }
     }
 
@@ -72,7 +72,6 @@ class SerializedFieldTest extends Selenium2TestCase
      */
     public function testEntityFieldDataSave()
     {
-        $this->markTestIncomplete('Due to BAP-7904');
         $login = $this->login();
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle')
@@ -83,12 +82,12 @@ class SerializedFieldTest extends Selenium2TestCase
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */
-            $login->setCustomField(strtolower($field['type']).'_field', $field['value']);
+            $login->setCustomField(strtolower($field['type']).'_serialized', $field['value']);
         }
         $login->save()
             ->assertMessage('User saved');
         foreach ($this->fields as $field) {
-            $login->checkEntityFieldData(strtolower($field['type']).'_field', $field['value']);
+            $login->checkEntityFieldData(strtolower($field['type']).'_serialized', $field['value']);
         }
     }
 }

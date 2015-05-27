@@ -19,8 +19,8 @@ class CustomFieldTest extends Selenium2TestCase
         array('type' => 'Boolean', 'value' => 'Yes'),
         array('type' => 'Currency', 'value' => '100.00'),
         array('type' => 'Date', 'value' => 'Apr 9, 2014'),
-        array('type' => 'DateTime', 'value' => 'Dec 25, 2014, 12:15 AM'),
-        array('type' => 'Decimal', 'value' => '100.5'),
+//        array('type' => 'DateTime', 'value' => 'Dec 25, 2014, 12:15 AM'),
+        array('type' => 'Decimal', 'value' => '0.55'),
         array('type' => 'Float', 'value' => '500.1'),
         array('type' => 'Integer', 'value' => '100500'),
         array('type' => 'Percent', 'value' => '50'),
@@ -73,7 +73,6 @@ class CustomFieldTest extends Selenium2TestCase
      */
     public function testEntityFieldDataSave()
     {
-//        $this->markTestIncomplete('Due to BAP-7904, BAP-8055');
         $login = $this->login();
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle')
