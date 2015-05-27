@@ -4,7 +4,7 @@ define(function(require) {
 
     var TransitionDefinitionCollection,
         BaseCollection = require('oroui/js/app/models/base/collection'),
-        TransitionDefinitionModel = require('oroworkflow/js/app/models/transition-definition-model');
+        TransitionDefinitionModel = require('./transition-definition-model');
 
     TransitionDefinitionCollection = BaseCollection.extend({
         model: TransitionDefinitionModel
