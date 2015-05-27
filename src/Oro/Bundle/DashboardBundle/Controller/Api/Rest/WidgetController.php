@@ -47,7 +47,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_dashboard_edit",
+     *      id="oro_dashboard_update",
      *      type="entity",
      *      permission="EDIT",
      *      class="OroDashboardBundle:Dashboard"
@@ -88,7 +88,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      description="Delete dashboard widget",
      *      resource=true
      * )
-     * @AclAncestor("oro_dashboard_edit")
+     * @AclAncestor("oro_dashboard_update")
      * @return Response
      */
     public function deleteAction($dashboardId, $widgetId)
@@ -124,7 +124,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      description="Update dashboard widgets positions",
      *      resource=true
      * )
-     * @AclAncestor("oro_dashboard_edit")
+     * @AclAncestor("oro_dashboard_update")
      *
      * @return Response
      */
@@ -166,7 +166,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      description="Add widget to dashboard",
      *      resource=true
      * )
-     * @AclAncestor("oro_dashboard_edit")
+     * @AclAncestor("oro_dashboard_update")
      * @return Response
      */
     public function postAddWidgetAction()
