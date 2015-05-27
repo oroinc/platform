@@ -52,7 +52,8 @@ datagrid:
         filters:
             columns:
                 command:
-                    type: string
+                    type: command_with_args
+                    fields: [j.command, j.args]
                     data_name: j.command
                 state:
                     type: choice
