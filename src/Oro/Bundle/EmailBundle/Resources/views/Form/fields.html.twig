@@ -50,7 +50,8 @@
                 $(function () {
                     var selectorEl = '{{ form.vars.id }}';
                     var emailLinkToScopeEl = $('#' + selectorEl);
-                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form').find('#oro_entity_config_type_attachment_enabled');
+                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form')
+                            .find('[data-ftid=oro_entity_config_type_attachment_enabled]');
                     initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
                     $(enableAttachmentEl).on('change', function() {
                         initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
@@ -134,7 +135,7 @@
     {% endfor %}
 
     {% set options = options|merge({
-        container: id,
+        containerId: id,
         inputName: full_name,
         entityAttachments: entityAttachmentsArray,
         attachmentsAvailable: attachmentsAvailableArray
