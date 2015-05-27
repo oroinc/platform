@@ -16,9 +16,8 @@ class HtmlTagExtension extends \Twig_Extension
     /**
      * @param HtmlTagHelper $htmlTagHelper
      */
-    public function __construct(
-        HtmlTagHelper $htmlTagHelper
-    ) {
+    public function __construct(HtmlTagHelper $htmlTagHelper)
+    {
         $this->htmlTagHelper = $htmlTagHelper;
     }
 

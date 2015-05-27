@@ -19,38 +19,53 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper = new HtmlTagHelper($this->htmlTagProvider);
     }
 
-    public function testGetStrippedBody()
+    public function testGetStripped()
     {
-        $actualString = '<style type="text/css">H1 {border-width: 1;}</style><div class="new">test</div>';
+        $actualString = '<div class="new">test</div>';
         $expectedString = 'test';
 
         $this->assertEquals($expectedString, $this->helper->getStripped($actualString));
     }
 
     /**
-     * @dataProvider shortBodiesProvider
+     * @dataProvider shortStringProvider
      */
-    public function testGetShortBody($expected, $actual, $maxLength)
+    public function testGetShort($expected, $actual, $maxLength)
     {
         $shortBody = $this->helper->getShort($actual, $maxLength);
         $this->assertEquals($expected, $shortBody);
     }
 
-    public static function bodiesProvider()
-    {
-        return [
-            ['<p>Hello</p>', '<p>Hello</p>', false],
-            ['<p>Hello</p>', '<p>Hello</p><div class="quote">Other content</div>', false],
-            ['<p>H</p><div class="quote">H</div>', '<p>H</p><div class="quote">H</div>', true]
-        ];
-    }
-
-    public static function shortBodiesProvider()
+    public static function shortStringProvider()
     {
         return [
             ['abc abc abc', 'abc abc abc abc ', 12],
             ['abc abc', 'abc abc abc abc abc', 8],
             ['abcab', 'abcabcabcabc', 5],
         ];
+    }
+
+    public function testHtmlPurify()
+    {
+        $testString = <<<STR
+<html dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="GENERATOR" content="MSHTML 10.00.9200.17228">
+<style id="owaParaStyle">P {
+	MARGIN-BOTTOM: 0px; MARGIN-TOP: 0px
+}
+</style>
+</head>
+<body fPStyle="1" ocsi="0">
+<div style="direction: ltr;font-family: Tahoma;color: #000000;font-size: 10pt;">no subject</div>
+</body>
+</html>
+
+STR;
+        $this->assertEquals(
+            '<div style="font-family:Tahoma;color:#000000;font-size:10pt;">no subject</div>',
+            trim($this->helper->getPurify($testString))
+        );
     }
 }
