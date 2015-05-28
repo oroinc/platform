@@ -1,5 +1,5 @@
 Layout example implementation
-===========
+=============================
 
 The goal of this guide is to demonstrate the capabilities of the layout engine and show how different layout blocks can be used to implement a simple page.
 This guide is intended for those already familiar with layouts. So, please, read our [Quick Start guide](./quick_start.md) before proceeding.
@@ -368,24 +368,86 @@ Note that if `visible` evaluates to false, the block will not be added to the fi
 Every product page is different since it contains product related data. The layout engine allows you to operate this data in the layout update files.
 Please, make sure you are familiar with [layout context](layout_context.md) and [layout data](layout_data.md) topics.
 
-First of all we'll need to create a data provider for our product data. The `ProductDataProvider` described in [layout data](layout_data.md) documentation would suffice our needs.
-But for demonstration purposes let's have our product data provider return the following data:
+Since product data is page specific (used on product page only), we'll be adding it to `data` collection of the layout context using a [context configurator](layout_context.md#context-configurators).
 
 ```php
-    public function getData(ContextInterface $context)
+namespace Acme\Bundle\ProductBundle\Layout\Extension;;
+
+use Symfony\Component\HttpFoundation\Request;
+
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+
+class ProductContextConfigurator implements ContextConfiguratorInterface
+{
+    /** @var Request|null */
+    protected $request;
+
+    /**
+     * Synchronized DI method call, sets current request for further usage
+     *
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
     {
-        return [
-            'id'          => 99,
-            'name'        => 'Chelsea Tee',
-            'description' => 'Ultrasoft, lightweight V-neck tee. 100% cotton. Machine wash.',
-            'category'    => 'Men',
-            'subcategory' => 'Tees, Knits and Polos',
-            'url'         => '/chelsea-tea.html'
-        ];
+        $this->request = $request;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureContext(ContextInterface $context)
+    {
+        $context->data()->setDefault(
+            'product',
+            '$request.product_id',
+            function () {
+                if (!$this->request) {
+                    throw new \BadMethodCallException('The request expected.');
+                }
+                $productId = $this->request->query->get('product_id') ?: $this->request->request->get('product_id');
+
+                return $this->getProductData($productId);
+            }
+        );
+    }
+
+    /*
+     * Demo function. Data should be selected from the database instead.
+     *
+     * @param int $productId
+     * @return array
+     */
+    protected function getProductData($productId)
+    {
+        $productData = [
+            '99' => [
+                'id'          => 99,
+                'name'        => 'Chelsea Tee',
+                'description' => 'Ultrasoft, lightweight V-neck tee. 100% cotton. Machine wash.',
+                'category'    => 'Men',
+                'subcategory' => 'Tees, Knits and Polos',
+                'url'         => '/chelsea-tea.html'
+            ]
+        ];
+
+        return isset($productData[$productId]) ? $productData[$productId] : [];
+    }
+}
 ```
 
-Now let's use our data provider in the layout update to add page title, meta description and canonical url:
+The product Id is received from the request, and based on it we obtain the rest of product data. It can be fetched from database or other sources, but for simplicity we use a simple array here.
+To enable it we have to register it in the DI container with the `layout.context_configurator` tag:
+```yaml
+    acme_product.layout.context_configurator.product:
+        class: Acme\Bundle\ProductBundle\Layout\Extension\ProductContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+```
+
+Now we can use product data in the layout update to add page title, meta description and canonical url:
 ```yaml
 layout:
     actions:
@@ -414,3 +476,152 @@ layout:
                 href: {@value: $data.product.url}
 ```
 Note how we use [Join](../../../../Component/ConfigExpression/Func/Join.php) function to compose the page title from different product fields.
+
+
+Let's consider a another example of using data providers.
+To implement a language switcher we'll create a separate data provider class, since this data is used throughout all pages.
+
+```php
+namespace Acme\Bundle\LocaleBundle\Layout\Extension;
+
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\DataProviderInterface;
+
+class ProductDataProvider implements DataProviderInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+	    return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData(ContextInterface $context)
+    {
+        return [
+            'default_language'    => 'english',
+            'available_languages' => [
+                'english' => 'English',
+                'french'  => 'French'
+            ]
+        ];
+    }
+}
+```
+
+We need to register our data provider in the DI container:
+```yaml
+    acme_locale.layout.data_provider.languages:
+        class: Acme\Bundle\LocaleBundle\Layout\Extension\LanguagesDataProvider
+        tags:
+            - { name: layout.data_provider, alias: languages }
+```
+
+Now we can refer to language data the same way as to product data. In our layout update file we can add:
+
+```yaml
+layout:
+    actions:
+        - @add:
+            id: lang_switch
+            parentId: page_container
+            blockType: block
+            options:
+               vars:
+                  default_language: { @value: $data.languages.default_language }
+                  available_languages: { @value: $data.languages.available_languages }
+                  product_url: { @value: $data.product.url }
+```
+
+And create the block template for the language switcher:
+```twig
+{% block _lang_switch_widget %}
+    <div class="header-language-background">
+        <div class="header-language-container">
+            <div class="store-language-container">
+                <div class="form-language">
+                    <label for="select-language">Your Language:</label>
+                    <select id="select-language" title="Your Language" onchange="window.location.href=this.value">
+                        {% for code, label in available_languages %}
+                            <option value="{{ product_url }}?___store={{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <p class="welcome-msg">Welcome </p>
+        </div>
+    </div>
+{% endblock %}
+```
+
+This will render the language switcher in the browser but will not know which language has been selected. For this we need to add a context configurator which will store the selected language.
+Similar to `ProductContextConfigurator` we'll fetch the language code from the request and save it in the layout context.
+
+```php
+<?php
+namespace Oro\Bundle\LayoutBundle\Layout\Extension;
+
+use Symfony\Component\HttpFoundation\Request;
+
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+
+class LocaleContextConfigurator implements ContextConfiguratorInterface
+{
+    /** @var Request|null */
+    protected $request;
+
+    /**
+     * Synchronized DI method call, sets current request for further usage
+     *
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureContext(ContextInterface $context)
+    {
+        $context->data()->setDefault(
+            'current_language',
+            '$request.___store',
+            function () {
+                if (!$this->request) {
+                    throw new \BadMethodCallException('The request expected.');
+                }
+                $locale = $this->request->query->get('___store') ?: $this->request->request->get('___store');
+
+                return $locale;
+            }
+        );
+    }
+}
+```
+
+Register locale context configurator:
+```yaml
+    acme_product.layout.context_configurator.locale:
+        class: Acme\Bundle\ProductBundle\Layout\Extension\LocaleContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+```
+We also need to modify our block template to have the language dropdown preselect the current value:
+```twig
+    <select id="select-language" title="Your Language" onchange="window.location.href=this.value">
+        {% for code, label in available_languages %}
+            <option value="{{ product_url }}?___store={{ code }}" {% if code == lang %}selected="selected"{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+```
+
+Now if you go to `/layout/test?product_id=99&___store=french` url you'll see that French language is preselected.
