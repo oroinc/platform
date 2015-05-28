@@ -215,10 +215,10 @@ class ConfigEntity extends CustomEntity
                     $dateField = "[contains(@id, '{$fieldName}') and contains(@id, 'date_selector_')]";
                     $timeField = "[contains(@id, '{$fieldName}') and contains(@id, 'time_selector_')]";
 
-                    if ($fieldName === 'datetime_field'
+                    if (
+                        preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $value, $valueParts)
                         and $this->isElementPresent("//div[@class='control-group']//input{$dateField}")
                         and $this->isElementPresent("//div[@class='control-group']//input{$timeField}")
-                        and preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $value, $valueParts)
                     ) {
                         $field = $this->test->byXpath("//div[@class='control-group']//input{$dateField}");
                         $field->click(); // focus
