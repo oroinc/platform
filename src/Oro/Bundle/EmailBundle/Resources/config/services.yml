@@ -400,6 +400,8 @@ services:
 
     oro_email.listener.datagrid.email:
         class: %oro_email.listener.datagrid.email.class%
+        arguments:
+            - @oro_email.datagrid_query_factory
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
@@ -423,6 +425,7 @@ services:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
             - @oro_email.helper.datagrid.emails
+            - @oro_email.datagrid_query_factory
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
 

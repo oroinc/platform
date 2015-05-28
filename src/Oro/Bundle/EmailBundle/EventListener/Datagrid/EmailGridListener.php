@@ -4,9 +4,22 @@ namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 
 class EmailGridListener
 {
+    /**
+     * @var EmailQueryFactory
+     */
+    protected $factory;
+
+    /**
+     * @param EmailQueryFactory $factory
+     */
+    public function __construct(EmailQueryFactory $factory)
+    {
+        $this->factory = $factory;
+    }
 
     /**
      * Add required filters
@@ -19,6 +32,8 @@ class EmailGridListener
         $ormDataSource = $event->getDatagrid()->getDatasource();
         $queryBuilder = $ormDataSource->getQueryBuilder();
         $parameters = $event->getDatagrid()->getParameters();
+
+        $this->factory->filterQueryByUserId($queryBuilder, $parameters->get('userId'));
 
         if ($parameters->has('emailIds')) {
             $emailIds = $parameters->get('emailIds');
