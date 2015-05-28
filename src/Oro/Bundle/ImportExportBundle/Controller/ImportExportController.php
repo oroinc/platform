@@ -144,7 +144,10 @@ class ImportExportController extends Controller
         $result = $this->getExportHandler()->getExportResult(
             JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
             $processorAlias,
-            ProcessorRegistry::TYPE_EXPORT_TEMPLATE
+            ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
+            'csv',
+            null,
+            $this->getOptionsFromRequest()
         );
 
         return $this->redirect($result['url']);
@@ -210,14 +213,10 @@ class ImportExportController extends Controller
      */
     protected function getOptionsFromRequest()
     {
-        $options = $this->getRequest()->get('options');
-
-        if ($options === null) {
-            $options = [];
-        }
+        $options = $this->getRequest()->get('options', []);
 
         if (!is_array($options)) {
-            throw new InvalidArgumentException('request parameter "options" must be array.');
+            throw new InvalidArgumentException('Request parameter "options" must be array.');
         }
 
         return $options;
