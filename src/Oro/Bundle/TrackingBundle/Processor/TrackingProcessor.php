@@ -38,7 +38,7 @@ class TrackingProcessor implements LoggerAwareInterface
     const BATCH_SIZE = 100;
 
     /** Max retries to identify tracking visit */
-    const MAX_RETRIES = 100;
+    const MAX_RETRIES = 5;
 
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -61,6 +61,15 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var DeviceDetectorFactory */
     protected $deviceDetector;
 
+    /** @var \DateTime start time */
+    protected $startTime = null;
+
+    /** @var \DateInterval|bool */
+    protected $maxExecTimeout = false;
+
+    /** Default max execution time (in minutes) */
+    protected $maxExecTime = 5;
+
     /**
      * @param ManagerRegistry                     $doctrine
      * @param TrackingEventIdentificationProvider $trackingIdentification
@@ -70,6 +79,22 @@ class TrackingProcessor implements LoggerAwareInterface
         $this->doctrine               = $doctrine;
         $this->trackingIdentification = $trackingIdentification;
         $this->deviceDetector         = new DeviceDetectorFactory();
+
+        $this->startTime      = $this->getCurrentUtcDateTime();
+        $this->maxExecTimeout = $this->maxExecTime > 0
+            ? new \DateInterval('PT' . $this->maxExecTime . 'M')
+            : false;
+    }
+
+    /**
+     * @param integer $minutes
+     */
+    public function setMaxExecutionTime($minutes = null)
+    {
+        if ($minutes !== null) {
+            $this->maxExecTime    = $minutes;
+            $this->maxExecTimeout = $minutes > 0 ? new \DateInterval('PT' . $minutes . 'M') : false;
+        }
     }
 
     /**
@@ -77,57 +102,115 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     public function process()
     {
-        /**
-         *  To avoid memory leaks, we turn off doctrine logger
-         */
+        /** To avoid memory leaks, we turn off doctrine logger */
         $this->getEntityManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->logger === null) {
             $this->logger = new NullLogger();
         }
 
-        $totalEvents  = $this->getEventsCount();
-        $totalBatches = number_format(ceil($totalEvents / self::BATCH_SIZE));
-        $this->logger->notice(
-            sprintf(
-                '<info>Total events to be processed - %s (%s batches).</info>',
-                number_format($totalEvents),
-                $totalBatches
-            )
-        );
-
+        $this->logger->notice('Check new visits...');
+        $totalEvents = $this->getEventsCount();
         if ($totalEvents > 0) {
-            $this->logger->notice('Processing new visits...');
+            $totalBatches = number_format(ceil($totalEvents / self::BATCH_SIZE));
+            $this->logger->notice(
+                sprintf(
+                    '<info>Total visits to be processed - %s (%s batches).</info>',
+                    number_format($totalEvents),
+                    $totalBatches
+                )
+            );
             while ($this->processVisits()) {
-                $this->logger->notice(
-                    sprintf(
-                        'Batch #%d of %s processed at <info>%s</info>.',
-                        ++$this->processedBatches,
-                        $totalBatches,
-                        date('Y-m-d H:i:s')
-                    )
-                );
+                $this->logBatch(++$this->processedBatches, $totalBatches);
+                if ($this->checkMaxExecutionTime()) {
+                    return;
+                }
             }
         }
 
         $this->logger->notice('Recheck previous visit identifiers...');
-        while ($this->identifyPrevVisits()) {
-            $this->logger->notice('Try to process Next batch');
+        $totalEvents = $this->getIdentifyPrevVisitsCount();
+        if ($totalEvents > 0) {
+            $totalBatches           = number_format(ceil($totalEvents / self::BATCH_SIZE));
+            $this->processedBatches = 0;
+            $this->logger->notice(
+                sprintf(
+                    '<info>Total previous visit identifiers to be processed - %s (%s batches).</info>',
+                    number_format($totalEvents),
+                    $totalBatches
+                )
+            );
+            while ($this->identifyPrevVisits()) {
+                $this->logBatch(++$this->processedBatches, $totalBatches);
+                if ($this->checkMaxExecutionTime()) {
+                    return;
+                }
+            }
         }
 
         $this->logger->notice('Recheck previous visit events...');
-        $this->skipList = [];
-        while ($this->identifyPrevVisitEvents()) {
-            $this->logger->notice('Try to process Next batch');
+        $totalEvents = $this->getIdentifyPrevVisitEventsCount();
+        if ($totalEvents > 0) {
+            $totalBatches           = number_format(ceil($totalEvents / self::BATCH_SIZE));
+            $this->processedBatches = 0;
+            $this->logger->notice(
+                sprintf(
+                    '<info>Total previous visit events to be processed - %s (%s batches).</info>',
+                    number_format($totalEvents),
+                    $totalBatches
+                )
+            );
+            $this->skipList = [];
+            while ($this->identifyPrevVisitEvents()) {
+                $this->logBatch(++$this->processedBatches, $totalBatches);
+                if ($this->checkMaxExecutionTime()) {
+                    return;
+                }
+            }
         }
 
         $this->logger->notice('<info>Done</info>');
     }
 
     /**
+     * @param integer $processed
+     * @param string  $total
+     */
+    protected function logBatch($processed, $total)
+    {
+        $this->logger->notice(
+            sprintf(
+                'Batch #%s of %s processed at <info>%s</info>.',
+                number_format($processed),
+                $total,
+                date('Y-m-d H:i:s')
+            )
+        );
+    }
+
+    /**
+     * Checks of process max execution time
+     *
+     * @return bool
+     */
+    protected function checkMaxExecutionTime()
+    {
+        if ($this->maxExecTimeout !== false) {
+            $date = $this->getCurrentUtcDateTime();
+            if ($date->sub($this->maxExecTimeout) >= $this->startTime) {
+                $this->logger->notice('<comment>Exit because allocated time frame elapsed.</comment>');
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns count of web events to be processed.
      *
-     * @return mixed
+     * @return integer
      */
     protected function getEventsCount()
     {
@@ -137,6 +220,55 @@ class TrackingProcessor implements LoggerAwareInterface
             ->createQueryBuilder('entity')
             ->select('COUNT (entity.id)')
             ->where('entity.parsed = false');
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Returns count of not identified web visits to be processed.
+     *
+     * @return integer
+     */
+    protected function getIdentifyPrevVisitsCount()
+    {
+        $em           = $this->getEntityManager();
+        $queryBuilder = $em
+            ->getRepository(self::TRACKING_VISIT_ENTITY)
+            ->createQueryBuilder('entity');
+        $queryBuilder
+            ->select('COUNT (entity.id)')
+            ->where('entity.identifierDetected = false')
+            ->andWhere('entity.parsedUID > 0')
+            ->andWhere('entity.parsingCount < :maxRetries')
+            ->orderBy('entity.firstActionTime', 'ASC')
+            ->setParameter('maxRetries', self::MAX_RETRIES);
+
+        if (count($this->skipList)) {
+            $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
+        }
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Returns count of tracking visit events to be processed.
+     *
+     * @return integer
+     */
+    protected function getIdentifyPrevVisitEventsCount()
+    {
+        $em           = $this->getEntityManager();
+        $queryBuilder = $em
+            ->getRepository(self::TRACKING_VISIT_EVENT_ENTITY)
+            ->createQueryBuilder('entity');
+        $queryBuilder
+            ->select('COUNT (entity.id)')
+            ->andWhere('entity.parsingCount < :maxRetries')
+            ->setParameter('maxRetries', self::MAX_RETRIES);
+
+        if (count($this->skipList)) {
+            $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
+        }
 
         return $queryBuilder->getQuery()->getSingleScalarResult();
     }
@@ -155,7 +287,8 @@ class TrackingProcessor implements LoggerAwareInterface
         $queryBuilder
             ->select('entity')
             ->andWhere('entity.parsingCount < :maxRetries')
-            ->setParameter('maxRetries', self::MAX_RETRIES);
+            ->setParameter('maxRetries', self::MAX_RETRIES)
+            ->setMaxResults(self::BATCH_SIZE);
 
         if (count($this->skipList)) {
             $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
@@ -201,7 +334,8 @@ class TrackingProcessor implements LoggerAwareInterface
             ->andWhere('entity.parsedUID > 0')
             ->andWhere('entity.parsingCount < :maxRetries')
             ->orderBy('entity.firstActionTime', 'ASC')
-            ->setParameter('maxRetries', self::MAX_RETRIES);
+            ->setParameter('maxRetries', self::MAX_RETRIES)
+            ->setMaxResults(self::BATCH_SIZE);
 
         if (count($this->skipList)) {
             $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
@@ -290,7 +424,7 @@ class TrackingProcessor implements LoggerAwareInterface
                     $this->getEntityManager()->createQueryBuilder()
                         ->update(self::TRACKING_VISIT_EVENT_ENTITY, 'event')
                         ->set('event.' . $associationName, ':identifier')
-                        ->where('event.visit in(' . implode(',', $subSelect) .')')
+                        ->where('event.visit in(' . implode(',', $subSelect) . ')')
                         ->setParameter('identifier', $identifier)
                         ->getQuery()
                         ->execute();
@@ -333,7 +467,7 @@ class TrackingProcessor implements LoggerAwareInterface
             ->getRepository(self::TRACKING_EVENT_ENTITY)
             ->createQueryBuilder('entity')
             ->where('entity.parsed = false')
-            ->orderBy('entity.createdAt', 'ASC')
+            ->orderBy('entity.id', 'ASC')
             ->setMaxResults(self::BATCH_SIZE);
 
         $entities = $queryBuilder->getQuery()->getResult();
@@ -570,5 +704,15 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         return $em;
+    }
+
+    /**
+     * Gets a DateTime object that is set to the current date and time in UTC.
+     *
+     * @return \DateTime
+     */
+    protected function getCurrentUtcDateTime()
+    {
+        return new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }
