@@ -6,7 +6,8 @@ define(function (require) {
         _ = require('underscore'),
         $ = require('jquery'),
         BaseView = require('oroui/js/app/views/base/view'),
-        TransitionsShortListView = require('../transition/transition-list-short-view');
+        TransitionsShortListView = require('../transition/transition-list-short-view'),
+        StepModel = require('../../models/step-model');
 
     StepRowView = BaseView.extend({
         tagName: 'tr',
@@ -62,6 +63,9 @@ define(function (require) {
         },
 
         render: function() {
+            if (!(this.model instanceof StepModel)) {
+                throw new Error('Model must be an instance of StepModel');
+            }
             this.transitionsListView = new TransitionsShortListView({
                 'collection': this.model.getAllowedTransitions(this.options.workflow),
                 'workflow': this.options.workflow,
