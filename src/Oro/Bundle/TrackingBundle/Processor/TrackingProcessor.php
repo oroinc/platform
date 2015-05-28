@@ -40,9 +40,6 @@ class TrackingProcessor implements LoggerAwareInterface
     /** Max retries to identify tracking visit */
     const MAX_RETRIES = 5;
 
-    /** The maximum execution time (in minutes) */
-    const MAX_EXEC_TIME_IN_MIN = 5;
-
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -70,6 +67,9 @@ class TrackingProcessor implements LoggerAwareInterface
     /** @var \DateInterval|bool */
     protected $maxExecTimeout = false;
 
+    /** Default max execution time (in minutes) */
+    protected $maxExecTime = 5;
+
     /**
      * @param ManagerRegistry                     $doctrine
      * @param TrackingEventIdentificationProvider $trackingIdentification
@@ -81,9 +81,20 @@ class TrackingProcessor implements LoggerAwareInterface
         $this->deviceDetector         = new DeviceDetectorFactory();
 
         $this->startTime      = $this->getCurrentUtcDateTime();
-        $this->maxExecTimeout = self::MAX_EXEC_TIME_IN_MIN > 0
-            ? new \DateInterval('PT' . self::MAX_EXEC_TIME_IN_MIN . 'M')
+        $this->maxExecTimeout = $this->maxExecTime > 0
+            ? new \DateInterval('PT' . $this->maxExecTime . 'M')
             : false;
+    }
+
+    /**
+     * @param integer $minutes
+     */
+    public function setMaxExecutionTime($minutes = null)
+    {
+        if ($minutes !== null) {
+            $this->maxExecTime    = $minutes;
+            $this->maxExecTimeout = $minutes > 0 ? new \DateInterval('PT' . $minutes . 'M') : false;
+        }
     }
 
     /**
@@ -99,6 +110,7 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         $this->logger->notice('Check new visits...');
+        $this->logger->notice($this->maxExecTime . '//' . ($this->maxExecTimeout->format('%I minutes')));
         $totalEvents = $this->getEventsCount();
         if ($totalEvents > 0) {
             $totalBatches = number_format(ceil($totalEvents / self::BATCH_SIZE));
@@ -110,15 +122,7 @@ class TrackingProcessor implements LoggerAwareInterface
                 )
             );
             while ($this->processVisits()) {
-                $this->logger->notice(
-                    sprintf(
-                        'Batch #%d of %s processed at <info>%s</info>.',
-                        number_format(++$this->processedBatches),
-                        $totalBatches,
-                        date('Y-m-d H:i:s')
-                    )
-                );
-
+                $this->logBatch(++$this->processedBatches, $totalBatches);
                 if ($this->checkMaxExecutionTime()) {
                     return;
                 }
@@ -138,14 +142,7 @@ class TrackingProcessor implements LoggerAwareInterface
                 )
             );
             while ($this->identifyPrevVisits()) {
-                $this->logger->notice(
-                    sprintf(
-                        'Batch #%d of %s processed at <info>%s</info>.',
-                        number_format(++$this->processedBatches),
-                        $totalBatches,
-                        date('Y-m-d H:i:s')
-                    )
-                );
+                $this->logBatch(++$this->processedBatches, $totalBatches);
                 if ($this->checkMaxExecutionTime()) {
                     return;
                 }
@@ -166,14 +163,7 @@ class TrackingProcessor implements LoggerAwareInterface
             );
             $this->skipList = [];
             while ($this->identifyPrevVisitEvents()) {
-                $this->logger->notice(
-                    sprintf(
-                        'Batch #%d of %s processed at <info>%s</info>.',
-                        number_format(++$this->processedBatches),
-                        $totalBatches,
-                        date('Y-m-d H:i:s')
-                    )
-                );
+                $this->logBatch(++$this->processedBatches, $totalBatches);
                 if ($this->checkMaxExecutionTime()) {
                     return;
                 }
@@ -181,6 +171,22 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         $this->logger->notice('<info>Done</info>');
+    }
+
+    /**
+     * @param integer $processed
+     * @param integer $total
+     */
+    protected function logBatch($processed, $total)
+    {
+        $this->logger->notice(
+            sprintf(
+                'Batch #%d of %s processed at <info>%s</info>.',
+                number_format($processed),
+                $total,
+                date('Y-m-d H:i:s')
+            )
+        );
     }
 
     /**
