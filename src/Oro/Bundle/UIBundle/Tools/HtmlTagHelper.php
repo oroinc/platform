@@ -9,6 +9,9 @@ class HtmlTagHelper
 {
     const MAX_STRING_LENGTH = 500;
 
+    /** @var HtmlTagProvider */
+    protected $htmlTagProvider;
+
     /** @var string */
     protected $cacheDir;
 
@@ -28,10 +31,11 @@ class HtmlTagHelper
      * @param string $string
      * @return string
      */
-    public function getPurify($string)
+    public function purify($string)
     {
         $transformer = new SanitizeHTMLTransformer(null, $this->cacheDir);
-        return $transformer->transform($string);
+
+        return trim($transformer->transform($string));
     }
 
     /**
@@ -39,31 +43,33 @@ class HtmlTagHelper
      * @param bool $uiAllowedTags
      * @return string
      */
-    public function getStripped($string, $uiAllowedTags = false)
+    public function stripTags($string, $uiAllowedTags = false)
     {
         if ($uiAllowedTags) {
             return strip_tags($string, $this->htmlTagProvider->getAllowedTags());
         }
-        return strip_tags($string);
+
+        return trim(strip_tags($string));
     }
 
     /**
-     * Get shorter text
+     * Shorten text
      *
      * @param string $string
      * @param int $maxLength
      * @return string
      */
-    public function getShort($string, $maxLength = self::MAX_STRING_LENGTH)
+    public function shorten($string, $maxLength = self::MAX_STRING_LENGTH)
     {
-        if (mb_strlen($string) > $maxLength) {
-            $string = mb_substr($string, 0, $maxLength);
-            $lastOccurrencePos = strrpos($string, ' ');
+        $encoding = mb_detect_encoding($string);
+        if (mb_strlen($string, $encoding) > $maxLength) {
+            $string = mb_substr($string, 0, $maxLength, $encoding);
+            $lastOccurrencePos = mb_strrpos($string, ' ', null, $encoding);
             if ($lastOccurrencePos !== false) {
-                $string = mb_substr($string, 0, $lastOccurrencePos);
+                $string = mb_substr($string, 0, $lastOccurrencePos, $encoding);
             }
         }
 
-        return $string;
+        return trim($string);
     }
 }

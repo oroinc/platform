@@ -280,10 +280,10 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            $desctription = $this->htmlTagHelper->getStripped(
-                $this->htmlTagHelper->getPurify($provider->getDescription($entity))
+            $description = $this->htmlTagHelper->stripTags(
+                $this->htmlTagHelper->purify($provider->getDescription($entity))
             );
-            $list->setDescription($desctription);
+            $list->setDescription($description);
             if ($this->hasCustomDate($provider)) {
                 $list->setCreatedAt($provider->getDate($entity));
                 $list->setUpdatedAt($provider->getDate($entity));
