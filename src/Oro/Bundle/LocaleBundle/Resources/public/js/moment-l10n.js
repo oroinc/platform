@@ -26,5 +26,7 @@ define(function (require) {
         }
     });
 
+    moment.defaultZone = moment.tz.zone(localeSettings.getTimeZone());
+
     return moment;
 });
