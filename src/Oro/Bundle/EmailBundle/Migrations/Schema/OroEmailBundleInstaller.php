@@ -66,6 +66,6 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle112_1::changeEmailToEmailBodyRelation($schema);
         OroEmailBundle112_1::splitEmailEntity($schema);
-        OroEmailBundle112_2::removeOldRelation($schema);
+        OroEmailBundle112_2::removeOldSchema($schema);
     }
 }

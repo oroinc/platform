@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityListener
 {

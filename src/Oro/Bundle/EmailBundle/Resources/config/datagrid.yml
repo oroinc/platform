@@ -168,6 +168,7 @@ datagrid:
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
         sorters:
             columns:
+                fromEmailExpression: { data_name: fromEmailExpression }
                 receivedAt:  { data_name: eu.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC

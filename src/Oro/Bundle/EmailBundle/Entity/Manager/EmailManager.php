@@ -43,7 +43,7 @@ class EmailManager
      *
      * @param EmailUser $entity
      */
-    public function setEmailSeen(EmailUser $entity)
+    public function setEmailUserSeen(EmailUser $entity)
     {
         if (!$entity->isSeen()) {
             $entity->setSeen(true);

@@ -6,14 +6,12 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Email
@@ -44,7 +42,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "comment"={
  *              "applicable"=true
- *          },
+ *          }
  *      }
  * )
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -698,10 +696,10 @@ class Email extends ExtendEmail
     {
         $emailUsers = $this->getEmailUsers()->filter(function($entry) use ($emailFolder) {
             /** @var EmailUser $entry */
-            return $entry->getFolder() == $emailFolder;
+            return $entry->getFolder() === $emailFolder;
         });
         if ($emailUsers != null && count($emailUsers) > 0) {
-            return $emailUsers->get(0);
+            return $emailUsers->first();
         }
 
         return null;
@@ -714,9 +712,10 @@ class Email extends ExtendEmail
      */
     public function addEmailUser(EmailUser $emailUser)
     {
-        $this->emailUsers[] = $emailUser;
-
-        $emailUser->setEmail($this);
+        if (!$this->emailUsers->contains($emailUser)) {
+            $this->emailUsers->add($emailUser);
+            $emailUser->setEmail($this);
+        }
 
         return $this;
     }
@@ -733,20 +732,5 @@ class Email extends ExtendEmail
         }
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFolders()
-    {
-        $folders = new ArrayCollection();
-
-        foreach ($this->getEmailUsers() as $emailUser) {
-            /** @var EmailUser $emailUser */
-            $folders->add($emailUser->getFolder());
-        }
-
-        return $folders;
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\DBAL\Types\Type;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
@@ -15,7 +16,10 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Remove security.permission config from email entity';
+        $logger = new ArrayLogger();
+        $this->doExecute($logger, true);
+
+        return $logger->getMessages();
     }
 
     /**
@@ -26,7 +30,7 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
         $this->doExecute($logger);
     }
 
-    protected function doExecute(LoggerInterface $logger)
+    protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $sql =
             "DELETE FROM oro_entity_config_index_value
@@ -44,10 +48,10 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
             'permissions'
         ];
         $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
+        if (!$dryRun) {
+            $statement->execute($parameters);
+        }
         $this->logQuery($logger, $sql, $parameters);
-
-        $logger->debug($sql);
 
         // update entity config cached data
         $sql = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';
@@ -64,7 +68,9 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
         $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
         $parameters = [$data, $className];
         $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
+        if (!$dryRun) {
+            $statement->execute($parameters);
+        }
         $this->logQuery($logger, $sql, $parameters);
     }
 }

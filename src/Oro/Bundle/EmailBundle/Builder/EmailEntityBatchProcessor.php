@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Doctrine\ORM\EntityManager;
@@ -284,7 +285,12 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
                     if ($this->areEmailsEqual($email, $existingEmail)) {
                         $emailUser->setEmail($existingEmail);
-                        $folders = $email->getFolders();
+
+                        $folders = new ArrayCollection();
+                        foreach ($email->getEmailUsers() as $existingEmailUser) {
+                            $folders->add($existingEmailUser->getFolder());
+                        }
+
                         foreach ($folders as $folder) {
                             if ($folder != $emailUser->getFolder()) {
                                 $eu = clone $emailUser;
@@ -293,6 +299,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                                 $em->persist($eu);
                             }
                         }
+
                         $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
                         unset($this->emails[$key]);
                     }
@@ -415,7 +422,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateFolderReferences(EmailFolder $oldFolder, EmailFolder $newFolder)
     {
         foreach ($this->emailUsers as $emailUser) {
-            if ($emailUser->getFolder() == $oldFolder) {
+            if ($emailUser->getFolder() === $oldFolder) {
                 $emailUser->setFolder($newFolder);
             }
         }

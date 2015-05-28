@@ -60,11 +60,9 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     {
         $emailUserTable = $schema->createTable('oro_email_user');
         $emailUserTable->addColumn('id', 'integer', ['autoincrement' => true]);
-        // todo remove `notnull` flag after data migration
         $emailUserTable->addColumn('folder_id', 'integer', ['notnull' => false]);
-        // todo remove `notnull` flag after data migration
         $emailUserTable->addColumn('email_id', 'integer', ['notnull' => false]);
-        $emailUserTable->addColumn('created', 'datetime');
+        $emailUserTable->addColumn('created_at', 'datetime');
         $emailUserTable->addColumn('received', 'datetime');
         $emailUserTable->addColumn('is_seen', 'boolean', ['default' => true]);
         $emailUserTable->setPrimaryKey(['id']);

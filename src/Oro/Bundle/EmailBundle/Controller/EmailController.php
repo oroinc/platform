@@ -19,7 +19,6 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
@@ -51,11 +50,11 @@ class EmailController extends Controller
             $noBodyFound = true;
         }
 
-        // set email as seen
+        // TODO Should be refactored in CRM-2482
         $em = $this->getDoctrine()->getManager();
         $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
         if ($emailUser) {
-            $this->getEmailManager()->setEmailSeen($emailUser);
+            $this->getEmailManager()->setEmailUserSeen($emailUser);
         }
 
         return [

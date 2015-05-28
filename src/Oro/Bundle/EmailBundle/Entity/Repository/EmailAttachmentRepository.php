@@ -24,6 +24,7 @@ class EmailAttachmentRepository extends EntityRepository
             ->andWhere('e.thread = :thread')
             ->setParameter('thread', $thread);
         $result = $queryBuilder->getQuery()->getResult();
+
         return $result;
     }
 }

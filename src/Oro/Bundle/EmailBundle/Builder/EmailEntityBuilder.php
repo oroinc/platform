@@ -59,7 +59,6 @@ class EmailEntityBuilder
      * @param string|string[]|null $to           The TO email address(es).
      *                                           Example of email address see in description of $from parameter
      * @param \DateTime            $sentAt       The date/time when email sent
-     * @param \DateTime            $receivedAt   The date/time when email received
      * @param \DateTime            $internalDate The date/time an email server returned in INTERNALDATE field
      * @param integer $importance                The email importance flag.
      *                                           Can be one of *_IMPORTANCE constants of Email class
@@ -70,12 +69,11 @@ class EmailEntityBuilder
      *
      * @return Email
      */
-    public function email(
+    protected function email(
         $subject,
         $from,
         $to,
         $sentAt,
-        $receivedAt,
         $internalDate,
         $importance = Email::NORMAL_IMPORTANCE,
         $cc = null,
@@ -134,10 +132,10 @@ class EmailEntityBuilder
     ) {
         $emailUser = new EmailUser();
 
-        $email = $this->email($subject, $from, $to, $sentAt, $receivedAt, $internalDate, $importance, $cc, $bcc);
+        $email = $this->email($subject, $from, $to, $sentAt, $internalDate, $importance, $cc, $bcc);
         $emailUser->setReceivedAt($receivedAt);
         $emailUser->setEmail($email);
-        if ($owner != null) {
+        if ($owner !== null) {
             $emailUser->setOwner($owner);
             $emailUser->setOrganization($owner->getOrganization());
         }

@@ -11,7 +11,6 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
@@ -318,7 +317,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         );
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {
-                $invalid++;
                 $invalid++;
                 $this->logger->error(
                     sprintf('Error occurred while trying to process email: %s', $e->getMessage()),
