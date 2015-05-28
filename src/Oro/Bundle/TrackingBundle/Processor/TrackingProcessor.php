@@ -110,7 +110,6 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         $this->logger->notice('Check new visits...');
-        $this->logger->notice($this->maxExecTime . '//' . ($this->maxExecTimeout->format('%I minutes')));
         $totalEvents = $this->getEventsCount();
         if ($totalEvents > 0) {
             $totalBatches = number_format(ceil($totalEvents / self::BATCH_SIZE));
