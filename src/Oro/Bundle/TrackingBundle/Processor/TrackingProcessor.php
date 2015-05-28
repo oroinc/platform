@@ -467,7 +467,7 @@ class TrackingProcessor implements LoggerAwareInterface
             ->getRepository(self::TRACKING_EVENT_ENTITY)
             ->createQueryBuilder('entity')
             ->where('entity.parsed = false')
-            ->orderBy('entity.createdAt', 'ASC')
+            ->orderBy('entity.id', 'ASC')
             ->setMaxResults(self::BATCH_SIZE);
 
         $entities = $queryBuilder->getQuery()->getResult();
