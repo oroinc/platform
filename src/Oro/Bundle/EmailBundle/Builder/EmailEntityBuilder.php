@@ -51,53 +51,6 @@ class EmailEntityBuilder
     }
 
     /**
-     * Create Email entity object
-     *
-     * @param string               $subject      The email subject
-     * @param string $from                       The FROM email address,
-     *                                           for example: john@example.com or "John Smith" <john@example.c4m>
-     * @param string|string[]|null $to           The TO email address(es).
-     *                                           Example of email address see in description of $from parameter
-     * @param \DateTime            $sentAt       The date/time when email sent
-     * @param \DateTime            $internalDate The date/time an email server returned in INTERNALDATE field
-     * @param integer $importance                The email importance flag.
-     *                                           Can be one of *_IMPORTANCE constants of Email class
-     * @param string|string[]|null $cc           The CC email address(es).
-     *                                           Example of email address see in description of $from parameter
-     * @param string|string[]|null $bcc          The BCC email address(es).
-     *                                           Example of email address see in description of $from parameter
-     *
-     * @return Email
-     */
-    protected function email(
-        $subject,
-        $from,
-        $to,
-        $sentAt,
-        $internalDate,
-        $importance = Email::NORMAL_IMPORTANCE,
-        $cc = null,
-        $bcc = null
-    ) {
-        $result = new Email();
-        $result
-            ->setSubject($subject)
-            ->setFromName($from)
-            ->setFromEmailAddress($this->address($from))
-            ->setSentAt($sentAt)
-            ->setInternalDate($internalDate)
-            ->setImportance($importance);
-
-        $this->addRecipients($result, EmailRecipient::TO, $to);
-        $this->addRecipients($result, EmailRecipient::CC, $cc);
-        $this->addRecipients($result, EmailRecipient::BCC, $bcc);
-
-        $this->batch->addEmail($result);
-
-        return $result;
-    }
-
-    /**
      * Create EmailUser entity object
      *
      * @param string               $subject      The email subject
@@ -143,6 +96,51 @@ class EmailEntityBuilder
         $this->batch->addEmailUser($emailUser);
 
         return $emailUser;
+    }
+
+    /**
+     * Create Email entity object
+     *
+     * @param string               $subject      The email subject
+     * @param string $from                       The FROM email address,
+     *                                           for example: john@example.com or "John Smith" <john@example.c4m>
+     * @param string|string[]|null $to           The TO email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param \DateTime            $sentAt       The date/time when email sent
+     * @param \DateTime            $internalDate The date/time an email server returned in INTERNALDATE field
+     * @param integer $importance                The email importance flag.
+     *                                           Can be one of *_IMPORTANCE constants of Email class
+     * @param string|string[]|null $cc           The CC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param string|string[]|null $bcc          The BCC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     *
+     * @return Email
+     */
+    protected function email(
+        $subject,
+        $from,
+        $to,
+        $sentAt,
+        $internalDate,
+        $importance = Email::NORMAL_IMPORTANCE,
+        $cc = null,
+        $bcc = null
+    ) {
+        $result = new Email();
+        $result
+            ->setSubject($subject)
+            ->setFromName($from)
+            ->setFromEmailAddress($this->address($from))
+            ->setSentAt($sentAt)
+            ->setInternalDate($internalDate)
+            ->setImportance($importance);
+
+        $this->addRecipients($result, EmailRecipient::TO, $to);
+        $this->addRecipients($result, EmailRecipient::CC, $cc);
+        $this->addRecipients($result, EmailRecipient::BCC, $bcc);
+
+        return $result;
     }
 
     /**
@@ -443,7 +441,7 @@ class EmailEntityBuilder
      */
     public function removeEmails()
     {
-        $this->batch->removeEmails();
+        $this->batch->removeEmailUsers();
     }
 
     /**

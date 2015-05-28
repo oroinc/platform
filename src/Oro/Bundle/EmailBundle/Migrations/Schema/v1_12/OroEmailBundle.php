@@ -74,14 +74,14 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
             $schema->getTable('oro_email_folder'),
             ['folder_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
             'FK_91F5CFF6162CB942'
         );
         $emailUserTable->addForeignKeyConstraint(
             $schema->getTable('oro_email'),
             ['email_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
             'FK_91F5CFF6A832C1C9'
         );
     }

@@ -86,7 +86,8 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
 
     protected function updateEmailUserTableFields(Schema $schema)
     {
-        $emailUserTable = $schema->createTable('oro_email_user');
+        $emailUserTable = $schema->getTable('oro_email_user');
+
         $emailUserTable->changeColumn('folder_id', ['notnull' => true]);
         $emailUserTable->changeColumn('email_id', ['notnull' => true]);
     }
