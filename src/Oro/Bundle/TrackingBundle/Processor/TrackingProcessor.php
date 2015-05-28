@@ -175,13 +175,13 @@ class TrackingProcessor implements LoggerAwareInterface
 
     /**
      * @param integer $processed
-     * @param integer $total
+     * @param string  $total
      */
     protected function logBatch($processed, $total)
     {
         $this->logger->notice(
             sprintf(
-                'Batch #%d of %s processed at <info>%s</info>.',
+                'Batch #%s of %s processed at <info>%s</info>.',
                 number_format($processed),
                 $total,
                 date('Y-m-d H:i:s')
