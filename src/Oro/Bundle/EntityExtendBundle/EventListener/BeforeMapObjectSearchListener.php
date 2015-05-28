@@ -65,7 +65,14 @@ class BeforeMapObjectSearchListener
                     $mapConfig = $this->addCustomEntityMapping($mapConfig, $extendConfig);
                 }
 
-                if (isset($mapConfig[$className])) {
+                if (isset($mapConfig[$className])
+                    && (
+                        $extendConfig->get('owner') === ExtendScope::OWNER_SYSTEM
+                        || ($extendConfig->get('owner') === ExtendScope::OWNER_CUSTOM
+                            && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
+                        )
+                    )
+                ) {
                     foreach ($searchConfigs as $searchConfig) {
                         /** @var FieldConfigId $fieldId */
                         $fieldId = $searchConfig->getId();

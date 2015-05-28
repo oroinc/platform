@@ -13,7 +13,7 @@ define(function(require) {
         AttributeCollection = require('./attribute-collection'),
         StepModel = require('./step-model'),
         TransitionModel = require('./transition-model'),
-        TransitionDefinitionModel = require('oroworkflow/js/app/models/transition-definition-model'),
+        TransitionDefinitionModel = require('./transition-definition-model'),
         AttributeModel = require('./attribute-model'),
         EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
