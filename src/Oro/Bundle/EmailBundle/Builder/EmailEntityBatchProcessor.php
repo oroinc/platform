@@ -245,6 +245,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
             foreach ($existingEmails as $existingEmail) {
                 foreach ($this->emailUsers as $key => $emailUser) {
                     if ($this->areEmailsEqual($emailUser->getEmail(), $existingEmail)) {
+                        $oldEmail = $emailUser->getEmail();
                         $emailUser->setEmail($existingEmail);
 
 /*                        $folders = new ArrayCollection();
@@ -261,7 +262,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                             }
                         }*/
 
-                        $this->changes[] = ['old' => $emailUser->getEmail(), 'new' => $existingEmail];
+                        $this->changes[] = ['old' => $oldEmail, 'new' => $existingEmail];
                     }
                 }
             }
