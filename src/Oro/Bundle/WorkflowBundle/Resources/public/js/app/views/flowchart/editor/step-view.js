@@ -27,7 +27,7 @@ define(function (require) {
         sourceDefaults: {
             filter: '.jsplumb-source',
             anchor: 'Continuous',
-            connector: ['StateMachine', {curviness: 20}],
+            connector: ['Flowchart', { cornerRadius: 5  }],
             maxConnections: 100
         },
 
