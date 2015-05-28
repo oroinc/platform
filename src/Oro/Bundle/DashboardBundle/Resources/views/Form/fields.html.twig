@@ -31,7 +31,7 @@
                     dateRangeFilter._formatRawValue(value);
 
                     $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
-                    $('div.widget-configuration').parent().css('overflow', 'inherit');
+                    $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
                 });
             }
         )
