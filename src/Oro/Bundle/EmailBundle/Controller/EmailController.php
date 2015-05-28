@@ -68,6 +68,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_user_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
      */
     public function viewThreadAction(Email $entity)
@@ -288,6 +289,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/user-emails", name="oro_email_user_emails")
+     * @AclAncestor("oro_email_email_user_view")
      * @Template
      */
     public function userEmailsAction()
