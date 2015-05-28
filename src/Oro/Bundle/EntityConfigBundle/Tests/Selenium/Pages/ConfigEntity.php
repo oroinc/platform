@@ -218,15 +218,17 @@ class ConfigEntity extends CustomEntity
                     if ($fieldName === 'datetime_field'
                         and $this->isElementPresent("//div[@class='control-group']//input{$dateField}")
                         and $this->isElementPresent("//div[@class='control-group']//input{$timeField}")
-                        and preg_match('/^(.+\d{4}),?\s(\d{2}\:\d{2}\s\w{2})$/', $value, $value)
+                        and preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $value, $valueParts)
                     ) {
                         $field = $this->test->byXpath("//div[@class='control-group']//input{$dateField}");
+                        $field->click(); // focus
                         $field->clear();
-                        $field->value($value[1]);
+                        $field->value($valueParts[1]);
 
                         $field = $this->test->byXpath("//div[@class='control-group']//input{$timeField}");
+                        $field->click(); // focus
                         $field->clear();
-                        $field->value($value[2]);
+                        $field->value($valueParts[2]);
                     }
                 }
             }
