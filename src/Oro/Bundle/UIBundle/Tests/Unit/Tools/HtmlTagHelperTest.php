@@ -24,7 +24,7 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
         $actualString = '<div class="new">test</div>';
         $expectedString = 'test';
 
-        $this->assertEquals($expectedString, $this->helper->getStripped($actualString));
+        $this->assertEquals($expectedString, $this->helper->stripTags($actualString));
     }
 
     /**
@@ -32,13 +32,14 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetShort($expected, $actual, $maxLength)
     {
-        $shortBody = $this->helper->getShort($actual, $maxLength);
+        $shortBody = $this->helper->shorten($actual, $maxLength);
         $this->assertEquals($expected, $shortBody);
     }
 
     public static function shortStringProvider()
     {
         return [
+            ['абв абв абв', 'абв абв абв абв ', 12],
             ['abc abc abc', 'abc abc abc abc ', 12],
             ['abc abc', 'abc abc abc abc abc', 8],
             ['abcab', 'abcabcabcabc', 5],
@@ -65,7 +66,7 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
 STR;
         $this->assertEquals(
             '<div style="font-family:Tahoma;color:#000000;font-size:10pt;">no subject</div>',
-            trim($this->helper->getPurify($testString))
+            trim($this->helper->purify($testString))
         );
     }
 }

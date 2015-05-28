@@ -39,7 +39,7 @@ class HtmlTagExtension extends \Twig_Extension
      */
     public function tagFilter($string)
     {
-        return $this->htmlTagHelper->getStripped($string);
+        return $this->htmlTagHelper->stripTags($string);
     }
 
     /**
@@ -50,7 +50,7 @@ class HtmlTagExtension extends \Twig_Extension
      */
     public function htmlPurify($string)
     {
-        return $this->htmlTagHelper->getPurify($string);
+        return $this->htmlTagHelper->purify($string);
     }
 
     /**
