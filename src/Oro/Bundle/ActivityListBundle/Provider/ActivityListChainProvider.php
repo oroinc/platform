@@ -16,6 +16,7 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
  * Class ActivityListChainProvider
@@ -42,22 +43,28 @@ class ActivityListChainProvider
     /** @var array */
     protected $targetClasses = [];
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      * @param EntityRoutingHelper $routingHelper
+     * @param HtmlTagHelper       $htmlTagHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        EntityRoutingHelper $routingHelper
+        EntityRoutingHelper $routingHelper,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
         $this->translator     = $translator;
         $this->routingHelper  = $routingHelper;
+        $this->htmlTagHelper  = $htmlTagHelper;
     }
 
     /**
@@ -273,7 +280,10 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            $list->setDescription($provider->getDescription($entity));
+            $description = $this->htmlTagHelper->stripTags(
+                $this->htmlTagHelper->purify($provider->getDescription($entity))
+            );
+            $list->setDescription($description);
             if ($this->hasCustomDate($provider)) {
                 $list->setCreatedAt($provider->getDate($entity));
                 $list->setUpdatedAt($provider->getDate($entity));
