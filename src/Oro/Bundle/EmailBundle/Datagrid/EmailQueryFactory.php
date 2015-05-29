@@ -43,6 +43,17 @@ class EmailQueryFactory
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param string $userId
+     */
+    public function filterQueryByUserId(QueryBuilder $qb, $userId)
+    {
+        if ($userId) {
+            $qb->andWhere('eu.owner = :owner')->setParameter('owner', $userId);
+        }
+    }
+
+    /**
      * @param string $emailFromTableAlias EmailAddress table alias of joined Email#fromEmailAddress association
      *
      * @return string
