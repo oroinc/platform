@@ -4,14 +4,13 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -57,7 +56,7 @@ class EmailUser
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="created", type="datetime")
+     * @ORM\Column(name="created_at", type="datetime")
      * @JMS\Type("dateTime")
      * @ConfigField(
      *      defaultValues={
@@ -67,10 +66,10 @@ class EmailUser
      *      }
      * )
      */
-    protected $created;
+    protected $createdAt;
 
     /**
-     * @var Organization
+     * @var OrganizationInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
@@ -137,15 +136,15 @@ class EmailUser
      *
      * @return \DateTime
      */
-    public function getCreated()
+    public function getCreatedAt()
     {
-        return $this->created;
+        return $this->createdAt;
     }
 
     /**
      * Get organization
      *
-     * @return Organization
+     * @return OrganizationInterface
      */
     public function getOrganization()
     {
@@ -155,10 +154,10 @@ class EmailUser
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param OrganizationInterface $organization
      * @return $this
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(OrganizationInterface $organization = null)
     {
         $this->organization = $organization;
 
@@ -290,6 +289,6 @@ class EmailUser
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

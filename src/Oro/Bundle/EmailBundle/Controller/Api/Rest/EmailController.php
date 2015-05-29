@@ -52,7 +52,7 @@ class EmailController extends RestGetController
      *      description="Get all emails",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_user_view")
      * @return Response
      */
     public function cgetAction()
@@ -88,7 +88,7 @@ class EmailController extends RestGetController
      *          404="Activity association was not found",
      *      }
      * )
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_user_view")
      * @return Response
      */
     public function getAssociationAction($entityId)
@@ -102,7 +102,7 @@ class EmailController extends RestGetController
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
-        if (!$this->getEmailHelper()->isEmailViewGranted($entity)) {
+        if (!$this->assertEmailViewGranted($entity)) {
             return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
         }
 
@@ -125,7 +125,7 @@ class EmailController extends RestGetController
      *          404="Activity association was not found",
      *      }
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_email_user_view")
      * @return Response
      */
     public function getAssociationsDataAction($entityId)
@@ -136,7 +136,7 @@ class EmailController extends RestGetController
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
-        if (!$this->getEmailHelper()->isEmailViewGranted($entity)) {
+        if (!$this->assertEmailViewGranted($entity)) {
             return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
         }
 
@@ -209,7 +209,7 @@ class EmailController extends RestGetController
      *      description="Add new association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_email_user_edit")
      */
     public function postAssociationsAction()
     {
@@ -280,7 +280,7 @@ class EmailController extends RestGetController
      *      description="Delete Association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_email_user_edit")
      *
      * @Delete("/emails/{entityId}/associations/{targetClassName}/{targetId}")
      *
@@ -333,7 +333,7 @@ class EmailController extends RestGetController
      *      description="Get email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_user_view")
      * @return Response
      */
     public function getAction($id)
@@ -354,7 +354,7 @@ class EmailController extends RestGetController
 
         $result = $manager->find($id);
         if ($result) {
-            if (!$this->getEmailHelper()->isEmailViewGranted($result)) {
+            if (!$this->assertEmailViewGranted($result)) {
                 return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
             }
 
@@ -367,6 +367,16 @@ class EmailController extends RestGetController
             ['result' => $result],
             $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
         );
+    }
+
+    /**
+     * @param Email $entity
+     *
+     * @return bool
+     */
+    protected function assertEmailViewGranted(Email $entity)
+    {
+        return $this->getEmailHelper()->isEmailViewGranted($entity);
     }
 
     /**

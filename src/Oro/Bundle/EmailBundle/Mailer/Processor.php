@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
@@ -90,7 +91,7 @@ class Processor
      *
      * @param EmailModel $model
      *
-     * @return Email
+     * @return EmailUser
      * @throws \Swift_SwiftException
      */
     public function process(EmailModel $model)

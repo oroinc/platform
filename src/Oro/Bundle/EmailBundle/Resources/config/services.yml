@@ -492,7 +492,7 @@ services:
            - @router
            - @oro_entity_config.config_manager
            - @oro_email.email.thread.provider
-           - @oro_email.email_helper
+           - @oro_ui.html_tag_helper
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 

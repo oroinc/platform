@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Doctrine\ORM\EntityManager;
@@ -36,11 +37,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      * @var array
      */
     protected $changes = [];
-
-    /**
-     * @var Email[]
-     */
-    protected $emails = [];
 
     /**
      * @var EmailUser[]
@@ -80,16 +76,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
-     * Register Email object
-     *
-     * @param Email $obj
-     */
-    public function addEmail(Email $obj)
-    {
-        $this->emails[] = $obj;
-    }
-
-    /**
      * Register EmailUser object
      *
      * @param EmailUser $obj
@@ -97,14 +83,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     public function addEmailUser(EmailUser $obj)
     {
         $this->emailUsers[] = $obj;
-    }
-
-    /**
-     * @return Email[]
-     */
-    public function getEmails()
-    {
-        return $this->emails;
     }
 
     /**
@@ -204,7 +182,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     {
         $this->persistFolders($em);
         $this->persistAddresses($em);
-        $this->persistEmails($em);
         $this->persistEmailUsers($em);
     }
 
@@ -225,7 +202,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     public function clear()
     {
         $this->changes = [];
-        $this->emails = [];
         $this->emailUsers = [];
         $this->folders = [];
         $this->origins = [];
@@ -235,23 +211,9 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Removes all email objects from this batch processor
      */
-    public function removeEmails()
+    public function removeEmailUsers()
     {
         $this->emailUsers = [];
-        $this->emails = [];
-    }
-
-    /**
-     * Tell the given EntityManager to manage Email objects and all its children in this batch
-     *
-     * @param EntityManager $em
-     */
-    protected function persistEmails(EntityManager $em)
-    {
-        $this->processDuplicateEmails($em);
-        foreach ($this->emails as $email) {
-            $em->persist($email);
-        }
     }
 
     /**
@@ -261,6 +223,8 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function persistEmailUsers(EntityManager $em)
     {
+        $this->processDuplicateEmails($em);
+
         foreach ($this->emailUsers as $emailUser) {
             $em->persist($emailUser);
 
@@ -280,11 +244,15 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
             // add existing emails to new folders and remove these emails from the list
             foreach ($existingEmails as $existingEmail) {
                 foreach ($this->emailUsers as $key => $emailUser) {
-                    $email = $emailUser->getEmail();
-
-                    if ($this->areEmailsEqual($email, $existingEmail)) {
+                    if ($this->areEmailsEqual($emailUser->getEmail(), $existingEmail)) {
+                        $oldEmail = $emailUser->getEmail();
                         $emailUser->setEmail($existingEmail);
-                        $folders = $email->getFolders();
+
+/*                        $folders = new ArrayCollection();
+                        foreach ($emailUser->getEmail()->getEmailUsers() as $existingEmailUser) {
+                            $folders->add($existingEmailUser->getFolder());
+                        }
+
                         foreach ($folders as $folder) {
                             if ($folder != $emailUser->getFolder()) {
                                 $eu = clone $emailUser;
@@ -292,15 +260,11 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
                                 $em->persist($eu);
                             }
-                        }
-                        $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
-                        unset($this->emails[$key]);
+                        }*/
+
+                        $this->changes[] = ['old' => $oldEmail, 'new' => $existingEmail];
                     }
                 }
-            }
-            // add existing emails to the list
-            foreach ($existingEmails as $existingEmail) {
-                $this->emails[] = $existingEmail;
             }
         }
     }
@@ -315,8 +279,8 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     {
         // get distinct list of Message-ID
         $messageIds = [];
-        foreach ($this->emails as $email) {
-            $messageId = $email->getMessageId();
+        foreach ($this->emailUsers as $emailUser) {
+            $messageId = $emailUser->getEmail()->getMessageId();
             if (!empty($messageId)) {
                 $messageIds[$messageId] = $messageId;
             }
@@ -394,11 +358,11 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function updateAddressReferences(EmailAddress $old, EmailAddress $new)
     {
-        foreach ($this->emails as $email) {
-            if ($email->getFromEmailAddress() === $old) {
-                $email->setFromEmailAddress($new);
+        foreach ($this->emailUsers as $emailUser) {
+            if ($emailUser->getEmail()->getFromEmailAddress() === $old) {
+                $emailUser->getEmail()->setFromEmailAddress($new);
             }
-            foreach ($email->getRecipients() as $recipient) {
+            foreach ($emailUser->getEmail()->getRecipients() as $recipient) {
                 if ($recipient->getEmailAddress() === $old) {
                     $recipient->setEmailAddress($new);
                 }
@@ -415,7 +379,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateFolderReferences(EmailFolder $oldFolder, EmailFolder $newFolder)
     {
         foreach ($this->emailUsers as $emailUser) {
-            if ($emailUser->getFolder() == $oldFolder) {
+            if ($emailUser->getFolder() === $oldFolder) {
                 $emailUser->setFolder($newFolder);
             }
         }

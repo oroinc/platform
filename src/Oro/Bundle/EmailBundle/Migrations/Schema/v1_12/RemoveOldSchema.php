@@ -23,7 +23,7 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::removeOldRelation($schema);
+        self::removeOldSchema($schema);
     }
 
     /**
@@ -31,7 +31,13 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public static function removeOldRelation(Schema $schema)
+    public static function removeOldSchema(Schema $schema)
+    {
+        self::removeOldRelations($schema);
+        self::updateEmailUserTableFields($schema);
+    }
+
+    protected function removeOldRelations(Schema $schema)
     {
         $emailBodyTable = $schema->getTable('oro_email_body');
 
@@ -76,5 +82,13 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         if ($emailTable->hasColumn('is_seen')) {
             $emailTable->dropColumn('is_seen');
         }
+    }
+
+    protected function updateEmailUserTableFields(Schema $schema)
+    {
+        $emailUserTable = $schema->getTable('oro_email_user');
+
+        $emailUserTable->changeColumn('folder_id', ['notnull' => true]);
+        $emailUserTable->changeColumn('email_id', ['notnull' => true]);
     }
 }

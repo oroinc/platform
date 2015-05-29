@@ -225,10 +225,10 @@ class EmailBody
     public function addAttachment(EmailAttachment $attachment)
     {
         $this->setHasAttachments(true);
-
-        $this->attachments[] = $attachment;
-
-        $attachment->setEmailBody($this);
+        if (!$this->attachments->contains($attachment)) {
+            $this->attachments->add($attachment);
+            $attachment->setEmailBody($this);
+        }
 
         return $this;
     }

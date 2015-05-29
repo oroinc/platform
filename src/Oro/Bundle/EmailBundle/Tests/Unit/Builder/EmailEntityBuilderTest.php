@@ -59,7 +59,8 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->initEmailStorage();
 
         $date = new \DateTime('now');
-        $email = $this->builder->email(
+        // todo CRM-2480
+/*        $email = $this->builder->email(
             'testSubject',
             '"Test" <test@example.com>',
             '"Test1" <test1@example.com>',
@@ -69,7 +70,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             Email::NORMAL_IMPORTANCE,
             ['"Test2" <test2@example.com>', 'test1@example.com'],
             ['"Test3" <test3@example.com>', 'test4@example.com']
-        );
+        );*/
 
         $this->assertEquals('testSubject', $email->getSubject());
         $this->assertEquals('"Test" <test@example.com>', $email->getFromName());
