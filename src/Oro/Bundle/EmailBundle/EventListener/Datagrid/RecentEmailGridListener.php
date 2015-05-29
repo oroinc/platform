@@ -35,13 +35,10 @@ class RecentEmailGridListener
         if ($datasource instanceof OrmDatasource) {
             $parameters = $datagrid->getParameters();
             $userId = $parameters->get('userId');
-
             $queryBuilder = $datasource->getQueryBuilder();
 
-            // add email address joins for From field
-            if ($this->emailQueryFactory !== null) {
-                $this->emailQueryFactory->prepareQuery($queryBuilder);
-            }
+            $this->emailQueryFactory->filterQueryByUserId($queryBuilder, $parameters->get('userId'));
+            $this->emailQueryFactory->prepareQuery($queryBuilder);
 
             // bind 'origin_ids' parameter
             $originIds    = [];
