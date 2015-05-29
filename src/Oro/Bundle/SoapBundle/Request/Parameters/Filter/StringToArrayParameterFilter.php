@@ -20,6 +20,10 @@ class StringToArrayParameterFilter implements ParameterFilterInterface
      */
     public function filter($rawValue, $operator)
     {
-        return explode($this->separator, $rawValue);
+        if ($rawValue) {
+            return explode($this->separator, $rawValue);
+        }
+
+        return $rawValue;
     }
 }

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\ORM\Internal\Hydration\ArrayHydrator;
 use Doctrine\Common\Collections\Criteria;
 
 use FOS\RestBundle\Util\Codes;
@@ -17,10 +18,14 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
 {
     const ITEMS_PER_PAGE = 10;
@@ -35,6 +40,8 @@ abstract class RestGetController extends FOSRestController implements EntityMana
 
         if ($manager->isSerializerConfigured()) {
             $result = $manager->serialize($qb);
+        } elseif ($qb instanceof SqlQueryBuilder) {
+            $result = $this->getPreparedItems($qb->getQuery()->getResult());
         } else {
             $result = $this->getPreparedItems($qb->getQuery()->getResult());
         }
@@ -112,7 +119,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function getPreparedItems($entities, $resultFields = [])
     {
-        $result = array();
+        $result = [];
         foreach ($entities as $entity) {
             $result[] = $this->getPreparedItem($entity, $resultFields);
         }
@@ -133,23 +140,30 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {
             $entity->__load();
         }
-        $result = array();
+        $result = [];
         if ($entity) {
-            /** @var UnitOfWork $uow */
-            $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
-            foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
-                if ($resultFields && !in_array($field, $resultFields)) {
-                    continue;
+            if (is_array($entity)) {
+                foreach ($entity as $field => $value) {
+                    $this->transformEntityField($field, $value);
+                    $result[$field] = $value;
                 }
+            } else {
+                /** @var UnitOfWork $uow */
+                $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
+                foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
+                    if ($resultFields && !in_array($field, $resultFields)) {
+                        continue;
+                    }
 
-                $accessors = array('get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field));
-                foreach ($accessors as $accessor) {
-                    if (method_exists($entity, $accessor)) {
-                        $value = $entity->$accessor();
+                    $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
+                    foreach ($accessors as $accessor) {
+                        if (method_exists($entity, $accessor)) {
+                            $value = $entity->$accessor();
 
-                        $this->transformEntityField($field, $value);
-                        $result[$field] = $value;
-                        break;
+                            $this->transformEntityField($field, $value);
+                            $result[$field] = $value;
+                            break;
+                        }
                     }
                 }
             }
@@ -173,10 +187,31 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function getFilterCriteria($supportedApiParams, $filterParameters = [], $filterMap = [])
     {
-        $allowedFilters = $this->filterQueryParameters($supportedApiParams);
-        $criteria       = Criteria::create();
+        return $this->buildFilterCriteria(
+            $this->filterQueryParameters($supportedApiParams),
+            $filterParameters,
+            $filterMap
+        );
+    }
 
-        foreach ($allowedFilters as $filterName => $filterData) {
+    /**
+     * @param array $filters           filter values. [filterName => [operator, value], ...]
+     * @param array $filterParameters  assoc array with filter params, like closure
+     *                                 [filterName => [closure => \Closure(...), ...]]
+     *                                 or [filterName => ParameterFilterInterface]
+     * @param array $filterMap         assoc array with map of filter query params to path that for doctrine criteria
+     *                                 For example: 2 filters by relation field - user_id and username.
+     *                                 Both should be applied to criteria as 'user' relation.
+     *                                 ['user_id' => 'user', 'user_name' => 'user']
+     *
+     * @return array
+     * @throws \Exception
+     */
+    protected function buildFilterCriteria($filters, $filterParameters = [], $filterMap = [])
+    {
+        $criteria = Criteria::create();
+
+        foreach ($filters as $filterName => $filterData) {
             list ($operator, $value) = $filterData;
 
             $filter = isset($filterParameters[$filterName]) ? $filterParameters[$filterName] : false;
