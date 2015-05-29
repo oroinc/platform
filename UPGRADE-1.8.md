@@ -17,6 +17,7 @@ UPGRADE FROM 1.7 to 1.8
 
 ####FormBundle
  - `Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension` by default adds unique suffix to id attribute of each form type
+ - `Oro\Bundle\FormBundle\Model\UpdateHandler` triggers events that can be used to modify data and interrupt processing
 
 ####SyncBundle
 Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. Instead the following websocket configuration is used:
@@ -31,3 +32,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `websocket_bind_port` and `websocket_bind_address` specify port and address to which the Clank server binds on startup and waits for incoming requests. By default (0.0.0.0), it listens to all addresses on the machine
 - `websocket_backend_port` and `websocket_backend_host` specify port and address to which the application should connect (PHP). By default ("*"), it connects to 127.0.0.1 address.
 - `websocket_frontend_port` and `websocket_frontend_host` specify port and address to which the browser should connect (JS). By default ("*"), it connects to host specified in the browser.
+
+####UiBundle
+ - Macros `scrollData` in `Oro/Bundle/UIBundle/Resources/views/macros.html.twig` triggers event `oro_ui.scroll_data.before.<pageIdentifier>` before data rendering

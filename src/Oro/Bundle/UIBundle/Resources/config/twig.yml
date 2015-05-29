@@ -34,6 +34,8 @@ services:
 
     oro_ui.twig.ui_extension:
         class: %oro_ui.twig.extension.class%
+        arguments:
+            - @event_dispatcher
         tags:
             - { name: twig.extension }
 
