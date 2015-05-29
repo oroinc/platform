@@ -84,7 +84,8 @@ class EmailFolder
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder",
+     *      cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $emailUsers;
 

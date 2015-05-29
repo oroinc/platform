@@ -107,7 +107,7 @@ class EmailUser
      * @var EmailFolder $folder
      *
      * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emailUsers", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $folder;
@@ -116,7 +116,7 @@ class EmailUser
      * @var Email $email
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $email;
