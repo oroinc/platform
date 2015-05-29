@@ -694,7 +694,7 @@ class Email extends ExtendEmail
      */
     public function getEmailUserByFolder(EmailFolder $emailFolder)
     {
-        $emailUsers = $this->getEmailUsers()->filter(function($entry) use ($emailFolder) {
+        $emailUsers = $this->getEmailUsers()->filter(function ($entry) use ($emailFolder) {
             /** @var EmailUser $entry */
             return $entry->getFolder() === $emailFolder;
         });
