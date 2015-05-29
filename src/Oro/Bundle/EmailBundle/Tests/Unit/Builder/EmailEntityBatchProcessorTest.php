@@ -118,8 +118,8 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $folder->setName('Exist');
         $folder->setFullName('Exist');
         $folder->setOrigin($origin);
-
         $this->batch->addFolder($folder);
+
         $newFolder = new EmailFolder();
         $newFolder->setName('New');
         $newFolder->setFullName('New');
@@ -147,7 +147,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email1->addEmailUser($emailUser1);
         $this->addEmailRecipient($email1, $addr);
         $this->addEmailRecipient($email1, $newAddr);
-        $this->batch->addEmail($email1);
+        $this->batch->addEmailUser($emailUser1);
 
         $email2 = new Email();
         $email2->setXMessageId('email2');
@@ -158,7 +158,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email2->addEmailUser($emailUser2);
         $this->addEmailRecipient($email2, $addr);
         $this->addEmailRecipient($email2, $newAddr);
-        $this->batch->addEmail($email2);
+        $this->batch->addEmailUser($emailUser2);
 
         $email3 = new Email();
         $email3->setXMessageId('email3');
@@ -169,7 +169,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email3->addEmailUser($emailUser3);
         $this->addEmailRecipient($email3, $addr);
         $this->addEmailRecipient($email3, $newAddr);
-        $this->batch->addEmail($email3);
+        $this->batch->addEmailUser($emailUser3);
 
         $email4 = new Email();
         $email4->setXMessageId('email4');
@@ -180,7 +180,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email4->addEmailUser($emailUser4);
         $this->addEmailRecipient($email4, $addr);
         $this->addEmailRecipient($email4, $newAddr);
-        $this->batch->addEmail($email4);
+        $this->batch->addEmailUser($emailUser4);
 
         $existingEmail = new Email();
         $existingEmail->setXMessageId('existing_email');
@@ -239,18 +239,6 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(array('messageId' => array('email1', 'email2', 'some_email')))
             ->will($this->returnValue([$existingEmail]));
 
-        $em->expects($this->exactly(5))
-            ->method('persist')
-            ->with(
-                $this->logicalOr(
-                    $this->identicalTo($newFolder),
-                    $this->identicalTo($newAddr),
-                    $this->identicalTo($email1),
-                    $this->identicalTo($email2),
-                    $this->identicalTo($existingEmail)
-                )
-            );
-
         $owner = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface');
 
         $this->ownerProvider->expects($this->any())
@@ -259,12 +247,12 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->batch->persist($em);
 
-        $this->assertCount(1, $email1->getFolders());
-        $this->assertCount(1, $email2->getFolders());
-        $this->assertTrue($origin === $email1->getFolders()->first()->getOrigin());
-        $this->assertTrue($origin === $email2->getFolders()->first()->getOrigin());
-        $this->assertSame($folder, $email1->getFolders()->first());
-        $this->assertSame($newFolder, $email2->getFolders()->first());
+        $this->assertCount(1, $email1->getEmailUsers());
+        $this->assertCount(1, $email2->getEmailUsers());
+        $this->assertTrue($origin === $emailUser1->getFolder()->getOrigin());
+        $this->assertTrue($origin === $emailUser2->getFolder()->getOrigin());
+        $this->assertSame($newFolder, $emailUser2->getFolder());
+        $this->assertSame($dbFolder, $emailUser1->getFolder());
         $this->assertTrue($dbAddr === $email1->getFromEmailAddress());
         $this->assertNull($email1->getFromEmailAddress()->getOwner());
         $this->assertTrue($newAddr === $email2->getFromEmailAddress());

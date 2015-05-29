@@ -244,7 +244,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($origin);
 
         $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['setFolder'])
+            ->setMethods(['setFolder', 'getEmail'])
             ->getMock();
         $emailUser->expects($this->once())
             ->method('setFolder');
@@ -436,7 +436,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user));
 
         $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['setFolder'])
+            ->setMethods(['setFolder', 'getEmail'])
             ->getMock();
         $emailUser->expects($this->once())
             ->method('setFolder');
