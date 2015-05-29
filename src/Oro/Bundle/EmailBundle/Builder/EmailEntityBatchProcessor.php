@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 
@@ -42,11 +41,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      * @var EmailFolder[]
      */
     protected $folders = array();
-
-    /**
-     * @var EmailOrigin[]
-     */
-    protected $origins = array();
 
     /**
      * Constructor
@@ -142,31 +136,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
-     * Register EmailOrigin object
-     *
-     * @param EmailOrigin $origin
-     * @throws \LogicException
-     */
-    public function addOrigin(EmailOrigin $origin)
-    {
-        $key = $origin->getId();
-        $this->origins[$key] = $origin;
-    }
-
-    /**
-     * Get EmailOrigin if it exists in the batch
-     *
-     * @param int $id The origin id
-     * @return EmailOrigin|null
-     */
-    public function getOrigin($id)
-    {
-        return isset($this->origins[$id])
-            ? $this->origins[$id]
-            : null;
-    }
-
-    /**
      * Tell the given EntityManager to manage this batch
      *
      * @param EntityManager $em
@@ -197,7 +166,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         $this->changes = array();
         $this->emails = array();
         $this->folders = array();
-        $this->origins = array();
         $this->addresses = array();
     }
 

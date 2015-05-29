@@ -32,37 +32,50 @@ class ApiFormHandler
      */
     public function __construct(FormInterface $form, Request $request, ObjectManager $entityManager)
     {
-        $this->form    = $form;
-        $this->request = $request;
+        $this->form          = $form;
+        $this->request       = $request;
         $this->entityManager = $entityManager;
     }
 
     /**
      * Process form
      *
-     * @param  mixed $entity
-     * @return bool  True on successful processing, false otherwise
+     * @param mixed $entity
+     *
+     * @return mixed|null The instance of saved entity on successful processing; otherwise, null
      */
     public function process($entity)
     {
-        $this->form->setData($entity);
+        $entity = $this->prepareFormData($entity);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'], true)) {
             $this->form->submit($this->request);
             if ($this->form->isValid()) {
-                $this->onSuccess($entity);
-
-                return true;
+                return $this->onSuccess($entity) ?: $entity;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    /**
+     * @param mixed $entity
+     *
+     * @return mixed The instance of form data object
+     */
+    protected function prepareFormData($entity)
+    {
+        $this->form->setData($entity);
+
+        return $entity;
     }
 
     /**
      * "Success" form handler
      *
      * @param mixed $entity
+     *
+     * @return mixed|null The instance of saved entity. Can be null if it is equal of the $entity argument
      */
     protected function onSuccess($entity)
     {

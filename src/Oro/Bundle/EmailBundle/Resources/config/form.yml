@@ -6,8 +6,12 @@ parameters:
     oro_email.form.handler.emailtemplate.class:           Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler
     oro_email.form.type.emailtemplate.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType
     oro_email.form.handler.email.class:                   Oro\Bundle\EmailBundle\Form\Handler\EmailHandler
+    oro_email.form.handler.email.api.class:               Oro\Bundle\EmailBundle\Form\Handler\EmailApiHandler
     oro_email.form.type.email.class:                      Oro\Bundle\EmailBundle\Form\Type\EmailType
+    oro_email.form.type.email.api.class:                  Oro\Bundle\EmailBundle\Form\Type\EmailApiType
+    oro_email.form.type.email_folder.api.class:           Oro\Bundle\EmailBundle\Form\Type\EmailFolderApiType
     oro_email.form.type.email_address.class:              Oro\Bundle\EmailBundle\Form\Type\EmailAddressType
+    oro_email.form.type.email_address.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailAddressApiType
     oro_email.form.type.attachment.class:                 Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType
     oro_email.form.type.attachments.class:                Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType
     oro_email.form.type.contexts_select.class:            Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType
@@ -77,10 +81,44 @@ services:
         tags:
             - { name: form.type, alias: oro_email_email }
 
+    oro_email.form.handler.email.api:
+        class: %oro_email.form.handler.email.api.class%
+        scope: request
+        arguments:
+            - @oro_email.form.email.api
+            - @request
+            - @doctrine.orm.entity_manager
+            - @oro_email.email.entity.builder=
+            - @oro_security.security_facade
+            - @event_dispatcher
+
+    oro_email.form.email.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - ~
+            - 'oro_email_email_api'
+
+    oro_email.form.type.email.api:
+        class: %oro_email.form.type.email.api.class%
+        tags:
+            - { name: form.type, alias: oro_email_email_api }
+
+    oro_email.form.type.email_folder.api:
+        class: %oro_email.form.type.email_folder.api.class%
+        tags:
+            - { name: form.type, alias: oro_email_email_folder_api }
+
     oro_email.form.type.email_address:
         class: %oro_email.form.type.email_address.class%
         tags:
             - { name: form.type, alias: oro_email_email_address }
+
+    oro_email.form.type.email_address.api:
+        class: %oro_email.form.type.email_address.api.class%
+        tags:
+            - { name: form.type, alias: oro_email_email_address_api }
 
     oro_email.form.type.attachment:
         class: %oro_email.form.type.attachment.class%

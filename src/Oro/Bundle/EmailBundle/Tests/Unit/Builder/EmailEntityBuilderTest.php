@@ -124,31 +124,6 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test@example.com', $result->getEmailAddress()->getEmail());
     }
 
-    public function testOrigin()
-    {
-        $storage = array();
-
-        $origin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')->getMock();
-        $origin->expects($this->any())->method('getId')->will($this->returnValue(1));
-
-        $this->batch->expects($this->never())->method('getOrigin');
-        $this->batch->expects($this->exactly(2))
-            ->method('addOrigin')
-            ->will(
-                $this->returnCallback(
-                    function ($origin) use (&$storage) {
-                        /** @var EmailOrigin $origin */
-                        $storage[$origin->getId()] = $origin;
-                    }
-                )
-            );
-
-        $result = $this->builder->setOrigin($origin);
-
-        $this->assertEquals(1, $result->getId());
-        $this->assertTrue($result === $this->builder->setOrigin($origin));
-    }
-
     public function testFolder()
     {
         $storage = array();

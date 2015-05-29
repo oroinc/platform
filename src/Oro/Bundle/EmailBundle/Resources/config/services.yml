@@ -541,3 +541,9 @@ services:
         arguments:
             - @knp_gaufrette.filesystem_map
             - @oro_email.form.factory
+
+    oro_email.email_importance_transformer:
+        class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailImportanceApiTransformer
+
+    oro_email.email_body_type_transformer:
+        class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailBodyTypeApiTransformer

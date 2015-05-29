@@ -90,16 +90,19 @@ abstract class EmailOrigin
     /**
      * Get an email folder
      *
-     * @param string $type Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
+     * @param string      $type     Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
+     * @param string|null $fullName
      *
      * @return EmailFolder|null
      */
-    public function getFolder($type)
+    public function getFolder($type, $fullName = null)
     {
         return $this->folders
             ->filter(
-                function (EmailFolder $folder) use (&$type) {
-                    return $folder->getType() === $type;
+                function (EmailFolder $folder) use ($type, $fullName) {
+                    return
+                        $folder->getType() === $type
+                        && (empty($fullName) || $folder->getFullName() === $fullName);
                 }
             )->first();
     }

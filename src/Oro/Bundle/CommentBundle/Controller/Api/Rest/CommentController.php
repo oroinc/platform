@@ -116,18 +116,21 @@ class CommentController extends RestController
      */
     public function postAction($relationClass, $relationId)
     {
+        $isProcessed = false;
+
         $entity    = call_user_func_array(array($this, 'createEntity'), func_get_args());
         $exception = $this->getForm();
 
         $this->getManager()->setRelationField($entity, $relationClass, $relationId);
 
-        $isProcessed = $this->processForm($entity);
+        $entity = $this->processForm($entity);
 
-        if ($isProcessed) {
+        if ($entity) {
             $view = $this->view(
                 $this->getManager()->getEntityViewModel($entity, $relationClass, $relationId),
                 Codes::HTTP_CREATED
             );
+            $isProcessed = true;
         } else {
             $view = $this->view($exception, Codes::HTTP_BAD_REQUEST);
         }
@@ -153,7 +156,8 @@ class CommentController extends RestController
         $entity = $this->getManager()->find($id);
 
         if ($entity) {
-            if ($this->processForm($entity)) {
+            $entity = $this->processForm($entity);
+            if ($entity) {
                 $view = $this->view($this->getManager()->getEntityViewModel($entity), Codes::HTTP_OK);
             } else {
                 $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
@@ -184,7 +188,8 @@ class CommentController extends RestController
 
         if ($entity) {
             $entity->setAttachment(null);
-            if ($this->processForm($entity)) {
+            $entity = $this->processForm($entity);
+            if ($entity) {
                 $view = $this->view($this->getManager()->getEntityViewModel($entity), Codes::HTTP_OK);
             } else {
                 $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);

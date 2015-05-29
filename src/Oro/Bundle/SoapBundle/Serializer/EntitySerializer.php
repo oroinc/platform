@@ -28,7 +28,17 @@ use Doctrine\ORM\QueryBuilder;
  *              'exclusion_policy' => 'all',
  *              'fields'           => [
  *                  'phone'   => null,
- *                  'primary' => null
+ *                  'primary' => [
+ *                      // as example we can convert boolean to Yes/No string
+ *                      // the data transformer must implement either
+ *                      // Symfony\Component\Form\DataTransformerInterface
+ *                      // or Oro\Bundle\SoapBundle\Serializer\DataTransformerInterface
+ *                      // Also several data transformers can be specified, for example
+ *                      // 'data_transformer' => ['first_transformer_service_id', 'second_transformer_service_id'],
+ *                      'data_transformer' => 'boolean_to_string_transformer_service_id',
+ *                      // the "primary" field should be named as "isPrimary" in the result
+ *                      'result_name' => 'isPrimary'
+ *                  ]
  *              ],
  *              'orderBy'          => [
  *                  'primary' => 'DESC'
@@ -157,7 +167,9 @@ class EntitySerializer
             $this->getEntityIds($entities, $entityClass),
             $config
         );
-        $this->applyRelatedData($result, $entityClass, $relatedData, $config);
+        if (!empty($relatedData)) {
+            $this->applyRelatedData($result, $entityClass, $relatedData, $config);
+        }
 
         if (isset($config['post_serialize'])) {
             $postSerialize = $config['post_serialize'];
@@ -189,24 +201,20 @@ class EntitySerializer
                 continue;
             }
 
-            $targetConfig = isset($config['fields'][$field])
-                ? $config['fields'][$field]
-                : [];
-
             $alias = 'a' . ++$aliasCounter;
             $qb->leftJoin(sprintf('%s.%s', $rootAlias, $field), $alias);
             $this->updateSelectQueryPart(
                 $qb,
                 $alias,
                 $entityMetadata->getAssociationTargetClass($field),
-                $targetConfig,
+                $this->getFieldConfig($config, $field),
                 true
             );
         }
     }
 
     /**
-     * @param object $entity
+     * @param mixed  $entity
      * @param string $entityClass
      * @param array  $config
      *
@@ -224,15 +232,18 @@ class EntitySerializer
         foreach ($resultFields as $field) {
             $value = null;
             if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
+                $targetConfig = $this->getFieldConfig($config, $field);
                 if ($entityMetadata->isAssociation($field)) {
                     if ($value !== null) {
-                        $targetConfig = isset($config['fields'][$field])
-                            ? $config['fields'][$field]
-                            : [];
                         if (!empty($targetConfig['fields'])) {
                             if (is_string($targetConfig['fields'])) {
                                 $value = $this->dataAccessor->getValue($value, $targetConfig['fields']);
-                                $value = $this->dataTransformer->transformValue($value);
+                                $value = $this->dataTransformer->transform(
+                                    $entityClass,
+                                    $field,
+                                    $value,
+                                    $targetConfig
+                                );
                             } else {
                                 $value = $this->serializeItem(
                                     $value,
@@ -241,13 +252,23 @@ class EntitySerializer
                                 );
                             }
                         } else {
-                            $value = $this->dataTransformer->transformValue($value);
+                            $value = $this->dataTransformer->transform(
+                                $entityClass,
+                                $field,
+                                $value,
+                                $targetConfig
+                            );
                         }
                     }
                 } else {
-                    $value = $this->dataTransformer->transformValue($value);
+                    $value = $this->dataTransformer->transform(
+                        $entityClass,
+                        $field,
+                        $value,
+                        $targetConfig
+                    );
                 }
-                $result[$field] = $value;
+                $result[$this->getResultFieldName($field, $targetConfig)] = $value;
             }
         }
 
@@ -363,9 +384,7 @@ class EntitySerializer
             }
 
             $mapping      = $entityMetadata->getAssociationMapping($field);
-            $targetConfig = isset($config['fields'][$field])
-                ? $config['fields'][$field]
-                : [];
+            $targetConfig = $this->getFieldConfig($config, $field);
 
             $relatedData[$field] = $this->hasAssociations($mapping['targetEntity'], $targetConfig)
                 ? $this->loadRelatedItems($entityIds, $mapping, $targetConfig)
@@ -428,9 +447,10 @@ class EntitySerializer
 
         $items = $qb->getQuery()->getArrayResult();
 
-        $result = [];
+        $result      = [];
+        $entityClass = $mapping['targetEntity'];
         foreach ($items as $item) {
-            $result[$item['entityId']][] = array_intersect_key($item, array_fill_keys($fields, true));
+            $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
         }
 
         return $result;
@@ -455,17 +475,19 @@ class EntitySerializer
             }
             $entityId = $resultItem[$entityIdFieldName];
             foreach ($relatedData as $field => $relatedItems) {
-                $resultItem[$field] = [];
+                $targetConfig = $this->getFieldConfig($config, $field);
+                $resultName   = $this->getResultFieldName($field, $targetConfig);
+
+                $resultItem[$resultName] = [];
                 if (empty($relatedItems[$entityId])) {
                     continue;
                 }
-                $targetConfig = isset($config['fields'][$field])
-                    ? $config['fields'][$field]
-                    : [];
                 foreach ($relatedItems[$entityId] as $relatedItem) {
-                    $resultItem[$field][] = !empty($targetConfig['fields']) && is_string($targetConfig['fields'])
-                        ? $relatedItem[$targetConfig['fields']]
-                        : $relatedItem;
+                    if (!empty($targetConfig['fields']) && is_string($targetConfig['fields'])) {
+                        $resultItem[$resultName][] = $relatedItem[$targetConfig['fields']];
+                    } else {
+                        $resultItem[$resultName][] = $relatedItem;
+                    }
                 }
             }
         }
@@ -613,5 +635,33 @@ class EntitySerializer
     protected function getEntityIdGetter($entityClass)
     {
         return 'get' . ucfirst($this->getEntityIdFieldName($entityClass));
+    }
+
+    /**
+     * Returns the configuration of the specified field
+     *
+     * @param array  $config The config of an entity the specified field belongs
+     * @param string $field  The name of the field
+     *
+     * @return array
+     */
+    protected function getFieldConfig($config, $field)
+    {
+        return isset($config['fields'][$field])
+            ? $config['fields'][$field]
+            : [];
+    }
+
+    /**
+     * @param string $field  The name of the field
+     * @param array  $config The config of the field
+     *
+     * @return mixed
+     */
+    protected function getResultFieldName($field, $config)
+    {
+        return isset($config['result_name'])
+            ? $config['result_name']
+            : $field;
     }
 }

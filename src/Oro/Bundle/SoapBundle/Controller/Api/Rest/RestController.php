@@ -20,18 +20,15 @@ abstract class RestController extends RestGetController implements
     RestApiCrudInterface
 {
     /**
-     * Edit entity
-     *
-     * @param  mixed $id
-     *
-     * @return Response
+     * {@inheritdoc}
      */
     public function handleUpdateRequest($id)
     {
         $entity = $this->getManager()->find($id);
 
         if ($entity) {
-            if ($this->processForm($entity)) {
+            $entity = $this->processForm($entity);
+            if ($entity) {
                 $view = $this->view(null, Codes::HTTP_NO_CONTENT);
             } else {
                 $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
@@ -52,11 +49,14 @@ abstract class RestController extends RestGetController implements
      */
     public function handleCreateRequest($_ = null)
     {
-        $entity      = call_user_func_array(array($this, 'createEntity'), func_get_args());
-        $isProcessed = $this->processForm($entity);
+        $isProcessed = false;
 
-        if ($isProcessed) {
+        $entity = call_user_func_array(array($this, 'createEntity'), func_get_args());
+        $entity = $this->processForm($entity);
+
+        if ($entity) {
             $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
+            $isProcessed = true;
         } else {
             $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
         }
@@ -77,11 +77,7 @@ abstract class RestController extends RestGetController implements
     }
 
     /**
-     * Delete entity
-     *
-     * @param  mixed $id
-     *
-     * @return Response
+     * {@inheritdoc}
      */
     public function handleDeleteRequest($id)
     {
@@ -104,15 +100,21 @@ abstract class RestController extends RestGetController implements
     /**
      * Process form.
      *
-     * @param  mixed $entity
+     * @param mixed $entity
      *
-     * @return bool
+     * @return mixed|null The instance of saved entity on successful processing; otherwise, null
      */
     protected function processForm($entity)
     {
         $this->fixRequestAttributes($entity);
 
-        return $this->getFormHandler()->process($entity);
+        $result = $this->getFormHandler()->process($entity);
+        if (is_object($result) || null === $result) {
+            return $result;
+        }
+
+        // some form handlers may return true/false rather that saved entity
+        return $result ? $entity : null;
     }
 
     /**
