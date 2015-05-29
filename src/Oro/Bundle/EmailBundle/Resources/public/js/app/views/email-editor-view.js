@@ -29,7 +29,7 @@ define(function (require) {
          */
         initialize: function (options) {
             EmailEditorView.__super__.initialize.apply(this, options);
-            this.templateGenerator = options.templateGenerator;
+            this.templatesProvider = options.templatesProvider;
             this.initElCache();
             this.init();
             this.readyPromise = mediator.execute('layout:init', this.$el, this);
@@ -80,7 +80,7 @@ define(function (require) {
             });
             confirm.on('ok', _.bind(function () {
                 mediator.execute('showLoading');
-                this.templateGenerator.generate(templateId, this.model.get('email').get('relatedEntityId'))
+                this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
                     .always(function () {
                         mediator.execute('hideLoading');
                     })

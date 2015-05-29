@@ -6,7 +6,7 @@ define(function (require) {
         EmailModel = require('../app/models/email-model');
 
     return {
-        readEmailEditorModel: function (options) {
+        createFromComponentOptions: function (options) {
             var $el = options._sourceElement;
             return new EmailEditorModel({
                 appendSignature: options.appendSignature,
