@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LDAPBundle\Provider;
 
-use Iterator;
-
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -25,7 +23,7 @@ class UserProvider
     }
 
     /**
-     * @return Iterator
+     * @return \Iterator
      */
     public function getUsersIterator()
     {

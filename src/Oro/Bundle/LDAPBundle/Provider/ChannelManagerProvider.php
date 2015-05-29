@@ -12,6 +12,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\LDAPBundle\LDAP\Ldap;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
 use Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class ChannelManagerProvider
 {
@@ -25,6 +26,7 @@ class ChannelManagerProvider
     /** @var Registry */
     private $registry;
 
+    /** @var UserManager */
     private $userManager;
 
     /** @var LoggerInterface */
@@ -33,7 +35,12 @@ class ChannelManagerProvider
     /** @var Channel[] */
     private $channels;
 
-    public function __construct(Registry $registry, $userManager, LoggerInterface $logger = null)
+    /**
+     * @param Registry $registry
+     * @param UserManager $userManager
+     * @param LoggerInterface $logger
+     */
+    public function __construct(Registry $registry, UserManager $userManager, LoggerInterface $logger = null)
     {
         $this->registry = $registry;
         $this->userManager = $userManager;

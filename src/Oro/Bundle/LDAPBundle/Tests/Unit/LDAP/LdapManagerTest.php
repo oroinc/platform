@@ -88,7 +88,11 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             ])));
 
-        $this->ldapManager = new LdapManager($this->registry, $this->driver, null, $this->channel);
+        $userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->ldapManager = new LdapManager($this->registry, $this->driver, $userManager, $this->channel);
     }
 
     public function testHydrate()

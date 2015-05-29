@@ -1,13 +1,20 @@
 <?php
 namespace Oro\Bundle\LDAPBundle\LDAP;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Zend\Ldap\Ldap as BaseLdap;
+
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class Ldap extends BaseLdap
 {
     use TransformsSettings;
 
+    /**
+     * Creates new instance of Ldap, configured using Channel as a source for settings.
+     *
+     * @param Channel $channel
+     * @throws \Zend\Ldap\Exception\LdapException
+     */
     public function __construct(Channel $channel)
     {
         $settings = iterator_to_array($channel->getTransport()->getSettingsBag());
@@ -18,7 +25,6 @@ class Ldap extends BaseLdap
 
         parent::__construct($options);
     }
-
 
     /**
      * Returns array of transforms for Ldap settings.

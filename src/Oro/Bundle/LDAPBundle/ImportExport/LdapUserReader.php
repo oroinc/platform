@@ -16,6 +16,11 @@ class LdapUserReader extends IteratorBasedReader
     /** @var ChannelManagerProvider */
     private $managerProvider;
 
+    /**
+     * @param ContextRegistry $contextRegistry
+     * @param ConnectorContextMediator $connectorContextMediator
+     * @param ChannelManagerProvider $managerProvider
+     */
     public function __construct(
         ContextRegistry $contextRegistry,
         ConnectorContextMediator $connectorContextMediator,

@@ -4,7 +4,7 @@ namespace Oro\Bundle\LDAPBundle\LDAP;
 trait TransformsSettings
 {
     /**
-     * Transforms settings into acceptable form for LdapManager and LdapDriver.
+     * Transforms settings according to provided transforms.
      *
      * @param array|\Traversable $settings
      * @param array $transforms

@@ -81,7 +81,11 @@ class ChannelManagerProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->managerProvider = new ChannelManagerProvider($this->registry, null);
+        $userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->managerProvider = new ChannelManagerProvider($this->registry, $userManager);
     }
 
     public function testChannelReturnsSameInstanceForSameChannel()

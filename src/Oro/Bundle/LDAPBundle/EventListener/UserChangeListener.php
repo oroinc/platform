@@ -21,30 +21,36 @@ class UserChangeListener
     /** @var User[] */
     protected $updatedUsers = [];
 
+    /**
+     * @param ServiceLink $managerProviderLink Service link with ChannelManagerProvider
+     */
     public function __construct(ServiceLink $managerProviderLink)
     {
         $this->managerProviderLink = $managerProviderLink;
     }
 
-    protected function processNew(array &$users)
+    protected function processNew()
     {
         /** @var ChannelManagerProvider $managerProvider */
         $managerProvider = $this->managerProviderLink->getService();
 
-        foreach ($users as $user) {
+        foreach ($this->newUsers as $user) {
             $managerProvider->save($user);
         }
 
-        $users = [];
+        $this->newUsers = [];
     }
 
-    protected function processUpdated(array &$users, UnitOfWork $uow)
+    /**
+     * @param UnitOfWork $uow
+     */
+    protected function processUpdated(UnitOfWork $uow)
     {
         /** @var ChannelManagerProvider $provider */
         $provider = $this->managerProviderLink->getService();
         $channels = $provider->getChannels();
 
-        foreach ($users as $user) {
+        foreach ($this->updatedUsers as $user) {
             $mappings = (array) $user->getLdapMappings();
 
             foreach ($mappings as $channelId => $dn) {
@@ -59,7 +65,7 @@ class UserChangeListener
             }
         }
 
-        $users = [];
+        $this->updatedUsers = [];
     }
 
     /**
@@ -71,9 +77,9 @@ class UserChangeListener
     {
         $uow = $args->getEntityManager()->getUnitOfWork();
 
-        $this->processUpdated($this->updatedUsers, $uow);
+        $this->processUpdated($uow);
 
-        $this->processNew($this->newUsers);
+        $this->processNew();
     }
 
     /**
@@ -86,24 +92,15 @@ class UserChangeListener
         $uow = $args->getEntityManager()->getUnitOfWork();
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if ($this->isValidUser($entity)) {
+            if ($entity instanceof User) {
                 $this->newUsers[] = $entity;
             }
         }
 
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            if ($this->isValidUser($entity)) {
+            if ($entity instanceof User) {
                 $this->updatedUsers[] = $entity;
             }
         }
-    }
-
-    protected function isValidUser($entity)
-    {
-        if ($entity instanceof User) {
-            return true;
-        }
-
-        return false;
     }
 }

@@ -27,6 +27,12 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
     /** @var string */
     private $usernameAttr;
 
+    /**
+     * @param UserManager $userManager
+     * @param ContextRegistry $contextRegistry
+     * @param ConnectorContextMediator $connectorContextMediator
+     * @param ChannelManagerProvider $managerProvider
+     */
     public function __construct(
         UserManager                 $userManager,
         ContextRegistry             $contextRegistry,
@@ -64,6 +70,9 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
         return $user;
     }
 
+    /**
+     * Initializes the processor.
+     */
     public function initialize()
     {
         $this->usernameAttr = $this->managerProvider->channel($this->getChannel())->getUsernameAttr();

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LDAPBundle\Model;
 
 use FR3D\LdapBundle\Model\LdapUserInterface;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\UserBundle\Entity\User as OroUser;

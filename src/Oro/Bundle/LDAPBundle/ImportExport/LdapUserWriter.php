@@ -24,6 +24,12 @@ class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
     /** @var ChannelManagerProvider */
     private $managerProvider;
 
+    /**
+     * @param UserManager $userManager
+     * @param ContextRegistry $contextRegistry
+     * @param ConnectorContextMediator $connectorContextMediator
+     * @param ChannelManagerProvider $managerProvider
+     */
     public function __construct(
         UserManager $userManager,
         ContextRegistry $contextRegistry,

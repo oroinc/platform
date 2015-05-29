@@ -26,8 +26,12 @@ services:
             - @oro_ldap.provider.channel_manager
 
     oro_ldap.importexport.writer.entity.user:
-        parent: oro_importexport.writer.entity
         class: %oro_ldap.importexport.writer.entity.user.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_importexport.writer.entity_detach_fixer
+            - @oro_importexport.context_registry
+            - @oro_ldap.event_listener.user_change_listener
 
     oro_ldap.importexport.processor.import.user:
         class: %oro_ldap.importexport.processor.import.user.class%

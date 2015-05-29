@@ -8,8 +8,12 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class UserBeforeRenderListener
 {
+    /** @var ChannelManagerProvider */
     private $managerProvider;
 
+    /**
+     * @param ChannelManagerProvider $managerProvider
+     */
     public function __construct(ChannelManagerProvider $managerProvider)
     {
         $this->managerProvider = $managerProvider;

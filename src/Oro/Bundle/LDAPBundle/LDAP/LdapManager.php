@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\LDAPBundle\Model\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 /**
@@ -32,10 +33,10 @@ class LdapManager extends BaseManager
     /**
      * @param Registry $registry
      * @param ZendLdapDriver $driver
-     * @param type $userManager
+     * @param $userManager
      * @param Channel $channel
      */
-    public function __construct(Registry $registry, ZendLdapDriver $driver, $userManager, Channel $channel)
+    public function __construct(Registry $registry, ZendLdapDriver $driver, UserManager $userManager, Channel $channel)
     {
         $settings = iterator_to_array($channel->getTransport()->getSettingsBag());
         $mappingSettings = $channel->getMappingSettings();
@@ -101,6 +102,12 @@ class LdapManager extends BaseManager
         return $this->ldapUsernameAttr;
     }
 
+    /**
+     * Returns dn of a user. In context of this managers'channel.
+     *
+     * @param UserInterface $user
+     * @return string
+     */
     private function getDn(UserInterface $user)
     {
         $mappings = (array) $user->getLdapMappings();
@@ -112,6 +119,13 @@ class LdapManager extends BaseManager
         return false;
     }
 
+    /**
+     * Sets users dn, in context of this managers'channel.
+     *
+     * @param UserInterface $user
+     * @param $dn
+     * @return $this
+     */
     private function setDn(UserInterface $user, $dn)
     {
         $mappings = (array) $user->getLdapMappings();
@@ -198,6 +212,9 @@ class LdapManager extends BaseManager
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function bind(UserInterface $user, $password)
     {
         $ldapUser = User::createFromUser($user, $this->channel->getId());
