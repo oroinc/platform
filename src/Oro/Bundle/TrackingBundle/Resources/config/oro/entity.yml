@@ -1,11 +1,9 @@
 oro_entity:
     exclusions:
         - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingData }
-        - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingEvent }
         - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingEventDictionary }
         - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingVisit }
         - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent, field: parsingCount }
-        - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent, field: webEvent }
         - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent, field: event }
         - { entity: Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent, field: visit }
 

@@ -8,11 +8,11 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
- * Class SerializedFieldTest
+ * Class CustomFieldTest
  *
  * @package Oro\Bundle\EntityBundle\Tests\Selenium
  */
-class SerializedFieldTest extends Selenium2TestCase
+class CustomFieldTest extends Selenium2TestCase
 {
     protected $fields = array(
         array('type' => 'BigInt', 'value' => '123456789'),
@@ -29,7 +29,7 @@ class SerializedFieldTest extends Selenium2TestCase
         array('type' => 'Text', 'value' => 'Some text value')
     );
 
-    public function testAddSerializedField()
+    public function testAddTableColumnField()
     {
         $login = $this->login();
         /** @var ConfigEntities $login */
@@ -39,17 +39,18 @@ class SerializedFieldTest extends Selenium2TestCase
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */
             $login->createField()
-            ->setFieldName(strtolower($field['type']).'_serialized')
-            ->setStorageType('Serialized field')
+            ->setFieldName(strtolower($field['type']).'_field')
+            ->setStorageType('Table column')
             ->setType($field['type'])
             ->proceed()
             ->save()
             ->assertMessage('Field saved');
         }
+        $login->updateSchema();
     }
 
     /**
-     * @depends testAddSerializedField
+     * @depends testAddTableColumnField
      */
     public function testEntityFieldsAvailability()
     {
@@ -63,7 +64,7 @@ class SerializedFieldTest extends Selenium2TestCase
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */
-            $login->checkEntityField(strtolower($field['type']).'_serialized');
+            $login->checkEntityField(strtolower($field['type']).'_field');
         }
     }
 
@@ -82,12 +83,12 @@ class SerializedFieldTest extends Selenium2TestCase
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */
-            $login->setCustomField(strtolower($field['type']).'_serialized', $field['value']);
+            $login->setCustomField(strtolower($field['type']).'_field', $field['value']);
         }
         $login->save()
             ->assertMessage('User saved');
         foreach ($this->fields as $field) {
-            $login->checkEntityFieldData(strtolower($field['type']).'_serialized', $field['value']);
+            $login->checkEntityFieldData(strtolower($field['type']).'_field', $field['value']);
         }
     }
 }
