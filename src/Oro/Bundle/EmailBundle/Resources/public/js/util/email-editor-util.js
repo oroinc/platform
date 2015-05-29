@@ -21,7 +21,6 @@ define(function (require) {
                     cc: options.cc,
                     bcc: options.bcc
                 }),
-                richEditorEnabled: false,
                 bodyFooter: $el.find('[name$="[bodyFooter]"]').val()
             });
         }

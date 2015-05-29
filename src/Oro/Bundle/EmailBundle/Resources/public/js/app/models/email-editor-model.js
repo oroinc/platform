@@ -14,7 +14,6 @@ define(function (require) {
             isSignatureEditable: false,
             signature: undefined,
             email: null,
-            richEditorEnabled: false,
             bodyFooter: undefined
         }
     });
