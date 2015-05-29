@@ -8,8 +8,11 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,8 +26,11 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private $addrManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailOwnerProvider|\PHPUnit_Framework_MockObject_MockObject */
     private $ownerProvider;
+
+    /** @var EventDispatcher */
+    private $eventDispatcher;
 
     protected function setUp()
     {
@@ -35,13 +41,15 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures',
             'Test%sProxy'
         );
-        $this->batch = new EmailEntityBatchProcessor($this->addrManager, $this->ownerProvider);
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+
+        $this->batch = new EmailEntityBatchProcessor($this->addrManager, $this->ownerProvider, $this->eventDispatcher);
     }
 
     public function testAddEmail()
     {
-        $this->batch->addEmail(new Email());
-        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'emails'));
+        $this->batch->addEmailUser(new EmailUser());
+        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'emailUsers'));
     }
 
     public function testAddAddress()

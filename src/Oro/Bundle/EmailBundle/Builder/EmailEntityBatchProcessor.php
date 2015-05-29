@@ -248,20 +248,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                         $oldEmail = $emailUser->getEmail();
                         $emailUser->setEmail($existingEmail);
 
-/*                        $folders = new ArrayCollection();
-                        foreach ($emailUser->getEmail()->getEmailUsers() as $existingEmailUser) {
-                            $folders->add($existingEmailUser->getFolder());
-                        }
-
-                        foreach ($folders as $folder) {
-                            if ($folder != $emailUser->getFolder()) {
-                                $eu = clone $emailUser;
-                                $eu->setFolder($folder);
-
-                                $em->persist($eu);
-                            }
-                        }*/
-
                         $this->changes[] = ['old' => $oldEmail, 'new' => $existingEmail];
                     }
                 }

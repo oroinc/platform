@@ -37,7 +37,7 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         self::updateEmailUserTableFields($schema);
     }
 
-    protected function removeOldRelations(Schema $schema)
+    protected static function removeOldRelations(Schema $schema)
     {
         $emailBodyTable = $schema->getTable('oro_email_body');
 
@@ -84,7 +84,7 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         }
     }
 
-    protected function updateEmailUserTableFields(Schema $schema)
+    protected static function updateEmailUserTableFields(Schema $schema)
     {
         $emailUserTable = $schema->getTable('oro_email_user');
 

@@ -54,13 +54,12 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testEmail()
+    public function testEmailUser()
     {
         $this->initEmailStorage();
 
         $date = new \DateTime('now');
-        // todo CRM-2480
-/*        $email = $this->builder->email(
+        $emailUser = $this->builder->emailUser(
             'testSubject',
             '"Test" <test@example.com>',
             '"Test1" <test1@example.com>',
@@ -70,24 +69,24 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             Email::NORMAL_IMPORTANCE,
             ['"Test2" <test2@example.com>', 'test1@example.com'],
             ['"Test3" <test3@example.com>', 'test4@example.com']
-        );*/
+        );
 
-        $this->assertEquals('testSubject', $email->getSubject());
-        $this->assertEquals('"Test" <test@example.com>', $email->getFromName());
-        $this->assertEquals('test@example.com', $email->getFromEmailAddress()->getEmail());
-        $this->assertEquals($date, $email->getSentAt());
+        $this->assertEquals('testSubject', $emailUser->getEmail()->getSubject());
+        $this->assertEquals('"Test" <test@example.com>', $emailUser->getEmail()->getFromName());
+        $this->assertEquals('test@example.com', $emailUser->getEmail()->getFromEmailAddress()->getEmail());
+        $this->assertEquals($date, $emailUser->getEmail()->getSentAt());
 
-        $this->assertEquals($date, $email->getInternalDate());
-        $this->assertEquals(Email::NORMAL_IMPORTANCE, $email->getImportance());
-        $to = $email->getRecipients(EmailRecipient::TO);
+        $this->assertEquals($date, $emailUser->getEmail()->getInternalDate());
+        $this->assertEquals(Email::NORMAL_IMPORTANCE, $emailUser->getEmail()->getImportance());
+        $to = $emailUser->getEmail()->getRecipients(EmailRecipient::TO);
         $this->assertEquals('"Test1" <test1@example.com>', $to[0]->getName());
         $this->assertEquals('test1@example.com', $to[0]->getEmailAddress()->getEmail());
-        $cc = $email->getRecipients(EmailRecipient::CC);
+        $cc = $emailUser->getEmail()->getRecipients(EmailRecipient::CC);
         $this->assertEquals('"Test2" <test2@example.com>', $cc[1]->getName());
         $this->assertEquals('test2@example.com', $cc[1]->getEmailAddress()->getEmail());
         $this->assertEquals('test1@example.com', $cc[2]->getName());
         $this->assertEquals('test1@example.com', $cc[2]->getEmailAddress()->getEmail());
-        $bcc = $email->getRecipients(EmailRecipient::BCC);
+        $bcc = $emailUser->getEmail()->getRecipients(EmailRecipient::BCC);
         $this->assertEquals('"Test3" <test3@example.com>', $bcc[3]->getName());
         $this->assertEquals('test3@example.com', $bcc[3]->getEmailAddress()->getEmail());
         $this->assertEquals('test4@example.com', $bcc[4]->getName());
