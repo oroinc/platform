@@ -32,6 +32,7 @@
 
                     $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
                     $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
+                    $('div.widget-configuration').closest('.ui-widget-content').trigger('dialogresize');
                 });
             }
         )
