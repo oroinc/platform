@@ -4,8 +4,9 @@
 define(function (require) {
     'use strict';
 
-    var _               = require('underscore'),
-        Backbone        = require('backbone'),
+    var CalendarView,
+        _               = require('underscore'),
+        $               = require('jquery'),
         moment          = require('moment'),
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
@@ -23,17 +24,9 @@ define(function (require) {
         localeSettings  = require('orolocale/js/locale-settings'),
         PluginManager = require('oroui/js/app/plugins/plugin-manager'),
         GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
+    require('jquery.fullcalendar');
 
-        require('jquery.fullcalendar');
-
-    var $ = Backbone.$;
-
-    /**
-     * @export  orocalendar/js/calendar-view
-     * @class   orocalendar.Сalendar
-     * @extends Backbone.View
-     */
-    return BaseView.extend({
+    CalendarView = BaseView.extend({
         MOMENT_BACKEND_FORMAT: dateTimeFormatter.backendFormats.datetime,
         /** @property */
         eventsTemplate: _.template(
@@ -53,7 +46,7 @@ define(function (require) {
 
         /** @property {Object} */
         options: {
-            timezone: localeSettings.getTimeZoneShift(),
+            timezone: localeSettings.getTimeZone(),
             eventsOptions: {
                 defaultView: 'month',
                 allDayText: __('oro.calendar.control.all_day'),
@@ -168,7 +161,7 @@ define(function (require) {
             if (this.connectionsView) {
                 this.connectionsView.dispose.call(this);
             }
-            Backbone.View.prototype.dispose.call(this);
+            CalendarView.__super__.dispose.call(this);
         },
 
         getEventView: function (eventModel) {
@@ -334,18 +327,14 @@ define(function (require) {
             }
             if (!this.eventView) {
                 try {
-                    attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
-                    attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
-
-                    _.extend(
-                        attrs,
-                        {
-                            calendarAlias: 'user',
-                            calendar: this.options.calendar,
-                            editable: this.options.newEventEditable,
-                            removable: this.options.newEventRemovable
-                        }
-                    );
+                    attrs.start = attrs.start.clone().utc().format(this.MOMENT_BACKEND_FORMAT);
+                    attrs.end = attrs.end.clone().utc().format(this.MOMENT_BACKEND_FORMAT);
+                    _.extend(attrs, {
+                        calendarAlias: 'user',
+                        calendar: this.options.calendar,
+                        editable: this.options.newEventEditable,
+                        removable: this.options.newEventRemovable
+                    });
                     eventModel = new EventModel(attrs);
                     this.getEventView(eventModel).render();
                 } catch (err) {
@@ -358,10 +347,9 @@ define(function (require) {
         onFcSelect: function (start, end) {
             var attrs = {
                 allDay: start.time().as('ms') === 0 && end.time().as('ms') === 0,
-                start: start.clone(),
-                end: end.clone()
+                start: start.clone().tz(this.options.timezone, true),
+                end: end.clone().tz(this.options.timezone, true)
             };
-            this.applyTzCorrection(-1, attrs);
             this.showAddEventDialog(attrs);
         },
 
@@ -377,7 +365,6 @@ define(function (require) {
         },
 
         onFcEventResize: function (fcEvent, newDuration, undo) {
-            fcEvent.end = fcEvent.start.clone().add(newDuration);
             this.saveFcEvent(fcEvent, undo);
         },
 
@@ -433,14 +420,13 @@ define(function (require) {
             var promises = [], eventModel, attrs;
             attrs = {
                 allDay: fcEvent.allDay,
-                start: fcEvent.start.clone(),
-                end: (fcEvent.end !== null) ? fcEvent.end.clone() : null
+                start: fcEvent.start.clone().tz(this.options.timezone, true),
+                end: (fcEvent.end !== null) ? fcEvent.end.clone().tz(this.options.timezone, true) : null
             };
-            this.applyTzCorrection(-1, attrs);
 
-            attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
+            attrs.start = attrs.start.utc().format(this.MOMENT_BACKEND_FORMAT);
             if (attrs.end) {
-                attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
+                attrs.end = attrs.end.utc().format(this.MOMENT_BACKEND_FORMAT);
             }
 
             eventModel = this.collection.get(fcEvent.id);
@@ -585,39 +571,17 @@ define(function (require) {
                 fcEvent.textColor = colors.color;
             }
 
-            this.applyTzCorrection(1, fcEvent);
+            if (fcEvent.start !== null && !moment.isMoment(fcEvent.start)) {
+                fcEvent.start = $.fullCalendar.moment(fcEvent.start).tz(this.options.timezone);
+            }
+            if (fcEvent.end !== null && !moment.isMoment(fcEvent.end)) {
+                fcEvent.end = $.fullCalendar.moment(fcEvent.end).tz(this.options.timezone);
+            }
+
             if (fcEvent.end && fcEvent.end.diff(fcEvent.start) === 0) {
                 fcEvent.end = null;
             }
             return fcEvent;
-        },
-
-        /**
-         * Applies timezone correction for data. The timezone taken from the settings and
-         * it equals current application timezone by default
-         * NOTE: changes passed model
-         *
-         * @param multiplier {int} allows to add or subtract timezone, pass 1 or -1 here please
-         * @param obj {object|moment} a moment or an object with start and end properties to which timezone will be applied
-         * @returns {object} object passed to function
-         */
-        applyTzCorrection: function (multiplier, obj) {
-            if (moment.isMoment(obj)) {
-                return obj.zone(0).add(this.options.timezone * multiplier, 'm');
-            }
-            if (obj.end !== null) {
-                if (!moment.isMoment(obj.start)) {
-                    obj.start = $.fullCalendar.moment(obj.start);
-                }
-                obj.start.zone(0).add(this.options.timezone * multiplier, 'm');
-            }
-            if (obj.end !== null) {
-                if (!moment.isMoment(obj.end)) {
-                    obj.end = $.fullCalendar.moment(obj.end);
-                }
-                obj.end.zone(0).add(this.options.timezone * multiplier, 'm');
-            }
-            return obj;
         },
 
         showSavingMask: function () {
@@ -669,6 +633,7 @@ define(function (require) {
             var options, keys, self, scrollTime;
             // prepare options for jQuery FullCalendar control
             options = { // prepare options for jQuery FullCalendar control
+                timezone: this.options.timezone,
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.onFcSelect, this),
@@ -685,7 +650,7 @@ define(function (require) {
                 }, this)
             };
             keys = [
-                'date', 'defaultView', 'editable', 'selectable',
+                'defaultDate', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'allDaySlot', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'scrollTime', 'slotEventOverlap',
@@ -694,11 +659,8 @@ define(function (require) {
                 'fixedWeekCount'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
-            if (!_.isUndefined(options.date)) {
-                options.date = dateTimeFormatter.applyTimeZoneCorrection(options.date);
-                options.year = options.date.getFullYear();
-                options.month = options.date.getMonth();
-                options.date = options.date.getDate();
+            if (!_.isUndefined(options.defaultDate)) {
+                options.defaultDate = moment(options.defaultDate);
             }
 
             if (!options.aspectRatio) {
@@ -707,7 +669,7 @@ define(function (require) {
             }
 
             if (this.options.scrollToCurrentTime) {
-                scrollTime = this.applyTzCorrection(1, moment.utc());
+                scrollTime = moment.tz(this.options.timezone);
                 if (scrollTime.minutes() < 10 && scrollTime.hours() !== 0) {
                     scrollTime.subtract(1, 'h');
                 }
@@ -751,8 +713,6 @@ define(function (require) {
             }, this);
 
             // create jQuery FullCalendar control
-            options.timezone = "UTC";
-
             this.getCalendarElement().fullCalendar(options);
             this.updateLayout();
             this.enableEventLoading = true;
@@ -822,7 +782,7 @@ define(function (require) {
                     end: currentView.intervalEnd.clone().utc()
                 },
                 // current time in calendar timezone
-                now = moment.utc().add(this.options.timezone, 'm');
+                now = moment.tz(this.options.timezone);
 
             if (currentView.name === 'month') {
                 // nothing to do
@@ -874,7 +834,6 @@ define(function (require) {
             var $fcView = this.getCalendarElement().find('.fc-view:first');
             return mediator.execute('layout:getAvailableHeight', $fcView)
         },
-
 
         /**
          * Chooses layout on resize or during creation
@@ -929,4 +888,6 @@ define(function (require) {
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
         }
     });
+
+    return CalendarView;
 });

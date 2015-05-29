@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
@@ -27,6 +26,9 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagHelper;
+
     /** @var TestActivityProvider */
     protected $testActivityProvider;
 
@@ -43,6 +45,9 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->translator     = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
+        $this->htmlTagHelper  = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->testActivityProvider = new TestActivityProvider();
 
@@ -50,7 +55,8 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->configManager,
             $this->translator,
-            $this->routeHelper
+            $this->routeHelper,
+            $this->htmlTagHelper
         );
         $this->provider->addProvider($this->testActivityProvider);
     }
