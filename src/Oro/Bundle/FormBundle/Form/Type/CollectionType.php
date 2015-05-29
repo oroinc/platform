@@ -13,6 +13,8 @@ use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 
 class CollectionType extends AbstractType
 {
+    const NAME = 'oro_collection';
+
     /**
      * {@inheritdoc}
      */
@@ -77,6 +79,6 @@ class CollectionType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_collection';
+        return static::NAME;
     }
 }

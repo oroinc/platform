@@ -215,21 +215,40 @@ class ConfigEntity extends CustomEntity
                     $dateField = "[contains(@id, '{$fieldName}') and contains(@id, 'date_selector_')]";
                     $timeField = "[contains(@id, '{$fieldName}') and contains(@id, 'time_selector_')]";
 
-                    if ($fieldName === 'datetime_field'
+                    if (
+                        preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $value, $valueParts)
                         and $this->isElementPresent("//div[@class='control-group']//input{$dateField}")
                         and $this->isElementPresent("//div[@class='control-group']//input{$timeField}")
-                        and preg_match('/^(.+\d{4}),?\s(\d{2}\:\d{2}\s\w{2})$/', $value, $value)
                     ) {
                         $field = $this->test->byXpath("//div[@class='control-group']//input{$dateField}");
+                        $field->click(); // focus
                         $field->clear();
-                        $field->value($value[1]);
+                        $field->value($valueParts[1]);
 
                         $field = $this->test->byXpath("//div[@class='control-group']//input{$timeField}");
+                        $field->click(); // focus
                         $field->clear();
-                        $field->value($value[2]);
+                        $field->value($valueParts[2]);
                     }
                 }
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $fieldName
+     * @param array $options
+     * @return $this
+     */
+    public function setMultiSelectField($fieldName, $options = array())
+    {
+        foreach ($options as $option) {
+            $this->test->byXPath(
+                "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
+                "//following-sibling::div//label[contains(., '{$option}')]"
+            )->click();
         }
 
         return $this;
