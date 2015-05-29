@@ -29,6 +29,7 @@ define(function (require) {
          */
         initialize: function (options) {
             EmailEditorView.__super__.initialize.apply(this, options);
+            this.templateGenerator = options.templateGenerator;
             this.initElCache();
             this.init();
             this.readyPromise = mediator.execute('layout:init', this.$el, this);
@@ -78,15 +79,12 @@ define(function (require) {
                 content: __('oro.email.emailtemplate.apply_template_confirmation_content')
             });
             confirm.on('ok', _.bind(function () {
-                var url = routing.generate(
-                    'oro_api_get_emailtemplate_compiled',
-                    {'id': templateId, 'entityId': this.model.get('email').get('relatedEntityId')}
-                );
-
                 mediator.execute('showLoading');
-
-                $.ajax(url, {
-                    success: _.bind(function (res) {
+                this.templateGenerator.generate(templateId, this.model.get('email').get('relatedEntityId'))
+                    .always(function () {
+                        mediator.execute('hideLoading');
+                    })
+                    .done(_.bind(function (res) {
                         if (!this.model.get('parentEmailId') || !this.$cache.subject.val()) {
                             this.$cache.subject.val(res.subject);
                         }
@@ -96,14 +94,7 @@ define(function (require) {
                         this.$cache.type.find('input[value=' + res.type + ']')
                             .prop('checked', true)
                             .trigger('change');
-                    }, this),
-                    error: function () {
-                        messenger.showErrorMessage(__('oro.email.emailtemplate.load_failed'));
-                    },
-                    dataType: 'json'
-                }).always(function () {
-                    mediator.execute('hideLoading');
-                });
+                    }, this));
             }, this));
             confirm.open();
         },

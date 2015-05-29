@@ -6,7 +6,8 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         _ = require('underscore'),
         EmailEditorView = require('../views/email-editor-view'),
-        EmailEditorUtil = require('../../util/email-editor-util');
+        emailEditorUtil = require('../../util/email-editor-util'),
+        emailTemplateGenerator = require('../../util/email-templates-generator');
 
     EmailEditorComponent = BaseComponent.extend({
         /**
@@ -17,7 +18,8 @@ define(function (require) {
             this._deferredInit();
             this.view = new EmailEditorView({
                 el: options._sourceElement,
-                model: EmailEditorUtil.readEmailEditorModel(options)
+                model: emailEditorUtil.readEmailEditorModel(options),
+                templateGenerator: emailTemplateGenerator
             });
             this.view.readyPromise.done(_.bind(this._resolveDeferredInit, this));
         }
