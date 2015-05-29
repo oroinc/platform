@@ -27,7 +27,7 @@ class BeforeListRenderEvent extends Event
     /**
      * @param \Twig_Environment $environment
      * @param array $data
-     * @param FormView $formView
+     * @param FormView|null $formView
      */
     public function __construct(Twig_Environment $environment, array $data, FormView $formView = null)
     {
@@ -45,7 +45,7 @@ class BeforeListRenderEvent extends Event
     }
 
     /**
-     * @return FormView
+     * @return FormView|null
      */
     public function getFormView()
     {
