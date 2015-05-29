@@ -8,26 +8,49 @@ use Oro\Bundle\UserBundle\Entity\Role;
 
 class UserTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreateFromUser()
+
+    /** @var User */
+    private $oroUser;
+
+    /** @var Role[] */
+    private $roles;
+
+    public function setUp()
     {
-        $roles = [
+        $this->roles = [
             new Role('role1'),
             new Role('role2'),
         ];
 
-        $oroUser = new TestingUser();
-        $oroUser
+        $this->oroUser = new TestingUser();
+        $this->oroUser
             ->setUsername('username')
             ->setPassword('password')
             ->setSalt('salt')
-            ->setRoles($roles)
-            ->setDn('dn');
+            ->setRoles($this->roles)
+            ->setLdapMappings([
+                1 => 'an example of user distinguished name in channel with id 1',
+                40 => 'an example of user distinguished name in channel with id 40',
+            ]);
+    }
 
-        $user = User::createFromUser($oroUser);
+    public function testCreateFromUserWithMappingForChannel()
+    {
+        $user = User::createFromUser($this->oroUser, 40);
         $this->assertEquals('username', $user->getUsername());
         $this->assertEquals('password', $user->getPassword());
         $this->assertEquals('salt', $user->getSalt());
-        $this->assertEquals($roles, $user->getRoles());
-        $this->assertEquals('dn', $user->getDn());
+        $this->assertEquals($this->roles, $user->getRoles());
+        $this->assertEquals('an example of user distinguished name in channel with id 40', $user->getDn());
+    }
+
+    public function testCreateFromUserWithoutMappingForChannel()
+    {
+        $user = User::createFromUser($this->oroUser, 25);
+        $this->assertEquals('username', $user->getUsername());
+        $this->assertEquals('password', $user->getPassword());
+        $this->assertEquals('salt', $user->getSalt());
+        $this->assertEquals($this->roles, $user->getRoles());
+        $this->assertNull($user->getDn());
     }
 }

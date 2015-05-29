@@ -3,19 +3,16 @@ namespace Oro\Bundle\LDAPBundle\EventListener;
 
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
+use Oro\Bundle\LDAPBundle\Provider\ChannelManagerProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserBeforeRenderListener
 {
-    /**
-     * @var LdapChannelManager
-     */
-    private $channelManager;
+    private $managerProvider;
 
-    public function __construct(LdapChannelManager $channelManager)
+    public function __construct(ChannelManagerProvider $managerProvider)
     {
-        $this->channelManager = $channelManager;
+        $this->managerProvider = $managerProvider;
     }
 
     /**
@@ -31,9 +28,15 @@ class UserBeforeRenderListener
             $mappings = [];
 
             /** @var Channel[] $channels */
-            $channels = $this->channelManager->getChannels(array_keys($value));
-            foreach ($channels as $channel) {
-                $mappings[$channel->getName()] = $value[$channel->getId()];
+            $channels = $this->managerProvider->getChannels();
+            foreach ($value as $channelId => $dn) {
+                if (!isset($channels[$channelId])) {
+                    continue;
+                }
+                $mappings[] = [
+                    'name' => $channels[$channelId]->getName(),
+                    'dn' => $dn,
+                ];
             }
 
             $event->setFieldViewValue([

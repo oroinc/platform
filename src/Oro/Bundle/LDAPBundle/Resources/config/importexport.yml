@@ -15,7 +15,7 @@ services:
         arguments:
             - @oro_importexport.context_registry
             - @oro_integration.provider.connector_context_mediator
-            - @oro_ldap.ldap.ldap_channel_manager
+            - @oro_ldap.provider.channel_manager
 
     oro_ldap.importexport.writer.ldap.user:
         class: %oro_ldap.importexport.writer.ldap.user.class%
@@ -23,7 +23,7 @@ services:
             - @oro_user.manager
             - @oro_importexport.context_registry
             - @oro_integration.provider.connector_context_mediator
-            - @oro_ldap.ldap.ldap_channel_manager
+            - @oro_ldap.provider.channel_manager
 
     oro_ldap.importexport.writer.entity.user:
         parent: oro_importexport.writer.entity
@@ -35,4 +35,4 @@ services:
             - @oro_user.manager
             - @oro_importexport.context_registry
             - @oro_integration.provider.connector_context_mediator
-            - @oro_ldap.ldap.ldap_channel_manager
+            - @oro_ldap.provider.channel_manager

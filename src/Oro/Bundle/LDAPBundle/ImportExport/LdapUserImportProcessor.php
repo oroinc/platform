@@ -4,12 +4,10 @@ namespace Oro\Bundle\LDAPBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Processor\StepExecutionAwareProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
-use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
+use Oro\Bundle\LDAPBundle\Provider\ChannelManagerProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -23,19 +21,22 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
     /** @var UserManager */
     private $userManager;
 
-    /** @var LdapChannelManager */
-    private $channelManager;
+    /** @var ChannelManagerProvider */
+    private $managerProvider;
+
+    /** @var string */
+    private $usernameAttr;
 
     public function __construct(
         UserManager                 $userManager,
         ContextRegistry             $contextRegistry,
         ConnectorContextMediator    $connectorContextMediator,
-        LdapChannelManager          $channelManager
+        ChannelManagerProvider      $managerProvider
     ) {
         $this->contextRegistry           = $contextRegistry;
         $this->userManager               = $userManager;
         $this->setConnectorContextMediator($connectorContextMediator);
-        $this->channelManager            = $channelManager;
+        $this->managerProvider            = $managerProvider;
     }
 
     /**
@@ -50,7 +51,7 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
         /** @var User $user */
         $user = $this->userManager->createUser();
 
-        $this->hydrate($user, $item);
+        $this->managerProvider->channel($this->getChannel())->hydrate($user, $item);
 
         // Set organization of user to same as on channel.
         $user->getOrganizations()->add($this->getChannel()->getOrganization());
@@ -63,19 +64,9 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
         return $user;
     }
 
-    /**
-     * Hydrates user with data from ldap and sets his new dn.
-     *
-     * @param UserInterface $user
-     * @param array $entry
-     */
-    protected function hydrate(UserInterface $user, array $entry)
+    public function initialize()
     {
-        $this->channelManager->hydrateThroughChannel(
-            $this->getChannel(),
-            $user,
-            $entry
-        );
+        $this->usernameAttr = $this->managerProvider->channel($this->getChannel())->getUsernameAttr();
     }
 
     /**
@@ -84,16 +75,14 @@ class LdapUserImportProcessor implements StepExecutionAwareProcessor
     public function process($item)
     {
         try {
-            $user = $this->userManager->findUserByUsername(
-                $item[$this->channelManager->getChannelUsernameAttr($this->getChannel())]
-            );
+            $user = $this->userManager->findUserByUsername($item[$this->usernameAttr]);
 
-            if ($user !== null) {
-                $this->hydrate($user, $item);
-                $this->getContext()->incrementUpdateCount();
-            } else {
+            if ($user === null) {
                 $user = $this->createUser($item);
                 $this->getContext()->incrementAddCount();
+            } else {
+                $this->managerProvider->channel($this->getChannel())->hydrate($user, $item);
+                $this->getContext()->incrementUpdateCount();
             }
 
             return $user;

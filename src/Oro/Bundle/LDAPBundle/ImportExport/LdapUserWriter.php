@@ -8,7 +8,7 @@ use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
-use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
+use Oro\Bundle\LDAPBundle\Provider\ChannelManagerProvider;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
@@ -21,19 +21,19 @@ class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
     /** @var ContextRegistry */
     private $contextRegistry;
 
-    /** @var LdapChannelManager */
-    private $channelManager;
+    /** @var ChannelManagerProvider */
+    private $managerProvider;
 
     public function __construct(
         UserManager $userManager,
         ContextRegistry $contextRegistry,
         ConnectorContextMediator $connectorContextMediator,
-        LdapChannelManager $channelManager
+        ChannelManagerProvider $managerProvider
     ) {
         $this->userManager = $userManager;
         $this->contextRegistry = $contextRegistry;
         $this->setConnectorContextMediator($connectorContextMediator);
-        $this->channelManager = $channelManager;
+        $this->managerProvider = $managerProvider;
     }
 
     /**
@@ -42,13 +42,13 @@ class LdapUserWriter implements ItemWriterInterface, StepExecutionAwareInterface
     public function write(array $items)
     {
         foreach ($items as $user) {
-            if ($this->channelManager->existsInChannel($this->getChannel(), $user)) {
+            if ($this->managerProvider->channel($this->getChannel())->exists($user)) {
                 $this->context->incrementUpdateCount();
             } else {
                 $this->context->incrementAddCount();
             }
 
-            $this->channelManager->exportThroughChannel($this->getChannel(), $user);
+            $this->managerProvider->channel($this->getChannel())->save($user);
         }
 
         $this->userManager->getStorageManager()->flush();

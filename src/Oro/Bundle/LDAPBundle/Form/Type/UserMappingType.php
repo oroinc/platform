@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class UserMappingType extends AbstractType
 {
@@ -21,6 +20,11 @@ class UserMappingType extends AbstractType
     protected $requiredFields = [
         'username',
         'email',
+    ];
+
+    /** @var array */
+    protected $ignoredFields = [
+        'ldap_mappings'
     ];
 
     /**
@@ -38,7 +42,7 @@ class UserMappingType extends AbstractType
     {
         $userManager = $this->getUserManager();
         $metadata = $userManager->getClassMetadata(static::USER_CLASS);
-        $notRequiredFields = array_diff($metadata->getFieldNames(), $this->requiredFields);
+        $notRequiredFields = array_diff($metadata->getFieldNames(), $this->requiredFields, $this->ignoredFields);
 
         $requiredOptions = [
             'required'    => true,

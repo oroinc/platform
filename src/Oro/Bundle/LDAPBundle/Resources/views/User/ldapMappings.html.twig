@@ -1,7 +1,7 @@
 {% if data.mappings is not empty %}
     <ul>
-        {% for channel,dn in data.mappings %}
-            <li>{{ channel }}:&nbsp;{{ dn }}</li>
+        {% for mapping in data.mappings %}
+            <li><strong>{{ mapping.name }}:</strong>&nbsp;{{ mapping.dn }}</li>
         {% endfor %}
     </ul>
 {% else %}

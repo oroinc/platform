@@ -2,77 +2,93 @@
 
 namespace Oro\Bundle\LDAPBundle\Tests\Unit\LDAP;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+
+use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
 use Oro\Bundle\LDAPBundle\LDAP\LdapManager;
-use Oro\Bundle\LDAPBundle\Tests\Unit\Stub\TestingUser;
 use Oro\Bundle\LDAPBundle\Tests\Unit\Stub\TestingRole;
+use Oro\Bundle\LDAPBundle\Tests\Unit\Stub\TestingUser;
 
 class LdapManagerTest extends \PHPUnit_Framework_TestCase
 {
     private $em;
-    private $cm;
-
     private $registry;
     private $driver;
     private $ldapManager;
+    private $channel;
+    private $transport;
 
     public function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+
+        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->cm->expects($this->exactly(9))
-            ->method('get')
-            ->withConsecutive(
-                ['oro_ldap.server_base_dn'],
-                ['oro_ldap.user_filter'],
-                ['oro_ldap.role_filter'],
-                ['oro_ldap.role_id_attribute'],
-                ['oro_ldap.role_user_id_attribute'],
-                ['oro_ldap.export_user_base_dn'],
-                ['oro_ldap.export_user_class'],
-                ['oro_ldap.role_mapping'],
-                ['oro_ldap.user_mapping']
-            )
-            ->willReturnOnConsecutiveCalls(
-                'dc=domain,dc=local',
-                'objectClass=inetOrgPerson',
-                'objectClass=groupOfNames',
-                'cn',
-                'member',
-                'ou=users,dc=domain,dc=local',
-                'inetOrgPerson',
-                [
+
+        $this->em->expects($this->any())
+            ->method('persist');
+
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->will($this->returnValue($this->em));
+
+        $this->driver = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->transport = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Transport')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->transport->expects($this->any())
+            ->method('getSettingsBag')
+            ->will($this->returnValue(new ParameterBag([
+                'server_hostname' => '127.0.0.1',
+                'server_port' => 389,
+                'server_encryption' => 'none',
+                'server_base_dn' => 'dc=domain,dc=local',
+                'admin_dn' => 'cn=admin,dc=domain,dc=local',
+                'admin_password' => 'some-password',
+            ])));
+
+        $this->channel = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->channel->expects($this->any())
+            ->method('getTransport')
+            ->will($this->returnValue($this->transport));
+
+        $this->channel->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(5));
+
+        $this->channel->expects($this->any())
+            ->method('getMappingSettings')
+            ->will($this->returnValue(ConfigObject::create([
+                'user_filter' => 'objectClass=inetOrgPerson',
+                'role_filter' => 'objectClass=groupOfNames',
+                'role_id_attribute' => 'cn',
+                'role_user_id_attribute' => 'member',
+                'export_user_base_dn' => 'ou=users,dc=domain,dc=local',
+                'export_user_class' => 'inetOrgPerson',
+                'role_mapping' => [
                     [
                         'ldapName' => 'role1',
                         'crmRoles' => [1],
                     ],
                 ],
-                [
+                'user_mapping' => [
                     'title'    => null,
                     'email'    => 'mail',
                     'username' => 'cn',
                 ]
-            );
+            ])));
 
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->driver = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $attributes = [
-            'filter' => '*',
-            'attributes' => [
-                ['ldap_attr' => 'attr'],
-            ],
-        ];
-
-        $this->ldapManager = new LdapManager($this->registry, $this->driver, null, $attributes);
-        $this->ldapManager->updateOroConfiguration($this->cm);
+        $this->ldapManager = new LdapManager($this->registry, $this->driver, null, $this->channel);
     }
 
     public function testHydrate()
@@ -108,7 +124,6 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
         $this->ldapManager->hydrate($user, $entry);
         $this->assertEquals('user1', $user->getUsername());
         $this->assertEquals('sth@example.com', $user->getEmail());
-        $this->assertEquals('cn=user1,dn=local', $user->getDn());
         $this->assertCount(1, $user->getRoles());
         $this->assertSame($role, $user->getRoles()[0]);
     }
@@ -147,7 +162,7 @@ class LdapManagerTest extends \PHPUnit_Framework_TestCase
         $user = new TestingUser();
         $user->setUsername('user1');
         $user->setEmail('email@example.com');
-        $user->setDn('cn=user1,ou=org,dc=domain,dc=local');
+        $user->setLdapMappings([5 => 'cn=user1,ou=org,dc=domain,dc=local']);
 
         $this->ldapManager->save($user);
     }

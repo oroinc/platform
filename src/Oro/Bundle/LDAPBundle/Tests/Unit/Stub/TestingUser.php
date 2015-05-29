@@ -9,25 +9,25 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class TestingUser extends User
 {
-    /** @var string */
-    protected $dn;
+    /** @var array */
+    protected $ldapMappings;
 
     /**
      * @return string
      */
-    public function getDn()
+    public function getLdapMappings()
     {
-        return $this->dn;
+        return $this->ldapMappings;
     }
 
     /**
-     * @param string $dn
+     * @param string $ldapMappings
      *
      * @return TestingUser
      */
-    public function setDn($dn)
+    public function setLdapMappings($ldapMappings)
     {
-        $this->dn = $dn;
+        $this->ldapMappings = $ldapMappings;
 
         return $this;
     }

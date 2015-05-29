@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LDAPBundle\Security;
 
+use Oro\Bundle\LDAPBundle\Provider\ChannelManagerProvider;
 use Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -20,26 +21,26 @@ class LdapProvider extends UserAuthenticationProvider
 {
     /** @var UserProviderInterface */
     protected $userProvider;
-    /** @var LdapChannelManager */
-    private $channelManager;
+    /** @var ChannelManagerProvider */
+    private $managerProvider;
 
     /**
      * @param UserCheckerInterface $userChecker
      * @param string $providerKey
      * @param UserProviderInterface $userProvider
-     * @param LdapChannelManager $channelManager
+     * @param ChannelManagerProvider $managerProvider
      * @param boolean $hideUserNotFoundExceptions
      */
     public function __construct(
         UserCheckerInterface $userChecker,
         $providerKey,
         UserProviderInterface $userProvider,
-        LdapChannelManager $channelManager,
+        ChannelManagerProvider $managerProvider,
         $hideUserNotFoundExceptions = true
     ) {
         parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
         $this->userProvider = $userProvider;
-        $this->channelManager = $channelManager;
+        $this->managerProvider = $managerProvider;
     }
 
     /**
@@ -104,20 +105,8 @@ class LdapProvider extends UserAuthenticationProvider
             throw new BadCredentialsException('There is no LDAP Integration to authenticate against.');
         }
 
-        $commonMapping = array_intersect_key($userMapping, $currentMapping);
-        if (empty($commonMapping)) {
-            throw new BadCredentialsException('The credentials were changed from another session.');
-        }
-
-        $matched = false;
-        foreach ($commonMapping as $mapping) {
-            if ($userMapping[$mapping] == $currentMapping[$mapping]) {
-                $matched = true;
-                break;
-            }
-        }
-
-        if (!$matched) {
+        // If there were any changes to mapping array ...
+        if ($userMapping !== $currentMapping) {
             throw new BadCredentialsException('The credentials were changed from another session.');
         }
     }
@@ -132,16 +121,11 @@ class LdapProvider extends UserAuthenticationProvider
      */
     protected function checkAuthAgainstLdap(UserInterface $user, UsernamePasswordToken $token)
     {
-        $mappings = (array)$user->getLdapMappings();
-        if (empty($mappings)) {
-            throw new BadCredentialsException('There is no LDAP Integration to authenticate against.');
-        }
-
         if ('' === ($presentedPassword = $token->getCredentials())) {
             throw new BadCredentialsException('The presented password cannot be empty.');
         }
 
-        if (false === $this->channelManager->checkAuthAgainstUsersChannels($user, $presentedPassword)) {
+        if (false === $this->managerProvider->bind($user, $presentedPassword)) {
             throw new BadCredentialsException('The presented password is invalid.');
         }
     }

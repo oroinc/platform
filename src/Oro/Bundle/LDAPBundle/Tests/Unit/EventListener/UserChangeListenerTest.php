@@ -6,14 +6,31 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\LDAPBundle\EventListener\UserChangeListener;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\LDAPBundle\Tests\Unit\Stub\TestingUser;
 
 class UserChangeListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $uow;
     private $em;
-    private $ldapManager;
+    private $managerProvider;
     private $userChangeListener;
+
+    private function setUpChannel($id, $name)
+    {
+        $channel = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $channel->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+
+        $channel->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue($id));
+
+        return $channel;
+    }
 
     public function setUp()
     {
@@ -26,17 +43,66 @@ class UserChangeListenerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())
             ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
-        $this->ldapManager = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\LdapManager')
+        $this->managerProvider = $this->getMockBuilder('Oro\Bundle\LDAPBundle\Provider\ChannelManagerProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->managerProvider->expects($this->any())
+            ->method('getChannels')
+            ->will($this->returnValue([
+                1 => $this->setUpChannel(1, 'First LDAP'),
+                40 => $this->setUpChannel(40, 'Second LDAP'),
+            ]));
         $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
         $serviceLink->expects($this->any())
             ->method('getService')
-            ->will($this->returnValue($this->ldapManager));
+            ->will($this->returnValue($this->managerProvider));
 
         $this->userChangeListener = new UserChangeListener($serviceLink);
+    }
+
+    public function testUserShouldNotBeUpdatedIfHeIsNotMappedToAnyChannel()
+    {
+        $user = new TestingUser();
+
+        $user->setLdapMappings([]);
+
+        $this->uow->expects($this->once())
+            ->method('getScheduledEntityUpdates')
+            ->will($this->returnValue([$user]));
+        $this->uow->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->will($this->returnValue([]));
+        $this->uow->expects($this->never())
+            ->method('getEntityChangeSet');
+        $this->managerProvider->expects($this->never())
+            ->method('channel');
+
+        $this->userChangeListener->onFlush(new OnFlushEventArgs($this->em));
+        $this->userChangeListener->postFlush(new PostFlushEventArgs($this->em));
+    }
+
+    public function testUserShouldBeAlwaysInserted()
+    {
+        $user = new TestingUser();
+
+        $user->setLdapMappings([
+            1 => 'some_dn'
+        ]);
+
+        $this->uow->expects($this->once())
+            ->method('getScheduledEntityUpdates')
+            ->will($this->returnValue([]));
+        $this->uow->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->will($this->returnValue([$user]));
+        $this->managerProvider->expects($this->once())
+            ->method('save')
+            ->with($this->equalTo($user));
+
+        $this->userChangeListener->onFlush(new OnFlushEventArgs($this->em));
+        $this->userChangeListener->postFlush(new PostFlushEventArgs($this->em));
     }
 
     public function testUserShouldNotBeUpdatedIfHeHasChangedOtherThanSynchronizedFields()
@@ -47,7 +113,11 @@ class UserChangeListenerTest extends \PHPUnit_Framework_TestCase
             'salt'     => ['oldSalt', 'newSalt'],
         ];
 
-        $user = new User();
+        $user = new TestingUser();
+
+        $user->setLdapMappings([
+            1 => 'some_dn'
+        ]);
 
         $this->uow->expects($this->once())
             ->method('getScheduledEntityUpdates')
@@ -59,11 +129,16 @@ class UserChangeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityChangeSet')
             ->with($user)
             ->will($this->returnValue($changeSet));
-        $this->ldapManager->expects($this->once())
+        $manager = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\LdapManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $manager->expects($this->once())
             ->method('getSynchronizedFields')
             ->will($this->returnValue($synchronizedFields));
-
-        $this->ldapManager->expects($this->never())
+        $this->managerProvider->expects($this->once())
+            ->method('channel')
+            ->will($this->returnValue($manager));
+        $manager->expects($this->never())
             ->method('save');
 
         $this->userChangeListener->onFlush(new OnFlushEventArgs($this->em));
@@ -78,7 +153,11 @@ class UserChangeListenerTest extends \PHPUnit_Framework_TestCase
             'salt'     => ['oldSalt', 'newSalt'],
         ];
 
-        $user = new User();
+        $user = new TestingUser();
+
+        $user->setLdapMappings([
+            1 => 'some_dn'
+        ]);
 
         $this->uow->expects($this->once())
             ->method('getScheduledEntityUpdates')
@@ -90,43 +169,16 @@ class UserChangeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityChangeSet')
             ->with($user)
             ->will($this->returnValue($changeSet));
-        $this->ldapManager->expects($this->once())
+        $manager = $this->getMockBuilder('Oro\Bundle\LDAPBundle\LDAP\LdapManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $manager->expects($this->once())
             ->method('getSynchronizedFields')
             ->will($this->returnValue($synchronizedFields));
-
-        $this->ldapManager->expects($this->once())
-            ->method('save')
-            ->with($user);
-
-        $this->userChangeListener->onFlush(new OnFlushEventArgs($this->em));
-        $this->userChangeListener->postFlush(new PostFlushEventArgs($this->em));
-    }
-
-    public function testNewUserShouldBeUpdatedIfHeHasChangedSynchronizedFields()
-    {
-        $synchronizedFields = ['username', 'email'];
-        $changeSet = [
-            'username' => [null, 'newUsername'],
-            'salt'     => [null, 'newSalt'],
-        ];
-
-        $user = new User();
-
-        $this->uow->expects($this->once())
-            ->method('getScheduledEntityUpdates')
-            ->will($this->returnValue([]));
-        $this->uow->expects($this->once())
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue([$user]));
-        $this->uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($user)
-            ->will($this->returnValue($changeSet));
-        $this->ldapManager->expects($this->once())
-            ->method('getSynchronizedFields')
-            ->will($this->returnValue($synchronizedFields));
-
-        $this->ldapManager->expects($this->once())
+        $this->managerProvider->expects($this->any())
+            ->method('channel')
+            ->will($this->returnValue($manager));
+        $manager->expects($this->once())
             ->method('save')
             ->with($user);
 

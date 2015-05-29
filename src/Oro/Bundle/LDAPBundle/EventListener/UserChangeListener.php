@@ -7,15 +7,13 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\LDAPBundle\LDAP\LdapChannelManager;
+use Oro\Bundle\LDAPBundle\Provider\ChannelManagerProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserChangeListener
 {
-
     /** @var ServiceLink */
-    private $channelManagerLink;
+    private $managerProviderLink;
 
     /** @var User[] */
     protected $newUsers = [];
@@ -23,18 +21,18 @@ class UserChangeListener
     /** @var User[] */
     protected $updatedUsers = [];
 
-    public function __construct(ServiceLink $channelManagerLink)
+    public function __construct(ServiceLink $managerProviderLink)
     {
-        $this->channelManagerLink = $channelManagerLink;
+        $this->managerProviderLink = $managerProviderLink;
     }
 
-    protected function processNew(array &$users, UnitOfWork $uow)
+    protected function processNew(array &$users)
     {
-        /** @var LdapChannelManager $manager */
-        $manager = $this->channelManagerLink->getService();
+        /** @var ChannelManagerProvider $managerProvider */
+        $managerProvider = $this->managerProviderLink->getService();
 
         foreach ($users as $user) {
-            $manager->exportThroughAllChannels($user);
+            $managerProvider->save($user);
         }
 
         $users = [];
@@ -42,12 +40,23 @@ class UserChangeListener
 
     protected function processUpdated(array &$users, UnitOfWork $uow)
     {
-        /** @var LdapChannelManager $manager */
-        $manager = $this->channelManagerLink->getService();
+        /** @var ChannelManagerProvider $provider */
+        $provider = $this->managerProviderLink->getService();
+        $channels = $provider->getChannels();
 
         foreach ($users as $user) {
-            $changedFields = $uow->getEntityChangeSet($user);
-            $manager->exportThroughUsersChannels($user, $changedFields);
+            $mappings = (array) $user->getLdapMappings();
+
+            foreach ($mappings as $channelId => $dn) {
+                $changedFields = $uow->getEntityChangeSet($user);
+                $channel = $channels[$channelId];
+                $mappedFields = $provider->channel($channel)->getSynchronizedFields();
+                $common = array_intersect($mappedFields, array_keys($changedFields));
+
+                if (!empty($common)) {
+                    $provider->channel($channel)->save($user);
+                }
+            }
         }
 
         $users = [];
@@ -64,7 +73,7 @@ class UserChangeListener
 
         $this->processUpdated($this->updatedUsers, $uow);
 
-        $this->processNew($this->newUsers, $uow);
+        $this->processNew($this->newUsers);
     }
 
     /**

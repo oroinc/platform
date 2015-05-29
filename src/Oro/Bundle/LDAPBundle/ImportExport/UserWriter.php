@@ -1,10 +1,6 @@
 <?php
 namespace Oro\Bundle\LDAPBundle\ImportExport;
 
-use Doctrine\Common\EventManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\LDAPBundle\EventListener\UserChangeListener;
 

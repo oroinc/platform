@@ -9,8 +9,8 @@ use FR3D\LdapBundle\Ldap\LdapManager as BaseManager;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LDAPBundle\LDAP\ZendLdapDriver;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\LDAPBundle\Model\User;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 /**
@@ -18,22 +18,34 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
  */
 class LdapManager extends BaseManager
 {
+    use TransformsSettings;
+
     /** @var Registry */
     private $registry;
 
     /** @var PropertyAccessor|null */
     private $propertyAccessor;
 
+    /** @var Channel */
+    private $channel;
+
     /**
      * @param Registry $registry
      * @param ZendLdapDriver $driver
      * @param type $userManager
-     * @param array $params
+     * @param Channel $channel
      */
-    public function __construct(Registry $registry, ZendLdapDriver $driver, $userManager, array $params)
+    public function __construct(Registry $registry, ZendLdapDriver $driver, $userManager, Channel $channel)
     {
+        $settings = iterator_to_array($channel->getTransport()->getSettingsBag());
+        $mappingSettings = $channel->getMappingSettings();
+        $mappingSettings->merge($settings);
+
+        $params = $this->transformSettings($mappingSettings, $this->getTransforms());
+
         parent::__construct($driver, $userManager, $params);
         $this->registry = $registry;
+        $this->channel = $channel;
     }
 
     /**
@@ -89,13 +101,33 @@ class LdapManager extends BaseManager
         return $this->ldapUsernameAttr;
     }
 
+    private function getDn(UserInterface $user)
+    {
+        $mappings = (array) $user->getLdapMappings();
+
+        if (isset($mappings[$this->channel->getId()])) {
+            return $mappings[$this->channel->getId()];
+        }
+
+        return false;
+    }
+
+    private function setDn(UserInterface $user, $dn)
+    {
+        $mappings = (array) $user->getLdapMappings();
+        $mappings[$this->channel->getId()] = $dn;
+
+        $user->setLdapMappings($mappings);
+
+        return $this;
+    }
+
     /**
      * @param UserInterface $user
      *
-     * @param string $dn
      * @return string Dn
      */
-    public function save(UserInterface $user, $dn = null)
+    public function save(UserInterface $user)
     {
         $propertyAccessor = $this->getPropertyAccessor();
 
@@ -103,6 +135,8 @@ class LdapManager extends BaseManager
         foreach ($this->params['attributes'] as $attribute) {
             $entry[$attribute['ldap_attr']] = $propertyAccessor->getValue($user, $attribute['user_field']);
         }
+
+        $dn = $this->getDn($user);
 
         if (!$dn) {
             $dn = $this->createDn($user->getUsername());
@@ -114,21 +148,23 @@ class LdapManager extends BaseManager
             $dn = $newDn;
         }
 
-        $this->driver->save($dn, $entry);
+        $this->setDn($user, $dn);
 
-        return $dn;
+        $this->registry->getManager()->persist($user);
+
+        return $this->driver->save($dn, $entry);
     }
 
     /**
      * Checks if user exists.
      *
      * @param UserInterface $user
-     * @param string $dn Optional Dn of user.
      *
      * @return bool
      */
-    public function exists(UserInterface $user, $dn = null)
+    public function exists(UserInterface $user)
     {
+        $dn = $this->getDn($user);
         return $this->driver->exists($dn ? $dn : $this->createDn($user->getUsername()));
     }
 
@@ -153,6 +189,7 @@ class LdapManager extends BaseManager
 
         $result = parent::hydrate($user, $entry);
 
+        $this->setDn($user, $entry['dn']);
         $user->setPassword($originalPassword);
 
         $roles = $this->findRolesForUser($entry['dn']);
@@ -160,6 +197,18 @@ class LdapManager extends BaseManager
 
         return $result;
     }
+
+    public function bind(UserInterface $user, $password)
+    {
+        $ldapUser = User::createFromUser($user, $this->channel->getId());
+
+        if ($ldapUser->getDn() == null) {
+            return false;
+        }
+
+        return parent::bind($ldapUser, $password);
+    }
+
 
     /**
      * @param UserInterface $user
@@ -213,14 +262,6 @@ class LdapManager extends BaseManager
     /**
      * @return EntityManager
      */
-    private function getUserEntityManager()
-    {
-        return $this->registry->getManagerForClass('OroUserBundle:User');
-    }
-
-    /**
-     * @return EntityManager
-     */
     private function getRoleEntityManager()
     {
         return $this->registry->getManagerForClass('OroUserBundle:Role');
@@ -246,5 +287,74 @@ class LdapManager extends BaseManager
         return array_map(function ($attribute) {
             return $attribute['user_field'];
         }, $this->params['attributes']);
+    }
+
+    /**
+     * Returns array of transforms for settings.
+     *
+     * @return array
+     */
+    private function getTransforms()
+    {
+        return [
+            'server_base_dn' => 'baseDn',
+            'user_filter' => 'filter',
+            'role_filter' => 'role_filter',
+            'role_id_attribute' => 'role_id_attribute',
+            'role_user_id_attribute' => 'role_user_id_attribute',
+            'export_user_base_dn' => 'export_dn',
+            'export_user_class' => 'export_class',
+            'role_mapping' => [$this, 'transformRoleMapping'],
+            'user_mapping' => [$this, 'transformUserMapping'],
+        ];
+    }
+
+    /**
+     * Transforms role mapping to be usable in configuration.
+     *
+     * @param $roleMapping
+     * @return array
+     */
+    private function transformRoleMapping($roleMapping)
+    {
+        $roles = [];
+        foreach ($roleMapping as $mapping) {
+            if (isset($roles[$mapping['ldapName']])) {
+                $roles[$mapping['ldapName']] = array_merge($roles[$mapping['ldapName']], $mapping['crmRoles']);
+            } else {
+                $roles[$mapping['ldapName']] = $mapping['crmRoles'];
+            }
+        }
+
+        return ['role_mapping' => $roles];
+    }
+
+    /**
+     * Transforms user mapping to be usable in configuration.
+     *
+     * @param $mapping
+     * @return array
+     */
+    private function transformUserMapping($mapping)
+    {
+        $definedMapping = array_filter($mapping, 'strlen');
+        if (!isset($definedMapping['username'])) {
+            return [];
+        }
+
+        $username = $definedMapping['username'];
+        unset($definedMapping['username']);
+
+        $sortedMapping = array_merge(['username' => $username], $definedMapping);
+        $attributes = [];
+        foreach ($sortedMapping as $userField => $ldapAttr) {
+            $attributes[] = [
+                'ldap_attr' => $ldapAttr,
+                'user_method' => sprintf('set%s', ucfirst($userField)),
+                'user_field' => $userField,
+            ];
+        }
+
+        return compact('attributes');
     }
 }
