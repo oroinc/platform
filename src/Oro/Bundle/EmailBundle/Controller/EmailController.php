@@ -90,6 +90,7 @@ class EmailController extends Controller
             $this->get('doctrine')->getManager(),
             $entity
         );
+        $emails = array_filter($emails, [$this->getEmailHelper(), 'isEmailViewGranted']);
         $this->loadEmailBody($emails);
 
         return [
