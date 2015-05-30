@@ -242,7 +242,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function filterQueryParameters(array $supportedParameters)
     {
         if (false === preg_match_all(
-            '#([\w\d_-]+)([<>=]{1,2})([^&]+)#',
+            '#([\w\d_-]+)([<>]?=|<>|[<>])([^&]+)#',
             rawurldecode($this->getRequest()->getQueryString()),
             $matches,
             PREG_SET_ORDER
