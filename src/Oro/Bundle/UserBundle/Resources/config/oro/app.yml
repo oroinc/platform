@@ -1,0 +1,3 @@
+nelmio_api_doc:
+    motd:
+        template: OroUserBundle::ApiDoc/motd.html.twig
