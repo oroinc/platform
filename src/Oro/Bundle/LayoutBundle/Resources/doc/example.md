@@ -563,7 +563,7 @@ Similar to `ProductContextConfigurator` we'll fetch the language code from the r
 
 ```php
 <?php
-namespace Oro\Bundle\LayoutBundle\Layout\Extension;
+namespace Acme\Bundle\LocaleBundle\Layout\Extension;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -609,7 +609,7 @@ class LocaleContextConfigurator implements ContextConfiguratorInterface
 Register locale context configurator:
 ```yaml
     acme_product.layout.context_configurator.locale:
-        class: Acme\Bundle\ProductBundle\Layout\Extension\LocaleContextConfigurator
+        class: Acme\Bundle\LocaleBundle\Layout\Extension\LocaleContextConfigurator
         calls:
             - [setRequest, [@?request=]]
         tags:
@@ -625,3 +625,348 @@ We also need to modify our block template to have the language dropdown preselec
 ```
 
 Now if you go to `/layout/test?product_id=99&___store=french` url you'll see that French language is preselected.
+
+
+Working with forms
+-----------------------------------
+
+Let's implement a simple search form by means of the layout engine.
+To use the form in layouts we need to configure the layout context first. Since the search form persists on many pages we will add it to the layout context using another context configurator:
+```php
+namespace Acme\Bundle\SearchBundle\Layout\Extension;
+
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\OptionsResolver\Options;
+
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
+
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
+
+class SearchContextConfigurator implements ContextConfiguratorInterface
+{
+    /*
+     * FormFactory
+     */
+    protected $formFactory;
+
+    public function __construct(FormFactory $formFactory)
+    {
+        $this->formFactory = $formFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureContext(ContextInterface $context)
+    {
+        $context->getResolver()
+            ->setDefaults(
+                [
+                    'search_form' => function (Options $options, $value) {
+                        if (null === $value) {
+                            $value = $this->createSearchForm();
+                        }
+
+                        return $value;
+                    }
+                ]
+            )
+            ->setAllowedTypes(['search_form' => ['null', 'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface']]);
+    }
+
+    /*
+     * @return FormAccessor
+     */
+    protected function createSearchForm()
+    {
+        $form = $this->formFactory->create('form');
+        $form->add(
+            'search',
+            'search',
+            [
+                'attr' => [
+                    'maxlength'   => 128,
+                    'placeholder' => 'Search entire store here...',
+                ]
+            ]
+        );
+
+        return new FormAccessor($form);
+    }
+}
+```
+
+Registering in the DI container:
+
+```yaml
+    acme_search.layout.context_configurator.search:
+        class: Acme\Bundle\SearchBundle\Layout\Extension\SearchContextConfigurator
+        arguments:
+            - @form.factory
+        tags:
+            - { name: layout.context_configurator }
+```
+
+Now we can add our search from into the layout:
+
+```yaml
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroLayoutBundle:layouts:first_theme/demo_layout_test/search.html.twig'
+        - @addTree:
+            items:
+                'searh_form:start':
+                    blockType: form_start
+                    options:
+                        form_name: search_form
+                        attr:
+                            id: search_mini_form
+                search_field:
+                    blockType: form_field
+                    options:
+                        form_name: search_form
+                        field_path: search
+                search_button:
+                    blockType: button
+                    options:
+                        action: submit
+                        text: Submit
+                        attr:
+                            class: button search-button
+                            title: Search
+                search_autocomplete:
+                    blockType: block
+                'searh_form:end':
+                    blockType: form_end
+                    options:
+                        form_name: search_form
+            tree:
+                search:
+                    'searh_form:start': ~
+                    search_field: ~
+                    search_button: ~
+                    search_autocomplete: ~
+                    'searh_form:end': ~
+```
+
+In `search.html.twig` will define the search autocomplete block:
+```twig
+{% block _search_autocomplete_widget -%}
+    <div id="search_autocomplete" class="search-autocomplete"></div>
+    <script type="text/javascript">
+        var searchForm = new Varien.searchForm('search_mini_form', 'search', '');
+        searchForm.initAutocomplete('/catalogsearch/ajax/suggest/', 'search_autocomplete');
+    </script>
+{%- endblock %}
+```
+
+Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
+For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
+
+As the result you'll be getting and HTML like this:
+```html
+<div id="header-search">
+    <form id="search_mini_form" action="/catalogsearch/result/" method="get">
+        <div class="control-group">
+            <label class="control-label required" for="form_search-uid-556af114b1fb4">Search<em>*</em></label>
+            <div class="controls">
+                <input type="search" id="form_search-uid-556af2fc646e0" name="form[search]" required="required" maxlength="128" placeholder="Search entire store here..." data-ftid="form_search">
+            </div>
+        </div>
+        <button class="button search-button" title="Search" type="submit">Submit</button>
+        <div id="search_autocomplete" class="search-autocomplete"></div>
+        <script type="text/javascript">
+            var searchForm = new Varien.searchForm('search_mini_form', 'search', '');
+            searchForm.initAutocomplete('/catalogsearch/ajax/suggest/', 'search_autocomplete');
+        </script>
+        <input type="hidden" id="form__token-uid-556af114b2701" name="form[_token]" data-ftid="form__token" value="9bd7b70c4218e3130d0deee54047a7a8b466531e">
+    </form>
+</div>
+```
+
+Extending exiting block types
+----------------------------------
+
+Currently the [LinkType](../../Layout/Block/Type/LinkType.php) does not support adding an image inside the `<a />` tag.
+For our example, we'll extend this block type to have such possibility.
+We create a `LinkExtension` class in place it in: `Acme/Bundle/LayoutBundle/Layout/Block/Extension` dir.
+
+```php
+namespace Acme\Bundle\LayoutBundle\Layout\Block\Extension;
+
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Component\Layout\AbstractBlockTypeExtension;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
+
+use Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType;
+
+/**
+ * This extension extends links with "image" option, that
+ * can be used to add an image inside the link tag.
+ */
+class LinkExtension extends AbstractBlockTypeExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(['image']);
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    {
+        if (!empty($options['image'])) {
+            $view->vars['image'] = $options['image'];
+        }
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedType()
+    {
+        return LinkType::NAME;
+    }
+}
+```
+And also register it in our container:
+
+```yaml
+    acme_layout.block_type_extension.link:
+        class: Acme\Bundle\LayoutBundle\Layout\Block\Extension\LinkExtension
+        tags:
+            - { name: layout.block_type_extension, alias: link }
+```
+
+Now we can customize the twig template for the link block by adding the following lines in the block theme file:
+
+```twig
+{% block link_widget -%}
+    <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
+        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+        {# Render image if defined #}
+        {%- if image is defined %}{{ block('image_block') }}{% endif %}
+    </a>
+{%- endblock %}
+
+{% block image_block -%}
+    <img src={{ image }}{% if image_class is defined %} class="{{ image_class }}"{% endif %}{% if image_alt is defined %} alt="{{ image_alt }}"{% endif %} />
+{%- endblock %}
+```
+
+Positioning of blocks in layout
+-----------------------------------
+
+The layout engine lets you add or move blocks into any position by specifying the `siblingId`. For example, we can add a logo image into our header block before the navigation block:
+
+```yaml
+    - @add:
+        id : logo
+        parentId: header
+        blockType: link
+        options:
+            image: logo.png
+            path: /
+            attr:
+                class: logo
+            vars:
+                image_class: large
+                image_alt: Madison Island
+        siblingId: navigation
+        prepend: true
+```
+
+Note that if `prepend` was false (by default it is) the logo would be placed right after the navigation block.
+
+Working with lists
+-----------------------------------
+As an example, we'll be adding navigation menu to the page using both ordered and unordered lists.
+
+In layout update file we do the following:
+```yaml
+layout:
+    actions:
+        - @addTree:
+            items:
+                nav_container:
+                    blockType: container
+                nav_category_list:
+                    blockType: ordered_list
+                    options:
+                        attr:
+                            class: nav-primary
+                nav_women_category:
+                    blockType: list_item
+                    options:
+                        attr:
+                            class: parent
+                nav_women_category_link:
+                    blockType: link
+                    options:
+                        path: /women.html
+                        text: Women
+                        attr:
+                            class: level0 has-children
+                nav_women_subcategory_list:
+                    blockType: list
+                    options:
+                        attr:
+                            class: level0
+                nav_women_all_subcategory:
+                    blockType: link
+                    options:
+                        path: /women.html
+                        text: View All Women
+                        attr:
+                            class: level1
+                nav_women_new_subcategory:
+                    blockType: link
+                    options:
+                        path: /women/new-arrivals.html
+                        text: New Arrivals
+                        attr:
+                            class: level1
+            tree:
+                navigation:
+                    nav_container:
+                        nav_category_list:
+                            nav_women_category:
+                                nav_women_category_link: ~
+                                nav_women_subcategory_list:
+                                    nav_women_all_subcategory: ~
+                                    nav_women_new_subcategory: ~
+```
+
+Note that we can use `list_item` block type to be able to add custom attributes (e.g. `class`) to the `<li>` tag and add child blocks.
+For the list items with no children we can add any other block tyle, `link` in our example, and it will be wrapped into the `<li>` tag.
+
+So our rendered HTML will look like this:
+```html
+<nav id="nav">
+    <ol class="nav-primary">
+        <li class="parent">
+            <a class="level0 has-children" href="/women.html">Women</a>
+            <ul class="level0">
+                <li><a class="level1" href="/women.html">View All Women</a></li>
+                <li><a class="level1" href="/women/new-arrivals.html">New Arrivals</a></li>
+            </ul>
+        </li>
+    </ol>
+</nav>
+```
+
+Note: to customize the `nav_container` block to be rendered in `<nav>` tag we need to add a template in the block theme file:
+```twig
+{% block _nav_container_widget %}
+    <nav id="nav">
+        {{ block_widget(block) }}
+    </nav>
+{% endblock %}
+```
