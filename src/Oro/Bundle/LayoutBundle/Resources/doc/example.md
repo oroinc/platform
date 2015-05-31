@@ -884,6 +884,15 @@ The layout engine lets you add or move blocks into any position by specifying th
 ```
 
 Note that if `prepend` was false (by default it is) the logo would be placed right after the navigation block.
+The same positioning can be achieved using `move` action. Let's move our language switcher before the header block:
+```yaml
+    - @move:
+        id: lang_switch
+        parentId: page_container
+        siblingId: ~
+        prepend: true
+```
+Note that if `siblingId` is not specified the block will be positioned an
 
 Working with lists
 -----------------------------------
@@ -969,4 +978,60 @@ Note: to customize the `nav_container` block to be rendered in `<nav>` tag we ne
         {{ block_widget(block) }}
     </nav>
 {% endblock %}
+```
+
+Bredcrumbs is a special case of the list where items are separated by some symbol. We can customize rendering of the list by adding the following template to our block theme:
+```twig
+{% block _breadcrumbs_widget -%}
+    <div class="breadcrumbs">
+        <ul>
+        {% for child in block -%}
+            {% if child.vars.visible -%}
+                {% if not loop.last %}
+                    <li>{{ block_widget(child) }}<span>/ </span></li>
+                {%- else -%}
+                    <li><strong>{{ block_widget(child) }}</strong></li>
+                {% endif %}
+            {%- endif %}
+        {%- endfor %}
+        </ul>
+    </div>
+{%- endblock %}
+```
+
+Now we can place the block with `breadcrumbs` Id in our layout update and add some child elements into it:
+```yaml
+layout:
+    actions:
+        - @add:
+            id : breadcrumbs
+            parentId: main_container
+            blockType: list
+            siblingId: ~
+            prepend: true
+        - @add:
+            id : breadcrumbs_home
+            parentId: breadcrumbs
+            blockType: link
+            options:
+                path: /
+                text: Home
+                attr:
+                    title: Go to Home Page
+        - @add:
+            id : breadcrumbs_product
+            parentId: breadcrumbs
+            blockType: text
+            options:
+                text: { @value: $data.product.name }
+```
+
+This should render into the following HTML:
+```html
+<div class="breadcrumbs">
+    <ul>
+        <li><a title="Go to Home Page" href="/">Home</a><span>/ </span></li>
+        <li><strong>Chelsea Tee</strong></li>
+    </ul>
+</div>
 ```
