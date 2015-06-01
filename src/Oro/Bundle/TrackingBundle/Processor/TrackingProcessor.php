@@ -463,22 +463,36 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function processVisits()
     {
-        $queryBuilder = $this->getEntityManager()
-            ->getRepository(self::TRACKING_EVENT_ENTITY)
-            ->createQueryBuilder('entity')
-            ->where('entity.parsed = false')
-            ->orderBy('entity.id', 'ASC')
-            ->setMaxResults(self::BATCH_SIZE);
+        $min = $this->getFirstEventId();
+        $max  = $this->getLastEventId();
 
-        $entities = $queryBuilder->getQuery()->getResult();
+        for ($id = $min; $id <= $max; $id++) {
+            $min_id = $id;
+            $max_id = $id + self::BATCH_SIZE;
 
-        if ($entities) {
-            $this->processTrackingVisits($entities);
+            $queryBuilder = $this->getEntityManager()
+                ->getRepository(self::TRACKING_EVENT_ENTITY)
+                ->createQueryBuilder('entity');
 
-            return true;
+            $queryBuilder
+                ->where('entity.parsed = false')
+                ->andWhere(
+                    $queryBuilder->expr()->gte('entity.id', ':min')
+                )
+                ->andWhere(
+                    $queryBuilder->expr()->lte('entity.id', ':max')
+                )
+                ->setParameter('min', $min_id)
+                ->setParameter('max', $max_id);
+
+            $entities = $queryBuilder->getQuery()->getResult();
+
+            if ($entities) {
+                $this->processTrackingVisits($entities);
+                return true;
+            }
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -714,5 +728,37 @@ class TrackingProcessor implements LoggerAwareInterface
     protected function getCurrentUtcDateTime()
     {
         return new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Get the first event id from oro_tracking_events that is not parsed yet
+     */
+    protected function getEventId($fistOrLast = 'MAX(entity.id)')
+    {
+        $query = $this->getEntityManager()
+            ->getRepository(self::TRACKING_EVENT_ENTITY)
+            ->createQueryBuilder('entity')
+            ->select($fistOrLast)
+            ->where('entity.parsed = false')
+            ->setMaxResults(1);
+
+        $result = $query->getQuery()->getOneOrNullResult();
+        return $result[1];
+    }
+
+    /**
+     * Get the first event id from oro_tracking_events that is not parsed yet
+     */
+    protected function getFirstEventId()
+    {
+        return $this->getEventId('MIN(entity.id)');
+    }
+
+    /**
+     * Get the last event id from oro_tracking_events that is not parsed yet
+     */
+    protected function getLastEventId()
+    {
+        return $this->getEventId('MAX(entity.id)');
     }
 }
