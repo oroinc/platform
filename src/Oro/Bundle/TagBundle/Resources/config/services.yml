@@ -167,3 +167,24 @@ services:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
           - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }
+
+    oro_tag.grid.extension.tag_filter:
+        class: Oro\Bundle\TagBundle\EventListener\TagsGridListener
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore }
+
+    oro_tag.form.type.entity_tags_selector:
+        class: Oro\Bundle\TagBundle\Form\Type\EntityTagsSelectType
+        arguments:
+            - @oro_security.acl_helper
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_tag_entity_tags_selector }
+
+    oro_tag.provider.virtual_relation.tags:
+        class: Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider
+        tags:
+            - { name: oro_entity.virtual_relation_provider, priority: 150 }
+
