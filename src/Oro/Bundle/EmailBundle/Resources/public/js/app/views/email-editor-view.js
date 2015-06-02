@@ -5,17 +5,16 @@ define(function (require) {
     var EmailEditorView,
         BaseView = require('oroui/js/app/views/base/view'),
         $ = require('jquery'),
-        select2 = require('jquery.select2'),
         routing = require('routing'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
-        messenger = require('oroui/js/messenger'),
         ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
+    require('jquery.select2');
 
     EmailEditorView = BaseView.extend({
         readyPromise: null,
-        $cache: null,
+        domCache: null,
 
         events: {
             'click #add-signature': 'onAddSignatureButtonClick',
@@ -30,17 +29,19 @@ define(function (require) {
         initialize: function (options) {
             EmailEditorView.__super__.initialize.apply(this, options);
             this.templatesProvider = options.templatesProvider;
-            this.initElCache();
-            this.init();
-            this.readyPromise = mediator.execute('layout:init', this.$el, this);
+            this.setupCache();
         },
 
         render: function () {
-            throw new Error("EmailEditorView should not be rendered");
+            this.domCache.body.val(this.initBody(this.domCache.body.val()));
+            this.addForgedAsterisk();
+            this.initFields();
+            this.renderPromise = mediator.execute('layout:init', this.$el, this);
+            return this;
         },
-
-        initElCache: function () {
-            this.$cache = {
+        
+        setupCache: function () {
+            this.domCache = {
                 subject: this.$('[name$="[subject]"]'),
                 body: this.$('[name$="[body]"]'),
                 type: this.$('[name$="[type]"]'),
@@ -54,10 +55,11 @@ define(function (require) {
                     var tinyMCE = this.pageComponent('bodyEditor').view.tinymceInstance;
                     tinyMCE.execCommand('mceInsertContent', false, this.model.get('signature'));
                 } else {
-                    this.$cache.body.focus();
-                    var caretPos = this.$cache.body.getCursorPosition();
-                    var body = this.$cache.body.val();
-                    this.$cache.body.val(body.substring(0, caretPos) + this.model.get('signature').replace(/(<([^>]+)>)/ig, "") + body.substring(caretPos));
+                    this.domCache.body.focus();
+                    var caretPos = this.domCache.body.getCursorPosition();
+                    var body = this.domCache.body.val();
+                    this.domCache.body.val(body.substring(0, caretPos) +
+                        this.model.get('signature').replace(/(<([^>]+)>)/ig, '') + body.substring(caretPos));
                 }
             } else {
                 var url = routing.generate('oro_user_profile_update');
@@ -81,40 +83,34 @@ define(function (require) {
             confirm.on('ok', _.bind(function () {
                 mediator.execute('showLoading');
                 this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
-                    .always(function () {
-                        mediator.execute('hideLoading');
-                    })
-                    .done(_.bind(function (res) {
-                        if (!this.model.get('parentEmailId') || !this.$cache.subject.val()) {
-                            this.$cache.subject.val(res.subject);
-                        }
-
-                        var body = this.initBody(res.body, false);
-                        this.$cache.body.val(body);
-                        this.$cache.type.find('input[value=' + res.type + ']')
-                            .prop('checked', true)
-                            .trigger('change');
-                    }, this));
+                    .always(_.bind(mediator.execute, mediator, 'hideLoading'))
+                    .done(_.bind(this.fillForm, this));
             }, this));
             confirm.open();
+        },
+
+        fillForm: function (emailData) {
+            if (!this.model.get('parentEmailId') || !this.domCache.subject.val()) {
+                this.domCache.subject.val(emailData.subject);
+            }
+
+            var body = this.initBody(emailData.body, false);
+            this.domCache.body.val(body);
+            this.domCache.type.find('input[value=' + emailData.type + ']')
+                .prop('checked', true)
+                .trigger('change');
         },
 
         onTypeChange: function(e) {
             this.pageComponent('bodyEditor').view.setEnabled($(e.target).val() === 'html');
         },
 
-        init: function () {
-            this.$cache.body.val(this.initBody(this.$cache.body.val()));
-            this.addForgedAsterisk();
-            this.initFields();
-        },
-
         initFields: function() {
             var select2Config = {
                 containerCssClass: 'taggable-email',
-                separator: ";",
+                separator: ';',
                 tags: [],
-                tokenSeparators: [";", ","]
+                tokenSeparators: [';', ',']
             };
             this.$('input.taggable-field').each(function(key, elem) {
                 if ($(elem).hasClass('from')) {
@@ -138,7 +134,7 @@ define(function (require) {
         showField: function (fieldName) {
             var field = fieldName.toLowerCase(),
                 $field = this.$('[data-ftid=oro_email_email_' + field + ']');
-            $field.parents('.control-group.taggable-field').css('display', 'block');
+            $field.parents('.control-group.taggable-field').show();
             $field.parents('.controls').find('input.select2-input')
                 .unbind('focusout')
                 .on('focusout', _.bind(function(e) {
@@ -160,7 +156,7 @@ define(function (require) {
         hideField: function (fieldName) {
             var field = fieldName.toLowerCase(),
                 $field = this.$('[data-ftid=oro_email_email_' + field + ']');
-            $field.parents('.control-group.taggable-field').css('display', 'none');
+            $field.parents('.control-group.taggable-field').hide();
 
             if (this.$('span.show' + fieldName).length > 0) {
                 return;
@@ -175,13 +171,13 @@ define(function (require) {
         },
 
         addForgedAsterisk: function () {
-            var label_tab = this.$('.forged-required').find('label'),
-                em_tag = label_tab.find('em');
+            var labelTab = this.$('.forged-required').find('label'),
+                emTag = labelTab.find('em');
 
-            if (em_tag.length <= 0) {
-                label_tab.append('<em>*</em>')
+            if (emTag.length <= 0) {
+                labelTab.append('<em>*</em>')
             } else {
-                em_tag.html('*');
+                emTag.html('*');
             }
         },
 

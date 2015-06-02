@@ -6,8 +6,9 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         _ = require('underscore'),
         EmailEditorView = require('../views/email-editor-view'),
-        emailEditorModelProvider = require('../../util/email-editor-model-provider'),
-        emailTemplatesProvider = require('../../util/email-templates-provider');
+        emailTemplatesProvider = require('../../util/email-templates-provider'),
+        EmailEditorModel = require('../models/email-editor-model'),
+        EmailModel = require('../models/email-model');
 
     EmailEditorComponent = BaseComponent.extend({
         /**
@@ -18,10 +19,31 @@ define(function (require) {
             this._deferredInit();
             this.view = new EmailEditorView({
                 el: options._sourceElement,
-                model: emailEditorModelProvider.createFromComponentOptions(options),
+                model: this.createEditorModelFromComponentOptions(options),
                 templatesProvider: emailTemplatesProvider
             });
-            this.view.readyPromise.done(_.bind(this._resolveDeferredInit, this));
+            this.view.render();
+            this.view.renderPromise.done(_.bind(this._resolveDeferredInit, this));
+        },
+
+
+        createEditorModelFromComponentOptions: function (options) {
+            var $el = options._sourceElement;
+            return new EmailEditorModel({
+                appendSignature: options.appendSignature,
+                isSignatureEditable: options.isSignatureEditable,
+                signature: $el.find('[name$="[signature]"]').val(),
+                email: new EmailModel({
+                    subject: $el.find('[name$="[subject]"]').val(),
+                    body: $el.find('[name$="[body]"]').val(),
+                    type: $el.find('[name$="[type]"]').val(),
+                    relatedEntityId: options.entityId,
+                    parentEmailId: $el.find('[name$="[parentEmailId]"]').val(),
+                    cc: options.cc,
+                    bcc: options.bcc
+                }),
+                bodyFooter: $el.find('[name$="[bodyFooter]"]').val()
+            });
         }
     });
     return EmailEditorComponent;
