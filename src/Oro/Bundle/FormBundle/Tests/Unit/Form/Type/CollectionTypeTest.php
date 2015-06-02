@@ -111,7 +111,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'handle_primary'       => true,
                 'show_form_when_empty' => true,
-                'add_label'            => 'Add'
+                'add_label'            => ''
             ],
             $resolvedOptions
         );
@@ -138,7 +138,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'handle_primary'       => true,
                 'show_form_when_empty' => false,
-                'add_label'            => 'Add'
+                'add_label'            => ''
             ],
             $resolvedOptions
         );
@@ -165,7 +165,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'handle_primary'       => true,
                 'show_form_when_empty' => false,
-                'add_label'            => 'Add'
+                'add_label'            => ''
             ],
             $resolvedOptions
         );

@@ -55,7 +55,7 @@ class CollectionType extends AbstractType
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'handle_primary'       => true,
                 'show_form_when_empty' => true,
-                'add_label'            => 'Add'
+                'add_label'            => ''
             ]
         );
         $resolver->setRequired(['type']);

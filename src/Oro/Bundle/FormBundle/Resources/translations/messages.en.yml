@@ -11,6 +11,8 @@ oro:
         choose_time: time
         click_here_to_select: Click here to select...
         tooltip.read_more: Read more
+        collection:
+            add: Add
         color:
             custom:         Custom color...
             bold_blue:      Bold blue
