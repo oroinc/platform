@@ -22,11 +22,11 @@ class ConfigEntity extends CustomEntity
     public function init($new = false)
     {
         if ($new) {
-            $this->name = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_model_className']");
+            $this->name = $this->test->byXPath("//*[@data-ftid='oro_entity_config_type_model_className']");
         }
-        $this->label = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_entity_label']");
-        $this->pluralLabel = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_entity_plural_label']");
-        $this->description = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_entity_description']");
+        $this->label = $this->test->byXPath("//*[@data-ftid='oro_entity_config_type_entity_label']");
+        $this->pluralLabel = $this->test->byXPath("//*[@data-ftid='oro_entity_config_type_entity_plural_label']");
+        $this->description = $this->test->byXPath("//*[@data-ftid='oro_entity_config_type_entity_description']");
 
         return $this;
     }
@@ -81,7 +81,7 @@ class ConfigEntity extends CustomEntity
 
     public function createField()
     {
-        $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title='Create field']")->click();
+        $this->test->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title='Create field']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
@@ -89,7 +89,7 @@ class ConfigEntity extends CustomEntity
 
     public function setFieldName($fieldName)
     {
-        $field = $this->test->byXpath("//*[@data-ftid='oro_entity_extend_field_type_fieldName']");
+        $field = $this->test->byXPath("//*[@data-ftid='oro_entity_extend_field_type_fieldName']");
         $field->clear();
         $field->value($fieldName);
         return $this;
@@ -97,7 +97,7 @@ class ConfigEntity extends CustomEntity
 
     public function setType($type)
     {
-        $field = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_entity_extend_field_type_type']"));
+        $field = $this->test->select($this->test->byXPath("//*[@data-ftid='oro_entity_extend_field_type_type']"));
         $field->selectOptionByLabel($type);
         return $this;
     }
@@ -105,7 +105,7 @@ class ConfigEntity extends CustomEntity
     public function setStorageType($type)
     {
         $field = $this->test
-            ->select($this->test->byXpath("//*[@data-ftid='oro_entity_extend_field_type_is_serialized']"));
+            ->select($this->test->byXPath("//*[@data-ftid='oro_entity_extend_field_type_is_serialized']"));
         $field->selectOptionByLabel($type);
         return $this;
     }
@@ -117,7 +117,7 @@ class ConfigEntity extends CustomEntity
     public function enableNotes($value = 'Yes')
     {
         $field = $this->test
-            ->select($this->test->byXpath("//*[@data-ftid='oro_entity_config_type_note_enabled']"));
+            ->select($this->test->byXPath("//*[@data-ftid='oro_entity_config_type_note_enabled']"));
         $field->selectOptionByLabel($value);
         return $this;
     }
@@ -141,7 +141,7 @@ class ConfigEntity extends CustomEntity
 
     public function edit()
     {
-        $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[contains(., 'Edit')]")->click();
+        $this->test->byXPath("//div[@class='pull-left btn-group icons-holder']/a[contains(., 'Edit')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->init();
@@ -150,7 +150,7 @@ class ConfigEntity extends CustomEntity
 
     public function proceed()
     {
-        $this->test->byXpath("//div[@class='btn-group']/button[contains(., 'Continue')]")->click();
+        $this->test->byXPath("//div[@class='btn-group']/button[contains(., 'Continue')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
@@ -158,8 +158,8 @@ class ConfigEntity extends CustomEntity
 
     public function updateSchema()
     {
-        $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title='Update schema']")->click();
-        $this->test->byXpath("//div[@class='modal-footer']/a[contains(., 'Yes, Proceed')]")->click();
+        $this->test->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title='Update schema']")->click();
+        $this->test->byXPath("//div[@class='modal-footer']/a[contains(., 'Yes, Proceed')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
@@ -167,7 +167,7 @@ class ConfigEntity extends CustomEntity
 
     public function newCustomEntityAdd()
     {
-        $this->test->byXpath("//div[@class='pull-right title-buttons-container']/a[contains(., 'Create')]")->click();
+        $this->test->byXPath("//div[@class='pull-right title-buttons-container']/a[contains(., 'Create')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
@@ -195,7 +195,7 @@ class ConfigEntity extends CustomEntity
     public function setCustomField($fieldName, $value)
     {
         if ($this->isElementPresent("//div[@class='control-group']/div/input[contains(@id, '{$fieldName}')]")) {
-            $field = $this->test->byXpath("//div[@class='control-group']/div/input[contains(@id, '{$fieldName}')]");
+            $field = $this->test->byXPath("//div[@class='control-group']/div/input[contains(@id, '{$fieldName}')]");
             $field->clear();
             $field->value($value);
         } else {
@@ -206,7 +206,7 @@ class ConfigEntity extends CustomEntity
                 $field->selectOptionByLabel($value);
             } else {
                 if ($this->isElementPresent("//div[@class='control-group']//textarea[contains(@id, '{$fieldName}')]")) {
-                    $field = $this->test->byXpath(
+                    $field = $this->test->byXPath(
                         "//div[@class='control-group']//textarea[contains(@id, '{$fieldName}')]"
                     );
                     $field->clear();
@@ -215,17 +215,16 @@ class ConfigEntity extends CustomEntity
                     $dateField = "[contains(@id, '{$fieldName}') and contains(@id, 'date_selector_')]";
                     $timeField = "[contains(@id, '{$fieldName}') and contains(@id, 'time_selector_')]";
 
-                    if (
-                        preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $value, $valueParts)
+                    if (preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $value, $valueParts)
                         and $this->isElementPresent("//div[@class='control-group']//input{$dateField}")
                         and $this->isElementPresent("//div[@class='control-group']//input{$timeField}")
                     ) {
-                        $field = $this->test->byXpath("//div[@class='control-group']//input{$dateField}");
+                        $field = $this->test->byXPath("//div[@class='control-group']//input{$dateField}");
                         $field->click(); // focus
                         $field->clear();
                         $field->value($valueParts[1]);
 
-                        $field = $this->test->byXpath("//div[@class='control-group']//input{$timeField}");
+                        $field = $this->test->byXPath("//div[@class='control-group']//input{$timeField}");
                         $field->click(); // focus
                         $field->clear();
                         $field->value($valueParts[2]);
