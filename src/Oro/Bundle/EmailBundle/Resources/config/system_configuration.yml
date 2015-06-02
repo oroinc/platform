@@ -22,6 +22,7 @@ oro_system_configuration:
             type: oro_rich_text
             options:
                 label: oro.email.system_configuration.signature_configuration.signature.label
+                required: false
 
         oro_email.append_signature:
             data_type: boolean

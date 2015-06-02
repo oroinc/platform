@@ -491,6 +491,7 @@ services:
            - @router
            - @oro_entity_config.config_manager
            - @oro_email.email.thread.provider
+           - @oro_ui.html_tag_helper
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 
@@ -515,8 +516,11 @@ services:
             - @oro_entity_config.provider.attachment
             - @oro_email.activity_list.provider
             - @oro_security.security_facade.link
+            - @oro_activity_list.provider.chain
+            - @doctrine.orm.entity_manager
         tags:
-            - { name: kernel.event_listener, event: oro_email.email_body_added, method: linkToScopeEvent, priority: 10 }
+            - { name: kernel.event_listener, event: oro_email.email_body_added, method: linkToScope, priority: 10 }
+            - { name: kernel.event_listener, event: oro_email.email_body_added, method: updateActivityDescription, priority: 20 }
 
     oro_email.provider.email_attachment_provider:
         class: %oro_email.provider.email_attachment_provider.class%

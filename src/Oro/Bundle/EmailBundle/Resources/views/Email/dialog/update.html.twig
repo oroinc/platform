@@ -32,7 +32,8 @@
             </div>
         {% endif %}
         <div class="form-container">
-            <form id="{{ form.vars.name }}" method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
+            <form id="{{ form.vars.id}}" name="{{ form.vars.name }}"
+                  method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
                 {%
                     set emailEditorOptions = {
                         entityId: entity.entityId,
@@ -63,19 +64,19 @@
 
                             <span>{{ 'oro.email.form.attach_file'|trans }}: </span>
                             <div class="dropup" style="display: inline-block">
-                                <a id="attach-file" class="dropdown-toggle" href="javascript:void(0);" aria-expanded="true">{{ 'oro.email.form.from_record'|trans }}</a>
+                                <a class="attach-file dropdown-toggle" href="javascript:void(0);" aria-expanded="true">{{ 'oro.email.form.from_record'|trans }}</a>
                                 <div class="dropdown-menu attachment-list-popup" role="menu" aria-labelledby="attach-file"></div>
                             </div>
                             |
                             <span>
-                                <a id="upload-new" href="javascript:void(0);">{{ 'oro.email.form.upload'|trans }}</a>
+                                <a class="upload-new" href="javascript:void(0);">{{ 'oro.email.form.upload'|trans }}</a>
                             </span>
                         </div>
                     </div>
 
                     {% set emailAttachmentOptions = {
-                        popupTriggerButton: '#attach-file',
-                        uploadNewButton: '#upload-new',
+                        popupTriggerButton: '.attach-file',
+                        uploadNewButton: '.upload-new',
                         popupContentEl: '.attachment-list-popup',
                         entityAttachments: entity.attachments.toArray,
                         attachmentsAvailable: entity.attachmentsAvailable

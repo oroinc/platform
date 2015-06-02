@@ -16,6 +16,7 @@ use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -42,6 +43,9 @@ class ActivityListManager
     /** @var ActivityListFilterHelper */
     protected $activityListFilterHelper;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * @param Registry                  $doctrine
      * @param SecurityFacade            $securityFacade
@@ -51,6 +55,7 @@ class ActivityListManager
      * @param ActivityListChainProvider $provider
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param CommentApiManager         $commentManager
+     * @param DoctrineHelper            $doctrineHelper
      */
     public function __construct(
         Registry $doctrine,
@@ -60,7 +65,8 @@ class ActivityListManager
         ConfigManager $config,
         ActivityListChainProvider $provider,
         ActivityListFilterHelper $activityListFilterHelper,
-        CommentApiManager $commentManager
+        CommentApiManager $commentManager,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
@@ -70,6 +76,7 @@ class ActivityListManager
         $this->chainProvider            = $provider;
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->commentManager           = $commentManager;
+        $this->doctrineHelper           = $doctrineHelper;
     }
 
     /**
@@ -184,15 +191,13 @@ class ActivityListManager
             $editorId   = $entity->getEditor()->getId();
         }
 
+        $isHead = $this->getHeadStatus($entity, $entityProvider);
+        $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider);
         $numberOfComments = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
-            $entity->getRelatedActivityId()
+            $relatedActivityEntities
         );
 
-        $isHead = false;
-        if ($this->isGroupingApplicable($entityProvider)) {
-            $isHead = $entity->isHead();
-        }
         $data = $entityProvider->getData($entity);
         if (isset($data['isHead']) && !$data['isHead']) {
             $isHead = false;
@@ -206,6 +211,7 @@ class ActivityListManager
             'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
+            'description'          => $entity->getDescription(),
             'data'                 => $data,
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
@@ -290,5 +296,44 @@ class ActivityListManager
     protected function isGroupingApplicable($entityProvider)
     {
         return $entityProvider instanceof ActivityListGroupProviderInterface;
+    }
+
+    /**
+     * @param ActivityList $entity
+     * @param object $entityProvider
+     *
+     * @return bool
+     */
+    protected function getHeadStatus(ActivityList $entity, $entityProvider)
+    {
+        $isHead = false;
+        if ($this->isGroupingApplicable($entityProvider)) {
+            $isHead = $entity->isHead();
+        }
+
+        return $isHead;
+    }
+
+    /**
+     * @param ActivityList $entity
+     * @param object $entityProvider
+     *
+     * @return array
+     */
+    protected function getRelatedActivityEntities(ActivityList $entity, $entityProvider)
+    {
+        $relatedActivityEntities = [$entity];
+        if ($this->isGroupingApplicable($entityProvider)) {
+            $relationEntity = $this->doctrineHelper->getEntity(
+                $entity->getRelatedActivityClass(),
+                $entity->getRelatedActivityId()
+            );
+            $relatedActivityEntities = $entityProvider->getGroupedEntities($relationEntity);
+            if (count($relatedActivityEntities) === 0) {
+                $relatedActivityEntities = [$entity];
+            }
+        }
+
+        return $relatedActivityEntities;
     }
 }

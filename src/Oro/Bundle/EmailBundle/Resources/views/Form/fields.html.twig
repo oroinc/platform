@@ -50,7 +50,8 @@
                 $(function () {
                     var selectorEl = '{{ form.vars.id }}';
                     var emailLinkToScopeEl = $('#' + selectorEl);
-                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form').find('#oro_entity_config_type_attachment_enabled');
+                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form')
+                            .find('[data-ftid=oro_entity_config_type_attachment_enabled]');
                     initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
                     $(enableAttachmentEl).on('change', function() {
                         initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
@@ -134,7 +135,7 @@
     {% endfor %}
 
     {% set options = options|merge({
-        container: id,
+        containerId: id,
         inputName: full_name,
         entityAttachments: entityAttachmentsArray,
         attachmentsAvailable: attachmentsAvailableArray
@@ -179,6 +180,18 @@
             {% endspaceless %}
         </div>
     </div>
+    <script type="text/javascript">
+        require(['jquery'],
+                function($) {
+                    $('.emailtemplate-translatation.oro-tabs.tabbable ul.nav.nav-tabs li a').on('show', function(e) {
+                        var target = e.target || window.event.target;
+                        var dataRelated = $(target).attr('data-related');
+                        $($(target).closest('form').find(':input.translation')).each(function(key, el) {
+                            $(el).val(dataRelated);
+                        });
+                    });
+                })
+    </script>
 {% endblock %}
 
 {#
@@ -192,7 +205,7 @@
     {% set locale = form.vars.name %}
 
     <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
-        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab">
+        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
             {{- localeLabels[locale]|default('N/A')|trans|capitalize -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
         </a>
     </li>

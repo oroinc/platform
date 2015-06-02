@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
@@ -67,18 +67,20 @@ class Traverse extends AbstractAction
         if (empty($options[self::OPTION_KEY_ARRAY])) {
             throw new InvalidParameterException('Array parameter is required');
         } elseif (!is_array($options[self::OPTION_KEY_ARRAY])
-            && !$options[self::OPTION_KEY_ARRAY] instanceof PropertyPath
+            && !$options[self::OPTION_KEY_ARRAY] instanceof PropertyPathInterface
         ) {
             throw new InvalidParameterException('Array parameter must be either array or valid property definition');
         }
 
-        if (!empty($options[self::OPTION_KEY_KEY]) && !$options[self::OPTION_KEY_KEY] instanceof PropertyPath) {
+        if (!empty($options[self::OPTION_KEY_KEY])
+            && !$options[self::OPTION_KEY_KEY] instanceof PropertyPathInterface
+        ) {
             throw new InvalidParameterException('Key must be valid property definition');
         }
 
         if (empty($options[self::OPTION_KEY_VALUE])) {
             throw new InvalidParameterException('Value parameter is required');
-        } elseif (!$options[self::OPTION_KEY_VALUE] instanceof PropertyPath) {
+        } elseif (!$options[self::OPTION_KEY_VALUE] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Value must be valid property definition');
         }
 

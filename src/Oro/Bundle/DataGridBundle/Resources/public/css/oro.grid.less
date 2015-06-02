@@ -82,6 +82,12 @@ table.grid {
     &.align-right {
       text-align: right;
     }
+    &.align-left {
+      text-align: left;
+    }
+    &.align-center {
+      text-align: center;
+    }
     > ul:only-child {
       margin-bottom: 0;
     }
@@ -250,5 +256,25 @@ table .thead-sizing {
     thead.thead-sizing {
       display: table-header-group;
     }
+  }
+}
+td > .nowrap-ellipsis {
+  position: relative;
+  min-width: 100px;
+  > div {
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+}
+.td-expander {
+  font-size: 30px;
+  line-height: 0;
+  height: 0;
+  overflow: hidden;
+  &:before, &:after {
+    content: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ';
   }
 }

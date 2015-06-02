@@ -32,13 +32,18 @@ define(function (require) {
         backendFormat: datetimeFormatter.backendFormats.datetime,
 
         /**
+         * @type {string}
+         */
+        timezone: localeSettings.getTimeZone(),
+
+        /**
          * Returns supper prototype
          *
          * @returns {Object}
          * @protected
          */
         _super: function () {
-            throw new Error("_super() should be defined");
+            throw new Error('_super() should be defined');
         },
 
         /**
@@ -46,7 +51,7 @@ define(function (require) {
          * @param {Object} options
          */
         initialize: function (options) {
-            _.extend(this, _.pick(options, ['timezoneShift']));
+            _.extend(this, _.pick(options, ['timezone']));
             this._super().initialize.apply(this, arguments);
         },
 
@@ -78,6 +83,7 @@ define(function (require) {
          * @param {Object} options
          */
         createFrontField: function (options) {
+            var dialogBelowClass = 'datetimepicker-dialog-is-below';
             this._super().createFrontField.call(this, options);
             if (options.fieldsWrapper) {
                 this.$frontDateField
@@ -88,6 +94,11 @@ define(function (require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontDateField.on('blur', function (e) {
+                $(this).parent().removeClass(dialogBelowClass);
+            }).on('datepicker:dialogReposition', function (e, position) {
+                $(this).parent().toggleClass(dialogBelowClass, position === 'below');
+            });
             this.$frontDateField.after(this.$frontTimeField);
         },
 
@@ -99,6 +110,22 @@ define(function (require) {
         initPickerWidget: function (options) {
             var widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
+            this.$frontTimeField.on('showTimepicker', function () {
+                var $el = $(this),
+                    needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+                $el.parent().toggleClass('datetimepicker-dialog-is-below', needClass);
+            });
+            this.$frontTimeField.on('hideTimepicker', function () {
+                $(this).parent().removeClass('datetimepicker-dialog-is-below');
+            });
+            this.$frontDateField.on('blur', function () {
+                if ($(this).hasClass('error')) {
+                    $(this).parent().removeClass('timepicker-error');
+                }
+            });
+            this.$frontTimeField.on('blur', function () {
+                $(this).parent().toggleClass('timepicker-error', $(this).hasClass('error'));
+            });
             this._super().initPickerWidget.apply(this, arguments);
         },
 
@@ -163,23 +190,6 @@ define(function (require) {
         updateTimeFieldState: $.noop,
 
         /**
-         * Sets datetime picker timezone
-         */
-        setTimeZoneShift: function (timezoneShift) {
-            this.timezoneShift = timezoneShift;
-        },
-
-        /**
-         * Gets datetime picker timezone
-         */
-        getTimeZoneShift: function () {
-            if (this.timezoneShift !== undefined) {
-                return this.timezoneShift;
-            }
-            return localeSettings.getTimeZoneShift();
-        },
-
-        /**
          * Reads value of original field and converts it to frontend format
          *
          * @returns {string}
@@ -188,7 +198,7 @@ define(function (require) {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.add(this.getTimeZoneShift(), 'm').format(this.getTimeFormat());
+                value = momentInstance.tz(this.timezone).format(this.getTimeFormat());
             }
             return value;
         },
@@ -206,7 +216,7 @@ define(function (require) {
             format = this.getDateTimeFormat();
             momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
-                return momentInstance;
+                return momentInstance.tz(this.timezone, true);
             }
         },
 
@@ -220,7 +230,7 @@ define(function (require) {
                 momentInstance = this.getFrontendMoment(),
                 format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
-                value = momentInstance.subtract(this.getTimeZoneShift(), 'm').format(format);
+                value = momentInstance.utc().format(format);
             }
             return value;
         },
@@ -234,7 +244,7 @@ define(function (require) {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.add(this.getTimeZoneShift(), 'm').format(this.getDateFormat());
+                value = momentInstance.tz(this.timezone).format(this.getDateFormat());
             }
             return value;
         },

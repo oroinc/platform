@@ -56,7 +56,7 @@ class EntityReaderById extends BaseReader
                     $this->qb->andWhere(
                         $this->qb->expr()->in('o.' . $identifier, ':id')
                     );
-                    $this->qb->setParameter(self::ID_FILTER, $optionValue);
+                    $this->qb->setParameter('id', $optionValue);
                 } else {
                     $this->qb->andWhere('o.' . $identifier . ' = :id');
                 }

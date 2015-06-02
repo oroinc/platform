@@ -134,11 +134,10 @@ class AssociationBuilder
         } catch (\ReflectionException $e) {
             // ignore entity not found exception
             return ['id'];
-        }
+        } catch (ORMMappingException $e) {
             // ignore any doctrine mapping exceptions
             // it may happens if the entity has relation to deleted custom entity
             // or during update schema for newly created custom entity with relation
-        catch (ORMMappingException $e) {
             return ['id'];
         } catch (PersistenceMappingException $e) {
             return ['id'];

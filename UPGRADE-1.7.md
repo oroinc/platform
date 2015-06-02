@@ -11,6 +11,7 @@ UPGRADE FROM 1.6 to 1.7
 - `Oro\Bundle\IntegrationBundle\Provider\SyncProcessor::processImport` - removed last parameter $saveStatus
 - `Oro\Bundle\IntegrationBundle\Event\SyncEvent` - second constructor argument `$configuration` now must be of type `array`
 - `Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator` - added public method `getInitializedTransport(Integration $integration, $markReadOnly = false)`
+- Integration import processors may be tagged with `oro_integration.sync_processor` DIC tag with `integration` name. During integration import appropriate processor will be used if registered.
 
 ####OroDistributionBundle:
 -  Error handler for Errors and Recoverable Fatal Errors added `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handleError`.
@@ -22,3 +23,6 @@ UPGRADE FROM 1.6 to 1.7
 
 ####OroEntityExtendBundle:
 - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension` class
+
+####OroReminderBundle:
+- Added parameter `NameFormatter $nameFormatter` to constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailNotification`

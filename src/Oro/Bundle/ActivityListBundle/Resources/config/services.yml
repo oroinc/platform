@@ -32,6 +32,7 @@ services:
             - @oro_activity_list.provider.chain
             - @oro_activity_list.filter.helper
             - @oro_comment.comment.api_manager
+            - @oro_entity.doctrine_helper
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -77,6 +78,7 @@ services:
            - @oro_entity_config.config_manager
            - @translator
            - @oro_entity.routing_helper
+           - @oro_ui.html_tag_helper
 
     oro_activity_list.entity_config_dumper.extension:
         class: %oro_activity_list.entity_config_dumper.extension.class%

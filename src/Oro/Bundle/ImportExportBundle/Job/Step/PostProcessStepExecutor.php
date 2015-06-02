@@ -10,7 +10,10 @@ use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
+use Oro\Bundle\ImportExportBundle\Job\ContextHelper;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
@@ -34,6 +37,11 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
      * @var StepExecution
      */
     protected $stepExecution;
+
+    /**
+     * @var ContextInterface
+     */
+    protected $stepExecutionContext;
 
     /**
      * @var array
@@ -70,6 +78,7 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
+        $this->stepExecutionContext = new StepExecutionProxyContext($this->stepExecution);
 
         return $this;
     }
@@ -248,6 +257,10 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
     {
         foreach ($this->postProcessingJobs as $jobData) {
             $jobResult = $this->executePostProcessingJob($jobData[self::JOB_TYPE_KEY], $jobData[self::JOB_NAME_KEY]);
+            $jobResultContext = $jobResult->getContext();
+            if ($jobResultContext instanceof ContextInterface) {
+                ContextHelper::mergeContextCounters($this->stepExecutionContext, $jobResultContext);
+            }
             if (!$jobResult->isSuccessful()) {
                 throw new RuntimeException(
                     sprintf(

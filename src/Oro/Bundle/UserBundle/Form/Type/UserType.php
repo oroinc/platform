@@ -57,6 +57,9 @@ class UserType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addEntityFields($builder);

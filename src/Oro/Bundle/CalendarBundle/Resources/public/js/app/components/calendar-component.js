@@ -51,7 +51,6 @@ define(function (require) {
             options.scrollToCurrentTime = true;
             options.connectionsOptions.collection = this.connectionCollection;
 
-            options.eventsOptions.date = options.date;
             options.eventsOptions.header = {
                 left: options.eventsOptions.leftHeader || '',
                 center: options.eventsOptions.centerHeader || '',
@@ -61,7 +60,6 @@ define(function (require) {
             _.extend(options.eventsOptions, options.calendarOptions);
 
             delete options.calendarOptions;
-            delete options.date;
             delete options.eventsOptions.centerHeader;
             delete options.eventsOptions.leftHeader;
             delete options.eventsOptions.rightHeader;

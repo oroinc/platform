@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
@@ -45,6 +46,9 @@ class EmailActivityListProvider implements
     /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
@@ -52,6 +56,7 @@ class EmailActivityListProvider implements
      * @param Router              $router
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
+     * @param HtmlTagHelper       $htmlTagHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -59,7 +64,8 @@ class EmailActivityListProvider implements
         ServiceLink $nameFormatterLink,
         Router $router,
         ConfigManager $configManager,
-        EmailThreadProvider $emailThreadProvider
+        EmailThreadProvider $emailThreadProvider,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -67,6 +73,7 @@ class EmailActivityListProvider implements
         $this->router               = $router;
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
+        $this->htmlTagHelper        = $htmlTagHelper;
     }
 
     /**
@@ -107,6 +114,24 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         return $entity->getSubject();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription($entity)
+    {
+        /** @var $entity Email */
+        if ($entity->getEmailBody()) {
+            $body = $entity->getEmailBody()->getBodyContent();
+            $content = $this->htmlTagHelper->purify($body);
+            $content = $this->htmlTagHelper->stripTags($content);
+            $content = $this->htmlTagHelper->shorten($content);
+
+            return $content;
+        }
+
+        return null;
     }
 
     /**
@@ -174,19 +199,18 @@ class EmailActivityListProvider implements
         if ($email->getThread()) {
             $emails = $email->getThread()->getEmails();
             // if there are just two email - add replayedEmailId to use on client side
-            if (count($emails) == 2) {
+            if (count($emails) === 2) {
                 $data['replayedEmailId'] = $emails[0]->getId();
             }
         }
 
         if ($email->getFromEmailAddress()->hasOwner()) {
-            $owner             = $email->getFromEmailAddress()->getOwner();
-            $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
-
+            $owner = $email->getFromEmailAddress()->getOwner();
+            $data['headOwnerName'] = $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
                 ->getRoute('view');
             if (null !== $route) {
-                $id                = $this->doctrineHelper->getSingleEntityIdentifier($owner);
+                $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
                 $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
             }
         }
