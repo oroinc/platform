@@ -7,6 +7,7 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TagBundle\Model\ExtendTag;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -45,7 +46,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class Tag
+class Tag extends ExtendTag
 {
     /**
      * @var integer
@@ -117,6 +118,8 @@ class Tag
      */
     public function __construct($name = null)
     {
+        parent::__construct();
+
         $this->setName($name);
         $this->tagging = new ArrayCollection();
     }
