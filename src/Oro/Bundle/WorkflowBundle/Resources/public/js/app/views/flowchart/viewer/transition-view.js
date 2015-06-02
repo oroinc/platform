@@ -1,6 +1,7 @@
 define(function (require) {
     'use strict';
     var _ = require('underscore'),
+        //$ = require('jquery'),
         FlowchartJsPlubmBaseView = require('../jsplumb/base-view'),
         FlowchartViewerTransitionView;
 
@@ -123,13 +124,19 @@ define(function (require) {
                 transitionModel = this.model,
                 areaView = this.areaView,
                 endEl = this.findElByStep(endStep),
-                startEl = this.findElByStep(startStep);
+                startEl = this.findElByStep(startStep),
+                endPosition = $(endEl).offset(),
+                startPosition = $(startEl).offset(),
+                anchors = endPosition.left - startPosition.left > endPosition.top - startPosition.top ?
+                    ["ContinuousRight", "ContinuousLeft"] : ["ContinuousBottom", "ContinuousTop" ];
 
             jsplumbConnection = this.areaView.jsPlumbInstance.connect({
                 source: startEl,
                 target: endEl,
+                connector: [ "Smartline", { cornerRadius: 5, stub: [20, 20] } ],
                 paintStyle: _.result(this, 'connectorStyle'),
                 hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
+                anchors: anchors,
                 overlays: [
                     ['Custom', {
                         create: _.bind(function () {

@@ -529,16 +529,15 @@ define(function (require) {
         }),
 
     helper = {
-        xPadding: 15,
+        xPadding: 60,
         yPadding: 15,
-        xIncrement: 200,
-        yIncrement: 125,
+        xIncrement: 240,
+        yIncrement: 130,
         matrix: null,
         transitions: null,
         connections: [],
         bounding: [],
         checkPositions: function (workflow) {
-            console.log(this);
             var that = this,
                 steps = workflow.get('steps').filter(function (item) {
                     return !item.get('position');

@@ -27,7 +27,7 @@ define(function (require) {
         sourceDefaults: {
             filter: '.jsplumb-source',
             anchor: 'Continuous',
-            connector: ['Flowchart', { cornerRadius: 5  }],
+            connector: ['Smartline', { cornerRadius: 5, stub: [20, 20] }],
             maxConnections: 100
         },
 

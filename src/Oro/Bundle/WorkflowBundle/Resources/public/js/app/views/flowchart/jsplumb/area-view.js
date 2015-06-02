@@ -3,6 +3,7 @@ define(function (require) {
     var $ = require('jquery'),
         _ = require('underscore'),
         jsPlumb = require('jsplumb'),
+        Smartline = require('jsplumb.smartline'),
         FlowchartJsPlubmBaseView = require('./base-view'),
         FlowchartJsPlubmAreaView;
 
