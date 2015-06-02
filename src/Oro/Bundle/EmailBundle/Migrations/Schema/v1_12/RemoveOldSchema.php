@@ -59,10 +59,6 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         if ($emailTable->hasForeignKey('FK_2A30C1719EB185F9')) {
             $emailTable->removeForeignKey('FK_2A30C1719EB185F9');
         }
-
-        if ($emailTable->hasIndex('oro_email_is_head')) {
-            $emailTable->dropIndex('oro_email_is_head');
-        }
         if ($emailTable->hasIndex('IDX_2A30C17132C8A3DE')) {
             $emailTable->dropIndex('IDX_2A30C17132C8A3DE');
         }

@@ -32,8 +32,10 @@ class EmailController extends SoapGetController
      */
     public function handleGetListRequest($page = 1, $limit = 10, $criteria = [], $orderBy = null)
     {
-        $entities = array_filter($this->getManager()->getList($limit, $page, $criteria, $orderBy),
-            [$this->getEmailHelper(), 'isEmailViewGranted']);
+        $entities = array_filter(
+            $this->getManager()->getList($limit, $page, $criteria, $orderBy),
+            [$this->getEmailHelper(), 'isEmailViewGranted']
+        );
         return $this->transformToSoapEntities($entities);
     }
 
