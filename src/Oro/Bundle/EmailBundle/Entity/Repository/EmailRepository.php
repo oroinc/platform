@@ -5,6 +5,8 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\UserBundle\Entity\User;
+
 class EmailRepository extends EntityRepository
 {
     /**
