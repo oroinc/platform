@@ -39,6 +39,6 @@ class EntityTagsSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with($this->isType('array'));
 
-        $this->formTypex->setDefaultOptions($resolver);
+        $this->formType->setDefaultOptions($resolver);
     }
 }
