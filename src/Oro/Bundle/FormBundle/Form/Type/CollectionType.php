@@ -34,7 +34,8 @@ class CollectionType extends AbstractType
             $view->vars,
             [
                 'handle_primary'       => $options['handle_primary'],
-                'show_form_when_empty' => $options['show_form_when_empty']
+                'show_form_when_empty' => $options['show_form_when_empty'],
+                'prototype_name'       => $options['prototype_name']
             ]
         );
     }

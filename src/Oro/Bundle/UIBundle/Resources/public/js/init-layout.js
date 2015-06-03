@@ -397,10 +397,11 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
      * ============================================================ */
     $(document).on('click', '.add-list-item', function (e) {
         e.preventDefault();
-        var $listContainer, index, html;
+        var $listContainer, prototypeName, index, html;
         $listContainer = $(this).siblings('.collection-fields-list');
         index = $listContainer.data('last-index') || $listContainer.children().length;
-        html = $listContainer.attr('data-prototype').replace(/__name__/g, index);
+        prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
+        html = $listContainer.attr('data-prototype').replace(new RegExp(prototypeName,"g"), index);
         $listContainer.append(html)
             .trigger('content:changed')
             .data('last-index', index + 1);
