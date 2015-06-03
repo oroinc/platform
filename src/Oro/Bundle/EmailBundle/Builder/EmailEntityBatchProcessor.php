@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 
@@ -42,11 +41,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      * @var EmailFolder[]
      */
     protected $folders = array();
-
-    /**
-     * @var EmailOrigin[]
-     */
-    protected $origins = array();
 
     /**
      * Constructor
@@ -142,31 +136,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
-     * Register EmailOrigin object
-     *
-     * @param EmailOrigin $origin
-     * @throws \LogicException
-     */
-    public function addOrigin(EmailOrigin $origin)
-    {
-        $key = $origin->getId();
-        $this->origins[$key] = $origin;
-    }
-
-    /**
-     * Get EmailOrigin if it exists in the batch
-     *
-     * @param int $id The origin id
-     * @return EmailOrigin|null
-     */
-    public function getOrigin($id)
-    {
-        return isset($this->origins[$id])
-            ? $this->origins[$id]
-            : null;
-    }
-
-    /**
      * Tell the given EntityManager to manage this batch
      *
      * @param EntityManager $em
@@ -197,7 +166,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         $this->changes = array();
         $this->emails = array();
         $this->folders = array();
-        $this->origins = array();
         $this->addresses = array();
     }
 
@@ -288,6 +256,26 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
+     * Determines whether two email addresses are the same
+     *
+     * @param EmailAddress|null $address1
+     * @param EmailAddress|null $address2
+     *
+     *@return bool
+     */
+    protected function areAddressesEqual($address1, $address2)
+    {
+        if ($address1 === $address2) {
+            return true;
+        }
+        if (null === $address1 || null === $address2) {
+            return false;
+        }
+
+        return strtolower($address1->getEmail()) === strtolower($address2->getEmail());
+    }
+
+    /**
      * Tell the given EntityManager to manage EmailAddress objects in this batch
      *
      * @param EntityManager $em
@@ -341,11 +329,11 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateAddressReferences(EmailAddress $old, EmailAddress $new)
     {
         foreach ($this->emails as $email) {
-            if ($email->getFromEmailAddress() === $old) {
+            if ($this->areAddressesEqual($email->getFromEmailAddress(), $old)) {
                 $email->setFromEmailAddress($new);
             }
             foreach ($email->getRecipients() as $recipient) {
-                if ($recipient->getEmailAddress() === $old) {
+                if ($this->areAddressesEqual($recipient->getEmailAddress(), $old)) {
                     $recipient->setEmailAddress($new);
                 }
             }

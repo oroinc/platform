@@ -16,6 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
+use Oro\Bundle\SoapBundle\Serializer\EntitySerializer;
 
 class ApiEntityManager
 {
@@ -40,6 +41,11 @@ class ApiEntityManager
     protected $eventDispatcher;
 
     /**
+     * @var EntitySerializer
+     */
+    protected $entitySerializer;
+
+    /**
      * Constructor
      *
      * @param string          $class Entity name
@@ -60,6 +66,16 @@ class ApiEntityManager
     public function setEventDispatcher(EventDispatcher $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * Sets the entity serializer
+     *
+     * @param EntitySerializer $entitySerializer
+     */
+    public function setEntitySerializer(EntitySerializer $entitySerializer)
+    {
+        $this->entitySerializer = $entitySerializer;
     }
 
     /**
@@ -184,6 +200,67 @@ class ApiEntityManager
         // $qb->addCriteria($criteria);
 
         return $qb;
+    }
+
+    /**
+     * Serializes the list of entities
+     *
+     * @param QueryBuilder $qb A query builder is used to get data
+     *
+     * @return array
+     */
+    public function serialize(QueryBuilder $qb)
+    {
+        return $this->entitySerializer->serialize($qb, $this->getSerializationConfig());
+    }
+
+    /**
+     * Serializes single entity
+     *
+     * @param mixed $id Entity id
+     *
+     * @return array|null
+     */
+    public function serializeOne($id)
+    {
+        $qb = $this->getRepository()->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', $id);
+
+        $config = $this->getSerializationConfig();
+        $this->entitySerializer->prepareQuery($qb, $config);
+        $entity = $qb->getQuery()->getResult();
+        if (!$entity) {
+            return null;
+        }
+
+        // dispatch oro_api.request.find.after event
+        $event = new FindAfter($entity[0]);
+        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+
+        $serialized = $this->entitySerializer->serializeEntities((array)$entity, $this->class, $config);
+
+        return $serialized[0];
+    }
+
+    /**
+     * Indicates whether the entity serializer is configured
+     *
+     * @return bool
+     */
+    public function isSerializerConfigured()
+    {
+        return null !== $this->getSerializationConfig();
+    }
+
+    /**
+     * Returns the configuration of the entity serializer is used for process GET reruests
+     *
+     * @return array|null
+     */
+    protected function getSerializationConfig()
+    {
+        return null;
     }
 
     /**

@@ -22,7 +22,6 @@ use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
-use Oro\Bundle\SoapBundle\Entity\Manager\EntitySerializerManagerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -39,7 +38,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $manager = $this->getManager();
         $qb      = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
 
-        if ($manager instanceof EntitySerializerManagerInterface) {
+        if ($manager->isSerializerConfigured()) {
             $result = $manager->serialize($qb);
         } elseif ($qb instanceof SqlQueryBuilder) {
             $result = $this->getPreparedItems($qb->getQuery()->getResult());
@@ -51,17 +50,13 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     }
 
     /**
-     * GET single item
-     *
-     * @param  mixed $id
-     *
-     * @return Response
+     * {@inheritdoc}
      */
     public function handleGetRequest($id)
     {
         $manager = $this->getManager();
 
-        if ($manager instanceof EntitySerializerManagerInterface) {
+        if ($manager->isSerializerConfigured()) {
             $result = $manager->serializeOne($id);
         } else {
             $result = $manager->find($id);
@@ -247,7 +242,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function filterQueryParameters(array $supportedParameters)
     {
         if (false === preg_match_all(
-            '#([\w\d_-]+)([<>=]{1,2})([^&]+)#',
+            '#([\w\d_-]+)([<>]?=|<>|[<>])([^&]+)#',
             rawurldecode($this->getRequest()->getQueryString()),
             $matches,
             PREG_SET_ORDER

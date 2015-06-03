@@ -6,17 +6,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressTransformer;
+use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressApiTransformer;
 
-class EmailAddressType extends AbstractType
+class EmailAddressApiType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addModelTransformer(
-            new EmailAddressTransformer($options['multiple'])
+        $builder->addViewTransformer(
+            new EmailAddressApiTransformer($options['multiple'])
         );
     }
 
@@ -27,6 +27,7 @@ class EmailAddressType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                'compound' => false,
                 'multiple' => false
             ]
         );
@@ -37,14 +38,6 @@ class EmailAddressType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_email_email_address';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'text';
+        return 'oro_email_email_address_api';
     }
 }
