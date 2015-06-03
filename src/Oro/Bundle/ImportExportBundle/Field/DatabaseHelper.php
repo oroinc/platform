@@ -274,4 +274,15 @@ class DatabaseHelper
         return $this->securityFacadeLink->getService()->getOrganization()
             && $this->ownershipMetadataProviderLink->getService()->getMetadata($entityName)->getOrganizationFieldName();
     }
+
+    /**
+     * @param $entity
+     */
+    public function persist($entity)
+    {
+        $entityName = ClassUtils::getClass($entity);
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getManagerForClass($entityName);
+        $entityManager->persist($entity);
+    }
 }
