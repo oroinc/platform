@@ -5,6 +5,9 @@ UPGRADE FROM 1.7 to 1.8
 - Removed `Oro\Component\PropertyAccess\PropertyPath` and `Oro\Component\PropertyAccess\PropertyPathInterface`, `Symfony\Component\PropertyAccess\PropertyPath` and `Symfony\Component\PropertyAccess\PropertyPathInterface` should be used instead
 - Removed `Oro\Component\PropertyAccess\Exception` namespace, `Symfony\Component\PropertyAccess\Exception` is used
 
+####EmailBundle
+- The format of object returned by GET /api/rest/{version}/emails and GET /api/rest/{version}/emails resources was changed. Not a email body is returned as "body" and "bodyType" properties rather than "emailBody" object. Possible values for "bodyType" are "text" and "html". Possible values for the "importance" property are "low", "normal" and "high" rather than -1, 0 and 1. The "recipients" property was removed and three new properties were added instead: "to", "cc" and "bcc". The format of "folders" collection was changed as well, now each folder can have the following properties: "origin", "fullName", "name" and "type". Possible values for "type" property are "inbox", "sent", "trash", "drafts", "spam" and "other".   
+
 ####ImportExportBundle
  - `Oro\Bundle\ImportExportBundle\Context\ContextInterface` added $incrementBy integer parameter for methods: incrementReadCount, incrementAddCount, incrementUpdateCount, incrementReplaceCount, incrementDeleteCount, incrementErrorEntriesCount
 
