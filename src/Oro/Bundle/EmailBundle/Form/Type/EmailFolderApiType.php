@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -51,8 +53,11 @@ class EmailFolderApiType extends AbstractType
                 'type',
                 'choice',
                 [
-                    'required' => true,
-                    'choices'  => [
+                    'required'    => true,
+                    'constraints' => [
+                        new Assert\NotBlank()
+                    ],
+                    'choices'     => [
                         FolderType::INBOX  => FolderType::INBOX,
                         FolderType::SENT   => FolderType::SENT,
                         FolderType::TRASH  => FolderType::TRASH,
@@ -62,6 +67,18 @@ class EmailFolderApiType extends AbstractType
                     ]
                 ]
             );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
+            ]
+        );
     }
 
     /**

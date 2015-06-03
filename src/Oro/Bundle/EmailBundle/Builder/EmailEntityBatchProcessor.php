@@ -256,6 +256,26 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
+     * Determines whether two email addresses are the same
+     *
+     * @param EmailAddress|null $address1
+     * @param EmailAddress|null $address2
+     *
+     *@return bool
+     */
+    protected function areAddressesEqual($address1, $address2)
+    {
+        if ($address1 === $address2) {
+            return true;
+        }
+        if (null === $address1 || null === $address2) {
+            return false;
+        }
+
+        return strtolower($address1->getEmail()) === strtolower($address2->getEmail());
+    }
+
+    /**
      * Tell the given EntityManager to manage EmailAddress objects in this batch
      *
      * @param EntityManager $em
@@ -309,11 +329,11 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateAddressReferences(EmailAddress $old, EmailAddress $new)
     {
         foreach ($this->emails as $email) {
-            if ($email->getFromEmailAddress() === $old) {
+            if ($this->areAddressesEqual($email->getFromEmailAddress(), $old)) {
                 $email->setFromEmailAddress($new);
             }
             foreach ($email->getRecipients() as $recipient) {
-                if ($recipient->getEmailAddress() === $old) {
+                if ($this->areAddressesEqual($recipient->getEmailAddress(), $old)) {
                     $recipient->setEmailAddress($new);
                 }
             }

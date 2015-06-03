@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Form\Model\EmailApi;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -13,6 +18,8 @@ class EmailApiType extends AbstractType
 {
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -20,7 +27,12 @@ class EmailApiType extends AbstractType
             ->add(
                 'folders',
                 'collection',
-                ['required' => false, 'allow_add' => true, 'type' => 'oro_email_email_folder_api']
+                [
+                    'required'       => false,
+                    'allow_add'      => true,
+                    'type'           => 'oro_email_email_folder_api',
+                    'error_bubbling' => false
+                ]
             )
             ->add('from', 'oro_email_email_address_api', ['required' => false])
             ->add('to', 'oro_email_email_address_api', ['required' => false, 'multiple' => true])
@@ -58,7 +70,7 @@ class EmailApiType extends AbstractType
                     'required' => false,
                     'choices'  => [
                         0 => false,
-                        1  => true
+                        1 => true
                     ]
                 ]
             )
@@ -69,7 +81,7 @@ class EmailApiType extends AbstractType
                     'required' => false,
                     'choices'  => [
                         0 => false,
-                        1  => true
+                        1 => true
                     ]
                 ]
             )
@@ -107,14 +119,17 @@ class EmailApiType extends AbstractType
                 'thread',
                 'oro_entity_identifier',
                 [
-                    'required' => false,
-                    'class'    => 'OroEmailBundle:EmailThread',
-                    'multiple' => false
+                    'required'       => false,
+                    'class'          => 'OroEmailBundle:EmailThread',
+                    'multiple'       => false,
+                    'error_bubbling' => false
                 ]
             )
             ->add('refs', 'text', ['required' => false]);
 
         $builder->addEventSubscriber(new PatchSubscriber());
+        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**
@@ -139,5 +154,66 @@ class EmailApiType extends AbstractType
     public function getName()
     {
         return 'oro_email_email_api';
+    }
+
+    /**
+     * POST_SET_DATA event handler
+     *
+     * @param FormEvent $event
+     */
+    public function postSetData(FormEvent $event)
+    {
+        /** @var EmailApi $data */
+        $data = $event->getData();
+        if (!$data || ($data->getEntity() && $data->getEntity()->getId())) {
+            return;
+        }
+
+        $form = $event->getForm();
+
+        FormUtils::replaceField(
+            $form,
+            'folders',
+            [
+                'constraints' => [
+                    new Assert\NotBlank()
+                ]
+            ]
+        );
+        FormUtils::replaceField(
+            $form,
+            'messageId',
+            [
+                'constraints' => [
+                    new Assert\NotBlank()
+                ]
+            ]
+        );
+        FormUtils::replaceField(
+            $form,
+            'from',
+            [
+                'constraints' => [
+                    new Assert\NotBlank()
+                ]
+            ]
+        );
+    }
+
+    /**
+     * POST_SUBMIT event handler
+     *
+     * @param FormEvent $event
+     */
+    public function postSubmit(FormEvent $event)
+    {
+        $data = $event->getData();
+        if (!$data || ($data->getEntity() && $data->getEntity()->getId())) {
+            return;
+        }
+
+        if (!$data->getTo() && !$data->getCc() && !$data->getBcc()) {
+            $event->getForm()->addError(new FormError('Recipients should not be empty'));
+        }
     }
 }

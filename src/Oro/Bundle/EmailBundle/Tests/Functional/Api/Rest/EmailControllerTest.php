@@ -196,16 +196,26 @@ class EmailControllerTest extends WebTestCase
      */
     public function testCreateForExistingEmail($id)
     {
-        $newEmail = array_merge($this->email, ['subject' => 'New subject']);
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
         $this->assertEquals($response['id'], $id, 'Existing email should be updated');
+    }
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
-        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+    /**
+     * @depends testCreateEmail
+     */
+    public function testCreateForExistingEmailButWithChangedProtectedProperty()
+    {
+        $newEmail = array_merge($this->email, ['subject' => 'New subject']);
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->assertEquals($newEmail['subject'], $email['subject']);
+        $this->assertEquals(
+            $response['message'],
+            'The Subject cannot be changed for already existing email.'
+            . ' Existing value: "New email". New value: "New subject".'
+        );
     }
 
     /**
@@ -219,6 +229,7 @@ class EmailControllerTest extends WebTestCase
     {
         $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
         $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($email['seen']);
 
         $folders   = $email['folders'];
         $folders[] = [
@@ -238,7 +249,7 @@ class EmailControllerTest extends WebTestCase
             'PUT',
             $this->getUrl('oro_api_put_email', ['id' => $id]),
             [
-                'subject' => 'Updated subject',
+                'seen'    => 1,
                 'folders' => $folders
             ]
         );
@@ -248,10 +259,8 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
         $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertEquals('Updated subject', $email['subject']);
         $this->assertCount(3, $email['folders']);
-        $this->assertTrue($email['head']);
-        $this->assertFalse($email['seen']);
+        $this->assertTrue($email['seen']);
 
         return $id;
     }
@@ -261,28 +270,21 @@ class EmailControllerTest extends WebTestCase
      *
      * @param integer $id
      */
-    public function testUpdateEmailBooleanValues($id)
+    public function testUpdateEmailProtectedProperty($id)
     {
         $this->client->request(
             'PUT',
             $this->getUrl('oro_api_put_email', ['id' => $id]),
             [
-                'head' => 0,
-                'seen' => 1
+                'head' => 0
             ]
         );
-        $result = $this->client->getResponse();
-        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
-        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        // check that previously set values are kept without changes
-        $this->assertEquals('Updated subject', $email['subject']);
-        $this->assertCount(3, $email['folders']);
-
-        // check boolean values are set correctly
-        $this->assertFalse($email['head']);
-        $this->assertTrue($email['seen']);
+        $this->assertEquals(
+            $response['message'],
+            'The Head cannot be changed for already existing email.'
+            . ' Existing value: "true". New value: "false".'
+        );
     }
 }

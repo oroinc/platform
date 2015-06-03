@@ -91,6 +91,8 @@ services:
             - @oro_email.email.entity.builder=
             - @oro_security.security_facade
             - @event_dispatcher
+            - @oro_email.email_importance_transformer
+            - @oro_email.email_body_type_transformer
 
     oro_email.form.email.api:
         class: Symfony\Component\Form\Form
