@@ -20,7 +20,7 @@ Scroll data object provides several useful methods to add information to scroll 
 - **addBlock($title, $priority, $class, $useSubBlockDivider)** - adds new block in the end of the list, 
 block title is required 
 - **addSubBlock($blockId, $title)** - adds new subblock to block with specified identifier (array key) 
-- **addSubBlockData($blockId, $subBlockID, $html)** - adds HTML code to the exiting subblock inside specified block 
+- **addSubBlockData($blockId, $subBlockID, $html)** - adds HTML code to the existing subblock inside specified block 
 
 
 ###Customization Example
