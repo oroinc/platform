@@ -3,9 +3,11 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\UIBundle\Twig\UiExtension;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
+use Oro\Bundle\UIBundle\View\ScrollData;
 
 class UiExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,10 +54,12 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testOnScrollDataBefore()
     {
+        /** @var \Twig_Environment $environment */
         $environment = $this->getMock('\Twig_Environment');
         $pageIdentifier = 'test-page';
-        $data = ['fields'];
-        $alteredData = array_merge($data, ['altered']);
+        $data = new ScrollData(['fields']);
+        $alteredData = new ScrollData(['altered', 'fields']);
+        /** @var FormView $formView */
         $formView = $this->getMock('Symfony\Component\Form\FormView');
 
         $this->eventDispatcher->expects($this->once())
@@ -66,15 +70,15 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
             )->willReturnCallback(
                 function ($name, BeforeListRenderEvent $event) use ($environment, $data, $alteredData, $formView) {
                     $this->assertEquals($environment, $event->getEnvironment());
-                    $this->assertEquals($data, $event->getData());
+                    $this->assertEquals($data, $event->getScrollData());
                     $this->assertEquals($formView, $event->getFormView());
-                    $event->setData($alteredData);
+                    $event->setScrollData($alteredData);
                 }
             );
 
         $this->assertEquals(
-            $alteredData,
-            $this->extension->scrollDataBefore($environment, $pageIdentifier, $data, $formView)
+            $alteredData->getData(),
+            $this->extension->scrollDataBefore($environment, $pageIdentifier, $data->getData(), $formView)
         );
     }
 }

@@ -7,6 +7,8 @@ use Symfony\Component\Form\FormView;
 
 use Twig_Environment;
 
+use Oro\Bundle\UIBundle\View\ScrollData;
+
 class BeforeListRenderEvent extends Event
 {
     /**
@@ -15,9 +17,9 @@ class BeforeListRenderEvent extends Event
     protected $environment;
 
     /**
-     * @var array
+     * @var ScrollData
      */
-    protected $data;
+    protected $scrollData;
 
     /**
      * @var FormView|null
@@ -26,13 +28,13 @@ class BeforeListRenderEvent extends Event
 
     /**
      * @param \Twig_Environment $environment
-     * @param array $data
+     * @param ScrollData $scrollData
      * @param FormView|null $formView
      */
-    public function __construct(Twig_Environment $environment, array $data, FormView $formView = null)
+    public function __construct(Twig_Environment $environment, ScrollData $scrollData, FormView $formView = null)
     {
         $this->formView    = $formView;
-        $this->data        = $data;
+        $this->scrollData  = $scrollData;
         $this->environment = $environment;
     }
 
@@ -53,20 +55,20 @@ class BeforeListRenderEvent extends Event
     }
 
     /**
-     * @return array
+     * @return ScrollData
      */
-    public function getData()
+    public function getScrollData()
     {
-        return $this->data;
+        return $this->scrollData;
     }
 
     /**
-     * @param array $data
+     * @param ScrollData $scrollData
      * @return BeforeListRenderEvent
      */
-    public function setData(array $data)
+    public function setScrollData(ScrollData $scrollData)
     {
-        $this->data = $data;
+        $this->scrollData = $scrollData;
 
         return $this;
     }
