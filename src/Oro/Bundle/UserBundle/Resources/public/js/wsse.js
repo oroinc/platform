@@ -15,6 +15,8 @@
 // Changelog:
 //   2005.07.21 - Release 1.0
 //
+//   2015.06.04 - Fix isodatetime() when today.getUTCDate() !== today.getDate()
+//
 
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
@@ -298,9 +300,10 @@ function isodatetime() {
     year = year + 1900; // http://onyx.idbsu.edu/~ipowell
     var month = today.getMonth() + 1;
     var day  = today.getDate();
+    var dayUTC = today.getUTCDate();
     var hour = today.getHours();
     var hourUTC = today.getUTCHours();
-    var diff = hour - hourUTC;
+    var diff = hour - (hourUTC - (day - dayUTC) * 24);
     var hourdifference = Math.abs(diff);
     var minute = today.getMinutes();
     var minuteUTC = today.getUTCMinutes();
