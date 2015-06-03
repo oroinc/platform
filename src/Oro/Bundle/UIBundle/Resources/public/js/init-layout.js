@@ -401,7 +401,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         $listContainer = $(this).siblings('.collection-fields-list');
         index = $listContainer.data('last-index') || $listContainer.children().length;
         prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
-        html = $listContainer.attr('data-prototype').replace(new RegExp(prototypeName,"g"), index);
+        html = $listContainer.attr('data-prototype').replace(new RegExp(prototypeName, "g"), index);
         $listContainer.append(html)
             .trigger('content:changed')
             .data('last-index', index + 1);
