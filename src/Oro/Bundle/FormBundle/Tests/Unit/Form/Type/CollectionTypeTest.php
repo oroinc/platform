@@ -57,11 +57,13 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'options'      => [
                     'handle_primary'       => false,
                     'show_form_when_empty' => false,
+                    'prototype_name'       => '__name__',
                     'add_label'            => 'Add'
                 ],
                 'expectedVars' => [
                     'handle_primary'       => false,
                     'show_form_when_empty' => false,
+                    'prototype_name'       => '__name__',
                     'add_label'            => 'Add'
                 ],
             ],
@@ -69,11 +71,13 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'options'      => [
                     'handle_primary'       => true,
                     'show_form_when_empty' => true,
+                    'prototype_name'       => '__custom_name__',
                     'add_label'            => 'Test Label'
                 ],
                 'expectedVars' => [
                     'handle_primary'       => true,
                     'show_form_when_empty' => true,
+                    'prototype_name'       => '__custom_name__',
                     'add_label'            => 'Test Label'
                 ],
             ],

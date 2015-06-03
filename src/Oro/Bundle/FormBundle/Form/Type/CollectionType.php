@@ -35,6 +35,7 @@ class CollectionType extends AbstractType
             [
                 'handle_primary'       => $options['handle_primary'],
                 'show_form_when_empty' => $options['show_form_when_empty'],
+                'prototype_name'       => $options['prototype_name'],
                 'add_label'            => $options['add_label']
             ]
         );
