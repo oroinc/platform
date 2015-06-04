@@ -85,7 +85,7 @@ class DatabaseHelper
 
         $storageKey = serialize($serializationCriteria);
 
-        if (empty($this->entities[$entityName]) || !array_key_exists($storageKey, $this->entities[$entityName])) {
+        if (empty($this->entities[$entityName]) || empty($this->entities[$entityName][$storageKey])) {
             /** @var EntityRepository $entityRepository */
             $entityRepository = $this->registry->getRepository($entityName);
             $queryBuilder = $entityRepository->createQueryBuilder('e')
@@ -284,5 +284,6 @@ class DatabaseHelper
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityName);
         $entityManager->persist($entity);
+        $entityManager->flush($entity);
     }
 }
