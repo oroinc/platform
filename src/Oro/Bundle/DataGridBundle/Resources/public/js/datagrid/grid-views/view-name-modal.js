@@ -27,6 +27,19 @@ define([
             ViewNameModal.__super__.initialize.call(this, options);
         },
 
+        open: function(cb) {
+            ViewNameModal.__super__.open.call(this, cb);
+
+            var self = this;
+
+            $("#gridViewName").one('keydown', function(e) {
+                if (e.which == 13) {
+                    self.trigger('close');
+                    self.trigger('ok');
+                }
+            });
+        },
+
         setNameError: function(error) {
             this.$('.validation-failed').remove();
             if (error) {
