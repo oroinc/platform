@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Model;
 
-class ExtendTag 
+class ExtendTag
 {
     /**
      * Constructor
