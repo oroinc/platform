@@ -7,6 +7,19 @@ Let's consider an example of layout implementation. Imagine you need to create a
 
 ![Product page example](./images/product_page.png "Product page example")
 
+Our guide is divided into the following sections:
+* [Getting started](#getting-started)
+* [Customize block rendering](#customize-block-rendering)
+* [Adding CSS and JS](#adding-css-and-js)
+* [Layout blocks positioning](#layout-blocks-positioning)
+* [Using page specific data](#using-page-specific-data)
+* [Extending exiting block types](#extending-exiting-block-types)
+* [Ordering of layout blocks](#ordering-of-layout-blocks)
+* [Working with lists](#working-with-lists)
+* [Working with forms](#working-with-forms)
+* [Creating new block types](#creating-new-block-types)
+* [Wrapping up](#wrapping-up)
+
 Getting started
 -----------------------
 
@@ -19,7 +32,7 @@ create a layout update file and place it in `Resources/views/layouts` directory,
 layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroLayoutBundle:layouts:first_theme/default.html.twig'
+            themes: 'AcmeLayoutBundle:layouts:first_theme/default.html.twig'
         - @addTree:
             items:
                 head:
@@ -76,6 +89,9 @@ layout:
                     blockType: container
                 footer:
                     blockType: container
+                    options:
+                        attr:
+                            class: footer
             tree:
                 root:
                     head:
@@ -97,7 +113,7 @@ layout:
 
 See [layout update](./layout_update.md) topic for more details.
 
-Customize rendering of blocks
+Customize block rendering
 ---------------------------------
 
 As you have seen in the previous section we have added `setBlockTheme` action there. The block theme responsible for defining how layout blocks are rendered.
@@ -147,9 +163,11 @@ Let's define these blocks in `Resources/views/layouts/first_theme/default.html.t
 {% endblock %}
 
 {% block _footer_widget %}
-    <footer{{ block('block_attributes') }}>
-        {{ block_widget(block) }}
-    </footer>
+    <div class="footer-container">
+        <div {{ block('block_attributes') }}>
+            {{ block_widget(block) }}
+        </div>
+    </div>
 {% endblock %}
 ```
 
@@ -173,7 +191,9 @@ When you open this page in a browser you can see the HTML like this:
                 <div id="col-left"></div>
                 <div class="col-main"></div>
             </div>
-            <footer></footer>
+            <div class="footer-container">
+                <div class="footer"></div>
+            </div>
         </div>
     </body>
 </html>
@@ -233,7 +253,7 @@ Imagine you need to add some scripts for IE only using html comments. In this ca
 layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroLayoutBundle:layouts:first_theme/demo_layout_test/test.html.twig'
+            themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/test.html.twig'
         - @add:
             id: script_ie
             parentId: head_script
@@ -253,7 +273,7 @@ As in case with default layout we define a new block theme for our layout update
 {% endblock %}
 ```
 
-Changing Layout blocks positioning
+Layout blocks positioning
 -----------------------------------
 
 In our default theme we have a two-column layout. But for our example page we'll need just one column. Let's remove the `left_panel` block and change the class for `main_container`:
@@ -358,7 +378,7 @@ layout:
     actions:
         - @add:
             id: demo_notice
-            parentId: body
+            parentId: body_wrapper
             blockType: block
             options:
                 visible: { @value: $context.debug }
@@ -422,12 +442,16 @@ class ProductContextConfigurator implements ContextConfiguratorInterface
     {
         $productData = [
             '99' => [
-                'id'          => 99,
-                'name'        => 'Chelsea Tee',
-                'description' => 'Ultrasoft, lightweight V-neck tee. 100% cotton. Machine wash.',
-                'category'    => 'Men',
-                'subcategory' => 'Tees, Knits and Polos',
-                'url'         => '/chelsea-tea.html'
+                'id'                => 99,
+                'name'              => 'Chelsea Tee',
+                'description'       => 'Ultrasoft, lightweight V-neck tee. 100% cotton. Machine wash.',
+                'short_description' => 'Minimalist style and maximum comfort meet in this lightweight tee.',
+                'category'          => 'Men',
+                'subcategory'       => 'Tees, Knits and Polos',
+                'url'               => '/chelsea-tea.html',
+                'image'             => '/img/mtk000t.jpg',
+                'price'             => '$75.00',
+                'availability'      => 'In Stock'
             ]
         ];
 
@@ -627,165 +651,6 @@ We also need to modify our block template to have the language dropdown preselec
 Now if you go to `/layout/test?product_id=99&___store=french` url you'll see that French language is preselected.
 
 
-Working with forms
------------------------------------
-
-Let's implement a simple search form by means of the layout engine.
-To use the form in layouts we need to configure the layout context first. Since the search form persists on many pages we will add it to the layout context using another context configurator:
-```php
-namespace Acme\Bundle\SearchBundle\Layout\Extension;
-
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Component\Layout\ContextConfiguratorInterface;
-use Oro\Component\Layout\ContextInterface;
-
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
-
-class SearchContextConfigurator implements ContextConfiguratorInterface
-{
-    /*
-     * FormFactory
-     */
-    protected $formFactory;
-
-    public function __construct(FormFactory $formFactory)
-    {
-        $this->formFactory = $formFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureContext(ContextInterface $context)
-    {
-        $context->getResolver()
-            ->setDefaults(
-                [
-                    'search_form' => function (Options $options, $value) {
-                        if (null === $value) {
-                            $value = $this->createSearchForm();
-                        }
-
-                        return $value;
-                    }
-                ]
-            )
-            ->setAllowedTypes(['search_form' => ['null', 'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface']]);
-    }
-
-    /*
-     * @return FormAccessor
-     */
-    protected function createSearchForm()
-    {
-        $form = $this->formFactory->create('form');
-        $form->add(
-            'search',
-            'search',
-            [
-                'attr' => [
-                    'maxlength'   => 128,
-                    'placeholder' => 'Search entire store here...',
-                ]
-            ]
-        );
-
-        return new FormAccessor($form);
-    }
-}
-```
-
-Registering in the DI container:
-
-```yaml
-    acme_search.layout.context_configurator.search:
-        class: Acme\Bundle\SearchBundle\Layout\Extension\SearchContextConfigurator
-        arguments:
-            - @form.factory
-        tags:
-            - { name: layout.context_configurator }
-```
-
-Now we can add our search from into the layout:
-
-```yaml
-layout:
-    actions:
-        - @setBlockTheme:
-            themes: 'OroLayoutBundle:layouts:first_theme/demo_layout_test/search.html.twig'
-        - @addTree:
-            items:
-                'searh_form:start':
-                    blockType: form_start
-                    options:
-                        form_name: search_form
-                        attr:
-                            id: search_mini_form
-                search_field:
-                    blockType: form_field
-                    options:
-                        form_name: search_form
-                        field_path: search
-                search_button:
-                    blockType: button
-                    options:
-                        action: submit
-                        text: Submit
-                        attr:
-                            class: button search-button
-                            title: Search
-                search_autocomplete:
-                    blockType: block
-                'searh_form:end':
-                    blockType: form_end
-                    options:
-                        form_name: search_form
-            tree:
-                search:
-                    'searh_form:start': ~
-                    search_field: ~
-                    search_button: ~
-                    search_autocomplete: ~
-                    'searh_form:end': ~
-```
-
-In `search.html.twig` will define the search autocomplete block:
-```twig
-{% block _search_autocomplete_widget -%}
-    <div id="search_autocomplete" class="search-autocomplete"></div>
-    <script type="text/javascript">
-        var searchForm = new Varien.searchForm('search_mini_form', 'search', '');
-        searchForm.initAutocomplete('/catalogsearch/ajax/suggest/', 'search_autocomplete');
-    </script>
-{%- endblock %}
-```
-
-Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
-For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
-
-As the result you'll be getting and HTML like this:
-```html
-<div id="header-search">
-    <form id="search_mini_form" action="/catalogsearch/result/" method="get">
-        <div class="control-group">
-            <label class="control-label required" for="form_search-uid-556af114b1fb4">Search<em>*</em></label>
-            <div class="controls">
-                <input type="search" id="form_search-uid-556af2fc646e0" name="form[search]" required="required" maxlength="128" placeholder="Search entire store here..." data-ftid="form_search">
-            </div>
-        </div>
-        <button class="button search-button" title="Search" type="submit">Submit</button>
-        <div id="search_autocomplete" class="search-autocomplete"></div>
-        <script type="text/javascript">
-            var searchForm = new Varien.searchForm('search_mini_form', 'search', '');
-            searchForm.initAutocomplete('/catalogsearch/ajax/suggest/', 'search_autocomplete');
-        </script>
-        <input type="hidden" id="form__token-uid-556af114b2701" name="form[_token]" data-ftid="form__token" value="9bd7b70c4218e3130d0deee54047a7a8b466531e">
-    </form>
-</div>
-```
-
 Extending exiting block types
 ----------------------------------
 
@@ -817,6 +682,7 @@ class LinkExtension extends AbstractBlockTypeExtension
     {
         $resolver->setOptional(['image']);
     }
+
     /**
      * {@inheritdoc}
      */
@@ -826,6 +692,7 @@ class LinkExtension extends AbstractBlockTypeExtension
             $view->vars['image'] = $options['image'];
         }
     }
+
     /**
      * {@inheritdoc}
      */
@@ -861,7 +728,83 @@ Now we can customize the twig template for the link block by adding the followin
 {%- endblock %}
 ```
 
-Positioning of blocks in layout
+Also when extending an existing block type it is possible to register an extra block prefix for it, which will provide more customization flexibility.
+At the moment, every time we need to wrap content into a `<div>` element, we have to add a `container` in the layout update and define its template in block theme file.
+This produces quite a lot of copy-paste code. Let's make create an extension for container type and register a new block prefix for it depending on some option:
+```php
+namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
+
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Component\Layout\AbstractBlockTypeExtension;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
+
+class ContainerExtension extends AbstractBlockTypeExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(['type']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        if (!empty($options['type'])) {
+            BlockUtils::registerPlugin($view, $options['type'] . '_' . $block->getTypeName());
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedType()
+    {
+        return 'container';
+    }
+}
+```
+
+Adding it to the DI container
+```yaml
+    acme_layout.block_type_extension.container:
+        class: Acme\Bundle\LayoutBundle\Layout\Block\Extension\ContainerExtension
+        tags:
+            - { name: layout.block_type_extension, alias: container }
+```
+
+Now we can define a template like this:
+```twig
+{% block div_container_widget %}
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}#}
+```
+
+And use it in the layout update file like this:
+
+```yaml
+layout:
+    actions:
+        - @add:
+            id: some_wrapper
+            blockType: container
+            parentId: some_parent
+            options:
+                type: div
+```
+The `type: div` option tells us to look for the template in the `div_container_widget` block. If the `type` option is not specified, the standard block will be used for rendering.
+
+
+
+Ordering of layout blocks
 -----------------------------------
 
 The layout engine lets you add or move blocks into any position by specifying the `siblingId`. For example, we can add a logo image into our header block before the navigation block:
@@ -892,7 +835,7 @@ The same positioning can be achieved using `move` action. Let's move our languag
         siblingId: ~
         prepend: true
 ```
-Note that if `siblingId` is not specified the block will be positioned an
+Note that if `siblingId` is not specified the block will be positioned as the first block.
 
 Working with lists
 -----------------------------------
@@ -1033,5 +976,888 @@ This should render into the following HTML:
         <li><a title="Go to Home Page" href="/">Home</a><span>/ </span></li>
         <li><strong>Chelsea Tee</strong></li>
     </ul>
+</div>
+```
+
+Working with forms
+-----------------------------------
+
+Let's implement a simple search form by means of the layout engine.
+To use the form in layouts we need to configure the layout context first. Since the search form persists on many pages we will add it to the layout context using another context configurator:
+```php
+namespace Acme\Bundle\SearchBundle\Layout\Extension;
+
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\OptionsResolver\Options;
+
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
+
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
+
+class SearchContextConfigurator implements ContextConfiguratorInterface
+{
+    /*
+     * FormFactory
+     */
+    protected $formFactory;
+
+    public function __construct(FormFactory $formFactory)
+    {
+        $this->formFactory = $formFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureContext(ContextInterface $context)
+    {
+        $context->getResolver()
+            ->setDefaults(
+                [
+                    'search_form' => function (Options $options, $value) {
+                        if (null === $value) {
+                            $value = $this->createSearchForm();
+                        }
+
+                        return $value;
+                    }
+                ]
+            )
+            ->setAllowedTypes(['search_form' => ['null', 'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface']]);
+    }
+
+    /*
+     * @return FormAccessor
+     */
+    protected function createSearchForm()
+    {
+        $form = $this->formFactory->create('form');
+        $form->add(
+            'search',
+            'search',
+            [
+                'attr' => [
+                    'maxlength'   => 128,
+                    'placeholder' => 'Search entire store here...',
+                ]
+            ]
+        );
+
+        return new FormAccessor($form);
+    }
+}
+```
+
+Registering in the DI container:
+
+```yaml
+    acme_search.layout.context_configurator.search:
+        class: Acme\Bundle\SearchBundle\Layout\Extension\SearchContextConfigurator
+        arguments:
+            - @form.factory
+        tags:
+            - { name: layout.context_configurator }
+```
+
+Now we can add our search from into the layout:
+
+```yaml
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/search.html.twig'
+        - @addTree:
+            items:
+                'searh_form:start':
+                    blockType: form_start
+                    options:
+                        form_name: search_form
+                        attr:
+                            id: search_mini_form
+                search_field:
+                    blockType: form_field
+                    options:
+                        form_name: search_form
+                        field_path: search
+                search_button:
+                    blockType: button
+                    options:
+                        action: submit
+                        text: Submit
+                        attr:
+                            class: button search-button
+                            title: Search
+                search_autocomplete:
+                    blockType: block
+                'searh_form:end':
+                    blockType: form_end
+                    options:
+                        form_name: search_form
+            tree:
+                search:
+                    'searh_form:start': ~
+                    search_field: ~
+                    search_button: ~
+                    search_autocomplete: ~
+                    'searh_form:end': ~
+```
+
+In `search.html.twig` will define the search autocomplete block:
+```twig
+{% block _search_autocomplete_widget -%}
+    <div id="search_autocomplete" class="search-autocomplete"></div>
+    <script type="text/javascript">
+        var searchForm = new Varien.searchForm('search_mini_form', 'search', '');
+        searchForm.initAutocomplete('/catalogsearch/ajax/suggest/', 'search_autocomplete');
+    </script>
+{%- endblock %}
+```
+
+Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
+For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
+
+As the result you'll be getting and HTML like this:
+```html
+<div id="header-search">
+    <form id="search_mini_form" action="/catalogsearch/result/" method="get">
+        <div class="control-group">
+            <label class="control-label required" for="form_search-uid-556af114b1fb4">Search<em>*</em></label>
+            <div class="controls">
+                <input type="search" id="form_search-uid-556af2fc646e0" name="form[search]" required="required" maxlength="128" placeholder="Search entire store here..." data-ftid="form_search">
+            </div>
+        </div>
+        <button class="button search-button" title="Search" type="submit">Submit</button>
+        <div id="search_autocomplete" class="search-autocomplete"></div>
+        <script type="text/javascript">
+            var searchForm = new Varien.searchForm('search_mini_form', 'search', '');
+            searchForm.initAutocomplete('/catalogsearch/ajax/suggest/', 'search_autocomplete');
+        </script>
+        <input type="hidden" id="form__token-uid-556af114b2701" name="form[_token]" data-ftid="form__token" value="9bd7b70c4218e3130d0deee54047a7a8b466531e">
+    </form>
+</div>
+```
+
+For the case when the form is page specific, we can return the form in the controller. We can create the form directly in the controller or return its identifier in the DI container.
+Let's try the second approach and create the form for adding a product to the shopping cart.
+First we'll create a new form type and register it in the container:
+
+```php
+namespace Acme\Bundle\ProductBundle\Form\Type;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+
+class ProductType extends AbstractType
+{
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add(
+                'color',
+                'choice',
+                [
+                    'label'      => 'Color',
+                    'required'   => true,
+                    'choices'  => [
+                        '' => 'Choose an Option...',
+                    ],
+                ]
+            )
+            ->add('qty', 'text', ['required' => true, 'label' => 'Qty']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'acme_product_product';
+    }
+}
+```
+
+Also in the container we will register the form using the newly created form type:
+```yaml
+    acme_product.form.type.product:
+        class: Acme\Bundle\ProductBundle\Form\Type\ProductType
+        tags:
+            - { name: form.type, alias: acme_product_product }
+
+    acme_product.form.product:
+        class:                        Symfony\Component\Form\Form
+        factory_method:               createNamed
+        factory_service:              form.factory
+        arguments:
+            - ~
+            - 'acme_product_product'
+```
+
+Now in our controller we can simply return the form Id from the container:
+```php
+    /**
+     * @Route("/test", name="demo_layout_test")
+     * @Layout
+     */
+    public function testAction()
+    {
+        return [
+            'form' => 'acme_product.form.product'
+        ];
+    }
+```
+
+Now we can render this form by adding it to the layout update file:
+```yaml
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/product.html.twig'
+        - @addTree:
+            items:
+                product_view:
+                    blockType: container
+                    options:
+                        type: div
+                        attr:
+                            class: product-view
+                product_essential:
+                    blockType: container
+                    options:
+                        type: div
+                        attr:
+                            class: product-essential
+                form_start:
+                    blockType: form_start
+                    options:
+                        form_action: /checkout
+                        attr:
+                            id: product_addtocart_form
+
+                color_field:
+                    blockType: form_field
+                    options:
+                        form_name: form
+                        field_path: color
+                qty_field:
+                    blockType: form_field
+                    options:
+                        form_name: form
+                        field_path: qty
+                add_to_cart_button:
+                    blockType: button
+                    options:
+                        type: button
+                        text: Add to Cart
+                        attr:
+                            onclick: "productAddToCartForm.submit(this)"
+                            title: Add to Cart
+                            class: button btn-cart
+                form_end:
+                    blockType: form_end
+            tree:
+                main_panel:
+                    product_view:
+                        product_essential:
+                            form_start: ~
+                            color_field: ~
+                            qty_field: ~
+                            add_to_cart_button: ~
+                            form_end: ~
+```
+
+This will output the similar HTLM:
+```html
+<div class="product-view">
+    <div class="product-essential">
+        <form id="product_addtocart_form" action="/checkout" method="post">
+            <div class="control-group">
+                <label class="control-label required" for="color-uid-556dc223b4c23">Color<em>*</em></label>
+                <div class="controls">
+                    <select id="color-uid-556dc223b4c23" name="color" required="required" data-ftid="color">
+                        <option value="" selected="selected">Choose an Option...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label required" for="qty-uid-556dc223b4d40">Qty<em>*</em></label>
+                <div class="controls">
+                    <input type="text" id="qty-uid-556dc223b4d40" name="qty" required="required" data-ftid="qty">
+                </div>
+            </div>
+            <button onclick="productAddToCartForm.submit(this)" title="Add to Cart" class="button btn-cart">Add to Cart</button>
+            <input type="hidden" id="_token-uid-556dc223b4f1d" name="_token" data-ftid="_token" value="c15138c5384cb471ecccd1a32d99f44f5800a15a">
+        </form>
+    </div>
+</div>
+```
+
+Creating new block types
+-----------------------------------
+
+Since the existing layout block types are covering only basic scenarios, it is often required to create new ones.
+Let's see how this is done on the example of `ImageType` that will be responsible for rendering `<img>` elements.
+
+First, let's create the block type file itself and place it in the `Acme/Bundle/LayoutBundle/Layout/Block/Type` directory:
+```php
+namespace Acme\Bundle\LayoutBundle\Layout\Block\Type;
+
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
+
+class ImageType extends AbstractType
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setRequired(['path'])
+            ->setOptional(['alt']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    {
+        BlockUtils::processUrl($view, $options, true);
+
+        if (!empty($options['alt'])) {
+            $view->vars['alt'] = $options['alt'];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'image';
+    }
+}
+```
+
+Now we should register it in the DI container using the `layout.block_type` tag:
+```yaml
+    acme_layout.block_type.image:
+        class: Acme\Bundle\LayoutBundle\Layout\Block\Type\ImageType
+        tags:
+             - { name: layout.block_type, alias: image }
+```
+
+All that's left is to define the default template for our block type in `Resources/views/layouts/first_theme/default.html.twig`:
+```twig
+{% block image_widget -%}
+    <img src={{ path }}{% if alt is defined %} alt="{{ alt }}"{% endif %}{{ block('block_attributes') }} />
+{%- endblock %}
+```
+
+Now we can add the product image box to our example page:
+```yaml
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/product.html.twig'
+        - @addTree:
+            items:
+                product_image_box:
+                    blockType: container
+                    options:
+                        type: div
+                        attr:
+                            class: product-img-box
+                product_image_container:
+                    blockType: container
+                product_more_views:
+                    blockType: container
+                product_image:
+                    blockType: image
+                    options:
+                        path: { @value: $data.product.image }
+                        alt: { @value: $data.product.name }
+                        attr:
+                            id: image-main
+                            class: gallery-image visible
+                            title: { @value: $data.product.name }
+                product_gallery:
+                    blockType: list
+                    options:
+                        attr:
+                            class: product-image-thumbs
+                product_thumb:
+                    blockType: link
+                    options:
+                        path: '#'
+                        image: { @value: $data.product.image }
+                        attr:
+                            class: thumb-link
+            tree:
+                product_essential:
+                    product_image_box:
+                        product_image_container:
+                            product_image: ~
+                        product_more_views:
+                            product_gallery:
+                                product_thumb: ~
+```
+
+And add some block definitions to the block theme file:
+```twig
+{% block _product_image_container_widget %}
+    <div class="product-image product-image-zoom">
+        <div class="product-image-gallery">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _product_more_views_widget %}
+    <div class="more-views">
+        <h2>More Views</h2>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+```
+
+The resulting HTML will look as follows:
+```html
+<div class="product-img-box">
+    <div class="product-image product-image-zoom">
+        <div class="product-image-gallery">
+            <img src="/img/mtk000t.jpg" alt="Chelsea Tee" id="image-main" class="gallery-image visible" title="Chelsea Tee">
+        </div>
+    </div>
+    <div class="more-views">
+        <h2>More Views</h2>
+        <ul class="product-image-thumbs">
+            <li><a class="thumb-link" href="#"><img src="/img/mtk000t.jpg"></a></li>
+        </ul>
+    </div>
+</div>
+```
+
+Wrapping up
+-------------
+So far we've seen how the layout engine can be extended to suit every day needs. Now we can do some practice and add more blocks to finish our sample product view page.
+
+```yaml
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'AcmeLayoutBundle:layouts:first_theme/demo_layout_test/product.html.twig'
+        - @add:
+            id: product_shop
+            parentId: product_essential
+            blockType: container
+            options:
+                type: div
+                attr:
+                    class: product-shop
+            siblingId: product_image_box # add right after this block
+        - @addTree:
+            items:
+                product_options:
+                    blockType: container
+                    options:
+                        type: div
+                        attr:
+                            id: product-options-wrapper
+                            class: product-options
+                product_options_bottom:
+                    blockType: container
+                    options:
+                        type: div
+                        attr:
+                            class: product-options-bottom
+                required_fields_note:
+                    blockType: container
+                    options:
+                        type: p
+                        attr:
+                            class: product-options-bottom
+                required_fields_note_text:
+                     blockType: text
+                     options:
+                        text: "* Required Fields"
+                # Displaying product data using custom block template and passing it in "vars" option
+                product_name:
+                    blockType: block
+                    options:
+                        vars:
+                            name: { @value: $data.product.name }
+                product_price:
+                    blockType: block
+                    options:
+                        vars:
+                            price: { @value: $data.product.price }
+                # All blocks are managed in the layout update. No custom block templates are required.
+                product_extra:
+                    blockType: container
+                    options:
+                        type: div
+                        attr:
+                            class: extra-info
+                product_availability:
+                    blockType: container
+                    options:
+                        type: p
+                        attr:
+                            class:
+                                @join:
+                                    - ' '
+                                    - availability
+                                    - { @iif: [$data.product.is_in_stock, 'in-stock', 'out-of-stock'] }
+                product_availability_label_wrapper:
+                    blockType: container
+                    options:
+                        type: span
+                        attr:
+                            class: label
+                product_availability_value_wrapper:
+                    blockType: container
+                    options:
+                        type: span
+                        attr:
+                            class: value
+                product_availability_label:
+                    blockType: text
+                    options:
+                        text: Availability
+                product_availability_value:
+                    blockType: text
+                    options:
+                        text: { @iif: [$data.product.is_in_stock, 'In Stock', 'Out of Stock'] }
+                product_short_description:
+                    blockType: container
+                    options:
+                        type: div
+                        attr:
+                            class: short-description
+                product_short_description_wrapper:
+                    blockType: container
+                    options:
+                        type: span
+                        attr:
+                            class: std
+                product_short_description_value:
+                    blockType: text
+                    options:
+                        text: { @value: $data.product.short_description }
+                # Adding list of links in 2 different ways.
+                # 1 - Using only layout update
+                product_add_to_links:
+                    blockType: list
+                    options:
+                        attr:
+                            class: add-to-links
+                product_add_to_wishlist_link:
+                    blockType: link
+                    options:
+                        path:
+                            @join:
+                              - '/'
+                              - wishlist/index/add/product/
+                              - { @value: $data.product.id }
+                        text: Add to Wishlist
+                        attr:
+                            class: link-wishlist
+                # 2 - Using custom block template
+                product_share_links:
+                    blockType: list
+                    options:
+                        attr:
+                            class: sharing-links
+                        vars:
+                            links: [{path: '/sendfriend', text: 'Email to a Friend'}, {path: '/facebook', text: 'Share on Facebook'}]
+            tree:
+                product_shop:
+                    product_name: ~
+                    product_price: ~
+                    product_extra:
+                        product_availability:
+                            product_availability_label_wrapper:
+                                product_availability_label: ~
+                            product_availability_value_wrapper:
+                                product_availability_value: ~
+                    product_short_description:
+                        product_short_description_wrapper:
+                            product_short_description_value:
+                    product_options:
+                        required_fields_note:
+                            required_fields_note_text: ~
+                    product_options_bottom:
+                        product_add_to_links:
+                            product_add_to_wishlist_link: ~
+                        product_share_links: ~
+        # Final position does not depend on move operations order
+        - @move:
+            id: color_field
+            parentId: product_options
+            siblingId: ~
+            prepend: true
+        - @add:
+            id: qty_wrapper
+            parentId: add_to_cart_wrapper
+            blockType: container
+            options:
+                type: div
+                attr:
+                    class: qty-wrapper
+        - @add:
+            id: add_to_cart_buttonaa
+            parentId: add_to_cart_wrapper
+            blockType: container
+            options:
+                type: div
+                attr:
+                    class: add-to-cart-buttons
+        - @move:
+            id: add_to_cart_button
+            parentId: add_to_cart_buttonaa
+        - @move:
+            id: qty_field
+            parentId: qty_wrapper
+        - @move:
+            id: add_to_cart_wrapper
+            parentId: product_options_bottom
+            siblingId: ~
+            prepend: true
+        # Adding product collateral tabs
+        - @add:
+            id: product_collateral_tabs
+            parentId: product_view
+            blockType: container
+            siblingId: product_essential
+        - @add:
+            id: product_collateral_tab_description
+            parentId: product_collateral_tabs
+            blockType: text
+            options:
+                text: { @value: $data.product.description }
+                vars:
+                    tabLabel: "Description"
+        # Adding footer links
+        - @add:
+            id: company_links
+            parentId: footer
+            blockType: list
+            options:
+                label: "Company"
+                attr:
+                    class: "links"
+        - @add:
+            id: social_media_links
+            parentId: footer
+            blockType: list
+            options:
+                label: "Connect With Us"
+                attr:
+                    class: "links social-media"
+        - @add:
+            id: footer_about_us_link
+            parentId: company_links
+            blockType: link
+            options:
+                path: "/about-us/"
+                text: About Us
+        - @add:
+            id: footer_facebook_link
+            parentId: social_media_links
+            blockType: link
+            options:
+                path: "#"
+                text: Facebook
+```
+
+Our block theme will include the following blocks:
+```twig
+{% block span_container_widget %}
+    <span {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </span>
+{% endblock %}
+
+{% block p_container_widget %}
+    <p {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </p>
+{% endblock %}
+
+{% block _product_name_widget %}
+    <div class="product-name">
+        <span class="h1">{{ name }}</span>
+    </div>
+{% endblock %}
+
+{% block _product_price_widget %}
+    <div class="price-info">
+        <div class="price-box">
+            <span class="regular-price" id="product-price">
+                <span class="price">{{ price }}</span>
+            </span>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _product_share_links_widget %}
+    <ul{{ block('block_attributes') }}>
+        {% for link in links %}
+            <li><a href="{{ link.path }}">{{ link.text }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block _product_collateral_tabs_widget -%}
+    <div class="product-collateral toggle-content tabs">
+        <dl id="collateral-tabs" class="collateral-tabs">
+            {% for child in block -%}
+                <dt class="tab"><span>{{ child.vars.tabLabel }}</span></dt>
+                <dd class="tab-container">
+                    <div class="tab-content">
+                        {{ block_widget(child) }}
+                    </div>
+                </dd>
+            {%- endfor %}
+        </dl>
+    </div>
+{%- endblock %}
+
+{% block footer_links_block -%}
+    <div{{ block('block_attributes') }}>
+        <div class="block-title">
+            <strong><span>{{ label }}</span></strong>
+        </div>
+        {{ block_widget(block) }}
+    </div>
+{%- endblock %}
+
+{% block _company_links_widget -%}
+    {{ block('footer_links_block') }}
+{%- endblock %}
+
+{% block _social_media_links_widget -%}
+    {{ block('footer_links_block') }}
+{%- endblock %}
+```
+
+In the result we'll be getting the following HTML for the main content:
+```html
+<div class="product-view">
+    <div class="product-essential">
+        <form id="product_addtocart_form" action="/checkout" method="post">
+            <div class="product-img-box">
+                <div class="product-image product-image-zoom">
+                    <div class="product-image-gallery">
+                        <img src="/img/mtk000t.jpg" alt="Chelsea Tee" id="image-main" class="gallery-image visible"
+                             title="Chelsea Tee">
+                    </div>
+                </div>
+                <div class="more-views">
+                    <h2>More Views</h2>
+                    <ul class="product-image-thumbs">
+                        <li><a class="thumb-link" href="#"><img src="/img/mtk000t.jpg"> </a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="product-shop">
+                <div class="product-name">
+                    <span class="h1">Chelsea Tee</span>
+                </div>
+                <div class="price-info">
+                    <div class="price-box">
+                        <span class="regular-price" id="product-price">
+                            <span class="price">$75.00</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="extra-info">
+                    <p class="availability in-stock">
+                        <span class="label">Availability</span>
+                        <span class="value">In Stock</span>
+                    </p>
+                </div>
+                <div class="short-description">
+                    <span class="std">Minimalist style and maximum comfort meet in this lightweight tee.</span>
+                </div>
+                <div id="product-options-wrapper" class="product-options">
+                    <div class="control-group"><label class="control-label required" for="color-uid-557060c04f53a">Color<em>*</em></label>
+                        <div class="controls">
+                            <select id="color-uid-557060c04f53a" name="color" required="required" data-ftid="color">
+                                <option value="" selected="selected">Choose an Option...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="product-options-bottom">* Required Fields</p>
+                </div>
+                <div class="product-options-bottom">
+                    <div class="add-to-cart">
+                        <div class="qty-wrapper">
+                            <div class="control-group">
+                                <label class="control-label required" for="qty-uid-557060c04f5f4">Qty<em>*</em></label>
+                                <div class="controls">
+                                    <input type="text" id="qty-uid-557060c04f5f4" name="qty" required="required" data-ftid="qty">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="add-to-cart-buttons">
+                            <button onclick="productAddToCartForm.submit(this)" title="Add to Cart" class="button btn-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <ul class="add-to-links">
+                        <li><a class="link-wishlist" href="wishlist/index/add/product//99">Add to Wishlist </a></li>
+                    </ul>
+                    <ul class="sharing-links">
+                        <li><a href="/sendfriend">Email to a Friend</a></li>
+                        <li><a href="/facebook">Share on Facebook</a></li>
+                    </ul>
+                </div>
+            </div>
+            <input type="hidden" id="_token-uid-557060c04f772" name="_token" data-ftid="_token" value="befbf76fe2155ddb5efec185140b05808790a7c6">
+        </form>
+    </div>
+    <div class="product-collateral toggle-content tabs">
+        <dl id="collateral-tabs" class="collateral-tabs">
+            <dt class="tab"><span>Description</span></dt>
+            <dd class="tab-container">
+                <div class="tab-content">
+                    Ultrasoft, lightweight V-neck tee. 100% cotton. Machine wash.
+                </div>
+            </dd>
+        </dl>
+    </div>
+</div>
+```
+
+And footer:
+```html
+<div class="footer-container">
+    <div class="footer">
+        <div class="links">
+            <div class="block-title">
+                <strong><span>Company</span></strong>
+            </div>
+            <ul class="links">
+                <li><a href="/about-us/">About Us</a></li>
+            </ul>
+        </div>
+        <div class="links social-media">
+            <div class="block-title">
+                <strong><span>Connect With Us</span></strong>
+            </div>
+            <ul class="links social-media">
+                <li><a href="#">Facebook</a></li>
+            </ul>
+        </div>
+    </div>
 </div>
 ```
