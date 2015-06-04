@@ -12,15 +12,15 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class EntityTagsSelectType extends AbstractType
 {
-    /** @var AclHelper  */
+    /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var Registry  */
+    /** @var Registry */
     protected $doctrine;
 
     public function __construct(AclHelper $aclHelper, Registry $doctrine)
     {
-        $this->doctrine = $doctrine;
+        $this->doctrine  = $doctrine;
         $this->aclHelper = $aclHelper;
     }
 
@@ -47,7 +47,7 @@ class EntityTagsSelectType extends AbstractType
     {
         $choices = function (Options $options) {
             if (empty($options['entity_class'])) {
-                return array();
+                return [];
             }
 
             return $this->aclHelper->apply($this->doctrine->getRepository('OroTagBundle:Tag')
@@ -60,10 +60,10 @@ class EntityTagsSelectType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'class'         => 'OroTagBundle:Tag',
-                'property'      => 'name',
-                'entity_class'  => null,
-                'choices' => $choices
+                'class'        => 'OroTagBundle:Tag',
+                'property'     => 'name',
+                'entity_class' => null,
+                'choices'      => $choices
             ]
         );
     }

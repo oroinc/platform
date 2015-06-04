@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 class TagVirtualRelationProvider implements VirtualRelationProviderInterface
 {
     const RELATION_NAME = 'tags_virtual';
-    const TARGET_ALIAS = 'virtualTag';
+    const TARGET_ALIAS  = 'virtualTag';
 
     /**
      * {@inheritdoc}
