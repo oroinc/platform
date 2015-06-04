@@ -33,7 +33,7 @@ class OroUserExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'oro_gender'       => new \Twig_Function_Method($this, 'getGenderLabel'),
+            'oro_gender'       => new \Twig_SimpleFunction('oro_gender', [$this, 'getGenderLabel']),
             'get_current_user' => new \Twig_SimpleFunction('get_current_user', [$this, 'getCurrentUser'])
         ];
     }
