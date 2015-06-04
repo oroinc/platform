@@ -33,9 +33,9 @@ class BeforeListRenderEvent extends Event
      */
     public function __construct(Twig_Environment $environment, ScrollData $scrollData, FormView $formView = null)
     {
-        $this->formView    = $formView;
-        $this->scrollData  = $scrollData;
         $this->environment = $environment;
+        $this->scrollData  = $scrollData;
+        $this->formView    = $formView;
     }
 
     /**
