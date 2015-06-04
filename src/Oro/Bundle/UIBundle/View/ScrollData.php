@@ -4,6 +4,14 @@ namespace Oro\Bundle\UIBundle\View;
 
 class ScrollData
 {
+    const TITLE = 'title';
+    const USE_SUB_BLOCK_DIVIDER = 'useSubBlockDivider';
+    const SUB_BLOCKS = 'subblocks';
+    const PRIORITY = 'priority';
+    const BLOCK_CLASS = 'class';
+    const DATA_BLOCKS = 'dataBlocks';
+    const DATA = 'data';
+
     /**
      * @var array
      */
@@ -27,22 +35,22 @@ class ScrollData
     public function addBlock($title, $priority = null, $class = null, $useSubBlockDivider = true)
     {
         $block = [
-            'title' => $title,
-            'useSubBlockDivider' => $useSubBlockDivider,
-            'subblocks' => [],
+            self::TITLE => $title,
+            self::USE_SUB_BLOCK_DIVIDER => $useSubBlockDivider,
+            self::SUB_BLOCKS => [],
         ];
 
         if (null !== $priority) {
-            $block['priority'] = $priority;
+            $block[self::PRIORITY] = $priority;
         }
 
         if (null !== $class) {
-            $block['class'] = $class;
+            $block[self::BLOCK_CLASS] = $class;
         }
 
-        $this->data['dataBlocks'][] = $block;
+        $this->data[self::DATA_BLOCKS][] = $block;
 
-        return $this->getLastKey($this->data['dataBlocks']);
+        return $this->getLastKey($this->data[self::DATA_BLOCKS]);
     }
 
     /**
@@ -54,15 +62,15 @@ class ScrollData
     {
         $this->assertBlockDefined($blockId);
 
-        $subBlock = ['data' => []];
+        $subBlock = [self::DATA => []];
 
         if (null !== $title) {
-            $subBlock['title'] = $title;
+            $subBlock[self::TITLE] = $title;
         }
 
-        $this->data['dataBlocks'][$blockId]['subblocks'][] = $subBlock;
+        $this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS][] = $subBlock;
 
-        return $this->getLastKey($this->data['dataBlocks'][$blockId]['subblocks']);
+        return $this->getLastKey($this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS]);
     }
 
     /**
@@ -75,9 +83,9 @@ class ScrollData
     {
         $this->assertSubBlockDefined($blockId, $subBlockID);
 
-        $this->data['dataBlocks'][$blockId]['subblocks'][$subBlockID]['data'][] = $html;
+        $this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS][$subBlockID][self::DATA][] = $html;
 
-        return $this->getLastKey($this->data['dataBlocks'][$blockId]['subblocks'][$subBlockID]['data']);
+        return $this->getLastKey($this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS][$subBlockID][self::DATA]);
     }
 
     /**
@@ -115,7 +123,7 @@ class ScrollData
      */
     protected function assertBlockDefined($blockId)
     {
-        if (!array_key_exists($blockId, $this->data['dataBlocks'])) {
+        if (!array_key_exists($blockId, $this->data[self::DATA_BLOCKS])) {
             throw new \LogicException(sprintf('Block %s is not defined', $blockId));
         }
     }
@@ -128,7 +136,7 @@ class ScrollData
     {
         $this->assertBlockDefined($blockId);
 
-        if (!array_key_exists($subBlockId, $this->data['dataBlocks'][$blockId]['subblocks'])) {
+        if (!array_key_exists($subBlockId, $this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS])) {
             throw new \LogicException(sprintf('Subblock %s is not defined', $subBlockId));
         }
     }

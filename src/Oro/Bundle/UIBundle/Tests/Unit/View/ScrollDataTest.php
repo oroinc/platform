@@ -48,11 +48,11 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
         return [
             'minimum parameters' => [
                 'expected' => [
-                    'dataBlocks' => [
+                    ScrollData::DATA_BLOCKS => [
                         [
-                            'title' => 'test title',
-                            'useSubBlockDivider' => true,
-                            'subblocks' => [],
+                            ScrollData::TITLE => 'test title',
+                            ScrollData::USE_SUB_BLOCK_DIVIDER => true,
+                            ScrollData::SUB_BLOCKS => [],
                         ]
                     ]
                 ],
@@ -60,13 +60,13 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
             ],
             'maximum parameters' => [
                 'expected' => [
-                    'dataBlocks' => [
+                    ScrollData::DATA_BLOCKS => [
                         [
-                            'title' => 'test title',
-                            'priority' => 25,
-                            'class' => 'active',
-                            'useSubBlockDivider' => false,
-                            'subblocks' => [],
+                            ScrollData::TITLE => 'test title',
+                            ScrollData::PRIORITY => 25,
+                            ScrollData::BLOCK_CLASS => 'active',
+                            ScrollData::USE_SUB_BLOCK_DIVIDER => false,
+                            ScrollData::SUB_BLOCKS => [],
                         ]
                     ]
                 ],
@@ -98,23 +98,25 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
     public function addSubBlockDataProvider()
     {
         $source = [
-            'dataBlocks' => [
+            ScrollData::DATA_BLOCKS => [
                 0 => [
-                    'title' => 'test title 0',
-                    'subblocks' => [],
+                    ScrollData::TITLE => 'test title 0',
+                    ScrollData::SUB_BLOCKS => [],
                 ],
                 1 => [
-                    'title' => 'test title 1',
-                    'subblocks' => [],
+                    ScrollData::TITLE => 'test title 1',
+                    ScrollData::SUB_BLOCKS => [],
                 ]
             ]
         ];
 
         $expectedFirst = $source;
-        $expectedFirst['dataBlocks'][0]['subblocks'][] = ['data' => []];
+        $expectedFirst[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][]
+            = [ScrollData::DATA => []];
 
         $expectedSecond = $source;
-        $expectedSecond['dataBlocks'][1]['subblocks'][] = ['title' => 'subblock title', 'data' => []];
+        $expectedSecond[ScrollData::DATA_BLOCKS][1][ScrollData::SUB_BLOCKS][]
+            = [ScrollData::TITLE => 'subblock title', ScrollData::DATA => []];
 
         return [
             'add to first block' => [
@@ -136,12 +138,12 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
         $html = 'another data';
 
         $data = [
-            'dataBlocks' => [
+            ScrollData::DATA_BLOCKS => [
                 0 => [
-                    'title' => 'test title 0',
-                    'subblocks' => [
+                    ScrollData::TITLE => 'test title 0',
+                    ScrollData::SUB_BLOCKS => [
                         0 => [
-                            'data' => ['some data']
+                            ScrollData::DATA => ['some data']
                         ],
                     ],
                 ],
@@ -149,7 +151,7 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
         ];
 
         $expected = $data;
-        $expected['dataBlocks'][0]['subblocks'][0]['data'][] = $html;
+        $expected[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][0][ScrollData::DATA][] = $html;
 
         $this->scrollData->setData($data);
         $this->assertEquals(1, $this->scrollData->addSubBlockData(0, 0, $html));
@@ -162,7 +164,7 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddSubBlockException()
     {
-        $this->scrollData->setData(['dataBlocks' => []]);
+        $this->scrollData->setData([ScrollData::DATA_BLOCKS => []]);
         $this->scrollData->addSubBlock(0);
     }
 
@@ -172,7 +174,7 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddSubBlockDataNoBlockException()
     {
-        $this->scrollData->setData(['dataBlocks' => []]);
+        $this->scrollData->setData([ScrollData::DATA_BLOCKS => []]);
         $this->scrollData->addSubBlockData(0, 0, 'html');
     }
 
@@ -182,7 +184,7 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddSubBlockDataNoSubBlockException()
     {
-        $this->scrollData->setData(['dataBlocks' => [0 => ['subblocks' => []]]]);
+        $this->scrollData->setData([ScrollData::DATA_BLOCKS => [0 => [ScrollData::SUB_BLOCKS => []]]]);
         $this->scrollData->addSubBlockData(0, 0, 'html');
     }
 }
