@@ -6,9 +6,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UIBundle\Route\Router;
+use Oro\Bundle\FormBundle\Event\FormHandler\AfterFormProcessEvent;
+use Oro\Bundle\FormBundle\Event\FormHandler\Events;
+use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
 
 class UpdateHandler
 {
@@ -33,17 +37,29 @@ class UpdateHandler
     protected $doctrineHelper;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @param Request $request
      * @param Session $session
      * @param Router $router
      * @param DoctrineHelper $doctrineHelper
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(Request $request, Session $session, Router $router, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        Request $request,
+        Session $session,
+        Router $router,
+        DoctrineHelper $doctrineHelper,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->request = $request;
         $this->session = $session;
         $this->router = $router;
         $this->doctrineHelper = $doctrineHelper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -117,18 +133,43 @@ class UpdateHandler
      * @param FormInterface $form
      * @param object $entity
      * @return bool
+     * @throws \Exception
      */
     protected function saveForm(FormInterface $form, $entity)
     {
+        $event = new FormProcessEvent($form, $entity);
+        $this->eventDispatcher->dispatch(Events::BEFORE_FORM_DATA_SET, $event);
+
+        if ($event->isFormProcessInterrupted()) {
+            return false;
+        }
+
         $form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+            $event = new FormProcessEvent($form, $entity);
+            $this->eventDispatcher->dispatch(Events::BEFORE_FORM_SUBMIT, $event);
+
+            if ($event->isFormProcessInterrupted()) {
+                return false;
+            }
+
             $form->submit($this->request);
 
             if ($form->isValid()) {
                 $manager = $this->doctrineHelper->getEntityManager($entity);
-                $manager->persist($entity);
-                $manager->flush();
+
+                $manager->beginTransaction();
+                try {
+                    $manager->persist($entity);
+                    $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $entity));
+                    $manager->flush();
+                    $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $entity));
+                    $manager->commit();
+                } catch (\Exception $e) {
+                    $manager->rollback();
+                    throw $e;
+                }
 
                 return true;
             }
