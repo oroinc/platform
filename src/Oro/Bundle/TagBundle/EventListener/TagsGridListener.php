@@ -10,11 +10,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 class TagsGridListener
 {
     const GRID_EXTEND_ENTITY_PATH = '[extended_entity_name]';
-    const GRID_LEFT_JOIN_PATH     = '[source][query][join][left]';
-    const GRID_FROM_PATH          = '[source][query][from]';
-    const GRID_SELECT_PATH        = '[source][query][select]';
-    const GRID_FILTERS_PATH       = '[filters][columns]';
-    const GRID_NAME_PATH          = 'name';
+    const GRID_LEFT_JOIN_PATH = '[source][query][join][left]';
+    const GRID_FROM_PATH = '[source][query][from]';
+    const GRID_SELECT_PATH = '[source][query][select]';
+    const GRID_FILTERS_PATH = '[filters][columns]';
+    const GRID_NAME_PATH = 'name';
 
     const COLUMN_NAME = 'tagname';
 
@@ -62,23 +62,24 @@ class TagsGridListener
             $config->offsetSetByPath(self::GRID_FROM_PATH, $fromParts);
         }
 
-        $leftJoins   = $config->offsetGetByPath(self::GRID_LEFT_JOIN_PATH, []);
-        $leftJoins[] = [
-            'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
-            'alias'         => 'tagging',
-            'conditionType' => 'WITH',
-            'condition'     => sprintf(
-                "(tagging.entityName = '%s' and tagging.recordId = %s.id)",
-                $entityClassName,
-                $alias
-            )
-        ];
-        $leftJoins[] = ['join' => 'tagging.tag', 'alias' => 'tag'];
-        $config->offsetSetByPath(self::GRID_LEFT_JOIN_PATH, $leftJoins);
+        $config->offsetAddToArrayByPath(
+            self::GRID_LEFT_JOIN_PATH,
+            [
+                [
+                    'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
+                    'alias'         => 'tagging',
+                    'conditionType' => 'WITH',
+                    'condition'     => sprintf(
+                        "(tagging.entityName = '%s' and tagging.recordId = %s.id)",
+                        $entityClassName,
+                        $alias
+                    )
+                ],
+                ['join' => 'tagging.tag', 'alias' => 'tag']
+            ]
+        );
 
-        $select   = $config->offsetGetByPath(self::GRID_SELECT_PATH, []);
-        $select[] = 'COUNT(tag.id) as tagsCount';
-        $config->offsetSetByPath(self::GRID_SELECT_PATH, $select);
+        $config->offsetAddToArrayByPath(self::GRID_SELECT_PATH, ['COUNT(tag.id) as tagsCount']);
 
         $filters[self::COLUMN_NAME] = [
             'type'         => 'entity',
