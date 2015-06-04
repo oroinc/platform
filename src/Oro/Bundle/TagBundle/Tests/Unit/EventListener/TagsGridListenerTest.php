@@ -48,32 +48,38 @@ class TagsGridListenerTest extends \PHPUnit_Framework_TestCase
         $event    = new BuildBefore($datagrid, $config);
         $listener->onBuildBefore($event);
         $this->assertEquals('COUNT(tag.id) as tagsCount', $config->offsetGetByPath('[source][query][select][1]'));
-        $this->assertEquals([
-            'type'         => 'entity',
-            'label'        => 'oro.tag.entity_plural_label',
-            'data_name'    => 'tag.id',
-            'enabled'      => false,
-            'translatable' => true,
-            'options'      => [
-                'field_type'    => 'oro_tag_entity_tags_selector',
-                'field_options' => [
-                    'entity_class'         => 'Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable',
-                    'multiple'             => true,
-                    'translatable_options' => true
+        $this->assertEquals(
+            [
+                'type'         => 'entity',
+                'label'        => 'oro.tag.entity_plural_label',
+                'data_name'    => 'tag.id',
+                'enabled'      => false,
+                'translatable' => true,
+                'options'      => [
+                    'field_type'    => 'oro_tag_entity_tags_selector',
+                    'field_options' => [
+                        'entity_class'         => 'Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable',
+                        'multiple'             => true,
+                        'translatable_options' => true
+                    ]
                 ]
-            ]
-        ], $config->offsetGetByPath('[filters][columns][tagname]'));
-        $this->assertEquals([
-            'left' => [
-                [
-                    'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
-                    'alias'         => 'tagging',
-                    'conditionType' => 'WITH',
-                    'condition'     => "(tagging.entityName = "
-                        . "'Oro\\Bundle\\TagBundle\\Tests\\Unit\\Fixtures\\Taggable' and tagging.recordId = t.id)",
-                ],
-                ['join' => 'tagging.tag', 'alias' => 'tag']
-            ]
-        ], $config->offsetGetByPath('[source][query][join]'));
+            ],
+            $config->offsetGetByPath('[filters][columns][tagname]')
+        );
+        $this->assertEquals(
+            [
+                'left' => [
+                    [
+                        'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
+                        'alias'         => 'tagging',
+                        'conditionType' => 'WITH',
+                        'condition'     => "(tagging.entityName = "
+                            . "'Oro\\Bundle\\TagBundle\\Tests\\Unit\\Fixtures\\Taggable' and tagging.recordId = t.id)",
+                    ],
+                    ['join' => 'tagging.tag', 'alias' => 'tag']
+                ]
+            ],
+            $config->offsetGetByPath('[source][query][join]')
+        );
     }
 }
