@@ -10,11 +10,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 class TagsGridListener
 {
     const GRID_EXTEND_ENTITY_PATH = '[extended_entity_name]';
-    const GRID_LEFT_JOIN_PATH = '[source][query][join][left]';
-    const GRID_FROM_PATH = '[source][query][from]';
-    const GRID_SELECT_PATH = '[source][query][select]';
-    const GRID_FILTERS_PATH = '[filters][columns]';
-    const GRID_NAME_PATH = 'name';
+    const GRID_LEFT_JOIN_PATH     = '[source][query][join][left]';
+    const GRID_FROM_PATH          = '[source][query][from]';
+    const GRID_SELECT_PATH        = '[source][query][select]';
+    const GRID_FILTERS_PATH       = '[filters][columns]';
+    const GRID_NAME_PATH          = 'name';
 
     const COLUMN_NAME = 'tagname';
 
