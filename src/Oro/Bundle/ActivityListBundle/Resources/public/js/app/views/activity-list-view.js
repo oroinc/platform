@@ -109,6 +109,8 @@ define(function (require) {
             this.collection.setPage(1);
             this._setPageNumber();
             this._reload();
+
+            mediator.trigger('widget_success:activity_list:refresh');
         },
 
         _initPager: function () {
@@ -382,6 +384,8 @@ define(function (require) {
                     url: this._getUrl('itemDelete', model),
                     success: _.bind(function () {
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
+                        mediator.trigger('widget_success:activity_list:item:delete');
+
                         this._reload();
                     }, this),
                     error: _.bind(function (model, response) {
