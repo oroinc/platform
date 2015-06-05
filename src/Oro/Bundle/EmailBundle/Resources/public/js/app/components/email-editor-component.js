@@ -9,9 +9,14 @@ define(function (require) {
         emailTemplatesProvider = require('../../util/email-templates-provider'),
         EmailEditorModel = require('../models/email-editor-model'),
         EmailModel = require('../models/email-model'),
-        DialogWidget = require('orowindows/js/widget/dialog-widget');
+        DialogWidget = require('oro/dialog-widget');
 
     EmailEditorComponent = BaseComponent.extend({
+        /**
+         * margin of <div class="control-group">
+         */
+        CONTROL_GROUP_MARGIN: 16,
+
         listen: {
             'parentResize': 'onResize'
         },
@@ -59,8 +64,8 @@ define(function (require) {
                 outerHeight = parentView.widget.height();
                 innerHeight = this.view.$el.height();
                 editorHeight = this.view.pageComponent('bodyEditor').view.getHeight();
-                availableHeight = Math.min(outerHeight - innerHeight + editorHeight, this.options.minimalWysiwygEditorHeight);
-                console.log(availableHeight);
+                availableHeight = Math.max(outerHeight - innerHeight + editorHeight - this.CONTROL_GROUP_MARGIN, this.options.minimalWysiwygEditorHeight);
+                this.view.pageComponent('bodyEditor').view.setHeight(availableHeight);
             } else {
                 throw new Error("Resize behaviour is supported only for dialog widgets");
             }

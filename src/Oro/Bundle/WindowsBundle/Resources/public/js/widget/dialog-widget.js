@@ -273,8 +273,8 @@ define(function (require) {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
                 }
                 this.widget = $('<div/>');
-                this.widget.html(this.$el).dialog(dialogOptions);
                 this._bindDialogEvents();
+                this.widget.html(this.$el).dialog(dialogOptions);
                 this.widget.attr('data-layout', 'separate');
             } else {
                 this.widget.html(this.$el);
