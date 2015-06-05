@@ -62,6 +62,11 @@ class JobExecutor
     protected $skipClear = false;
 
     /**
+     * @var bool
+     */
+    protected $validationMode = false;
+
+    /**
      * @param ConnectorRegistry $jobRegistry
      * @param BatchJobRepository $batchJobRepository
      * @param ContextRegistry $contextRegistry
@@ -122,17 +127,20 @@ class JobExecutor
 
             $failureExceptions = $this->collectFailureExceptions($jobExecution);
 
-            if ($jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions) {
-                if (!$isTransactionRunning) {
-                    $this->entityManager->commit();
-                }
+            $isSuccessful = $jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions;
+            if ($isSuccessful) {
                 $jobResult->setSuccessful(true);
-            } else {
-                if (!$isTransactionRunning) {
-                    $this->entityManager->rollback();
-                }
+            } elseif ($failureExceptions) {
                 foreach ($failureExceptions as $failureException) {
                     $jobResult->addFailureException($failureException);
+                }
+            }
+
+            if (!$isTransactionRunning) {
+                if ($isSuccessful && !$this->validationMode) {
+                    $this->entityManager->commit();
+                } else {
+                    $this->entityManager->rollback();
                 }
             }
 
@@ -401,5 +409,21 @@ class JobExecutor
     public function isSkipClear()
     {
         return $this->skipClear;
+    }
+
+    /**
+     * @param boolean $validationMode
+     */
+    public function setValidationMode($validationMode)
+    {
+        $this->validationMode = $validationMode;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isValidationMode()
+    {
+        return $this->validationMode;
     }
 }
