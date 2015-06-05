@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Proxy\Proxy;
-use Doctrine\ORM\Internal\Hydration\ArrayHydrator;
 use Doctrine\Common\Collections\Criteria;
 
 use FOS\RestBundle\Util\Codes;

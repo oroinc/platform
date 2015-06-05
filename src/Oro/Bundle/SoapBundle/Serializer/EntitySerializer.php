@@ -6,12 +6,17 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+
 /**
  * @todo: This is draft implementation of the entity serializer.
  *       It is expected that the full implementation will be done when new API component is implemented.
  * What need to do:
  *  * by default the value of identifier field should be used
  *    for related entities (now it should be configured manually in serialization rules)
+ *  * add support for extended fields
  *
  * Example of serialization rules used in the $config parameter of
  * {@see serialize}, {@see serializeEntities} and {@see prepareQuery} methods:
@@ -100,6 +105,9 @@ class EntitySerializer
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var DataAccessorInterface */
     protected $dataAccessor;
 
@@ -108,15 +116,18 @@ class EntitySerializer
 
     /**
      * @param ManagerRegistry          $doctrine
+     * @param ConfigManager            $configManager
      * @param DataAccessorInterface    $dataAccessor
      * @param DataTransformerInterface $dataTransformer
      */
     public function __construct(
         ManagerRegistry $doctrine,
+        ConfigManager $configManager,
         DataAccessorInterface $dataAccessor,
         DataTransformerInterface $dataTransformer
     ) {
         $this->doctrineHelper  = new DoctrineHelper($doctrine);
+        $this->configManager   = $configManager;
         $this->dataAccessor    = $dataAccessor;
         $this->dataTransformer = $dataTransformer;
     }
@@ -520,10 +531,11 @@ class EntitySerializer
     /**
      * @param string $entityClass
      * @param array  $config
+     * @param bool   $allowExtendedFields
      *
      * @return string[]
      */
-    protected function getFields($entityClass, $config)
+    protected function getFields($entityClass, $config, $allowExtendedFields = false)
     {
         if ($this->isExcludeAll($config)) {
             if (empty($config['fields'])) {
@@ -537,8 +549,10 @@ class EntitySerializer
             $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
             $fields         = array_filter(
                 array_merge($entityMetadata->getFieldNames(), $entityMetadata->getAssociationNames()),
-                function ($field) use ($entityClass) {
-                    return $this->dataAccessor->hasGetter($entityClass, $field);
+                function ($field) use ($entityClass, $config, $allowExtendedFields) {
+                    return
+                        $this->hasFieldConfig($config, $field)
+                        || $this->isApplicableField($entityClass, $field, $allowExtendedFields);
                 }
             );
         }
@@ -548,6 +562,55 @@ class EntitySerializer
         }
 
         return $fields;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $field
+     * @param bool   $allowExtendedFields
+     *
+     * @return bool
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    protected function isApplicableField($entityClass, $field, $allowExtendedFields)
+    {
+        if (!$this->dataAccessor->hasGetter($entityClass, $field)) {
+            return false;
+        }
+
+        $fieldModel = $this->configManager->getConfigFieldModel($entityClass, $field);
+        if (!$fieldModel) {
+            // this serializer works with non configurable entities as well
+            return true;
+        }
+
+        if ($fieldModel->getMode() === ConfigModelManager::MODE_HIDDEN) {
+            // exclude hidden fields
+            return false;
+        }
+
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $extendConfig         = $extendConfigProvider->getConfig($entityClass, $field);
+
+        if (!$allowExtendedFields && $extendConfig->is('is_extend')) {
+            // exclude extended fields if it is requested
+            return false;
+        }
+
+        if ($extendConfig->is('is_deleted') || $extendConfig->is('state', ExtendScope::STATE_NEW)) {
+            // exclude deleted and not created yet fields
+            return false;
+        }
+
+        if ($extendConfig->has('target_entity')
+            && $extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
+        ) {
+            // exclude associations with deleted custom entities
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -635,6 +698,24 @@ class EntitySerializer
     protected function getEntityIdGetter($entityClass)
     {
         return 'get' . ucfirst($this->getEntityIdFieldName($entityClass));
+    }
+
+    /**
+     * Checks if the specified field has some special configuration
+     *
+     * @param array  $config The config of an entity the specified field belongs
+     * @param string $field  The name of the field
+     *
+     * @return array
+     */
+    protected function hasFieldConfig($config, $field)
+    {
+        return
+            !empty($config['fields'])
+            && (
+                isset($config['fields'][$field])
+                || array_key_exists($field, $config['fields'])
+            );
     }
 
     /**

@@ -18,7 +18,11 @@ use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Stream\Local as LocalStream;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class AttachmentManager
 {
@@ -35,27 +39,31 @@ class AttachmentManager
     /** @var  array */
     protected $fileIcons;
 
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $securityFacadeLink;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
     /**
-     * @param FilesystemMap $filesystemMap
-     * @param Router        $router
-     * @param ServiceLink   $securityFacadeLink
-     * @param array         $fileIcons
+     * @param FilesystemMap      $filesystemMap
+     * @param Router             $router
+     * @param ServiceLink        $securityFacadeLink
+     * @param array              $fileIcons
+     * @param AssociationManager $associationManager
      */
     public function __construct(
         FilesystemMap $filesystemMap,
         Router $router,
         ServiceLink $securityFacadeLink,
-        $fileIcons
+        $fileIcons,
+        AssociationManager $associationManager
     ) {
         $this->filesystem         = $filesystemMap->get('attachments');
         $this->router             = $router;
         $this->fileIcons          = $fileIcons;
         $this->securityFacadeLink = $securityFacadeLink;
+        $this->associationManager = $associationManager;
     }
 
     /**
@@ -173,12 +181,15 @@ class AttachmentManager
     /**
      * Get file content
      *
-     * @param File $entity
+     * @param File|string $file The File object or file name
+     *
      * @return string
      */
-    public function getContent(File $entity)
+    public function getContent($file)
     {
-        return $this->filesystem->get($entity->getFilename())->getContent();
+        return $this->filesystem
+            ->get($file instanceof File ? $file->getFilename() : $file)
+            ->getContent();
     }
 
     /**
@@ -200,6 +211,26 @@ class AttachmentManager
             $entity,
             $type,
             $absolute
+        );
+    }
+
+    /**
+     * Get url of REST API resource which can be used to get the content of the given file
+     *
+     * @param int    $fileId           The id of the File object
+     * @param string $ownerEntityClass The FQCN of an entity the File object belongs
+     * @param mixed  $ownerEntityId    The id of an entity the File object belongs
+     *
+     * @return string
+     */
+    public function getFileRestApiUrl($fileId, $ownerEntityClass, $ownerEntityId)
+    {
+        return $this->router->generate(
+            'oro_api_get_file',
+            [
+                'key' => $this->buildFileKey($fileId, $ownerEntityClass, $ownerEntityId),
+                '_format' => 'binary'
+            ]
         );
     }
 
@@ -355,5 +386,57 @@ class AttachmentManager
         if ($entity->isEmptyFile() && $entity->getFilename() === null) {
             $em->remove($entity);
         }
+    }
+
+    /**
+     * Builds the key of the File object
+     *
+     * @param int    $fileId           The id of the File object
+     * @param string $ownerEntityClass The FQCN of an entity the File object belongs
+     * @param mixed  $ownerEntityId    The id of an entity the File object belongs
+     *
+     * @return string
+     */
+    public function buildFileKey($fileId, $ownerEntityClass, $ownerEntityId)
+    {
+        return str_replace(
+            '/',
+            '_',
+            base64_encode(serialize([$fileId, $ownerEntityClass, $ownerEntityId]))
+        );
+    }
+
+    /**
+     * Extracts data from the given key of the File object
+     *
+     * @param string $key
+     *
+     * @return array [fileId, ownerEntityClass, ownerEntityId]
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function parseFileKey($key)
+    {
+        if (!($decoded = base64_decode(str_replace('_', '/', $key)))
+            || count($result = @unserialize($decoded)) !== 3
+        ) {
+            throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the list of fields responsible to store attachment associations
+     *
+     * @return array [target_entity_class => field_name]
+     */
+    public function getAttachmentTargets()
+    {
+        return $this->associationManager->getAssociationTargets(
+            AttachmentScope::ATTACHMENT,
+            $this->associationManager->getSingleOwnerFilter('attachment'),
+            RelationType::MANY_TO_ONE
+        );
     }
 }

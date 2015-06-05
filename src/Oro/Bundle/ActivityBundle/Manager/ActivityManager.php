@@ -9,7 +9,9 @@ use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -30,25 +32,31 @@ class ActivityManager
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider      $activityConfigProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
+     * @param AssociationManager  $associationManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $activityConfigProvider,
         ConfigProvider $entityConfigProvider,
-        ConfigProvider $extendConfigProvider
+        ConfigProvider $extendConfigProvider,
+        AssociationManager $associationManager
     ) {
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
         $this->activityConfigProvider = $activityConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
         $this->extendConfigProvider   = $extendConfigProvider;
+        $this->associationManager     = $associationManager;
     }
 
     /**
@@ -190,39 +198,12 @@ class ActivityManager
      */
     public function getActivityTargets($activityClassName)
     {
-        $result = [];
-
-        $extendConfig = $this->extendConfigProvider->getConfig($activityClassName);
-        $relations    = $extendConfig->get('relation', false, []);
-        foreach ($relations as $key => $relation) {
-            if (!$relation['owner']) {
-                continue;
-            }
-            $targetEntityClass = $relation['target_entity'];
-            $associationName   = ExtendHelper::buildAssociationName(
-                $targetEntityClass,
-                ActivityScope::ASSOCIATION_KIND
-            );
-            $relationKey       = ExtendHelper::buildRelationKey(
-                $activityClassName,
-                $associationName,
-                RelationType::MANY_TO_MANY,
-                $targetEntityClass
-            );
-            if ($key !== $relationKey) {
-                continue;
-            }
-            $activityClassNames = $this->activityConfigProvider
-                ->getConfig($targetEntityClass)
-                ->get('activities', false, []);
-            if (!in_array($activityClassName, $activityClassNames, true)) {
-                continue;
-            }
-
-            $result[$targetEntityClass] = $associationName;
-        }
-
-        return $result;
+        return $this->associationManager->getAssociationTargets(
+            $activityClassName,
+            $this->associationManager->getMultiOwnerFilter('activity', 'activities'),
+            RelationType::MANY_TO_MANY,
+            ActivityScope::ASSOCIATION_KIND
+        );
     }
 
     /**
