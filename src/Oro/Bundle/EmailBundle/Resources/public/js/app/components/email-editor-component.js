@@ -15,7 +15,7 @@ define(function (require) {
         /**
          * margin of <div class="control-group">
          */
-        CONTROL_GROUP_MARGIN: 16,
+        CONTROL_GROUP_MARGIN: 10,
 
         listen: {
             'parentResize': 'onResize'

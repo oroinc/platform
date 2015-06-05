@@ -9,7 +9,7 @@ define(function (require) {
         LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     WysiwygEditorView = BaseView.extend({
-        TINYMCE_UI_HEIGHT: 33,
+        TINYMCE_UI_HEIGHT: 39,
 
         autoRender: true,
         firstRender: true,
