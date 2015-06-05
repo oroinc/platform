@@ -316,18 +316,12 @@ class ProcessCollectorListener implements OptionalListenerInterface
             }
         }
 
+        // create queued JMS jobs
+        $this->createJobs($entityManager);
+
         // save both handled entities and queued process jobs
         if ($hasQueuedOrHandledProcesses) {
             $entityManager->flush();
-
-            foreach ($handledProcesses as $entityProcess) {
-                /** @var ProcessTrigger $trigger */
-                $trigger = $entityProcess['trigger'];
-                /** @var ProcessData $data */
-                $data = $entityProcess['data'];
-
-                $this->handler->finishTrigger($trigger, $data);
-            }
         }
 
         // delete unused processes
@@ -336,8 +330,16 @@ class ProcessCollectorListener implements OptionalListenerInterface
             $this->removedEntityHashes = array();
         }
 
-        // create queued JMS jobs
-        $this->createJobs($entityManager);
+        if ($hasQueuedOrHandledProcesses) {
+            foreach ($handledProcesses as $entityProcess) {
+               /** @var ProcessTrigger $trigger */
+               $trigger = $entityProcess['trigger'];
+               /** @var ProcessData $data */
+               $data = $entityProcess['data'];
+
+               $this->handler->finishTrigger($trigger, $data);
+           }
+        }
     }
 
     /**
@@ -379,8 +381,6 @@ class ProcessCollectorListener implements OptionalListenerInterface
 
         $this->queuedJobs = array();
 
-        $entityManager->flush();
-
         $this->confirmJobs($entityManager, $jmsJobList);
     }
 
@@ -394,8 +394,6 @@ class ProcessCollectorListener implements OptionalListenerInterface
             $jmsJob->setState(Job::STATE_PENDING);
             $entityManager->persist($jmsJob);
         }
-
-        $entityManager->flush();
     }
 
     /**
