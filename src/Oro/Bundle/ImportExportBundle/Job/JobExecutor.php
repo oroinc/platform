@@ -20,6 +20,11 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * @todo: https://magecore.atlassian.net/browse/BAP-2600 move job results processing outside
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class JobExecutor
 {
     const CONNECTOR_NAME = 'oro_importexport';
