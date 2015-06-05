@@ -25,19 +25,15 @@ define([
             options.okText =  __('oro.datagrid.gridView.save_name');
 
             ViewNameModal.__super__.initialize.call(this, options);
+
+            this.events = _.extend({}, this.events, {'keydown #gridViewName': _.bind(this.closeOnEnter, this)});
         },
 
-        open: function(cb) {
-            ViewNameModal.__super__.open.call(this, cb);
-
-            var self = this;
-
-            $("#gridViewName").one('keydown', function(e) {
-                if (e.which == 13) {
-                    self.trigger('close');
-                    self.trigger('ok');
-                }
-            });
+        closeOnEnter: function(e) {
+            if (e.which == 13) {
+                this.trigger('close');
+                this.trigger('ok');
+            }
         },
 
         setNameError: function(error) {
