@@ -30,6 +30,9 @@ class ActivityManagerTest extends OrmTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $associationManager;
+
     /** @var ActivityManager */
     protected $manager;
 
@@ -75,12 +78,18 @@ class ActivityManagerTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->associationManager =
+            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
+                ->disableOriginalConstructor()
+                ->getMock();
+
         $this->manager = new ActivityManager(
             new DoctrineHelper($doctrine),
             new EntityClassResolver($doctrine),
             $this->activityConfigProvider,
             $this->entityConfigProvider,
-            $this->extendConfigProvider
+            $this->extendConfigProvider,
+            $this->associationManager
         );
     }
 

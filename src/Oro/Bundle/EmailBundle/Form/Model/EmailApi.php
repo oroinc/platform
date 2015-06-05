@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
-use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
 class EmailApi
 {
-    /** @var Email|null */
+    /** @var EmailEntity|null */
     protected $entity;
 
     /** @var array */
@@ -71,9 +71,9 @@ class EmailApi
     protected $refs;
 
     /**
-     * @param Email|null $entity
+     * @param EmailEntity|null $entity
      */
-    public function __construct(Email $entity = null)
+    public function __construct(EmailEntity $entity = null)
     {
         $this->entity = $entity;
     }
@@ -81,7 +81,7 @@ class EmailApi
     /**
      * Get the email entity linked to this model
      *
-     * @return Email|null
+     * @return EmailEntity|null
      */
     public function getEntity()
     {
@@ -91,11 +91,11 @@ class EmailApi
     /**
      * Set the email entity linked to this model
      *
-     * @param Email $entity
+     * @param EmailEntity $entity
      *
      * @return self
      */
-    public function setEntity(Email $entity)
+    public function setEntity(EmailEntity $entity)
     {
         $this->entity = $entity;
 

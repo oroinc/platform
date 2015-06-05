@@ -17,6 +17,9 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
     /** @var EntitySerializer */
@@ -54,10 +57,15 @@ abstract class EntitySerializerTestCase extends OrmTestCase
                 )
             );
 
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $this->serializer = new EntitySerializer(
             $doctrine,
+            $this->configManager,
             new EntityDataAccessor(),
             new EntityDataTransformer($this->container)
         );

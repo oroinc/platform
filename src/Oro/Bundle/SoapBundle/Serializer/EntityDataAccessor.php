@@ -11,7 +11,7 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     public function hasGetter($className, $property)
     {
-        $suffix = ucfirst($property);
+        $suffix = $this->camelize($property);
 
         if (method_exists($className, 'get' . $suffix)) {
             return true;
@@ -38,7 +38,7 @@ class EntityDataAccessor implements DataAccessorInterface
                 return true;
             }
         } else {
-            $suffix = ucfirst($property);
+            $suffix = $this->camelize($property);
 
             $accessor = 'get' . $suffix;
             if (method_exists($object, $accessor)) {
@@ -89,5 +89,17 @@ class EntityDataAccessor implements DataAccessorInterface
         };
 
         return $value;
+    }
+
+    /**
+     * Camelizes a given string.
+     *
+     * @param string $string Some string
+     *
+     * @return string The camelized version of the string
+     */
+    protected function camelize($string)
+    {
+        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
     }
 }

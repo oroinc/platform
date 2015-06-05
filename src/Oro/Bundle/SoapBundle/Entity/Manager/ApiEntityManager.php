@@ -11,6 +11,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
@@ -108,16 +109,18 @@ class ApiEntityManager
     {
         $object = $this->getRepository()->find($id);
 
-        // dispatch oro_api.request.find.after event
-        $event = new FindAfter($object);
-        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+        if ($object) {
+            $this->checkFoundEntity($object);
+        }
 
         return $object;
     }
 
     /**
-     * @param  object                    $entity
+     * @param object $entity
+     *
      * @return int
+     *
      * @throws \InvalidArgumentException
      */
     public function getEntityId($entity)
@@ -234,13 +237,23 @@ class ApiEntityManager
             return null;
         }
 
-        // dispatch oro_api.request.find.after event
-        $event = new FindAfter($entity[0]);
-        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+        $this->checkFoundEntity($entity[0]);
 
         $serialized = $this->entitySerializer->serializeEntities((array)$entity, $this->class, $config);
 
         return $serialized[0];
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @throws AccessDeniedException if access to the given entity is denied
+     */
+    protected function checkFoundEntity($entity)
+    {
+        // dispatch oro_api.request.find.after event
+        $event = new FindAfter($entity);
+        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
     }
 
     /**
