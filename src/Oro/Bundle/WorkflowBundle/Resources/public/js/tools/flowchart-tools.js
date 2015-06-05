@@ -41,15 +41,6 @@ define(function (require) {
         } ()),
         Matrix = (function () {
 
-            function intersect(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2) {
-                var v1, v2, v3, v4;
-                v1 = (bx2 - bx1) * (ay1 - by1) - (by2 - by1) * (ax1 - bx1);
-                v2 = (bx2 - bx1) * (ay2 - by1) - (by2 - by1) * (ax2 - bx1);
-                v3 = (ax2 - ax1) * (by1 - ay1) - (ay2 - ay1) * (bx1 - ax1);
-                v4 = (ax2 - ax1) * (by2 - ay1) - (ay2 - ay1) * (bx2 - ax1);
-                return (v1 * v2 < 0) && (v3 * v4 < 0);
-            }
-
             var Matrix = function (options) {
 
                 _.extend(this, {
@@ -235,24 +226,6 @@ define(function (require) {
                         x: this.xIncrement * cell.x + this.xPadding,
                         y: this.yIncrement * cell.y + this.yPadding
                     };
-                },
-
-                calculateIntersect: function () {
-                    var that = this, coords = [], i, j, counter = 0;
-                    _.each(this.connections, function (item) {
-                        coords.push({
-                            from: that.getCoords(that.findCell(item.from)),
-                            to: that.getCoords(that.findCell(item.to))
-                        })
-                    });
-                    for ( i = 0; i < coords.length - 1; i++) {
-                        for (j = i + 1; j < coords.length; j++) {
-                            if (intersect(coords[i].from.x, coords[i].from.y, coords[i].to.x, coords[i].to.y,coords[j].from.x, coords[j].from.y, coords[j].to.x, coords[j].to.y)) {
-                                counter++;
-                            }
-                        }
-                    }
-                    return counter;
                 }
             });
 
@@ -528,7 +501,7 @@ define(function (require) {
             }
         }),
 
-    helper = {
+    instance = {
         xPadding: 60,
         yPadding: 15,
         xIncrement: 240,
@@ -583,7 +556,6 @@ define(function (require) {
                 rule.apply();
 
             });
-            console.log(this.matrix.calculateIntersect());
             this.matrix.align().show();
         },
 
@@ -612,5 +584,5 @@ define(function (require) {
     };
 
 
-    return helper;
+    return instance;
 });

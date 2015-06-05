@@ -13,6 +13,7 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
             userSuppliedSegments = null,
             lastx = null, lasty = null, lastOrientation,
             cornerRadius = params.cornerRadius != null ? params.cornerRadius : 0,
+            showLoopback = params.showLoopback !== false,
             sgn = function (n) {
                 return n < 0 ? -1 : n === 0 ? 0 : 1;
             },
@@ -40,7 +41,6 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
                 return _a;
             },
             writeSegments = function (conn, segments, paintInfo) {
-                console.log(segments)
                 var current = null, next;
                 for (var i = 0; i < segments.length - 1; i++) {
 
@@ -99,6 +99,46 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
             userSuppliedSegments = s;
         };
 
+        this.getSegs = function () {
+            return segments;
+        };
+
+        this.getAbsSegments = function (conn) {
+            var i,
+                j,
+                cur,
+                rect1 = conn.endpoints[0].canvas.getBoundingClientRect(),
+                rect2 = conn.endpoints[1].canvas.getBoundingClientRect(),
+                x = Math.min((rect1.left + rect1.right), (rect2.left + rect2.right)) / 2,
+                y = Math.min((rect1.top + rect1.bottom),(rect2.top + rect2.bottom)) / 2,
+                result = [];
+            for (i = 0; i < segments.length; i++) {
+                cur = [segments[i][0] + x, segments[i][1] + y, segments[i][2] + x, segments[i][3] + y, segments[i][4]];
+                if(i > 0) {
+                    j = result.length - 1;
+                    if (cur[4] == 'v' && result[j][4] == 'v') {
+                        if (cur[1] == result[j][3]) {
+                            result[j][3] = cur[3];
+                            continue;
+                        } else if (cur[3] == result[j][1]) {
+                            result[j][1] = cur[1];
+                            continue;
+                        }
+                    } else if (cur[4] == 'h' && result[j][4] == 'h') {
+                        if (cur[0] == result[j][2]) {
+                            result[j][2] = cur[2];
+                            continue;
+                        } else if (cur[2] == result[j][0]) {
+                            result[j][0] = cur[0];
+                            continue;
+                        }
+                    }
+                }
+                result.push(cur);
+            }
+            return result;
+        };
+
         this.isEditable = function () {
             return true;
         };
@@ -126,6 +166,25 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
             lastx = null;
             lasty = null;
             lastOrientation = null;
+
+            if (showLoopback && (params.sourceEndpoint.elementId === params.targetEndpoint.elementId)) {
+                if(paintInfo.so[1] > 0) {
+                    addSegment(segments, paintInfo.sx, paintInfo.sy + paintInfo.startStubY, paintInfo);
+                    addSegment(segments, paintInfo.tx + paintInfo.endStubX, paintInfo.sy + paintInfo.startStubY, paintInfo);
+                    addSegment(segments, paintInfo.tx + paintInfo.endStubX, paintInfo.ty, paintInfo);
+                    addSegment(segments, paintInfo.tx, paintInfo.ty, paintInfo);
+                } else {
+                    addSegment(segments, paintInfo.sx + paintInfo.startStubX, paintInfo.sy, paintInfo);
+                    addSegment(segments, paintInfo.sx + paintInfo.startStubX, paintInfo.ty + paintInfo.endStubY, paintInfo);
+                    addSegment(segments, paintInfo.tx, paintInfo.ty + paintInfo.endStubY, paintInfo);
+                    addSegment(segments, paintInfo.tx, paintInfo.ty, paintInfo);
+                }
+                writeSegments(this, segments, paintInfo);
+                return;
+
+            }
+
+
 
             var midx = paintInfo.startStubX + ((paintInfo.endStubX - paintInfo.startStubX) * midpoint),
                 midy = paintInfo.startStubY + ((paintInfo.endStubY - paintInfo.startStubY) * midpoint);
@@ -259,11 +318,19 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
                             comparator = pi["is" + axis.toUpperCase() + "GreaterThanStubTimes2"];
 
                         if (params.sourceEndpoint.elementId == params.targetEndpoint.elementId) {
-                            var _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) + _super.maxStub;
+                            var _val;
+                            if (! (otherAxis in params.sourceEndpoint.anchor)) {
+                                _val = oss;
+                            } else {
+                                _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) + _super.maxStub;
+                            }
+                            /*if(isNaN(_val)) {
+                                _val = 0;
+                            }*/
                             return {
                                 "x": [
-                                    [ ss, _val ],
-                                    [ es, _val ]
+                                    [ ss, 30 ],
+                                    [ es, 80 ]
                                 ],
                                 "y": [
                                     [ _val, ss ],
@@ -273,6 +340,10 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
 
                         }
                         else if (!comparator || (pi.so[idx] == 1 && ss > es) || (pi.so[idx] == -1 && ss < es)) {
+                            if(isNaN(midy)) {
+                                debugger;
+                            }
+
                             return {
                                 "x": [
                                     [ ss, midy ],
@@ -285,6 +356,10 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
                             }[axis];
                         }
                         else if ((pi.so[idx] == 1 && ss < es) || (pi.so[idx] == -1 && ss > es)) {
+                            if(isNaN(pi.sy)) {
+                                debugger;
+                            }
+
                             return {
                                 "x": [
                                     [ midx, pi.sy ],

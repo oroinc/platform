@@ -20,7 +20,7 @@ define(function (require) {
          * @type {Object}
          */
         connectorStyle: {
-            strokeStyle: '#4F719A',
+            strokeStyle: '#e8e8ff',// '#4F719A',
             lineWidth: 2,
             outlineColor: 'transparent',
             outlineWidth: 7
@@ -125,33 +125,31 @@ define(function (require) {
                 areaView = this.areaView,
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep),
-                endPosition = $(endEl).offset(),
-                startPosition = $(startEl).offset(),
-                anchors = endPosition.left - startPosition.left > endPosition.top - startPosition.top ?
-                    ["ContinuousRight", "ContinuousLeft"] : ["ContinuousBottom", "ContinuousTop" ];
+                anchors = this.areaView.jpm.getAnchors(startEl, endEl),
+                parameters = {
+                    source: startEl,
+                    target: endEl,
+                    connector: [ "Smartline", { cornerRadius: 5 } ],
+                    paintStyle: _.result(this, 'connectorStyle'),
+                    hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
+                    anchors: anchors,
+                    overlays: [
+                        ['Custom', {
+                            create: _.bind(function () {
+                                overlayView = new this.transitionOverlayView({
+                                    model: transitionModel,
+                                    areaView: areaView,
+                                    stepFrom: startStep
+                                });
+                                overlayView.render();
+                                return overlayView.$el;
+                            }, this),
+                            location: 0.5
+                        }]
+                    ]
+                };
 
-            jsplumbConnection = this.areaView.jsPlumbInstance.connect({
-                source: startEl,
-                target: endEl,
-                connector: [ "Smartline", { cornerRadius: 5, stub: [20, 20] } ],
-                paintStyle: _.result(this, 'connectorStyle'),
-                hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
-                anchors: anchors,
-                overlays: [
-                    ['Custom', {
-                        create: _.bind(function () {
-                            overlayView = new this.transitionOverlayView({
-                                model: transitionModel,
-                                areaView: areaView,
-                                stepFrom: startStep
-                            });
-                            overlayView.render();
-                            return overlayView.$el;
-                        }, this),
-                        location: 0.5
-                    }]
-                ]
-            });
+            jsplumbConnection = this.areaView.jsPlumbInstance.connect(parameters);
             jsplumbConnection.overlayView = overlayView;
             this.connections.push({
                 startStep: startStep,
