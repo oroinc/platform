@@ -275,15 +275,8 @@ class DatabaseHelper
             && $this->ownershipMetadataProviderLink->getService()->getMetadata($entityName)->getOrganizationFieldName();
     }
 
-    /**
-     * @param $entity
-     */
-    public function persist($entity)
+    public function getRegistry()
     {
-        $entityName = ClassUtils::getClass($entity);
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
-        $entityManager->persist($entity);
-        $entityManager->flush($entity);
+        return $this->registry;
     }
 }
