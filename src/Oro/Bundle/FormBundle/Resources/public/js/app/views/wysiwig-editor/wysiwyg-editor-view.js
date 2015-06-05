@@ -120,6 +120,10 @@ define(function (require) {
             }
         },
 
+        getHeight: function () {
+            return this.$el.parent().height();
+        },
+
         dispose: function () {
             if (this.disposed) {
                 return;

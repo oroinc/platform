@@ -273,8 +273,8 @@ define(function (require) {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
                 }
                 this.widget = $('<div/>');
-                this._transmitDialogEvents();
                 this.widget.html(this.$el).dialog(dialogOptions);
+                this._bindDialogEvents();
                 this.widget.attr('data-layout', 'separate');
             } else {
                 this.widget.html(this.$el);
@@ -292,8 +292,6 @@ define(function (require) {
                 this._fixDialogMinHeight(false);
                 this.widget.trigger('resize');
             }, this));
-
-            this.widget.on('dialogresizestop', _.bind(this._fixBorderShifting, this));
         },
 
         _afterLayoutInit: function () {
@@ -303,11 +301,11 @@ define(function (require) {
         },
 
         _initAdjustHeight: function(content) {
-            this.widget.off('dialogresize dialogmaximize dialogrestore', _.bind(this._fixScrollableHeight, this));
+            this.widget.off('.adjust-height-events');
             var scrollableContent = content.find('.scrollable-container');
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                this.widget.on('dialogresize dialogmaximize dialogrestore', _.bind(this._fixScrollableHeight, this));
+                this.widget.on('dialogresize.adjust-height-events dialogmaximize.adjust-height-events dialogrestore.adjust-height-events', _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
         },
@@ -380,11 +378,21 @@ define(function (require) {
         },
 
         /**
-         * Transmits dialog window state events over system message bus
+         * Returns state of the dialog
+         *
+         * @returns {string}
+         */
+        getState: function () {
+            return this.widget.dialog('state');
+        },
+
+        /**
+         * Binds dialog window state events,
+         * Transmits open/close/statechange events over system message bus
          *
          * @protected
          */
-        _transmitDialogEvents: function () {
+        _bindDialogEvents: function () {
             var self = this;
             this.widget.on('dialogbeforeclose', function () {
                 mediator.trigger('widget_dialog:close', self);
@@ -397,15 +405,35 @@ define(function (require) {
                     mediator.trigger('widget_dialog:stateChange', self);
                 }
             });
+            this.widget.on({
+                'dialogresizestart': _.bind(this.onResizeStart, this),
+                'dialogresize': _.bind(this.onResize, this),
+                'dialogresizestop': _.bind(this.onResizeStop, this)
+            });
         },
 
-        /**
-         * Returns state of the dialog
-         *
-         * @returns {string}
-         */
-        getState: function () {
-            return this.widget.dialog('state');
+        onResizeStart: function (e) {
+            var that = this;
+            this.$el.css({overflow: 'hidden'});
+            _.forEach(this.pageComponents, function (cmp) {
+                cmp.trigger('parentResizeStart', e, that);
+            });
+        },
+
+        onResize: function (e) {
+            var that = this;
+            _.forEach(this.pageComponents, function (cmp) {
+                cmp.trigger('parentResize', e, that);
+            });
+        },
+
+        onResizeStop: function (e) {
+            var that = this;
+            this.$el.css({overflow: ''});
+            this._fixBorderShifting();
+            _.forEach(this.pageComponents, function (cmp) {
+                cmp.trigger('parentResizeStop', e, that);
+            });
         }
     });
 

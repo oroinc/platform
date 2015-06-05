@@ -8,14 +8,22 @@ define(function (require) {
         EmailEditorView = require('../views/email-editor-view'),
         emailTemplatesProvider = require('../../util/email-templates-provider'),
         EmailEditorModel = require('../models/email-editor-model'),
-        EmailModel = require('../models/email-model');
+        EmailModel = require('../models/email-model'),
+        DialogWidget = require('orowindows/js/widget/dialog-widget');
 
     EmailEditorComponent = BaseComponent.extend({
+        listen: {
+            'parentResize': 'onResize'
+        },
+
+        options: null,
+
         /**
          * @constructor
          * @param {Object} options
          */
         initialize: function (options) {
+            this.options = options;
             this._deferredInit();
             this.view = new EmailEditorView({
                 el: options._sourceElement,
@@ -25,7 +33,6 @@ define(function (require) {
             this.view.render();
             this.view.renderPromise.done(_.bind(this._resolveDeferredInit, this));
         },
-
 
         createEditorModelFromComponentOptions: function (options) {
             var $el = options._sourceElement;
@@ -44,6 +51,19 @@ define(function (require) {
                 }),
                 bodyFooter: $el.find('[name$="[bodyFooter]"]').val()
             });
+        },
+
+        onResize: function (e, parentView) {
+            var outerHeight, innerHeight, editorHeight, availableHeight;
+            if (parentView instanceof DialogWidget) {
+                outerHeight = parentView.widget.height();
+                innerHeight = this.view.$el.height();
+                editorHeight = this.view.pageComponent('bodyEditor').view.getHeight();
+                availableHeight = Math.min(outerHeight - innerHeight + editorHeight, this.options.minimalWysiwygEditorHeight);
+                console.log(availableHeight);
+            } else {
+                throw new Error("Resize behaviour is supported only for dialog widgets");
+            }
         }
     });
     return EmailEditorComponent;
