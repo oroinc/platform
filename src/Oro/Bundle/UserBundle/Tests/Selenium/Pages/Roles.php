@@ -33,7 +33,7 @@ class Roles extends AbstractPageFilteredGrid
     public function open($roleName = array())
     {
         $this->getEntity($roleName)->click();
-        sleep(1);
+        //sleep(1);
         $this->waitPageToLoad();
         $this->waitForAjax();
 
