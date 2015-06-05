@@ -145,7 +145,7 @@ class IndexListener implements OptionalListenerInterface
     {
         $entitiesToReindex = [];
 
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
+        foreach ($uow->getScheduledEntityUpdates() as $hash => $entity) {
             $className = get_class($entity);
             if (!$this->mappingProvider->isFieldsMappingExists($className)) {
                 continue;
@@ -161,7 +161,7 @@ class IndexListener implements OptionalListenerInterface
             $changeSet = $uow->getEntityChangeSet($entity);
             $fieldsToReindex = array_intersect($indexedFields, array_keys($changeSet));
             if ($fieldsToReindex) {
-                $entitiesToReindex[] = $entity;
+                $entitiesToReindex[$hash] = $entity;
             }
         }
 
