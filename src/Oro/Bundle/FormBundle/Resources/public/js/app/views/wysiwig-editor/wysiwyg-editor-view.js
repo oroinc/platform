@@ -10,11 +10,13 @@ define(function (require) {
 
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 39,
+        TEXTAREA_UI_HEIGHT: 16,
 
         autoRender: true,
         firstRender: true,
 
         tinymceConnected: false,
+        height: false,
         tinymceInstance: null,
 
         defaults: {
@@ -106,6 +108,7 @@ define(function (require) {
                 this.$el.removeAttr('data-focusable');
             }
             this.firstRender = false;
+            this.trigger('resize');
         },
 
         setEnabled: function (enabled) {
@@ -127,7 +130,11 @@ define(function (require) {
         },
 
         setHeight: function (newHeight) {
-            return this.$el.parent().find('iframe').height(newHeight - this.TINYMCE_UI_HEIGHT);
+            if (this.tinymceConnected) {
+                this.$el.parent().find('iframe').height(newHeight - this.TINYMCE_UI_HEIGHT);
+            } else {
+                this.$el.height(newHeight - this.TEXTAREA_UI_HEIGHT);
+            }
         },
 
         dispose: function () {

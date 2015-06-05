@@ -36,7 +36,10 @@ define(function (require) {
                 templatesProvider: emailTemplatesProvider
             });
             this.view.render();
-            this.view.renderPromise.done(_.bind(this._resolveDeferredInit, this));
+            this.view.renderPromise.done(_.bind(function(){
+                this._resolveDeferredInit()
+                this.listenTo(this.view.pageComponent('bodyEditor').view, 'resize', this.onResize, this);
+            }, this));
         },
 
         createEditorModelFromComponentOptions: function (options) {
@@ -58,17 +61,13 @@ define(function (require) {
             });
         },
 
-        onResize: function (e, parentView) {
+        onResize: function () {
             var outerHeight, innerHeight, editorHeight, availableHeight;
-            if (parentView instanceof DialogWidget) {
-                outerHeight = parentView.widget.height();
-                innerHeight = this.view.$el.height();
-                editorHeight = this.view.pageComponent('bodyEditor').view.getHeight();
-                availableHeight = Math.max(outerHeight - innerHeight + editorHeight - this.CONTROL_GROUP_MARGIN, this.options.minimalWysiwygEditorHeight);
-                this.view.pageComponent('bodyEditor').view.setHeight(availableHeight);
-            } else {
-                throw new Error("Resize behaviour is supported only for dialog widgets");
-            }
+            outerHeight = this.view.$el.closest('.ui-widget-content').height();
+            innerHeight = this.view.$el.height();
+            editorHeight = this.view.pageComponent('bodyEditor').view.getHeight();
+            availableHeight = Math.max(outerHeight - innerHeight + editorHeight - this.CONTROL_GROUP_MARGIN, this.options.minimalWysiwygEditorHeight);
+            this.view.pageComponent('bodyEditor').view.setHeight(availableHeight);
         }
     });
     return EmailEditorComponent;
