@@ -407,7 +407,7 @@ define(function (require) {
             });
             this.widget.on({
                 'dialogresizestart': _.bind(this.onResizeStart, this),
-                'dialogresize': _.bind(this.onResize, this),
+                'dialogresize dialogmaximize dialogrestore': _.bind(this.onResize, this),
                 'dialogresizestop': _.bind(this.onResizeStop, this)
             });
         },
