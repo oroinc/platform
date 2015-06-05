@@ -36,7 +36,7 @@ define(function (require) {
 
         className: 'workflow-flowchart-viewer',
 
-        connectionDefaults: {
+        defaultConnectionConfiguration: {
             detachable: false
         },
 
@@ -52,7 +52,7 @@ define(function (require) {
             this.$el.addClass(this.className);
             var stepCollectionView,
                 transitionOverlayView = this.transitionOverlayView,
-                connectionDefaults = this.connectionDefaults,
+                defaultConnectionConfiguration = this.defaultConnectionConfiguration,
                 StepView = this.stepView,
                 TransitionView = this.transitionView,
                 that = this,
@@ -81,7 +81,7 @@ define(function (require) {
                         stepCollection: steps,
                         stepCollectionView: stepCollectionView,
                         transitionOverlayView: transitionOverlayView,
-                        connectionDefaults: connectionDefaults
+                        defaultConnectionConfiguration: _.extend({}, defaultConnectionConfiguration)
                     }, options);
                     return new TransitionView(options);
                 },

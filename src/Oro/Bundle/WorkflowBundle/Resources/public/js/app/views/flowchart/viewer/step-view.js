@@ -1,6 +1,9 @@
 define(function (require) {
     'use strict';
     var FlowchartJsPlubmBoxView = require('../jsplumb/box-view'),
+        $ = require('jquery'),
+        _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
         FlowchartViewerStepView;
 
     FlowchartViewerStepView = FlowchartJsPlubmBoxView.extend({

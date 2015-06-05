@@ -18,7 +18,7 @@ define(function (require) {
         /**
          * @type {Object}
          */
-        connectionDefaults: {
+        defaultConnectionConfiguration: {
             detachable: false
         },
 
@@ -46,8 +46,9 @@ define(function (require) {
                 throw new Error(optionKeysToCopy.join(', ') + ' options are required');
             }
             _.extend(this, _.pick(options, optionKeysToCopy));
-            if (options.connectionDefaults) {
-                _.extend(this.connectionDefaults, options.connectionDefaults);
+            this.defaultConnectionConfiguration = _.extend({}, _.result(this, 'defaultConnectionConfiguration'));
+            if (options.defaultConnectionConfiguration) {
+                _.extend(this.defaultConnectionConfiguration, options.defaultConnectionConfiguration);
             }
             FlowchartViewerTransitionView.__super__.initialize.apply(this, arguments);
         },
@@ -136,6 +137,8 @@ define(function (require) {
                 startEl = this.findElByStep(startStep);
 
             jsplumbConnection = this.areaView.jsPlumbInstance.connect(_.extend(
+                {},
+                this.defaultConnectionConfiguration,
                 {
                     source: startEl,
                     target: endEl,
@@ -155,8 +158,7 @@ define(function (require) {
                             location: 0.5
                         }]
                     ]
-                },
-                this.connectionDefaults
+                }
             ));
             jsplumbConnection.overlayView = overlayView;
             this.connections.push({

@@ -2,9 +2,6 @@ define(function (require) {
     'use strict';
     var FlowchartViewerStepView = require('../viewer/step-view'),
         mediator = require('oroui/js/mediator'),
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
         FlowchartEditorStepView;
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({

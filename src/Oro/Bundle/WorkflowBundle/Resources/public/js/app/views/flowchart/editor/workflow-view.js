@@ -16,7 +16,7 @@ define(function (require) {
         stepView: FlowchartEditorStepView,
         className: 'workflow-flowchart-editor',
 
-        connectionDefaults: {
+        defaultConnectionConfiguration: {
             detachable: true
         },
 
