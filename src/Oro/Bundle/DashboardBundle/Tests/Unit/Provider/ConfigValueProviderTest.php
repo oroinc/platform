@@ -41,4 +41,20 @@ class ConfigValueProviderTest extends \PHPUnit_Framework_TestCase
         $value = 'test';
         $this->assertSame('test view value', $this->provider->getViewValue('test_form_type', $value));
     }
+
+    public function testGetFormValue()
+    {
+
+        $value          = 'test';
+        $convertedValue = 'converted';
+        $this->assertSame(
+            $convertedValue,
+            $this->provider->getFormValue(
+                'test_form_type',
+                ['value' => $convertedValue],
+                $value
+            )
+        );
+        $this->assertSame($value, $this->provider->getFormValue('unsupported', [], $value));
+    }
 }
