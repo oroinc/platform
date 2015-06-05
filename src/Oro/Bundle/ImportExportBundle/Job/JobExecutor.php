@@ -126,12 +126,10 @@ class JobExecutor
             $job->execute($jobExecution);
             $isSuccessful = $this->handleJobResult($jobExecution, $jobResult);
 
-            if (!$isTransactionRunning) {
-                if ($isSuccessful && !$this->validationMode) {
-                    $this->entityManager->commit();
-                } else {
-                    $this->entityManager->rollback();
-                }
+            if (!$isTransactionRunning && $isSuccessful && !$this->validationMode) {
+                $this->entityManager->commit();
+            } elseif (!$isTransactionRunning) {
+                $this->entityManager->rollback();
             }
 
             // trigger save of JobExecution and JobInstance
