@@ -77,7 +77,8 @@
         "components/backbone": "1.1.*",
         "components/font-awesome": "~4.3.0",
         "piwik/device-detector": "~3.0",
-        "oro/jsplumb": "~1.7"
+        "oro/jsplumb": "~1.7",
+        "oro/moment-timezone": "0.3.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

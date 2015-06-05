@@ -18,7 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
-use Oro\Bundle\EmailBundle\Tools\EmailHelper;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
@@ -46,10 +46,8 @@ class EmailActivityListProvider implements
     /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
-    /**
-     * @var EmailHelper
-     */
-    protected $emailHelper;
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
 
     /**
      * @param DoctrineHelper      $doctrineHelper
@@ -58,6 +56,7 @@ class EmailActivityListProvider implements
      * @param Router              $router
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
+     * @param HtmlTagHelper       $htmlTagHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -66,7 +65,7 @@ class EmailActivityListProvider implements
         Router $router,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
-        EmailHelper $emailHelper
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -74,7 +73,7 @@ class EmailActivityListProvider implements
         $this->router               = $router;
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
-        $this->emailHelper          = $emailHelper;
+        $this->htmlTagHelper        = $htmlTagHelper;
     }
 
     /**
@@ -125,8 +124,9 @@ class EmailActivityListProvider implements
         /** @var $entity Email */
         if ($entity->getEmailBody()) {
             $body = $entity->getEmailBody()->getBodyContent();
-            $content = $this->emailHelper->getStrippedBody($body);
-            $content = $this->emailHelper->getShortBody($content);
+            $content = $this->htmlTagHelper->purify($body);
+            $content = $this->htmlTagHelper->stripTags($content);
+            $content = $this->htmlTagHelper->shorten($content);
 
             return $content;
         }

@@ -204,17 +204,17 @@ JS;
     }
 
     /**
-     * @param $title
+     * @param $expectedTitle
      * @param string $message
      * @return $this
      */
-    public function assertTitle($title, $message = null)
+    public function assertTitle($expectedTitle, $message = null)
     {
-        PHPUnit_Framework_Assert::assertContains(
-            $title,
-            $this->test->title(),
-            $message ?: $this->test->source()
-        );
+        $actual = $this->test->title();
+        $constraint = new \PHPUnit_Framework_Constraint_IsEqual($actual);
+
+        PHPUnit_Framework_Assert::assertThat($expectedTitle, $constraint, $message);
+
         return $this;
     }
 

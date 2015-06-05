@@ -749,6 +749,8 @@
         ]
 #}
 {% macro scrollData(dataTarget, data, form = null) %}
+    {% set data = oro_ui_scroll_data_before(dataTarget, data, form) %}
+
     {% if form is defined and form %}
         {% set isForm = true %}
     {% else %}

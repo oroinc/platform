@@ -28,7 +28,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $task = $this->getEntity($entityData, 1);
         $task->click();
         $this->waitPageToLoad();
-        sleep(1);
+        //sleep(1);
         $this->waitForAjax();
 
         return $this;
@@ -301,7 +301,7 @@ abstract class AbstractPageGrid extends AbstractPage
         }
 
         $this->waitPageToLoad();
-        sleep(1);
+        //sleep(1);
         $this->waitForAjax();
         return $this;
     }

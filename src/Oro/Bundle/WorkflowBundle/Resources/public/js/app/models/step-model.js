@@ -4,7 +4,7 @@ define(function(require) {
 
     var StepModel,
         _ = require('underscore'),
-        TransitionCollection = require('oroworkflow/js/app/models/transition-collection'),
+        TransitionCollection = require('./transition-collection'),
         BaseModel = require('oroui/js/app/models/base/model');
 
     StepModel = BaseModel.extend({
