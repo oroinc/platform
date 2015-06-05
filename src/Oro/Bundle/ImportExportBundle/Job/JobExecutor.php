@@ -78,10 +78,10 @@ class JobExecutor
         ContextRegistry $contextRegistry,
         ManagerRegistry $managerRegistry
     ) {
-        $this->batchJobRegistry   = $jobRegistry;
+        $this->batchJobRegistry = $jobRegistry;
         $this->batchJobRepository = $batchJobRepository;
-        $this->contextRegistry    = $contextRegistry;
-        $this->managerRegistry    = $managerRegistry;
+        $this->contextRegistry = $contextRegistry;
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -124,17 +124,7 @@ class JobExecutor
             }
 
             $job->execute($jobExecution);
-
-            $failureExceptions = $this->collectFailureExceptions($jobExecution);
-
-            $isSuccessful = $jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions;
-            if ($isSuccessful) {
-                $jobResult->setSuccessful(true);
-            } elseif ($failureExceptions) {
-                foreach ($failureExceptions as $failureException) {
-                    $jobResult->addFailureException($failureException);
-                }
-            }
+            $isSuccessful = $this->handleJobResult($jobExecution, $jobResult);
 
             if (!$isTransactionRunning) {
                 if ($isSuccessful && !$this->validationMode) {
@@ -161,6 +151,28 @@ class JobExecutor
         }
 
         return $jobResult;
+    }
+
+    /**
+     * @param JobExecution $jobExecution
+     * @param JobResult $jobResult
+     *
+     * @return bool
+     */
+    protected function handleJobResult(JobExecution $jobExecution, JobResult $jobResult)
+    {
+        $failureExceptions = $this->collectFailureExceptions($jobExecution);
+
+        $isSuccessful = $jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions;
+        if ($isSuccessful) {
+            $jobResult->setSuccessful(true);
+        } elseif ($failureExceptions) {
+            foreach ($failureExceptions as $failureException) {
+                $jobResult->addFailureException($failureException);
+            }
+        }
+
+        return $isSuccessful;
     }
 
     /**
