@@ -44,7 +44,6 @@ class ConfigValueProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFormValue()
     {
-
         $value          = 'test';
         $convertedValue = 'converted';
         $this->assertSame(
