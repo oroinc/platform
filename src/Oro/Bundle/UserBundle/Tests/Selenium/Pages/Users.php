@@ -43,7 +43,7 @@ class Users extends AbstractPageFilteredGrid
     {
         $user = $this->getEntity($entityData);
         $user->click();
-        sleep(1);
+        //sleep(1);
         $this->waitPageToLoad();
         $this->waitForAjax();
 
