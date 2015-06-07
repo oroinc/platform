@@ -3,6 +3,7 @@ namespace ConfigBundle\Tests\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
+use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -279,7 +280,10 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     protected function getProviderWithConfigLoaded($configPath)
     {
         $config   = $this->getConfig($configPath);
-        $provider = new SystemConfigurationFormProvider($config, $this->factory, $this->securityFacade);
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->disableOriginalConstructor()->getMock();
+        $configBag = new ConfigBag($config, $container);
+        $provider = new SystemConfigurationFormProvider($configBag, $this->factory, $this->securityFacade);
 
         return $provider;
     }
