@@ -541,3 +541,11 @@ services:
 
     oro_email.email_body_type_transformer:
         class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailBodyTypeApiTransformer
+
+    oro_email.entity_alias_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
+        public: false
+        arguments:
+            - @oro_email.email.address.manager
+        tags:
+            - { name: entity.alias_provider }

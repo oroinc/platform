@@ -36,7 +36,7 @@ class DQLNameFormatter
     /**
      * @param NameFormatter $nameFormatter
      */
-    public function __construct(NameFormatter $nameFormatter)
+    public function __construct(NameFormatter $nameFormatter = null)
     {
         $this->nameFormatter = $nameFormatter;
     }

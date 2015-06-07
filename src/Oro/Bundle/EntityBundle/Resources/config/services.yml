@@ -28,6 +28,9 @@ parameters:
 
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
     oro_entity.entity_context_provider.class:                Oro\Bundle\EntityBundle\Provider\EntityContextProvider
+    oro_entity.entity_alias_resolver.class:                  Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
+    oro_entity.entity_alias_provider.class:                  Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
+
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
@@ -207,3 +210,26 @@ services:
             - @oro_entity.routing_helper
             - @oro_entity.entity_provider
             - @oro_entity_config.provider.entity
+
+    oro_entity.entity_alias.cache.warmer:
+        class: Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer
+        arguments:
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: kernel.cache_warmer, priority: 30 }
+
+    oro_entity.entity_alias_resolver:
+        class: %oro_entity.entity_alias_resolver.class%
+        arguments:
+            - @doctrine
+            - %kernel.debug%
+        lazy: true
+
+    oro_entity.entity_alias_provider:
+        class: %oro_entity.entity_alias_provider.class%
+        public: false
+        arguments:
+            - %oro_entity.entity_aliases%
+            - %oro_entity.entity_alias_exclusions%
+        tags:
+            - { name: entity.alias_provider, priority: 100 }

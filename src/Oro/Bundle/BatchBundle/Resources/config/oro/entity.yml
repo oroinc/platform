@@ -1,0 +1,8 @@
+oro_entity:
+    entity_alias_exclusions:
+        - Akeneo\Bundle\BatchBundle\Entity\FieldMapping
+        - Akeneo\Bundle\BatchBundle\Entity\ItemMapping
+        - Akeneo\Bundle\BatchBundle\Entity\JobExecution
+        - Akeneo\Bundle\BatchBundle\Entity\JobInstance
+        - Akeneo\Bundle\BatchBundle\Entity\StepExecution
+        - Akeneo\Bundle\BatchBundle\Entity\Warning

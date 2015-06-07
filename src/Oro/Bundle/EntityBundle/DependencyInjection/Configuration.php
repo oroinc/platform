@@ -143,6 +143,40 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
+            ->arrayNode('entity_aliases')
+                ->info('Entity aliases')
+                ->example(
+                    [
+                        'Acme\Bundle\Entity\SomeEntity' => [
+                            'alias' => 'someentity',
+                            'plural_alias' => 'someentities'
+                        ]
+                    ]
+                )
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                    ->children()
+                        ->scalarNode('alias')
+                            ->isRequired()
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->scalarNode('plural_alias')
+                            ->isRequired()
+                            ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->arrayNode('entity_alias_exclusions')
+                ->info('Entities which has no aliases')
+                ->example(
+                    [
+                        'Acme\Bundle\Entity\SomeEntity1',
+                        'Acme\Bundle\Entity\SomeEntity2'
+                    ]
+                )
+                ->prototype('scalar')->end()
+            ->end()
         ->end();
 
         return $treeBuilder;

@@ -34,6 +34,7 @@ services:
         abstract: true
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
+            - [setDoctrineHelper, [@oro_entity.doctrine_helper]]
             - [setEntitySerializer, [@oro_soap.entity_serializer]]
 
     oro_soap.handler.include_delegate:

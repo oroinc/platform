@@ -9,6 +9,7 @@ use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -191,7 +192,7 @@ class ActivityManager
     /**
      * Returns the list of fields responsible to store activity associations for the given activity entity type
      *
-     * @param string $activityClassName
+     * @param string $activityClassName The FQCN of the activity entity
      *
      * @return array [target_entity_class => field_name]
      */
@@ -202,6 +203,39 @@ class ActivityManager
             $this->associationManager->getMultiOwnerFilter('activity', 'activities'),
             RelationType::MANY_TO_MANY,
             ActivityScope::ASSOCIATION_KIND
+        );
+    }
+
+    /**
+     * Returns a query builder that could be used for fetching the list of entities
+     * associated with the given activity
+     *
+     * @param string      $activityClassName The FQCN of the activity entity
+     * @param mixed|null  $filters           Criteria is used to filter activity entities
+     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null  $joins             Additional associations required to filter activity entities
+     * @param int         $limit             The maximum number of items per page
+     * @param int         $page              The page number
+     * @param string|null $orderBy           The ordering expression for the result
+     *
+     * @return SqlQueryBuilder
+     */
+    public function getActivityTargetsQueryBuilder(
+        $activityClassName,
+        $filters,
+        $joins,
+        $limit = null,
+        $page = null,
+        $orderBy = null
+    ) {
+        return $this->associationManager->getMultiAssociationsQueryBuilder(
+            $activityClassName,
+            $filters,
+            $joins,
+            $this->getActivityTargets($activityClassName),
+            $limit,
+            $page,
+            $orderBy
         );
     }
 

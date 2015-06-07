@@ -37,7 +37,17 @@ class EntityProcessor
      */
     protected $commands = [
         'oro:entity-extend:update-config' => [],
-        'oro:entity-extend:update-schema' => [],
+        'oro:entity-extend:update-schema' => []
+    ];
+
+    /**
+     * @var array
+     */
+    protected $finalizeCommands = [
+        'router:cache:clear'  => [],
+        'fos:js-routing:dump' => [
+            '--target' => 'web/js/routes.js'
+        ]
     ];
 
     /**
@@ -70,23 +80,14 @@ class EntityProcessor
 
         $this->maintenance->activate();
 
-        $exitCode = 0;
-        foreach ($this->commands as $command => $options) {
-            $code = $this->commandExecutor->runCommand(
-                $command,
-                $options,
-                $this->logger
-            );
-
-            if ($code !== 0) {
-                $exitCode = $code;
-            }
-        }
-
-        $isSuccess = $exitCode === 0;
+        $isSuccess = $this->executeCommand($this->commands);
 
         if ($isSuccess && $generateProxies) {
             $this->generateProxies();
+        }
+
+        if ($isSuccess) {
+            $isSuccess = $this->executeCommand($this->finalizeCommands);
         }
 
         return $isSuccess;
@@ -123,6 +124,29 @@ class EntityProcessor
                 }
             }
         }
+    }
+
+    /**
+     * @param array $commands
+     *
+     * @return bool
+     */
+    protected function executeCommand(array $commands)
+    {
+        $exitCode = 0;
+        foreach ($commands as $command => $options) {
+            $code = $this->commandExecutor->runCommand(
+                $command,
+                $options,
+                $this->logger
+            );
+
+            if ($code !== 0) {
+                $exitCode = $code;
+            }
+        }
+
+        return $exitCode === 0;
     }
 
     /**
