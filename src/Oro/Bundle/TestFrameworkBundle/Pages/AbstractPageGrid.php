@@ -301,7 +301,7 @@ abstract class AbstractPageGrid extends AbstractPage
         }
 
         $this->waitPageToLoad();
-        sleep(1);
+        //sleep(1);
         $this->waitForAjax();
         return $this;
     }

@@ -429,7 +429,7 @@
                         {{ _self.oro_collection_item_prototype(child) }}
                     {% endfor %}
                 {% elseif show_form_when_empty and prototype_html is defined %}
-                    {{ prototype_html|replace({prototype_name: '0'})|raw }}
+                    {{ prototype_html|replace({(prototype_name): '0'})|raw }}
                 {% endif %}
             </div>
             {% if allow_add %}
