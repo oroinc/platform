@@ -13,4 +13,4 @@ oro_activity_bundle_api:
     defaults:
         version: latest
     options:
-        group: activity_association
+        group: activity_associations

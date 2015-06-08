@@ -63,7 +63,7 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
 
-    oro_activity.routing.options_resolver.activity_association:
+    oro_activity.routing.options_resolver.activity_associations:
         class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver
         public: false
         arguments:
