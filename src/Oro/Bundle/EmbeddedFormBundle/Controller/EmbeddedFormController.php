@@ -86,7 +86,7 @@ class EmbeddedFormController extends Controller
      * @Route("update/{id}", name="oro_embedded_form_update", requirements={"id"="[-\d\w]+"})
      * @Template()
      * @Acl(
-     *      id="oro_embedded_form_edit",
+     *      id="oro_embedded_form_update",
      *      type="entity",
      *      permission="EDIT",
      *      class="OroEmbeddedFormBundle:EmbeddedForm"
