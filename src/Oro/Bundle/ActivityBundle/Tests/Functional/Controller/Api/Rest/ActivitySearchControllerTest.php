@@ -17,6 +17,8 @@ class ActivitySearchControllerTest extends WebTestCase
 
     protected function setUp()
     {
+        $this->markTestSkipped('Due to BAP-8365');
+
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(['OroCRMPro\Bundle\OutlookBundle\Tests\Functional\DataFixtures\LoadOutlookEntitiesData']);
         $this->baseUrl = $this->getUrl('orocrmpro_api_outlook_get_search');
