@@ -211,9 +211,9 @@ JS;
     public function assertTitle($expectedTitle, $message = null)
     {
         $actual = $this->test->title();
-        $constraint = new \PHPUnit_Framework_Constraint_IsEqual($actual);
+        $constraint = new \PHPUnit_Framework_Constraint_IsEqual($expectedTitle);
 
-        PHPUnit_Framework_Assert::assertThat($expectedTitle, $constraint, $message);
+        PHPUnit_Framework_Assert::assertThat($actual, $constraint, $message);
 
         return $this;
     }
