@@ -62,11 +62,25 @@
             });
 
             {% if pageReload %}
-                $('#{{ form.vars.id }}').submit(function() {
-                    Mediator.once('page:update', function() {
-                        Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
-                        // force reload without hash navigation
-                        window.location.reload();
+                $('#{{ form.vars.id }}').submit(function () {
+                    Mediator.once('page:request', function (actionArgs) {
+                        actionArgs.options.fromCache = true;
+                    });
+
+                    Mediator.once('page:update', function (pageData, actionArgs, jqXHR, updatePromises) {
+                        var deferred = $.Deferred();
+                        updatePromises.push(deferred.promise());
+
+                        var flashMessages = pageData.flashMessages.success;
+
+                        Mediator.execute('refreshPage');
+
+                        Mediator.once('page:afterChange', function () {
+                            deferred.resolve();
+                            flashMessages.forEach(function (msg) {
+                                Messenger.notificationFlashMessage('success', msg);
+                            });
+                        });
                     });
                 });
             {% endif %}
