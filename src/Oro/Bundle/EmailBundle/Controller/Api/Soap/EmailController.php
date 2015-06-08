@@ -73,7 +73,7 @@ class EmailController extends SoapGetController
      * @Soap\Param("targetClassName", phpType = "string")
      * @Soap\Param("targetId", phpType = "int")
      * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_update")
      */
     public function postAssociationsAction($id, $targetClassName, $targetId)
     {
@@ -114,7 +114,7 @@ class EmailController extends SoapGetController
      * @Soap\Param("targetClassName", phpType = "string")
      * @Soap\Param("targetId", phpType = "int")
      * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_edit")
+     * @AclAncestor("oro_email_update")
      */
     public function deleteAssociationAction($id, $targetClassName, $targetId)
     {

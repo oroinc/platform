@@ -43,5 +43,4 @@ class Segments extends AbstractPageFilteredGrid
         $this->waitForAjax();
         return new Segment($this->test);
     }
-
 }

@@ -11,7 +11,7 @@ use Oro\Bundle\SoapBundle\Entity\SoapEntityInterface;
 abstract class SoapGetController extends ContainerAware implements EntityManagerAwareInterface, SoapApiReadInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function handleGetListRequest($page = 1, $limit = 10, $criteria = [], $orderBy = null)
     {
@@ -19,7 +19,7 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function handleGetRequest($id)
     {

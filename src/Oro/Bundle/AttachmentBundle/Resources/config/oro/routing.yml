@@ -11,3 +11,12 @@ oro_attachment_bundle_api:
         version:  latest|v1
     defaults:
         version:  latest
+
+oro_attachment_bundle_file_api:
+    resource: "@OroAttachmentBundle/Controller/Api/Rest/FileController.php"
+    type: rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+    defaults:
+        version:  latest
