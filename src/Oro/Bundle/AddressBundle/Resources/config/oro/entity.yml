@@ -12,9 +12,3 @@ oro_entity:
                     join:
                         left:
                             - { join: entity.region, alias: region }
-
-    entity_alias_exclusions:
-        - Oro\Bundle\AddressBundle\Entity\AddressType
-        - Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation
-        - Oro\Bundle\AddressBundle\Entity\CountryTranslation
-        - Oro\Bundle\AddressBundle\Entity\RegionTranslation

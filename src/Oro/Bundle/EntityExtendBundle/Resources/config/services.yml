@@ -40,6 +40,7 @@ parameters:
     oro_entity_extend.listener.before_map_object_search_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener
     oro_entity_extend.listener.search_entity_config_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
     oro_entity_extend.association_manager.class:              Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager
+    oro_entity_extend.entity_alias_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -353,3 +354,12 @@ services:
     oro_entity_extend.dql.formatter.name.link:
         tags:
             - { name: oro_service_link, service: oro_locale.dql.formatter.name }
+
+    oro_entity_extend.entity_alias_provider:
+        class: %oro_entity_extend.entity_alias_provider.class%
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_config_bag
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: entity.alias_provider, priority: 90 }

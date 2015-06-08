@@ -2,8 +2,5 @@ oro_entity:
     entity_alias_exclusions:
         - Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent
         - Oro\Bundle\EmailBundle\Entity\EmailBody
-        - Oro\Bundle\EmailBundle\Entity\EmailFolder
-        - Oro\Bundle\EmailBundle\Entity\EmailOrigin
         - Oro\Bundle\EmailBundle\Entity\EmailRecipient
-        - Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation
         - Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin

@@ -6,9 +6,9 @@ oro_entity:
         Oro\Bundle\IntegrationBundle\Entity\FieldsChanges:
             alias:        integrationfieldschanges
             plural_alias: integrationfieldschanges
+        Oro\Bundle\IntegrationBundle\Entity\Status:
+            alias:        integrationstatus
+            plural_alias: integrationstatuses
         Oro\Bundle\IntegrationBundle\Entity\Transport:
             alias:        integrationtransport
             plural_alias: integrationtransports
-
-    entity_alias_exclusions:
-        - Oro\Bundle\IntegrationBundle\Entity\Status

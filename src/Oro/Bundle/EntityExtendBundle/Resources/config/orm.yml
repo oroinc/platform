@@ -4,7 +4,6 @@ parameters:
     oro_entity_extend.entity_metadata_builder.indices.class:    Oro\Bundle\EntityExtendBundle\ORM\IndexMetadataBuilder
     oro_entity_extend.listener.entity_listener.class:           Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
     oro_entity_extend.manager.multi_enum_entity.class:          Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager
-    oro_entity_extend.entity_alias_provider.class:              Oro\Bundle\EntityExtendBundle\ORM\ExtendEntityAliasProvider
 
 services:
     oro_entity_extend.entity_metadata_builder:
@@ -44,11 +43,3 @@ services:
 
     oro_entity_extend.manager.multi_enum_entity:
         class: %oro_entity_extend.manager.multi_enum_entity.class%
-
-    oro_entity_extend.entity_alias_provider:
-        class: %oro_entity_extend.entity_alias_provider.class%
-        public: false
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: entity.alias_provider, priority: 90 }

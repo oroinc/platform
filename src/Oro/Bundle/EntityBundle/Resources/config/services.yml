@@ -29,6 +29,7 @@ parameters:
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
     oro_entity.entity_context_provider.class:                Oro\Bundle\EntityBundle\Provider\EntityContextProvider
     oro_entity.entity_alias_resolver.class:                  Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
+    oro_entity.entity_alias_config_bag.class:                Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag
     oro_entity.entity_alias_provider.class:                  Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
 
 services:
@@ -225,11 +226,17 @@ services:
             - %kernel.debug%
         lazy: true
 
-    oro_entity.entity_alias_provider:
-        class: %oro_entity.entity_alias_provider.class%
+    oro_entity.entity_alias_config_bag:
+        class: %oro_entity.entity_alias_config_bag.class%
         public: false
         arguments:
             - %oro_entity.entity_aliases%
             - %oro_entity.entity_alias_exclusions%
+
+    oro_entity.entity_alias_provider:
+        class: %oro_entity.entity_alias_provider.class%
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_config_bag
         tags:
             - { name: entity.alias_provider, priority: 100 }

@@ -23,7 +23,7 @@ class EntityAlias
         } elseif (!preg_match('/^[a-z][a-z0-9_]*$/D', $alias)) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'The "%s" string cannot be used as an entity alias '
+                    'The string "%s" cannot be used as an entity alias '
                     . 'because it contains illegal characters. '
                     . 'The valid alias should start with a letter and only contain '
                     . 'lower case letters, numbers and underscores ("_").',
@@ -33,10 +33,10 @@ class EntityAlias
         }
         if (empty($pluralAlias)) {
             throw new \InvalidArgumentException('The entity plural alias should not be empty.');
-        } elseif (!preg_match('/^[a-z][a-z0-9_]*$/D', $alias)) {
+        } elseif (!preg_match('/^[a-z][a-z0-9_]*$/D', $pluralAlias)) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'The "%s" string cannot be used as an entity plural alias '
+                    'The string "%s" cannot be used as an entity plural alias '
                     . 'because it contains illegal characters. '
                     . 'The valid alias should start with a letter and only contain '
                     . 'lower case letters, numbers and underscores ("_").',

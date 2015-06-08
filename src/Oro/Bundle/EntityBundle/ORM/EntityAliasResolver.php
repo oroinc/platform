@@ -56,6 +56,7 @@ class EntityAliasResolver implements WarmableInterface
      * @return string The alias for the requested entity
      *
      * @throws NotFoundEntityAliasException if an alias not found
+     * @throws RuntimeException if duplicate alias is found
      */
     public function getAlias($entityClass)
     {
@@ -77,6 +78,7 @@ class EntityAliasResolver implements WarmableInterface
      * @return string The plural alias for the requested entity
      *
      * @throws NotFoundEntityAliasException if an alias not found
+     * @throws RuntimeException if duplicate alias is found
      */
     public function getPluralAlias($entityClass)
     {
@@ -277,6 +279,9 @@ class EntityAliasResolver implements WarmableInterface
         return null;
     }
 
+    /**
+     * Makes sure that aliases for all entities are loaded
+     */
     protected function ensureAllAliasesLoaded()
     {
         foreach ($this->getAllEntityClasses() as $entityClass) {
