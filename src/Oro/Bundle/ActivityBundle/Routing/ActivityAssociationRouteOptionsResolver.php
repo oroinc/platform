@@ -33,7 +33,9 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      */
     public function resolve(Route $route)
     {
-        if ($route->getOption('group') !== 'activity_associations') {
+        if ($route->getOption('group') !== 'activity_associations'
+            || false === strpos($route->getPath(), '{entity}')
+        ) {
             return;
         }
 
