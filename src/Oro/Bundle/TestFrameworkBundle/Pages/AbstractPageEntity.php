@@ -8,7 +8,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  * @package Oro\Bundle\TestFrameworkBundle\Pages
  * {@inheritdoc}
  */
-abstract class AbstractPageEntity extends AbstractPage
+abstract class AbstractPageEntity extends AbstractPageFilteredGrid
 {
     /** @var string */
     protected $owner;
@@ -260,6 +260,26 @@ abstract class AbstractPageEntity extends AbstractPage
             "/*[@class='details'][contains(., '{$activityType}')]",
             "{$activityType} '{$activityName}' not found"
         );
+
+        return $this;
+    }
+
+    /**
+     * @param $filterName
+     * @param $entityName
+     * @return $this
+     */
+    public function assignEntityFromEmbeddedGrid($filterName, $entityName)
+    {
+        $this->filterBy($filterName, $entityName);
+        $this->assertElementPresent(
+            "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
+            "//preceding-sibling::td/input"
+        );
+        $this->test->byXpath(
+            "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
+            "//preceding-sibling::td/input"
+        )->click();
 
         return $this;
     }
