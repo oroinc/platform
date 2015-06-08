@@ -10,7 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class ActivitySearchRouteOptionsResolver implements RouteOptionsResolverInterface
+class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     /** @var ConfigProvider */
     protected $groupingConfigProvider;
@@ -33,7 +33,7 @@ class ActivitySearchRouteOptionsResolver implements RouteOptionsResolverInterfac
      */
     public function resolve(Route $route)
     {
-        if ($route->getOption('group') !== 'activity_search') {
+        if ($route->getOption('group') !== 'activity_association') {
             return;
         }
 
