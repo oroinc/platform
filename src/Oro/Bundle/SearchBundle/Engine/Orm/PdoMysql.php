@@ -88,7 +88,18 @@ class PdoMysql extends BaseDriver
      */
     protected function getWords($value)
     {
-        return array_filter(explode(' ', $value));
+        $results = array_filter(explode(' ', $value));
+        $results = array_map(
+            function ($word) {
+                if (filter_var($word, FILTER_VALIDATE_EMAIL)) {
+                    $word = sprintf('"%s"', $word);
+                }
+
+                return $word;
+            },
+            $results
+        );
+        return $results;
     }
 
     /**
