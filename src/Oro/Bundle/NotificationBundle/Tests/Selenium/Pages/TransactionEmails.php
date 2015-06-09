@@ -54,9 +54,7 @@ class TransactionEmails extends AbstractPageFilteredGrid
         $this->waitForAjax();
         $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         $this->test->moveto($action);
-        $this->waitForAjax();
         $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        //$this->waitForAjax();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
