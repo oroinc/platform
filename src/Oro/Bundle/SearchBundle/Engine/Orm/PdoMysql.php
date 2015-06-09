@@ -234,7 +234,7 @@ class PdoMysql extends BaseDriver
     /**
      * @param  QueryBuilder $qb
      * @param  int          $index
-     * @param  array        $words ,
+     * @param  array        $words
      * @param  array        $searchCondition
      *
      * @return string
