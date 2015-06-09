@@ -58,7 +58,7 @@ class Tag extends AbstractPageEntity
     {
         $this->owner->click();
         $this->waitForAjax();
-        $this->test->byXpath("//div[@id='select2-drop']/div/input")->value($owner);
+        $this->test->byXPath("//div[@id='select2-drop']/div/input")->value($owner);
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@id='select2-drop']//div[contains(., '{$owner}')]",
@@ -75,8 +75,8 @@ class Tag extends AbstractPageEntity
         return;
     }
 
-    public function save()
+    public function save($button = 'Save')
     {
-        return parent::save('Save');
+        return parent::save($button);
     }
 }
