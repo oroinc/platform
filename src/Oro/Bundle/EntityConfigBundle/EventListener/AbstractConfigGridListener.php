@@ -169,7 +169,6 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                 }
 
                 $fieldName    = $provider->getScope() . '_' . $code;
-                $item['grid'] = $provider->getPropertyConfig()->initConfig($item['grid']);
                 $item['grid'] = $this->mapEntityConfigTypes($item['grid']);
 
                 $field = [
