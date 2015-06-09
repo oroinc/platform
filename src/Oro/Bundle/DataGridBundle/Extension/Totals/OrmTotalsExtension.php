@@ -284,19 +284,21 @@ class OrmTotalsExtension extends AbstractExtension
             }
         };
 
-        $query = clone $this->masterQB;
-        $query
+        $queryBuilder = clone $this->masterQB;
+        $queryBuilder
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
 
-        $parameters = $query->getParameters();
+        $parameters = $queryBuilder->getParameters();
         if ($parameters->count()) {
-            $query->resetDQLPart('where')
+            $queryBuilder->resetDQLPart('where')
                 ->resetDQLPart('having')
                 ->setParameters(new ArrayCollection());
         }
 
-        $this->addPageLimits($query, $pageData, $perPage);
+        $this->addPageLimits($queryBuilder, $pageData, $perPage);
+        
+        $query = $queryBuilder->getQuery();
 
         if (!$skipAclWalkerCheck) {
             $query = $this->aclHelper->apply($query);
@@ -322,8 +324,8 @@ class OrmTotalsExtension extends AbstractExtension
         $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
 
         if (!$perPage) {
-            $query = clone $this->masterQB;
-            $data = $query
+            $queryBuilder = clone $this->masterQB;
+            $data = $queryBuilder
                 ->getQuery()
                 ->setFirstResult(null)
                 ->setMaxResults(null)
