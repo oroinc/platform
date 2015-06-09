@@ -4,7 +4,6 @@ namespace Oro\Bundle\DistributionBundle\Routing;
 
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -37,7 +36,7 @@ class OroAutoLoader extends YamlFileLoader
      */
     public function load($file, $type = null)
     {
-        $routes = new RouteCollection();
+        $routes = new SortableRouteCollection();
 
         foreach ($this->kernel->getBundles() as $bundle) {
             $path = $bundle->getPath() . '/Resources/config/oro/routing.yml';
@@ -47,10 +46,13 @@ class OroAutoLoader extends YamlFileLoader
             }
         }
 
+        $routeCollectionAccessor = new RouteCollectionAccessor($routes);
         /** @var Route $route */
         foreach ($routes as $route) {
-            $this->routeOptionsResolver->resolve($route);
+            $this->routeOptionsResolver->resolve($route, $routeCollectionAccessor);
         }
+
+        $routes->sortByPriority();
 
         return $routes;
     }

@@ -9,7 +9,8 @@ interface RouteOptionsResolverInterface
     /**
      * Performs the route modifications based on its options
      *
-     * @param Route $route
+     * @param Route                   $route
+     * @param RouteCollectionAccessor $routeCollectionAccessor
      */
-    public function resolve(Route $route);
+    public function resolve(Route $route, RouteCollectionAccessor $routeCollectionAccessor);
 }

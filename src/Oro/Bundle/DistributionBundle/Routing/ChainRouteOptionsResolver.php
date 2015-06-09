@@ -12,14 +12,14 @@ class ChainRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(Route $route)
+    public function resolve(Route $route, RouteCollectionAccessor $routeCollectionAccessor)
     {
         if (empty($this->resolvers)) {
             return;
         }
 
         foreach ($this->resolvers as $resolver) {
-            $resolver->resolve($route);
+            $resolver->resolve($route, $routeCollectionAccessor);
         }
     }
 
