@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 class EntityAliasCacheWarmer implements CacheWarmerInterface
 {
     /** @var EntityAliasResolver */
-    private $entityAliasResolver;
+    protected $entityAliasResolver;
 
     /**
      * @param EntityAliasResolver $entityAliasResolver
