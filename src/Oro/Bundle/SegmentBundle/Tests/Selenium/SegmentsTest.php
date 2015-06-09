@@ -21,7 +21,7 @@ class SegmentsTest extends Selenium2TestCase
             ->setName($segmentName)
             ->setEntity('User')
             ->setType('Dynamic')
-            ->setOrganization('Acme, General')
+            ->setOrganization('Main')
             ->addColumn(['First name', 'Last name', 'Username'])
             ->addFieldCondition('Username', 'Admin')
             ->save();

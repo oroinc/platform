@@ -31,8 +31,8 @@ class Tag extends AbstractPageEntity
     public function init($new = true)
     {
         if ($new) {
-            $this->tagName = $this->test->byXpath("//*[@data-ftid='oro_tag_tag_form_name']");
-            $this->owner = $this->test->byXpath("//div[starts-with(@id,'s2id_oro_tag_tag_form_owner')]/a");
+            $this->tagName = $this->test->byXPath("//*[@data-ftid='oro_tag_tag_form_name']");
+            $this->owner = $this->test->byXPath("//div[starts-with(@id,'s2id_oro_tag_tag_form_owner')]/a");
         }
         return $this;
     }
@@ -64,7 +64,7 @@ class Tag extends AbstractPageEntity
             "//div[@id='select2-drop']//div[contains(., '{$owner}')]",
             "Owner autocomplete doesn't return search value"
         );
-        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
+        $this->test->byXPath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
 
@@ -77,10 +77,6 @@ class Tag extends AbstractPageEntity
 
     public function save()
     {
-        $this->test->byXpath("//button[contains(., 'Save')]")->click();
-        $this->waitForAjax();
-        $this->waitPageToLoad();
-
-        return $this;
+        return parent::save('Save');
     }
 }
