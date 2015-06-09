@@ -88,6 +88,7 @@ class SearchMappingProvider
      * Return true if given class supports
      *
      * @param $className
+     *
      * @return bool
      */
     public function isClassSupported($className)
@@ -101,6 +102,7 @@ class SearchMappingProvider
      * Return true if fields mapping exists for the given class name
      *
      * @param $className
+     *
      * @return bool
      */
     public function isFieldsMappingExists($className)
