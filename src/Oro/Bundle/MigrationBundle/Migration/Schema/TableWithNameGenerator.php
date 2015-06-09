@@ -6,6 +6,8 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class TableWithNameGenerator extends Table
 {
+    const INDEX_PREFIX = 'idx';
+
     /**
      * @var DbIdentifierNameGenerator
      */
@@ -24,7 +26,7 @@ class TableWithNameGenerator extends Table
     /**
      * {@inheritdoc}
      */
-    public function addIndex(array $columnNames, $indexName = null, array $flags = array())
+    public function addIndex(array $columnNames, $indexName = null, array $flags = [])
     {
         if (!$indexName) {
             $indexName = $this->nameGenerator->generateIndexName(
@@ -59,7 +61,7 @@ class TableWithNameGenerator extends Table
         $foreignTable,
         array $localColumnNames,
         array $foreignColumnNames,
-        array $options = array(),
+        array $options = [],
         $constraintName = null
     ) {
         if (!$constraintName) {
@@ -77,4 +79,30 @@ class TableWithNameGenerator extends Table
             $constraintName
         );
     }
+
+    /**
+     * Generates a readable identifier for indexes with self::INDEX_PREFIX prefix from a name of the table and
+     * a list column names (if the length of the index less then 30 chars).
+     * {@inheritdoc}
+     */
+    // @codingStandardsIgnoreStart
+    protected function _generateIdentifierName($columnNames, $prefix = '', $maxSize = 30)
+    {
+        if (strtolower($prefix) !== self::INDEX_PREFIX) {
+            return parent::_generateIdentifierName($columnNames, $prefix, $maxSize);
+        }
+
+
+        // Removes name of the table from a list of column names
+        $key = array_search($this->getName(), $columnNames);
+        if ($key !== false) {
+            unset($columnNames[$key]);
+        }
+
+        return $this->nameGenerator->generateIndexName(
+            $this->getName(),
+            $columnNames
+        );
+    }
+    // @codingStandardsIgnoreEnd
 }

@@ -513,7 +513,7 @@ class User extends ExtendUser implements
     /**
      * @var EmailOrigin[]|ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"all"})
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"persist", "remove"})
      * @ORM\JoinTable(name="oro_user_email_origin",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="CASCADE")}
