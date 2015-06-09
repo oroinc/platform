@@ -133,5 +133,6 @@ services:
             - @oro_query_designer.query_designer.manager
             - @oro_query_designer.grid.datagrid_configuration_builder
             - @oro_activity_list.datagrid.builder.link
+            - @event_dispatcher
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: activityList }
