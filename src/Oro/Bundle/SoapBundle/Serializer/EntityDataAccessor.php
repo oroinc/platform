@@ -11,7 +11,7 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     public function hasGetter($className, $property)
     {
-        $suffix = ucfirst($property);
+        $suffix = $this->camelize($property);
 
         if (method_exists($className, 'get' . $suffix)) {
             return true;
@@ -31,25 +31,33 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     public function tryGetValue($object, $property, &$value)
     {
-        $suffix = ucfirst($property);
+        if (is_array($object)) {
+            if (isset($object[$property]) || array_key_exists($property, $object)) {
+                $value = $object[$property];
 
-        $accessor = 'get' . $suffix;
-        if (method_exists($object, $accessor)) {
-            $value = $object->$accessor();
+                return true;
+            }
+        } else {
+            $suffix = $this->camelize($property);
 
-            return true;
-        }
-        $accessor = 'is' . $suffix;
-        if (method_exists($object, $accessor)) {
-            $value = $object->$accessor();
+            $accessor = 'get' . $suffix;
+            if (method_exists($object, $accessor)) {
+                $value = $object->$accessor();
 
-            return true;
-        }
-        $accessor = 'has' . $suffix;
-        if (method_exists($object, $accessor)) {
-            $value = $object->$accessor();
+                return true;
+            }
+            $accessor = 'is' . $suffix;
+            if (method_exists($object, $accessor)) {
+                $value = $object->$accessor();
 
-            return true;
+                return true;
+            }
+            $accessor = 'has' . $suffix;
+            if (method_exists($object, $accessor)) {
+                $value = $object->$accessor();
+
+                return true;
+            }
         }
 
         return false;
@@ -62,15 +70,36 @@ class EntityDataAccessor implements DataAccessorInterface
     {
         $value = null;
         if (!$this->tryGetValue($object, $property, $value)) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Cannot get a value of "%s" field from "%s" entity.',
-                    $property,
-                    ClassUtils::getClass($object)
-                )
-            );
+            if (is_array($object)) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Cannot get a value of "%s" field.',
+                        $property
+                    )
+                );
+            } else {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Cannot get a value of "%s" field from "%s" entity.',
+                        $property,
+                        ClassUtils::getClass($object)
+                    )
+                );
+            }
         };
 
         return $value;
+    }
+
+    /**
+     * Camelizes a given string.
+     *
+     * @param string $string Some string
+     *
+     * @return string The camelized version of the string
+     */
+    protected function camelize($string)
+    {
+        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
     }
 }

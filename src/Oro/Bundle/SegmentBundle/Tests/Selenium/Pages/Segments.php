@@ -32,4 +32,15 @@ class Segments extends AbstractPageFilteredGrid
 
         return new SegmentData($this->test);
     }
+
+    /**
+     * @return Segment
+     */
+    public function add()
+    {
+        $this->test->byXPath("//a[@title='Create Segment']")->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
+        return new Segment($this->test);
+    }
 }

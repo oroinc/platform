@@ -328,7 +328,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
 
         if ($entity) {
             try {
-                if ($this->processForm($entity)) {
+                $entity = $this->processForm($entity);
+                if ($entity) {
                     $view = $this->view(null, Codes::HTTP_NO_CONTENT);
                 } else {
                     $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
@@ -349,11 +350,13 @@ class CalendarEventController extends RestController implements ClassResourceInt
     public function handleCreateRequest($_ = null)
     {
         $isProcessed = false;
+
         $entity = call_user_func_array([$this, 'createEntity'], func_get_args());
         try {
-            $isProcessed = $this->processForm($entity);
-            if ($isProcessed) {
+            $entity = $this->processForm($entity);
+            if ($entity) {
                 $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
+                $isProcessed = true;
             } else {
                 $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
             }
