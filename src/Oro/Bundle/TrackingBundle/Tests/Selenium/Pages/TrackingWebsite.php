@@ -26,7 +26,7 @@ class TrackingWebsite extends AbstractPageEntity
      */
     public function setName($name)
     {
-        $object = $this->test->byId('oro_tracking_website_name');
+        $object = $this->test->byXpath("//*[@data-ftid='oro_tracking_website_name']");
         $object->clear();
         $object->value($name);
 
@@ -39,7 +39,7 @@ class TrackingWebsite extends AbstractPageEntity
      */
     public function setIdentifier($identifier)
     {
-        $object = $this->test->byId('oro_tracking_website_identifier');
+        $object = $this->test->byXpath("//*[@data-ftid='oro_tracking_website_identifier']");
         $object->clear();
         $object->value($identifier);
 
@@ -52,7 +52,7 @@ class TrackingWebsite extends AbstractPageEntity
      */
     public function setUrl($url)
     {
-        $object = $this->test->byId('oro_tracking_website_url');
+        $object = $this->test->byXpath("//*[@data-ftid='oro_tracking_website_url']");
         $object->clear();
         $object->value($url);
 

@@ -90,7 +90,11 @@ class PrepareResultItemListener
 
                 foreach ($routeParameters['parameters'] as $parameter => $field) {
                     if ($entity) {
-                        $routeData[$parameter] = $this->mapper->getFieldValue($entity, $field);
+                        if (substr_count($field, '@') === 2) {
+                            $routeData[$parameter] = str_replace('@', '', $field);
+                        } else {
+                            $routeData[$parameter] = $this->mapper->getFieldValue($entity, $field);
+                        }
                     } else {
                         $routeData[$parameter] = $item->getRecordId();
                     }

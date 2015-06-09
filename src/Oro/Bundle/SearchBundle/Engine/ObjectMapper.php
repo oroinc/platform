@@ -25,7 +25,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getMappingConfig()
     {
-        return $this->mappingConfig;
+        return $this->mappingProvider->getMappingConfig();
     }
 
     /**
@@ -37,13 +37,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getEntitiesListAliases()
     {
-        $entities = array();
-
-        foreach ($this->mappingConfig as $class => $mappingEntity) {
-            $entities[$class] = isset($mappingEntity['alias']) ? $mappingEntity['alias'] : '';
-        }
-
-        return $entities;
+        return $this->mappingProvider->getEntitiesListAliases();
     }
 
     /**
@@ -55,7 +49,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getEntities($modeFilter = null)
     {
-        $entities = array_keys($this->mappingConfig);
+        $entities = $this->mappingProvider->getEntityClasses();
         if (null == $modeFilter) {
             return $entities;
         }
@@ -80,11 +74,9 @@ class ObjectMapper extends AbstractMapper
      */
     public function mapObject($object)
     {
-        $mappingConfig = $this->mappingConfig;
-        $objectData = array();
-
+        $objectData = [];
         $objectClass = ClassUtils::getRealClass($object);
-        if (is_object($object) && isset($mappingConfig[$objectClass])) {
+        if (is_object($object) && $this->mappingProvider->isFieldsMappingExists($objectClass)) {
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
             foreach ($this->getEntityMapParameter($objectClass, 'fields', array()) as $field) {
                 if (!isset($field['relation_type'])) {
@@ -123,6 +115,9 @@ class ObjectMapper extends AbstractMapper
                 }
             }
 
+            /**
+             *  Dispatch oro_search.prepare_entity_map event
+             */
             $event = new PrepareEntityMapEvent($object, $objectClass, $objectData);
             $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
             $objectData = $event->getData();

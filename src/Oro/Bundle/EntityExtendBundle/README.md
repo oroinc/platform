@@ -402,3 +402,14 @@ In this code we:
 
 In variable `$viewData` can be simple string or array `[ 'link' => 'example.com', 'title' => 'some text representation']`. In case of string it will be formatted in twig template automatically based on field type. In case of array we show field with text equal to `'title'`. Also title will be escaped. If `'link'` option exists we show field as link with href equal to `'link'` option value.
 
+Custom fields and entities in search
+------------------------------------
+
+During creation or editing custom entity or field, user can set parameter 'searchable'. If this parameter will be set to true, this custom entity or field will be indexed by search engine.
+
+For string field type, user can set additional parameter `title_field`. If this parameter is set to true, value of this field will be included into the search result title.
+
+For the custom entity, search alias will be the same as table name. For example, if user creates new entity with the name 'myentity', 
+it's table name will be 'oro_ext_myentity', and this name will be set search entity alias.
+
+During indexation, for entity field will be created search field in search index with the same name.

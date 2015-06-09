@@ -44,6 +44,10 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->input  = $this->getMock('Symfony\Component\Console\Input\InputInterface');
         $this->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
@@ -67,7 +71,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new UpdateSchemaDoctrineListener($this->indexManager);
+        $this->listener = new UpdateSchemaDoctrineListener($this->indexManager, $registry);
     }
 
     public function testNotRelatedCommand()
@@ -75,7 +79,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
         $command = $this->getMock('Oro\Bundle\SearchBundle\Command\IndexCommand', ['execute']);
 
         $this->eventMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getCommand')
             ->will($this->returnValue($command));
 
@@ -95,7 +99,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->eventMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getCommand')
             ->will($this->returnValue($this->doctrineCommand));
 

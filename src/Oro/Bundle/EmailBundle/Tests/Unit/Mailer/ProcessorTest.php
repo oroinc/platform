@@ -239,10 +239,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:InternalEmailOrigin')
             ->will($this->returnValue($emailOriginRepo));
 
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('setOrigin')
-            ->with($origin);
-
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();

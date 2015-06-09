@@ -7,10 +7,10 @@ abstract class ConfigValueConverterAbstract
     /**
      * Returns converted value
      *
-     * @param array $widgetConfig
-     * @param mixed $value
-     * @param array $config
-     * @param array $options
+     * @param array $widgetConfig Widget configuration
+     * @param mixed $value        Value needs to be converted
+     * @param array $config       Field configuration
+     * @param array $options      Widget options
      *
      * @return null|mixed
      */

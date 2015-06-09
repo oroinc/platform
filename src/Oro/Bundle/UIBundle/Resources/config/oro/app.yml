@@ -25,6 +25,3 @@ assetic:
             inputs:
                 - %kernel.root_dir%/../vendor/components/backbone/backbone.js
             output: bundles/components/backbone/backbone.js
-
-oro_layout:
-    active_theme: oro
