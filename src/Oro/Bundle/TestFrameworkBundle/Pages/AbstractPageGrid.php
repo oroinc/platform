@@ -289,9 +289,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $element = $entity->element(
             $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '...')]")
         );
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $element->click();
-        $element->click();
+        $this->test->moveto($element);
 
         $entity->element(
             $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
@@ -451,9 +449,7 @@ abstract class AbstractPageGrid extends AbstractPage
     public function checkActionMenu($actionName)
     {
         $actionMenu =  $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $actionMenu->click();
-        $actionMenu->click();
+        $this->test->moveto($actionMenu);
         $this->waitForAjax();
         $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 
