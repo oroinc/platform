@@ -118,4 +118,19 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
      * @return array
      */
     abstract public function getDateTimeFormatDataProvider();
+
+    /**
+     * @param string $expected
+     * @param string $locale
+     * @dataProvider getDateFormatDayProvider
+     */
+    public function testGetDayFormat($expected, $locale)
+    {
+        $this->assertEquals($expected, $this->converter->getDayFormat($locale));
+    }
+
+    /**
+     * @return array
+     */
+    abstract public function getDateFormatDayProvider();
 }

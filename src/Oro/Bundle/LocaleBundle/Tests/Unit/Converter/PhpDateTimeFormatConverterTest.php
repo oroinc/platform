@@ -62,4 +62,15 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
             ),
         );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDateFormatDayProvider()
+    {
+        return array(
+            'en default' => array('M j', self::LOCALE_EN),
+            'ru default' => array('d.m.', self::LOCALE_RU),
+        );
+    }
 }

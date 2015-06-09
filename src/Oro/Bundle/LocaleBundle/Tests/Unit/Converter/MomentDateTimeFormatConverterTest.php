@@ -62,4 +62,15 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
             ),
         );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDateFormatDayProvider()
+    {
+        return array(
+            'en default' => array("MMM D", self::LOCALE_EN),
+            'ru default' => array("DD.MM.", self::LOCALE_RU),
+        );
+    }
 }

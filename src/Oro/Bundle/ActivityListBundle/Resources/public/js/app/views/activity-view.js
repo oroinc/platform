@@ -68,8 +68,8 @@ define(function (require) {
             data.has_comments = this.options.configuration.has_comments;
             data.ignoreHead = this.options.ignoreHead;
             data.collapsed = this.collapsed;
-            data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
-            data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
+            data.createdAt = dateTimeFormatter.formatSmartDateTime(data.createdAt);
+            data.updatedAt = dateTimeFormatter.formatSmartDateTime(data.updatedAt);
             data.relatedActivityClass = _.escape(data.relatedActivityClass);
             if (data.owner_id) {
                 data.owner_url = routing.generate('oro_user_view', {'id': data.owner_id});

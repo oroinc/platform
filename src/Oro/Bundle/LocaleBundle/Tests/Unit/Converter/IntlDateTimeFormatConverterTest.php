@@ -62,4 +62,15 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
             ),
         );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDateFormatDayProvider()
+    {
+        return array(
+            'en default'      => array("MMM d", self::LOCALE_EN),
+            'ru default'      => array("dd.MM.", self::LOCALE_RU),
+        );
+    }
 }

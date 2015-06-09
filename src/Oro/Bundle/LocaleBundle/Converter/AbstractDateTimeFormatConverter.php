@@ -139,6 +139,18 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
     /**
      * {@inheritDoc}
      */
+    public function getDayFormat($locale = null)
+    {
+        $pattern = $this->formatter->getPattern(\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, $locale);
+
+        $pattern = preg_replace(['/y/', "/'.*'/", '/,/'], '', $pattern);
+
+        return $this->convertFormat(trim($pattern));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getDateFormat($dateFormat = null, $locale = null)
     {
         return $this->getFormat($dateFormat, \IntlDateFormatter::NONE, $locale);
