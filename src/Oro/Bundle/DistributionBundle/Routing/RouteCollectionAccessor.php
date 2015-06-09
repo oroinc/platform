@@ -41,9 +41,11 @@ class RouteCollectionAccessor
 
         $key = $this->getRouteKey($routePath, $routeMethods);
 
-        return isset($this->routeMap[$key])
-            ? $this->routeMap[$key]
-            : null;
+        if (!isset($this->routeMap[$key])) {
+            return null;
+        }
+
+        return $this->collection->get($this->routeMap[$key]);
     }
 
     /**
