@@ -56,6 +56,7 @@ define(function (require) {
         listen: {
             'requestAddTransition model': 'addNewStepTransition',
             'requestAddStep model': 'addNewStep',
+            'requestRefreshChart model': 'refreshChart',
             'requestEditStep model': 'openManageStepForm',
             'requestCloneStep model': 'cloneStep',
             'requestRemoveStep model': 'removeStep',
@@ -64,6 +65,10 @@ define(function (require) {
             'requestEditTransition model': 'openManageTransitionForm',
             'change:entity model': 'resetWorkflow',
             'saveWorkflow model': 'saveConfiguration'
+        },
+
+        refreshChart: function () {
+            flowchartTools.checkPositions(this.model);
         },
 
         /**

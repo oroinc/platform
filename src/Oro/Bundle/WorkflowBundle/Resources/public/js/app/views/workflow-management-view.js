@@ -20,6 +20,7 @@ define(function (require) {
         events: {
             'click .add-step-btn': 'addNewStep',
             'click .add-transition-btn': 'addNewTransition',
+            'click .refresh-btn': 'refreshChart',
             'submit': 'onSubmit',
             'click [type=submit]': 'setSubmitActor'
         },
@@ -157,6 +158,10 @@ define(function (require) {
 
         addNewStep: function () {
             this.model.trigger('requestAddStep');
+        },
+
+        refreshChart: function () {
+            this.model.trigger('requestRefreshChart');
         },
 
         initEntityFieldsData: function (fields) {

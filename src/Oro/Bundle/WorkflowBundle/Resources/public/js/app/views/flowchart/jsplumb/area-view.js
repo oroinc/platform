@@ -3,10 +3,17 @@ define(function (require) {
     var $ = require('jquery'),
         _ = require('underscore'),
         jsPlumb = require('jsplumb'),
+        Smartline = require('jsplumb.smartline'),
+        JPManager = require('../../../../tools/jsplumb-manager'),
         FlowchartJsPlubmBaseView = require('./base-view'),
         FlowchartJsPlubmAreaView;
 
     FlowchartJsPlubmAreaView = FlowchartJsPlubmBaseView.extend({
+
+        /**
+         * @type {JsPlumbManager}
+         */
+        jpm: null,
 
         jsPlumbInstance: null,
 
@@ -25,6 +32,10 @@ define(function (require) {
             ]
         },
 
+        events: {
+            'mouseup': 'recalculateConnections'
+        },
+
         render: function () {
             // do nothing except connect()
             if (!this.isConnected) {
@@ -38,6 +49,14 @@ define(function (require) {
             var options = $.extend(true, {}, _.result(this, 'defaults'));
             options.Container = this.id();
             this.jsPlumbInstance = jsPlumb.getInstance(options);
+            this.jpm = new JPManager(this.jsPlumbInstance);
+            this.recalculateConnections();
+        },
+
+        recalculateConnections: function () {
+            _.delay(function (jpm) {
+                jpm.recalculateConnections();
+            }, 100, this.jpm);
         }
     });
 

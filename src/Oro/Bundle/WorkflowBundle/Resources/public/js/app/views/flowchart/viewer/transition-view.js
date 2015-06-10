@@ -1,6 +1,7 @@
 define(function (require) {
     'use strict';
     var _ = require('underscore'),
+        //$ = require('jquery'),
         FlowchartJsPlubmBaseView = require('../jsplumb/base-view'),
         FlowchartViewerTransitionView;
 
@@ -26,7 +27,7 @@ define(function (require) {
          * @type {Object}
          */
         connectorStyle: {
-            strokeStyle: '#4F719A',
+            strokeStyle: '#e8e8ff',// '#4F719A',
             lineWidth: 2,
             outlineColor: 'transparent',
             outlineWidth: 7
@@ -134,16 +135,15 @@ define(function (require) {
                 transitionModel = this.model,
                 areaView = this.areaView,
                 endEl = this.findElByStep(endStep),
-                startEl = this.findElByStep(startStep);
-
-            jsplumbConnection = this.areaView.jsPlumbInstance.connect(_.extend(
-                {},
-                this.defaultConnectionConfiguration,
-                {
+                startEl = this.findElByStep(startStep),
+                anchors = this.areaView.jpm.getAnchors(startEl, endEl),
+                parameters = {
                     source: startEl,
                     target: endEl,
+                    connector: [ "Smartline", { cornerRadius: 5 } ],
                     paintStyle: _.result(this, 'connectorStyle'),
                     hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
+                    anchors: anchors,
                     overlays: [
                         ['Custom', {
                             create: _.bind(function () {
@@ -158,8 +158,9 @@ define(function (require) {
                             location: 0.5
                         }]
                     ]
-                }
-            ));
+                };
+
+            jsplumbConnection = this.areaView.jsPlumbInstance.connect(parameters);
             jsplumbConnection.overlayView = overlayView;
             this.connections.push({
                 startStep: startStep,
