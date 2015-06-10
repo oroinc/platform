@@ -9,6 +9,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
@@ -24,6 +25,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      */
     protected $translator;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @var string
      */
@@ -32,11 +36,16 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /**
      * @param EntityManager       $entityManager
      * @param TranslatorInterface $translator
+     * @param SecurityFacade      $securityFacade
      */
-    public function __construct(EntityManager $entityManager, TranslatorInterface $translator)
-    {
-        $this->entityManager = $entityManager;
-        $this->translator    = $translator;
+    public function __construct(
+        EntityManager $entityManager,
+        TranslatorInterface $translator,
+        SecurityFacade $securityFacade
+    ) {
+        $this->entityManager  = $entityManager;
+        $this->translator     = $translator;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -72,9 +81,11 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                 }
 
                 if ($entity) {
-                    $this->entityManager->remove($entity);
+                    if ($this->securityFacade->isGranted('DELETE', $entity)) {
+                        $this->entityManager->remove($entity);
+                        $iteration++;
+                    }
 
-                    $iteration++;
                     if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
                         $this->finishBatch();
                     }
