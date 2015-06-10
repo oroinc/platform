@@ -106,7 +106,7 @@ define([
                 this.title = options.title;
             }
 
-            this.originalTitle = $(document).prop('title');
+            this.originalTitle = $('head title').text();
 
             this.gridName = options.gridName;
             this.collection = options.collection;
@@ -697,7 +697,12 @@ define([
                 return;
             }
 
-            $(document).prop('title', this._createTitle());
+            var newTitle = this._createTitle();
+            /**
+             * IMPORTANT: Both lines should be present for correct PhantomJS selenium driver work.
+             */
+            $('head title').text(newTitle);
+            $(document).prop('title', newTitle);
         }
     });
 
