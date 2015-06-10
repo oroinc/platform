@@ -5,7 +5,7 @@ request:
     offset: 0
     max_results: 1
 response:
-    records_count: 9
+    records_count: 1
     count: 1
     rest:
         data:

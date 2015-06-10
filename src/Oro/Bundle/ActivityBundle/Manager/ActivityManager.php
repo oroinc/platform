@@ -14,6 +14,7 @@ use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -34,6 +35,9 @@ class ActivityManager
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -43,19 +47,22 @@ class ActivityManager
      * @param ConfigProvider      $activityConfigProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
+     * @param AssociationManager  $associationManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $activityConfigProvider,
         ConfigProvider $entityConfigProvider,
-        ConfigProvider $extendConfigProvider
+        ConfigProvider $extendConfigProvider,
+        AssociationManager $associationManager
     ) {
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
         $this->activityConfigProvider = $activityConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
         $this->extendConfigProvider   = $extendConfigProvider;
+        $this->associationManager     = $associationManager;
     }
 
     /**
@@ -203,6 +210,23 @@ class ActivityManager
         }
 
         return $hasChanges;
+    }
+
+    /**
+     * Returns the list of fields responsible to store activity associations for the given activity entity type
+     *
+     * @param string $activityClassName
+     *
+     * @return array [target_entity_class => field_name]
+     */
+    public function getActivityTargets($activityClassName)
+    {
+        return $this->associationManager->getAssociationTargets(
+            $activityClassName,
+            $this->associationManager->getMultiOwnerFilter('activity', 'activities'),
+            RelationType::MANY_TO_MANY,
+            ActivityScope::ASSOCIATION_KIND
+        );
     }
 
     /**

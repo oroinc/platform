@@ -272,7 +272,7 @@ class RawLayout
                 throw new Exception\LogicException('The sibling item cannot be the same as the parent item.');
             }
             $parentPath = $this->items[$parentId][self::PATH];
-            if (strpos(implode('/', $parentPath) . '/', implode('/', $path)) === 0) {
+            if (strpos(implode('/', $parentPath) . '/', implode('/', $path) . '/') === 0) {
                 throw new Exception\LogicException(
                     sprintf(
                         'The parent item (path: %s) cannot be a child of the moving item (path: %s).',
