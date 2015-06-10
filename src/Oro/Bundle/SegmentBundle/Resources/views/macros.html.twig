@@ -1,8 +1,8 @@
 {% macro query_designer_condition_builder(params) %}
     {% set activityConditionOptions = {
         listOption: render(path('oro_api_get_activitylist_activity_list_option')),
-        entitySelector: '#' ~ params.entity_choice_id,
-        fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity',
+        entitySelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
+        fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]',
         fieldChoice: {
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
@@ -44,7 +44,7 @@
     } %}
     {% set conditionBuilderOptions = {
         criteriaListSelector: '#' ~ params.criteria_list_id,
-        entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]',
+        entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
         onFieldsUpdate: {
             toggleCriteria: [
                 'condition-activity',
@@ -181,7 +181,7 @@
             confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
         },
         auditFieldsLoader: {
-            entityChoice:      '#' ~ type ~ '_form_entity',
+            entityChoice:      '[data-ftid=' ~ type ~ '_form_entity]',
             loadingMaskParent: '#' ~ form.vars.name,
             router:            'oro_api_get_audit_fields',
             routingParams:     {},

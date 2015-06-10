@@ -285,10 +285,11 @@ define(function (require) {
 
             this.$entityChoice = $(options.entityChoice);
 
-            var entityChoiceCloneId = this.$entityChoice.attr('id') + options.router;
+            var entityChoiceCloneId = this.$entityChoice.data('ftid') + options.router;
             var $entityChoiceClone = $('<input>').attr({
                 'id': entityChoiceCloneId,
-                'class': 'hide'
+                'class': 'hide',
+                'data-ftid': entityChoiceCloneId
             });
             this.$entityChoice.after($entityChoiceClone.prop('outerHTML'));
             $entityChoice = $('#' + entityChoiceCloneId);
