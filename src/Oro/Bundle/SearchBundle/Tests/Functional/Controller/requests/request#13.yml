@@ -5,8 +5,8 @@ request:
     offset: 1
     max_results: 3
 response:
-    records_count: 9
-    count: 3
+    records_count: 1
+    count: 0
     rest:
         data: []
     soap:
