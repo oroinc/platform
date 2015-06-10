@@ -5,6 +5,17 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use FOS\RestBundle\View\View;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -14,14 +25,9 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
+use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 
 /**
  * @Route("/workflowwidget")
@@ -170,27 +176,7 @@ class WidgetController extends Controller
 
                 $saved = true;
 
-                if (!$transition->getPageTemplate() && !$transition->getDialogTemplate()) {
-                    $transitResponse = $this->forward(
-                        'OroWorkflowBundle:Api/Rest/Workflow:transit',
-                        [
-                            'transitionName' => $transitionName,
-                            'workflowItemId' => $workflowItem->getId(),
-                        ],
-                        [
-                            '_format' => 'json',
-                        ]
-                    );
-
-                    $response = $this->render(
-                        'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
-                        [
-                            'response'          => json_decode($transitResponse->getContent()),
-                            'responseCode'      => $transitResponse->getStatusCode(),
-                            'transitionSuccess' => $transitResponse->getStatusCode() === 200,
-                        ]
-                    );
-
+                if ($response = $this->handleTransition($transition, $workflowItem, $transitionName)) {
                     return $response;
                 }
             }
@@ -205,6 +191,56 @@ class WidgetController extends Controller
                 'form' => $transitionForm->createView(),
             )
         );
+    }
+
+    /**
+     * @param Transition $transition
+     * @param WorkflowItem $workflowItem
+     * @param string $transitionName
+     *
+     * @return Response|null
+     */
+    protected function handleTransition(Transition $transition, WorkflowItem $workflowItem, $transitionName)
+    {
+        if ($transition->getPageTemplate() || $transition->getDialogTemplate()) {
+            return;
+        }
+
+        $responseCode = null;
+        $transitResponseContent = null;
+
+        try {
+            $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName);
+        } catch (WorkflowNotFoundException $e) {
+            $responseCode = 404;
+        } catch (InvalidTransitionException $e) {
+            $responseCode = 400;
+        } catch (ForbiddenTransitionException $e) {
+            $responseCode = 403;
+        } catch (\Exception $e) {
+            $responseCode = 500;
+        }
+
+        if (!$responseCode) {
+            $view = View::create([
+                'workflowItem' => $workflowItem,
+            ]);
+            $view->setFormat('json');
+            $transitResponse = $this->get('fos_rest.view_handler')->handle($view);
+            $responseCode = $transitResponse->getStatusCode();
+            $transitResponseContent = json_decode($transitResponse->getContent());
+        }
+
+        $response = $this->render(
+            'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+            [
+                'response'          => $transitResponseContent,
+                'responseCode'      => $responseCode,
+                'transitionSuccess' => $responseCode === 200,
+            ]
+        );
+
+        return $response;
     }
 
     /**
