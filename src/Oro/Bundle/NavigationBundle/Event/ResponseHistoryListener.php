@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Event;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -154,7 +155,7 @@ class ResponseHistoryListener
             && $request->getMethod() == 'GET'
             && (!$request->isXmlHttpRequest()
                 || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
-            && ($user instanceof UserInterface);
+            && ($user instanceof User);
 
         if ($result) {
             $route  = $request->get('_route');
