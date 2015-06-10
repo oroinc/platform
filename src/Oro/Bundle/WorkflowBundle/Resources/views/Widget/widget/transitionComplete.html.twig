@@ -1,0 +1,30 @@
+<div class="widget-content">
+    <script>
+        require([
+            'jquery',
+            'oroui/js/widget-manager',
+            'oroworkflow/js/transition-event-handlers',
+        ], function(
+            $,
+            widgetManager,
+            TransitionEventHandlers
+        ) {
+
+            var response = {{ response|json_encode|raw }};
+            var responseCode = {{ responseCode|json_encode|raw }};
+            var transitionSuccess = {{ transitionSuccess|json_encode|raw }};
+
+            var element = $('<div>');
+
+            if (transitionSuccess) {
+                TransitionEventHandlers.getOnSuccess(element)(response);
+            } else {
+                TransitionEventHandlers.getOnFailure(element)({status: responseCode}, '', '');
+            }
+
+            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                widget.remove();
+            });
+        });
+    </script>
+</div>

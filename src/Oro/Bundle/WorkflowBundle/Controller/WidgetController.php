@@ -169,6 +169,30 @@ class WidgetController extends Controller
                 $this->getEntityManager()->flush();
 
                 $saved = true;
+
+                if (!$transition->getPageTemplate() && !$transition->getDialogTemplate()) {
+                    $transitResponse = $this->forward(
+                        'OroWorkflowBundle:Api/Rest/Workflow:transit',
+                        [
+                            'transitionName' => $transitionName,
+                            'workflowItemId' => $workflowItem->getId(),
+                        ],
+                        [
+                            '_format' => 'json',
+                        ]
+                    );
+
+                    $response = $this->render(
+                        'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+                        [
+                            'response'          => json_decode($transitResponse->getContent()),
+                            'responseCode'      => $transitResponse->getStatusCode(),
+                            'transitionSuccess' => $transitResponse->getStatusCode() === 200,
+                        ]
+                    );
+
+                    return $response;
+                }
             }
         }
 
