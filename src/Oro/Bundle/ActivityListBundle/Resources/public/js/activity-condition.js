@@ -141,12 +141,6 @@ define([
         },
 
         _updateFieldChoice: function () {
-            this._on(this.$fieldsLoader, {
-                fieldsloaderupdate: function (e, data) {
-                    this.$fieldChoice.fieldChoice('setValue', '');
-                    this.$fieldChoice.fieldChoice('updateData', this._getTypeChoiceEntity(), data);
-                }
-            });
             this._updateFieldsLoader();
             this.$fieldChoice.fieldChoice('updateData', this._getTypeChoiceEntity(), this.$fieldsLoader.data('fields'));
 
