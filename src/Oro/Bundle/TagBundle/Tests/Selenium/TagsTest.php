@@ -45,8 +45,8 @@ class TagsTest extends Selenium2TestCase
             ->assertTitle("{$tagName} Tag - Edit - Tags - System")
             ->setTagName($newTagName)
             ->save()
-            ->assertTitle('All - Tags - System')
-            ->assertMessage('Tag saved');
+            ->assertMessage('Tag saved')
+            ->assertTitle('All - Tags - System');
 
         return $newTagName;
     }
@@ -62,7 +62,7 @@ class TagsTest extends Selenium2TestCase
         $login->openTags('Oro\Bundle\TagBundle')
             ->filterBy('Tag', $tagName)
             ->delete()
-            ->assertTitle('All - Tags - System')
-            ->assertMessage('Item deleted');
+            ->assertMessage('Item deleted')
+            ->assertTitle('All - Tags - System');
     }
 }
