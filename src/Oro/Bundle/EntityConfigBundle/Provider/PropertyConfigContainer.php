@@ -362,7 +362,7 @@ class PropertyConfigContainer
      */
     protected function initParameter($parameter)
     {
-        if ($this->container->has($parameter)) {
+        if (is_string($parameter) && $this->container->has($parameter)) {
             $callableService = $this->container->get($parameter);
 
             return call_user_func($callableService);
