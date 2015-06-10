@@ -205,6 +205,7 @@
         ],
         function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel, EntitiesTpl, EntityTpl) {
             {% set selectionUrl = null %}
+            {% set originalFieldId = attr['data-ftid'] %}
             {% if form.vars.grid_url is defined and form.vars.grid_url %}
                 {% set selectionUrl = form.vars.grid_url %}
             {% elseif form.vars.selection_url is defined and form.vars.selection_url %}
@@ -217,8 +218,8 @@
                 el: '#{{ id }}-container',
                 template: EntitiesTpl,
                 elementTemplate: EntityTpl,
-                addedElement: '#{{ id }}_added',
-                removedElement: '#{{ id }}_removed',
+                addedElement: 'input[data-ftid="{{ originalFieldId }}_added"]',
+                removedElement: 'input[data-ftid="{{ originalFieldId }}_removed"]',
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
                 selectionUrl: {{ selectionUrl|json_encode|raw }},
