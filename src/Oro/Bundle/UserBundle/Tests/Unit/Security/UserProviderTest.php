@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Security;
 
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
-
 use Oro\Bundle\UserBundle\Security\UserProvider;
 
 class UserProviderTest extends \PHPUnit_Framework_TestCase
@@ -27,26 +24,9 @@ class UserProviderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 
-        $ef         = new EncoderFactory(array(static::USER_CLASS => new MessageDigestPasswordEncoder('sha512')));
-        $class      = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-        $om         = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
-
-        $om->expects($this->any())
-            ->method('getRepository')
-            ->withAnyParameters()
-            ->will($this->returnValue($repository));
-
-        $om->expects($this->any())
-            ->method('getClassMetadata')
-            ->with($this->equalTo(static::USER_CLASS))
-            ->will($this->returnValue($class));
-
-        $this->userManager = $this->getMock(
-            'Oro\Bundle\UserBundle\Entity\UserManager',
-            array('findUserBy', 'findUserByUsernameOrEmail', 'getClass'),
-            array(static::USER_CLASS, $om, $ef)
-        );
+        $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->userManager
             ->expects($this->any())
@@ -57,7 +37,7 @@ class UserProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
     public function testLoadUserByInvalidUsername()
     {
@@ -92,7 +72,7 @@ class UserProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
     public function testRefreshDeleted()
     {
@@ -107,7 +87,7 @@ class UserProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UnsupportedUserException
+     * @expectedException \Symfony\Component\Security\Core\Exception\UnsupportedUserException
      */
     public function testRefreshInvalidUser()
     {
