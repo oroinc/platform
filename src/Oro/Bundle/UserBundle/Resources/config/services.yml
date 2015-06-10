@@ -69,6 +69,7 @@ services:
         arguments:                    ["@oro_security.link.sid_manager"]
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: prePersist }
 
     oro_user.twig.user_extension:
         class:                        %oro_user.twig.user_extension.class%
