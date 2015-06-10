@@ -9,8 +9,6 @@ Table of Contents
    - [Step](#step)
    - [Transition](#transition)
    - [Attribute](#attribute)
-   - [Condition](#condition)
-   - [Condition Factory](#condition-factory)
    - [Action](#action)
    - [Action Factory](#action-factory)
  - [Entity Assemblers](#entity-assemblers)
@@ -18,7 +16,6 @@ Table of Contents
    - [Step Assembler](#step-assembler)
    - [Transition Assembler](#transition-assembler)
    - [Attribute Assembler](#attribute-assembler)
-   - [Condition Assembler](#condition-assembler)
    - [Action Assembler](#action-assembler)
    - [Form Options Assembler](#form-option-assembler)
  - [Database Entities](#database-entities)
@@ -157,31 +154,6 @@ for the entity actions.
 * **isEntityUpdateAllowed(attributeName)** - check is attribute has ACL permission for update entity;
 * **isEntityDeleteAllowed(attributeName)** - check is attribute has ACL permission for delete entity;
 
-Condition
----------
-**Interface:**
-Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface
-
-**Description:**
-Basic interface for Transition Conditions.
-
-**Methods:**
-* **setMessage(message)** - set condition error message;
-* **isAllowed(context, errors)** - calculates whether specific condition is allowed for current context
-(usually context is WorkflowItem) and optionally returns list of errors;
-* **initialize(options)** - initialize specific condition based on input options;
-
-Condition Factory
------------------
-**Class:**
-Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory
-
-**Description:**
-Creates instances of Transition Conditions based on type (alias) and options.
-
-**Methods:**
-* **create(type, array options, message)** - creates specific instance of Transition Condition;
-
 Action
 ------
 **Interface:**
@@ -241,7 +213,7 @@ Oro\Bundle\WorkflowBundle\Model\TransitionAssembler
 
 **Description:**
 Creates instances of Transitions based on transition configuration, transition definition configuration, form options
-and list of Step entities. Uses Condition Factory and Action Factory to create configurable conditions and actions.
+and list of Step entities. Uses ConfigExpression Factory and Action Factory to create configurable conditions and actions.
 
 **Methods:**
 * **assemble(array configuration, array definitionsConfiguration, steps, attributes)** - assemble and returns list of Transitions;
@@ -257,24 +229,13 @@ Assemble Attribute instances based on WorkflowDefinition and source configuratio
 **Methods:**
 * **assemble(definition, array $configuration)** - assemble and returns list of Attributes;
 
-Condition Assembler
--------------------
-**Class:**
-Oro\Bundle\WorkflowBundle\Model\Condition\ConditionAssembler
-
-**Description:**
-Recursively walks through Condition configuration and creates instance of appropriate Conditions using Condition Factory.
-
-**Methods:**
-assemble(configuration) - assemble configuration and returns root Condition instance;
-
 Action Assembler
 ----------------
 **Class:**
 Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler
 
 **Description:**
-Walks through Action configuration and creates instance of appropriate Actions using Action Factory and Condition Factory.
+Walks through Action configuration and creates instance of appropriate Actions using Action Factory and ConfigExpression Factory.
 
 **Methods:**
 * **assemble(array configuration)** - assemble configuration and returns instance of treeExecutor Actions;

@@ -253,7 +253,6 @@ services:
     oro_integration.workflow.condition.has_active_integration:
         class: %oro_integration.workflow.condition.has_active_integration.class%
         arguments:
-            - @oro_workflow.context_accessor
             - @doctrine
         tags:
             - { name: oro_workflow.condition, alias: 'has_active_integration' }

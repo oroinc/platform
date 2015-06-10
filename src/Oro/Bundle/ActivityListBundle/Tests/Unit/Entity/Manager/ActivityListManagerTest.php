@@ -62,17 +62,12 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->config         = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+            ->disableOriginalConstructor()->getMock();
         $this->provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()->getMock();
-
         $this->activityListFilterHelper = $this
             ->getMockBuilder('Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+            ->disableOriginalConstructor()->getMock();
         $this->em             = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
         $this->commentManager = $this->getMockBuilder('Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager')
@@ -219,6 +214,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $testItem->setUpdatedAt(new \DateTime('2014-01-01', new \DateTimeZone('UTC')));
         $testItem->setVerb(ActivityList::VERB_UPDATE);
         $testItem->setSubject('test_subject');
+        $testItem->setDescription('test_description');
         $testItem->setRelatedActivityClass('Acme\TestBundle\Entity\TestEntity');
         $testItem->setRelatedActivityId(127);
 
@@ -252,6 +248,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'editor_id'            => 142,
                 'verb'                 => 'update',
                 'subject'              => 'test_subject',
+                'description'          => 'test_description',
                 'data'                 => ['test_data'],
                 'relatedActivityClass' => 'Acme\TestBundle\Entity\TestEntity',
                 'relatedActivityId'    => 127,

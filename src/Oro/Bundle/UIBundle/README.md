@@ -14,6 +14,7 @@ User interface layouts and controls.
 - [Items Manager](./Resources/doc/reference/items-manager.md)
 - [Content providers](./Resources/doc/reference/content-providers.md)
 - [Loading Mask View](./Resources/doc/reference/client-side/loading-mask-view.md)
+- [Scroll Data Customization](./Resources/doc/reference/scroll-data-customization.md)
 
 ## Configuration Settings
 

@@ -2,7 +2,8 @@
 
 namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Oro\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCase
@@ -67,7 +68,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($collection, $path)
     {

@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
@@ -19,9 +20,9 @@ class SystemConfigurationFormProvider extends Provider
     /** @var FormFactoryInterface */
     protected $factory;
 
-    public function __construct($config, FormFactoryInterface $factory, SecurityFacade $securityFacade)
+    public function __construct(ConfigBag $configBag, FormFactoryInterface $factory, SecurityFacade $securityFacade)
     {
-        parent::__construct($config, $securityFacade);
+        parent::__construct($configBag, $securityFacade);
 
         $this->factory = $factory;
     }

@@ -6,21 +6,38 @@ Bundle adds support of websocket communications. Based on JDareClankBundle.
 ## Configuration ##
 Set port and host (optional) for websocket server in parameters.yml
 ``` yaml
-    websocket_host: '*'
-    websocket_port: 8080
+    websocket_bind_address:  0.0.0.0
+    websocket_bind_port:     8080
+    websocket_frontend_host: "*"
+    websocket_frontend_port: 8080
+    websocket_backend_host:  "*"
+    websocket_backend_port:  8080
 ```
+
+Since Clank server is running as a service, there are three host:port pairs for configuration:
+- `websocket_bind_port` and `websocket_bind_address` specify port and address to which the Clank server binds on startup and waits for incoming requests. By default (0.0.0.0), it listens to all addresses on the machine
+- `websocket_backend_port` and `websocket_backend_host` specify port and address to which the application should connect (PHP). By default ("*"), it connects to 127.0.0.1 address.
+- `websocket_frontend_port` and `websocket_frontend_host` specify port and address to which the browser should connect (JS). By default ("*"), it connects to host specified in the browser.
+
+
 
 Add the following to your app/config.yml
 ``` yaml
 clank:
     web_socket_server:
-        port:                 %websocket_port%               # The port the socket server will listen on
-        host:                 %websocket_host%               # (optional) The host ip to bind to
+        port:                 %websocket_bind_port%          # The port the socket server will listen on
+        host:                 %websocket_bind_address%       # (optional) The host ip to bind to
     session_handler:          session.handler.pdo            # Any session handler except native (files)
     periodic:
         -
             service:          "oro_wamp.db_ping"
             time:             60000                          # the time in milliseconds between the "tick" function being called
+
+twig:
+    globals:
+        ws:
+            port:             "%websocket_frontend_port%"    # Websocket port used in JS
+            host:             "%websocket_frontend_host%"    # Websocket host used in JS
 
 framework:
     session:

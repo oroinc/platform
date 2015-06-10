@@ -12,6 +12,11 @@ class CumulativeResourceManager
     private static $instance = null;
 
     /**
+     * @var string
+     */
+    private $appRootDir;
+
+    /**
      * @var array
      */
     private $bundles = [];
@@ -68,6 +73,29 @@ class CumulativeResourceManager
     public function setBundles($bundles)
     {
         $this->bundles = $bundles;
+
+        return $this;
+    }
+
+    /**
+     * Gets application root directory
+     *
+     * @return string
+     */
+    public function getAppRootDir()
+    {
+        return $this->appRootDir;
+    }
+
+    /**
+     * Sets application root directory
+     *
+     * @param string $appRootDir
+     * @return CumulativeResourceManager
+     */
+    public function setAppRootDir($appRootDir)
+    {
+        $this->appRootDir = $appRootDir;
 
         return $this;
     }

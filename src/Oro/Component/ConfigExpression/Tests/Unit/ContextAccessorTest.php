@@ -2,8 +2,9 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class ContextAccessorTest extends \PHPUnit_Framework_TestCase
@@ -149,7 +150,7 @@ class ContextAccessorTest extends \PHPUnit_Framework_TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage The property "test" cannot be got by "__get" method because "__isset" method returns false. Class "Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub".
      */
     // @codingStandardsIgnoreEnd

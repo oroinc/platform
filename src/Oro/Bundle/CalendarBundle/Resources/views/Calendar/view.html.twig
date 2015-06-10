@@ -42,8 +42,8 @@
             calendarOptions: calendar,
             eventsItemsJson: render(path('oro_api_get_calendarevents', {calendar: entity.id, start: startDate|date('c'), end: endDate|date('c'), subordinate: true})),
             connectionsItemsJson: render(path('oro_api_get_calendar_connections', {id: entity.id})),
-            date: 'now'|date('c'),
             eventsOptions: {
+                defaultDate: 'now'|date('c', oro_timezone()),
                 'containerSelector': '.calendar-events',
                 'itemViewTemplateSelector': '#template-view-calendar-event',
                 'itemFormTemplateSelector': '#template-calendar-event',

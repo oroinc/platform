@@ -17,6 +17,8 @@ parameters:
 
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
+    oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
+
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
@@ -91,126 +93,8 @@ services:
         calls:
             - [setRequest, ["@?request="]]
 
-    oro_ui.layout_expression.asset:
-        class: Oro\Bundle\UIBundle\ConfigExpression\Asset
+    oro_ui.html_tag_helper:
+        class: %oro_ui.html_tag_helper.class%
         arguments:
-            - @templating.helper.assets
-        tags:
-            - { name: oro_layout.expression, alias: asset }
-
-    oro_ui.layout_expression.encode_class:
-        class: Oro\Bundle\UIBundle\ConfigExpression\EncodeClass
-        arguments:
-            - @oro_entity.routing_helper
-        tags:
-            - { name: oro_layout.expression, alias: encode_class }
-
-    oro_ui.layout_context_configurator.widget:
-        class: Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator
-        calls:
-            - [setRequest, [@?request=]]
-        tags:
-            - { name: layout.context_configurator, priority: -100 }
-
-    oro_ui.layout_context_configurator.user_agent:
-        class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
-        calls:
-            - [setRequest, [@?request=]]
-        tags:
-            - { name: layout.context_configurator }
-
-    oro_ui.layout_context_configurator.hash_navigation:
-        class: Oro\Bundle\UIBundle\Layout\Extension\HashNavContextConfigurator
-        calls:
-            - [setRequest, [@?request=]]
-        tags:
-            - { name: layout.context_configurator }
-
-    oro_ui.layout_context_configurator.config:
-        class: Oro\Bundle\UIBundle\Layout\Extension\ConfigContextConfigurator
-        arguments:
-            - @oro_config.user
-            - # alias: config key
-                navbar_position: oro_ui.navbar_position
-        tags:
-            - { name: layout.context_configurator }
-
-    oro_ui.layout_context_configurator.entity_config:
-        class: Oro\Bundle\UIBundle\Layout\Extension\EntityConfigContextConfigurator
-        arguments:
-            - @oro_entity_config.config_manager
-            - # alias: [scope, code]
-                entity_auditable: [dataaudit, auditable]
-        tags:
-            - { name: layout.context_configurator }
-
-    oro_ui.layout_context_configurator.entity_class:
-        class: Oro\Bundle\UIBundle\Layout\Extension\EntityClassContextConfigurator
-        tags:
-            - { name: layout.context_configurator }
-
-    oro_ui.block_type_extension.head:
-        class: Oro\Bundle\UIBundle\Layout\Block\Extension\HeadExtension
-        arguments:
-            - @oro_navigation.title_provider
-            - @oro_navigation.title_translator
-        tags:
-            - { name: layout.block_type_extension, alias: head }
-
-    oro_ui.block_type.placeholder:
-        class: Oro\Bundle\UIBundle\Layout\Block\Type\PlaceholderType
-        tags:
-             - { name: layout.block_type, alias: placeholder }
-
-    oro_ui.block_type.require_js:
-        class: Oro\Bundle\UIBundle\Layout\Block\Type\RequireJsType
-        tags:
-             - { name: layout.block_type, alias: require_js }
-
-    oro_ui.block_type.button_separator:
-        class: Oro\Bundle\UIBundle\Layout\Block\Type\ButtonSeparatorType
-        tags:
-             - { name: layout.block_type, alias: button_separator }
-
-    oro_ui.block_type.pinned_button_group:
-        class: Oro\Bundle\UIBundle\Layout\Block\Type\PinnedButtonGroupType
-        tags:
-             - { name: layout.block_type, alias: pinned_button_group }
-
-    oro_ui.block_type.breadcrumb_list:
-        class: Oro\Bundle\UIBundle\Layout\Block\Type\BreadcrumbListType
-        tags:
-             - { name: layout.block_type, alias: breadcrumbs }
-
-    oro_ui.block_type.datagrid:
-        class: Oro\Bundle\UIBundle\Layout\Block\Type\DatagridType
-        arguments:
-            - @oro_datagrid.datagrid.name_strategy
-        tags:
-             - { name: layout.block_type, alias: datagrid }
-
-    oro_ui.block_type_extension.link:
-        class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
-        tags:
-            - { name: layout.block_type_extension, alias: link }
-
-    oro_ui.block_type_extension.button:
-        class: Oro\Bundle\UIBundle\Layout\Block\Extension\ButtonExtension
-        tags:
-            - { name: layout.block_type_extension, alias: button }
-
-    oro_ui.block_type_extension.taggable_datagrid:
-        class: Oro\Bundle\UIBundle\Layout\Block\Extension\TaggableDatagridExtension
-        tags:
-            - { name: layout.block_type_extension, alias: datagrid }
-
-    oro_ui.block_type_extension.form_start:
-        class: Oro\Bundle\UIBundle\Layout\Block\Extension\FormStartExtension
-        tags:
-            - { name: layout.block_type_extension, alias: form_start }
-
-    oro_ui.layout_loader.widget_path_provider:
-        class:  Oro\Bundle\UIBundle\Layout\Extension\Theme\WidgetPathProvider
-        public: false
-        tags:
-            - { name: layout.resource.path_provider, priority: -10 }
+            - @oro_form.provider.html_tag_provider
+            - %kernel.cache_dir%

@@ -103,6 +103,7 @@ config:
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
+        'tpl': 'bundles/oroui/js/requirejs/tpl.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
@@ -112,6 +113,7 @@ config:
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
+        'oroui/js/app/views/hidden-initialization-view': 'bundles/oroui/js/app/views/hidden-initialization-view.js'
         'oroui/js/app/views/page/before-content-addition-view': 'bundles/oroui/js/app/views/page/before-content-addition-view.js'
         'oroui/js/app/views/page/breadcrumb-view': 'bundles/oroui/js/app/views/page/breadcrumb-view.js'
         'oroui/js/app/views/page/content-view': 'bundles/oroui/js/app/views/page/content-view.js'
@@ -131,7 +133,6 @@ config:
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
-        'oroui/js/app/components/hidden-initialization-component': 'bundles/oroui/js/app/components/hidden-initialization-component.js'
         'oroui/js/app/components/hidden-redirect-component': 'bundles/oroui/js/app/components/hidden-redirect-component.js'
         'oroui/js/app/components/jquery-widget-component': 'bundles/oroui/js/app/components/jquery-widget-component.js'
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'

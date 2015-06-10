@@ -122,7 +122,6 @@ class Processor
         }
 
         $origin = $this->getEmailOrigin($model->getFrom());
-        $this->emailEntityBuilder->setOrigin($origin);
 
         $email = $this->emailEntityBuilder->email(
             $model->getSubject(),

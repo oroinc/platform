@@ -54,7 +54,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()", "addAxis()"/"removeAxis()", "setAxes()", "__set()" or "__call()" exist and have public access in class "Mock_CarNoAdderAndRemover
      */
     // @codingStandardsIgnoreEnd

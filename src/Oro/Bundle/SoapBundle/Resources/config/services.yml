@@ -34,6 +34,7 @@ services:
         abstract: true
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
+            - [setEntitySerializer, [@oro_soap.entity_serializer]]
 
     oro_soap.handler.include_delegate:
         class: %oro_soap.handler.include_delegate.class%
@@ -68,6 +69,7 @@ services:
         class: %oro_soap.entity_serializer.class%
         arguments:
             - @doctrine
+            - @oro_entity_config.config_manager
             - @oro_soap.entity_accessor
             - @oro_soap.entity_data_transformer
 
@@ -76,3 +78,5 @@ services:
 
     oro_soap.entity_data_transformer:
         class: %oro_soap.entity_data_transformer.class%
+        arguments:
+            - @service_container

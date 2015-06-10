@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
+use Oro\Component\ConfigExpression\ExpressionInterface;
+
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 
 interface ActionInterface
 {
@@ -26,8 +27,8 @@ interface ActionInterface
     /**
      * Set optional condition for action
      *
-     * @param ConditionInterface $condition
+     * @param ExpressionInterface $condition
      * @return mixed
      */
-    public function setCondition(ConditionInterface $condition);
+    public function setCondition(ExpressionInterface $condition);
 }

@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
@@ -54,7 +55,8 @@ class ImportExportController extends Controller
 
         return [
             'entityName' => $entityName,
-            'form'       => $importForm->createView()
+            'form'       => $importForm->createView(),
+            'options'    => $this->getOptionsFromRequest(),
         ];
     }
 
@@ -76,9 +78,13 @@ class ImportExportController extends Controller
         $existingAliases = $processorRegistry
             ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
 
+        $jobName = $this->getRequest()->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
         $result = $this->getImportHandler()->handleImportValidation(
-            JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
-            $processorAlias
+            $jobName,
+            $processorAlias,
+            'csv',
+            null,
+            $this->getOptionsFromRequest()
         );
         $result['showStrategy'] = count($existingAliases) > 1;
 
@@ -94,9 +100,13 @@ class ImportExportController extends Controller
      */
     public function importProcessAction($processorAlias)
     {
+        $jobName = $this->getRequest()->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
         $result = $this->getImportHandler()->handleImport(
-            JobExecutor::JOB_IMPORT_FROM_CSV,
-            $processorAlias
+            $jobName,
+            $processorAlias,
+            'csv',
+            null,
+            $this->getOptionsFromRequest()
         );
 
         return new JsonResponse($result);
@@ -111,13 +121,18 @@ class ImportExportController extends Controller
      */
     public function instantExportAction($processorAlias)
     {
+        $jobName = $this->getRequest()->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
+
         return $this->getExportHandler()->handleExport(
-            JobExecutor::JOB_EXPORT_TO_CSV,
+            $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT,
             'csv',
             null,
-            ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
+            array_merge(
+                $this->getOptionsFromRequest(),
+                ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
+            )
         );
     }
 
@@ -130,10 +145,14 @@ class ImportExportController extends Controller
      */
     public function templateExportAction($processorAlias)
     {
+        $jobName = $this->getRequest()->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
         $result = $this->getExportHandler()->getExportResult(
-            JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
+            $jobName,
             $processorAlias,
-            ProcessorRegistry::TYPE_EXPORT_TEMPLATE
+            ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
+            'csv',
+            null,
+            $this->getOptionsFromRequest()
         );
 
         return $this->redirect($result['url']);
@@ -192,5 +211,19 @@ class ImportExportController extends Controller
     protected function getJobExecutor()
     {
         return $this->get('oro_importexport.job_executor');
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOptionsFromRequest()
+    {
+        $options = $this->getRequest()->get('options', []);
+
+        if (!is_array($options)) {
+            throw new InvalidArgumentException('Request parameter "options" must be array.');
+        }
+
+        return $options;
     }
 }

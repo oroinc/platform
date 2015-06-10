@@ -17,6 +17,34 @@ oro_menu_config:
             extras:
                 position: 15
 
+        # if exist option "dialog", then you need to add dialog_config options
+        shortcut_compose_email:
+            label: 'oro.email.menu.shortcut_compose_email.label'
+            route: 'oro_email_email_create'
+            extras:
+                description: 'oro.email.menu.shortcut_compose_email.description'
+                isCustomAction: true
+                dialog: true
+                dialog_config:
+                    dataUrl: 'oro_email_email_create'
+                    aCss: 'no-hash'
+                    iCss: ''
+                    label: 'oro.email.menu.shortcut_compose_email.label'
+                    widget:
+                        type: 'dialog'
+                        multiple: true
+                        refreshWidgetAlias: 'activity-list-widget'
+                        reloadGridName: 'user-email-grid'
+                        options:
+                            alias: 'email-dialog'
+                            dialogOptions:
+                                title: 'oro.email.menu.shortcut_compose_email.label'
+                                allowMaximize: true
+                                allowMinimize: true
+                                dblclick: 'maximize'
+                                maximizedHeightDecreaseBy: 'minimize-bar'
+                                width: 1000
+
     tree:
         application_menu:
             children:
@@ -28,6 +56,9 @@ oro_menu_config:
         usermenu:
             children:
                 oro_email_user_emails: ~
+        shortcuts:
+            children:
+                shortcut_compose_email: ~
 
 oro_titles:
     oro_email_view: "%%subject%% - My Emails - %%username%%"

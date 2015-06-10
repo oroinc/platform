@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
@@ -59,7 +60,7 @@ class RequestEntity extends AbstractAction
         if (empty($options['attribute'])) {
             throw new InvalidParameterException('Attribute name parameter is required');
         }
-        if (!$options['attribute'] instanceof PropertyPath) {
+        if (!$options['attribute'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Attribute must be valid property definition.');
         }
 

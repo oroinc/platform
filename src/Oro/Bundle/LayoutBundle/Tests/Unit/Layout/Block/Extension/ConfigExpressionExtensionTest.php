@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
@@ -12,7 +14,6 @@ use Oro\Component\Layout\OptionValueBag;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension;
 use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 {

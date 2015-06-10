@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
@@ -35,7 +35,7 @@ abstract class AbstractDateAction extends AbstractAction
             throw new InvalidParameterException('Option "attribute" name parameter is required');
         }
 
-        if (!$options['attribute'] instanceof PropertyPath) {
+        if (!$options['attribute'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Option "attribute" must be valid property definition.');
         }
 

@@ -1,21 +1,22 @@
 oro:
     activitylist:
-        entity_label:         Activity list
-        entity_plural_label:  Activity list
-        entity_description:   Represent activities list
+        entity_label:        Activity list
+        entity_plural_label: Activity list
+        entity_description:  Represent activities list
 
-        id.label:             Id
-        owner.label:          Created by
-        editor.label:         Updated by
-        verb.label:           Verb
-        subject.label:        Subject
-        data.label:           Data
-        organization.label:   Organization
+        id.label:            Id
+        owner.label:         Created by
+        editor.label:        Updated by
+        verb.label:          Verb
+        subject.label:       Subject
+        data.label:          Data
+        organization.label:  Organization
         related_activity_class.label: Related activity class
         related_activity_id.label:    Related activity id
-        created_at.label: Created at
-        updated_at.label: Updated at
-        head.label:           Is Head
+        created_at.label:    Created at
+        updated_at.label:    Updated at
+        head.label:          Is Head
+        description.label:   Description
 
         no_activities_exist: No activities found
 
@@ -25,7 +26,7 @@ oro:
             activity_list.label: Activity lists
             fields:
                 sorting_field:
-                    label:     Sort by field
+                    label:   Sort by field
                     choices:
                         createdAt: Created date
                         updatedAt: Updated date

@@ -68,6 +68,15 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getDescription($entity)
+    {
+        /** @var $entity CalendarEvent */
+        return $entity->getDescription();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getData(ActivityList $activityListEntity)
     {
         return [];
