@@ -130,6 +130,8 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
+            - @oro_activity.manager
+            - @oro_activity_list.provider.chain
             - @oro_activity_list.filter.helper
             - @oro_query_designer.query_designer.manager
             - @oro_query_designer.grid.datagrid_configuration_builder

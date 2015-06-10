@@ -12,6 +12,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
@@ -35,6 +37,12 @@ class ActivityListFilter extends EntityFilter
     /** @var ActivityListFilterHelper */
     protected $activityListFilterHelper;
 
+    /** @var ActivityManager */
+    protected $activityManager;
+
+    /** @var ActivityListChainProvider */
+    protected $activityListChainProvider;
+
     /** @var string */
     protected $activityAlias;
 
@@ -56,6 +64,8 @@ class ActivityListFilter extends EntityFilter
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
+     * @param ActivityManager $activityManager
+     * @param ActivityListChainProvider $activityListChainProvider
      * @param ActivityListFilterHelper $activityListFilterHelper
      * @param Manager $queryDesignerManager
      * @param DatagridConfigurationBuilder $datagridConfigurationBuilder
@@ -65,6 +75,8 @@ class ActivityListFilter extends EntityFilter
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
+        ActivityManager $activityManager,
+        ActivityListChainProvider $activityListChainProvider,
         ActivityListFilterHelper $activityListFilterHelper,
         Manager $queryDesignerManager,
         DatagridConfigurationBuilder $datagridConfigurationBuilder,
@@ -72,6 +84,8 @@ class ActivityListFilter extends EntityFilter
         EventDispatcherInterface $eventDispatcher
     ) {
         parent::__construct($factory, $util);
+        $this->activityManager = $activityManager;
+        $this->activityListChainProvider = $activityListChainProvider;
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->queryDesignerManager = $queryDesignerManager;
         $this->datagridConfigurationBuilder = $datagridConfigurationBuilder;
@@ -135,13 +149,34 @@ class ActivityListFilter extends EntityFilter
 
         $activityQb = $em
             ->getRepository('OroActivityListBundle:ActivityList')
-            ->createQueryBuilder($this->activityListAlias);
+            ->createQueryBuilder($this->activityListAlias)
+            ->select('1')
+            ->setMaxResults(1);
+
+        $availableActivityAssociations = $this->activityManager->getActivityAssociations($data['entityClassName']);
+        $availableClasses = array_map(function ($assoc) {
+            return $assoc['className'];
+        }, $availableActivityAssociations);
+
+        $chosenActivities = $data['activityType']['value'];
+        if (count($chosenActivities) === 1 && empty($chosenActivities[0])) {
+            $chosenActivities = $this->activityListChainProvider->getSupportedActivities();
+        }
+        $chosenClasses = array_map(function ($className) {
+            return str_replace('_', '\\', $className);
+        }, $chosenActivities);
+
+        $unavailableChoices = array_diff($chosenClasses, $availableClasses);
+
+        if ($unavailableChoices) {
+            $activityQb->andWhere('1 = 0');
+
+            return $activityQb;
+        }
 
         $activityQb
-            ->select('1')
                 ->join($joinField, $this->activityAlias)
-                ->andWhere(sprintf('%s.id = %s.%s', $this->activityAlias, $this->getEntityAlias(), $entityIdField))
-                ->setMaxResults(1);
+                ->andWhere(sprintf('%s.id = %s.%s', $this->activityAlias, $this->getEntityAlias(), $entityIdField));
 
         $entityField = $this->getField();
         $dateRangeField = strpos($entityField, '$') === 0 ? substr($entityField, 1) : null;
