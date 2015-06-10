@@ -94,6 +94,12 @@ define([
             if (data && data.columnName) {
                 this.element.one('changed', _.bind(function () {
                     this.filter.setValue(data.criterion.data.filter.data);
+                    this.element.data('value', {
+                        criterion: {
+                            data: data.criterion.data.filter.data
+                        }
+                    });
+                    this._renderFilter(base64_decode(data.columnName));
                 }, this));
                 this.selectField(base64_decode(data.columnName));
             }
