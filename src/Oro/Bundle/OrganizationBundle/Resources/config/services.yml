@@ -71,11 +71,6 @@ services:
         tags:
             - { name: form.type, alias: oro_type_choice_ownership_type }
 
-    oro_organization.method.get_ownership_type:
-        tags:
-            - { name: oro_service_method, service: oro_organization.form.type.ownership_type, method: getOwnershipsArray }
-        lazy: true
-
     oro_organization.owner_assignment_checker.default:
         class: %oro_organization.owner_assignment_checker.default.class%
         public: false
