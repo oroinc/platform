@@ -19,28 +19,6 @@ define([
         },
 
         _create: function () {
-            this.options.fieldChoice.dataFilter = function (entityName, entityFields) {
-                var excludedFields = {
-                    'Oro\\Bundle\\EmailBundle\\Entity\\Email': [
-                        'importance',
-                        'internalDate',
-                        'head',
-                        'seen',
-                        'refs',
-                        'xMessageId',
-                        'xThreadId',
-                    ],
-                };
-
-                if (!_.has(excludedFields, entityName)) {
-                    return entityFields;
-                }
-
-                return _.reject(entityFields, function (field) {
-                    return _.contains(excludedFields[entityName], field.name);
-                });
-            };
-
             var data = this.element.data('value');
             this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
 
