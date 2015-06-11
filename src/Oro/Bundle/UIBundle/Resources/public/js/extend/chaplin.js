@@ -14,6 +14,32 @@ define([
     location = window.location;
     original.viewDispose = Chaplin.View.prototype.dispose;
 
+    /**
+     * Added raw argument. Removed Internet Explorer < 9 workaround
+     *
+     * @param {string} subtitle
+     * @param {boolean=} raw
+     * @returns {string}
+     */
+    Chaplin.Layout.prototype.adjustTitle = function(subtitle, raw) {
+        if (!raw) {
+            var title,
+                _this = this;
+            if (subtitle == null) {
+                subtitle = '';
+            }
+            title = this.settings.titleTemplate({
+                title: this.title,
+                subtitle: subtitle
+            });
+        } else {
+            title = subtitle;
+        }
+        // removed Internet Explorer < 9 workaround
+        document.title = title;
+        return title;
+    };
+
     Chaplin.View.prototype.dispose = function () {
         if (this.disposed) {
             return;
