@@ -317,7 +317,7 @@ class ConfigController extends Controller
 
         /** @var ConfigProvider $ownershipConfigProvider */
         $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
-        $ownerTypes              = $this->get('oro_organization.method.get_ownership_type')->execute();
+        $ownerTypes              = $this->get('oro_organization.form.type.ownership_type')->getOwnershipsArray();
         $ownerType               = $ownershipConfigProvider->getConfig($entity->getClassName())->get('owner_type');
         $ownerType               = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 

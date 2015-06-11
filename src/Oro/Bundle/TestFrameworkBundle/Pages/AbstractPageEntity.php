@@ -55,10 +55,10 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
     public function close($redirect = false)
     {
         $class = get_class($this);
-        if (substr($class, -1) == 'y') {
+        if (substr($class, -1) === 'y') {
             $class = substr($class, 0, strlen($class) - 1) . 'ies';
         } else {
-            $class = $class . 's';
+            $class .= 's';
         }
 
         return new $class($this->test, $redirect);
