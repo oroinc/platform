@@ -122,42 +122,10 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
         $this->om->expects($this->once())->method('persist')->with($this->equalTo($user));
         $this->om->expects($this->once())->method('flush');
 
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(['role' => User::ROLE_DEFAULT]))
-            ->will($this->returnValue(new Role(User::ROLE_DEFAULT)));
-
         $this->userManager->updateUser($user);
 
         $this->assertEquals(self::TEST_EMAIL, $user->getEmail());
         $this->assertEquals($encodedPassword, $user->getPassword());
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Default user role not found
-     */
-    public function testUpdateUserUnsupported()
-    {
-        $user = $this->getUser()
-            ->setUsername(self::TEST_NAME)
-            ->setEmail(self::TEST_EMAIL)
-            ->setPlainPassword('password');
-
-        $this->om->expects($this->never())
-            ->method('persist')
-            ->with($this->equalTo($user));
-        $this->om->expects($this->never())
-            ->method('flush');
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(['role' => User::ROLE_DEFAULT]))
-            ->will($this->returnValue(null));
-
-        $this->userManager->updateUser($user);
     }
 
     public function testFindUserBy()
