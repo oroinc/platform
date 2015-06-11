@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;

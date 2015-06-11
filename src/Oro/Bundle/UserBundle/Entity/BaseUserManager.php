@@ -50,7 +50,7 @@ class BaseUserManager implements UserProviderInterface
     /**
      * Returns an empty user instance
      *
-     * @return User
+     * @return OroUserInterface
      */
     public function createUser()
     {
@@ -67,7 +67,6 @@ class BaseUserManager implements UserProviderInterface
      */
     public function updateUser(OroUserInterface $user, $flush = true)
     {
-        $this->assertRoles($user);
         $this->updatePassword($user);
         $this->getStorageManager()->persist($user);
 
@@ -106,7 +105,7 @@ class BaseUserManager implements UserProviderInterface
      * Finds one user by the given criteria
      *
      * @param  array $criteria
-     * @return User
+     * @return OroUserInterface
      */
     public function findUserBy(array $criteria)
     {
@@ -127,7 +126,7 @@ class BaseUserManager implements UserProviderInterface
      * Finds a user by email
      *
      * @param  string $email
-     * @return User
+     * @return OroUserInterface
      */
     public function findUserByEmail($email)
     {
@@ -138,7 +137,7 @@ class BaseUserManager implements UserProviderInterface
      * Finds a user by username
      *
      * @param  string $username
-     * @return User
+     * @return OroUserInterface
      */
     public function findUserByUsername($username)
     {
@@ -149,7 +148,7 @@ class BaseUserManager implements UserProviderInterface
      * Finds a user either by email, or username
      *
      * @param  string $usernameOrEmail
-     * @return User
+     * @return OroUserInterface
      */
     public function findUserByUsernameOrEmail($usernameOrEmail)
     {
@@ -164,7 +163,7 @@ class BaseUserManager implements UserProviderInterface
      * Finds a user either by confirmation token
      *
      * @param  string $token
-     * @return User
+     * @return OroUserInterface
      */
     public function findUserByConfirmationToken($token)
     {
@@ -188,7 +187,7 @@ class BaseUserManager implements UserProviderInterface
      * all ACL checks.
      *
      * @param  SecurityUserInterface $user
-     * @return User
+     * @return OroUserInterface
      * @throws UnsupportedUserException if a User Instance is given which is not managed by this UserManager
      *                                  (so another Manager could try managing it)
      * @throws UsernameNotFoundException if user could not be reloaded
@@ -219,7 +218,7 @@ class BaseUserManager implements UserProviderInterface
      * all ACL checks.
      *
      * @param  string $username
-     * @return User
+     * @return OroUserInterface
      * @throws UsernameNotFoundException if user not found
      */
     public function loadUserByUsername($username)
@@ -290,26 +289,5 @@ class BaseUserManager implements UserProviderInterface
     public function getStorageManager()
     {
         return $this->registry->getManagerForClass($this->getClass());
-    }
-
-    /**
-     * We need to make sure to have at least one role.
-     *
-     * @param UserInterface $user
-     * @throws \RuntimeException
-     */
-    protected function assertRoles(OroUserInterface $user)
-    {
-        if (count($user->getRoles()) === 0) {
-            $role = $this->getStorageManager()
-                ->getRepository('OroUserBundle:Role')
-                ->findOneBy(['role' => User::ROLE_DEFAULT]);
-
-            if (!$role) {
-                throw new \RuntimeException('Default user role not found');
-            }
-
-            $user->addRole($role);
-        }
     }
 }

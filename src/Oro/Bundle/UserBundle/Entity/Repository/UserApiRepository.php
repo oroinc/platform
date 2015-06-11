@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;

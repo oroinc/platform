@@ -3,26 +3,25 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 
 class UserProvider implements UserProviderInterface
 {
     /**
-     * @var UserManager
+     * @var BaseUserManager
      */
     protected $userManager;
 
     /**
      * Constructor.
      *
-     * @param UserManager $userManager
+     * @param BaseUserManager $userManager
      */
-    public function __construct(UserManager $userManager)
+    public function __construct(BaseUserManager $userManager)
     {
         $this->userManager = $userManager;
     }
@@ -46,17 +45,7 @@ class UserProvider implements UserProviderInterface
      */
     public function refreshUser(SecurityUserInterface $user)
     {
-        if (!$user instanceof UserInterface) {
-            throw new UnsupportedUserException(
-                sprintf('Expected an instance of Oro\Bundle\UserBundle\Entity\User, but got "%s".', get_class($user))
-            );
-        }
-
-        if (null === $reloadedUser = $this->userManager->findUserBy(array('id' => $user->getId()))) {
-            throw new UsernameNotFoundException(sprintf('User with ID "%d" could not be reloaded.', $user->getId()));
-        }
-
-        return $reloadedUser;
+        return $this->userManager->refreshUser($user);
     }
 
     /**
@@ -74,7 +63,7 @@ class UserProvider implements UserProviderInterface
      * This method is meant to be an extension point for possible child classes.
      *
      * @param  string    $username
-     * @return User|null
+     * @return UserInterface|null
      */
     protected function findUser($username)
     {
