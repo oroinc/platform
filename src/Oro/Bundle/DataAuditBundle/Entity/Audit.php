@@ -263,11 +263,21 @@ class Audit extends AbstractLogEntry
     }
 
     /**
-     * @throws BadMethodCallException
+     * @deprecated Use method createField instead
      */
     public function setData($data)
     {
-        throw new \BadMethodCallException('Method "setData" is not supported. Use "createField" method instead.');
+        parent::setData($data);
+    }
+
+    /**
+     * @deprecated This method is for internal use only. Use method getData or getFields instead
+     *
+     * @return array|null
+     */
+    public function getDeprecatedData()
+    {
+        return $this->data;
     }
 
     /**

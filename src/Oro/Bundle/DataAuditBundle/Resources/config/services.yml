@@ -4,6 +4,7 @@ parameters:
 
     oro_dataaudit.listener.entity_listener.class:   Oro\Bundle\DataAuditBundle\EventListener\EntityListener
     oro_dataaudit.listener.kernel_listener.class:   Oro\Bundle\DataAuditBundle\EventListener\KernelListener
+    oro_dataaudit.listener.deprecated_audit_data_listener.class: Oro\Bundle\DataAuditBundle\EventListener\DeprecatedAuditDataListener
 
     oro_dataaudit.loggable.loggable_manager.class:  Oro\Bundle\DataAuditBundle\Loggable\LoggableManager
 
@@ -15,7 +16,7 @@ parameters:
 
     oro_dataaudit.placeholder.filter.class:         Oro\Bundle\DataAuditBundle\Placeholder\AuditableFilter
 
-    oro_dataaudit.audit.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_dataaudit.audit.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_dataaudit.filter.audit.class:               Oro\Bundle\DataAuditBundle\Filter\AuditFilter
 
@@ -62,6 +63,12 @@ services:
         arguments:                                  [@oro_dataaudit.loggable.loggable_manager, @security.context]
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
+
+    oro_dataaudit.listener.deprecated_audit_data_listener:
+        class: %oro_dataaudit.listener.deprecated_audit_data_listener.class%
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_dataaudit.dataaudit_grid_service:
         class: %oro_dataaudit.event_listener.dataaudit_grid_listener.class%
