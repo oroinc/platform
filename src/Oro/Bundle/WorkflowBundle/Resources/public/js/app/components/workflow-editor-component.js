@@ -6,7 +6,6 @@ define(function (require) {
     var WorkflowEditorComponent,
         WorkflowViewerComponent = require('./workflow-viewer-component'),
         FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
-        flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
         mediator = require('oroui/js/mediator'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
@@ -32,8 +31,6 @@ define(function (require) {
         /** @lends WorkflowEditorComponent.prototype */{
 
         initViews: function () {
-            flowchartTools.checkPositions(this.model);
-
             this.workflowManagementView = new WorkflowManagementView({
                 el: this._sourceElement,
                 stepsEl: '.workflow-definition-steps-list-container',
@@ -68,7 +65,7 @@ define(function (require) {
         },
 
         refreshChart: function () {
-            flowchartTools.checkPositions(this.model);
+            this.flowchartView.jpm.organizeBlocks(this.model);
         },
 
         /**

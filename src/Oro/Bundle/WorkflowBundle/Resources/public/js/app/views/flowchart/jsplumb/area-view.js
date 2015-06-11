@@ -50,6 +50,7 @@ define(function (require) {
             options.Container = this.id();
             this.jsPlumbInstance = jsPlumb.getInstance(options);
             this.jpm = new JPManager(this.jsPlumbInstance);
+            this.jpm.organizeBlocks(this.model);
             this.recalculateConnections();
         },
 

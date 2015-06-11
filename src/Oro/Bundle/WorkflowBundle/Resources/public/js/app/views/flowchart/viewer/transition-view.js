@@ -160,7 +160,11 @@ define(function (require) {
                     ]
                 };
 
-            jsplumbConnection = this.areaView.jsPlumbInstance.connect(parameters);
+            jsplumbConnection = this.areaView.jsPlumbInstance.connect(_.extend(
+                {},
+                this.defaultConnectionConfiguration,
+                parameters
+            ));
             jsplumbConnection.overlayView = overlayView;
             this.connections.push({
                 startStep: startStep,

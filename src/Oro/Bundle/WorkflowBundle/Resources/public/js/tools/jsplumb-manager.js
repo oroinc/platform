@@ -1,4 +1,4 @@
-define(['underscore'], function (_) {
+define(function (require) {
     "use strict";
 
     function getEdge (params) {
@@ -37,7 +37,14 @@ define(['underscore'], function (_) {
         return (v1 * v2 < 0) && (v3 * v4 < 0);
     }
 
-    var positions = [0.5, 0.8, 0.2, 0.65, 0.35, 0.6, 0.3, 0.7, 0.4],
+    var _ = require('underscore'),
+        Matrix = require('./jsplumb-manager/jpm-matrix'),
+        HideStartRule = require('./jsplumb-manager/jpm-hide-start-rule'),
+        CascadeRule = require('./jsplumb-manager/jpm-cascade-rule'),
+        PyramidRule = require('./jsplumb-manager/jpm-pyramid-rule'),
+        TriadaRule = require('./jsplumb-manager/jpm-triada-rule'),
+        CherryRule = require('./jsplumb-manager/jpm-cherry-rule'),
+        positions = [0.5, 0.8, 0.2, 0.65, 0.35, 0.6, 0.3, 0.7, 0.4],
         mids = {
             'top': [0.5, 0, 0, -1],
             'bottom': [0.5, 1, 0, 1],
@@ -53,10 +60,58 @@ define(['underscore'], function (_) {
                 [[1, 0.5, 1, 0],[0.5, 0, 0, -1]],
                 [[0.5, 1, 0, 1],[0, 0.5, -1, 0]]
             ];
-
+            this.xPadding = 60;
+            this.yPadding = 15;
+            this.xIncrement = 240;
+            this.yIncrement = 130;
         };
 
     _.extend(JsPlumbManager.prototype, {
+
+        organizeBlocks: function (workflow) {
+            var steps = workflow.get('steps').filter(function (item) {
+                    return !item.get('position');
+                }),
+                matrix = new Matrix({
+                    workflow: workflow,
+                    xPadding: this.xPadding,
+                    yPadding: this.xPadding,
+                    xIncrement: this.xIncrement,
+                    yIncrement: this.yIncrement
+                });
+
+            var cells = [],
+                rules = [
+                    HideStartRule,
+                    CascadeRule,
+                    PyramidRule,
+                    TriadaRule,
+                    CherryRule
+                ],
+                transforms = [];
+            matrix.forEachCell(function(item){
+                cells.push(item);
+            });
+
+            _.each(cells, function (item) {
+                _.find(rules, function (type) {
+                    var rule = new type(matrix);
+                    if (rule.match(item)) {
+                        transforms.push(rule);
+                        return true;
+                    }
+                });
+            });
+            transforms.sort(function(a, b) {
+                return a.root.y > b.root.y;
+            });
+            _.each(transforms, function (rule) {
+                console.log('Rule: ' + rule.name + '; Step: ' + rule.root.step.get('label'));
+                rule.apply();
+
+            });
+            matrix.align().show();
+        },
 
         getLoopbackAnchors: function (elId) {
             var preset, ind, presets = this.loopbackAnchorPreset;
