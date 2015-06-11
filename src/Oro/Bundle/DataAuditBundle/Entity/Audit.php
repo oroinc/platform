@@ -82,6 +82,9 @@ class Audit extends AbstractLogEntry
      */
     protected $version;
 
+    /**
+     * Redefined parent property to remove the column from db
+     */
     protected $data;
 
     /**
