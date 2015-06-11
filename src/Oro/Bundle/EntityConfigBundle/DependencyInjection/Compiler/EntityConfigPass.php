@@ -43,7 +43,6 @@ class EntityConfigPass implements CompilerPassInterface
             $provider->setArguments(
                 [
                     new Reference('oro_entity_config.config_manager'),
-                    new Reference('service_container'),
                     $scope,
                     $config
                 ]

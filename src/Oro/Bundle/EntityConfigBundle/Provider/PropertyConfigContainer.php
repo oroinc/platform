@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
@@ -21,17 +19,12 @@ class PropertyConfigContainer
     /** @var array */
     protected $config;
 
-    /** @var ContainerInterface */
-    protected $container;
-
     /**
-     * @param                    $config
-     * @param ContainerInterface $container
+     * @param array $config
      */
-    public function __construct($config, ContainerInterface $container)
+    public function __construct($config)
     {
-        $this->config    = $config;
-        $this->container = $container;
+        $this->config = $config;
     }
 
     /**
@@ -336,38 +329,5 @@ class PropertyConfigContainer
         return
             isset($this->config[$type]['items'][$code]['options']['require_schema_update'])
             && $this->config[$type]['items'][$code]['options']['require_schema_update'] === true;
-    }
-
-    /**
-     * @param $config
-     * @return array|string
-     */
-    public function initConfig($config)
-    {
-        if (is_array($config)) {
-            $result = array();
-            foreach ($config as $key => $value) {
-                $result[$key] = is_array($value) ? $this->initConfig($value) : $this->initParameter($value);
-            }
-        } else {
-            $result = $this->initParameter($config);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param $parameter
-     * @return mixed
-     */
-    protected function initParameter($parameter)
-    {
-        if (is_string($parameter) && $this->container->has($parameter)) {
-            $callableService = $this->container->get($parameter);
-
-            return call_user_func($callableService);
-        }
-
-        return $parameter;
     }
 }
