@@ -133,9 +133,9 @@ class Notes extends AbstractPageEntity
         $editAction =
             "//*[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
             "//a[@title='Update Note']";
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $this->test->byXPath($actionMenu)->click();
-        $this->test->byXPath($actionMenu)->click();
+
+
+        $this->test->moveto($this->test->byXPath($actionMenu));
         $this->test->byXPath($editAction)->click();
         $this->waitForAjax();
         $this->assertElementPresent(
@@ -159,9 +159,7 @@ class Notes extends AbstractPageEntity
         $deleteAction =
             "//*[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
             "//a[@title='Delete Note']";
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $this->test->byXPath($actionMenu)->click();
-        $this->test->byXPath($actionMenu)->click();
+        $this->test->moveto($this->test->byXPath($actionMenu));
         $this->test->byXPath($deleteAction)->click();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitForAjax();

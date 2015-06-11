@@ -8,6 +8,11 @@ UPGRADE FROM 1.7 to 1.8
 ####EmailBundle
 - The format of object returned by GET /api/rest/{version}/emails and GET /api/rest/{version}/emails resources was changed. Not a email body is returned as "body" and "bodyType" properties rather than "emailBody" object. Possible values for "bodyType" are "text" and "html". Possible values for the "importance" property are "low", "normal" and "high" rather than -1, 0 and 1. The "recipients" property was removed and three new properties were added instead: "to", "cc" and "bcc". The format of "folders" collection was changed as well, now each folder can have the following properties: "origin", "fullName", "name" and "type". Possible values for "type" property are "inbox", "sent", "trash", "drafts", "spam" and "other".   
 
+####EntityConfigBundle
+- The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
+- IMPORTANT: if you use the service method links in your `entity_config.yml` they should be replaced with the direct service method call. For example `my_service_method_link` should be replaced with `@my_service->method`.
+- Removed the method `initConfig` of the class `Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer`.
+
 ####ImportExportBundle
  - `Oro\Bundle\ImportExportBundle\Context\ContextInterface` added $incrementBy integer parameter for methods: incrementReadCount, incrementAddCount, incrementUpdateCount, incrementReplaceCount, incrementDeleteCount, incrementErrorEntriesCount
 
