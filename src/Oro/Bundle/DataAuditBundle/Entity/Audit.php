@@ -223,7 +223,7 @@ class Audit extends AbstractLogEntry
     /**
      * Get field
      *
-     * @return AuditField[]|Collection|false
+     * @return AuditField|false
      */
     public function getField($field)
     {
