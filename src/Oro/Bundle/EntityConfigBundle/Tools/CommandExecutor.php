@@ -60,13 +60,18 @@ class CommandExecutor
      * in seconds. Default timeout is 300 seconds.
      * If '--ignore-errors' parameter is specified any errors are ignored;
      * otherwise, an exception is raises if an error happened.
+     * If '--disable-cache-sync' parameter is specified a synchronization of caches between current
+     * process and its child processes are disabled.
      *
      * @param string               $command
      * @param array                $params
      * @param LoggerInterface|null $logger
      *
      * @return integer The exit status code
+     *
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function runCommand($command, $params = [], LoggerInterface $logger = null)
     {
@@ -97,6 +102,12 @@ class CommandExecutor
             $pb->setTimeout($this->defaultTimeout);
         }
 
+        $disableCacheSync = false;
+        if (array_key_exists('--disable-cache-sync', $params)) {
+            $disableCacheSync = $params['--disable-cache-sync'];
+            unset($params['--disable-cache-sync']);
+        }
+
         foreach ($params as $name => $val) {
             $this->processParameter($pb, $name, $val);
         }
@@ -119,7 +130,7 @@ class CommandExecutor
         );
 
         // synchronize all data caches
-        if ($this->dataCacheManager) {
+        if ($this->dataCacheManager && !$disableCacheSync) {
             $this->dataCacheManager->sync();
         }
 
