@@ -569,7 +569,7 @@ abstract class AbstractUser implements
         }
 
         return (bool)$this->getRole($roleName);
-}
+    }
 
     /**
      * {@inheritDoc}
@@ -771,7 +771,7 @@ abstract class AbstractUser implements
     public function isPasswordRequestNonExpired($ttl)
     {
         return $this->getPasswordRequestedAt() instanceof \DateTime
-            && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
     /**

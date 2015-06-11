@@ -931,8 +931,7 @@ class User extends ExtendUser implements
     public function setImapConfiguration(ImapEmailOrigin $imapConfiguration = null)
     {
         $currentImapConfiguration = $this->getImapConfiguration();
-        if (
-            $currentImapConfiguration &&
+        if ($currentImapConfiguration &&
             (null === $imapConfiguration || $currentImapConfiguration !== $imapConfiguration)
         ) {
             // deactivate current IMAP configuration and remove a reference to it
