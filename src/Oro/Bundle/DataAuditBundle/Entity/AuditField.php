@@ -238,6 +238,20 @@ class AuditField
     }
 
     /**
+     * @param string $dataType
+     *
+     * @return string|null
+     */
+    public static function normalizeDataTypeName($dataType)
+    {
+        if (isset(static::$typeMap[$dataType])) {
+            return static::$typeMap[$dataType];
+        }
+
+        return null;
+    }
+
+    /**
      * @param mixed $value
      *
      * @return this
@@ -271,19 +285,5 @@ class AuditField
     protected function getPropertyName($type)
     {
         return sprintf('%s%s', $type, ucfirst($this->dataType));
-    }
-
-    /**
-     * @param string $dataType
-     *
-     * @return string|null
-     */
-    public static function normalizeDataTypeName($dataType)
-    {
-        if (isset(static::$typeMap[$dataType])) {
-            return static::$typeMap[$dataType];
-        }
-
-        return null;
     }
 }
