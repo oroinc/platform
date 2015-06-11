@@ -20,6 +20,7 @@ use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
@@ -61,12 +62,16 @@ class ActivityListFilter extends EntityFilter
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var EntityRoutingHelper */
+    protected $entityRoutingHelper;
+
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
      * @param ActivityManager $activityManager
      * @param ActivityListChainProvider $activityListChainProvider
      * @param ActivityListFilterHelper $activityListFilterHelper
+     * @param EntityRoutingHelper $entityRoutingHelper
      * @param Manager $queryDesignerManager
      * @param DatagridConfigurationBuilder $datagridConfigurationBuilder
      * @param ServiceLink $gridBuilderLink
@@ -78,6 +83,7 @@ class ActivityListFilter extends EntityFilter
         ActivityManager $activityManager,
         ActivityListChainProvider $activityListChainProvider,
         ActivityListFilterHelper $activityListFilterHelper,
+        EntityRoutingHelper $entityRoutingHelper,
         Manager $queryDesignerManager,
         DatagridConfigurationBuilder $datagridConfigurationBuilder,
         ServiceLink $gridBuilderLink,
@@ -87,6 +93,7 @@ class ActivityListFilter extends EntityFilter
         $this->activityManager = $activityManager;
         $this->activityListChainProvider = $activityListChainProvider;
         $this->activityListFilterHelper = $activityListFilterHelper;
+        $this->entityRoutingHelper = $entityRoutingHelper;
         $this->queryDesignerManager = $queryDesignerManager;
         $this->datagridConfigurationBuilder = $datagridConfigurationBuilder;
         $this->gridBuilderLink = $gridBuilderLink;
@@ -163,7 +170,7 @@ class ActivityListFilter extends EntityFilter
             $chosenActivities = $this->activityListChainProvider->getSupportedActivities();
         }
         $chosenClasses = array_map(function ($className) {
-            return str_replace('_', '\\', $className);
+            return $this->entityRoutingHelper->decodeClassName($className);
         }, $chosenActivities);
 
         $unavailableChoices = array_diff($chosenClasses, $availableClasses);
@@ -335,7 +342,7 @@ class ActivityListFilter extends EntityFilter
      */
     protected function getRelatedActivityClass(array $data)
     {
-        return str_replace('_', '\\', $data['activityType']['value'][0]);
+        return $this->entityRoutingHelper->decodeClassName($data['activityType']['value'][0]);
     }
 
     /**
