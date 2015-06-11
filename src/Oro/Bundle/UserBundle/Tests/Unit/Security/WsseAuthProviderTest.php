@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Security;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
@@ -20,7 +20,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     const TEST_NONCE = 'someNonce';
     const TEST_API_KEY = 'someApiKey';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|UserProviderInterface */
     protected $userProvider;
 
     /** @var MessageDigestPasswordEncoder */
@@ -32,8 +32,8 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
-        $this->encoder      = new MessageDigestPasswordEncoder('sha1', true, 1);
-        $cache              = new ArrayCache();
+        $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
+        $cache = new ArrayCache();
 
         $this->provider = new WsseAuthProvider($this->userProvider, $this->encoder, $cache);
     }
@@ -46,11 +46,11 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider userProvider
      *
-     * @param UserInterface $user
-     * @param               $secret
-     * @param string        $salt
+     * @param object $user
+     * @param string $secret
+     * @param string $salt
      */
-    public function testOverridesLogic(UserInterface $user, $secret, $salt = '')
+    public function testOverridesLogic($user, $secret, $salt = '')
     {
         $this->userProvider
             ->expects($this->exactly(2))
@@ -58,7 +58,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user));
 
         $nonce = base64_encode(uniqid(self::TEST_NONCE));
-        $time  = date('Y-m-d H:i:s');
+        $time = date('Y-m-d H:i:s');
 
         $digest = $this->encoder->encodePassword(
             sprintf(
@@ -92,7 +92,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $userApiKey->setApiKey(self::TEST_API_KEY);
         $userApiKeys = new ArrayCollection([$userApiKey]);
 
-        $advancedUser = $this->getMock('Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface');
+        $advancedUser = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $advancedUser
             ->expects($this->exactly(2))
             ->method('getApiKeys')
@@ -103,7 +103,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
 
         return [
             'regular user given, should use password and salt' => [$regularUser, self::TEST_PASSWORD, self::TEST_SALT],
-            'advanced user given, should take API key only'    => [$advancedUser, $userApiKeys]
+            'advanced user given, should take API key only' => [$advancedUser, $userApiKeys]
         ];
     }
 
@@ -112,7 +112,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSecret()
     {
-        $noApiKeyUser = $this->getMock('Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface');
+        $noApiKeyUser = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $noApiKeyUser
             ->expects(static::exactly(2))
             ->method('getApiKeys')
@@ -128,7 +128,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
             ->will(static::returnValue($noApiKeyUser));
 
         $nonce = base64_encode(uniqid(self::TEST_NONCE));
-        $time  = date('Y-m-d H:i:s');
+        $time = date('Y-m-d H:i:s');
 
         $digest = $this->encoder->encodePassword(
             sprintf('%s%s%s', base64_decode($nonce), $time, ''),

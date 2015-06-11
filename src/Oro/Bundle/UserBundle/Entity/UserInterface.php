@@ -10,14 +10,14 @@ interface UserInterface extends AdvancedUserInterface
     /**
      * @param  string $username New username
      *
-     * @return User
+     * @return UserInterface
      */
     public function setUsername($username);
 
     /**
      * @param string $password New encoded password
      *
-     * @return User
+     * @return UserInterface
      */
     public function setPassword($password);
 
@@ -31,7 +31,7 @@ interface UserInterface extends AdvancedUserInterface
     /**
      * @param  string $password New password as plain string
      *
-     * @return User
+     * @return UserInterface
      */
     public function setPlainPassword($password);
 
@@ -40,7 +40,7 @@ interface UserInterface extends AdvancedUserInterface
      *
      * @param  Role $role
      *
-     * @return User
+     * @return UserInterface
      */
     public function addRole(Role $role);
 }

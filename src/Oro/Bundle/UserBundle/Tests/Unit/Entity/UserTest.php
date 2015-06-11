@@ -3,18 +3,17 @@
 namespace Oro\Bundle\UserBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserApi;
-use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\Group;
-use Oro\Bundle\UserBundle\Entity\Status;
-use Oro\Bundle\UserBundle\Entity\Email;
-
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -48,7 +47,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testIsPasswordRequestNonExpired()
     {
-        $user      = new User;
+        $user = new User;
         $requested = new \DateTime('-10 seconds');
 
         $user->setPasswordRequestedAt($requested);
@@ -72,7 +71,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testConfirmationToken()
     {
-        $user  = new User;
+        $user = new User;
         $token = $user->generateToken();
 
         $this->assertNotEmpty($token);
@@ -84,7 +83,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testSetRolesWithArrayArgument()
     {
-        $roles = array(new Role(User::ROLE_DEFAULT));
+        $roles = [new Role(User::ROLE_DEFAULT)];
         $user = new User;
         $this->assertEmpty($user->getRoles());
         $user->setRoles($roles);
@@ -93,7 +92,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testSetRolesWithCollectionArgument()
     {
-        $roles = new ArrayCollection(array(new Role(User::ROLE_DEFAULT)));
+        $roles = new ArrayCollection([new Role(User::ROLE_DEFAULT)]);
         $user = new User;
         $this->assertEmpty($user->getRoles());
         $user->setRoles($roles);
@@ -176,7 +175,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User;
         $role = new Role(User::ROLE_DEFAULT);
-        $roles = new ArrayCollection(array($role));
+        $roles = new ArrayCollection([$role]);
         $user->setRolesCollection($roles);
         $this->assertSame($roles, $user->getRolesCollection());
     }
@@ -188,13 +187,13 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testSetRolesCollectionThrowsException()
     {
         $user = new User();
-        $user->setRolesCollection(array());
+        $user->setRolesCollection([]);
     }
 
     public function testGroups()
     {
-        $user  = new User;
-        $role  = new Role('ROLE_FOO');
+        $user = new User;
+        $role = new Role('ROLE_FOO');
         $group = new Group('Users');
 
         $group->addRole($role);
@@ -229,15 +228,15 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializing()
     {
-        $user  = new User;
+        $user = new User;
         $clone = clone $user;
-        $data  = $user->serialize();
+        $data = $user->serialize();
 
         $this->assertNotEmpty($data);
 
         $user->setPassword('new-pass')
-             ->setConfirmationToken('token')
-             ->setUsername('new-name');
+            ->setConfirmationToken('token')
+            ->setUsername('new-name');
 
         $user->unserialize($data);
 
@@ -269,8 +268,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testStatuses()
     {
-        $user  = new User;
-        $status  = new Status();
+        $user = new User;
+        $status = new Status();
 
         $this->assertNotContains($status, $user->getStatuses());
         $this->assertNull($user->getCurrentStatus());
@@ -292,8 +291,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testEmails()
     {
-        $user  = new User;
-        $email  = new Email();
+        $user = new User;
+        $email = new Email();
 
         $this->assertNotContains($email, $user->getEmails());
 
@@ -308,9 +307,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testNames()
     {
-        $user  = new User();
+        $user = new User();
         $first = 'James';
-        $last  = 'Bond';
+        $last = 'Bond';
 
         $user->setFirstName($first);
         $user->setLastName($last);
@@ -319,7 +318,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testDates()
     {
         $user = new User;
-        $now  = new \DateTime('-1 year');
+        $now = new \DateTime('-1 year');
 
         $user->setBirthday($now);
         $user->setLastLogin($now);
@@ -331,14 +330,14 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testUnserialize()
     {
         $user = new User();
-        $serialized = array(
+        $serialized = [
             'password',
             'salt',
             'username',
             true,
             'confirmation_token',
             10
-        );
+        ];
         $user->unserialize(serialize($serialized));
 
         $this->assertEquals($serialized[0], $user->getPassword());
@@ -358,14 +357,14 @@ class UserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider
      * @param string $property
-     * @param mixed  $value
+     * @param mixed $value
      */
     public function testSettersAndGetters($property, $value)
     {
         $obj = new User();
 
-        call_user_func_array(array($obj, 'set' . ucfirst($property)), array($value));
-        $this->assertEquals($value, call_user_func_array(array($obj, 'get' . ucfirst($property)), array()));
+        call_user_func_array([$obj, 'set' . ucfirst($property)], [$value]);
+        $this->assertEquals($value, call_user_func_array([$obj, 'get' . ucfirst($property)], []));
     }
 
     /**
@@ -375,24 +374,26 @@ class UserTest extends \PHPUnit_Framework_TestCase
      */
     public function provider()
     {
-        return array(
-            array('username', 'test'),
-            array('email', 'test'),
-            array('nameprefix', 'test'),
-            array('firstname', 'test'),
-            array('middlename', 'test'),
-            array('lastname', 'test'),
-            array('namesuffix', 'test'),
-            array('birthday', new \DateTime()),
-            array('password', 'test'),
-            array('plainPassword', 'test'),
-            array('confirmationToken', 'test'),
-            array('passwordRequestedAt', new \DateTime()),
-            array('lastLogin', new \DateTime()),
-            array('loginCount', 11),
-            array('createdAt', new \DateTime()),
-            array('updatedAt', new \DateTime()),
-        );
+        return [
+            ['username', 'test'],
+            ['email', 'test'],
+            ['nameprefix', 'test'],
+            ['firstname', 'test'],
+            ['middlename', 'test'],
+            ['lastname', 'test'],
+            ['namesuffix', 'test'],
+            ['birthday', new \DateTime()],
+            ['password', 'test'],
+            ['plainPassword', 'test'],
+            ['confirmationToken', 'test'],
+            ['passwordRequestedAt', new \DateTime()],
+            ['passwordChangedAt', new \DateTime()],
+            ['lastLogin', new \DateTime()],
+            ['loginCount', 11],
+            ['createdAt', new \DateTime()],
+            ['updatedAt', new \DateTime()],
+            ['salt', md5('user')],
+        ];
     }
 
     public function testPreUpdateUnChanged()
@@ -406,6 +407,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $updatedAt = new \DateTime('2015-01-01');
         $user->setUpdatedAt($updatedAt);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -425,6 +427,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $updatedAt = new \DateTime('2015-01-01');
         $user->setUpdatedAt($updatedAt);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -438,10 +441,10 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testBusinessUnit()
     {
-        $user  = new User;
+        $user = new User;
         $businessUnit = new BusinessUnit();
 
-        $user->setBusinessUnits(new ArrayCollection(array($businessUnit)));
+        $user->setBusinessUnits(new ArrayCollection([$businessUnit]));
 
         $this->assertContains($businessUnit, $user->getBusinessUnits());
 
@@ -468,8 +471,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testOrganization()
     {
-        $entity         = new User();
-        $organization   = new Organization();
+        $entity = new User();
+        $organization = new Organization();
 
         $this->assertNull($entity->getOrganization());
         $entity->setOrganization($organization);
@@ -549,16 +552,22 @@ class UserTest extends \PHPUnit_Framework_TestCase
             new ArrayCollection([$apiKey1, $apiKey2]),
             $entity->getApiKeys()
         );
+
+        $entity->removeApiKey($apiKey2);
+        $this->assertEquals(
+            new ArrayCollection([$apiKey1]),
+            $entity->getApiKeys()
+        );
     }
 
     public function testOrganizations()
     {
-        $user  = new User;
+        $user = new User;
         $disabledOrganization = new Organization();
         $organization = new Organization();
         $organization->setEnabled(true);
 
-        $user->setOrganizations(new ArrayCollection(array($organization)));
+        $user->setOrganizations(new ArrayCollection([$organization]));
         $this->assertContains($organization, $user->getOrganizations());
 
         $user->removeOrganization($organization);
@@ -569,7 +578,49 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
         $user->addOrganization($disabledOrganization);
         $result = $user->getOrganizations(true);
-        $this->assertTrue($result->count() == 1);
+        $this->assertCount(1, $result);
         $this->assertSame($result->first(), $organization);
+    }
+
+    public function testGetClass()
+    {
+        $user = new User;
+        $this->assertInstanceOf($user->getClass(), $user);
+    }
+
+    public function testGetEmailFields()
+    {
+        $user = new User;
+        $this->assertInternalType('array', $user->getEmailFields());
+        $this->assertEquals(['email'], $user->getEmailFields());
+    }
+
+    public function testGetTaggableId()
+    {
+        $id = 2;
+        $user = new User;
+        $user->setId($id);
+        $this->assertEquals($id, $user->getId());
+        $this->assertEquals($id, $user->getTaggableId());
+    }
+
+    public function testTags()
+    {
+        $user = new User;
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getTags());
+
+        $tags = ['tag1', 'tag2'];
+        $user->setTags($tags);
+
+        $this->assertEquals($tags, $user->getTags());
+    }
+
+    public function testGetNotificationEmails()
+    {
+        $user = new User;
+        $email = 'user@example.com';
+        $user->setEmail($email);
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getNotificationEmails());
+        $this->assertEquals([$email], $user->getNotificationEmails()->toArray());
     }
 }
