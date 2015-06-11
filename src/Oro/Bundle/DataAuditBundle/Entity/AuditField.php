@@ -242,7 +242,7 @@ class AuditField
      *
      * @return this
      */
-    private function setOldValue($value)
+    protected function setOldValue($value)
     {
         $propertyValue = $this->getPropertyName('old');
         $this->$propertyValue = $value;
@@ -255,7 +255,7 @@ class AuditField
      *
      * @return this
      */
-    private function setNewValue($value)
+    protected function setNewValue($value)
     {
         $propertyValue = $this->getPropertyName('new');
         $this->$propertyValue = $value;
@@ -268,7 +268,7 @@ class AuditField
      *
      * @return string
      */
-    private function getPropertyName($type)
+    protected function getPropertyName($type)
     {
         return sprintf('%s%s', $type, ucfirst($this->dataType));
     }
