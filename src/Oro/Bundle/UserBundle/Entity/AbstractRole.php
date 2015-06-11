@@ -6,6 +6,9 @@ use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
 abstract class AbstractRole extends BaseRole
 {
+    /**
+     * @var string
+     */
     protected $role;
 
     /**
