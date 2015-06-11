@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
+/**
+ * @deprecated since v 1.8
+ */
 class ServiceMethodPass implements CompilerPassInterface
 {
     const TAG_NAME = 'oro_service_method';
@@ -61,8 +64,8 @@ class ServiceMethodPass implements CompilerPassInterface
 
             $service->setClass('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod');
 
-            $service->addMethodCall('setMethod', array($tag[0]['method']));
-            $service->addMethodCall('setService', array(new Reference($tag[0]['service'])));
+            $service->addMethodCall('setMethod', [$tag[0]['method']]);
+            $service->addMethodCall('setService', [new Reference($tag[0]['service'])]);
         }
     }
 }

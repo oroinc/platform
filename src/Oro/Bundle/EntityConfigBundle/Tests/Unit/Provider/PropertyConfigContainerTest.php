@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\CallableClass;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -15,13 +14,9 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
     /** @var PropertyConfigContainer */
     protected $configContainer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
-
     protected function setUp()
     {
-        $this->container       = $this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->configContainer = new PropertyConfigContainer([], $this->container);
+        $this->configContainer = new PropertyConfigContainer([]);
     }
 
     public function testConfigGetterAndSetter()
@@ -30,47 +25,6 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->configContainer->setConfig($config);
         $this->assertEquals($config, $this->configContainer->getConfig());
-    }
-
-    public function testInitConfig()
-    {
-        $config         = [
-            'val1' => '1',
-            'val2' => 'test.ServiceMethod',
-            'val3' => [
-                'val1' => '1',
-                'val2' => 'test.ServiceMethod',
-            ]
-        ];
-        $expectedConfig = [
-            'val1' => '1',
-            'val2' => 'testVal',
-            'val3' => [
-                'val1' => '1',
-                'val2' => 'testVal',
-            ]
-        ];
-
-        $testServiceMethod = new CallableClass('testVal');
-
-        $this->container->expects($this->exactly(4))
-            ->method('has')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['1', false],
-                        ['test.ServiceMethod', true],
-                    ]
-                )
-            );
-        $this->container->expects($this->exactly(2))
-            ->method('get')
-            ->with('test.ServiceMethod')
-            ->will($this->returnValue($testServiceMethod));
-
-        $result = $this->configContainer->initConfig($config);
-
-        $this->assertEquals($expectedConfig, $result);
     }
 
     public function testGetItemsWithDefaultParams()
