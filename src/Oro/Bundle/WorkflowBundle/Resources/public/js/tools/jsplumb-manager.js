@@ -51,8 +51,9 @@ define(function (require) {
             'left': [0, 0.5, -1, 0],
             'right': [1, 0.5, 1, 0]
         },
-        JsPlumbManager = function (jsplumb) {
+        JsPlumbManager = function (jsplumb, workflow) {
             this.jp = jsplumb;
+            this.workflow = workflow;
             this.loopback = {};
             this.loopbackAnchorPreset = [
                 [[1, 0.3, 1, 0],[0.8, 0, 0, -1]],
@@ -64,16 +65,17 @@ define(function (require) {
             this.yPadding = 15;
             this.xIncrement = 240;
             this.yIncrement = 130;
+            this.stepForNew = 10;
         };
 
     _.extend(JsPlumbManager.prototype, {
 
-        organizeBlocks: function (workflow) {
-            var steps = workflow.get('steps').filter(function (item) {
+        organizeBlocks: function () {
+            var steps = this.workflow.get('steps').filter(function (item) {
                     return !item.get('position');
                 }),
                 matrix = new Matrix({
-                    workflow: workflow,
+                    workflow: this.workflow,
                     xPadding: this.xPadding,
                     yPadding: this.xPadding,
                     xIncrement: this.xIncrement,
@@ -111,6 +113,22 @@ define(function (require) {
 
             });
             matrix.align().show();
+        },
+
+        getPositionForNew: function () {
+            var val = 0,
+                exist = [],
+                step = this.stepForNew;
+            this.workflow.get('steps').each(function (item) {
+                var pos = item.get('position');
+                if(pos && pos[0] == pos[1] && pos[0] % step == 0) {
+                    exist.push(pos[0]);
+                }
+            })
+            while(_.indexOf(exist, val) >= 0) {
+                val += step;
+            }
+            return [val, val];
         },
 
         getLoopbackAnchors: function (elId) {

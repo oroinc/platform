@@ -22,7 +22,6 @@ define(function (require) {
             }
             this.areaView = options.areaView;
             FlowchartJsPlubmBoxView.__super__.initialize.apply(this, arguments);
-
             // append $el to the area view
             this.areaView.$el.append(this.$el);
         },
@@ -33,6 +32,8 @@ define(function (require) {
             // or jsPlumb.redraw must be called
             if (this.model.get('position')) {
                 this.refreshPosition();
+            } else {
+                this.model.set('position', this.areaView.jpm.getPositionForNew());
             }
         },
 

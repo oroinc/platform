@@ -11,11 +11,17 @@ define(function (require) {
                     return child.y == cell.y + 2;
                 }), child3 = _.find(cell.children, function(child) {
                     return child.y == cell.y + 3;
+                }), child4 = _.find(cell.children, function(child) {
+                    return child.y == cell.y + 4;
                 });
 
                 if (child1 && child2 && child3) {
                     this.root = cell;
                     this.items = [child1, child2, child3];
+                    return true;
+                } else if (child2 && child3 && child4) {
+                    this.root = cell;
+                    this.items = [child2, child3, child4];
                     return true;
                 } else {
                     this.root = null;

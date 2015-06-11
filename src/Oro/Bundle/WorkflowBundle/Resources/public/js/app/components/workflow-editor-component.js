@@ -65,7 +65,7 @@ define(function (require) {
         },
 
         refreshChart: function () {
-            this.flowchartView.jpm.organizeBlocks(this.model);
+            this.flowchartView.jpm.organizeBlocks();
         },
 
         /**

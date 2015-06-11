@@ -49,8 +49,8 @@ define(function (require) {
             var options = $.extend(true, {}, _.result(this, 'defaults'));
             options.Container = this.id();
             this.jsPlumbInstance = jsPlumb.getInstance(options);
-            this.jpm = new JPManager(this.jsPlumbInstance);
-            this.jpm.organizeBlocks(this.model);
+            this.jpm = new JPManager(this.jsPlumbInstance, this.model);
+            this.jpm.organizeBlocks();
             this.recalculateConnections();
         },
 
