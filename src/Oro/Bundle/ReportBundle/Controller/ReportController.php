@@ -164,7 +164,7 @@ class ReportController extends Controller
     /**
      * Method detects type of report's chart 'label' field, and in case of datetime will check dates interval and
      * set proper type (time, day, date, month or year). Xaxis labels not taken into account - they will be rendered
-     * automatically by flotr2. Also chart dot labels may overlap if dates are close to each other.
+     * automatically. Also chart dot labels may overlap if dates are close to each other.
      *
      * Should be refactored in scope of BAP-8294.
      *
