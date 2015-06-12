@@ -14,6 +14,15 @@ use Symfony\Component\Config\FileLocator;
  */
 class OroSyncExtension extends Extension
 {
+    const CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST  = 'websocket_host';
+    const CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  = 'websocket_port';
+    const CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS  = 'websocket_bind_address';
+    const CONFIG_PARAM_WEBSOCKET_BIND_PORT     = 'websocket_bind_port';
+    const CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  = 'websocket_backend_host';
+    const CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  = 'websocket_backend_port';
+    const CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST = 'websocket_frontend_host';
+    const CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT = 'websocket_frontend_port';
+
     /**
      * {@inheritDoc}
      */
@@ -22,5 +31,41 @@ class OroSyncExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('services.yml');
+
+        $this->cloneParameters(
+            $container,
+            self::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST,
+            [
+                self::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS,
+                self::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST,
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST
+            ]
+        );
+        $this->cloneParameters(
+            $container,
+            self::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT,
+            [
+                self::CONFIG_PARAM_WEBSOCKET_BIND_PORT,
+                self::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT,
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT
+            ]
+        );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $source
+     * @param array            $targets
+     */
+    protected function cloneParameters(ContainerBuilder $container, $source, $targets)
+    {
+        if ($container->hasParameter($source)) {
+            $value = $container->getParameter($source);
+            foreach ($targets as $target) {
+                if (!$container->hasParameter($target)) {
+                    $container->setParameter($target, $value);
+                }
+            }
+        }
     }
 }

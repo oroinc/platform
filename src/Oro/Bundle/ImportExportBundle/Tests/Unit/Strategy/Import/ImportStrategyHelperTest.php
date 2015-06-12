@@ -139,7 +139,13 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->helper->validateEntity($entity));
     }
 
-    public function testValidateEntity()
+    /**
+     * @param string|null $path
+     * @param string $error
+     * @param string $expectedMessage
+     * @dataProvider validateDataProvider
+     */
+    public function testValidateEntity($path, $error, $expectedMessage)
     {
         $entity = new \stdClass();
 
@@ -147,17 +153,36 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $violation->expects($this->once())
             ->method('getPropertyPath')
-            ->will($this->returnValue('testPath'));
+            ->will($this->returnValue($path));
         $violation->expects($this->once())
             ->method('getMessage')
-            ->will($this->returnValue('Error'));
+            ->will($this->returnValue($error));
         $violations = array($violation);
         $this->validator->expects($this->once())
             ->method('validate')
             ->with($entity)
             ->will($this->returnValue($violations));
 
-        $this->assertEquals(array('testPath: Error'), $this->helper->validateEntity($entity));
+        $this->assertEquals(array($expectedMessage), $this->helper->validateEntity($entity));
+    }
+
+    /**
+     * @return array
+     */
+    public function validateDataProvider()
+    {
+        return [
+            'without property path' => [
+                'path' => null,
+                'error' => 'Error',
+                'expectedMessage' => 'Error',
+            ],
+            'with property path' => [
+                'path' => 'testPath',
+                'error' => 'Error',
+                'expectedMessage' => 'testPath: Error',
+            ]
+        ];
     }
 
     /**
