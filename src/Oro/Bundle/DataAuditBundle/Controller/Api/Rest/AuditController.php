@@ -148,6 +148,39 @@ class AuditController extends RestGetController implements ClassResourceInterfac
     }
 
     /**
+     * Get entity Manager
+     *
+     * @return ApiEntityManager
+     */
+    public function getManager()
+    {
+        return $this->get('oro_dataaudit.audit.manager.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPreparedItem($entity, $resultFields = [])
+    {
+        /** @var Audit $entity */
+        $result = parent::getPreparedItem($entity, $resultFields);
+
+        // process relations
+        $result['user'] = $entity->getUser() ? $entity->getUser()->getId() : null;
+
+        // prevent BC breaks
+        // @deprecated since 1.4.1
+        $result['object_class'] = $result['objectClass'];
+        $result['object_name']  = $result['objectName'];
+        $result['username']     = $entity->getUser() ? $entity->getUser()->getUsername() : null;
+
+        unset($result['fields']);
+        $result['data'] = $entity->getData();
+
+        return $result;
+    }
+
+    /**
      * @param array $entities
      *
      * @return array
@@ -188,38 +221,5 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         }
 
         return $auditableEntities;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPreparedItem($entity, $resultFields = [])
-    {
-        /** @var Audit $entity */
-        $result = parent::getPreparedItem($entity, $resultFields);
-
-        // process relations
-        $result['user'] = $entity->getUser() ? $entity->getUser()->getId() : null;
-
-        // prevent BC breaks
-        // @deprecated since 1.4.1
-        $result['object_class'] = $result['objectClass'];
-        $result['object_name']  = $result['objectName'];
-        $result['username']     = $entity->getUser() ? $entity->getUser()->getUsername() : null;
-
-        unset($result['fields']);
-        $result['data'] = $entity->getData();
-
-        return $result;
-    }
-
-    /**
-     * Get entity Manager
-     *
-     * @return ApiEntityManager
-     */
-    public function getManager()
-    {
-        return $this->get('oro_dataaudit.audit.manager.api');
     }
 }

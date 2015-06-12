@@ -24,6 +24,14 @@ class SegmentWidgetOptionsListener
     }
 
     /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
+    }
+
+    /**
      * @param WidgetOptionsLoadEvent $event
      */
     public function onLoad(WidgetOptionsLoadEvent $event)
@@ -61,13 +69,5 @@ class SegmentWidgetOptionsListener
         $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::MASTER_REQUEST);
 
         return $response->getContent();
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
     }
 }

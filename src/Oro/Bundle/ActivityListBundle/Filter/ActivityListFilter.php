@@ -101,6 +101,26 @@ class ActivityListFilter extends EntityFilter
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getForm()
+    {
+        if (!$this->form) {
+            $this->form = $this->formFactory->create($this->getFormType());
+        }
+
+        return $this->form;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata()
+    {
+        return [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
@@ -403,26 +423,6 @@ class ActivityListFilter extends EntityFilter
         preg_match('/[^:+]+$/', $fieldName, $matches);
 
         return $matches[0];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getForm()
-    {
-        if (!$this->form) {
-            $this->form = $this->formFactory->create($this->getFormType());
-        }
-
-        return $this->form;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata()
-    {
-        return [];
     }
 
     /**

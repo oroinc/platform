@@ -48,6 +48,22 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
     /**
      * {@inheritdoc}
      */
+    public function getDescription()
+    {
+        return 'Copy audit data into oro_audit_field table.';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getAuditCount() / static::LIMIT);
@@ -153,22 +169,6 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             ->select('a.id AS id, a.data AS data, ec.id AS entity_id')
             ->from('oro_audit', 'a')
             ->join('a', 'oro_entity_config', 'ec', 'a.object_class = ec.class_name');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDescription()
-    {
-        return 'Copy audit data int oro_audit_field table.';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     /**

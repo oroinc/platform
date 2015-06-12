@@ -50,6 +50,26 @@ class AuditFilter extends EntityFilter
     /**
      * {@inheritDoc}
      */
+    public function getForm()
+    {
+        if (!$this->form) {
+            $this->form = $this->formFactory->create($this->getFormType());
+        }
+
+        return $this->form;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $this->auditAlias = $ds->generateParameterName('a');
@@ -204,26 +224,6 @@ class AuditFilter extends EntityFilter
         preg_match('/^[^+]+/', $columnName, $matches);
 
         return $matches[0];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getForm()
-    {
-        if (!$this->form) {
-            $this->form = $this->formFactory->create($this->getFormType());
-        }
-
-        return $this->form;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata()
-    {
-        return [];
     }
 
     /**

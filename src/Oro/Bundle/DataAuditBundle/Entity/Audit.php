@@ -84,6 +84,8 @@ class Audit extends AbstractLogEntry
 
     /**
      * Redefined parent property to remove the column from db
+     *
+     * @var array|null
      */
     protected $data;
 
@@ -263,6 +265,8 @@ class Audit extends AbstractLogEntry
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @deprecated Use method createField instead
      */
     public function setData($data)
