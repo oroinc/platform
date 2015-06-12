@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 interface UserInterface extends AdvancedUserInterface
 {
     /**
-     * @param  string $username New username
+     * @param string $username New username
      *
      * @return UserInterface
      */
@@ -28,7 +29,7 @@ interface UserInterface extends AdvancedUserInterface
     public function getPlainPassword();
 
     /**
-     * @param  string $password New password as plain string
+     * @param string $password New password as plain string
      *
      * @return UserInterface
      */
@@ -37,9 +38,9 @@ interface UserInterface extends AdvancedUserInterface
     /**
      * Adds a Role to the Collection.
      *
-     * @param  Role $role
+     * @param RoleInterface $role
      *
      * @return UserInterface
      */
-    public function addRole(Role $role);
+    public function addRole(RoleInterface $role);
 }

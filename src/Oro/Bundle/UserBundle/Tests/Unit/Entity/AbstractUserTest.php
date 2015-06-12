@@ -91,7 +91,7 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $roles must be an instance of Doctrine\Common\Collections\Collection or an array
+     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or an array
      */
     public function testSetRolesThrowsInvalidArgumentException()
     {
@@ -121,7 +121,7 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\AbstractRole or a string
+     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or a string
      */
     public function testHasRoleThrowsInvalidArgumentException()
     {
@@ -153,7 +153,7 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\AbstractRole or a string
+     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or a string
      */
     public function testRemoveRoleThrowsInvalidArgumentException()
     {
