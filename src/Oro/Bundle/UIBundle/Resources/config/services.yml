@@ -17,6 +17,8 @@ parameters:
 
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
+    oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
+
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
@@ -214,3 +216,9 @@ services:
         public: false
         tags:
             - { name: layout.resource.path_provider, priority: -10 }
+
+    oro_ui.html_tag_helper:
+        class: %oro_ui.html_tag_helper.class%
+        arguments:
+            - @oro_form.provider.html_tag_provider
+            - %kernel.cache_dir%

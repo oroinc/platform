@@ -315,7 +315,8 @@ class ProcessDefinition implements DomainObjectInterface
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())
             ->setExecutionOrder($definition->getExecutionOrder())
-            ->setActionsConfiguration($definition->getActionsConfiguration());
+            ->setActionsConfiguration($definition->getActionsConfiguration())
+            ->setExcludeDefinitions($definition->getExcludeDefinitions());
 
         return $this;
     }
