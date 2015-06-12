@@ -698,11 +698,7 @@ define([
             }
 
             var newTitle = this._createTitle();
-            /**
-             * IMPORTANT: Both lines should be present for correct PhantomJS selenium driver work.
-             */
-            $('head title').text(newTitle);
-            $(document).prop('title', newTitle);
+            mediator.execute('adjustTitle', newTitle, true);
         }
     });
 
