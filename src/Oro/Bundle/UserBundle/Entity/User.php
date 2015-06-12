@@ -25,6 +25,9 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
 /**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserRepository")
  * @ORM\Table(name="oro_user")
  * @ORM\HasLifecycleCallbacks()
@@ -208,6 +211,25 @@ class User extends ExtendUser implements
     protected $nameSuffix;
 
     /**
+     * @var Group[]|Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Group")
+     * @ORM\JoinTable(name="oro_user_access_group",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     * @Oro\Versioned("getName")
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $groups;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="birthday", type="date", nullable=true)
@@ -388,6 +410,7 @@ class User extends ExtendUser implements
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins = new ArrayCollection();
         $this->apiKeys = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     /**
@@ -999,5 +1022,90 @@ class User extends ExtendUser implements
     public function getEmailOrigins()
     {
         return $this->emailOrigins;
+    }
+
+    /**
+     * Gets the groups granted to the user
+     *
+     * @return Collection
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasGroup($name)
+    {
+        return (bool)$this
+            ->getGroups()
+            ->filter(
+                function (Group $group) use ($name) {
+                    return $group->getName() === $name;
+                }
+            )
+            ->count();
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroupNames()
+    {
+        return $this
+            ->getGroups()
+            ->map(
+                function (Group $group) {
+                    return $group->getName();
+                }
+            )
+            ->toArray();
+    }
+
+    /**
+     * @param Group $group
+     *
+     * @return User
+     */
+    public function addGroup(Group $group)
+    {
+        if (!$this->getGroups()->contains($group)) {
+            $this->getGroups()->add($group);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Group $group
+     *
+     * @return User
+     */
+    public function removeGroup(Group $group)
+    {
+        if ($this->getGroups()->contains($group)) {
+            $this->getGroups()->removeElement($group);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoles()
+    {
+        $roles = parent::getRoles();
+
+        /** @var Group $group */
+        foreach ($this->getGroups() as $group) {
+            $roles = array_merge($roles, $group->getRoles()->toArray());
+        }
+
+        return array_unique($roles);
     }
 }

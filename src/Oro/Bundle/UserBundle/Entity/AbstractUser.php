@@ -130,7 +130,7 @@ abstract class AbstractUser implements
     /**
      * @var Role[]|Collection
      *
-     * @ORM\ManyToMany(targetEntity="Role")
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role")
      * @ORM\JoinTable(name="oro_user_access_role",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
@@ -146,25 +146,6 @@ abstract class AbstractUser implements
      * )
      */
     protected $roles;
-
-    /**
-     * @var Group[]|Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Group")
-     * @ORM\JoinTable(name="oro_user_access_group",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @Oro\Versioned("getName")
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $groups;
 
     /**
      * Random string sent to the user email address in order to verify it
@@ -243,7 +224,6 @@ abstract class AbstractUser implements
     {
         $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
         $this->roles = new ArrayCollection();
-        $this->groups = new ArrayCollection();
         $this->organizations = new ArrayCollection();
     }
 
@@ -253,6 +233,14 @@ abstract class AbstractUser implements
     public function __toString()
     {
         return (string)$this->getUsername();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
@@ -484,14 +472,7 @@ abstract class AbstractUser implements
      */
     public function getRoles()
     {
-        $roles = $this->roles->toArray();
-
-        /** @var Group $group */
-        foreach ($this->getGroups() as $group) {
-            $roles = array_merge($roles, $group->getRoles()->toArray());
-        }
-
-        return array_unique($roles);
+        return $this->roles->toArray();
     }
 
     /**
@@ -518,16 +499,6 @@ abstract class AbstractUser implements
         }
 
         return $this;
-    }
-
-    /**
-     * Gets the groups granted to the user
-     *
-     * @return Collection
-     */
-    public function getGroups()
-    {
-        return $this->groups;
     }
 
     /**
@@ -585,66 +556,6 @@ abstract class AbstractUser implements
     public function eraseCredentials()
     {
         $this->plainPassword = null;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasGroup($name)
-    {
-        return (bool)$this
-            ->getGroups()
-            ->filter(
-                function (Group $group) use ($name) {
-                    return $group->getName() === $name;
-                }
-            )
-            ->count();
-    }
-
-    /**
-     * @return array
-     */
-    public function getGroupNames()
-    {
-        return $this
-            ->getGroups()
-            ->map(
-                function (Group $group) {
-                    return $group->getName();
-                }
-            )
-            ->toArray();
-    }
-
-    /**
-     * @param Group $group
-     *
-     * @return AbstractUser
-     */
-    public function addGroup(Group $group)
-    {
-        if (!$this->getGroups()->contains($group)) {
-            $this->getGroups()->add($group);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Group $group
-     *
-     * @return AbstractUser
-     */
-    public function removeGroup(Group $group)
-    {
-        if ($this->getGroups()->contains($group)) {
-            $this->getGroups()->removeElement($group);
-        }
-
-        return $this;
     }
 
     /**

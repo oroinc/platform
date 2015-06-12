@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Security;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Oro\Bundle\UserBundle\Security\UserProvider;
 

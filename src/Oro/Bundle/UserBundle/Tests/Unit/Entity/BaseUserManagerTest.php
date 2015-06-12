@@ -1,9 +1,8 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Entity;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
