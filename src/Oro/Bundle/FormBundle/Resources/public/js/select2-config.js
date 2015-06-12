@@ -7,17 +7,16 @@ define(['jquery', 'underscore', 'oroui/js/tools'
      * @export  oroform/js/select2-config
      * @class   oroform.Select2Config
      */
-    var Select2Config = function (config, url, perPage, excluded) {
+    var Select2Config = function (config, url) {
         this.config = config || {};
         this.config.separator = config.separator || ',';
         this.url = url;
-        this.perPage = perPage;
-        this.excluded = excluded;
     };
 
     Select2Config.prototype = {
-        getConfig: function () {
-            var self = this;
+        getConfig: function (excluded, perPage) {
+            excluded = excluded || [];
+            perPage = perPage || 10;
             // create default AJAX object for AJAX based Select2
             // and if this object was not created in extra config block
             if (this.config.ajax === undefined && this.url) {
@@ -26,7 +25,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
                     data: function (query, page) {
                         return {
                             page: page,
-                            per_page: self.perPage,
+                            per_page: perPage,
                             query: query
                         };
                     },
@@ -41,11 +40,11 @@ define(['jquery', 'underscore', 'oroui/js/tools'
                     this.config.initSelection = _.bind(this.initSelection, this);
                 }
                 var filterData = function(data) {
-                    if (self.excluded) {
+                    if (excluded) {
                         var forRemove = [];
                         var results = data.results;
                         for (var i = 0; i < results.length; i++) {
-                            if (results[i].hasOwnProperty('id') && self.excluded.indexOf(results[i].id) > -1) {
+                            if (results[i].hasOwnProperty('id') && excluded.indexOf(results[i].id) > -1) {
                                 forRemove.push(i);
                             }
                         }
@@ -89,7 +88,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
         },
 
         format: function(jsTemplate) {
-            var self = this;
+            var that = this;
             // pre-compile template if it exists
             if (jsTemplate) {
                 jsTemplate = _.template(jsTemplate);
@@ -101,29 +100,29 @@ define(['jquery', 'underscore', 'oroui/js/tools'
                 }
                 var result = '',
                     highlight = function (str) {
-                        return object.children ? str : self.highlightSelection(str, query);
+                        return object.children ? str : that.highlightSelection(str, query);
                     };
                 if (object._html !== undefined) {
                     result = _.escape(object._html);
                 } else if (jsTemplate) {
                     object = _.clone(object);
                     object.highlight = highlight;
-                    if (self.config.formatContext !== undefined) {
-                        object.context = self.config.formatContext();
+                    if (that.config.formatContext !== undefined) {
+                        object.context = that.config.formatContext();
                     }
                     result = jsTemplate(object);
                 } else {
-                    result = highlight(_.escape(self.getTitle(object, self.config.properties)));
+                    result = highlight(_.escape(that.getTitle(object, that.config.properties)));
                 }
                 return result;
             };
         },
 
         initSelection: function(element, callback) {
-            var self = this;
+            var that = this;
 
             var handleResults = function(data) {
-                if (self.config.multiple === true) {
+                if (that.config.multiple === true) {
                     callback(data);
                 } else {
                     callback(data.pop());
@@ -132,7 +131,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
 
             var setSelect2ValueById = function(id) {
                 if (_.isArray(id)) {
-                    id = id.join(self.config.separator);
+                    id = id.join(that.config.separator);
                 }
                 var select2Obj = element.data('select2');
                 var select2AjaxOptions = select2Obj.opts.ajax;

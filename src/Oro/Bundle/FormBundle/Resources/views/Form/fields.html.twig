@@ -1,11 +1,38 @@
 {% extends 'OroUIBundle:Form:fields.html.twig' %}
 
 {% block genemu_jqueryselect2_widget %}
-    {{ form_widget(form, { 'attr': {'class': 'select2'} }) }}
-    {{ form_javascript(form) }}
+    {% set routeParameters = configs.route_parameters is defined ? configs.route_parameters : [] %}
+    {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, routeParameters) : '' %}
+    {% if configs.placeholder is defined %}
+        {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
+    {% endif %}
+    {% if configs.result_template_twig is defined and configs.result_template_twig %}
+        {% set configs = configs|merge({'result_template': include(configs.result_template_twig) }) %}
+    {% endif %}
+    {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
+        {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
+    {% endif %}
+    {% if configs.extra_config is defined and configs.extra_config == 'multi_autocomplete' %}
+        {% set configs = configs|merge({'resource_granted': resource_granted('oro_tag_create') }) %}
+    {% endif %}
+    {% if configs.component is defined %}
+        {% set component = configs.component %}
+    {% else %}
+        {% set component = 'oroform/js/app/components/select2-component' %}
+    {% endif %}
+    {% set options = {'configs': configs, 'url': url} %}
+    {% if excluded is defined %}
+        {% set options = options|merge({'excluded': excluded }) %}
+    {% endif %}
+    {{ form_widget(form, { 'attr': {
+        'class': 'select2',
+        'data-page-component-module': component,
+        'data-page-component-options': options|json_encode|raw
+    } }) }}
+    {#{ form_javascript(form) }#}
 {% endblock %}
 
-{% block genemu_jqueryselect2_javascript %}
+{%  block genemu_jqueryselect2_javascript %}
     <script type="text/javascript">
         require(['underscore', 'jquery', 'oroform/js/select2-config', 'oroform/js/select2_relevancy_order_handler'
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}

@@ -1,9 +1,3 @@
-{% block oro_combobox_dataconfig_users_multiselect %}
-    {{ block('oro_combobox_dataconfig_autocomplete') }}
-
-    select2Config.multiple = true;
-{% endblock %}
-
 {% block oro_combobox_dataconfig_acl_users_multiselect %}
     select2Config.ajax = {
         url: {{ url|json_encode|raw }},
