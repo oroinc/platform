@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 

@@ -19,6 +19,9 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var TotalHeaderHandler|\PHPUnit_Framework_MockObject_MockObject */
     protected $handler;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $em;
+
     protected function setUp()
     {
         $this->optimizer = $this->getMock('Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer');
@@ -29,11 +32,28 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([$this->optimizer])
             ->setMethods(['calculateCount'])
             ->getMock();
+
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configuration->expects($this->any())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->any())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
     }
 
     protected function tearDown()
     {
-        unset($this->handler, $this->optimizer);
+        unset($this->handler, $this->optimizer, $this->em);
     }
 
     public function testSupportsWithValidQueryAndAction()
@@ -80,7 +100,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $testCount = 22;
 
-        $query = new Query($this->getMock('Doctrine\ORM\EntityManager', [], [], '', false));
+        $query = new Query($this->em);
         $qb    = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()->getMock();
         $qb->expects($this->once())->method('getQuery')
@@ -101,7 +121,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $testCount = 22;
 
-        $query = new Query($this->getMock('Doctrine\ORM\EntityManager', [], [], '', false));
+        $query = new Query($this->em);
         $this->handler->expects($this->once())->method('calculateCount')
             ->with($this->isInstanceOf('Doctrine\ORM\Query'))
             ->willReturn($testCount);
@@ -143,7 +163,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $repo->expects($this->once())->method('createQueryBuilder')
             ->willReturn($qb);
 
-        $query = new Query($this->getMock('Doctrine\ORM\EntityManager', [], [], '', false));
+        $query = new Query($this->em);
         $qb->expects($this->once())->method('getQuery')
             ->willReturn($query);
 

@@ -49,7 +49,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
 
         $statement->expects($this->any())
             ->method('fetch')
-            ->will($this->onConsecutiveCalls(['sclr0' => self::TEST_COUNT], false));
+            ->will($this->onConsecutiveCalls(['sclr_0' => self::TEST_COUNT], false));
         $statement->expects($this->any())
             ->method('fetchColumn')
             ->will($this->returnValue(self::TEST_COUNT));
@@ -65,16 +65,16 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
         return array(
             'empty'               => array(
                 'dql'                => 'SELECT e FROM Stub:Entity e',
-                'expectedCountQuery' => 'SELECT count(@0_.a) AS sclr0 FROM  @0_',
+                'expectedCountQuery' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_',
             ),
             'empty with group by' => array(
                 'dql'                => 'SELECT e FROM Stub:Entity e GROUP BY e.b',
                 'expectedCountQuery' => 'SELECT COUNT(*) FROM ' .
-                    '(SELECT @0_.a AS a0, @0_.b AS b1 FROM  @0_ GROUP BY @0_.b) AS e',
+                    '(SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ GROUP BY t0_.b) AS e',
             ),
             'single parameters'   => array(
                 'dql'                => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
-                'expectedCountQuery' => 'SELECT count(@0_.a) AS sclr0 FROM  @0_ WHERE @0_.a = ? AND @0_.b = ?',
+                'expectedCountQuery' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
                 'sqlParameters'      => array(1, 2),
                 'types'              => array(Type::INTEGER, Type::INTEGER),
                 'queryParameters'    => array('a' => 1, 'b' => 2),
@@ -83,7 +83,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
                 'dql'
                     => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
                 'expectedCountQuery'
-                    => 'SELECT DISTINCT count(DISTINCT @0_.a) AS sclr0 FROM  @0_ WHERE @0_.a = ? AND @0_.b = ?',
+                    => 'SELECT DISTINCT count(DISTINCT t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
                 'sqlParameters'      => array(3, 3),
                 'types'              => array(Type::INTEGER, Type::INTEGER),
                 'queryParameters'    => array('value' => 3),

@@ -36,11 +36,11 @@ class ChannelRepository extends EntityRepository
         if ($integrationId) {
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('j.args', ':integrationIdType1'),
-                    $qb->expr()->like('j.args', ':integrationIdType2'),
+                    $qb->expr()->like('cast(j.args as text)', ':integrationIdType1'),
+                    $qb->expr()->like('cast(j.args as text)', ':integrationIdType2'),
                     $qb->expr()->andX(
-                        $qb->expr()->notLike('j.args', ':noIntegrationIdType1'),
-                        $qb->expr()->notLike('j.args', ':noIntegrationIdType2')
+                        $qb->expr()->notLike('cast(j.args as text)', ':noIntegrationIdType1'),
+                        $qb->expr()->notLike('cast(j.args as text)', ':noIntegrationIdType2')
                     )
                 )
             )
