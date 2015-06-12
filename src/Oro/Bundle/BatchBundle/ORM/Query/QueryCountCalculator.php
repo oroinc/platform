@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 
 /**
@@ -61,28 +61,9 @@ class QueryCountCalculator
                 $query->setHint(CountWalker::HINT_DISTINCT, false);
             }
 
-            // fix of doctrine count walker bug
-            // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-            /* @var $countQuery Query */
-            $countQuery = clone $query;
-            $countQuery->setParameters(clone $query->getParameters());
-            foreach ($query->getHints() as $name => $value) {
-                $countQuery->setHint($name, $value);
-            }
-            if (!$countQuery->hasHint(CountWalker::HINT_DISTINCT)) {
-                $countQuery->setHint(CountWalker::HINT_DISTINCT, true);
-            }
-
-            $this->appendTreeWalker($countQuery, 'Oro\Bundle\BatchBundle\ORM\Query\Walker\CountWalker');
-            $countQuery->setFirstResult(null)->setMaxResults(null);
-
-            try {
-                $data   = $countQuery->getScalarResult();
-                $data   = array_map('current', $data);
-                $result = array_sum($data);
-            } catch (NoResultException $e) {
-                $result = 0;
-            }
+            $paginator = new Paginator($query);
+            $paginator->setUseOutputWalkers(false);
+            $result = $paginator->count();
         } else {
             $parser            = new Parser($query);
             $parserResult      = $parser->parse();
@@ -167,23 +148,5 @@ class QueryCountCalculator
         }
 
         return $this->shouldUseWalker;
-    }
-
-    /**
-     * Appends a custom tree walker to the tree walkers hint.
-     *
-     * @param Query  $query
-     * @param string $walkerClass
-     */
-    private function appendTreeWalker(Query $query, $walkerClass)
-    {
-        $hints = $query->getHint(Query::HINT_CUSTOM_TREE_WALKERS);
-
-        if ($hints === false) {
-            $hints = [];
-        }
-
-        $hints[] = $walkerClass;
-        $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $hints);
     }
 }
