@@ -1,15 +1,4 @@
 {% macro query_designer_condition_builder(params) %}
-    {% set activityConditionOptions = {
-        listOption: render(path('oro_api_get_activitylist_activity_list_option')),
-        entitySelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
-        fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]',
-        fieldChoice: {
-            select2: {
-                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
-            },
-        },
-    } %}
-
     {% set fieldConditionOptions = {
         fieldChoice: {
             select2: {
@@ -17,15 +6,6 @@
             },
             fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]'
         }
-    } %}
-
-    {% set dataAuditConditionOptions = {
-        fieldChoice: {
-            select2: {
-                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
-            },
-            fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_get_audit_fields',
-        },
     } %}
 
     {% set segmentConditionOptions = {
@@ -62,18 +42,7 @@
                     <div class="span3 filter-criteria">
                         <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
                         <ul class="criteria-list" id="{{ params.criteria_list_id }}">
-                            <li class="option" data-criteria="condition-activity"
-                                data-module="oroactivitylist/js/activity-condition"
-                                data-widget="activityCondition"
-                                data-options="{{ activityConditionOptions|json_encode }}">
-                                {{ 'oro.activitylist.condition_builder.criteria.activity'|trans }}
-                            </li>
-                            <li class="option" data-criteria="condition-data-audit"
-                                data-module="orodataaudit/js/data-audit-condition"
-                                data-widget="dataAuditCondition"
-                                data-options="{{ dataAuditConditionOptions|json_encode }}">
-                                {{ 'oro.dataaudit.condition_builder.criteria.data_audit'|trans }}
-                            </li>
+                            {% placeholder segment_criteria_list with {params: params} %}
                             <li class="option" data-criteria="condition-item"
                                 data-module="oroquerydesigner/js/field-condition"
                                 data-widget="fieldCondition"
@@ -169,7 +138,6 @@
         {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
     {% endif %}
 
-    {% set auditFieldsData = render(path('oro_api_get_audit_fields')) %}
     {% set widgetOptions = {
         valueSource: '[data-ftid=' ~ type ~ '_form_definition]',
         fieldsLoader: {
@@ -178,14 +146,6 @@
             router:            'oro_api_querydesigner_fields_entity',
             routingParams:     entityFieldsRouteParams,
             fieldsData:        fieldsData,
-            confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
-        },
-        auditFieldsLoader: {
-            entityChoice:      '[data-ftid=' ~ type ~ '_form_entity]',
-            loadingMaskParent: '#' ~ form.vars.name,
-            router:            'oro_api_get_audit_fields',
-            routingParams:     {},
-            fieldsData:        auditFieldsData,
             confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
         },
         filters: {
@@ -219,6 +179,8 @@
     {% else %}
         {% set widgetOptions = widgetOptions|merge({'columnFieldChoiceOptions': {exclude: ['relation_type']} }) %}
     {% endif %}
+
+    {% set widgetOptions = update_segment_widget_options(widgetOptions) %}
 
     <div data-page-component-module="orosegment/js/app/components/segment-component"
          data-page-component-options="{{ widgetOptions|json_encode }}"></div>

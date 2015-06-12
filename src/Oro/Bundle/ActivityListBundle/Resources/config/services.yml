@@ -10,6 +10,7 @@ parameters:
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
     oro_activity_list.event_listener.actitity_list_changes_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListChangesListener
     oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
+    oro_activity_list.event_listener.segment_widget_options_load.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener
 
     oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
     oro_activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
@@ -81,6 +82,11 @@ services:
            - @translator
            - @oro_entity.routing_helper
            - @oro_ui.html_tag_helper
+
+    oro_activity_list.event_listener.segment_widget_options_load:
+        class: %oro_activity_list.event_listener.segment_widget_options_load.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_segment.widget_options_load, method: onLoad }
 
     oro_activity_list.entity_config_dumper.extension:
         class: %oro_activity_list.entity_config_dumper.extension.class%

@@ -32,13 +32,6 @@ define(function (require) {
                 confirmMessage: '',
                 loadEvent: 'fieldsLoaded'
             },
-            auditFieldsLoader: {
-                loadingMaskParent: '',
-                router: null,
-                routingParams: {},
-                fieldsData: [],
-                loadEvent: 'auditFieldsLoaded'
-            },
             filters: {
                 criteriaList: '',
                 conditionBuilder: ''
@@ -62,34 +55,31 @@ define(function (require) {
         },
 
         initialize: function (options) {
-            this.processOptions(options);
-            this.$storage = $(this.options.valueSource);
+            require(options.extensions || [], _.bind(function () {
+                var extensions = arguments;
+                _.each(extensions, function (extension) {
+                    extension.load(this);
+                }, this);
 
-            this.initEntityFieldsUtil();
-            var $fieldsLoader = this.initFieldsLoader();
-            var $auditFieldsLoader = this.initFieldsLoader(this.options.auditFieldsLoader);
-            this.initGrouping();
-            this.initColumn();
-            this.configureFilters();
+                this.processOptions(options);
+                this.$storage = $(this.options.valueSource);
 
-            this.initEntityChangeEvents($fieldsLoader, $auditFieldsLoader);
+                this.initEntityFieldsUtil();
+                this.$fieldsLoader = this.initFieldsLoader();
+                this.initGrouping();
+                this.initColumn();
+                this.configureFilters();
 
-            this.trigger(
-                this.options.fieldsLoader.loadEvent,
-                $fieldsLoader.val(),
-                $fieldsLoader.fieldsLoader('getFieldsData'));
-            this.trigger(
-                this.options.auditFieldsLoader.loadEvent,
-                $auditFieldsLoader.val(),
-                $auditFieldsLoader.fieldsLoader('getFieldsData'));
+                this.initEntityChangeEvents();
 
-            SegmentComponent.__super__.initialize.call(this, options);
+                SegmentComponent.__super__.initialize.call(this, options);
 
-            this.form = this.$storage.parents('form');
-            this.form.submit(_.bind(this.onBeforeSubmit, this));
+                this.form = this.$storage.parents('form');
+                this.form.submit(_.bind(this.onBeforeSubmit, this));
+            }, this));
         },
 
-        initEntityChangeEvents: function ($fieldsLoader, $auditFieldsLoader) {
+        initEntityChangeEvents: function () {
             var confirm = new DeleteConfirmation({
                 title: __('Change Entity Confirmation'),
                 okText: __('Yes'),
@@ -105,11 +95,8 @@ define(function (require) {
                     return !_.isEmpty(value);
                 });
 
-                var ok = function () {
-                    var additionalOptions = _.pick(e, 'val', 'removed');
-                    $fieldsLoader.val(e.val).trigger('change', additionalOptions);
-                    $auditFieldsLoader.val(e.val).trigger('change', additionalOptions);
-                };
+                var ok = _.partial(this._getEntityChangeOkCallback, e, _.pick(e, 'val', 'removed'));
+
                 var cancel = function () {
                     var oldVal = (e.removed && e.removed.id) || null;
                     self.$entityChoice.val(oldVal).change();
@@ -131,6 +118,15 @@ define(function (require) {
             this.once('dispose:before', function () {
                 confirm.dispose();
             });
+
+            this.trigger(
+                this.options.fieldsLoader.loadEvent,
+                this.$fieldsLoader.val(),
+                this.$fieldsLoader.fieldsLoader('getFieldsData'));
+        },
+
+        _onEntityChangeConfirm: function (e, additionalOptions) {
+            this.$fieldsLoader.val(e.val).trigger('change', additionalOptions);
         },
 
         onBeforeSubmit: function (e) {
@@ -543,7 +539,7 @@ define(function (require) {
 
         configureFilters: function () {
             var self, options, metadata,
-                $fieldCondition, $dataAuditCondition, $segmentCondition, $activityCondition,
+                $fieldCondition, $segmentCondition,
                 $builder, $criteria;
 
             self = this;
@@ -562,27 +558,6 @@ define(function (require) {
             $fieldCondition = $criteria.find('[data-criteria=condition-item]');
             if (!_.isEmpty($fieldCondition)) {
                 $.extend(true, $fieldCondition.data('options'), {
-                    fieldChoice: this.options.fieldChoiceOptions,
-                    filters: metadata.filters,
-                    hierarchy: metadata.hierarchy
-                });
-            }
-
-            $dataAuditCondition = $criteria.find('[data-criteria=condition-data-audit]');
-            if (!_.isEmpty($dataAuditCondition)) {
-                this.on('auditFieldsLoaded', function (className, data) {
-                    $dataAuditCondition.toggleClass('disabled', !data[className]);
-                });
-                $.extend(true, $dataAuditCondition.data('options'), {
-                    fieldChoice: this.options.fieldChoiceOptions,
-                    filters: metadata.filters,
-                    hierarchy: metadata.hierarchy
-                });
-            }
-
-            $activityCondition = $criteria.find('[data-criteria=condition-activity]');
-            if (!_.isEmpty($activityCondition)) {
-                $.extend(true, $activityCondition.data('options'), {
                     fieldChoice: this.options.fieldChoiceOptions,
                     filters: metadata.filters,
                     hierarchy: metadata.hierarchy

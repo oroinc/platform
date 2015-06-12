@@ -5,6 +5,9 @@ placeholders:
     scripts_before:
         items:
             template_audit_condition_type_select: ~
+    segment_criteria_list:
+        items:
+            data_audit_condition: ~
 
 items:
     change_history_link:
@@ -13,3 +16,5 @@ items:
         acl: oro_dataaudit_history
     template_audit_condition_type_select:
         template: OroDataAuditBundle:js:audit-condition-type-select.html.twig
+    data_audit_condition:
+        template: OroDataAuditBundle:Segment:data_audit_condition.html.twig
