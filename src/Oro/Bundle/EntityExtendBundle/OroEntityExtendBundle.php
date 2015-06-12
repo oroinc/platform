@@ -7,7 +7,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
