@@ -19,16 +19,18 @@ class OroExposeLoader extends AbstractLoader
 
         foreach ($this->kernel->getBundles() as $bundle) {
             try {
-                $collection = parent::load($bundle->getPath() . '/Resources/config/oro/routing.yml', $type);
-
-                /** @var Route $route */
-                foreach ($collection->getIterator() as $routeName => $route) {
-                    if ($route->hasOption(self::OPTION_EXPOSE) && $route->getOption(self::OPTION_EXPOSE)) {
-                        $routes->add($routeName, $route);
-                    }
-                }
+                $path = $this->locator->locate('Resources/config/oro/routing.yml', $bundle->getPath());
             } catch (\InvalidArgumentException $e) {
                 continue;
+            }
+
+            $collection = parent::load($path, $type);
+
+            /** @var Route $route */
+            foreach ($collection->getIterator() as $routeName => $route) {
+                if ($route->hasOption(self::OPTION_EXPOSE) && $route->getOption(self::OPTION_EXPOSE)) {
+                    $routes->add($routeName, $route);
+                }
             }
         }
 

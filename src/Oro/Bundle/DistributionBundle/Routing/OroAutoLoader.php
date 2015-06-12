@@ -18,10 +18,12 @@ class OroAutoLoader extends AbstractLoader
 
         foreach ($bundles as $bundle) {
             try {
-                $routes->addCollection(parent::load($bundle->getPath() . '/Resources/config/oro/routing.yml', $type));
+                $path = $this->locator->locate('Resources/config/oro/routing.yml', $bundle->getPath());
             } catch (\InvalidArgumentException $e) {
                 continue;
             }
+
+            $routes->addCollection(parent::load($path, $type));
         }
 
         return $this->dispatchEvent(RouteCollectionEvent::AUTOLOAD, $routes);

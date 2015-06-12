@@ -50,14 +50,21 @@ abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad(array $expected)
     {
+        $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR;
         $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
-        $bundle->expects($this->any())->method('getPath')->willReturn(
-            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR
+        $bundle->expects($this->any())->method('getPath')->willReturn($dir);
+
+        $this->locator->expects($this->atLeastOnce())->method('locate')->willReturnOnConsecutiveCalls(
+            $this->returnCallback(
+                function ($filename) use ($dir) {
+                    return $dir . $filename;
+                }
+            ),
+            $this->returnArgument(0),
+            $this->throwException(new \InvalidArgumentException())
         );
 
-        $this->locator->expects($this->once())->method('locate')->will($this->returnArgument(0));
-
-        $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
+        $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle, $bundle]);
 
         $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
             $this->isType('string'),
@@ -73,10 +80,25 @@ abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->getLoader()->load('file', 'type')->getIterator()->getArrayCopy());
     }
 
+    public function testDispatchEventWithoutEventDispatcher()
+    {
+        $this->kernel->expects($this->once())->method('getBundles')->willReturn([]);
+        $this->eventDispatcher->expects($this->never())->method('dispatch');
+        $this->assertEquals(
+            [],
+            $this->getLoaderWithoutEventDispatcher()->load('file', 'type')->getIterator()->getArrayCopy()
+        );
+    }
+
     /**
      * @return AbstractLoader
      */
     abstract public function getLoader();
+
+    /**
+     * @return AbstractLoader
+     */
+    abstract public function getLoaderWithoutEventDispatcher();
 
     /**
      * @return array

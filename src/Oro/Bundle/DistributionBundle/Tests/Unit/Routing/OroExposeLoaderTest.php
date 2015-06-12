@@ -16,6 +16,14 @@ class OroExposeLoaderTest extends AbstractLoaderTest
         return new OroExposeLoader($this->locator, $this->kernel, $this->eventDispatcher);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getLoaderWithoutEventDispatcher()
+    {
+        return new OroExposeLoader($this->locator, $this->kernel);
+    }
+
     public function testSupports()
     {
         $this->assertTrue($this->getLoader()->supports(null, 'oro_expose'));

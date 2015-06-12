@@ -16,6 +16,14 @@ class OroAutoLoaderTest extends AbstractLoaderTest
         return new OroAutoLoader($this->locator, $this->kernel, $this->eventDispatcher);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getLoaderWithoutEventDispatcher()
+    {
+        return new OroAutoLoader($this->locator, $this->kernel);
+    }
+
     public function testSupports()
     {
         $this->assertTrue($this->getLoader()->supports(null, 'oro_auto'));
