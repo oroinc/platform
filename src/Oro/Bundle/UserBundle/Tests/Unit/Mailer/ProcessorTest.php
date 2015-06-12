@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Mailer;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Mailer;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -147,6 +147,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($sendEmailResult, $this->mailProcessor->{$methodName}($this->user));
     }
 
+    /**
+     * @return array
+     */
     public function sendEmailResultProvider()
     {
         return [
