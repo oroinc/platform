@@ -11,4 +11,4 @@ items:
         applicable: @oro_activity_list.placeholder.filter->isApplicable($entity$)
         template: OroActivityListBundle:ActivityList:activities.html.twig
     activity_condition:
-        template: OroActivityListBundle:Segment:activity_condition.html.twig
+        action: OroActivityListBundle:Segment:activityCondition

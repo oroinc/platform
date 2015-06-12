@@ -15,102 +15,110 @@ define([
             listOption: {},
             filters: {},
             entitySelector: null,
-            filterContainer: '<span class="active-filter">'
+            filterContainer: '<span class="active-filter">',
+            extensions: [],
         },
 
         _create: function () {
-            var data = this.element.data('value');
-            this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
+            require(this.options.extensions, _.bind(function () {
+                var extensions = arguments;
+                _.each(extensions, function (extension) {
+                    extension.load(this);
+                }, this);
 
-            this.element.data('value', {});
-            this._superApply(arguments);
-            this.element.data('value', data);
+                var data = this.element.data('value');
+                this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
 
-            var data = $.extend(true, {
-                criterion: {
-                    data: {
-                        filterType: 'hasActivity',
-                        activityType: {}
-                    }
-                }
-            }, this.element.data('value'));
+                this.element.data('value', {});
+                $.oroquerydesigner.fieldCondition.prototype._create.apply(this, arguments);
+                this.element.data('value', data);
 
-            this.activityFilter = new ChoiceFilter({
-                caret: '',
-                templateSelector: '#simple-choice-filter-template-embedded',
-                choices: {
-                    hasActivity: __('oro.activityCondition.hasActivity'),
-                    hasNotActivity: __('oro.activityCondition.hasNotActivity')
-                }
-            });
-            this.activityFilter.setValue({
-                type: data.criterion.data.filterType
-            });
-            this.$activityChoice = $(this.options.filterContainer).html(this.activityFilter.render().$el);
-
-            var listOption = JSON.parse(this.options.listOption);
-            var typeChoices = {};
-            _.each(listOption, function (options, id) {
-                typeChoices[id] = options.label;
-            });
-            this.typeFilter = new MultiSelectFilter({
-                label: __('oro.activityCondition.listOfActivityTypes'),
-                choices: typeChoices
-            });
-            this.$typeChoice = $(this.options.filterContainer).html(this.typeFilter.render().$el);
-            this.typeFilter.setValue(data.criterion.data.activityType);
-            var filterOptions = _.findWhere(this.options.filters, {
-                type: 'datetime'
-            });
-            if (!filterOptions) {
-                throw new Error('Cannot find filter "datetime"');
-            }
-
-            this.element.prepend(this.$activityChoice, '-', this.$typeChoice, '-');
-
-            this._updateFieldChoice();
-            if (data && data.columnName) {
-                this.element.one('changed', _.bind(function () {
-                    this.filter.setValue(data.criterion.data.filter.data);
-                    this.element.data('value', {
-                        criterion: {
-                            data: data.criterion.data.filter.data
+                var data = $.extend(true, {
+                    criterion: {
+                        data: {
+                            filterType: 'hasActivity',
+                            activityType: {}
                         }
-                    });
-                    this._renderFilter(base64_decode(data.columnName));
-                }, this));
-                this.selectField(base64_decode(data.columnName));
-            }
-
-            this.activityFilter.on('update', _.bind(this._onUpdate, this));
-            this.typeFilter.on('update', _.bind(this._onUpdate, this));
-
-            this._on(this.$activityChoice, {
-                change: function () {
-                    this.activityFilter.applyValue();
-                }
-            });
-
-            this.typeFilter.on('update', _.bind(function () {
-                var oldEntity = this.$fieldChoice.data('entity');
-                var newEntity = this._getTypeChoiceEntity();
-
-                if (oldEntity !== newEntity) {
-                    this.$fieldChoice.fieldChoice('setValue', '');
-                    this.$filterContainer.empty();
-                    if (this.filter) {
-                        this.filter.reset();
                     }
+                }, this.element.data('value'));
+
+                this.activityFilter = new ChoiceFilter({
+                    caret: '',
+                    templateSelector: '#simple-choice-filter-template-embedded',
+                    choices: {
+                        hasActivity: __('oro.activityCondition.hasActivity'),
+                        hasNotActivity: __('oro.activityCondition.hasNotActivity')
+                    }
+                });
+                this.activityFilter.setValue({
+                    type: data.criterion.data.filterType
+                });
+                this.$activityChoice = $(this.options.filterContainer).html(this.activityFilter.render().$el);
+
+                var listOption = JSON.parse(this.options.listOption);
+                var typeChoices = {};
+                _.each(listOption, function (options, id) {
+                    typeChoices[id] = options.label;
+                });
+                this.typeFilter = new MultiSelectFilter({
+                    label: __('oro.activityCondition.listOfActivityTypes'),
+                    choices: typeChoices
+                });
+                this.$typeChoice = $(this.options.filterContainer).html(this.typeFilter.render().$el);
+                this.typeFilter.setValue(data.criterion.data.activityType);
+                var filterOptions = _.findWhere(this.options.filters, {
+                    type: 'datetime'
+                });
+                if (!filterOptions) {
+                    throw new Error('Cannot find filter "datetime"');
                 }
 
-                this.$fieldChoice.fieldChoice('updateData', newEntity, this.$fieldsLoader.data('fields'));
+                this.element.prepend(this.$activityChoice, '-', this.$typeChoice, '-');
+
+                this._updateFieldChoice();
+                if (data && data.columnName) {
+                    this.element.one('changed', _.bind(function () {
+                        this.filter.setValue(data.criterion.data.filter.data);
+                        this.element.data('value', {
+                            criterion: {
+                                data: data.criterion.data.filter.data
+                            }
+                        });
+                        this._renderFilter(base64_decode(data.columnName));
+                    }, this));
+                    this.selectField(base64_decode(data.columnName));
+                }
+
+                this.activityFilter.on('update', _.bind(this._onUpdate, this));
+                this.typeFilter.on('update', _.bind(this._onUpdate, this));
+
+                this._on(this.$activityChoice, {
+                    change: function () {
+                        this.activityFilter.applyValue();
+                    }
+                });
+
+                this.typeFilter.on('update', _.bind(function () {
+                    var oldEntity = this.$fieldChoice.data('entity');
+                    var newEntity = this._getTypeChoiceEntity();
+
+                    if (oldEntity !== newEntity) {
+                        this.$fieldChoice.fieldChoice('setValue', '');
+                        this.$filterContainer.empty();
+                        if (this.filter) {
+                            this.filter.reset();
+                        }
+                    }
+
+                    this.$fieldChoice.fieldChoice('updateData', newEntity, this.$fieldsLoader.data('fields'));
+                }, this));
+
+                this._on(this.$typeChoice, {
+                    change: function (e) {
+                        this.typeFilter.applyValue();
+                    }
+                });
             }, this));
-
-            this._on(this.$typeChoice, {
-                change: function (e) {
-                    this.typeFilter.applyValue();
-                }
-            });
         },
 
         _getTypeChoiceEntity: function () {

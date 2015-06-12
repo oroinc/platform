@@ -3,7 +3,6 @@
 define([
     'jquery',
     'underscore',
-    'oroactivitylist/js/activity-condition',
 ], function ($, _) {
 
     var excludedFields = {
@@ -18,10 +17,10 @@ define([
         ],
     };
 
-    $.widget('oroactivity.activityCondition', $.oroactivity.activityCondition, {
-        _create: function () {
-            var originalFilter = this.options.fieldChoice.dataFilter;
-            this.options.fieldChoice.dataFilter = function (entityName, entityFields) {
+    return {
+        load: function (activityCondition) {
+            var originalFilter = activityCondition.options.fieldChoice.dataFilter;
+            activityCondition.options.fieldChoice.dataFilter = function (entityName, entityFields) {
                 if (originalFilter) {
                     entityFields = originalFilter.apply(this, arguments);
                 }
@@ -34,8 +33,6 @@ define([
                     return _.contains(excludedFields[entityName], field.name);
                 });
             };
-
-            this._superApply(arguments);
         }
-    });
+    };
 });
