@@ -2,28 +2,91 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SoapBundle\Event\GetListBefore;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 
-class AssociationManagerTest extends \PHPUnit_Framework_TestCase
+class AssociationManagerTest extends OrmTestCase
 {
+    /** @var EntityManagerMock */
+    private $em;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $configManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $eventDispatcher;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $nameFormatter;
 
     /** @var AssociationManager */
     private $associationManager;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $reader         = new AnnotationReader();
+        $metadataDriver = new AnnotationDriver(
+            $reader,
+            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations'
+        );
+
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $this->em->getConfiguration()->setEntityNamespaces(
+            [
+                'Test' => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations'
+            ]
+        );
+
+        $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine              = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
+        $this->doctrineHelper = new DoctrineHelper($doctrine);
+        $this->nameFormatter  = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $nameFormatterLink    =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $nameFormatterLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->nameFormatter);
 
-        $this->associationManager = new AssociationManager($this->configManager);
+        $this->associationManager = new AssociationManager(
+            $this->configManager,
+            $this->eventDispatcher,
+            $this->doctrineHelper,
+            $nameFormatterLink
+        );
     }
 
     public function testGetSingleOwnerManyToOneAssociationTargets()
@@ -296,6 +359,76 @@ class AssociationManagerTest extends \PHPUnit_Framework_TestCase
                 'TargetClass1' => $association1
             ],
             $result
+        );
+    }
+
+    public function testGetMultiAssociationsQueryBuilder()
+    {
+        $ownerClass         = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestOwner';
+        $targetClass1       = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestTarget1';
+        $targetClass2       = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestTarget2';
+        $filters            = ['name' => 'test', 'phones.phone' => '123-456'];
+        $joins              = ['phones'];
+        $associationTargets = [$targetClass1 => 'targets_1', $targetClass2 => 'targets_2'];
+
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')
+            ->willReturnCallback(
+                function ($eventName, GetListBefore $event) {
+                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 10));
+                    $event->setCriteria($updatedCriteria);
+                }
+            );
+        $this->eventDispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->willReturnCallback(
+                function ($eventName, GetListBefore $event) {
+                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 100));
+                    $event->setCriteria($updatedCriteria);
+                }
+            );
+
+        $this->nameFormatter->expects($this->at(0))
+            ->method('getFormattedNameDQL')
+            ->with('target', $targetClass1)
+            ->willReturn('CONCAT(target.firstName, CONCAT(\' \', target.lastName))');
+        $this->nameFormatter->expects($this->at(1))
+            ->method('getFormattedNameDQL')
+            ->with('target', $targetClass2)
+            ->willReturn('CONCAT(target.firstName, CONCAT(\' \', target.lastName))');
+
+        $result = $this->associationManager->getMultiAssociationsQueryBuilder(
+            $ownerClass,
+            $filters,
+            $joins,
+            $associationTargets,
+            5,
+            2,
+            'title'
+        );
+
+        $this->assertEquals(
+            'SELECT entity.id1 AS id, entity.sclr2 AS entity, entity.sclr3 AS title '
+            . 'FROM ('
+            . 'SELECT DISTINCT t0_.id AS id0, t1_.id AS id1, '
+            . '\'' . $targetClass1 . '\' AS sclr2, '
+            . 't1_.firstName || \' \' || t1_.lastName AS sclr3 '
+            . 'FROM test_owner t0_ '
+            . 'INNER JOIN test_owner_to_target1 t2_ ON t0_.id = t2_.owner_id '
+            . 'INNER JOIN test_target1 t1_ ON t1_.id = t2_.target_id '
+            . 'LEFT JOIN test_phone t3_ ON t0_.id = t3_.owner_id '
+            . 'WHERE (t0_.name = \'test\' AND t3_.phone = \'123-456\') AND t1_.age = 10'
+            . ' UNION ALL '
+            . 'SELECT DISTINCT t0_.id AS id0, t1_.id AS id1, '
+            . '\'' . $targetClass2 . '\' AS sclr2, '
+            . 't1_.firstName || \' \' || t1_.lastName AS sclr3 '
+            . 'FROM test_owner t0_ '
+            . 'INNER JOIN test_owner_to_target2 t2_ ON t0_.id = t2_.owner_id '
+            . 'INNER JOIN test_target2 t1_ ON t1_.id = t2_.target_id '
+            . 'LEFT JOIN test_phone t3_ ON t0_.id = t3_.owner_id '
+            . 'WHERE (t0_.name = \'test\' AND t3_.phone = \'123-456\') AND t1_.age = 100'
+            . ') entity ORDER BY title ASC LIMIT 5 OFFSET 5',
+            $result->getSQL()
         );
     }
 }

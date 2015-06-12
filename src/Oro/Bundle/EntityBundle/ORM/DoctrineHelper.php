@@ -290,7 +290,7 @@ class DoctrineHelper
      * @param QueryBuilder $qb
      * @param array|null   $joins
      */
-    public function applyJoins(QueryBuilder$qb, $joins)
+    public function applyJoins(QueryBuilder $qb, $joins)
     {
         if (empty($joins)) {
             return;

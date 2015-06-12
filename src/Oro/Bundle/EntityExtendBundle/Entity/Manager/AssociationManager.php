@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\DBAL\Types\Type;
 
@@ -169,7 +170,7 @@ class AssociationManager
         $subQueries = [];
         foreach ($associationTargets as $entityClass => $fieldName) {
             // dispatch oro_api.request.get_list.before event
-            $event = new GetListBefore($criteria, $entityClass);
+            $event = new GetListBefore($this->cloneCriteria($criteria), $entityClass);
             $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
             $subCriteria = $event->getCriteria();
 
@@ -177,7 +178,7 @@ class AssociationManager
             $subQb    = $em->getRepository($associationOwnerClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
-                        'e.id AS emailId, target.%s AS entityId, \'%s\' AS entityClass, '
+                        'e.id AS id, target.%s AS entityId, \'%s\' AS entityClass, '
                         . ($nameExpr ?: '\'\'') . ' AS entityTitle',
                         $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass),
                         str_replace('\'', '\'\'', $entityClass)
@@ -263,5 +264,22 @@ class AssociationManager
     protected function getNameFormatter()
     {
         return $this->nameFormatterLink->getService();
+    }
+
+    /**
+     * Makes a clone of the given Criteria
+     *
+     * @param Criteria $criteria
+     *
+     * @return Criteria
+     */
+    protected function cloneCriteria(Criteria $criteria)
+    {
+        return new Criteria(
+            $criteria->getWhereExpression(),
+            $criteria->getOrderings(),
+            $criteria->getFirstResult(),
+            $criteria->getMaxResults()
+        );
     }
 }
