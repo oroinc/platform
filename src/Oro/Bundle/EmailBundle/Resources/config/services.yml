@@ -546,4 +546,4 @@ services:
     oro_email.event_listener.activity_condition_options_listener:
         class: %oro_email.event_listener.activity_condition_options_listener.class%
         tags:
-            - { name: kernel.event_listener, name: oro_activity_list.activity_condition_options_load, method: onLoad }
+            - { name: kernel.event_listener, event: oro_activity_list.activity_condition_options_load, method: onLoad }

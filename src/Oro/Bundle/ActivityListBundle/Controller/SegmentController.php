@@ -52,10 +52,12 @@ class SegmentController extends Controller
             return $conditionOptions;
         }
 
-        $event = new ActivityConditionOptionsLoadEvent($conditionOptions);
+        $event = new ActivityConditionOptionsLoadEvent($conditionOptions['activityConditionOptions']);
         $dispatcher->dispatch(ActivityConditionOptionsLoadEvent::EVENT_NAME, $event);
 
-        return $event->getOptions();
+        return [
+            'activityConditionOptions' => $event->getOptions(),
+        ];
     }
 
     /**
