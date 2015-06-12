@@ -121,16 +121,6 @@ class Role extends AbstractRole
     }
 
     /**
-     * Return the role name field
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string)$this->label;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getPrefix()

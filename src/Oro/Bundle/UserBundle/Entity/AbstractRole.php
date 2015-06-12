@@ -33,4 +33,17 @@ abstract class AbstractRole extends BaseRole
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    abstract public function getLabel();
+
+    /**
+     * @return null|string
+     */
+    public function __toString()
+    {
+        return (string)$this->getLabel();
+    }
 }

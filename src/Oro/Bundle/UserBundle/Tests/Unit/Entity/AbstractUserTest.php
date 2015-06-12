@@ -121,7 +121,7 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string
+     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\AbstractRole or a string
      */
     public function testHasRoleThrowsInvalidArgumentException()
     {
@@ -153,7 +153,7 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string
+     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\AbstractRole or a string
      */
     public function testRemoveRoleThrowsInvalidArgumentException()
     {

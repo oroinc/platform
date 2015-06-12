@@ -128,7 +128,7 @@ abstract class AbstractUser implements
     protected $enabled = true;
 
     /**
-     * @var Role[]|Collection
+     * @var AbstractRole[]|Collection
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role")
      * @ORM\JoinTable(name="oro_user_access_role",
@@ -426,21 +426,21 @@ abstract class AbstractUser implements
     }
 
     /**
-     * Remove the Role object from collection
+     * Remove the AbstractRole object from collection
      *
-     * @param Role|string $role
+     * @param AbstractRole|string $role
      *
      * @throws \InvalidArgumentException
      */
     public function removeRole($role)
     {
-        if ($role instanceof Role) {
+        if ($role instanceof AbstractRole) {
             $roleObject = $role;
         } elseif (is_string($role)) {
             $roleObject = $this->getRole($role);
         } else {
             throw new \InvalidArgumentException(
-                '$role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string'
+                '$role must be an instance of Oro\Bundle\UserBundle\Entity\AbstractRole or a string'
             );
         }
         if ($roleObject) {
@@ -453,7 +453,7 @@ abstract class AbstractUser implements
      *
      * @param string $roleName Role name
      *
-     * @return Role|null
+     * @return AbstractRole|null
      */
     public function getRole($roleName)
     {
@@ -469,6 +469,8 @@ abstract class AbstractUser implements
 
     /**
      * {@inheritdoc}
+     *
+     * @return AbstractRole[]
      */
     public function getRoles()
     {
@@ -529,13 +531,13 @@ abstract class AbstractUser implements
      */
     public function hasRole($role)
     {
-        if ($role instanceof Role) {
+        if ($role instanceof AbstractRole) {
             $roleName = $role->getRole();
         } elseif (is_string($role)) {
             $roleName = $role;
         } else {
             throw new \InvalidArgumentException(
-                '$role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string'
+                '$role must be an instance of Oro\Bundle\UserBundle\Entity\AbstractRole or a string'
             );
         }
 
