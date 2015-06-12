@@ -17,6 +17,9 @@ class OroDataAuditBundle implements Migration
         $this->createAuditField($schema);
         $queries->addPostQuery(new MigrateAuditFieldQuery());
         $queries->addPostQuery('ALTER TABLE oro_audit DROP COLUMN data');
+        $queries->addPostQuery(
+            $this->getDropEntityConfigFieldQuery('Oro\Bundle\DataAuditBundle\Entity\Audit', 'data')
+        );
     }
 
     /**
