@@ -95,7 +95,7 @@ define(function (require) {
                     return !_.isEmpty(value);
                 });
 
-                var ok = _.partial(this._getEntityChangeOkCallback, e, _.pick(e, 'val', 'removed'));
+                var ok = _.partial(_.bind(self._onEntityChangeConfirm, self), e, _.pick(e, 'val', 'removed'));
 
                 var cancel = function () {
                     var oldVal = (e.removed && e.removed.id) || null;

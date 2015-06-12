@@ -6,8 +6,8 @@ define([
 ], function ($, _) {
 
     return {
-        load: function (Segment) {
-            Segment.defaults = $.extend(true, Segment.defaults, {
+        load: function (segment) {
+            segment.defaults = $.extend(true, segment.defaults, {
                 defaults: {
                     auditFieldsLoader: {
                         loadingMaskParent: '',
@@ -19,8 +19,8 @@ define([
                 }
             });
 
-            var originalConfigureFilters = Segment.configureFilters;
-            Segment.configureFilters = function () {
+            var originalConfigureFilters = segment.configureFilters;
+            segment.configureFilters = function () {
                 var $criteria = $(this.options.filters.criteriaList);
 
                 var $dataAuditCondition = $criteria.find('[data-criteria=condition-data-audit]');
@@ -38,15 +38,15 @@ define([
                 originalConfigureFilters.apply(this, arguments);
             };
 
-            var originalInitFieldsLoader = Segment.initFieldsLoader;
-            Segment.initFieldsLoader = function () {
+            var originalInitFieldsLoader = segment.initFieldsLoader;
+            segment.initFieldsLoader = function () {
                 this.$auditFieldsLoader = originalInitFieldsLoader.call(this, this.options.auditFieldsLoader);
 
                 return originalInitFieldsLoader.apply(this, arguments);
             };
 
-            var originalInitEntityChangeEvents = Segment.initEntityChangeEvents;
-            Segment.initEntityChangeEvents = function () {
+            var originalInitEntityChangeEvents = segment.initEntityChangeEvents;
+            segment.initEntityChangeEvents = function () {
                 this.trigger(
                 this.options.auditFieldsLoader.loadEvent,
                 this.$auditFieldsLoader.val(),
@@ -55,8 +55,8 @@ define([
                 return originalInitEntityChangeEvents.apply(this, arguments);
             };
 
-            var original_onEntityChangeConfirm = Segment._onEntityChangeConfirm;
-            Segment._onEntityChangeConfirm = function (e, additionalOptions) {
+            var original_onEntityChangeConfirm = segment._onEntityChangeConfirm;
+            segment._onEntityChangeConfirm = function (e, additionalOptions) {
                 this.$auditFieldsLoader.val(e.val).trigger('change', additionalOptions);
 
                 return original_onEntityChangeConfirm.apply(this, arguments);
