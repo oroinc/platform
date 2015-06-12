@@ -61,7 +61,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
          * TODO: the correct expression cannot be used due a bud described in
          * This problem still exists in doctrine 2.5, in the case when we try equals expression
          * with IS NULL.
-         * For example DQL:
+         * An example of DQL which fails:
          * SELECT u.id FROM OroUserBundle:User u
          * WHERE (
          *      CASE WHEN (:business_unit_id IS NOT NULL)
