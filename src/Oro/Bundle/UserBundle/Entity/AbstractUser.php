@@ -12,6 +12,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ *
  * @ORM\MappedSuperclass
  */
 abstract class AbstractUser implements
