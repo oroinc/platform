@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig_Extension;
 use Twig_SimpleFunction;
 
+use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 
 class SegmentExtension extends Twig_Extension
@@ -31,6 +32,10 @@ class SegmentExtension extends Twig_Extension
     {
         return [
             new Twig_SimpleFunction('update_segment_widget_options', [$this, 'updateSegmentWidgetOptions']),
+            new Twig_SimpleFunction(
+                'update_segment_condition_builder_options',
+                [$this, 'updateSegmentConditionBuilderOptions']
+            ),
         ];
     }
 
@@ -49,6 +54,23 @@ class SegmentExtension extends Twig_Extension
         $this->dispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
 
         return $event->getWidgetOptions();
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
+    public function updateSegmentConditionBuilderOptions(array $options)
+    {
+        if (!$this->dispatcher->hasListeners(ConditionBuilderOptionsLoadEvent::EVENT_NAME)) {
+            return $options;
+        }
+
+        $event = new ConditionBuilderOptionsLoadEvent($options);
+        $this->dispatcher->dispatch(ConditionBuilderOptionsLoadEvent::EVENT_NAME, $event);
+
+        return $event->getOptions();
     }
 
     /**

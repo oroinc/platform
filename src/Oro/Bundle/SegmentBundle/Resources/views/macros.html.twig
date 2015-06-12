@@ -7,7 +7,6 @@
             fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]'
         }
     } %}
-
     {% set segmentConditionOptions = {
         segmentChoice: {
             select2: {
@@ -26,15 +25,10 @@
         criteriaListSelector: '#' ~ params.criteria_list_id,
         entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
         onFieldsUpdate: {
-            toggleCriteria: [
-                'condition-activity',
-                'condition-data-audit',
-                'condition-item',
-                'condition-segment',
-                'conditions-group',
-            ]
+            toggleCriteria: ['condition-item', 'condition-segment', 'conditions-group']
         }
     } %}
+    {% set conditionBuilderOptions = update_segment_condition_builder_options(conditionBuilderOptions) %}
     <div class="condition-builder left-panel-container">
         <div class="panel-placeholder">
             <div>

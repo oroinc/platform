@@ -13,7 +13,8 @@ parameters:
 
     oro_dataaudit.event_listener.dataaudit_grid_listener.class: Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener
     oro_dataaudit.event_listener.dataaudit_history_grid_listener.class: Oro\Bundle\DataAuditBundle\EventListener\AuditHistoryGridListener
-    oro_dataaudit.event_listener.segment_widget_options_load.class:     Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener
+    oro_dataaudit.event_listener.segment_widget_options_listener.class: Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener
+    oro_dataaudit.event_listener.segment_condition_builder_options_listener.class: Oro\Bundle\DataAuditBundle\EventListener\SegmentConditionBuilderOptionsListener
 
     oro_dataaudit.placeholder.filter.class:         Oro\Bundle\DataAuditBundle\Placeholder\AuditableFilter
 
@@ -83,14 +84,19 @@ services:
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.audit-history-grid, method: onBuildAfter }
 
-    oro_dataaudit.event_listener.segment_widget_options_load:
-        class: %oro_dataaudit.event_listener.segment_widget_options_load.class%
+    oro_dataaudit.event_listener.segment_widget_options_listener:
+        class: %oro_dataaudit.event_listener.segment_widget_options_listener.class%
         arguments:
             - @http_kernel
         calls:
             - [setRequest, [@?request=]]
         tags:
             - { name: kernel.event_listener, event: oro_segment.widget_options_load, method: onLoad }
+
+    oro_dataaudit.event_listener.segment_condition_builder_options_listener:
+        class: %oro_dataaudit.event_listener.segment_condition_builder_options_listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_segment.condition_builder_options_load, method: onLoad }
 
     # Placeholder filter
     oro_dataaudit.placeholder.filter:
