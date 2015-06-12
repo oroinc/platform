@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
+use Oro\Bundle\IntegrationBundle\Provider\ForceConnectorInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -199,9 +200,12 @@ class IntegrationController extends Controller
         }
         $form = $this->getForm();
 
+        $registry = $this->get('oro_integration.manager.types_registry');
+
         return [
             'entity'   => $integration,
             'form'     => $form->createView(),
+            'supports_force_sync' => $registry->isForceSyncSupported($integration->getType()),
         ];
     }
 

@@ -75,14 +75,16 @@
                     'label' : 'oro.integration.button.sync'|trans
                 }) }}
 
-                {{ UI.clientButton({
-                    'dataUrl': path('oro_integration_schedule', { 'id': entity.id, 'force': true }) ,
-                    'aCss':   'no-hash schedule-button',
-                    'label' : 'oro.integration.button.force_sync'|trans,
-                    'dataAttributes': {
-                        'force': true
-                    }
-                }) }}
+                {% if supports_force_sync %}
+                    {{ UI.clientButton({
+                        'dataUrl': path('oro_integration_schedule', { 'id': entity.id, 'force': true }) ,
+                        'aCss':   'no-hash schedule-button',
+                        'label' : 'oro.integration.button.force_sync'|trans,
+                        'dataAttributes': {
+                            'force': true
+                        }
+                    }) }}
+                {% endif %}
             {% endset %}
             {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}
         </div>
