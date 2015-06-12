@@ -40,7 +40,7 @@ abstract class AbstractRole extends BaseRole
     abstract public function getLabel();
 
     /**
-     * @return null|string
+     * @return string
      */
     public function __toString()
     {
