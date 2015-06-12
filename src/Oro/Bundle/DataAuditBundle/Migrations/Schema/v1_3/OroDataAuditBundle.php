@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroDataAuditBundle implements Migration
@@ -55,5 +56,45 @@ class OroDataAuditBundle implements Migration
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return ParametrizedSqlMigrationQuery
+     */
+    private function getDropEntityConfigFieldQuery($className, $fieldName)
+    {
+        $dropFieldIndexSql = 'DELETE FROM oro_entity_config_index_value'
+            . ' WHERE entity_id IS NULL AND field_id IN ('
+            . ' SELECT oecf.id FROM oro_entity_config_field AS oecf'
+            . ' WHERE oecf.field_name = :field'
+            . ' AND oecf.entity_id IN ('
+            . ' SELECT oec.id'
+            . ' FROM oro_entity_config AS oec'
+            . ' WHERE oec.class_name = :class'
+            . ' ))';
+        $dropFieldSql      = 'DELETE FROM oro_entity_config_field'
+            . ' WHERE field_name = :field'
+            . ' AND entity_id IN ('
+            . ' SELECT id'
+            . ' FROM oro_entity_config'
+            . ' WHERE class_name = :class'
+            . ' )';
+
+        $query = new ParametrizedSqlMigrationQuery();
+        $query->addSql(
+            $dropFieldIndexSql,
+            ['field' => $fieldName, 'class' => $className],
+            ['field' => 'string', 'class' => 'string']
+        );
+        $query->addSql(
+            $dropFieldSql,
+            ['field' => $fieldName, 'class' => $className],
+            ['field' => 'string', 'class' => 'string']
+        );
+
+        return $query;
     }
 }
