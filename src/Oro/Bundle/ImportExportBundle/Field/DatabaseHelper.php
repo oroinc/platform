@@ -85,7 +85,7 @@ class DatabaseHelper
 
         $storageKey = serialize($serializationCriteria);
 
-        if (empty($this->entities[$entityName]) || !array_key_exists($storageKey, $this->entities[$entityName])) {
+        if (empty($this->entities[$entityName]) || empty($this->entities[$entityName][$storageKey])) {
             /** @var EntityRepository $entityRepository */
             $entityRepository = $this->registry->getRepository($entityName);
             $queryBuilder = $entityRepository->createQueryBuilder('e')
@@ -273,5 +273,10 @@ class DatabaseHelper
     {
         return $this->securityFacadeLink->getService()->getOrganization()
             && $this->ownershipMetadataProviderLink->getService()->getMetadata($entityName)->getOrganizationFieldName();
+    }
+
+    public function getRegistry()
+    {
+        return $this->registry;
     }
 }
