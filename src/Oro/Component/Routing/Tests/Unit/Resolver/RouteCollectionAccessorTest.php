@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Tests\Unit\Routing;
+namespace Oro\Component\Routing\Tests\Unit\Resolver;
 
-use Oro\Bundle\DistributionBundle\Routing\RouteCollectionAccessor;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 
 class RouteCollectionAccessorTest extends \PHPUnit_Framework_TestCase
 {

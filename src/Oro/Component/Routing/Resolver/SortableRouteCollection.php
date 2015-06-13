@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Routing;
+namespace Oro\Component\Routing\Resolver;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-use Oro\Component\Layout\Util\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class SortableRouteCollection extends RouteCollection
 {
@@ -21,7 +21,7 @@ class SortableRouteCollection extends RouteCollection
         $p->setAccessible(true);
 
         $routes = $p->getValue($this);
-        ArrayUtils::sortBy(
+        ArrayUtil::sortBy(
             $routes,
             false,
             function (Route $route) {

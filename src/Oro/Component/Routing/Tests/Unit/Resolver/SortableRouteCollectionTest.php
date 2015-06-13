@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Tests\Unit\Routing;
+namespace Oro\Component\Routing\Tests\Unit\Resolver;
 
 use Symfony\Component\Routing\Route;
 
-use Oro\Bundle\DistributionBundle\Routing\SortableRouteCollection;
+use Oro\Component\Routing\Resolver\SortableRouteCollection;
 
 class SortableRouteCollectionTest extends \PHPUnit_Framework_TestCase
 {

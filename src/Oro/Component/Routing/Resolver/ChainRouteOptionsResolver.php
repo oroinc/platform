@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Routing;
+namespace Oro\Component\Routing\Resolver;
 
 use Symfony\Component\Routing\Route;
 
