@@ -866,6 +866,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'join'          => 'accounts.users_field',
                 'condition'     => 'users.active = true',
                 'conditionType' => 'WITH'
+            ],
+            'products'    => [
+                'condition' => 'products.active = true'
             ]
         ];
 
@@ -898,6 +901,14 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'users',
                 'WITH',
                 'users.active = true'
+            );
+        $qb->expects($this->at(7))
+            ->method('leftJoin')
+            ->with(
+                'root_alias.products',
+                'products',
+                'WITH',
+                'products.active = true'
             );
 
         $this->doctrineHelper->applyJoins($qb, $joins);
