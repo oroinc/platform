@@ -49,9 +49,7 @@ class EntityProcessor
      */
     protected $finalizeCommands = [
         'router:cache:clear'  => [],
-        'fos:js-routing:dump' => [
-            '--target' => 'web/js/routes.js'
-        ]
+        'fos:js-routing:dump' => ['--target' => 'web/js/routes.js']
     ];
 
     /**
