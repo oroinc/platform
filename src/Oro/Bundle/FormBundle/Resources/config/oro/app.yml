@@ -8,6 +8,10 @@ assetic:
             inputs:
                 - %kernel.root_dir%/../vendor/tinymce/tinymce/jquery.tinymce.min.js
             output: bundles/tinymce/jquery.tinymce.min.js
+        tinymce_bdesk_photo:
+            inputs:
+                - bundles/oroform/lib/bdeskphoto/plugin.min.js
+            output: bundles/tinymce/plugins/bdeskphoto/plugin.min.js
         tinymce_textcolor:
             inputs:
                 - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/textcolor/plugin.min.js
