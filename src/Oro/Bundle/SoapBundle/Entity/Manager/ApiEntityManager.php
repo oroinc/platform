@@ -13,8 +13,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
 use Oro\Bundle\SoapBundle\Serializer\EntitySerializer;
@@ -36,6 +38,9 @@ class ApiEntityManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var EntityAliasResolver */
+    protected $entityAliasResolver;
+
     /** @var EntitySerializer */
     protected $entitySerializer;
 
@@ -56,10 +61,14 @@ class ApiEntityManager
     /**
      * Sets the type of the entity this manager is responsible for
      *
-     * @param string $entityName The name of the entity
+     * @param string $entityName The name or the plural alias of the entity
      */
     public function setClass($entityName)
     {
+        if (false === strpos($entityName, '\\')) {
+            $entityName = $this->entityAliasResolver->getClassByPluralAlias($entityName);
+        }
+
         $this->metadata = $this->om->getClassMetadata($entityName);
         $this->class    = $this->metadata->getName();
     }
@@ -82,6 +91,16 @@ class ApiEntityManager
     public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * Sets the entity alias resolver
+     *
+     * @param EntityAliasResolver $entityAliasResolver
+     */
+    public function setEntityAliasResolver(EntityAliasResolver $entityAliasResolver)
+    {
+        $this->entityAliasResolver = $entityAliasResolver;
     }
 
     /**
@@ -202,7 +221,7 @@ class ApiEntityManager
      * @param null  $orderBy
      * @param array $joins
      *
-     * @return QueryBuilder|SqlQueryBuilder
+     * @return QueryBuilder|SqlQueryBuilder|SearchQuery
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {

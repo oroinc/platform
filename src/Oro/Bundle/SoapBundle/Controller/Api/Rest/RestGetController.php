@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
+use Doctrine\ORM\QueryBuilder;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -18,6 +20,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
+use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
@@ -34,18 +38,43 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [], $joins = [])
     {
-        $manager = $this->getManager();
-        $qb      = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
+        $manager    = $this->getManager();
+        $qb         = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
+        $totalCount = null;
 
         if ($manager->isSerializerConfigured()) {
             $result = $manager->serialize($qb);
+        } elseif ($qb instanceof QueryBuilder) {
+            $result = $this->getPreparedItems($qb->getQuery()->getResult());
         } elseif ($qb instanceof SqlQueryBuilder) {
             $result = $this->getPreparedItems($qb->getQuery()->getResult());
+        } elseif ($qb instanceof SearchQuery) {
+            $searchResult = $this->container->get('oro_search.index')->query($qb);
+
+            $dispatcher = $this->get('event_dispatcher');
+            foreach ($searchResult->getElements() as $item) {
+                $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+            }
+
+            $result       = $this->getPreparedItems($searchResult->toArray());
+            $totalCount   = function () use ($searchResult) {
+                return $searchResult->getRecordsCount();
+            };
         } else {
-            $result = $this->getPreparedItems($qb->getQuery()->getResult());
+            throw new \RuntimeException(
+                sprintf(
+                    'Unsupported query type: %s.',
+                    is_object($qb) ? get_class($qb) : gettype($qb)
+                )
+            );
         }
 
-        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
+        $responseContext = ['result' => $result, 'query' => $qb];
+        if (null !== $totalCount) {
+            $responseContext['totalCount'] = $totalCount;
+        }
+
+        return $this->buildResponse($result, self::ACTION_LIST, $responseContext);
     }
 
     /**
@@ -146,6 +175,12 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                     $this->transformEntityField($field, $value);
                     $result[$field] = $value;
                 }
+            } elseif ($entity instanceof SearchResultItem) {
+                return [
+                    'id'     => $entity->getRecordId(),
+                    'entity' => $entity->getEntityName(),
+                    'title'  => $entity->getRecordTitle()
+                ];
             } else {
                 /** @var UnitOfWork $uow */
                 $uow = $this->getDoctrine()->getManager()->getUnitOfWork();

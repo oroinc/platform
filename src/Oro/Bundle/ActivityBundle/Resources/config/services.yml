@@ -76,10 +76,10 @@ services:
         class: %oro_activity.controller.activity_search.rest.api.class%
         abstract: true
 
-    oro_activity.manager.activity_search.api.abstract:
+    oro_activity.manager.activity_search.api:
         class: %oro_activity.manager.activity_search.api.class%
         parent: oro_soap.manager.entity_manager.abstract
-        abstract: true
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_search.index
             - @oro_activity.manager
