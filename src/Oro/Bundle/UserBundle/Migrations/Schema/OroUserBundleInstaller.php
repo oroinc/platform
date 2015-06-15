@@ -110,7 +110,6 @@ class OroUserBundleInstaller implements
         $this->addOroAccessGroupIndexes($schema);
 
         EmailOrigin1::addUserAndOrganizationColumns($schema, $queries);
-        EmailOrigin2::updateFields($schema);
     }
 
     /**
