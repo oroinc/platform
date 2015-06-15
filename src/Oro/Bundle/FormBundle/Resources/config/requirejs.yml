@@ -23,7 +23,6 @@ config:
                 - 'jquery'
                 - 'tinymce/tinymce.min'
                 - 'tinymce/plugins/textcolor/plugin.min'
-                #- 'tinymce/plugins/bdesk_photo/plugin.min.js'
                 - 'tinymce/plugins/code/plugin.min'
                 - 'tinymce/plugins/link/plugin.min'
                 - 'tinymce/themes/modern/theme.min'
@@ -67,14 +66,11 @@ config:
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
         'oroform/js/app/views/datepair-view': 'bundles/oroform/js/app/views/datepair-view.js'
-
-        #'tinymce/plugins/bdesk_photo/plugin.min.js': 'bundles/tinymce/plugins/bdesk_photo/plugin.min.js'
 build:
     paths:
         'tinymce/tinymce.min': 'empty:'
         'tinymce/tinymce.jquery.min': 'empty:'
         'tinymce/plugins/textcolor/plugin.min': 'empty:'
-        #'tinymce/plugins/bdesk_photo/plugin.min.js': 'empty:'
         'tinymce/plugins/code/plugin.min': 'empty:'
         'tinymce/plugins/link/plugin.min': 'empty:'
         'tinymce/themes/modern/theme.min': 'empty:'

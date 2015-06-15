@@ -22,9 +22,7 @@ define(function (require) {
         defaults: {
             enabled: true,
             plugins: ['textcolor', 'code', 'bdesk_photo'],
-           // plugins: ['textcolor', 'code'],
             menubar : false,
-           // toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code '],
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar : false
         },
