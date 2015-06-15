@@ -61,12 +61,15 @@ class ApiEntityManager
     /**
      * Sets the type of the entity this manager is responsible for
      *
-     * @param string $entityName The name or the plural alias of the entity
+     * @param string $entityName  The name or the plural alias of the entity
+     * @param bool   $pluralAlias Determines whether the entity name may be a singular of plural alias
      */
-    public function setClass($entityName)
+    public function setClass($entityName, $pluralAlias = false)
     {
         if (false === strpos($entityName, '\\')) {
-            $entityName = $this->entityAliasResolver->getClassByPluralAlias($entityName);
+            $entityName = $pluralAlias
+                ? $this->entityAliasResolver->getClassByPluralAlias($entityName)
+                : $this->entityAliasResolver->getClassByAlias($entityName);
         }
 
         $this->metadata = $this->om->getClassMetadata($entityName);

@@ -9,6 +9,7 @@ parameters:
     oro_activity.widget_provider.actions.class:         Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider
     oro_activity.controller.activity_search.rest.api.class: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivitySearchController
     oro_activity.manager.activity_search.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager
+    oro_activity.manager.activity_entity.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
 
 services:
     oro_activity.manager:
@@ -17,6 +18,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_entity.orm.entity_class_resolver
             - @oro_entity_config.provider.activity
+            - @oro_entity_config.provider.grouping
             - @oro_entity_config.provider.entity
             - @oro_entity_config.provider.extend
             - @oro_entity_extend.association_manager
@@ -63,23 +65,21 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
 
-    oro_activity.routing.options_resolver.activity_associations:
-        class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver
-        public: false
-        arguments:
-            - @oro_entity_config.provider.grouping
-            - @oro_entity.entity_alias_resolver
-        tags:
-            - { name: routing.options_resolver }
-
     oro_activity.controller.activity_search.rest.api.abstract:
         class: %oro_activity.controller.activity_search.rest.api.class%
         abstract: true
+
+    oro_activity.manager.activity_entity.api:
+        class: %oro_activity.manager.activity_entity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
 
     oro_activity.manager.activity_search.api:
         class: %oro_activity.manager.activity_search.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - @doctrine.orm.entity_manager
-            - @oro_search.index
             - @oro_activity.manager
+            - @oro_search.index

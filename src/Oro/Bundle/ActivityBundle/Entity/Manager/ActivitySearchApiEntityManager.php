@@ -19,13 +19,13 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
 
     /**
      * @param ObjectManager   $om
-     * @param SearchIndexer   $searchIndexer
      * @param ActivityManager $activityManager
+     * @param SearchIndexer   $searchIndexer
      */
     public function __construct(
         ObjectManager $om,
-        SearchIndexer $searchIndexer,
-        ActivityManager $activityManager
+        ActivityManager $activityManager,
+        SearchIndexer $searchIndexer
     ) {
         parent::__construct(null, $om);
         $this->searchIndexer   = $searchIndexer;
@@ -39,7 +39,7 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
     {
         return $this->searchIndexer->getSimpleSearchQuery(
             $criteria['search'],
-            ($page - 1) * $limit,
+            $this->getOffset($page, $limit),
             $limit,
             $this->getSearchAliases(isset($criteria['from']) ? $criteria['from'] : [])
         );

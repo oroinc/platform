@@ -16,17 +16,15 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
 /**
- * @RouteResource("search_activity")
+ * @RouteResource("activity_search_relation")
  * @NamePrefix("oro_api_")
  */
 class ActivitySearchController extends RestGetController
 {
     /**
-     * Returns the list of activities by the given search string.
+     * Searches entities associated with the specified type of an activity entity.
      *
-     * @param string $entity
-     *
-     * @Get("/{entity}/activities/search", name="")
+     * @Get("/activity_relations/search", name="")
      *
      * @QueryParam(
      *      name="page",
@@ -39,6 +37,11 @@ class ActivitySearchController extends RestGetController
      *      requirements="\d+",
      *      nullable=true,
      *      description="Number of items per page. Defaults to 10."
+     * )
+     * @QueryParam(
+     *     name="activity_type",
+     *     nullable=false,
+     *     description="The type of the activity entity."
      * )
      * @QueryParam(
      *     name="search",
@@ -54,14 +57,17 @@ class ActivitySearchController extends RestGetController
      * )
      *
      * @ApiDoc(
-     *      description="Returns the list of activities by the given search string",
+     *      description="Searches entities associated with the specified type of an activity entity",
      *      resource=true
      * )
      *
      * @return Response
      */
-    public function cgetAction($entity)
+    public function cgetAction()
     {
+        $manager = $this->getManager();
+        $manager->setClass($this->getRequest()->get('activity_type'));
+
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
@@ -73,8 +79,6 @@ class ActivitySearchController extends RestGetController
             $filter          = new StringToArrayParameterFilter();
             $filters['from'] = $filter->filter($from, null);
         }
-
-        $this->getManager()->setClass($entity);
 
         return $this->handleGetListRequest($page, $limit, $filters);
     }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
@@ -31,6 +32,9 @@ class ActivityManager
     protected $activityConfigProvider;
 
     /** @var ConfigProvider */
+    protected $groupingConfigProvider;
+
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
     /** @var ConfigProvider */
@@ -46,6 +50,7 @@ class ActivityManager
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider      $activityConfigProvider
+     * @param ConfigProvider      $groupingConfigProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param AssociationManager  $associationManager
@@ -54,6 +59,7 @@ class ActivityManager
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $activityConfigProvider,
+        ConfigProvider $groupingConfigProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         AssociationManager $associationManager
@@ -61,6 +67,7 @@ class ActivityManager
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
         $this->activityConfigProvider = $activityConfigProvider;
+        $this->groupingConfigProvider = $groupingConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
         $this->extendConfigProvider   = $extendConfigProvider;
         $this->associationManager     = $associationManager;
@@ -211,6 +218,30 @@ class ActivityManager
         }
 
         return $hasChanges;
+    }
+
+    /**
+     * Returns the list of FQCN of all activity entities
+     *
+     * @return string[]
+     */
+    public function getActivityTypes()
+    {
+        return array_map(
+            function (ConfigInterface $config) {
+                return $config->getId()->getClassName();
+            },
+            $this->groupingConfigProvider->filter(
+                function (ConfigInterface $config) {
+                    // filter activity entities
+                    $groups = $config->get('groups');
+
+                    return
+                        !empty($groups)
+                        && in_array(ActivityScope::GROUP_ACTIVITY, $groups, true);
+                }
+            )
+        );
     }
 
     /**

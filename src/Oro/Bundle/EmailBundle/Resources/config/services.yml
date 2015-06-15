@@ -79,6 +79,7 @@ parameters:
 
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
+    oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
 services:
     oro_email.entity.cache.warmer:
@@ -549,3 +550,11 @@ services:
             - @oro_email.email.address.manager
         tags:
             - { name: entity.alias_provider }
+
+    oro_email.manager.email_activity.api:
+        class: %oro_email.manager.email_activity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager

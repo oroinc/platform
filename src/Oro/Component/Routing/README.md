@@ -6,17 +6,17 @@ Oro Routing Component
 Supported Features
 ------------------
 
-- Provides implementation of a routing loader for collect routing definition from all bundles.
+- Provides implementation of a routing loader for collecting routing definition from all bundles.
 - Allows to change a priority of a route through `priority` option.
-- Provides a way to easy create own resolvers for routes based on route options.
+- Provides a way to easily create own resolvers for routes based on route options.
 
 
 Configuration
 -------------
 
-It is supposed that you application is built around [Symfony Framework](http://symfony.com/), but this component can be used without it as well.
+It is supposed that your application is built around [Symfony Framework](http://symfony.com/), but this component can be used without it as well.
 
-At the first you need to register the cumulative loader which allows you to load routing definitions from all your bundles automatically.
+At first, you need to register the cumulative loader which allows you to load routing definitions from all your bundles automatically.
 
 ``` yaml
 services:
@@ -126,9 +126,9 @@ The configuration of the `Oro Routing Component` is finished.
 Change a route priority
 -----------------------
 
-In Symfony if several routes match the same URL the earlier route always win. The routes order registered by the cumulative loader depends on the order of bundles. But sometime you may need to change this order.
+In Symfony if several routes match the same URL the earlier route always win. The routes order registered by the cumulative loader depends on the order of bundles. But sometimes you may need to change this order.
 
-To achieve this the `priority` option were introduced. By default all routes have zero priority. If you need to move a route up set less number for the `priority` option. For example the following route will be moved at the top of the route list:
+To achieve this, the `priority` option was introduced. By default all routes have zero priority. If you need to move a route up, set lesser number for the `priority` option. For example the following route will be moved at the top of the route list:
 
 ``` yaml
 acme_product:

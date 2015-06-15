@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Util\Codes;
 
@@ -78,6 +79,11 @@ class EmailController extends RestController
      *
      * @param string $id
      *
+     * @Get(
+     *      "/emails/{id}",
+     *      name="",
+     *      requirements={"id"="\d+"}
+     * )
      * @ApiDoc(
      *      description="Get email",
      *      resource=true

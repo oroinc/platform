@@ -1,0 +1,7 @@
+oro_activity_api:
+    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityEntityController
+    type:     rest
+
+oro_activity_search_api:
+    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivitySearchController
+    type:     rest

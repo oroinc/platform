@@ -37,13 +37,13 @@ class ServiceLinkPass implements CompilerPassInterface
             }
 
             if ($container->hasDefinition($serviceId)) {
-                // the service we are referred to must be public
+                // the service we are referring to must be public
                 $serviceDef = $container->getDefinition($serviceId);
                 if (!$serviceDef->isPublic()) {
                     $serviceDef->setPublic(true);
                 }
             } elseif ($container->hasAlias($serviceId)) {
-                // the service alias we are referred to must be public
+                // the service alias we are referring to must be public
                 $serviceAlias = $container->getAlias($serviceId);
                 if (!$serviceAlias->isPublic()) {
                     $serviceAlias->setPublic(true);
