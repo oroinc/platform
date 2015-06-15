@@ -214,6 +214,8 @@ services:
 
     oro_user.placeholder.filter:
         class: %oro_user.placeholder.filter.class%
+        arguments:
+            - @oro_security.security_facade
 
     oro_user.password_change.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract
