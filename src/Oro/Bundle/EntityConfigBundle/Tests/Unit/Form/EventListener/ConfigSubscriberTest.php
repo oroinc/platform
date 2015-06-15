@@ -623,8 +623,6 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConfigProvider($scope, $configs, $isGetPropertyConfigExpected)
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -632,7 +630,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getScope')
             ->will($this->returnValue($scope));
         if ($isGetPropertyConfigExpected) {
-            $propertyConfig = new PropertyConfigContainer($configs, $container);
+            $propertyConfig = new PropertyConfigContainer($configs);
             $provider->expects($this->once())
                 ->method('getPropertyConfig')
                 ->will($this->returnValue($propertyConfig));

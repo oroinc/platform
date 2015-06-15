@@ -8,9 +8,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
@@ -286,7 +286,7 @@ class EmailEntityBuilder
      *
      * @return EmailFolder
      */
-    protected function folder($type, $fullName, $name)
+    public function folder($type, $fullName, $name)
     {
         $result = $this->batch->getFolder($type, $fullName);
         if ($result === null) {
@@ -302,7 +302,7 @@ class EmailEntityBuilder
     }
 
     /**
-     * Register EmailOrigin entity object
+     * Register EmailFolder entity object
      *
      * @param EmailFolder $folder The email folder
      *
@@ -313,20 +313,6 @@ class EmailEntityBuilder
         $this->batch->addFolder($folder);
 
         return $folder;
-    }
-
-    /**
-     * Register EmailOrigin entity object
-     *
-     * @param EmailOrigin $origin The email origin
-     *
-     * @return EmailOrigin
-     */
-    public function setOrigin(EmailOrigin $origin)
-    {
-        $this->batch->addOrigin($origin);
-
-        return $origin;
     }
 
     /**
@@ -373,7 +359,7 @@ class EmailEntityBuilder
      *
      * @return EmailRecipient
      */
-    protected function recipient($type, $email)
+    public function recipient($type, $email)
     {
         $result = new EmailRecipient();
 
@@ -407,5 +393,28 @@ class EmailEntityBuilder
     public function getBatch()
     {
         return $this->batch;
+    }
+
+    /**
+     * Tells this builder to manage the given object
+     *
+     * @param object $obj
+     */
+    public function setObject($obj)
+    {
+        if ($obj instanceof Email) {
+            $this->batch->addEmail($obj);
+        } elseif ($obj instanceof EmailAddress) {
+            $this->batch->addAddress($obj);
+        } elseif ($obj instanceof EmailFolder) {
+            $this->batch->addFolder($obj);
+        } else {
+            throw new UnexpectedTypeException(
+                $obj,
+                'Oro\Bundle\EmailBundle\Entity\Email'
+                . ', Oro\Bundle\EmailBundle\Entity\EmailAddress'
+                . ' or Oro\Bundle\EmailBundle\Entity\EmailFolder'
+            );
+        }
     }
 }

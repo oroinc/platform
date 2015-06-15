@@ -10,23 +10,24 @@ interface RestApiReadInterface
     const ACTION_READ = 'read';
 
     /**
-     * Get paginated items list
+     * Handles GET request for the list of items
      *
      * @param int   $page
      * @param int   $limit
      * @param array $filters array of filtering criteria, e.g. ['age' => 20, ...]
      *                       or \Doctrine\Common\Collections\Criteria
+     * @param array $joins   Additional associations required to filter data
      *
      * @return Response
      */
-    public function handleGetListRequest($page, $limit, $filters = []);
+    public function handleGetListRequest($page, $limit, $filters = [], $joins = []);
 
     /**
-     * Get item by identifier
+     * Handles GET request for a single item
      *
-     * @param  mixed $id
+     * @param mixed $id The id of an entity
      *
-     * @return mixed
+     * @return Response
      */
     public function handleGetRequest($id);
 }

@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -56,7 +53,7 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $configManagerLink->expects($this->any())->method('getService')->will($this->returnValue($this->configManager));
 
-        $provider = new ConfigProvider($this->configManager, new Container(), 'testScope', array());
+        $provider = new ConfigProvider($this->configManager, 'testScope', array());
 
         $this->configManager->expects($this->any())->method('getEntityManager')->will($this->returnValue($em));
         $this->configManager->expects($this->any())->method('getUpdateConfig')->will(

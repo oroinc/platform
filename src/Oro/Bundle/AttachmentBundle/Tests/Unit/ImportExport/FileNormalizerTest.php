@@ -56,8 +56,13 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
         $securityFacade->expects($this->any())->method('getLoggedUser')
             ->will($this->returnValue(null));
 
+        $associationManager = $this
+            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
-            ->setConstructorArgs([$filesystemMap, $router, $serviceLink, []])
+            ->setConstructorArgs([$filesystemMap, $router, $serviceLink, [], $associationManager])
             ->setMethods(['upload', 'getAttachment'])
             ->getMock();
 

@@ -43,6 +43,7 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
 
     /**
      * Gets the type of the association. For example manyToOne or manyToMany
+     * {@see Oro\Bundle\EntityExtendBundle\Extend\RelationType}
      *
      * @return string
      */

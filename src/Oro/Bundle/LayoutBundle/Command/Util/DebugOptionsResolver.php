@@ -50,7 +50,7 @@ class DebugOptionsResolver extends OptionsResolver
             $reflClass = $reflClass->getParentClass();
         }
         if (!$prop) {
-            throw new \RuntimeException(sprintf('Property "%s" does not exist.' . $propertyName));
+            throw new \RuntimeException(sprintf('Property "%s" does not exist.', $propertyName));
         }
 
         $prop->setAccessible(true);

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils;
 
+/**
+ * @deprecated since v 1.8
+ */
 class ServiceMethod
 {
     /**

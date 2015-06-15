@@ -385,6 +385,9 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
+                    ],
+                    'importexport' => [
+                        'identity' => true
                     ]
                 ]
             );
@@ -400,9 +403,6 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'datagrid' => [
                         'is_visible' => false
-                    ],
-                    'importexport' => [
-                        'identity' => true
                     ]
                 ]
             );

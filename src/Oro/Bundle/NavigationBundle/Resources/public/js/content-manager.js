@@ -227,12 +227,16 @@ define([
     /**
      * Takes url, picks out path and trims root part
      *
-     * @param url
+     * @param {string} url
      * @returns {*}
      */
     function fetchPath(url) {
         var _ref;
-        _ref = url.split('?');
+        // it's anchor address inside current page
+        if (url[0] === '#') {
+            url = current.path;
+        }
+        _ref = url.split('#')[0].split('?');
         return mediator.execute('retrievePath', _ref[0]);
     }
 
@@ -406,7 +410,7 @@ define([
          * (assumes that URL contains only path and query)
          *
          * @param {string} url
-         * @param {string} refPath
+         * @param {string=} refPath
          * @returns {boolean}
          */
         compareUrl: function (url, refPath) {

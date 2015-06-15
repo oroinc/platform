@@ -80,7 +80,7 @@ datagrid:
                 rowAction:     true
             update:
                 type:          navigate
-                acl_resource:  oro_dashboard_edit
+                acl_resource:  oro_dashboard_update
                 label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link

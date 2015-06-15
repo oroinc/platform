@@ -59,7 +59,7 @@ datagrid:
                 link: view_link
                 rowAction: true
             update:
-                acl_resource: oro_embedded_form_edit
+                acl_resource: oro_embedded_form_update
                 type: navigate
                 label: oro.grid.action.update
                 icon: edit

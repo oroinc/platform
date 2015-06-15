@@ -5,6 +5,7 @@ define(function (require) {
 
     var DatetimeFilter,
         _ = require('underscore'),
+        moment = require('moment'),
         __ = require('orotranslation/js/translator'),
         datetimeFormatter = require('orolocale/js/formatter/datetime'),
         VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view'),
@@ -85,7 +86,7 @@ define(function (require) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
             _.extend(options, {
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
-                timezoneShift: 0,
+                timezone: 'UTC',
                 timeInputAttrs: {
                     'class': 'timepicker-input',
                     'placeholder': __('oro.form.choose_time')

@@ -72,7 +72,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @var array
      */
-    private static $loadedFixtures = array();
+    private static $loadedFixtures = [];
 
     /**
      * @var ReferenceRepository
@@ -110,7 +110,7 @@ abstract class WebTestCase extends BaseWebTestCase
             }
             self::$clientInstance = null;
             self::$soapClientInstance = null;
-            self::$loadedFixtures = array();
+            self::$loadedFixtures = [];
         }
     }
 
@@ -123,7 +123,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return Client A Client instance
      */
-    protected function initClient(array $options = array(), array $server = array(), $force = false)
+    protected function initClient(array $options = [], array $server = [], $force = false)
     {
         if ($force) {
             $this->resetClient();
@@ -236,7 +236,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @return SoapClient
      * @throws \Exception
      */
-    protected function initSoapClient($wsdl = null, array $options = array(), $force = false)
+    protected function initSoapClient($wsdl = null, array $options = [], $force = false)
     {
         if (!self::$soapClientInstance || $force) {
             if ($wsdl === null) {
@@ -244,10 +244,10 @@ abstract class WebTestCase extends BaseWebTestCase
             }
 
             $options = array_merge(
-                array(
+                [
                     'location' => $wsdl,
                     'soap_version' => SOAP_1_2
-                ),
+                ],
                 $options
             );
 
@@ -285,7 +285,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return string
      */
-    protected static function runCommand($name, array $params = array())
+    protected static function runCommand($name, array $params = [])
     {
         $kernel = self::getContainer()->get('kernel');
 
@@ -439,7 +439,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return string
      */
-    protected function getUrl($name, $parameters = array(), $absolute = false)
+    protected function getUrl($name, $parameters = [], $absolute = false)
     {
         return self::getContainer()->get('router')->generate($name, $parameters, $absolute);
     }
@@ -483,7 +483,7 @@ abstract class WebTestCase extends BaseWebTestCase
             $randomString = self::generateRandomString(5);
         }
 
-        $parameters = array();
+        $parameters = [];
         $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
         foreach ($testFiles as $fileName => $object) {
             $parameters[$fileName] = Yaml::parse($fileName);
@@ -554,7 +554,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
         $created  = date('c');
         $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
-        $wsseHeader = array(
+        $wsseHeader = [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
             'HTTP_X-WSSE' => sprintf(
@@ -564,7 +564,7 @@ abstract class WebTestCase extends BaseWebTestCase
                 $nonce,
                 $created
             )
-        );
+        ];
 
         return $wsseHeader;
     }
@@ -583,11 +583,11 @@ abstract class WebTestCase extends BaseWebTestCase
         $userPassword = self::AUTH_PW,
         $userOrganization = self::AUTH_ORGANIZATION
     ) {
-        return array(
+        return [
             'PHP_AUTH_USER'         => $userName,
             'PHP_AUTH_PW'           => $userPassword,
             'PHP_AUTH_ORGANIZATION' => $userOrganization
-        );
+        ];
     }
 
     /**
@@ -675,10 +675,34 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
     {
-        \PHPUnit_Framework_TestCase::assertEquals(
-            $statusCode,
-            $response->getStatusCode()
-        );
+        try {
+            \PHPUnit_Framework_TestCase::assertEquals(
+                $statusCode,
+                $response->getStatusCode()
+            );
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            if ($statusCode < 400
+                && $response->getStatusCode() >= 400
+                && $response->headers->contains('Content-Type', 'application/json')
+            ) {
+                $content = self::jsonToArray($response->getContent());
+                if (!empty($content['message'])) {
+                    $errors = null;
+                    if (!empty($content['errors'])) {
+                        $errors = is_array($content['errors'])
+                            ? json_encode($content['errors'])
+                            : $content['errors'];
+                    }
+                    $e = new \PHPUnit_Framework_ExpectationFailedException(
+                        $e->getMessage()
+                        . ' Error message: ' . $content['message']
+                        . ($errors ? '. Errors: ' . $errors : ''),
+                        $e->getComparisonFailure()
+                    );
+                }
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -704,7 +728,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
     {
-        $actualIntersect = array();
+        $actualIntersect = [];
         foreach (array_keys($expected) as $expectedKey) {
             if (array_key_exists($expectedKey, $actual)) {
                 $actualIntersect[$expectedKey] = $actual[$expectedKey];
