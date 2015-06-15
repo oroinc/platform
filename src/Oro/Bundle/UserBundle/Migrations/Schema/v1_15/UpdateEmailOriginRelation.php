@@ -38,7 +38,7 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
         );
 
         $queries->addPostQuery('UPDATE oro_email_origin eo SET eo.user_id = (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id)');
-        $queries->addPostQuery('UPDATE oro_email_origin eo SET eo.organization_id = (SELECT u.organization_id FROM oro_user u WHERE u.user_id = eo.user_id)');
+        $queries->addPostQuery('UPDATE oro_email_origin eo SET eo.organization_id = (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.user_id)');
     }
 
     /**
