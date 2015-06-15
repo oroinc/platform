@@ -14,13 +14,13 @@ class EmailAttachmentRepository extends EntityRepository
      *
      * @param EmailThread $thread
      *
-     * @return EmailAttachment
+     * @return EmailAttachment[]
      */
     public function getThreadAttachments(EmailThread $thread)
     {
         $queryBuilder = $this->createQueryBuilder('ea')
             ->leftJoin('ea.emailBody', 'eb')
-            ->leftJoin('eb.header', 'e')
+            ->leftJoin('eb.email', 'e')
             ->andWhere('e.thread = :thread')
             ->setParameter('thread', $thread);
         $result = $queryBuilder->getQuery()->getResult();

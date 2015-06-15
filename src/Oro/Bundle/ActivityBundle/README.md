@@ -130,7 +130,7 @@ An example:
      *      name="oro_email_activity_view"
      * )
      *
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_user_view")
      * @Template
      */
     public function activityAction($entityClass, $entityId)
@@ -161,7 +161,7 @@ Now you need to bind the controller to your activity entity. It can be done usin
  *      "grouping"={"groups"={"activity"}},
  *      "activity"={
  *          "route"="oro_email_activity_view",
- *          "acl"="oro_email_view"
+ *          "acl"="oro_email_email_user_view"
  *      }
  *  }
  * )
@@ -249,10 +249,10 @@ Register these templates in *placeholders.yml*, for example:
 items:
     oro_send_email_button:
         template: OroEmailBundle:Email:activityButton.html.twig
-        acl: oro_email_create
+        acl: oro_email_email_user_create
     oro_send_email_link:
         template: OroEmailBundle:Email:activityLink.html.twig
-        acl: oro_email_create
+        acl: oro_email_email_user_create
 ```
 
 Bind items declared in *placeholders.yml* to the activity entity using `action_button_widget` and `action_link_widget` attribute. For example:
@@ -264,7 +264,7 @@ Bind items declared in *placeholders.yml* to the activity entity using `action_b
  *      "grouping"={"groups"={"activity"}},
  *      "activity"={
  *          "route"="oro_email_activity_view",
- *          "acl"="oro_email_view",
+ *          "acl"="oro_email_email_user_view",
  *          "action_button_widget"="oro_send_email_button"
  *          "action_link_widget"="oro_send_email_link"
  *      }

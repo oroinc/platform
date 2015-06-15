@@ -36,6 +36,7 @@ class EmailGridTest extends AbstractDatagridTestCase
     {
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['userId'] =
             $this->getReference('simple_user')->getId();
+        $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['_pager']['_per_page'] = 100;
 
         parent::testGrid($requestData);
     }

@@ -21,6 +21,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as Em
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -42,7 +43,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_15';
     }
 
     /**
@@ -109,6 +110,8 @@ class OroUserBundleInstaller implements
         PasswordChanged::addPasswordChangedColumn($schema);
 
         $this->addOroAccessGroupIndexes($schema);
+
+        SetOwnerForEmail::addOwnerToOroEmail($schema);
     }
 
     /**

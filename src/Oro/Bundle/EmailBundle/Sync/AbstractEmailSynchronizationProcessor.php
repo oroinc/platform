@@ -5,16 +5,18 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+use Doctrine\ORM\UnexpectedResultException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
+use Oro\Bundle\UserBundle\Entity\User;
 
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
@@ -67,7 +69,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     abstract public function process(EmailOrigin $origin, $syncStartTime);
 
     /**
-     * Returns the id of a user the given email origin belongs to.
+     * Returns the user the given email origin belongs to
      *
      * @param EmailOrigin $origin
      *
@@ -80,7 +82,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         ) {
             return $this->emailOriginUsers[$origin->getId()];
         }
-
         $this->logger->notice(sprintf('Finding an user for email origin "%s" ...', (string)$origin));
         $qb = $this->em->getRepository('Oro\Bundle\UserBundle\Entity\User')
             ->createQueryBuilder('u')
@@ -90,8 +91,13 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             ->setParameter('originId', $origin->getId())
             ->setMaxResults(1);
 
-        $result = $qb->getQuery()->getArrayResult();
-        $userId = !empty($result) ? $result[0]['id'] : null;
+        $userId = null;
+        try {
+            $userId = $qb->getQuery()->getSingleScalarResult();
+        } catch (UnexpectedResultException $e) {
+            $this->logger->notice($e->getMessage());
+        }
+
         if ($userId === null) {
             $this->logger->notice('The user was not found.');
         } else {
@@ -225,12 +231,13 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      * @param EmailHeader $email
      * @param EmailFolder $folder
      * @param bool        $isSeen
+     * @param User        $owner
      *
-     * @return EmailEntity
+     * @return EmailUser
      */
-    protected function addEmail(EmailHeader $email, EmailFolder $folder, $isSeen = false)
+    protected function addEmailUser(EmailHeader $email, EmailFolder $folder, $isSeen = false, User $owner = null)
     {
-        $emailEntity = $this->emailEntityBuilder->email(
+        $emailUser = $this->emailEntityBuilder->emailUser(
             $email->getSubject(),
             $email->getFrom(),
             $email->getToRecipients(),
@@ -239,17 +246,20 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $email->getInternalDate(),
             $email->getImportance(),
             $email->getCcRecipients(),
-            $email->getBccRecipients()
+            $email->getBccRecipients(),
+            $owner
         );
-        $emailEntity
-            ->addFolder($folder)
+
+        $emailUser
+            ->setFolder($folder)
+            ->setSeen($isSeen)
+            ->getEmail()
             ->setMessageId($email->getMessageId())
             ->setRefs($email->getRefs())
             ->setXMessageId($email->getXMessageId())
-            ->setXThreadId($email->getXThreadId())
-            ->setSeen($isSeen);
+            ->setXThreadId($email->getXThreadId());
 
-        return $emailEntity;
+        return $emailUser;
     }
 
     /**
@@ -289,7 +299,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             'Oro\Bundle\ConfigBundle\Entity\Config',
             'Oro\Bundle\ConfigBundle\Entity\ConfigValue',
             'Oro\Bundle\EmailBundle\Entity\EmailOrigin',
-            'Oro\Bundle\EmailBundle\Entity\EmailFolder'
+            'Oro\Bundle\EmailBundle\Entity\EmailFolder',
         ];
     }
 
@@ -305,6 +315,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      */
     protected function cleanUp($isFolderSyncComplete = false, $folder = null)
     {
+        $this->emailEntityBuilder->getBatch()->clear();
+
         /**
          * Entities which should NOT be cleared.
          */
