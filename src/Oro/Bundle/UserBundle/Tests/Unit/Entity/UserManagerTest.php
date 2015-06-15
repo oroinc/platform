@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
@@ -18,19 +24,24 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
     protected $userManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager
      */
     protected $om;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
     protected $registry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|EncoderFactoryInterface
      */
     protected $ef;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     */
+    protected $metadata;
 
     protected function setUp()
     {
@@ -45,7 +56,18 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->will($this->returnValue($this->om));
 
+        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->om->expects($this->any())->method('getClassMetadata')->willReturn($this->metadata);
+
         $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $this->ef);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->ef, $this->om, $this->registry, $this->userManager, $this->metadata);
     }
 
     public function testGetApi()
@@ -79,6 +101,8 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
 
+        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
+            ->willReturn('Symfony\Component\Security\Core\Role\RoleInterface');
         $this->om->expects($this->never())
             ->method('persist')
             ->with($this->equalTo($user));
@@ -90,7 +114,6 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
         $this->om
             ->expects($this->any())
             ->method('getRepository')
-            ->with('OroUserBundle:Role')
             ->will($this->returnValue($repository));
 
         $this->userManager->updateUser($user);
@@ -122,13 +145,14 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
         $this->om->expects($this->once())->method('persist')->with($this->equalTo($user));
         $this->om->expects($this->once())->method('flush');
 
+        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
+            ->willReturn('Symfony\Component\Security\Core\Role\RoleInterface');
         $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $this->om
             ->expects($this->any())
             ->method('getRepository')
-            ->with('OroUserBundle:Role')
             ->will($this->returnValue($repository));
 
         $repository
@@ -141,5 +165,31 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($email, $user->getEmail());
         $this->assertEquals($encodedPassword, $user->getPassword());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Expected Symfony\Component\Security\Core\Role\RoleInterface, \stdClass given
+     */
+    public function testNotSupportedRole()
+    {
+        $user = new User();
+
+        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
+            ->willReturn('\stdClass');
+        $this->om->expects($this->never())
+            ->method('persist')
+            ->with($this->equalTo($user));
+        $this->om->expects($this->never())
+            ->method('flush');
+        $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->om
+            ->expects($this->any())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $this->userManager->updateUser($user);
     }
 }
