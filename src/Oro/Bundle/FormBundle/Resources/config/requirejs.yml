@@ -23,7 +23,7 @@ config:
                 - 'jquery'
                 - 'tinymce/tinymce.min'
                 - 'tinymce/plugins/textcolor/plugin.min'
-                - 'tinymce/plugins/bdesk_photo/plugin.min.js'
+                #- 'tinymce/plugins/bdesk_photo/plugin.min.js'
                 - 'tinymce/plugins/code/plugin.min'
                 - 'tinymce/plugins/link/plugin.min'
                 - 'tinymce/themes/modern/theme.min'
