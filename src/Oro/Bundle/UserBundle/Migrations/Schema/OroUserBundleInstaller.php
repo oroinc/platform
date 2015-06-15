@@ -8,11 +8,9 @@ use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_2\OroUserBundle as UserAvatars;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_3\OroUserBundle as UserEmailActivities;
@@ -21,6 +19,8 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as Em
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin1;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateFieldsAfterPopulation as EmailOrigin2;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -42,7 +42,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_15';
     }
 
     /**
@@ -78,7 +78,6 @@ class OroUserBundleInstaller implements
         $this->createOroUserAccessRoleTable($schema);
         $this->createOroUserAccessGroupTable($schema);
         $this->createOroUserBusinessUnitTable($schema);
-        $this->createOroUserEmailOriginTable($schema);
         $this->createOroAccessGroupTable($schema);
         $this->createOroUserAccessGroupRoleTable($schema);
         $this->createOroAccessRoleTable($schema);
@@ -109,6 +108,9 @@ class OroUserBundleInstaller implements
         PasswordChanged::addPasswordChangedColumn($schema);
 
         $this->addOroAccessGroupIndexes($schema);
+
+        EmailOrigin1::addUserAndOrganizationColumns($schema, $queries);
+        EmailOrigin2::updateFields($schema);
     }
 
     /**

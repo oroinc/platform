@@ -8,8 +8,10 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ConfigurationType extends AbstractType
 {
@@ -18,9 +20,13 @@ class ConfigurationType extends AbstractType
     /** @var Mcrypt */
     protected $encryptor;
 
-    public function __construct(Mcrypt $encryptor)
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    public function __construct(Mcrypt $encryptor, ServiceLink $serviceLink)
     {
         $this->encryptor = $encryptor;
+        $this->securityFacade = $serviceLink->getService();
     }
 
     /**
@@ -67,6 +73,23 @@ class ConfigurationType extends AbstractType
                     $event->getForm()->setData(null);
                 }
             }
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function(FormEvent $event) {
+                /** @var ImapEmailOrigin $data */
+                $data = $event->getForm()->getData();
+                if ($data->getOrganization() === null) {
+                    $data->setOrganization($this->securityFacade->getOrganization());
+                }
+                if ($data->getUser() === null) {
+                    $data->setUser($this->securityFacade->getLoggedUser());
+                }
+
+                $event->getForm()->setData($data);
+            },
+            -1
         );
 
         $builder
