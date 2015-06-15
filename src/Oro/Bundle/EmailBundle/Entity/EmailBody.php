@@ -69,15 +69,6 @@ class EmailBody
     protected $persistent;
 
     /**
-     * @var Email
-     *
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailBody")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id")
-     * @JMS\Exclude
-     */
-    protected $header;
-
-    /**
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailAttachment", mappedBy="emailBody",
@@ -86,6 +77,14 @@ class EmailBody
      * @JMS\Exclude
      */
     protected $attachments;
+
+    /**
+     * @var Email
+     *
+     * @ORM\OneToOne(targetEntity="Email", mappedBy="emailBody")
+     * @JMS\Exclude
+     */
+    protected $email;
 
     public function __construct()
     {
@@ -208,29 +207,6 @@ class EmailBody
     }
 
     /**
-     * Get email header
-     *
-     * @return Email
-     */
-    public function getHeader()
-    {
-        return $this->header;
-    }
-
-    /**
-     * Set email header
-     *
-     * @param Email $header
-     * @return $this
-     */
-    public function setHeader(Email $header)
-    {
-        $this->header = $header;
-
-        return $this;
-    }
-
-    /**
      * Get email attachments
      *
      * @return ArrayCollection|EmailAttachment[]
@@ -249,10 +225,29 @@ class EmailBody
     public function addAttachment(EmailAttachment $attachment)
     {
         $this->setHasAttachments(true);
+        if (!$this->attachments->contains($attachment)) {
+            $this->attachments->add($attachment);
+            $attachment->setEmailBody($this);
+        }
 
-        $this->attachments[] = $attachment;
+        return $this;
+    }
 
-        $attachment->setEmailBody($this);
+    /**
+     * @return Email
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param Email $email
+     * @return $this
+     */
+    public function setEmail(Email $email)
+    {
+        $this->email = $email;
 
         return $this;
     }

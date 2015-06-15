@@ -446,21 +446,26 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->willReturn([$expected['subject'], $expected['body']]);
 
         $self = $this;
-        $emailEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\Email')
+        $emailUserEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->disableOriginalConstructor()
+            ->setMethods(['getEmail'])
             ->getMock();
+        $emailEntity = $this->getMock('\Oro\Bundle\EmailBundle\Entity\Email');
+        $emailUserEntity->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($emailEntity);
         $this->emailProcessor->expects($this->once())
             ->method('process')
             ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
             ->will(
                 $this->returnCallback(
-                    function (Email $model) use ($emailEntity, $expected, $self) {
+                    function (Email $model) use ($emailUserEntity, $expected, $self) {
                         $self->assertEquals($expected['body'], $model->getBody());
                         $self->assertEquals($expected['subject'], $model->getSubject());
                         $self->assertEquals($expected['from'], $model->getFrom());
                         $self->assertEquals($expected['to'], $model->getTo());
 
-                        return $emailEntity;
+                        return $emailUserEntity;
                     }
                 )
             );

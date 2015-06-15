@@ -21,9 +21,9 @@ class EntityListener
     protected $emailThreadManager;
 
     /**
-     * @param EmailOwnerManager $emailOwnerManager
+     * @param EmailOwnerManager    $emailOwnerManager
      * @param EmailActivityManager $emailActivityManager
-     * @param EmailThreadManager $emailThreadManager
+     * @param EmailThreadManager   $emailThreadManager
      */
     public function __construct(
         EmailOwnerManager    $emailOwnerManager,

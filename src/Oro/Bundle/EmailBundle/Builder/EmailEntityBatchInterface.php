@@ -20,4 +20,9 @@ interface EmailEntityBatchInterface
      * @return array [old, new] The list of changes
      */
     public function getChanges();
+
+    /**
+     * Clears batch
+     */
+    public function clear();
 }
