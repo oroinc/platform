@@ -88,6 +88,14 @@ class SendEmail extends AbstractSendEmail
             $this->contextAccessor->getValue($context, $this->options['body'])
         );
 
+        if (isset($this->options['type']) && in_array($this->options['type'], ['txt', 'html'])) {
+            $type = $this->options['type'];
+        } else {
+            $type = 'txt';
+        }
+
+        $emailModel->setType($type);
+
         $email = $this->emailProcessor->process($emailModel);
 
         if (array_key_exists('attribute', $this->options)) {
