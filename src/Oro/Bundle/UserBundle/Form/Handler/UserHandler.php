@@ -12,12 +12,13 @@ use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
-
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
  * Class UserHandler
@@ -55,6 +56,9 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /** @var UserConfigManager */
     protected $userConfigManager;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param FormInterface     $form
      * @param Request           $request
@@ -66,6 +70,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
      * @param FlashBagInterface $flashBag
      * @param Translator        $translator
      * @param LoggerInterface   $logger
+     * @param ServiceLink       $serviceLink
      */
     public function __construct(
         FormInterface     $form,
@@ -77,7 +82,8 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         \Swift_Mailer     $mailer = null,
         FlashBagInterface $flashBag = null,
         Translator        $translator = null,
-        LoggerInterface   $logger = null
+        LoggerInterface   $logger = null,
+        ServiceLink       $serviceLink = null
     ) {
         parent::__construct($form, $request, $manager);
         $this->userConfigManager = $userConfigManager;
@@ -87,6 +93,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         $this->flashBag          = $flashBag;
         $this->translator        = $translator;
         $this->logger            = $logger;
+        $this->securityFacade    = $serviceLink->getService();
     }
 
     /**
@@ -94,6 +101,9 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
      */
     public function process(User $user)
     {
+        if ($this->securityFacade !== null && $user->getCurrentOrganization() === null) {
+            $user->setCurrentOrganization($this->securityFacade->getOrganization());
+        }
         $this->form->setData($user);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {

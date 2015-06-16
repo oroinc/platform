@@ -157,7 +157,7 @@ class EmailUser
      * @param OrganizationInterface $organization
      * @return $this
      */
-    public function setOrganization(OrganizationInterface $organization = null)
+    public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;
 

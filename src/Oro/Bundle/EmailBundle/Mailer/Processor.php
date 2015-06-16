@@ -142,7 +142,9 @@ class Processor
             $messageDate,
             Email::NORMAL_IMPORTANCE,
             $model->getCc(),
-            $model->getBcc()
+            $model->getBcc(),
+            $origin->getOwner(),
+            $origin->getOrganization()
         );
 
         $emailUser->setFolder($origin->getFolder(FolderType::SENT));

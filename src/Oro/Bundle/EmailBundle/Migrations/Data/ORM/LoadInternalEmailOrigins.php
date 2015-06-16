@@ -16,7 +16,8 @@ class LoadInternalEmailOrigins extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $outboxFolder = new EmailFolder();
+        // todo CRM-2480 mb remove it completely so as seems that this origin is not used anywhere?
+/*        $outboxFolder = new EmailFolder();
         $outboxFolder
             ->setType(FolderType::SENT)
             ->setName(FolderType::SENT)
@@ -28,6 +29,6 @@ class LoadInternalEmailOrigins extends AbstractFixture
             ->addFolder($outboxFolder);
 
         $manager->persist($origin);
-        $manager->flush();
+        $manager->flush();*/
     }
 }

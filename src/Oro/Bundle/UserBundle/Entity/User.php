@@ -553,6 +553,13 @@ class User extends ExtendUser implements
      */
     protected $organization;
 
+    /**
+     * @var OrganizationInterface
+     *
+     * Organization that user logged in
+     */
+    protected $currentOrganization;
+
     public function __construct()
     {
         parent::__construct();
@@ -1668,7 +1675,9 @@ class User extends ExtendUser implements
     {
         $items = $this->emailOrigins->filter(
             function ($item) {
-                return $item instanceof ImapEmailOrigin;
+                return
+                    $item instanceof ImapEmailOrigin
+                    && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );
 
@@ -1760,5 +1769,25 @@ class User extends ExtendUser implements
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return $this
+     */
+    public function setCurrentOrganization(OrganizationInterface $organization)
+    {
+        $this->currentOrganization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return OrganizationInterface
+     */
+    public function getCurrentOrganization()
+    {
+        return $this->currentOrganization;
     }
 }

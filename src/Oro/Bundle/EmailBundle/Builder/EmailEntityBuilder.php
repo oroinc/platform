@@ -14,6 +14,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailEntityBuilder
@@ -53,21 +54,22 @@ class EmailEntityBuilder
     /**
      * Create EmailUser entity object
      *
-     * @param string               $subject      The email subject
-     * @param string $from                       The FROM email address,
-     *                                           for example: john@example.com or "John Smith" <john@example.c4m>
-     * @param string|string[]|null $to           The TO email address(es).
-     *                                           Example of email address see in description of $from parameter
-     * @param \DateTime            $sentAt       The date/time when email sent
-     * @param \DateTime            $receivedAt   The date/time when email received
-     * @param \DateTime            $internalDate The date/time an email server returned in INTERNALDATE field
-     * @param integer $importance                The email importance flag.
-     *                                           Can be one of *_IMPORTANCE constants of Email class
-     * @param string|string[]|null $cc           The CC email address(es).
-     *                                           Example of email address see in description of $from parameter
-     * @param string|string[]|null $bcc          The BCC email address(es).
-     *                                           Example of email address see in description of $from parameter
-     * @param User|null $owner                   Owner of the email
+     * @param string               $subject             The email subject
+     * @param string $from                              The FROM email address,
+     *                                                  for example: john@example.com or "John Smith" <john@example.c4m>
+     * @param string|string[]|null $to                  The TO email address(es).
+            *                                           Example of email address see in description of $from parameter
+     * @param \DateTime            $sentAt              The date/time when email sent
+     * @param \DateTime            $receivedAt          The date/time when email received
+     * @param \DateTime            $internalDate        The date/time an email server returned in INTERNALDATE field
+     * @param integer $importance                       The email importance flag.
+     *                                                  Can be one of *_IMPORTANCE constants of Email class
+     * @param string|string[]|null $cc                  The CC email address(es).
+     *                                                  Example of email address see in description of $from parameter
+     * @param string|string[]|null $bcc                 The BCC email address(es).
+     *                                                  Example of email address see in description of $from parameter
+     * @param User|null $owner                          Owner of the email
+     * @param OrganizationInterface|null $organization
      *
      * @return EmailUser
      */
@@ -81,7 +83,8 @@ class EmailEntityBuilder
         $importance = Email::NORMAL_IMPORTANCE,
         $cc = null,
         $bcc = null,
-        $owner = null
+        $owner = null,
+        $organization = null
     ) {
         $emailUser = new EmailUser();
 
@@ -90,6 +93,10 @@ class EmailEntityBuilder
         $emailUser->setEmail($email);
         if ($owner !== null) {
             $emailUser->setOwner($owner);
+        }
+        if ($organization !== null) {
+            $emailUser->setOrganization($organization);
+        } elseif ($owner !== null) {
             $emailUser->setOrganization($owner->getOrganization());
         }
 
