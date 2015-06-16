@@ -528,7 +528,7 @@ abstract class AbstractUser implements
      */
     public function getDefaultRole()
     {
-        return self::ROLE_DEFAULT;
+        return static::ROLE_DEFAULT;
     }
 
     /**
