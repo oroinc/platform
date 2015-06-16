@@ -5,6 +5,7 @@ datagrid:
             query:
                 select:
                     - partial eu.{id, email}
+                    - eu.seen
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -104,6 +105,10 @@ datagrid:
                 type: url
                 route: oro_email_thread_view
                 params: { id: email.id }
+            toggle_seen_link:
+                type:       url
+                route:      oro_email_toggle_seen
+                params:     [ id ]
 
         actions:
             view_thread:
@@ -112,7 +117,23 @@ datagrid:
                 link: view_thread_link
                 icon: eye-open
                 rowAction: true
-
+            mark_as_read:
+                type: ajax
+                label: oro.email.datagrid.emails.action.mark_as_read
+                link:  toggle_seen_link
+                icon: plus
+                defaultMessages:
+                    success:         oro.email.action.success_mark_read
+                    error:           oro.email.action.error
+            mark_as_unread:
+                type: ajax
+                label: oro.email.datagrid.emails.action.mark_as_unread
+                link:  toggle_seen_link
+                icon: plus
+                defaultMessages:
+                    success:         oro.email.action.success_mark_unread
+                    error:           oro.email.action.error
+        action_configuration: @oro_email.helper.datagrid.emails->getActionConfigurationClosure
     dashboard-recent-emails-grid:
         source:
             type: orm

@@ -120,4 +120,14 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
+
+    public function testChangeStatus()
+    {
+        $url = $this->getUrl('toggleSeenAction', ['id' => $this->getReference('email_1')->getId()]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('abc', $content);
+    }
 }
