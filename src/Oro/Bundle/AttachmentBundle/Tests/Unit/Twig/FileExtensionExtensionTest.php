@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
@@ -66,6 +67,20 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         /** @var $function \Twig_SimpleFunction */
         foreach ($result as $function) {
             $this->assertTrue(in_array($function->getName(), $functions));
+        }
+    }
+
+    public function testGetFilters()
+    {
+        $result = $this->extension->getFilters();
+        $filters = [
+            'base64_encode',
+            'filtered_image_url'
+        ];
+
+        /** @var $filter \Twig_SimpleFilter */
+        foreach ($result as $filter) {
+            $this->assertTrue(in_array($filter->getName(), $filters));
         }
     }
 
@@ -248,5 +263,19 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFileUrl');
 
         $this->extension->getImageView($environment, $parentEntity, $attachmentId);
+    }
+
+    public function testGetsBase64Content()
+    {
+        $file = new File();
+        $file->setMimeType('image/png');
+        $this->manager->expects($this->once())
+            ->method('getContent')
+            ->willReturn(file_get_contents(__DIR__ . '/../Fixtures/testFile/test.png'));
+        $expectedResult = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAA1BMVEX///+'
+            . 'nxBvIAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB98GEAgrLyNXN+0AAAAmaVRYdENvbW1lbnQAAAAAA'
+            . 'ENyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjleRfWwAAAAxJREFUCNdjYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==';
+
+        $this->assertEquals($expectedResult, $this->extension->getBase64Content($file));
     }
 }
