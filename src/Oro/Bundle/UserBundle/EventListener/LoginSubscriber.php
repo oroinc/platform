@@ -4,21 +4,21 @@ namespace Oro\Bundle\UserBundle\EventListener;
 
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
+use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\LoginInfoInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class LoginSubscriber
 {
     /**
-     * @var UserManager
+     * @var BaseUserManager
      */
     protected $userManager;
 
     /**
-     * @param UserManager $userManager
+     * @param BaseUserManager $userManager
      */
-    public function __construct(UserManager $userManager)
+    public function __construct(BaseUserManager $userManager)
     {
         $this->userManager = $userManager;
     }

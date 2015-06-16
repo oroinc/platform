@@ -25,6 +25,10 @@ abstract class AbstractUser implements
     OrganizationAwareUserInterface,
     PasswordRecoveryInterface
 {
+    const ROLE_DEFAULT = 'ROLE_USER';
+    const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
+    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -517,6 +521,14 @@ abstract class AbstractUser implements
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultRole()
+    {
+        return self::ROLE_DEFAULT;
     }
 
     /**
