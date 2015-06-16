@@ -146,7 +146,7 @@ class IndexListener implements OptionalListenerInterface
         $entitiesToReindex = [];
 
         foreach ($uow->getScheduledEntityUpdates() as $hash => $entity) {
-            $className = get_class($entity);
+            $className = ClassUtils::getClass($entity);
             if (!$this->mappingProvider->isFieldsMappingExists($className)) {
                 continue;
             }
