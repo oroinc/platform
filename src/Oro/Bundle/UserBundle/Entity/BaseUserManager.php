@@ -5,12 +5,15 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -67,6 +70,7 @@ class BaseUserManager implements UserProviderInterface
      */
     public function updateUser(OroUserInterface $user, $flush = true)
     {
+        $this->assertRoles($user);
         $this->updatePassword($user);
         $this->getStorageManager()->persist($user);
 
@@ -82,7 +86,8 @@ class BaseUserManager implements UserProviderInterface
      */
     public function updatePassword(OroUserInterface $user)
     {
-        if (0 !== strlen($password = $user->getPlainPassword())) {
+        $password = $user->getPlainPassword();
+        if (0 !== strlen($password)) {
             $encoder = $this->getEncoder($user);
 
             $user->setPassword($encoder->encodePassword($password, $user->getSalt()));
@@ -284,10 +289,41 @@ class BaseUserManager implements UserProviderInterface
     }
 
     /**
-     * @return ObjectManager
+     * @return ObjectManager|EntityManager
      */
     public function getStorageManager()
     {
         return $this->registry->getManagerForClass($this->getClass());
+    }
+
+    /**
+     * We need to make sure to have at least one role.
+     *
+     * @param UserInterface $user
+     * @throws \RuntimeException
+     */
+    protected function assertRoles(UserInterface $user)
+    {
+        if (count($user->getRoles()) === 0) {
+            $metadata = $this->getStorageManager()->getClassMetadata(ClassUtils::getClass($user));
+            $roleClassName = $metadata->getAssociationTargetClass('roles');
+
+            if (!is_a($roleClassName, 'Symfony\Component\Security\Core\Role\RoleInterface', true)) {
+                throw new \RuntimeException(
+                    sprintf('Expected Symfony\Component\Security\Core\Role\RoleInterface, %s given', $roleClassName)
+                );
+            }
+
+            /** @var RoleInterface $role */
+            $role = $this->getStorageManager()
+                ->getRepository($roleClassName)
+                ->findOneBy(['role' => $user->getDefaultRole()]);
+
+            if (!$role) {
+                throw new \RuntimeException('Default user role not found');
+            }
+
+            $user->addRole($role);
+        }
     }
 }

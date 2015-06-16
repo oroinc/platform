@@ -43,4 +43,11 @@ interface UserInterface extends AdvancedUserInterface
      * @return UserInterface
      */
     public function addRole(RoleInterface $role);
+
+    /**
+     * Default role for UserInterface entity
+     *
+     * @return string
+     */
+    public function getDefaultRole();
 }
