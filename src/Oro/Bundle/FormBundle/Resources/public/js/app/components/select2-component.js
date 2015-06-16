@@ -15,23 +15,29 @@ define(function (require) {
          * @param {Object} options
          */
         initialize: function (options) {
-            var $el = options._sourceElement,
-                select2Config = options.configs,
+            var select2Config = options.configs,
                 extraModules = {},
-                perPage = options.configs.per_page || 10;
+                params = {
+                    $el: options._sourceElement,
+                    perPage: options.configs.per_page || 10,
+                    url: options.url,
+                    value: _.result(options, 'value', false),
+                    suggestions: _.result(options, 'suggestions', false),
+                    oroTagCreateGranted: _.result(options, 'oro_tag_create_granted', false),
+                    channelId: _.result(options, 'channel_id', ''),
+                    channelFieldName: _.result(options, 'channel_field_name', ''),
+                    marketingListId: _.result(options, 'marketing_list_id', '')
+                };
             if ('extra_modules' in select2Config) {
                 _.each(select2Config.extra_modules, function (item) {
                     extraModules[item.name] = require(item.path);
                 });
             }
+            console.log('Select2 component = ' + _.result(select2Config, 'component'))
 
-            if (select2Config.component || select2Config.extra_config) {
-                debugger;
-            }
+            this.processExtraConfig(select2Config, params);
 
-            this.processExtraConfig(select2Config, options.url, perPage, $el);
-
-            orderHandler.handle(select2Config, options.url, perPage, $el);
+            orderHandler.handle(select2Config, params.url, params.perPage, params.$el);
 
 
             var configurator = new Select2Config(
@@ -39,11 +45,11 @@ define(function (require) {
                 options.url
             );
 
-            select2Config = configurator.getConfig(options.excluded || [], perPage);
+            select2Config = configurator.getConfig(options.excluded || [], params.perPage);
 
-            $el.select2(select2Config);
+            params.$el.select2(select2Config);
 
-            $el.trigger('select2-init');
+            params.$el.trigger('select2-init');
         },
 
         processExtraConfig: function (select2Config) {

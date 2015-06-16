@@ -1,25 +1,18 @@
 define(function (require) {
     'use strict';
-    var Select2AclUserAutocompleteComponent,
+    var Select2RelationComponent,
         Select2Component = require('./select2-component');
-    Select2AclUserAutocompleteComponent = Select2Component.extend({
+    Select2RelationComponent = Select2Component.extend({
         processExtraConfig: function (select2Config, params) {
-            Select2AclUserAutocompleteComponent.__super__.processExtraConfig(select2Config, params);
+            Select2RelationComponent.__super__.processExtraConfig(select2Config, params);
             select2Config.ajax = {
                 url: params.url,
                 data: function (query, page) {
-                    var queryParts = [
-                        query,
-                        select2Config.entity_name,
-                        select2Config.permission,
-                        select2Config.entity_id,
-                        select2Config.excludeCurrent === true ? 1 : ''
-                    ];
                     return {
                         page: page,
                         per_page: params.perPage,
                         name: select2Config.autocomplete_alias,
-                        query: queryParts.join(';')
+                        query: [query, select2Config.target_entity, select2Config.target_field].join(',')
                     };
                 },
                 results: function (data, page) {
@@ -29,5 +22,5 @@ define(function (require) {
             return select2Config;
         }
     });
-    return Select2AclUserAutocompleteComponent;
+    return Select2RelationComponent;
 });

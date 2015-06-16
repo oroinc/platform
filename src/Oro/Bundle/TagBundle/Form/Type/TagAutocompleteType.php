@@ -17,7 +17,7 @@ class TagAutocompleteType extends AbstractType
             array(
                 'configs' => array(
                     'placeholder'    => 'oro.tag.form.choose_or_create_tag',
-                    'extra_config'   => 'multi_autocomplete',
+                    'component'   => 'orotag/js/components/select2-multi-autocomplete-component',
                     'multiple'       => true
                 ),
                 'autocomplete_alias' => 'tags',

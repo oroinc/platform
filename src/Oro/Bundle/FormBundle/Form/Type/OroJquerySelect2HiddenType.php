@@ -170,8 +170,8 @@ class OroJquerySelect2HiddenType extends AbstractType
                         if (empty($result['route_name'])) {
                             $result['route_name'] = 'oro_form_autocomplete_search';
                         }
-                        if (empty($result['extra_config'])) {
-                            $result['extra_config'] = 'autocomplete';
+                        if (empty($result['component'])) {
+                            $result['component'] = 'oroform/js/app/components/select2-autocomplete-component';
                         }
                     }
 
