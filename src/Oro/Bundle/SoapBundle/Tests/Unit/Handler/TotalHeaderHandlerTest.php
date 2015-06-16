@@ -191,13 +191,25 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $em     = $this->getMock(
-            'Doctrine\ORM\EntityManager',
-            ['getConnection'],
-            [],
-            '',
-            false
-        );
+
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configuration->expects($this->once())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->once())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
+        $em = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
+
         $em->expects($this->once())->method('getConnection')
             ->will($this->returnValue($conn));
         $conn->expects($this->once())->method('createQueryBuilder')
@@ -229,7 +241,25 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $testCount = 22;
 
-        $query  = new SqlQuery($this->getMock('Doctrine\ORM\EntityManager', [], [], '', false));
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configuration->expects($this->any())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->once())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
+        $em = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
+
+        $query  = new SqlQuery($em);
         $dbalQb = $this->getMock(
             'Doctrine\DBAL\Query\QueryBuilder',
             ['setMaxResults', 'setFirstResult'],
