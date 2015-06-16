@@ -15,6 +15,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  *
  * @ORM\MappedSuperclass
  */
