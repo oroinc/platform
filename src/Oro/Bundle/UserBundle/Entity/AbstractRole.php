@@ -24,7 +24,7 @@ abstract class AbstractRole extends BaseRole
      */
     public function setRole($role)
     {
-        $this->role = (string)strtoupper($role);
+        $this->role = (string)strtoupper(preg_replace('/[^\w\-]/i', '_', uniqid($role . '_')));
 
         // every role should be prefixed with role prefix
         if (strpos($this->role, $this->getPrefix()) !== 0) {
