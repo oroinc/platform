@@ -78,9 +78,9 @@ abstract class EmailOrigin
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="emailOrigins", cascade={"remove"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $user;
+    protected $owner;
 
     /**
      * @var OrganizationInterface
@@ -275,9 +275,9 @@ abstract class EmailOrigin
     /**
      * @return User
      */
-    public function getUser()
+    public function getOwner()
     {
-        return $this->user;
+        return $this->owner;
     }
 
     /**
@@ -285,9 +285,9 @@ abstract class EmailOrigin
      *
      * @return $this
      */
-    public function setUser($user)
+    public function setOwner($user)
     {
-        $this->user = $user;
+        $this->owner = $user;
 
         return $this;
     }

@@ -60,6 +60,5 @@ services:
         class: %oro_imap.form.type.configuration.class%
         arguments:
             - @oro_security.encoder.mcrypt
-            - @oro_security.security_facade.link
         tags:
              - { name: form.type, alias: oro_imap_configuration }

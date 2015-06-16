@@ -167,6 +167,7 @@ class EmailApiHandler extends ApiFormHandler
             $email->setSentAt($messageDate);
         }
         // ReceivedAt
+        // todo CRM-2480
         if ($model->getReceivedAt()) {
             $email->setReceivedAt($model->getReceivedAt());
         } elseif (!$email->getId()) {
@@ -273,10 +274,12 @@ class EmailApiHandler extends ApiFormHandler
                 function ($item) use ($originName) {
                     return
                         $item instanceof InternalEmailOrigin
-                        && $item->getName() === $originName;
+                        && $item->getName() === $originName
+                        && $item->getOrganization() === $this->securityFacade->getOrganization();
                 }
             );
 
+            // todo CRM-2480
             $this->emailOrigin = !$origins->isEmpty()
                 ? $origins->first()
                 : $this->createEmailOrigin($originOwner, $originName);
@@ -325,6 +328,7 @@ class EmailApiHandler extends ApiFormHandler
                 $this->emailEntityBuilder->setFolder($folder);
             }
 
+            // todo CRM-2480
             $email->addFolder($folder);
         }
     }

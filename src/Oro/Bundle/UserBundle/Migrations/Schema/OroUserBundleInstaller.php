@@ -91,7 +91,6 @@ class OroUserBundleInstaller implements
         $this->addOroUserAccessRoleForeignKeys($schema);
         $this->addOroUserAccessGroupForeignKeys($schema);
         $this->addOroUserBusinessUnitForeignKeys($schema);
-        $this->addOroUserEmailOriginForeignKeys($schema);
         $this->addOroAccessGroupForeignKeys($schema);
         $this->addOroUserAccessGroupRoleForeignKeys($schema);
         $this->addOroUserStatusForeignKeys($schema);
@@ -109,7 +108,7 @@ class OroUserBundleInstaller implements
 
         $this->addOroAccessGroupIndexes($schema);
 
-        EmailOrigin1::addUserAndOrganizationColumns($schema, $queries);
+        EmailOrigin1::addOnwerAndOrganizationColumns($schema, $queries);
         SetOwnerForEmail::addOwnerToOroEmail($schema);
     }
 
@@ -236,21 +235,6 @@ class OroUserBundleInstaller implements
         $table->addIndex(['user_id'], 'IDX_B190CE8FA76ED395', []);
         $table->addIndex(['business_unit_id'], 'IDX_B190CE8FA58ECB40', []);
         $table->setPrimaryKey(['user_id', 'business_unit_id']);
-    }
-
-    /**
-     * Create oro_user_email_origin table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroUserEmailOriginTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_user_email_origin');
-        $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('origin_id', 'integer', []);
-        $table->addIndex(['user_id'], 'IDX_CB3E838BA76ED395', []);
-        $table->addIndex(['origin_id'], 'IDX_CB3E838B56A273CC', []);
-        $table->setPrimaryKey(['user_id', 'origin_id']);
     }
 
     /**
@@ -448,28 +432,6 @@ class OroUserBundleInstaller implements
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_business_unit'),
             ['business_unit_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE']
-        );
-    }
-
-    /**
-     * Add oro_user_email_origin foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroUserEmailOriginForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_user_email_origin');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE']
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email_origin'),
-            ['origin_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
         );

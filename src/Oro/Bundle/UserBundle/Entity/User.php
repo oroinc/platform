@@ -513,7 +513,7 @@ class User extends ExtendUser implements
     /**
      * @var EmailOrigin[]|ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="user", cascade={"all"})
+     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"all"})
      */
     protected $emailOrigins;
 

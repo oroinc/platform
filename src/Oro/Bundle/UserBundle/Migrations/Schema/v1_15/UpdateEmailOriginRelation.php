@@ -15,18 +15,18 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addUserAndOrganizationColumns($schema, $queries);
+        self::addOnwerAndOrganizationColumns($schema, $queries);
     }
 
-    public static function addUserAndOrganizationColumns(Schema $schema, QueryBag $queries)
+    public static function addOnwerAndOrganizationColumns(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_email_origin');
-        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
-            ['user_id'],
+            ['owner_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
@@ -36,9 +36,6 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
-
-        $queries->addPostQuery('UPDATE oro_email_origin eo SET eo.user_id = (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id)');
-        $queries->addPostQuery('UPDATE oro_email_origin eo SET eo.organization_id = (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.user_id)');
     }
 
     /**
