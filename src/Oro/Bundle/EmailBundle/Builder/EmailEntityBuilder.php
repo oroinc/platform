@@ -87,6 +87,7 @@ class EmailEntityBuilder
 
         $email = $this->email($subject, $from, $to, $sentAt, $internalDate, $importance, $cc, $bcc);
         $emailUser->setReceivedAt($receivedAt);
+        $emailUser->setChangeStatusAt($receivedAt);
         $emailUser->setEmail($email);
         if ($owner !== null) {
             $emailUser->setOwner($owner);
