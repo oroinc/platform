@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
@@ -13,6 +14,7 @@ use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -30,6 +32,9 @@ class ActivityManager
     protected $activityConfigProvider;
 
     /** @var ConfigProvider */
+    protected $groupingConfigProvider;
+
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
     /** @var ConfigProvider */
@@ -45,6 +50,7 @@ class ActivityManager
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider      $activityConfigProvider
+     * @param ConfigProvider      $groupingConfigProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param AssociationManager  $associationManager
@@ -53,6 +59,7 @@ class ActivityManager
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $activityConfigProvider,
+        ConfigProvider $groupingConfigProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         AssociationManager $associationManager
@@ -60,6 +67,7 @@ class ActivityManager
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
         $this->activityConfigProvider = $activityConfigProvider;
+        $this->groupingConfigProvider = $groupingConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
         $this->extendConfigProvider   = $extendConfigProvider;
         $this->associationManager     = $associationManager;
@@ -213,9 +221,33 @@ class ActivityManager
     }
 
     /**
+     * Returns the list of FQCN of all activity entities
+     *
+     * @return string[]
+     */
+    public function getActivityTypes()
+    {
+        return array_map(
+            function (ConfigInterface $config) {
+                return $config->getId()->getClassName();
+            },
+            $this->groupingConfigProvider->filter(
+                function (ConfigInterface $config) {
+                    // filter activity entities
+                    $groups = $config->get('groups');
+
+                    return
+                        !empty($groups)
+                        && in_array(ActivityScope::GROUP_ACTIVITY, $groups, true);
+                }
+            )
+        );
+    }
+
+    /**
      * Returns the list of fields responsible to store activity associations for the given activity entity type
      *
-     * @param string $activityClassName
+     * @param string $activityClassName The FQCN of the activity entity
      *
      * @return array [target_entity_class => field_name]
      */
@@ -226,6 +258,39 @@ class ActivityManager
             $this->associationManager->getMultiOwnerFilter('activity', 'activities'),
             RelationType::MANY_TO_MANY,
             ActivityScope::ASSOCIATION_KIND
+        );
+    }
+
+    /**
+     * Returns a query builder that could be used for fetching the list of entities
+     * associated with the given activity
+     *
+     * @param string      $activityClassName The FQCN of the activity entity
+     * @param mixed|null  $filters           Criteria is used to filter activity entities
+     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null  $joins             Additional associations required to filter activity entities
+     * @param int         $limit             The maximum number of items per page
+     * @param int         $page              The page number
+     * @param string|null $orderBy           The ordering expression for the result
+     *
+     * @return SqlQueryBuilder
+     */
+    public function getActivityTargetsQueryBuilder(
+        $activityClassName,
+        $filters,
+        $joins,
+        $limit = null,
+        $page = null,
+        $orderBy = null
+    ) {
+        return $this->associationManager->getMultiAssociationsQueryBuilder(
+            $activityClassName,
+            $filters,
+            $joins,
+            $this->getActivityTargets($activityClassName),
+            $limit,
+            $page,
+            $orderBy
         );
     }
 

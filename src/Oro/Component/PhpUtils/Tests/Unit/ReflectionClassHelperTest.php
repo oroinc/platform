@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Util;
+namespace Oro\Component\PhpUtils\Tests\Unit;
 
-use Oro\Component\Layout\Util\ReflectionUtils;
+use Oro\Component\PhpUtils\ReflectionClassHelper;
 
-class ReflectionUtilsTest extends \PHPUnit_Framework_TestCase
+class ReflectionClassHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ReflectionUtils */
+    /** @var ReflectionClassHelper */
     protected $utils;
 
     protected function setUp()
     {
-        $this->utils = new ReflectionUtils(
+        $this->utils = new ReflectionClassHelper(
             'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubLayoutBuilderInterface'
         );
     }
@@ -81,27 +81,27 @@ class ReflectionUtilsTest extends \PHPUnit_Framework_TestCase
             'not enough arguments'                               => [
                 '$arguments'            => [],
                 '$expectedResult'       => false,
-                '$expectedErrorMessage' => 'Missing required argument(s) for "add" action: id, parentId, blockType',
+                '$expectedErrorMessage' => 'Missing required argument(s) for "add" method: id, parentId, blockType',
             ],
             'extra arguments given, not assoc list'              => [
                 '$arguments'            => [1, 2, 3, 4, 5, 6, 7],
                 '$expectedResult'       => false,
-                '$expectedErrorMessage' => 'Number of arguments given greater than declared in "add" action',
+                '$expectedErrorMessage' => 'Number of arguments given greater than declared in "add" method',
             ],
             'extra arguments given, assoc list'                  => [
                 '$arguments'            => ['id' => 'testId', 'extraKey' => 'unknown', 'extraKeyOneMore' => 1],
                 '$expectedResult'       => false,
-                '$expectedErrorMessage' => 'Unknown argument(s) for "add" action given: extraKey, extraKeyOneMore',
+                '$expectedErrorMessage' => 'Unknown argument(s) for "add" method given: extraKey, extraKeyOneMore',
             ],
             'missing required arguments, assoc list'             => [
                 '$arguments'            => ['id' => 'testId', 'parentId' => 'parent'],
                 '$expectedResult'       => false,
-                '$expectedErrorMessage' => 'Missing required argument(s) for "add" action: blockType',
+                '$expectedErrorMessage' => 'Missing required argument(s) for "add" method: blockType',
             ],
             'missing required arguments, not assoc list'         => [
                 '$arguments'            => ['testId', 'parent'],
                 '$expectedResult'       => false,
-                '$expectedErrorMessage' => '"add" action requires at least 3 argument(s) to be passed, 2 given',
+                '$expectedErrorMessage' => '"add" method requires at least 3 argument(s) to be passed, 2 given',
             ],
             'all required args given, assoc'                     => [
                 '$arguments'            => ['id' => 'testId', 'parentId' => 'parent', 'blockType' => 'type'],

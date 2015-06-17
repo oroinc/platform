@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Util;
+namespace Oro\Component\PhpUtils\Tests\Unit;
 
-use Oro\Component\Layout\Util\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
-class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
+class ArrayUtilTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider isAssocDataProvider
      */
     public function testIsAssoc($array, $expectedResult)
     {
-        $this->assertEquals($expectedResult, ArrayUtils::isAssoc($array));
+        $this->assertEquals($expectedResult, ArrayUtil::isAssoc($array));
     }
 
     public function isAssocDataProvider()
@@ -29,7 +29,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
     {
         $array = [];
 
-        ArrayUtils::sortBy($array);
+        ArrayUtil::sortBy($array);
         $this->assertSame([], $array);
     }
 
@@ -41,7 +41,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => '3'],
         ];
 
-        ArrayUtils::sortBy($array);
+        ArrayUtil::sortBy($array);
         $this->assertSame(
             [
                 ['name' => '1'],
@@ -60,7 +60,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => '3'],
         ];
 
-        ArrayUtils::sortBy($array, true);
+        ArrayUtil::sortBy($array, true);
         $this->assertSame(
             [
                 ['name' => '1'],
@@ -79,7 +79,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => '3', 'priority' => 100],
         ];
 
-        ArrayUtils::sortBy($array);
+        ArrayUtil::sortBy($array);
         $this->assertSame(
             [
                 ['name' => '1', 'priority' => 100],
@@ -98,7 +98,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => '3', 'priority' => 100],
         ];
 
-        ArrayUtils::sortBy($array, true);
+        ArrayUtil::sortBy($array, true);
         $this->assertSame(
             [
                 ['name' => '1', 'priority' => 100],
@@ -123,7 +123,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => '9'],
         ];
 
-        ArrayUtils::sortBy($array);
+        ArrayUtil::sortBy($array);
         $this->assertSame(
             [
                 ['name' => '5', 'priority' => -100],
@@ -154,7 +154,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => '9'],
         ];
 
-        ArrayUtils::sortBy($array, true);
+        ArrayUtil::sortBy($array, true);
         $this->assertSame(
             [
                 ['name' => '3', 'priority' => 100],
@@ -185,7 +185,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             'i9' => ['name' => '9'],
         ];
 
-        ArrayUtils::sortBy($array);
+        ArrayUtil::sortBy($array);
         $this->assertSame(
             [
                 'i5' => ['name' => '5', 'priority' => -100],
@@ -216,7 +216,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             'i9' => ['name' => '9'],
         ];
 
-        ArrayUtils::sortBy($array, true);
+        ArrayUtil::sortBy($array, true);
         $this->assertSame(
             [
                 'i3' => ['name' => '3', 'priority' => 100],
@@ -241,7 +241,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => 'b'],
         ];
 
-        ArrayUtils::sortBy($array, false, 'name', SORT_STRING);
+        ArrayUtil::sortBy($array, false, 'name', SORT_STRING);
         $this->assertSame(
             [
                 ['name' => 'a'],
@@ -260,7 +260,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => 'b'],
         ];
 
-        ArrayUtils::sortBy($array, true, 'name', SORT_STRING);
+        ArrayUtil::sortBy($array, true, 'name', SORT_STRING);
         $this->assertSame(
             [
                 ['name' => 'c'],
@@ -279,7 +279,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => 'B'],
         ];
 
-        ArrayUtils::sortBy($array, false, 'name', SORT_STRING | SORT_FLAG_CASE);
+        ArrayUtil::sortBy($array, false, 'name', SORT_STRING | SORT_FLAG_CASE);
         $this->assertSame(
             [
                 ['name' => 'a'],
@@ -298,7 +298,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => 'B'],
         ];
 
-        ArrayUtils::sortBy($array, true, 'name', SORT_STRING | SORT_FLAG_CASE);
+        ArrayUtil::sortBy($array, true, 'name', SORT_STRING | SORT_FLAG_CASE);
         $this->assertSame(
             [
                 ['name' => 'C'],
@@ -317,7 +317,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ['name' => '3', 'child' => ['priority' => 2]],
         ];
 
-        ArrayUtils::sortBy($array, false, '[child][priority]');
+        ArrayUtil::sortBy($array, false, '[child][priority]');
         $this->assertSame(
             [
                 ['name' => '1', 'child' => ['priority' => 1]],
@@ -339,7 +339,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             $obj3,
         ];
 
-        ArrayUtils::sortBy($array);
+        ArrayUtil::sortBy($array);
         $this->assertSame(
             [
                 $obj1,
@@ -367,7 +367,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             $obj3,
         ];
 
-        ArrayUtils::sortBy($array, false, 'child.priority');
+        ArrayUtil::sortBy($array, false, 'child.priority');
         $this->assertSame(
             [
                 $obj1,
@@ -389,7 +389,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             $obj3,
         ];
 
-        ArrayUtils::sortBy(
+        ArrayUtil::sortBy(
             $array,
             false,
             function ($item) {
@@ -417,7 +417,7 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             $obj3,
         ];
 
-        ArrayUtils::sortBy(
+        ArrayUtil::sortBy(
             $array,
             false,
             [$this, 'getObjectPriority']

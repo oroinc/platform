@@ -12,3 +12,11 @@ oro_entity:
                     join:
                         left:
                             - { join: entity.region, alias: region }
+
+    entity_aliases:
+        Test\Entity\Product:
+            alias:        testproduct
+            plural_alias: testproducts
+
+    entity_alias_exclusions:
+        - Test\Entity\Address
