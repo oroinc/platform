@@ -12,8 +12,9 @@ security:
         main:
             oauth:
                 resource_owners:
-                    google: /login/check-google
-                login_path: /user/login
-                failure_path: /user/login
+                    google: oro_sso_google_login
+                login_path: oro_user_security_login
+                failure_path: oro_user_security_login
+                check_path: oro_user_security_check
                 oauth_user_provider:
                     service: oro_sso.oauth_provider

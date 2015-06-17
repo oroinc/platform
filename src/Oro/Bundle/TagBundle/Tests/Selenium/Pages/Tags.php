@@ -55,11 +55,8 @@ class Tags extends AbstractPageFilteredGrid
      */
     public function edit()
     {
-        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $action->click();
-        $action->click();
-        $this->waitForAjax();
+        $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
+        $this->test->moveto($menu);
         $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -70,13 +67,9 @@ class Tags extends AbstractPageFilteredGrid
 
     public function delete()
     {
-        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $action->click();
-        $action->click();
-        $this->waitForAjax();
+        $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
+        $this->test->moveto($menu);
         $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->waitForAjax();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();

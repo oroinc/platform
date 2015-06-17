@@ -240,7 +240,6 @@ class TrackingProcessor implements LoggerAwareInterface
             ->where('entity.identifierDetected = false')
             ->andWhere('entity.parsedUID > 0')
             ->andWhere('entity.parsingCount < :maxRetries')
-            ->orderBy('entity.firstActionTime', 'ASC')
             ->setParameter('maxRetries', self::MAX_RETRIES);
 
         if (count($this->skipList)) {

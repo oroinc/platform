@@ -115,7 +115,11 @@ class ImportStrategyHelper
             $errors = array();
             /** @var ConstraintViolationInterface $violation */
             foreach ($violations as $violation) {
-                $errors[] = sprintf(sprintf('%s: %s', $violation->getPropertyPath(), $violation->getMessage()));
+                $propertyPath = $violation->getPropertyPath();
+                if ($propertyPath) {
+                    $propertyPath .= ': ';
+                }
+                $errors[] = $propertyPath . $violation->getMessage();
             }
             return $errors;
         }

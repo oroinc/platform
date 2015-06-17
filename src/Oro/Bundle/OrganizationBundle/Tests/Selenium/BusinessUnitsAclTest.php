@@ -21,7 +21,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->assertTitle('Create Role - Roles - User Management - System')
             ->save()
             ->assertMessage('Role saved')
-            ->assertTitle('Roles - User Management - System')
+            ->assertTitle('All - Roles - User Management - System')
             ->close();
 
         return ($randomPrefix);
@@ -56,7 +56,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - User Management - System');
+            ->assertTitle('All - Users - User Management - System');
 
         return $username;
     }
@@ -79,7 +79,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
-            ->assertTitle('Business Units - User Management - System')
+            ->assertTitle('All - Business Units - User Management - System')
             ->close();
 
         return $unitName;
@@ -132,7 +132,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
         /** @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
-            ->checkActionMenu('Delete')
+            ->assertNoActionMenu('Delete')
             ->open(array($unitName))
             ->assertElementNotPresent("//div[@class='pull-left btn-group icons-holder']/a[@title='Delete Account']");
     }
@@ -152,7 +152,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
         /** @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
-            ->checkActionMenu('Update')
+            ->assertNoActionMenu('Update')
             ->open(array($unitName))
             ->assertElementNotPresent(
                 "//div[@class='pull-left btn-group icons-holder']/a[@title='Edit Business Unit']"
