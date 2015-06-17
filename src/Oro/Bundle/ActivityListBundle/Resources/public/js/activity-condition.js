@@ -118,6 +118,12 @@ define([
                         this.typeFilter.applyValue();
                     }
                 });
+
+                this._on(this.$fieldsLoader, {
+                    change: function () {
+                        this.$fieldsLoader.data('activityFieldsUpdated', false);
+                    }
+                });
             }, this));
         },
 

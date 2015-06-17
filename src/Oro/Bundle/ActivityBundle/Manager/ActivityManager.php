@@ -240,7 +240,8 @@ class ActivityManager
     {
         $result = [];
 
-        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        $config = $this->activityConfigProvider->getConfig($entityClass);
+        $activityClassNames = $config->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
             if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
                 continue;
