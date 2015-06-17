@@ -58,6 +58,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\UserBundle\Entity\User` is based on `Oro\Bundle\UserBundle\Entity\AbstractUser` and implements `Symfony\Component\Security\Core\User\UserInterface` using `Oro\Bundle\UserBundle\Entity\UserInterface` directly
 - `Oro\Bundle\UserBundle\Entity\PasswordRecoveryInterface` introduced to cover all required data for password recovery
 - `Oro\Bundle\UserBundle\Entity\UserInterface` method `public function addRole(RoleInterface $role)` signature changed to use `Symfony\Component\Security\Core\Role\RoleInterface`
-- `Oro\Bundle\UserBundle\Mailer\Processor` now is based on `Oro\Bundle\UserBundle\Mailer\BaseProcessor`
+- `Oro\Bundle\UserBundle\Mailer\Processor` is now based on `Oro\Bundle\UserBundle\Mailer\BaseProcessor`
 - `Oro\Bundle\UserBundle\Mailer\Processor` - first argument `$user` of `sendChangePasswordEmail`, `sendResetPasswordEmail` and `sendResetPasswordAsAdminEmail` methods must implement `Oro\Bundle\UserBundle\Entity\UserInterface`
 - First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly

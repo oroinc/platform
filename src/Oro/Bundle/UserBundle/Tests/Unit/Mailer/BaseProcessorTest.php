@@ -15,6 +15,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class BaseProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    const FROM_EMAIL = 'email_from@example.com';
+    const FROM_NAME = 'Email From Name';
+
     /**
      * @var EmailTemplateRepository|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -60,21 +63,8 @@ class BaseProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $emailTemplate;
 
-    /**
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * @var array
-     */
-    protected $templateData;
-
     protected function setUp()
     {
-        $this->user = new User();
-        $this->templateData = ['templateData'];
-
         $this->objectRepository = $this->getMockForClass(
             'Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository'
         );
@@ -92,66 +82,95 @@ class BaseProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->objectManager);
 
         $this->configManager = $this->getMockForClass('Oro\Bundle\ConfigBundle\Config\ConfigManager');
+        $this->configManager->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(
+                function ($param) {
+                    switch ($param) {
+                        case 'oro_notification.email_notification_sender_email':
+                            return self::FROM_EMAIL;
+                            break;
+                        case 'oro_notification.email_notification_sender_name':
+                            return self::FROM_NAME;
+                            break;
+                        default:
+                            return null;
+                            break;
+                    }
+                }
+            );
 
         $this->renderer = $this->getMockForClass('Oro\Bundle\EmailBundle\Provider\EmailRenderer');
-        $this->renderer->expects($this->any())
-            ->method('compileMessage')
-            ->willReturn($this->templateData);
 
         $this->emailHolderHelper = $this->getMockForClass('Oro\Bundle\EmailBundle\Tools\EmailHolderHelper');
 
         $this->mailer = $this->getMockForClass('\Swift_Mailer');
 
-        $this->mailProcessor = $this->getMockBuilder('Oro\Bundle\UserBundle\Mailer\BaseProcessor')
-            ->setConstructorArgs(
-                [
-                    $this->managerRegistry,
-                    $this->configManager,
-                    $this->renderer,
-                    $this->emailHolderHelper,
-                    $this->mailer
-                ]
-            )
-            ->setMethods(['sendEmail'])
-            ->getMock();
+        $this->mailProcessor = new BaseProcessor(
+            $this->managerRegistry,
+            $this->configManager,
+            $this->renderer,
+            $this->emailHolderHelper,
+            $this->mailer
+        );
 
         $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
     }
 
     protected function tearDown()
     {
-        unset($this->user, $this->templateData, $this->objectRepository, $this->objectManager, $this->managerRegistry);
-        unset($this->configManager, $this->renderer, $this->emailHolderHelper, $this->mailer, $this->mailProcessor);
-        unset($this->emailTemplate);
+        unset($this->user, $this->objectRepository, $this->objectManager, $this->managerRegistry, $this->configManager);
+        unset($this->renderer, $this->emailHolderHelper, $this->mailer, $this->mailProcessor, $this->emailTemplate);
     }
 
     /**
-     * @param string  $templateName
-     * @param string  $getTypeResult
-     * @param string  $typeValue
-     * @param boolean $sendEmailResult
      *
      * @dataProvider sendEmailResultProvider
+     *
+     * @param User   $user
+     * @param string $templateName
+     * @param array  $templateParams
+     * @param array  $templateData
+     * @param string $emailType
+     * @param string $expectedMessage
+     * @param string $mailerResult
      */
-    public function testSendEmail($templateName, $getTypeResult, $typeValue, $sendEmailResult)
-    {
+    public function testSendEmail(
+        User $user,
+        $templateName,
+        array $templateParams,
+        array $templateData,
+        $emailType,
+        $expectedMessage,
+        $mailerResult
+    ) {
+        $this->emailTemplate->expects($this->once())
+            ->method('getType')
+            ->willReturn($emailType);
+
         $this->objectRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['name' => $templateName])
             ->willReturn($this->emailTemplate);
 
-        $this->emailTemplate->expects($this->once())
-            ->method('getType')
-            ->willReturn($getTypeResult);
+        $this->renderer->expects($this->once())
+            ->method('compileMessage')
+            ->with($this->emailTemplate, $templateParams)
+            ->willReturn($templateData);
 
-        $this->mailProcessor->expects($this->once())
-            ->method('sendEmail')
-            ->with($this->user, $this->templateData, $typeValue)
-            ->willReturn($sendEmailResult);
+        $this->emailHolderHelper->expects($this->once())
+            ->method('getEmail')
+            ->with($user)
+            ->willReturn($user->getEmail());
+
+        $this->mailer->expects($this->once())
+            ->method('send')
+            ->with($this->isInstanceOf($expectedMessage))
+            ->willReturn($mailerResult);
 
         $this->assertEquals(
-            $sendEmailResult,
-            $this->mailProcessor->getEmailTemplateAndSendEmail($this->user, $templateName)
+            $mailerResult,
+            $this->mailProcessor->getEmailTemplateAndSendEmail($user, $templateName, $templateParams)
         );
     }
 
@@ -160,18 +179,42 @@ class BaseProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function sendEmailResultProvider()
     {
+        $user = new User();
+        $user->setEmail('email_to@example.com');
+
+        $subject = 'rendered subject';
+        $email = 'rendered template';
+
+        $typePlain = 'text/plain';
+        $typeHtml = 'text/html';
+
+        $messagePlain = \Swift_Message::newInstance()
+            ->setSubject($subject)
+            ->setFrom(self::FROM_EMAIL, self::FROM_NAME)
+            ->setTo($user->getEmail())
+            ->setBody($email, $typePlain);
+
+        $messageHtml = clone $messagePlain;
+        $messageHtml->setBody($email, $typeHtml);
+
         return [
             [
-                'test_email',
-                'txt',
-                'text/plain',
-                true
+                'user' => $user,
+                'templateName' => 'test_email',
+                'templateParams' => ['entity' => $user],
+                'templateData' => [$subject, $email],
+                'emailType' => 'txt',
+                'expectedMessage' => $messagePlain,
+                'mailerResult' => 1
             ],
             [
-                'test_email',
-                'html',
-                'text/html',
-                false
+                'user' => $user,
+                'templateName' => 'test_email',
+                'templateParams' => ['entity' => $user],
+                'templateData' => [$subject, $email],
+                'emailType' => 'html',
+                'expectedMessage' => $messageHtml,
+                'mailerResult' => 0
             ]
         ];
     }

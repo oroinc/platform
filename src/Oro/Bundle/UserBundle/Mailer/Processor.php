@@ -13,7 +13,7 @@ class Processor extends BaseProcessor
     /**
      * @param UserInterface $user
      *
-     * @return bool
+     * @return int
      */
     public function sendChangePasswordEmail(UserInterface $user)
     {
@@ -27,7 +27,7 @@ class Processor extends BaseProcessor
     /**
      * @param UserInterface $user
      *
-     * @return bool
+     * @return int
      */
     public function sendResetPasswordEmail(UserInterface $user)
     {
@@ -41,7 +41,7 @@ class Processor extends BaseProcessor
     /**
      * @param UserInterface $user
      *
-     * @return bool
+     * @return int
      */
     public function sendResetPasswordAsAdminEmail(UserInterface $user)
     {

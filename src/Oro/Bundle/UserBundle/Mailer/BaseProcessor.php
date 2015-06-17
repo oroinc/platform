@@ -39,7 +39,7 @@ class BaseProcessor
         ConfigManager $configManager,
         EmailRenderer $renderer,
         EmailHolderHelper $emailHolderHelper,
-        \Swift_Mailer $mailer = null
+        \Swift_Mailer $mailer
     ) {
         $this->managerRegistry   = $managerRegistry;
         $this->configManager     = $configManager;
@@ -53,9 +53,9 @@ class BaseProcessor
      * @param array         $templateData
      * @param string        $type
      *
-     * @return bool
+     * @return int          The return value is the number of recipients who were accepted for delivery
      */
-    protected function sendEmail(UserInterface $user, $templateData, $type)
+    protected function sendEmail(UserInterface $user, array $templateData, $type)
     {
         list($subjectRendered, $templateRendered) = $templateData;
 
@@ -70,7 +70,7 @@ class BaseProcessor
             ->setTo($email)
             ->setBody($templateRendered, $type);
 
-        $this->mailer->send($message);
+        return $this->mailer->send($message);
     }
 
     /**
@@ -91,7 +91,7 @@ class BaseProcessor
      * @param string        $emailTemplateName
      * @param array         $emailTemplateParams
      *
-     * @return bool
+     * @return int
      */
     public function getEmailTemplateAndSendEmail(
         UserInterface $user,
@@ -103,7 +103,16 @@ class BaseProcessor
         return $this->sendEmail(
             $user,
             $this->renderer->compileMessage($emailTemplate, $emailTemplateParams),
-            $emailTemplate->getType() === 'txt' ? 'text/plain' : 'text/html'
+            $this->getEmailTemplateType($emailTemplate)
         );
+    }
+
+    /**
+     * @param EmailTemplateInterface $emailTemplate
+     * @return string
+     */
+    protected function getEmailTemplateType(EmailTemplateInterface $emailTemplate)
+    {
+        return $emailTemplate->getType() === 'txt' ? 'text/plain' : 'text/html';
     }
 }
