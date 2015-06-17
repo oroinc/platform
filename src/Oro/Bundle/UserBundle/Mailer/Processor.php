@@ -19,7 +19,7 @@ class Processor extends BaseProcessor
     {
         return $this->getEmailTemplateAndSendEmail(
             $user,
-            $this->getUserChangePasswordTemplate(),
+            static::TEMPLATE_USER_CHANGE_PASSWORD,
             ['entity' => $user, 'plainPassword' => $user->getPlainPassword()]
         );
     }
@@ -33,7 +33,7 @@ class Processor extends BaseProcessor
     {
         return $this->getEmailTemplateAndSendEmail(
             $user,
-            $this->getUserResetPasswordTemplate(),
+            static::TEMPLATE_USER_RESET_PASSWORD,
             ['entity' => $user]
         );
     }
@@ -47,32 +47,8 @@ class Processor extends BaseProcessor
     {
         return $this->getEmailTemplateAndSendEmail(
             $user,
-            $this->getUserResetPasswordAsAdminTemplate(),
+            static::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN,
             ['entity' => $user]
         );
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUserChangePasswordTemplate()
-    {
-        return static::TEMPLATE_USER_CHANGE_PASSWORD;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUserResetPasswordTemplate()
-    {
-        return static::TEMPLATE_USER_RESET_PASSWORD;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUserResetPasswordAsAdminTemplate()
-    {
-        return static::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN;
     }
 }
