@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\ArrayCache;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -26,12 +27,12 @@ class SearchMappingProvider
 
     /**
      * @param EventDispatcherInterface $dispatcher
-     * @param Cache                    $cacheDriver
+     * @param Cache|null               $cacheDriver
      */
-    public function __construct(EventDispatcherInterface $dispatcher, Cache $cacheDriver)
+    public function __construct(EventDispatcherInterface $dispatcher, Cache $cacheDriver = null)
     {
         $this->dispatcher = $dispatcher;
-        $this->cacheDriver = $cacheDriver;
+        $this->cacheDriver = $cacheDriver ?: new ArrayCache();
     }
 
     /**
