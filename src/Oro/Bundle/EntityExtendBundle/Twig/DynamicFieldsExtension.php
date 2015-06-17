@@ -7,6 +7,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -40,18 +42,24 @@ class DynamicFieldsExtension extends \Twig_Extension
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param ConfigManager            $configManager
      * @param FieldTypeHelper          $fieldTypeHelper
      * @param EventDispatcherInterface $dispatcher
+     * @param SecurityFacade           $securityFacade
      */
     public function __construct(
         ConfigManager $configManager,
         FieldTypeHelper $fieldTypeHelper,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        SecurityFacade $securityFacade
     ) {
         $this->fieldTypeHelper  = $fieldTypeHelper;
         $this->eventDispatcher  = $dispatcher;
+        $this->securityFacade   = $securityFacade;
         $this->extendProvider   = $configManager->getProvider('extend');
         $this->entityProvider   = $configManager->getProvider('entity');
         $this->viewProvider     = $configManager->getProvider('view');
@@ -133,6 +141,11 @@ class DynamicFieldsExtension extends \Twig_Extension
 
         // skip invisible fields
         if (!$this->viewProvider->getConfigById($config->getId())->is('is_displayable')) {
+            return false;
+        }
+
+        $acl = $this->viewProvider->getConfigById($config->getId())->get('acl');
+        if (($acl !== null) && !$this->securityFacade->isGranted($acl)) {
             return false;
         }
 
