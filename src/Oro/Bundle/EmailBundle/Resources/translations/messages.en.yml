@@ -127,6 +127,8 @@ oro:
                 view:
                     inbox: Inbox
                     sent: Sent Mail
+            filters:
+                new: New Mail
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -183,6 +185,7 @@ oro:
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
+        new.label:                New
 
         entity_config:
             email:
