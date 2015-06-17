@@ -261,11 +261,11 @@ abstract class EmailOrigin
     }
 
     /**
-     * @param mixed $organization
+     * @param OrganizationInterface $organization
      *
      * @return $this
      */
-    public function setOrganization($organization)
+    public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;
 

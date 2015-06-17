@@ -58,7 +58,7 @@ class EmailEntityBuilder
      * @param string $from                              The FROM email address,
      *                                                  for example: john@example.com or "John Smith" <john@example.c4m>
      * @param string|string[]|null $to                  The TO email address(es).
-            *                                           Example of email address see in description of $from parameter
+     *                                                  Example of email address see in description of $from parameter
      * @param \DateTime            $sentAt              The date/time when email sent
      * @param \DateTime            $receivedAt          The date/time when email received
      * @param \DateTime            $internalDate        The date/time an email server returned in INTERNALDATE field
