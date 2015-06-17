@@ -72,6 +72,7 @@ class SendEmail extends AbstractSendEmail
      */
     protected function executeAction($context)
     {
+        $type = 'txt';
         $emailModel = new Email();
         $emailModel->setFrom($this->getEmailAddress($context, $this->options['from']));
         $to = [];
@@ -87,6 +88,10 @@ class SendEmail extends AbstractSendEmail
         $emailModel->setBody(
             $this->contextAccessor->getValue($context, $this->options['body'])
         );
+        if (array_key_exists('type', $this->options) && in_array($this->options['type'], ['txt', 'html'], true)) {
+            $type = $this->options['type'];
+        }
+        $emailModel->setType($type);
 
         $email = $this->emailProcessor->process($emailModel);
 
