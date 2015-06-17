@@ -8,6 +8,7 @@ class InternalEmailOriginTest extends \PHPUnit_Framework_TestCase
 {
     public function testNameGetterAndSetter()
     {
+        $entity = new InternalEmailOrigin();
         $entity->setName('test');
         $this->assertEquals('test', $entity->getName());
     }
