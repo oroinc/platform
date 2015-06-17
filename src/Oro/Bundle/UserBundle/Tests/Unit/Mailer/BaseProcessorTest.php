@@ -84,20 +84,11 @@ class BaseProcessorTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockForClass('Oro\Bundle\ConfigBundle\Config\ConfigManager');
         $this->configManager->expects($this->any())
             ->method('get')
-            ->willReturnCallback(
-                function ($param) {
-                    switch ($param) {
-                        case 'oro_notification.email_notification_sender_email':
-                            return self::FROM_EMAIL;
-                            break;
-                        case 'oro_notification.email_notification_sender_name':
-                            return self::FROM_NAME;
-                            break;
-                        default:
-                            return null;
-                            break;
-                    }
-                }
+            ->willReturnMap(
+                [
+                    ['oro_notification.email_notification_sender_email', false, false, self::FROM_EMAIL],
+                    ['oro_notification.email_notification_sender_name', false, false, self::FROM_NAME]
+                ]
             );
 
         $this->renderer = $this->getMockForClass('Oro\Bundle\EmailBundle\Provider\EmailRenderer');
@@ -119,21 +110,23 @@ class BaseProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->user, $this->objectRepository, $this->objectManager, $this->managerRegistry, $this->configManager);
-        unset($this->renderer, $this->emailHolderHelper, $this->mailer, $this->mailProcessor, $this->emailTemplate);
+        unset(
+            $this->user, $this->objectRepository, $this->objectManager, $this->managerRegistry, $this->configManager,
+            $this->renderer, $this->emailHolderHelper, $this->mailer, $this->mailProcessor, $this->emailTemplate
+        );
     }
 
     /**
      *
      * @dataProvider sendEmailResultProvider
      *
-     * @param User   $user
-     * @param string $templateName
-     * @param array  $templateParams
-     * @param array  $templateData
-     * @param string $emailType
-     * @param string $expectedMessage
-     * @param string $mailerResult
+     * @param User           $user
+     * @param string         $templateName
+     * @param array          $templateParams
+     * @param array          $templateData
+     * @param string         $emailType
+     * @param \Swift_Message $expectedMessage
+     * @param string         $mailerResult
      */
     public function testSendEmail(
         User $user,
@@ -141,7 +134,7 @@ class BaseProcessorTest extends \PHPUnit_Framework_TestCase
         array $templateParams,
         array $templateData,
         $emailType,
-        $expectedMessage,
+        \Swift_Message $expectedMessage,
         $mailerResult
     ) {
         $this->emailTemplate->expects($this->once())
@@ -165,7 +158,18 @@ class BaseProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->mailer->expects($this->once())
             ->method('send')
-            ->with($this->isInstanceOf($expectedMessage))
+            ->with(
+                $this->callback(
+                    function (\Swift_Message $message) use ($expectedMessage) {
+                        $this->assertEquals($expectedMessage->getSubject(), $message->getSubject());
+                        $this->assertEquals($expectedMessage->getFrom(), $message->getFrom());
+                        $this->assertEquals($expectedMessage->getTo(), $message->getTo());
+                        $this->assertEquals($expectedMessage->getBody(), $message->getBody());
+
+                        return true;
+                    }
+                )
+            )
             ->willReturn($mailerResult);
 
         $this->assertEquals(
