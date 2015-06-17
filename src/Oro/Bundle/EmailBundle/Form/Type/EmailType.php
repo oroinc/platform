@@ -41,7 +41,7 @@ class EmailType extends AbstractType
             ->add('entityId', 'hidden', ['required' => false])
             ->add(
                 'from',
-                'oro_email_email_address',
+                'oro_email_email_address_from',
                 [
                     'required' => true,
                     'label' => 'oro.email.from_email_address.label',
