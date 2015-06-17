@@ -157,13 +157,17 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $emailAddress = strtolower($helper->extractPureEmailAddress($emailAddress));
         }
         $query = $qb->where($qb->expr()->in('ce.email', $emailList))->getQuery();
-        $result = $query->getOneOrNullResult();
+        $result = $query->getResult();
 
         if ($result) {
-            return $result->getOwner()->getOrganization() === $organization;
-        } else {
-            return false;
+            foreach ($result as $contactEmail) {
+                if ($contactEmail->getOwner()->getOrganization() === $organization) {
+                    return true;
+                }
+            }
         }
+
+        return false;
     }
 
     /**
