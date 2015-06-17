@@ -9,8 +9,6 @@ use Doctrine\ORM\QueryBuilder;
 use LogicException;
 
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
@@ -18,16 +16,12 @@ use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 
 class ActivityListFilter extends EntityFilter
@@ -53,17 +47,11 @@ class ActivityListFilter extends EntityFilter
     /** @var Manager */
     protected $queryDesignerManager;
 
-    /** @var DatagridConfigurationBuilder */
-    protected $datagridConfigurationBuilder;
-
-    /** @var ServiceLink */
-    protected $gridBuilderLink;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
+
+    /** @var DatagridHelper */
+    protected $datagridHelper;
 
     /**
      * @param FormFactoryInterface $factory
@@ -73,9 +61,7 @@ class ActivityListFilter extends EntityFilter
      * @param ActivityListFilterHelper $activityListFilterHelper
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param Manager $queryDesignerManager
-     * @param DatagridConfigurationBuilder $datagridConfigurationBuilder
-     * @param ServiceLink $gridBuilderLink
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param DatagridHelper $datagridHelper
      */
     public function __construct(
         FormFactoryInterface $factory,
@@ -85,9 +71,7 @@ class ActivityListFilter extends EntityFilter
         ActivityListFilterHelper $activityListFilterHelper,
         EntityRoutingHelper $entityRoutingHelper,
         Manager $queryDesignerManager,
-        DatagridConfigurationBuilder $datagridConfigurationBuilder,
-        ServiceLink $gridBuilderLink,
-        EventDispatcherInterface $eventDispatcher
+        DatagridHelper $datagridHelper
     ) {
         parent::__construct($factory, $util);
         $this->activityManager = $activityManager;
@@ -95,9 +79,7 @@ class ActivityListFilter extends EntityFilter
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->queryDesignerManager = $queryDesignerManager;
-        $this->datagridConfigurationBuilder = $datagridConfigurationBuilder;
-        $this->gridBuilderLink = $gridBuilderLink;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->datagridHelper = $datagridHelper;
     }
 
     /**
@@ -310,19 +292,8 @@ class ActivityListFilter extends EntityFilter
     protected function createRelatedActivityGrid(array $data)
     {
         $source = $this->createRelatedActivitySource($data);
-        $this->datagridConfigurationBuilder->setGridName('related-activity');
-        $this->datagridConfigurationBuilder->setSource($source);
-        $config = $this->datagridConfigurationBuilder->getConfiguration();
 
-        $stopPropagationListener = function (Event $e) {
-            $e->stopPropagation();
-        };
-
-        $this->eventDispatcher->addListener(BuildBefore::NAME, $stopPropagationListener, 255);
-        $grid = $this->gridBuilderLink->getService()->build($config, new ParameterBag());
-        $this->eventDispatcher->removeListener(BuildBefore::NAME, $stopPropagationListener);
-
-        return $grid;
+        return $this->datagridHelper->createGrid($source);
     }
 
     /**

@@ -23,6 +23,7 @@ parameters:
     oro_activity_list.filter.helper.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
 
     oro_activity_list.filter.activity_list.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
+    oro_activity_list.filter.datagrid_helper.class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
 
 services:
     oro_activity_list.manager:
@@ -147,8 +148,13 @@ services:
             - @oro_activity_list.filter.helper
             - @oro_entity.routing_helper
             - @oro_query_designer.query_designer.manager
+            - @oro_activity_list.filter.datagrid_helper
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: activityList }
+
+    oro_activity_list.filter.datagrid_helper:
+        class: %oro_activity_list.filter.datagrid_helper.class%
+        arguments:
             - @oro_query_designer.grid.datagrid_configuration_builder
             - @oro_activity_list.datagrid.builder.link
             - @event_dispatcher
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: activityList }
