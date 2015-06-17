@@ -129,7 +129,7 @@ datagrid:
                 type: ajax
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 link:  toggle_seen_link
-                icon: plus
+                icon: minus
                 defaultMessages:
                     success:         oro.email.action.success_mark_unread
                     error:           oro.email.action.error
