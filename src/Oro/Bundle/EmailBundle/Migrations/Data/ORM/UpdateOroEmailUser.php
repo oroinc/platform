@@ -60,6 +60,7 @@ class UpdateOroEmailUser extends AbstractFixture implements DependentFixtureInte
                     $newEmailUser->setFolder($folder);
                     $newEmailUser->setEmail($email);
                     $newEmailUser->setReceivedAt($emailUser->getReceivedAt());
+                    $newEmailUser->setChangeStatusAt($emailUser->getChangeStatusAt());
                     $newEmailUser->setSeen($emailUser->isSeen());
                     $newEmailUser->setOwner($owner);
                     $newEmailUser->setOrganization($owner->getOrganization());
