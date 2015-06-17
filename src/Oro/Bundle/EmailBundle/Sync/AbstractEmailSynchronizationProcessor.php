@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use Doctrine\ORM\UnexpectedResultException;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -115,16 +116,53 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      *
      * @return bool
      */
-    protected function isApplicableEmail(EmailHeader $email, $folderType, $userId = null)
+    protected function isApplicableEmail(EmailHeader $email, $folderType, $userId = null, $organization = null)
     {
         if ($userId === null) {
             return $this->isKnownSender($email) && $this->isKnownRecipient($email);
+        }
+
+        if ($organization && !$this->checkOrganization($email, $folderType, $organization)) {
+            return false;
         }
 
         if ($folderType === FolderType::SENT) {
             return $this->isUserSender($userId, $email) && $this->isKnownRecipient($email);
         } else {
             return $this->isKnownSender($email) && $this->isUserRecipient($userId, $email);
+        }
+    }
+
+    /**
+     * @param EmailHeader $email
+     * @param             $folderType
+     * @param             $organization
+     *
+     * @return bool
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * todo CRM-2480 temporary solution for determination of emails` organization
+     */
+    protected function checkOrganization(EmailHeader $email, $folderType, $organization)
+    {
+        $helper = new EmailAddressHelper();
+        $repo = $this->em->getRepository('OroCRMContactBundle:ContactEmail');
+        $qb = $repo->createQueryBuilder('ce');
+
+        if ($folderType === FolderType::SENT) {
+            $emailList = array_merge($email->getToRecipients(), $email->getCcRecipients(), $email->getBccRecipients());
+        } else {
+            $emailList = [$email->getFrom()];
+        }
+        foreach ($emailList as &$emailAddress) {
+            $emailAddress = strtolower($helper->extractPureEmailAddress($emailAddress));
+        }
+        $query = $qb->where($qb->expr()->in('ce.email', $emailList))->getQuery();
+        $result = $query->getOneOrNullResult();
+
+        if ($result) {
+            return $result->getOwner()->getOrganization() === $organization;
+        } else {
+            return false;
         }
     }
 
