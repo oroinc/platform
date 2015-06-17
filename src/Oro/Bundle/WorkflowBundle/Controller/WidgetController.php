@@ -131,6 +131,10 @@ class WidgetController extends Controller
                 $serializer->setWorkflowName($workflow->getName());
                 $data = $serializer->serialize(new WorkflowData($formAttributes), 'json');
                 $saved = true;
+
+                if ($response = $this->handleStartTransition($transition, $workflowItem, $transitionName, $data, $workflowName)) {
+                    return $response;
+                }
             }
         }
 
@@ -191,6 +195,74 @@ class WidgetController extends Controller
                 'form' => $transitionForm->createView(),
             )
         );
+    }
+
+    protected function handleStartTransition(Transition $transition, WorkflowItem $workflowItem, $transitionName, $data, $workflowName)
+    {
+        if ($transition->getPageTemplate() || $transition->getDialogTemplate()) {
+            return;
+        }
+
+        $responseCode = null;
+        $transitResponseContent = null;
+
+        try {
+            /* @var $workflowManager WorkflowManager */
+            $workflowManager = $this->get('oro_workflow.manager');
+
+            $entityId = $this->getRequest()->get('entityId', 0);
+            $dataArray = array();
+            if ($data) {
+                $serializer = $this->get('oro_workflow.serializer.data.serializer');
+                $serializer->setWorkflowName($workflowName);
+                /** @var WorkflowData $data */
+                $data = $serializer->deserialize(
+                    $data,
+                    'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
+                    'json'
+                );
+                $dataArray = $data->getValues();
+            }
+
+            $workflow = $workflowManager->getWorkflow($workflowName);
+            $entityClass = $workflow->getDefinition()->getRelatedEntity();
+            $entity = $this->getEntityReference($entityClass, $entityId);
+
+            $workflowItem = $workflowManager->startWorkflow($workflow, $entity, $transitionName, $dataArray);
+        } catch (HttpException $e) {
+            $responseCode = $e->getStatusCode();
+        } catch (WorkflowNotFoundException $e) {
+            $responseCode = 404;
+        } catch (UnknownAttributeException $e) {
+            $responseCode = 400;
+        } catch (InvalidTransitionException $e) {
+            $responseCode = 400;
+        } catch (ForbiddenTransitionException $e) {
+            $responseCode = 403;
+        } catch (\Exception $e) {
+            $responseCode = 500;
+        }
+
+        if (!$responseCode) {
+            $view = View::create([
+                'workflowItem' => $workflowItem,
+            ]);
+            $view->setFormat('json');
+            $transitResponse = $this->get('fos_rest.view_handler')->handle($view);
+            $responseCode = $transitResponse->getStatusCode();
+            $transitResponseContent = json_decode($transitResponse->getContent());
+        }
+
+        $response = $this->render(
+            'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+            [
+                'response'          => $transitResponseContent,
+                'responseCode'      => $responseCode,
+                'transitionSuccess' => $responseCode === 200,
+            ]
+        );
+
+        return $response;
     }
 
     /**
