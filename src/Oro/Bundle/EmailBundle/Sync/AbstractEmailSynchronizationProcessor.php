@@ -247,7 +247,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $email->getImportance(),
             $email->getCcRecipients(),
             $email->getBccRecipients(),
-            $owner
+            $owner,
+            $folder->getOrigin()->getOrganization()
         );
 
         $emailUser
@@ -315,6 +316,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      */
     protected function cleanUp($isFolderSyncComplete = false, $folder = null)
     {
+        // todo CRM-2480
+        return;
         $this->emailEntityBuilder->getBatch()->clear();
 
         /**
