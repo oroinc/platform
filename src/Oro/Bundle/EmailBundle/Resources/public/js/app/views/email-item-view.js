@@ -25,8 +25,7 @@ define(function (require) {
          * @inheritDoc
          */
         render: function () {
-            mediator.execute('layout:init', this.$el, this)
-                .done(_.bind(function () {
+            this.initLayout().done(_.bind(function () {
                     var commentsComponent = this.pageComponent('comments');
                     if (commentsComponent) {
                         this.commentCount = this.fetchCommentsQuantity();
