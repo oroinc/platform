@@ -6,9 +6,8 @@ define([
     'chaplin',
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/models/page-model',
-    'oroui/js/app/components/base/component-container-mixin'
-], function ($, _, Chaplin, __, BaseController, PageModel, componentContainerMixin) {
+    'oroui/js/app/models/page-model'
+], function ($, _, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
     var document, location, history, console, utils, mediator, PageController;
@@ -21,7 +20,6 @@ define([
     mediator = Chaplin.mediator;
 
     PageController = BaseController.extend({});
-    _.extend(PageController.prototype, componentContainerMixin);
     _.extend(PageController.prototype, {
         /**
          * Creates page model
@@ -60,7 +58,6 @@ define([
             if (this.disposed) {
                 return;
             }
-            this.disposePageComponents();
             PageController.__super__.dispose.call(this);
         },
 

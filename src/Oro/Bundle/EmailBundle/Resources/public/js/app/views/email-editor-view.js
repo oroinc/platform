@@ -36,10 +36,10 @@ define(function (require) {
             this.domCache.body.val(this.initBody(this.domCache.body.val()));
             this.addForgedAsterisk();
             this.initFields();
-            this.renderPromise = mediator.execute('layout:init', this.$el, this);
+            this.renderPromise = this.initLayout();
             return this;
         },
-        
+
         setupCache: function () {
             this.domCache = {
                 subject: this.$('[name$="[subject]"]'),
@@ -62,12 +62,11 @@ define(function (require) {
                         this.model.get('signature').replace(/(<([^>]+)>)/ig, '') + body.substring(caretPos));
                 }
             } else {
-                var url = routing.generate('oro_user_profile_update');
-                if (this.model.get('isSignatureEditable')) {
-                    mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature', {url: url}));
-                } else {
-                    mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature_no_permission'));
-                }
+                var url = routing.generate('oro_user_profile_update'),
+                    message = this.model.get('isSignatureEditable') ?
+                        __('oro.email.thread.no_signature', {url: url}) :
+                        __('oro.email.thread.no_signature_no_permission');
+                mediator.execute('showFlashMessage', 'info', message);
             }
         },
 

@@ -4,7 +4,7 @@ define(function (require) {
     'use strict';
 
     var HiddenInitializationView,
-        mediator = require('oroui/js/mediator'),
+        _ = require('underscore'),
         BaseView = require('oroui/js/app/views/base/view');
     /**
      * View allows hide part of DOM tree till all page components will be initialized
@@ -30,7 +30,7 @@ define(function (require) {
 
         render: function () {
             this.$el.addClass('invisible');
-            mediator.execute('layout:init', this.$el, this).done(_.bind( function () {
+            this.initLayout().done(_.bind(function () {
                 this.$el.removeClass('invisible');
             }, this));
         }
