@@ -207,61 +207,70 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     }
 
     /**
-     * @param array $supportedApiParams valid parameters that can be passed
-     * @param array $filterParameters   assoc array with filter params, like closure
-     *                                  [filterName => [closure => \Closure(...), ...]]
-     *                                  or [filterName => ParameterFilterInterface]
-     * @param array $filterMap          assoc array with map of filter query params to path that for doctrine criteria
-     *                                  For example: 2 filters by relation field - user_id and username.
-     *                                  Both should be applied to criteria as 'user' relation.
-     *                                  ['user_id' => 'user', 'user_name' => 'user']
+     * @param array $parameters  The allowed query parameters
+     * @param array $normalisers The normalizers of the filter values.
+     *                           [filterName => normalizer, ...]
+     *                           Each normalizer can be:
+     *                             * instance of ParameterFilterInterface
+     *                             * [closure => \Closure(...), ...]
+     * @param array $fieldMap    The map between filters and entity fields
+     *                           [filterName => fieldName or alias.fieldName, ...]
+     *                           For example: 2 filters by relation field - user_id and user_name.
+     *                           Both should be applied to 'user' relation.
+     *                           ['user_id' => 'user', 'user_name' => 'user']
      *
      * @return array
      * @throws \Exception
      */
-    protected function getFilterCriteria($supportedApiParams, $filterParameters = [], $filterMap = [])
+    protected function getFilterCriteria($parameters, $normalisers = [], $fieldMap = [])
     {
         return $this->buildFilterCriteria(
-            $this->filterQueryParameters($supportedApiParams),
-            $filterParameters,
-            $filterMap
+            $this->filterQueryParameters($parameters),
+            $normalisers,
+            $fieldMap
         );
     }
 
     /**
-     * @param array $filters           filter values. [filterName => [operator, value], ...]
-     * @param array $filterParameters  assoc array with filter params, like closure
-     *                                 [filterName => [closure => \Closure(...), ...]]
-     *                                 or [filterName => ParameterFilterInterface]
-     * @param array $filterMap         assoc array with map of filter query params to path that for doctrine criteria
-     *                                 For example: 2 filters by relation field - user_id and username.
-     *                                 Both should be applied to criteria as 'user' relation.
-     *                                 ['user_id' => 'user', 'user_name' => 'user']
+     * Builds the Criteria object based on the given filters
+     *
+     * @param array $filters     The filter criteria.
+     *                           [filterName => [operator, value], ...]
+     * @param array $normalisers The normalizers of the filter values.
+     *                           [filterName => normalizer, ...]
+     *                           Each normalizer can be:
+     *                             * instance of ParameterFilterInterface
+     *                             * [closure => \Closure(...), ...]
+     * @param array $fieldMap    The map between filters and entity fields
+     *                           [filterName => fieldName or alias.fieldName, ...]
+     *                           For example: 2 filters by relation field - user_id and user_name.
+     *                           Both should be applied to 'user' relation.
+     *                           ['user_id' => 'user', 'user_name' => 'user']
      *
      * @return array
      * @throws \Exception
      */
-    protected function buildFilterCriteria($filters, $filterParameters = [], $filterMap = [])
+    protected function buildFilterCriteria($filters, $normalisers = [], $fieldMap = [])
     {
         $criteria = Criteria::create();
 
-        foreach ($filters as $filterName => $filterData) {
-            list ($operator, $value) = $filterData;
+        foreach ($filters as $filterName => $data) {
+            list ($operator, $value) = $data;
 
-            $filter = isset($filterParameters[$filterName]) ? $filterParameters[$filterName] : false;
-            if ($filter) {
+            $normaliser = isset($normalisers[$filterName]) ? $normalisers[$filterName] : false;
+            if ($normaliser) {
                 switch (true) {
-                    case $filter instanceof ParameterFilterInterface:
-                        $value = $filter->filter($value, $operator);
+                    case $normaliser instanceof ParameterFilterInterface:
+                        $value = $normaliser->filter($value, $operator);
                         break;
-                    case is_array($filter) && isset($filter['closure']) && is_callable($filter['closure']):
-                        $value = call_user_func($filter['closure'], $value, $operator);
+                    case is_array($normaliser) && isset($normaliser['closure']) && is_callable($normaliser['closure']):
+                        $value = call_user_func($normaliser['closure'], $value, $operator);
                         break;
                 }
             }
 
-            $filterName = isset($filterMap[$filterName]) ? $filterMap[$filterName] : $filterName;
-            $this->addCriteria($criteria, $filterName, $operator, $value);
+            $fieldName = isset($fieldMap[$filterName]) ? $fieldMap[$filterName] : $filterName;
+            $this->addCriteria($criteria, $fieldName, $operator, $value);
         }
 
         return $criteria;

@@ -23,7 +23,7 @@ class TestPhone
     protected $phone;
 
     /**
-     * @ORM\ManyToOne(targetEntity="TestOwner", inversedBy="phones")
+     * @ORM\ManyToOne(targetEntity="TestOwner1", inversedBy="phones")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $owner;

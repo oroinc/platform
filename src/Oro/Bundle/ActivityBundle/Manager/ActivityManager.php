@@ -227,19 +227,21 @@ class ActivityManager
      */
     public function getActivityTypes()
     {
-        return array_map(
-            function (ConfigInterface $config) {
-                return $config->getId()->getClassName();
-            },
-            $this->groupingConfigProvider->filter(
+        return array_values(
+            array_map(
                 function (ConfigInterface $config) {
-                    // filter activity entities
-                    $groups = $config->get('groups');
+                    return $config->getId()->getClassName();
+                },
+                $this->groupingConfigProvider->filter(
+                    function (ConfigInterface $config) {
+                        // filter activity entities
+                        $groups = $config->get('groups');
 
-                    return
-                        !empty($groups)
-                        && in_array(ActivityScope::GROUP_ACTIVITY, $groups, true);
-                }
+                        return
+                            !empty($groups)
+                            && in_array(ActivityScope::GROUP_ACTIVITY, $groups, true);
+                    }
+                )
             )
         );
     }
@@ -288,6 +290,59 @@ class ActivityManager
             $filters,
             $joins,
             $this->getActivityTargets($activityClassName),
+            $limit,
+            $page,
+            $orderBy
+        );
+    }
+
+    /**
+     * Returns the list of fields responsible to store activity associations for the given target entity type
+     *
+     * @param string $targetClassName The FQCN of the target entity
+     *
+     * @return array [activity_entity_class => field_name]
+     */
+    public function getActivities($targetClassName)
+    {
+        $result = [];
+        foreach ($this->getActivityTypes() as $activityClass) {
+            $targets = $this->getActivityTargets($activityClass);
+            if (isset($targets[$targetClassName])) {
+                $result[$activityClass] = $targets[$targetClassName];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns a query builder that could be used for fetching the list of activity entities
+     * associated with the given target entity
+     *
+     * @param string      $targetClassName The FQCN of the activity entity
+     * @param mixed|null  $filters         Criteria is used to filter activity entities
+     *                                     e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null  $joins           Additional associations required to filter activity entities
+     * @param int         $limit           The maximum number of items per page
+     * @param int         $page            The page number
+     * @param string|null $orderBy         The ordering expression for the result
+     *
+     * @return SqlQueryBuilder
+     */
+    public function getActivitiesQueryBuilder(
+        $targetClassName,
+        $filters,
+        $joins,
+        $limit = null,
+        $page = null,
+        $orderBy = null
+    ) {
+        return $this->associationManager->getMultiAssociationOwnersQueryBuilder(
+            $targetClassName,
+            $filters,
+            $joins,
+            $this->getActivities($targetClassName),
             $limit,
             $page,
             $orderBy

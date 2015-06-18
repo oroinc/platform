@@ -74,4 +74,26 @@ class EmailActivityControllerTest extends WebTestCase
         $this->client->request('GET', $this->baseUrl . '?from=test1@example.com');
         $this->getJsonResponseContent($this->client->getResponse(), 404);
     }
+
+    public function testGetActivityTypes()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_activity_types')
+        );
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        // at least email activity should be returned
+        $this->assertTrue(count($entities) >= 1);
+    }
+
+    public function testGetActivityTargetTypes()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_activity_target_types', ['activity' => 'emails'])
+        );
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        // at least User entity should be returned
+        $this->assertTrue(count($entities) >= 1);
+    }
 }
