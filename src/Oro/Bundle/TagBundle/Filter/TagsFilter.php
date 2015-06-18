@@ -56,7 +56,7 @@ class TagsFilter extends EntityFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new LogicException(sprintf(
+            throw new \LogicException(sprintf(
                 '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
                 get_class($ds)
             ));
