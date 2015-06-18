@@ -23,7 +23,7 @@ define([
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
         if (this.parent) {
-            this.parent.pageComponent(this.name || $sourceElement.data('ftid') || this.cid, this);
+            this.parent.pageComponent(this.name || this.cid, this);
         }
         if ($sourceElement) {
             $sourceElement.data('componentInstance', this);
