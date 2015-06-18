@@ -68,3 +68,5 @@ oro:
             mins: mins
             hr: hr
             hrs: hrs
+        components:
+            initialization_error: 'Error occurred during layout update. Please contact system administrator.'
