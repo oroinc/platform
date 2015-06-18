@@ -1,6 +1,14 @@
 {% extends 'OroDashboardBundle:Dashboard:tabbedWidget.html.twig' %}
 {% import 'OroEmailBundle::macros.html.twig' as Email %}
 
+{% if unreadInboxMailCount > 0 %}
+    {% set unreadInboxMailCount %}
+        <div class="email-mail-count-circle">{{ unreadInboxMailCount }}</div>
+    {% endset %}
+{% else %}
+    {% set unreadInboxMailCount = '' %}
+{% endif %}
+
 {% block content %}
     {% set tabs = [{
         'url': path(
@@ -8,7 +16,8 @@
             {'widget': widgetName, 'activeTab': 'inbox', 'contentType': 'tab'}
         ),
         'name': 'inbox',
-        'label': 'oro.dashboard.recent_emails.inbox'|trans
+        'label': 'oro.dashboard.recent_emails.inbox'|trans,
+        'afterHtml': unreadInboxMailCount
     },
     {
         'url': path(
