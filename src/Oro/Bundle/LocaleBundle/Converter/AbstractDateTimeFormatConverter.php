@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
+use Symfony\Component\Translation\Translator;
+
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverterInterface
@@ -128,12 +130,17 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      */
     protected $formatMatch = array();
 
+    /** @var Translator */
+    private $translator;
+
     /**
      * @param DateTimeFormatter $formatter
+     * @param Translator $translator
      */
-    public function __construct(DateTimeFormatter $formatter)
+    public function __construct(DateTimeFormatter $formatter, Translator $translator)
     {
         $this->formatter = $formatter;
+        $this->translator = $translator;
     }
 
     /**
@@ -141,11 +148,9 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      */
     public function getDayFormat($locale = null)
     {
-        $pattern = $this->formatter->getPattern(\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, $locale);
+        $pattern = $this->translator->trans('oro.locale.date_format.day', [], null, $locale);
 
-        $pattern = preg_replace(['/y/', "/'.*'/", '/,/'], '', $pattern);
-
-        return $this->convertFormat(trim($pattern));
+        return $this->convertFormat($pattern);
     }
 
     /**

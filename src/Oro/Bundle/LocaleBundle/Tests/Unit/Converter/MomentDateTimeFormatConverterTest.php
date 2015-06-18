@@ -11,7 +11,7 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
      */
     protected function createFormatConverter()
     {
-        return new MomentDateTimeFormatConverter($this->formatter);
+        return new MomentDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
     /**
@@ -70,7 +70,7 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     {
         return array(
             'en default' => array("MMM D", self::LOCALE_EN),
-            'ru default' => array("DD.MM.", self::LOCALE_RU),
+            'ru default' => array("D.MMM", self::LOCALE_RU),
         );
     }
 }

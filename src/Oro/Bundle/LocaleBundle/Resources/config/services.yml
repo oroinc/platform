@@ -110,6 +110,7 @@ services:
         class: %oro_locale.format_converter.date_time.intl.class%
         arguments:
             - @oro_locale.formatter.date_time
+            - @translator
         tags:
             - { name: oro_locale.format_converter.date_time, alias: intl }
 
@@ -117,6 +118,7 @@ services:
         class: %oro_locale.format_converter.date_time.moment.class%
         arguments:
             - @oro_locale.formatter.date_time
+            - @translator
         tags:
             - { name: oro_locale.format_converter.date_time, alias: moment }
 
@@ -124,6 +126,7 @@ services:
         class: %oro_locale.format_converter.date_time.php.class%
         arguments:
             - @oro_locale.formatter.date_time
+            - @translator
         tags:
             - { name: oro_locale.format_converter.date_time, alias: php }
 
@@ -154,6 +157,7 @@ services:
         class: %oro_locale.formatter.date_time.class%
         arguments:
             - @oro_locale.settings
+            - @translator
 
     oro_locale.formatter.number:
         class: %oro_locale.formatter.number.class%

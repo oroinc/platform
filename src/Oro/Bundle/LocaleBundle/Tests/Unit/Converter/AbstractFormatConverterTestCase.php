@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 
@@ -19,6 +21,11 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
      * @var LocaleSettings
      */
     protected $formatter;
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
 
     /**
      * @var array
@@ -55,6 +62,21 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
         $this->formatter->expects($this->any())
             ->method('getPattern')
             ->will($this->returnValueMap($this->localFormatMap));
+
+        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator->method('trans')
+            ->will($this->returnCallback(function($one, $two, $tree, $locale){
+                if ($locale == self::LOCALE_EN)
+                    return 'MMM d';
+
+                if ($locale == self::LOCALE_RU)
+                    return 'd.MMM';
+
+                return '';
+            }));
 
         $this->converter = $this->createFormatConverter();
     }

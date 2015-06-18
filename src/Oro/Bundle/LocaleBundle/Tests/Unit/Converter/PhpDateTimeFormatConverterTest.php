@@ -11,7 +11,7 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
      */
     protected function createFormatConverter()
     {
-        return new PhpDateTimeFormatConverter($this->formatter);
+        return new PhpDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
     /**
@@ -70,7 +70,7 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     {
         return array(
             'en default' => array('M j', self::LOCALE_EN),
-            'ru default' => array('d.m.', self::LOCALE_RU),
+            'ru default' => array("j.M", self::LOCALE_RU),
         );
     }
 }

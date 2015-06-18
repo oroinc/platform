@@ -11,7 +11,7 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
      */
     protected function createFormatConverter()
     {
-        return new IntlDateTimeFormatConverter($this->formatter);
+        return new IntlDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
     /**
@@ -70,7 +70,7 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     {
         return array(
             'en default'      => array("MMM d", self::LOCALE_EN),
-            'ru default'      => array("dd.MM.", self::LOCALE_RU),
+            'ru default'      => array("d.MMM", self::LOCALE_RU),
         );
     }
 }
