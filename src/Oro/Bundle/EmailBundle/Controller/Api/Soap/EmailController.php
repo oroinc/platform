@@ -8,7 +8,6 @@ use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
-use Oro\Bundle\EmailBundle\Tools\EmailHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController;
@@ -34,7 +33,9 @@ class EmailController extends SoapGetController
     {
         $entities = array_filter(
             $this->getManager()->getList($limit, $page, $criteria, $orderBy),
-            [$this->getEmailHelper(), 'isEmailViewGranted']
+            function ($entity) {
+                return $this->container->get('oro_security.security_facade')->isGranted('VIEW', $entity);
+            }
         );
         return $this->transformToSoapEntities($entities);
     }
@@ -57,7 +58,7 @@ class EmailController extends SoapGetController
     {
         $entity = parent::getEntity($id);
 
-        $this->assertEmailViewGranted($entity);
+        $this->assertEmailAccessGranted('VIEW', $entity);
 
         return $entity;
     }
@@ -112,9 +113,7 @@ class EmailController extends SoapGetController
             throw new \SoapFault('NOT_FOUND', $translator->trans('oro.email.not_found', ['%id%'=>$id]));
         }
 
-        if (!$this->getEmailHelper()->isEmailEditGranted($entity)) {
-            throw new \SoapFault('FORBIDDEN', 'Record is forbidden');
-        }
+        $this->assertEmailAccessGranted('EDIT', $entity);
 
         /**
          * @var $entityRoutingHelper EntityRoutingHelper
@@ -157,7 +156,7 @@ class EmailController extends SoapGetController
             throw new \SoapFault('NOT_FOUND', $translator->trans('oro.email.not_found', ['%id%'=>$id]));
         }
 
-        $this->assertEmailViewGranted($entity);
+        $this->assertEmailAccessGranted('VIEW', $entity);
 
         $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
         $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
@@ -167,9 +166,15 @@ class EmailController extends SoapGetController
         return true;
     }
 
-    protected function assertEmailViewGranted(Email $entity)
+    /**
+     * @param string $attribute
+     * @param Email $entity
+     *
+     * @throws \SoapFault
+     */
+    protected function assertEmailAccessGranted($attribute, Email $entity)
     {
-        if (!$this->getEmailHelper()->isEmailViewGranted($entity)) {
+        if (!$this->container->get('oro_security.security_facade')->isGranted($attribute, $entity)) {
             throw new \SoapFault('FORBIDDEN', 'Record is forbidden');
         }
     }
@@ -184,7 +189,7 @@ class EmailController extends SoapGetController
     protected function getEmailAttachmentContentEntity($attachmentId)
     {
         $attachment = $this->getManager()->findEmailAttachment($attachmentId);
-        $this->assertEmailViewGranted($attachment->getEmailBody()->getEmail());
+        $this->assertEmailAccessGranted('VIEW', $attachment->getEmailBody()->getEmail());
 
         if (!$attachment) {
             throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $attachmentId));
@@ -211,13 +216,5 @@ class EmailController extends SoapGetController
     protected function getEmailCacheManager()
     {
         return $this->container->get('oro_email.email.cache.manager');
-    }
-
-    /**
-     * @return EmailHelper
-     */
-    protected function getEmailHelper()
-    {
-        return $this->container->get('oro_email.email_helper');
     }
 }
