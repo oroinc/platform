@@ -49,13 +49,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-
-        // TODO Should be refactored in CRM-2482
-        $em = $this->getDoctrine()->getManager();
-        $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
-        if ($emailUser) {
-            $this->getEmailManager()->setEmailUserSeen($emailUser);
-        }
+        $this->setSeenStatus($entity);
 
         return [
             'entity' => $entity,
@@ -74,6 +68,8 @@ class EmailController extends Controller
     public function viewThreadAction(Email $entity)
     {
         $this->assertEmailViewGranted($entity);
+
+        $this->setSeenStatus($entity);
 
         return ['entity' => $entity];
     }
@@ -530,5 +526,19 @@ class EmailController extends Controller
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
+    }
+
+    /**
+     * @param Email $entity
+     */
+    protected function setSeenStatus(Email $entity)
+    {
+        // todo: CRM-2482 - move to manager
+        $emailUser = $this->getDoctrine()->getManager()
+            ->getRepository('OroEmailBundle:EmailUser')
+            ->findByEmailAndOwner($entity, $this->getUser());
+        if ($emailUser) {
+            $this->getEmailManager()->setEmailUserSeen($emailUser);
+        }
     }
 }
