@@ -8,7 +8,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  * @package Oro\Bundle\TestFrameworkBundle\Pages
  * {@inheritdoc}
  */
-abstract class AbstractPageEntity extends AbstractPage
+abstract class AbstractPageEntity extends AbstractPageFilteredGrid
 {
     /** @var string */
     protected $owner;
@@ -21,12 +21,12 @@ abstract class AbstractPageEntity extends AbstractPage
 
     /**
      * Save entity
-     *
+     * @param string $button Default name of save button
      * @return $this
      */
-    public function save()
+    public function save($button = 'Save and Close')
     {
-        $this->test->byXpath("//button[normalize-space(.) = 'Save and Close']")->click();
+        $this->test->byXPath("//button[normalize-space(.) = '{$button}']")->click();
         sleep(1);
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -40,7 +40,7 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function toGrid()
     {
-        $this->test->byXpath("//div[@class='customer-content pull-left']/div[1]//a")->click();
+        $this->test->byXPath("//div[@class='customer-content pull-left']/div[1]//a")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -55,10 +55,10 @@ abstract class AbstractPageEntity extends AbstractPage
     public function close($redirect = false)
     {
         $class = get_class($this);
-        if (substr($class, -1) == 'y') {
+        if (substr($class, -1) === 'y') {
             $class = substr($class, 0, strlen($class) - 1) . 'ies';
         } else {
-            $class = $class . 's';
+            $class .= 's';
         }
 
         return new $class($this->test, $redirect);
@@ -76,7 +76,7 @@ abstract class AbstractPageEntity extends AbstractPage
     {
         if ($this->isElementPresent("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]")) {
             $tagsPath = $this->test
-                ->byXpath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
+                ->byXPath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
             $tagsPath->click();
             $tagsPath->value(substr($tag, 0, (strlen($tag)-1)));
             $this->waitForAjax();
@@ -109,7 +109,7 @@ abstract class AbstractPageEntity extends AbstractPage
     {
         if ($this->isElementPresent("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]")) {
             $tagsPath = $this->test
-                ->byXpath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
+                ->byXPath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
             $tagsPath->click();
             $tagsPath->value($tag);
             $this->waitForAjax();
@@ -117,7 +117,7 @@ abstract class AbstractPageEntity extends AbstractPage
                 "//div[@id='select2-drop']//div[contains(., '{$tag}')]",
                 "Tag's autocomplete doesn't return entity"
             );
-            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$tag}')]")->click();
+            $this->test->byXPath("//div[@id='select2-drop']//div[contains(., '{$tag}')]")->click();
 
             return $this;
         } else {
@@ -160,13 +160,13 @@ abstract class AbstractPageEntity extends AbstractPage
             $ownerObject = $this->test->byXPath($this->owner);
             $ownerObject->click();
             $this->waitForAjax();
-            $this->test->byXpath("//div[@id='select2-drop']/div/input")->value($owner);
+            $this->test->byXPath("//div[@id='select2-drop']/div/input")->value($owner);
             $this->waitForAjax();
             $this->assertElementPresent(
                 "//div[@id='select2-drop']//div[contains(., '{$owner}')]",
                 "Owner autocomplete doesn't return search value"
             );
-            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
+            $this->test->byXPath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
         }
         return $this;
     }
@@ -260,6 +260,26 @@ abstract class AbstractPageEntity extends AbstractPage
             "/*[@class='details'][contains(., '{$activityType}')]",
             "{$activityType} '{$activityName}' not found"
         );
+
+        return $this;
+    }
+
+    /**
+     * @param $filterName
+     * @param $entityName
+     * @return $this
+     */
+    public function assignEntityFromEmbeddedGrid($filterName, $entityName)
+    {
+        $this->filterBy($filterName, $entityName);
+        $this->assertElementPresent(
+            "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
+            "//preceding-sibling::td/input"
+        );
+        $this->test->byXPath(
+            "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
+            "//preceding-sibling::td/input"
+        )->click();
 
         return $this;
     }

@@ -9,10 +9,14 @@ define(function (require) {
         LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     WysiwygEditorView = BaseView.extend({
+        TINYMCE_UI_HEIGHT: 39,
+        TEXTAREA_UI_HEIGHT: 16,
+
         autoRender: true,
         firstRender: true,
 
         tinymceConnected: false,
+        height: false,
         tinymceInstance: null,
 
         defaults: {
@@ -104,6 +108,7 @@ define(function (require) {
                 this.$el.removeAttr('data-focusable');
             }
             this.firstRender = false;
+            this.trigger('resize');
         },
 
         setEnabled: function (enabled) {
@@ -117,6 +122,18 @@ define(function (require) {
         setFocus: function (e) {
             if (this.enabled) {
                 this.tinymceInstance.focus();
+            }
+        },
+
+        getHeight: function () {
+            return this.$el.parent().height();
+        },
+
+        setHeight: function (newHeight) {
+            if (this.tinymceConnected) {
+                this.$el.parent().find('iframe').height(newHeight - this.TINYMCE_UI_HEIGHT);
+            } else {
+                this.$el.height(newHeight - this.TEXTAREA_UI_HEIGHT);
             }
         },
 

@@ -22,6 +22,9 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $associationManager;
+
     /** @var TestAttachment */
     protected $attachment;
 
@@ -67,7 +70,18 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $securityFacade->expects($this->any())->method('getLoggedUser')
             ->will($this->returnValue(null));
 
-        $this->attachmentManager = new AttachmentManager($filesystemMap, $this->router, $serviceLink, $ileIcons);
+        $this->associationManager = $this
+            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->attachmentManager = new AttachmentManager(
+            $filesystemMap,
+            $this->router,
+            $serviceLink,
+            $ileIcons,
+            $this->associationManager
+        );
     }
 
     public function testGetContent()
@@ -279,5 +293,32 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
             [pow(1024, 3), '1.07 GB'],
             [pow(1024, 4), pow(1024, 4)],
         ];
+    }
+
+    public function testFileKey()
+    {
+        $fileId           = 123;
+        $ownerEntityClass = 'Acme\MyClass';
+        $ownerEntityId    = 456;
+
+        $key = $this->attachmentManager->buildFileKey($fileId, $ownerEntityClass, $ownerEntityId);
+        $this->assertNotEmpty($key);
+        $this->assertTrue(is_string($key));
+
+        list($extractedFileId, $extractedOwnerEntityClass, $extractedOwnerEntityId) =
+            $this->attachmentManager->parseFileKey($key);
+
+        $this->assertSame($fileId, $extractedFileId);
+        $this->assertSame($ownerEntityClass, $extractedOwnerEntityClass);
+        $this->assertSame($ownerEntityId, $extractedOwnerEntityId);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid file key: "Invalid Key".
+     */
+    public function testParseInvalidFileKey()
+    {
+        $this->attachmentManager->parseFileKey('Invalid Key');
     }
 }

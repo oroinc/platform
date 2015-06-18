@@ -149,31 +149,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
-     * Register EmailOrigin object
-     *
-     * @param EmailOrigin $origin
-     * @throws \LogicException
-     */
-    public function addOrigin(EmailOrigin $origin)
-    {
-        $key = $origin->getId();
-        $this->origins[$key] = $origin;
-    }
-
-    /**
-     * Get EmailOrigin if it exists in the batch
-     *
-     * @param int $id The origin id
-     * @return EmailOrigin|null
-     */
-    public function getOrigin($id)
-    {
-        return isset($this->origins[$id])
-            ? $this->origins[$id]
-            : null;
-    }
-
-    /**
      * Tell the given EntityManager to manage this batch
      *
      * @param EntityManager $em
@@ -289,6 +264,26 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function areEmailsEqual(Email $email1, Email $email2)
     {
         return $email1->getMessageId() === $email2->getMessageId();
+    }
+
+    /**
+     * Determines whether two email addresses are the same
+     *
+     * @param EmailAddress|null $address1
+     * @param EmailAddress|null $address2
+     *
+     *@return bool
+     */
+    protected function areAddressesEqual($address1, $address2)
+    {
+        if ($address1 === $address2) {
+            return true;
+        }
+        if (null === $address1 || null === $address2) {
+            return false;
+        }
+
+        return strtolower($address1->getEmail()) === strtolower($address2->getEmail());
     }
 
     /**

@@ -41,12 +41,14 @@
                         cc: entity.cc,
                         bcc: entity.bcc,
                         appendSignature: appendSignature,
+                        minimalWysiwygEditorHeight: 150,
                         isSignatureEditable: resource_granted('oro_user_user_update')
                     }
                 %}
                 <fieldset class="form-horizontal"
                           data-page-component-module="oroemail/js/app/components/email-editor-component"
                           data-page-component-options="{{ emailEditorOptions | json_encode }}"
+                          data-layout="separate"
                         >
                     {{ form_row(form.gridName) }}
                     {{ form_row(form.from) }}

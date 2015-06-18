@@ -210,6 +210,13 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             return currencyCode;
         },
 
+        /**
+         * @return {string} name of system tynezone
+         */
+        getTimeZone: function () {
+            return this.settings.timezone;
+        },
+
         getTimeZoneOffset: function() {
             return this.settings.timezone_offset;
         },

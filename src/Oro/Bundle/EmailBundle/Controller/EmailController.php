@@ -239,6 +239,7 @@ class EmailController extends Controller
      * Link attachment to entity
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_user_edit")
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
@@ -365,7 +366,6 @@ class EmailController extends Controller
 
         if ($emailUser) {
             $this->getEmailManager()->toggleEmailUserSeen($emailUser);
-            $this->getEmailManager()->updateChangeStatusAt($emailUser);
         }
 
         return new JsonResponse(['successful' => (bool)$emailUser]);

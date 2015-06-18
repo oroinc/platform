@@ -1,0 +1,12 @@
+route:
+    path: /root
+
+route2:
+    path: /root2
+    options:
+        expose: true
+
+route3:
+    path: /root3
+    options:
+        expose: false

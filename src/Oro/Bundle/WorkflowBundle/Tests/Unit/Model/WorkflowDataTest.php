@@ -35,6 +35,9 @@ class WorkflowDataTest extends \PHPUnit_Framework_TestCase
 
         $this->data->setModified(false);
         $this->assertFalse($this->data->isModified());
+
+        $this->data->set('nullable', null);
+        $this->assertTrue($this->data->isModified());
     }
 
     public function testHasGetSetRemove()
@@ -236,7 +239,11 @@ class WorkflowDataTest extends \PHPUnit_Framework_TestCase
     {
         $data = new \stdClass();
         $data->value = 'one';
-        $this->data->setFieldsMapping(array('test2' => 'test.value'));
+        $data->nullable = null;
+        $this->data->setFieldsMapping([
+            'test2' => 'test.value',
+            'nullable' => 'test.nullable'
+        ]);
 
         $this->assertFalse($this->data->has('test'), 'no test');
         $this->assertFalse($this->data->has('test2'), 'no test2');
@@ -246,6 +253,9 @@ class WorkflowDataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->data->has('test'), 'has test');
         $this->assertTrue($this->data->has('test2'), 'has test2');
+
+        $this->assertTrue($this->data->has('nullable'), 'has nullable');
+        $this->assertNull($this->data->get('nullable'));
 
         $this->data->set('test2', 'two');
         $this->assertEquals('two', $this->data->get('test2'));
