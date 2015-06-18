@@ -412,28 +412,25 @@ define(function (require) {
             });
         },
 
-        onResizeStart: function (e) {
-            var that = this;
+        onResizeStart: function (event) {
             this.$el.css({overflow: 'hidden'});
-            _.forEach(this.pageComponents, function (cmp) {
-                cmp.trigger('parentResizeStart', e, that);
-            });
+            this.getComponentManager().forEachComponent(function (component) {
+                component.trigger('parentResizeStart', event, this);
+            }, this);
         },
 
-        onResize: function (e) {
-            var that = this;
-            _.forEach(this.pageComponents, function (cmp) {
-                cmp.trigger('parentResize', e, that);
-            });
+        onResize: function (event) {
+            this.getComponentManager().forEachComponent(function (component) {
+                component.trigger('parentResize', event, this);
+            }, this);
         },
 
-        onResizeStop: function (e) {
-            var that = this;
+        onResizeStop: function (event) {
             this.$el.css({overflow: ''});
             this._fixBorderShifting();
-            _.forEach(this.pageComponents, function (cmp) {
-                cmp.trigger('parentResizeStop', e, that);
-            });
+            this.getComponentManager().forEachComponent(function (component) {
+                component.trigger('parentResizeStop', event, this);
+            }, this);
         }
     });
 

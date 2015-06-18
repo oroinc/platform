@@ -43,10 +43,19 @@ define([
     Backbone.View.prototype.eventNamespace = function () {
         return '.delegateEvents' + this.cid;
     };
+    Backbone.View.prototype.getLayoutElement = function () {
+        return this.$el;
+    };
+    Backbone.View.prototype.initLayout = function () {
+        // initializes layout
+        Backbone.mediator.execute('layout:init', this.getLayoutElement());
+        // initializes page components
+        return this.initPageComponents();
+    };
 
     Backbone.Model.prototype.disposed = false;
     Backbone.Model.prototype.dispose = function () {
-        var prop, properties, _i, _len, mediator;
+        var prop, properties, _i, _len;
         if (this.disposed) {
             return;
         }

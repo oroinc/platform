@@ -28,7 +28,7 @@ define([
 
         render: function () {
             var self = this;
-            mediator.execute('layout:init', this.$el, this).done(function () {
+            this.initLayout().done(function () {
                 self.handleLayoutInit();
             });
         },
