@@ -147,6 +147,7 @@ datagrid:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
                     - a
+                    - CASE WHEN eu.seen = 1 THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -163,6 +164,10 @@ datagrid:
                         - o.id IN (:origin_ids)
         properties:
             id: ~
+            row_class_name:
+                type: callback
+                className: 'email-row-is-readed'
+                callable: @oro_email.helper.datagrid.emails->getReadedRowClosure
         options:
             entityHint: email
             toolbarOptions:
@@ -180,8 +185,10 @@ datagrid:
                         - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
         columns:
             receivedAt:
+                type: twig
                 label: oro.email.received_at.label
-                frontend_type: datetime
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/date_long.html.twig
             fromEmailExpression:
                 type: twig
                 label: oro.email.from_name.label
