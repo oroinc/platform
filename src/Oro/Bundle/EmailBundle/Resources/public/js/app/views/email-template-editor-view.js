@@ -2,24 +2,24 @@
 define(function (require) {
     'use strict';
 
-    var EmailVariableComponent1,
+    var EmailTemplateEditorView,
         $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
         BaseView = require('oroui/js/app/views/base/view');
 
-    EmailVariableComponent1 = BaseView.extend({
+    EmailTemplateEditorView = BaseView.extend({
         options: {
             typeSwitcher: 'input[name*="type"]', //selector of type switcher
             hasWysiwyg: false, //is wysiwyg editor enabled in System->Configuration
             isWysiwygEnabled: false, //true if 'type' is set to 'Html'
             editorComponents: [], //collection of editor(s) view components
-            emailVariableview: {} // link to app/views/email-variable-view
+            emailVariableView: {} // link to app/views/email-variable-view
         },
 
         initialize: function (options) {
-            EmailVariableComponent1.__super__.initialize.apply(this, arguments);
+            EmailTemplateEditorView.__super__.initialize.apply(this, arguments);
 
             this.options = _.defaults(options || {}, this.options);
 
@@ -27,14 +27,14 @@ define(function (require) {
         },
 
         render: function () {
-            mediator.execute('layout:init', this.$el, this).then(_.bind(this.afterLayoutInit, this));
+            this.initLayout().then(_.bind(this.afterLayoutInit, this));
         },
 
         afterLayoutInit: function () {
             this.options.hasWysiwyg = $(this.el).find('textarea[name*="content"]:first').data('wysiwygEnabled') == true;
             if (this.options.hasWysiwyg) {
                 this.options.isWysiwygEnabled = $(this.options.typeSwitcher).filter(':checked').val() === 'html';
-                this.options.emailVariableview = this.pageComponent('email-template-variables');
+                this.options.emailVariableView = this.componentManager.get('email-template-variables');
 
                 this._collectEditors();
                 this._initTypeSwitcher();
@@ -65,17 +65,17 @@ define(function (require) {
         _collectEditors: function () {
             this.options.editorComponents = [];
             if (this.options.hasWysiwyg) {
-                _.each(this.pageComponents, function (component) {
-                    if (!_.isUndefined(component.view)
-                        && !_.isUndefined(component.view.tinymceConnected)
-                        && component.view.tinymceConnected === true
+                _.each(this.componentManager.components, function (component) {
+                    if (!_.isUndefined(component.component.view)
+                        && !_.isUndefined(component.component.view.tinymceConnected)
+                        && component.component.view.tinymceConnected === true
                     ) {
-                        this.options.editorComponents.push(component);
-                        $(component.view.tinymceInstance.getBody()).on(
+                        this.options.editorComponents.push(component.component);
+                        $(component.component.view.tinymceInstance.getBody()).on(
                             'blur',
                             _.bind(
                                 function (e) {
-                                    this.options.emailVariableview.view._updateElementsMetaData(e);
+                                    this.options.emailVariableView.view._updateElementsMetaData(e);
                                 },
                                 this
                             )
@@ -119,5 +119,5 @@ define(function (require) {
 
     });
 
-    return EmailVariableComponent1;
+    return EmailTemplateEditorView;
 });
