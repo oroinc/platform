@@ -5,15 +5,21 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         Select2AutocompleteComponent = require('oroform/js/app/components/select2-autocomplete-component');
     Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
-        processExtraConfig: function (select2Config, params) {
-            Select2MultiAutocompleteComponent.__super__.processExtraConfig(select2Config, params);
-            select2Config.maximumInputLength = 50;
+        oroTagCreateGranted: false,
+        initialize: function (options) {
+            this.oroTagCreateGranted = _.result(options, 'oro_tag_create_granted', this.oroTagCreateGranted);
+            Select2MultiAutocompleteComponent.__super__.initialize.call(this, options);
+        },
+        preConfig: function (config) {
+            var that = this;
+            Select2MultiAutocompleteComponent.__super__.preConfig.call(this, config);
+            config.maximumInputLength = 50;
 
-            select2Config.createSearchChoice = function(term, data) {
+            config.createSearchChoice = function(term, data) {
                 if (
                     $(data).filter(function() {
                         return this.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
-                    }).length === 0 && params.oroTagCreateGranted
+                    }).length === 0 && that.oroTagCreateGranted
                 ) {
                     return {
                         id: term,
@@ -23,11 +29,11 @@ define(function (require) {
                 return null;
             }
 
-            if (!params.oroTagCreateGranted) {
-                select2Config.placeholder = __('oro.tag.form.choose_tag');
+            if (!this.oroTagCreateGranted) {
+                config.placeholder = __('oro.tag.form.choose_tag');
             }
 
-            return select2Config;
+            return config;
         }
     });
     return Select2MultiAutocompleteComponent;
