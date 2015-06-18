@@ -21,12 +21,12 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
 
     /**
      * Save entity
-     *
+     * @param string $button Default name of save button
      * @return $this
      */
-    public function save()
+    public function save($button = 'Save and Close')
     {
-        $this->test->byXPath("//button[normalize-space(.) = 'Save and Close']")->click();
+        $this->test->byXPath("//button[normalize-space(.) = '{$button}']")->click();
         sleep(1);
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -55,10 +55,10 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
     public function close($redirect = false)
     {
         $class = get_class($this);
-        if (substr($class, -1) == 'y') {
+        if (substr($class, -1) === 'y') {
             $class = substr($class, 0, strlen($class) - 1) . 'ies';
         } else {
-            $class = $class . 's';
+            $class .= 's';
         }
 
         return new $class($this->test, $redirect);

@@ -95,7 +95,7 @@ define(function (require) {
             this.$('.dropdown-menu.activity-item').on('mouseleave', function () {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
-            mediator.execute('layout:init', this.$el, this);
+            this.initLayout();
             return this;
         },
 
@@ -143,7 +143,7 @@ define(function (require) {
 
         _onContentChange: function () {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
-            mediator.execute('layout:init', this.$el, this).done(_.bind(function () {
+            this.initLayout().done(_.bind(function () {
                 // if the activity has an emailTreadComponent -- handle comment count change in own way
                 var threadComponent = this.pageComponent('email-thread');
                 if (threadComponent) {
@@ -184,7 +184,7 @@ define(function (require) {
             }
             options._sourceElement = this.$(this.options.commentsBlock);
             commentsComponent = new CommentComponent(options);
-            this.pageComponent('comments', commentsComponent);
+            this.pageComponent('comments', commentsComponent, options._sourceElement[0]);
             this.listenTo(commentsComponent.collection, 'stateChange', this.updateCommentsQuantity, this);
         },
 
@@ -200,7 +200,10 @@ define(function (require) {
         },
 
         updateCommentsQuantity: function () {
-            this.model.set('commentCount', this.pageComponent('comments').collection.getState().totalItemsQuantity);
+            var component = this.pageComponent('comments');
+            if (component !== null) {
+                this.model.set('commentCount', component.collection.getState().totalItemsQuantity);
+            }
         }
     });
 

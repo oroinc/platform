@@ -132,7 +132,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
         /** @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
-            ->checkActionMenu('Delete')
+            ->assertNoActionMenu('Delete')
             ->open(array($unitName))
             ->assertElementNotPresent("//div[@class='pull-left btn-group icons-holder']/a[@title='Delete Account']");
     }
@@ -152,7 +152,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
         /** @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
-            ->checkActionMenu('Update')
+            ->assertNoActionMenu('Update')
             ->open(array($unitName))
             ->assertElementNotPresent(
                 "//div[@class='pull-left btn-group icons-holder']/a[@title='Edit Business Unit']"

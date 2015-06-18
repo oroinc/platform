@@ -520,7 +520,7 @@ define(function (require) {
 
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
-            mediator.execute('layout:init', this.$el, this).always(_.bind(function () {
+            this.initLayout().always(_.bind(function () {
                 this.rendered = true;
                 /**
                  * Backbone event. Fired when the grid has been successfully rendered.
@@ -608,7 +608,7 @@ define(function (require) {
                  * @event grid_load:complete
                  */
                 mediator.trigger('grid_load:complete', this.collection, this.$el);
-                mediator.execute('layout:init', this.$el, this);
+                this.initLayout();
                 this.trigger('content:update');
             }
         },

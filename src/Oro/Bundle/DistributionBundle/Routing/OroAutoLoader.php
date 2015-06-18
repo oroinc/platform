@@ -2,46 +2,38 @@
 
 namespace Oro\Bundle\DistributionBundle\Routing;
 
-use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 
-class OroAutoLoader extends YamlFileLoader
+use Symfony\Component\Routing\RouteCollection;
+
+class OroAutoLoader extends AbstractLoader
 {
     /**
-     * @var HttpKernelInterface
+     * {@inheritdoc}
      */
-    protected $kernel;
-
-    /**
-     *
-     * @param FileLocatorInterface $locator
-     */
-    public function __construct(FileLocatorInterface $locator, HttpKernelInterface $kernel)
-    {
-        parent::__construct($locator);
-
-        $this->kernel = $kernel;
-    }
-
     public function load($file, $type = null)
     {
         $routes = new RouteCollection();
+        $bundles = $this->kernel->getBundles();
 
-        foreach ($this->kernel->getBundles() as $bundle) {
-            $path = $bundle->getPath() . '/Resources/config/oro/routing.yml';
-
-            if (is_file($path)) {
-                $routes->addCollection(parent::load($path, $type));
+        foreach ($bundles as $bundle) {
+            try {
+                $path = $this->locator->locate('Resources/config/oro/routing.yml', $bundle->getPath());
+            } catch (\InvalidArgumentException $e) {
+                continue;
             }
+
+            $routes->addCollection(parent::load($path, $type));
         }
 
-        return $routes;
+        return $this->dispatchEvent(RouteCollectionEvent::AUTOLOAD, $routes);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supports($resource, $type = null)
     {
-        return 'oro_auto' == $type;
+        return 'oro_auto' === $type;
     }
 }
