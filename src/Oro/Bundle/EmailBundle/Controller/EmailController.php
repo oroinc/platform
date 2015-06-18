@@ -342,6 +342,36 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/toggle_seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
+     * @param Email $emailEntity
+     * @return array
+     */
+    public function toggleSeenAction(Email $emailEntity)
+    {
+        if (!$this->getEmailHelper()->isEmailEditGranted($emailEntity)) {
+            return new JsonResponse(
+                [
+                    'message' => $this
+                        ->get('translator')
+                        ->trans('oro.email.datagrid.emails.action.enable_to_change_status'),
+                    'successful' => false
+                ]
+            );
+        }
+
+        $emailUser = $this
+            ->get('doctrine')
+            ->getRepository('OroEmailBundle:EmailUser')
+            ->findByEmailAndOwner($emailEntity, $this->getUser());
+
+        if ($emailUser) {
+            $this->getEmailManager()->toggleEmailUserSeen($emailUser);
+        }
+
+        return new JsonResponse(['successful' => (bool)$emailUser]);
+    }
+
+    /**
      * @return EmailHelper
      */
     protected function getEmailHelper()

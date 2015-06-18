@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -103,5 +104,21 @@ class EmailGridHelper
         }
 
         return $this->emailOrigins;
+    }
+
+    /**
+     * Returns callback for configuration of grid/actions visibility per row
+     *
+     * @return callable
+     */
+    public function getActionConfigurationClosure()
+    {
+        return function (ResultRecordInterface $record) {
+            if ($record->getValue('seen')) {
+                return array('mark_as_read' => false);
+            } else {
+                return array('mark_as_unread' => false);
+            }
+        };
     }
 }

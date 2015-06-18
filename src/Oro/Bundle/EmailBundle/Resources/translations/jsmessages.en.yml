@@ -22,6 +22,10 @@ oro:
             added: Attachment added
         send_email: Send email
         menu.shortcut_compose_email.label: Compose email
+        action:
+            success_mark_read: "Email has been market as read"
+            success_mark_unread: "Email has been market as unread"
+            error: Error has occurred
 "The email was sent": "The email was sent"
 "Preview": "Preview"
 "Yes, Proceed": "Yes, Proceed"
