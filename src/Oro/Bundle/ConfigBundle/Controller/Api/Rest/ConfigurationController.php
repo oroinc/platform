@@ -58,7 +58,8 @@ class ConfigurationController extends FOSRestController
      *      description="Get all configuration data of the specified section",
      *      resource=true,
      *      filters={
-     *          {"name"="scope", "dataType"="string", "description"="Scope name. By default - user"}
+     *          {"name"="scope", "dataType"="string", "description"="Scope name. By default - user"},
+     *          {"name"="_locale", "dataType"="string", "description"="Locale of the configuration value"}
      *      }
      * )
      * @AclAncestor("oro_config_system")
