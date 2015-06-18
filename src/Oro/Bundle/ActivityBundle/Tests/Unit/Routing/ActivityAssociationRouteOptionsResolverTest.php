@@ -7,11 +7,11 @@ use Symfony\Component\Routing\Route;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\SortableRouteCollection;
 
-use Oro\Bundle\ActivityBundle\Routing\ActivityRelationRouteOptionsResolver;
+use Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
-class ActivityRelationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
+class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $groupingConfigProvider;
@@ -25,7 +25,7 @@ class ActivityRelationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
     /** @var RouteCollectionAccessor */
     protected $routeCollectionAccessor;
 
-    /** @var ActivityRelationRouteOptionsResolver */
+    /** @var ActivityAssociationRouteOptionsResolver */
     protected $routeOptionsResolver;
 
     protected function setUp()
@@ -38,7 +38,7 @@ class ActivityRelationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->routeOptionsResolver = new ActivityRelationRouteOptionsResolver(
+        $this->routeOptionsResolver = new ActivityAssociationRouteOptionsResolver(
             $this->groupingConfigProvider,
             $this->entityAliasResolver
         );
@@ -58,7 +58,7 @@ class ActivityRelationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
 
     public function testResolveActivityRelationRouteWithoutEntityPlaceholder()
     {
-        $route = new Route('/route', [], [], ['group' => 'activity_relations']);
+        $route = new Route('/route', [], [], ['group' => 'activity_association']);
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 
@@ -67,7 +67,7 @@ class ActivityRelationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
 
     public function testResolve()
     {
-        $route = new Route('/{activity}/route', [], [], ['group' => 'activity_relations']);
+        $route = new Route('/{activity}/route', [], [], ['group' => 'activity_association']);
 
         $this->routeCollection->add('first_route', new Route('/first_route'));
         $this->routeCollection->add(

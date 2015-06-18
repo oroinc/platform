@@ -12,7 +12,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class ActivityRelationRouteOptionsResolver implements RouteOptionsResolverInterface
+class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     const ACTIVITY_ATTRIBUTE = 'activity';
     const ACTIVITY_PLACEHOLDER = '{activity}';
@@ -44,7 +44,7 @@ class ActivityRelationRouteOptionsResolver implements RouteOptionsResolverInterf
      */
     public function resolve(Route $route, RouteCollectionAccessor $routeCollectionAccessor)
     {
-        if ($route->getOption('group') !== 'activity_relations') {
+        if ($route->getOption('group') !== 'activity_association') {
             return;
         }
 

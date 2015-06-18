@@ -68,8 +68,8 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
 
-    oro_activity.routing.options_resolver.activity_relations:
-        class: Oro\Bundle\ActivityBundle\Routing\ActivityRelationRouteOptionsResolver
+    oro_activity.routing.options_resolver.activity_association:
+        class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver
         public: false
         arguments:
             - @oro_entity_config.provider.grouping
