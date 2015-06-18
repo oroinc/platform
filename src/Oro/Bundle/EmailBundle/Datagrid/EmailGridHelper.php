@@ -114,10 +114,32 @@ class EmailGridHelper
     public function getActionConfigurationClosure()
     {
         return function (ResultRecordInterface $record) {
-            if ($record->getValue('seen')) {
-                return array('mark_as_read' => false);
-            } else {
+            if ($record->getValue('is_new')) {
                 return array('mark_as_unread' => false);
+            } else {
+                return array('mark_as_read' => false);
+            }
+        };
+    }
+
+    /**
+     * Returns callback for row of emails grid per row
+     *
+     * @return callable
+     */
+    public function getReadedRowClosure($gridName, $keyName, $node)
+    {
+        if (!array_key_exists('className', $node)) {
+            return false;
+        }
+
+        $className = $node['className'];
+
+        return function (ResultRecordInterface $record) use ($className) {
+            if ($record->getValue('is_new') === '0') {
+                return $className;
+            } else {
+                return '';
             }
         };
     }

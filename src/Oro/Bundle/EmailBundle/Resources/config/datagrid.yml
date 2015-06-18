@@ -5,7 +5,7 @@ datagrid:
             query:
                 select:
                     - partial eu.{id, email}
-                    - eu.seen
+                    - CASE WHEN eu.seen = 1 THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -90,7 +90,8 @@ datagrid:
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
                 folder:  { type: string,   data_name: f.type, label: oro.email.folders.label }
-        views_list : @oro_email.emailfolder.datagrid_view_list
+                is_new:    { type: boolean,  data_name: is_new, label: oro.email.new.label }
+        views_list : @oro_email.emailseen.datagrid_view_list
 
     activity-email-grid:
         extends: email-grid
@@ -106,9 +107,13 @@ datagrid:
                 route: oro_email_thread_view
                 params: { id: email.id }
             toggle_seen_link:
-                type:       url
-                route:      oro_email_toggle_seen
-                params:     [ id ]
+                type: url
+                route: oro_email_toggle_seen
+                params: { id: email.id }
+            row_class_name:
+                type: callback
+                className: 'email-row-is-readed'
+                callable: @oro_email.helper.datagrid.emails->getReadedRowClosure
 
         actions:
             view_thread:
@@ -123,16 +128,16 @@ datagrid:
                 link:  toggle_seen_link
                 icon: plus
                 defaultMessages:
-                    success:         oro.email.action.success_mark_read
-                    error:           oro.email.action.error
+                    success: oro.email.action.success_mark_read
+                    error: oro.email.action.error
             mark_as_unread:
                 type: ajax
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 link:  toggle_seen_link
                 icon: minus
                 defaultMessages:
-                    success:         oro.email.action.success_mark_unread
-                    error:           oro.email.action.error
+                    success: oro.email.action.success_mark_unread
+                    error: oro.email.action.error
         action_configuration: @oro_email.helper.datagrid.emails->getActionConfigurationClosure
     dashboard-recent-emails-grid:
         source:
@@ -142,6 +147,7 @@ datagrid:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
                     - a
+                    - CASE WHEN eu.seen = 1 THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -158,6 +164,10 @@ datagrid:
                         - o.id IN (:origin_ids)
         properties:
             id: ~
+            row_class_name:
+                type: callback
+                className: 'email-row-is-readed'
+                callable: @oro_email.helper.datagrid.emails->getReadedRowClosure
         options:
             entityHint: email
             toolbarOptions:
@@ -175,8 +185,10 @@ datagrid:
                         - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
         columns:
             receivedAt:
+                type: twig
                 label: oro.email.received_at.label
-                frontend_type: datetime
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/date_long.html.twig
             fromEmailExpression:
                 type: twig
                 label: oro.email.from_name.label
