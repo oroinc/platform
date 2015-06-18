@@ -95,13 +95,47 @@ class Attachment
             $contentType = 'text/plain';
             $encoding = 'ASCII';
         }
+        $contentTransferEncoding = 'BINARY';
 
         if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {
             $contentTransferEncoding = $this->part->getHeader('Content-Transfer-Encoding')->getFieldValue();
-        } else {
-            $contentTransferEncoding = 'BINARY';
         }
 
         return new Content($this->part->getContent(), $contentType, $contentTransferEncoding, $encoding);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmbeddedContentId()
+    {
+        $contentIdValue = $this->getContentIdValue();
+        if ($contentIdValue !== null) {
+            $contentDisposition = $this->getContentDispositionValue();
+            if (!$contentDisposition || Decode::splitContentType($contentDisposition, 'type') === 'inline') {
+                return substr($contentIdValue, 1, strlen($contentIdValue) - 2);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getContentIdValue()
+    {
+        return $this->part->getHeaders()->has('Content-ID')
+            ? $this->part->getHeader('Content-ID')->getFieldValue()
+            : null;
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getContentDispositionValue()
+    {
+        return $this->part->getHeaders()->has('Content-Disposition')
+            ? $this->part->getHeader('Content-Disposition')->getFieldValue()
+            : null;
     }
 }
