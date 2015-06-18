@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -48,11 +47,6 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $ef;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
-     */
-    protected $metadata;
-
     protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
@@ -60,6 +54,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->ef = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
+        $class = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
 
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
@@ -70,17 +65,20 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->will($this->returnValue($this->repository));
 
+        $this->om
+            ->expects($this->any())
+            ->method('getClassMetadata')
+            ->with($this->equalTo(static::USER_CLASS))
+            ->will($this->returnValue($class));
+
         $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->will($this->returnValue($this->om));
 
-        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metadata->expects($this->any())->method('getName')->willReturn(static::USER_CLASS);
-        $this->om->expects($this->any())->method('getClassMetadata')->willReturn($this->metadata);
+        $class->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue(static::USER_CLASS));
 
         $this->userManager = new BaseUserManager(static::USER_CLASS, $this->registry, $this->ef);
     }
@@ -294,87 +292,10 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
     {
         $user = $this->userManager->createUser();
         if ($withRole) {
-            $role = new Role($user->getDefaultRole());
+            $role = new Role(User::ROLE_ADMINISTRATOR);
             $user->addRole($role);
         }
 
         return $user;
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Default user role not found
-     */
-    public function testUpdateUserUnsupported()
-    {
-        $user = $this->getUser();
-
-        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
-            ->willReturn('Symfony\Component\Security\Core\Role\RoleInterface');
-        $this->om->expects($this->never())
-            ->method('persist')
-            ->with($this->equalTo($user));
-        $this->om->expects($this->never())
-            ->method('flush');
-
-        $this->userManager->updateUser($user);
-    }
-
-    public function testUpdateUserWithRoles()
-    {
-        $password = 'password';
-        $encodedPassword = 'encodedPassword';
-        $email = 'test@test.com';
-
-        $user = $this->getUser();
-        $user
-            ->setUsername($email)
-            ->setEmail($email)
-            ->setPlainPassword($password);
-
-        $encoder = $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
-        $encoder->expects($this->once())
-            ->method('encodePassword')
-            ->with($user->getPlainPassword(), $user->getSalt())
-            ->will($this->returnValue($encodedPassword));
-
-        $this->ef->expects($this->once())
-            ->method('getEncoder')
-            ->with($user)
-            ->will($this->returnValue($encoder));
-
-        $this->om->expects($this->once())->method('persist')->with($this->equalTo($user));
-        $this->om->expects($this->once())->method('flush');
-
-        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
-            ->willReturn('Symfony\Component\Security\Core\Role\RoleInterface');
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(['role' => $user->getDefaultRole()]))
-            ->will($this->returnValue(new Role($user->getDefaultRole())));
-
-        $this->userManager->updateUser($user);
-
-        $this->assertEquals($email, $user->getEmail());
-        $this->assertEquals($encodedPassword, $user->getPassword());
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Expected Symfony\Component\Security\Core\Role\RoleInterface, \stdClass given
-     */
-    public function testNotSupportedRole()
-    {
-        $user = $this->getUser();
-
-        $this->metadata->expects($this->once())->method('getAssociationTargetClass')->willReturn('\stdClass');
-        $this->om->expects($this->never())
-            ->method('persist')
-            ->with($this->equalTo($user));
-        $this->om->expects($this->never())
-            ->method('flush');
-
-        $this->userManager->updateUser($user);
     }
 }
