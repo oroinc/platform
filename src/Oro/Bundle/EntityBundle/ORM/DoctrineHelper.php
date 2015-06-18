@@ -179,12 +179,12 @@ class DoctrineHelper
     }
 
     /**
-     * @param object $entity
+     * @param object|string $entityOrClass
      * @return bool
      */
-    public function isManageableEntity($entity)
+    public function isManageableEntity($entityOrClass)
     {
-        $entityClass = $this->getEntityClass($entity);
+        $entityClass = $this->getEntityClass($entityOrClass);
 
         return null !== $this->registry->getManagerForClass($entityClass);
     }

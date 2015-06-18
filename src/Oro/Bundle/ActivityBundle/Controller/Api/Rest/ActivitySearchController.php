@@ -24,7 +24,9 @@ class ActivitySearchController extends RestGetController
     /**
      * Searches entities associated with the specified type of an activity entity.
      *
-     * @Get("/activity_relations/search", name="")
+     * @param string $activity The type of the activity entity.
+     *
+     * @Get("/activities/{activity}/relations/search", name="")
      *
      * @QueryParam(
      *      name="page",
@@ -37,11 +39,6 @@ class ActivitySearchController extends RestGetController
      *      requirements="\d+",
      *      nullable=true,
      *      description="Number of items per page. Defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="activity_type",
-     *     nullable=false,
-     *     description="The type of the activity entity."
      * )
      * @QueryParam(
      *     name="search",
@@ -63,10 +60,10 @@ class ActivitySearchController extends RestGetController
      *
      * @return Response
      */
-    public function cgetAction()
+    public function cgetAction($activity)
     {
         $manager = $this->getManager();
-        $manager->setClass($this->getRequest()->get('activity_type'));
+        $manager->setClass($manager->resolveEntityClass($activity, true));
 
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);

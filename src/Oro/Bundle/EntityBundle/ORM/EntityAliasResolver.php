@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
-use Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
@@ -55,14 +55,14 @@ class EntityAliasResolver implements WarmableInterface
      *
      * @return string The alias for the requested entity
      *
-     * @throws NotFoundEntityAliasException if an alias not found
+     * @throws EntityAliasNotFoundException if an alias not found
      * @throws RuntimeException if duplicate alias is found
      */
     public function getAlias($entityClass)
     {
         $entityAlias = $this->findEntityAlias($entityClass);
         if (!$entityAlias) {
-            throw new NotFoundEntityAliasException(
+            throw new EntityAliasNotFoundException(
                 sprintf('An alias for "%s" entity not found.', $entityClass)
             );
         }
@@ -77,14 +77,14 @@ class EntityAliasResolver implements WarmableInterface
      *
      * @return string The plural alias for the requested entity
      *
-     * @throws NotFoundEntityAliasException if an alias not found
+     * @throws EntityAliasNotFoundException if an alias not found
      * @throws RuntimeException if duplicate alias is found
      */
     public function getPluralAlias($entityClass)
     {
         $entityAlias = $this->findEntityAlias($entityClass);
         if (!$entityAlias) {
-            throw new NotFoundEntityAliasException(
+            throw new EntityAliasNotFoundException(
                 sprintf('A plural alias for "%s" entity not found.', $entityClass)
             );
         }
@@ -99,13 +99,13 @@ class EntityAliasResolver implements WarmableInterface
      *
      * @return string The FQCN of an entity
      *
-     * @throws NotFoundEntityAliasException if the given alias is not associated with any entity class
+     * @throws EntityAliasNotFoundException if the given alias is not associated with any entity class
      */
     public function getClassByAlias($alias)
     {
         $entityClass = $this->findClassByAlias($alias);
         if (!$entityClass) {
-            throw new NotFoundEntityAliasException(
+            throw new EntityAliasNotFoundException(
                 sprintf('The alias "%s" is not associated with any entity class.', $alias)
             );
         }
@@ -120,13 +120,13 @@ class EntityAliasResolver implements WarmableInterface
      *
      * @return string The FQCN of an entity
      *
-     * @throws NotFoundEntityAliasException if the given plural alias is not associated with any entity class
+     * @throws EntityAliasNotFoundException if the given plural alias is not associated with any entity class
      */
     public function getClassByPluralAlias($pluralAlias)
     {
         $entityClass = $this->findClassByPluralAlias($pluralAlias);
         if (!$entityClass) {
-            throw new NotFoundEntityAliasException(
+            throw new EntityAliasNotFoundException(
                 sprintf('The plural alias "%s" is not associated with any entity class.', $pluralAlias)
             );
         }

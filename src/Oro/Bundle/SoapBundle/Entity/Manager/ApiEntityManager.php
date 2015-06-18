@@ -61,10 +61,23 @@ class ApiEntityManager
     /**
      * Sets the type of the entity this manager is responsible for
      *
+     * @param string $entityClass The FQCN of an entity
+     */
+    public function setClass($entityClass)
+    {
+        $this->metadata = $this->om->getClassMetadata($entityClass);
+        $this->class    = $this->metadata->getName();
+    }
+
+    /**
+     * Resolves the entity class name
+     *
      * @param string $entityName  The name or the plural alias of the entity
      * @param bool   $pluralAlias Determines whether the entity name may be a singular of plural alias
+     *
+     * @return string The FQCN of an entity
      */
-    public function setClass($entityName, $pluralAlias = false)
+    public function resolveEntityClass($entityName, $pluralAlias = false)
     {
         if (false === strpos($entityName, '\\')) {
             $entityName = $pluralAlias
@@ -72,8 +85,7 @@ class ApiEntityManager
                 : $this->entityAliasResolver->getClassByAlias($entityName);
         }
 
-        $this->metadata = $this->om->getClassMetadata($entityName);
-        $this->class    = $this->metadata->getName();
+        return $entityName;
     }
 
     /**

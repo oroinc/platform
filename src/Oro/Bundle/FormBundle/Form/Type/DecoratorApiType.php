@@ -9,7 +9,21 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
-class AbstractApiType extends AbstractType
+/**
+ * This form type may be used to adapt any form type to be used as root form type for REST and SOAP API
+ *
+ * Example of usage:
+ * <code>
+ * user.form.type.api:
+ *     parent: oro_form.type.api
+ *     arguments:
+ *         - user_api # form type name (must be equal to 'alias' attribute of 'form.type' tag)
+ *         - @user.form.type # decorated form type service
+ *     tags:
+ *         - { name: form.type, alias: user_api }
+ * </code>
+ */
+class DecoratorApiType extends AbstractType
 {
     /**
      * @var string

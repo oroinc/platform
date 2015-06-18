@@ -12,3 +12,5 @@ oro_activity_bundle_api:
         _format:  json
     defaults:
         version:  latest
+    options:
+        group: activity_relations
