@@ -324,7 +324,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                     'placeholder'             => 'oro.user.form.choose_user',
                     'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
                     'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
-                    'extra_config'            => 'acl_user_autocomplete',
+                    'component'               => 'oroform/js/app/components/select2-acl-user-autocomplete-component',
                     'permission'              => $permission,
                     'entity_name'             => str_replace('\\', '_', $dataClass),
                     'entity_id'               => $entityId

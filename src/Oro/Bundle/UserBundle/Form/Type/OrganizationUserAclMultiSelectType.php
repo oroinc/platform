@@ -15,7 +15,7 @@ class OrganizationUserAclMultiSelectType extends UserMultiSelectType
             [
                 'autocomplete_alias' => 'acl_users',
                 'configs'            => [
-                    'extra_config'            => 'acl_users_multiselect',
+                    'component'               => 'orouser/js/components/select2-acl-user-multiselect-component',
                     'permission'              => 'VIEW',
                     'entity_name'             => 'Oro\Bundle\UserBundle\Entity\User',
                     'entity_id'               => 0,

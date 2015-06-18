@@ -169,7 +169,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'properties'         => ['bar', 'baz'],
                         'route_name'         => 'oro_form_autocomplete_search',
                         'route_parameters'   => [],
-                        'extra_config'       => 'autocomplete'
+                        'component'       => 'oroform/js/app/components/select2-autocomplete-component'
                     ],
                     'attr'    => [
                         'data-selected-data' => json_encode(

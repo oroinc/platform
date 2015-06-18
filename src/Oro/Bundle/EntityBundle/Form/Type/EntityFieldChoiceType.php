@@ -67,8 +67,7 @@ class EntityFieldChoiceType extends AbstractType
             'placeholder'             => 'oro.entity.form.choose_entity_field',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection.html.twig',
-            'extra_config'            => 'entity_field_choice',
-            'extra_modules'           => ['EntityFieldUtil' => 'oroentity/js/entity-field-choice-util']
+            'component'               => 'oroentity/js/components/select2-entity-field-choice-component'
         ];
 
         $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
