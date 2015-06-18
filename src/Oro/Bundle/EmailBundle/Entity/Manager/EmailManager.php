@@ -47,7 +47,7 @@ class EmailManager
     {
         if (!$entity->isSeen()) {
             $entity->setSeen(true);
-            $entity->setChangeStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
+            $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
             $this->em->flush();
         }
     }
@@ -60,7 +60,7 @@ class EmailManager
     public function toggleEmailUserSeen(EmailUser $entity)
     {
         $entity->setSeen(!((bool) $entity->isSeen()));
-        $entity->setChangeStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($entity);
         $this->em->flush();
     }
