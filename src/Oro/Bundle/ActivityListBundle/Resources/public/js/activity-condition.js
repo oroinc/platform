@@ -61,7 +61,7 @@ define([
                     typeChoices[id] = options.label;
                 });
                 this.typeFilter = new MultiSelectFilter({
-                    label: __('oro.activityCondition.listOfActivityTypes'),
+                    showLabel: false,
                     choices: typeChoices
                 });
                 this.$typeChoice = $(this.options.filterContainer).html(this.typeFilter.render().$el);
@@ -128,14 +128,7 @@ define([
         },
 
         _getTypeChoiceEntity: function () {
-            var entity = '$activity';
-
-            var first = _.first(this.typeFilter.value.value);
-            if (this.typeFilter.value.value.length === 1 && !_.isEmpty(first)) {
-                entity = first.replace(/_/g, '\\');
-            }
-
-            return entity;
+            return '$activity';
         },
 
         _updateFieldChoice: function () {
@@ -191,13 +184,7 @@ define([
                 return;
             }
 
-            var classNames = _.map(this.typeFilter.choices, function (item) {
-                return item.value.replace(/_/g, '\\');
-            });
-            var data = this.$fieldsLoader.data('fields');
-            _.each(classNames, function (className) {
-                this._updateEntityWithActivityFields(data[className]);
-            }, this);
+            var data = {};
             data['$activity'] = {
                 fields: [],
                 fieldsIndex: {},

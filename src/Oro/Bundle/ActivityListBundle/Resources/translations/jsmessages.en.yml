@@ -23,4 +23,3 @@ oro:
     activityCondition:
         hasActivity: Has activity
         hasNotActivity: Has not activity
-        listOfActivityTypes: List of Activity Types
