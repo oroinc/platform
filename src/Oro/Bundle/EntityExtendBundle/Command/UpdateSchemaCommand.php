@@ -41,11 +41,22 @@ class UpdateSchemaCommand extends ContainerAwareCommand
      *
      * @param  InputInterface  $input
      * @param  OutputInterface $output
+     *
      * @return int|null|void
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription());
+
+        /**
+         * Unfortunately due a poor design of the Doctrine\ORM\Tools\SchemaTool::getSchemaFromMetadata
+         * we have to use "class_alias" to replace "Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets"
+         * with "Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaUpdateRemoveNamespacedAssets".
+         */
+        class_alias(
+            'Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaUpdateRemoveNamespacedAssets',
+            'Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets'
+        );
 
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
@@ -89,6 +100,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
     /**
      * @param string        $className
      * @param ConfigManager $configManager
+     *
      * @return bool
      */
     protected function isExtendEntity($className, ConfigManager $configManager)

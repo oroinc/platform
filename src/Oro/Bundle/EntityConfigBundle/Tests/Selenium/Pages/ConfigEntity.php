@@ -181,7 +181,7 @@ class ConfigEntity extends CustomEntity
     {
         $this->assertElementPresent(
             "//div[@class='control-group']/label[contains(., '{$fieldName}')]",
-            'Custom entity field not found'
+            "Custom entity field not found : {$fieldName}"
         );
 
         return $this;
