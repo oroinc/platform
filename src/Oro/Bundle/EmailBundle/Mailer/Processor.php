@@ -231,6 +231,9 @@ class Processor
     public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
         $originKey = $originName . $email;
+        $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization() !== null
+            ? $this->securityFacade->getOrganization()
+            : null;
         if (!array_key_exists($originKey, $this->origins)) {
             $emailOwner = $this->emailOwnerProvider->findEmailOwner(
                 $this->getEntityManager(),
@@ -239,10 +242,10 @@ class Processor
 
             if ($emailOwner instanceof User) {
                 $origins = $emailOwner->getEmailOrigins()->filter(
-                    function ($item) {
+                    function ($item) use ($organization) {
                         return
                             $item instanceof InternalEmailOrigin
-                            && $item->getOrganization() === $this->securityFacade->getOrganization();
+                            && (!$organization || $item->getOrganization() === $organization);
                     }
                 );
 
@@ -267,8 +270,11 @@ class Processor
      *
      * @return InternalEmailOrigin
      */
-    protected function createUserInternalOrigin(User $emailOwner, OrganizationInterface $organization)
+    protected function createUserInternalOrigin(User $emailOwner, OrganizationInterface $organization = null)
     {
+        $organization = $organization
+            ? $organization
+            : $emailOwner->getOrganization();
         $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
 
         $outboxFolder = new EmailFolder();

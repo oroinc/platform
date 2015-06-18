@@ -24,6 +24,7 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -42,6 +43,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
     /** @var ImapEmailManager */
     protected $manager;
+
+    /** @var User */
+    protected $currentUser;
+
+    /** @var OrganizationInterface */
+    protected $currentOrganization;
 
     /**
      * Constructor
@@ -68,6 +75,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     {
         // make sure that the entity builder is empty
         $this->emailEntityBuilder->clear();
+
+        $this->initEnv($origin);
 
         // iterate through all folders and do a synchronization of emails for each one
         $imapFolders = $this->syncFolders($origin);
@@ -109,16 +118,17 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
-     * {@inheritdoc}
+     * @param EmailOrigin $emailOrigin
      */
-    protected function getDoNotCleanableEntityClasses()
+    protected function initEnv(EmailOrigin $emailOrigin)
     {
-        return array_merge(
-            parent::getDoNotCleanableEntityClasses(),
-            [
-                'Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin',
-                'Oro\Bundle\ImapBundle\Entity\ImapEmailFolder'
-            ]
+        $this->currentUser = $this->em->getReference(
+            'Oro\Bundle\UserBundle\Entity\User',
+            $emailOrigin->getOwner()->getId()
+        );
+        $this->currentOrganization = $this->em->getReference(
+            'Oro\Bundle\OrganizationBundle\Entity\Organization',
+            $emailOrigin->getOrganization()->getId()
         );
     }
 
@@ -301,7 +311,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $folder             = $imapFolder->getFolder();
         $folderType         = $folder->getType();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
-        $userId             = $this->getUserId($folder->getOrigin());
 
         $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
         $this->logger->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
@@ -344,7 +353,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $invalid = 0;
             }
 
-            if (!$this->isApplicableEmail($email, $folderType, (int) $userId, $folder->getOrigin()->getOrganization())) {
+            if (!$this->isApplicableEmail(
+                $email,
+                $folderType,
+                (int) $this->currentUser->getId(),
+                $this->currentOrganization)
+            ) {
                 continue;
             }
 
@@ -358,7 +372,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->saveEmails(
                     $batch,
                     $imapFolder,
-                    $this->em->getReference('Oro\Bundle\UserBundle\Entity\User', $userId)
+                    $this->currentUser,
+                    $this->currentOrganization
                 );
                 $count = 0;
                 $batch = [];
@@ -368,7 +383,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->saveEmails(
                 $batch,
                 $imapFolder,
-                $this->em->getReference('Oro\Bundle\UserBundle\Entity\User', $userId)
+                $this->currentUser,
+                $this->currentOrganization
             );
         }
 
@@ -389,8 +405,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param ImapEmailFolder $imapFolder
      * @param User            $owner
      */
-    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder, User $owner)
-    {
+    protected function saveEmails(
+        array $emails,
+        ImapEmailFolder $imapFolder,
+        User $owner,
+        OrganizationInterface $organization
+    ) {
         $this->emailEntityBuilder->removeEmails();
 
         $folder        = $imapFolder->getFolder();
@@ -441,7 +461,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                             $email,
                             $folder,
                             $email->hasFlag("\\Seen"),
-                            $owner
+                            $owner,
+                            $organization
                         )->getEmail(),
                         $imapFolder
                     );
