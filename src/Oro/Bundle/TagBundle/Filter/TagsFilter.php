@@ -106,7 +106,6 @@ class TagsFilter extends EntityFilter
         return 'oro_type_tag_filter';
     }
 
-
     /**
      * {@inheritdoc}
      */
