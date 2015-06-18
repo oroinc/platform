@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 use \Zend\Mail\Header\ContentType;
 use \Zend\Mail\Header\HeaderInterface;
 use \Zend\Mail\Storage\Part;
-use \Zend\Mime\Decode;
 
 class Message extends \Zend\Mail\Storage\Message
 {
@@ -146,6 +145,7 @@ class Message extends \Zend\Mail\Storage\Message
                 // In this case it is assumed that any part which has ";name="
                 // in the Content-Type is an attachment
                 // param name of Content-type also may be missed
+                // then we will use Content-Disposition header to detect part as attachment
                 return new Attachment($part);
             }
         }

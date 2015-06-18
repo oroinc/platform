@@ -95,8 +95,8 @@ class Attachment
             $contentType = 'text/plain';
             $encoding = 'ASCII';
         }
-        $contentTransferEncoding = 'BINARY';
 
+        $contentTransferEncoding = 'BINARY';
         if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {
             $contentTransferEncoding = $this->part->getHeader('Content-Transfer-Encoding')->getFieldValue();
         }

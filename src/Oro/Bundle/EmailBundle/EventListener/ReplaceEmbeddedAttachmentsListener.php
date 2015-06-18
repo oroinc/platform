@@ -7,17 +7,20 @@ use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 
 class ReplaceEmbeddedAttachmentsListener
 {
+    /**
+     * @param EmailBodyLoaded $event
+     */
     public function replace(EmailBodyLoaded $event)
     {
-        $emailBody = $event->getEmail()->getEmailBody();
-        $content = $emailBody->getBodyContent();
-        $attachments = $emailBody->getAttachments();
+        $emailBody    = $event->getEmail()->getEmailBody();
+        $content      = $emailBody->getBodyContent();
+        $attachments  = $emailBody->getAttachments();
         $replacements = [];
         if (!$emailBody->getBodyIsText()) {
             foreach ($attachments as $attachment) {
                 $contentId = $attachment->getEmbeddedContentId();
                 if ($contentId !== null && $this->supportsAttachment($attachment)) {
-                    $replacement                = sprintf(
+                    $replacement                       = sprintf(
                         'data:%s;base64,%s',
                         $attachment->getContentType(),
                         $attachment->getContent()->getContent()
@@ -29,9 +32,13 @@ class ReplaceEmbeddedAttachmentsListener
         }
     }
 
+    /**
+     * @param EmailAttachment $attachment
+     * @return bool
+     */
     protected function supportsAttachment(EmailAttachment $attachment)
     {
-        return  $attachment->getContent()->getContentTransferEncoding() === 'base64'
-            && strpos($attachment->getContentType(), 'image/') === 0;
+        return $attachment->getContent()->getContentTransferEncoding() === 'base64'
+        && strpos($attachment->getContentType(), 'image/') === 0;
     }
 }
