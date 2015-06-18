@@ -365,7 +365,6 @@ class EmailController extends Controller
 
         if ($emailUser) {
             $this->getEmailManager()->toggleEmailUserSeen($emailUser);
-            $this->getEmailManager()->updateChangeStatusAt($emailUser);
         }
 
         return new JsonResponse(['successful' => (bool)$emailUser]);
