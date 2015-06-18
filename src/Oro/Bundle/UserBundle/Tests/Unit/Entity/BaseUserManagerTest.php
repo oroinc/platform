@@ -292,7 +292,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
     {
         $user = $this->userManager->createUser();
         if ($withRole) {
-            $role = new Role($user->getDefaultRole());
+            $role = new Role(User::ROLE_ADMINISTRATOR);
             $user->addRole($role);
         }
 

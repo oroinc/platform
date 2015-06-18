@@ -525,14 +525,6 @@ abstract class AbstractUser implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getDefaultRole()
-    {
-        return static::ROLE_DEFAULT;
-    }
-
-    /**
      * Never use this to check if this user has access to anything!
      * Use the SecurityContext, or an implementation of AccessDecisionManager
      * instead, e.g.
