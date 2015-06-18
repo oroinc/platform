@@ -119,6 +119,9 @@ oro:
             emails:
                 action:
                     view: "View"
+                    mark_as_read: "Mark As Read"
+                    mark_as_unread: "Mark As Unread"
+                    enable_to_change_status: "Enable to change status"
 
             emailfolder:
                 view:
