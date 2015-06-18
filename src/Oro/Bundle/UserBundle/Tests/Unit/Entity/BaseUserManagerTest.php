@@ -90,7 +90,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateUser()
     {
-        $this->assertInstanceof(static::USER_CLASS, $this->getUser());
+        $this->assertInstanceOf(static::USER_CLASS, $this->getUser());
     }
 
     public function testDeleteUser()
