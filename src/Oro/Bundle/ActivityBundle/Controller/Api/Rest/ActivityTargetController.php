@@ -32,7 +32,7 @@ class ActivityTargetController extends RestGetController
      *
      * @return Response
      */
-    public function getTypesAction()
+    public function getAllTypesAction()
     {
         $result = $this->getManager()->getTargetTypes();
 

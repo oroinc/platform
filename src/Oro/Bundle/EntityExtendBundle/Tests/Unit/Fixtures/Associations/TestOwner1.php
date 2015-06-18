@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="test_owner")
+ * @ORM\Table(name="test_owner1")
  */
-class TestOwner
+class TestOwner1
 {
     /**
      * @ORM\Id
@@ -29,7 +29,7 @@ class TestOwner
 
     /**
      * @ORM\ManyToMany(targetEntity="TestTarget1")
-     * @ORM\JoinTable(name="test_owner_to_target1",
+     * @ORM\JoinTable(name="test_owner1_to_target1",
      *     joinColumns = { @ORM\JoinColumn(name = "owner_id", referencedColumnName = "id") },
      *     inverseJoinColumns = { @ORM\JoinColumn(name = "target_id", referencedColumnName = "id")}
      * )
@@ -38,7 +38,7 @@ class TestOwner
 
     /**
      * @ORM\ManyToMany(targetEntity="TestTarget2")
-     * @ORM\JoinTable(name="test_owner_to_target2",
+     * @ORM\JoinTable(name="test_owner1_to_target2",
      *     joinColumns = { @ORM\JoinColumn(name = "owner_id", referencedColumnName = "id") },
      *     inverseJoinColumns = { @ORM\JoinColumn(name = "target_id", referencedColumnName = "id")}
      * )

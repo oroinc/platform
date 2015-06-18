@@ -361,7 +361,7 @@ class AssociationManagerTest extends OrmTestCase
 
     public function testGetMultiAssociationsQueryBuilder()
     {
-        $ownerClass         = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestOwner';
+        $ownerClass         = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestOwner1';
         $targetClass1       = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestTarget1';
         $targetClass2       = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestTarget2';
         $filters            = ['name' => 'test', 'phones.phone' => '123-456'];
@@ -410,8 +410,8 @@ class AssociationManagerTest extends OrmTestCase
             . 'SELECT DISTINCT t0_.id AS id0, t1_.id AS id1, '
             . '\'' . $targetClass1 . '\' AS sclr2, '
             . 't1_.firstName || \' \' || t1_.lastName AS sclr3 '
-            . 'FROM test_owner t0_ '
-            . 'INNER JOIN test_owner_to_target1 t2_ ON t0_.id = t2_.owner_id '
+            . 'FROM test_owner1 t0_ '
+            . 'INNER JOIN test_owner1_to_target1 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t1_ ON t1_.id = t2_.target_id '
             . 'LEFT JOIN test_phone t3_ ON t0_.id = t3_.owner_id '
             . 'WHERE (t0_.name = \'test\' AND t3_.phone = \'123-456\') AND t1_.age = 10'
@@ -419,11 +419,79 @@ class AssociationManagerTest extends OrmTestCase
             . 'SELECT DISTINCT t0_.id AS id0, t1_.id AS id1, '
             . '\'' . $targetClass2 . '\' AS sclr2, '
             . 't1_.firstName || \' \' || t1_.lastName AS sclr3 '
-            . 'FROM test_owner t0_ '
-            . 'INNER JOIN test_owner_to_target2 t2_ ON t0_.id = t2_.owner_id '
+            . 'FROM test_owner1 t0_ '
+            . 'INNER JOIN test_owner1_to_target2 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target2 t1_ ON t1_.id = t2_.target_id '
             . 'LEFT JOIN test_phone t3_ ON t0_.id = t3_.owner_id '
             . 'WHERE (t0_.name = \'test\' AND t3_.phone = \'123-456\') AND t1_.age = 100'
+            . ') entity ORDER BY title ASC LIMIT 5 OFFSET 5',
+            $result->getSQL()
+        );
+    }
+
+    public function testGetMultiAssociationOwnersQueryBuilder()
+    {
+        $targetClass       = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestTarget1';
+        $ownerClass1       = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestOwner1';
+        $ownerClass2       = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations\TestOwner2';
+        $filters           = ['name' => 'test'];
+        $joins             = [];
+        $associationOwners = [$ownerClass1 => 'targets_1', $ownerClass2 => 'targets_1'];
+
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')
+            ->willReturnCallback(
+                function ($eventName, GetListBefore $event) {
+                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 10));
+                    $event->setCriteria($updatedCriteria);
+                }
+            );
+        $this->eventDispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->willReturnCallback(
+                function ($eventName, GetListBefore $event) {
+                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 100));
+                    $event->setCriteria($updatedCriteria);
+                }
+            );
+
+        $this->nameFormatter->expects($this->at(0))
+            ->method('getFormattedNameDQL')
+            ->with('e', $ownerClass1)
+            ->willReturn('e.name');
+        $this->nameFormatter->expects($this->at(1))
+            ->method('getFormattedNameDQL')
+            ->with('e', $ownerClass2)
+            ->willReturn('e.name');
+
+        $result = $this->associationManager->getMultiAssociationOwnersQueryBuilder(
+            $targetClass,
+            $filters,
+            $joins,
+            $associationOwners,
+            5,
+            2,
+            'title'
+        );
+
+        $this->assertEquals(
+            'SELECT entity.id1 AS id, entity.sclr2 AS entity, entity.name3 AS title '
+            . 'FROM ('
+            . 'SELECT t0_.id AS id0, t1_.id AS id1, '
+            . '\'' . $ownerClass1 . '\' AS sclr2, '
+            . 't1_.name AS name3 '
+            . 'FROM test_owner1 t1_ '
+            . 'INNER JOIN test_owner1_to_target1 t2_ ON t1_.id = t2_.owner_id '
+            . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '
+            . 'WHERE t1_.name = \'test\' AND t0_.age = 10'
+            . ' UNION ALL '
+            . 'SELECT t0_.id AS id0, t1_.id AS id1, '
+            . '\'' . $ownerClass2 . '\' AS sclr2, '
+            . 't1_.name AS name3 '
+            . 'FROM test_owner2 t1_ '
+            . 'INNER JOIN test_owner2_to_target1 t2_ ON t1_.id = t2_.owner_id '
+            . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '
+            . 'WHERE t1_.name = \'test\' AND t0_.age = 100'
             . ') entity ORDER BY title ASC LIMIT 5 OFFSET 5',
             $result->getSQL()
         );
