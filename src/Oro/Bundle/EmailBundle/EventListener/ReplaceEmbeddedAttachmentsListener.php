@@ -13,22 +13,24 @@ class ReplaceEmbeddedAttachmentsListener
     public function replace(EmailBodyLoaded $event)
     {
         $emailBody    = $event->getEmail()->getEmailBody();
-        $content      = $emailBody->getBodyContent();
-        $attachments  = $emailBody->getAttachments();
-        $replacements = [];
-        if (!$emailBody->getBodyIsText()) {
-            foreach ($attachments as $attachment) {
-                $contentId = $attachment->getEmbeddedContentId();
-                if ($contentId !== null && $this->supportsAttachment($attachment)) {
-                    $replacement                       = sprintf(
-                        'data:%s;base64,%s',
-                        $attachment->getContentType(),
-                        $attachment->getContent()->getContent()
-                    );
-                    $replacements['cid:' . $contentId] = $replacement;
+        if ($emailBody !== null) {
+            $content      = $emailBody->getBodyContent();
+            $attachments  = $emailBody->getAttachments();
+            $replacements = [];
+            if (!$emailBody->getBodyIsText()) {
+                foreach ($attachments as $attachment) {
+                    $contentId = $attachment->getEmbeddedContentId();
+                    if ($contentId !== null && $this->supportsAttachment($attachment)) {
+                        $replacement                       = sprintf(
+                            'data:%s;base64,%s',
+                            $attachment->getContentType(),
+                            $attachment->getContent()->getContent()
+                        );
+                        $replacements['cid:' . $contentId] = $replacement;
+                    }
                 }
+                $emailBody->setBodyContent(strtr($content, $replacements));
             }
-            $emailBody->setBodyContent(strtr($content, $replacements));
         }
     }
 

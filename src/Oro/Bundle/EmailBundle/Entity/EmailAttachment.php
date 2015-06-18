@@ -231,10 +231,13 @@ class EmailAttachment
 
     /**
      * @param string $embeddedContentId
+     * @return $this
      */
     public function setEmbeddedContentId($embeddedContentId)
     {
         $this->embeddedContentId = $embeddedContentId;
+
+        return $this;
     }
 
     /**
