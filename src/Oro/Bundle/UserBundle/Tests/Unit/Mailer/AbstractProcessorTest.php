@@ -158,10 +158,12 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->emailTemplate, $templateParams)
             ->willReturn([$expectedMessage->getSubject(), $expectedMessage->getBody()]);
 
+        $to = $expectedMessage->getTo();
+        $toKeys = array_keys($to);
         $this->emailHolderHelper->expects($this->once())
             ->method('getEmail')
             ->with($this->isInstanceOf('Oro\Bundle\UserBundle\Entity\UserInterface'))
-            ->willReturn(array_shift(array_keys($expectedMessage->getTo())));
+            ->willReturn(array_shift($toKeys));
 
         $this->mailer->expects($this->once())
             ->method('send')
