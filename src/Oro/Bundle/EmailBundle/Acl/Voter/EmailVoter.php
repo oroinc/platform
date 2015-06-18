@@ -30,7 +30,7 @@ class EmailVoter implements VoterInterface
      */
     public function supportsAttribute($attribute)
     {
-        return in_array($attribute, ['VIEW', 'EDIT']);
+        return in_array($attribute, ['CREATE', 'VIEW', 'EDIT']);
     }
 
     /**

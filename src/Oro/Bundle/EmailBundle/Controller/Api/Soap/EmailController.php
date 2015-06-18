@@ -19,7 +19,7 @@ class EmailController extends SoapGetController
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
      * @Soap\Result(phpType = "Oro\Bundle\EmailBundle\Entity\Email[]")
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function cgetAction($page = 1, $limit = 10)
     {
@@ -44,7 +44,7 @@ class EmailController extends SoapGetController
      * @Soap\Method("getEmail")
      * @Soap\Param("id", phpType = "int")
      * @Soap\Result(phpType = "Oro\Bundle\EmailBundle\Entity\Email")
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function getAction($id)
     {
@@ -67,7 +67,7 @@ class EmailController extends SoapGetController
      * @Soap\Method("getEmailBody")
      * @Soap\Param("id", phpType="int")
      * @Soap\Result(phpType="Oro\Bundle\EmailBundle\Entity\EmailBody")
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function getEmailBodyAction($id)
     {
@@ -86,7 +86,7 @@ class EmailController extends SoapGetController
      * @Soap\Method("getEmailAttachment")
      * @Soap\Param("id", phpType="int")
      * @Soap\Result(phpType="Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent")
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function getEmailAttachment($id)
     {
@@ -99,7 +99,7 @@ class EmailController extends SoapGetController
      * @Soap\Param("targetClassName", phpType = "string")
      * @Soap\Param("targetId", phpType = "int")
      * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      */
     public function postAssociationsAction($id, $targetClassName, $targetId)
     {
@@ -142,7 +142,7 @@ class EmailController extends SoapGetController
      * @Soap\Param("targetClassName", phpType = "string")
      * @Soap\Param("targetId", phpType = "int")
      * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      */
     public function deleteAssociationAction($id, $targetClassName, $targetId)
     {

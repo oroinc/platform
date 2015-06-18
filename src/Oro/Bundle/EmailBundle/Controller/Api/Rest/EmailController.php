@@ -58,7 +58,7 @@ class EmailController extends RestController
      *      description="Get all emails",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function cgetAction()
@@ -86,7 +86,7 @@ class EmailController extends RestController
      *      description="Get email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAction($id)
@@ -103,7 +103,7 @@ class EmailController extends RestController
      *      description="Update email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      * @return Response
      */
     public function putAction($id)
@@ -118,7 +118,7 @@ class EmailController extends RestController
      *      description="Create new email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      */
     public function postAction()
     {
@@ -155,7 +155,7 @@ class EmailController extends RestController
      *          404="Activity association was not found",
      *      }
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAssociationAction($entityId)
@@ -192,7 +192,7 @@ class EmailController extends RestController
      *          404="Activity association was not found",
      *      }
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAssociationsDataAction($entityId)
@@ -276,7 +276,7 @@ class EmailController extends RestController
      *      description="Add new association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      */
     public function postAssociationsAction()
     {
@@ -349,7 +349,7 @@ class EmailController extends RestController
      *      description="Delete Association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      *
      * @Delete("/emails/{entityId}/associations/{targetClassName}/{targetId}")
      *

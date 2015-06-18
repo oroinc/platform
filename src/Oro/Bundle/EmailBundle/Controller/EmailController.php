@@ -65,7 +65,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
      */
     public function viewThreadAction(Email $entity)
@@ -167,7 +167,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/create")
-     * @AclAncestor("oro_email_email_user_create")
+     * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
     public function createAction()
@@ -178,7 +178,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/reply/{id}", name="oro_email_email_reply", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_user_create")
+     * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
     public function replyAction(Email $email)
@@ -189,7 +189,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/forward/{id}", name="oro_email_email_forward", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_user_create")
+     * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
     public function forwardAction(Email $email)
@@ -237,7 +237,7 @@ class EmailController extends Controller
      * Link attachment to entity
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
@@ -287,7 +287,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/user-emails", name="oro_email_user_emails")
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @Template
      */
     public function userEmailsAction()
