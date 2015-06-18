@@ -293,6 +293,9 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         return ($folderType1 === $folderType2);
     }
 
+    /**
+     * @return array
+     */
     protected function entitiesToClear()
     {
         return [
