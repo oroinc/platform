@@ -3,12 +3,12 @@ define(function (require) {
     var Select2GridComponent,
         Select2Component = require('./select2-component');
     Select2GridComponent = Select2Component.extend({
-        processExtraConfig: function (select2Config, params) {
-            Select2GridComponent.__super__.processExtraConfig(select2Config, params);
-            var grid = select2Config.grid,
+        preConfig: function (config) {
+            Select2GridComponent.__super__.preConfig.call(this, config);
+            var that = this,
+                grid = config.grid,
                 gridName = grid.name;
-            select2Config.ajax = {
-                url: params.url,
+            _.extend(config.ajax, {
                 data: function (query, page, searchById) {
                     var result = {},
                         sortByKey;
@@ -18,23 +18,23 @@ define(function (require) {
                         result[gridName + '[_filter][id][type]'] = 3;
                         result[gridName + '[_filter][id][value]'] = query;
                     } else {
-                        sortByKey = grid.sort_by || select2Config.properties[0];
+                        sortByKey = grid.sort_by || config.properties[0];
                         result[gridName + '[_pager][_page]'] = page;
                         result[gridName + '[_pager][_per_page]'] = perPage;
                         result[gridName + '[_sort_by][' + sortByKey + ']'] = grid.sort_order || 'ASC';
-                        result[gridName + '[_filter][' + select2Config.properties[0] + '][type]'] = 1;
-                        result[gridName + '[_filter][' + select2Config.properties[0] + '][value]'] = query;
+                        result[gridName + '[_filter][' + config.properties[0] + '][type]'] = 1;
+                        result[gridName + '[_filter][' + config.properties[0] + '][value]'] = query;
                     }
                     return result;
                 },
                 results: function (data, page) {
                     return {
                         results: data.data,
-                        more: page * params.perPage < data.options.totalRecords
+                        more: page * that.perPage < data.options.totalRecords
                     };
                 }
-            };
-            return select2Config;
+            });
+            return config;
         }
     });
     return Select2GridComponent;

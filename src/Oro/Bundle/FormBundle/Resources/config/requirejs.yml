@@ -47,12 +47,10 @@ config:
 
         'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
 
-        'oroform/js/select2-config': 'bundles/oroform/js/select2-config.js'
         'oroform/js/multiple-entity': 'bundles/oroform/js/multiple-entity.js'
         'oroform/js/multiple-entity/view': 'bundles/oroform/js/multiple-entity/view.js'
         'oroform/js/multiple-entity/model': 'bundles/oroform/js/multiple-entity/model.js'
         'oroform/js/multiple-entity/collection': 'bundles/oroform/js/multiple-entity/collection.js'
-        'oroform/js/select2_relevancy_order_handler': 'bundles/oroform/js/select2-relevancy-order-handler.js'
         'oroform/js/create-select-type-handler': 'bundles/oroform/js/create-select-type-handler.js'
         'oroform/js/select-create-inline-type-handler': 'bundles/oroform/js/select-create-inline-type-handler.js'
 
