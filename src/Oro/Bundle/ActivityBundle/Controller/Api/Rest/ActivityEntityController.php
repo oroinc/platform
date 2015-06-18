@@ -15,7 +15,6 @@ use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager;
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
@@ -32,6 +31,19 @@ class ActivityEntityController extends RestController
      *
      * @Get("/activities/{activity}/{id}/relations", name="")
      *
+     * @QueryParam(
+     *      name="page",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Page number, starting from 1. Defaults to 1."
+     * )
+     * @QueryParam(
+     *      name="limit",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Number of items per page. Defaults to 10."
+     * )
+     *
      * @ApiDoc(
      *      description="Returns the list of entities associated with the specified activity entity",
      *      resource=true
@@ -47,20 +59,13 @@ class ActivityEntityController extends RestController
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        $criteria = $this->buildFilterCriteria(
-            [
-                'id' => ['=', $id]
-            ],
-            [
-                'id' => new IdentifierToReferenceFilter($this->getDoctrine(), $manager->getMetadata()->getName())
-            ]
-        );
+        $criteria = $this->buildFilterCriteria(['id' => ['=', $id]]);
 
         return $this->handleGetListRequest($page, $limit, $criteria);
     }
 
     /**
-     * Adds an association between an activity and an related entity.
+     * Adds an association between an activity and an target entity.
      *
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
@@ -68,7 +73,7 @@ class ActivityEntityController extends RestController
      * @Post("/activities/{activity}/{id}/relations", name="")
      *
      * @ApiDoc(
-     *      description="Adds an association between an activity and an related entity",
+     *      description="Adds an association between an activity and an target entity",
      *      resource=true
      * )
      *
@@ -83,17 +88,17 @@ class ActivityEntityController extends RestController
     }
 
     /**
-     * Deletes an association between an activity and an related entity.
+     * Deletes an association between an activity and an target entity.
      *
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
-     * @param string $entity   The type of the related entity.
-     * @param mixed  $entityId The id of the related entity.
+     * @param string $entity   The type of the target entity.
+     * @param mixed  $entityId The id of the target entity.
      *
      * @Delete("/activities/{activity}/{id}/{entity}/{entityId}", name="")
      *
      * @ApiDoc(
-     *      description="Deletes an association between an activity and an related entity",
+     *      description="Deletes an association between an activity and an target entity",
      *      resource=true
      * )
      *

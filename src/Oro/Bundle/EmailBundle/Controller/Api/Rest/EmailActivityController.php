@@ -12,7 +12,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
@@ -136,14 +135,7 @@ class EmailActivityController extends RestGetController
 
         $page     = (int)$this->getRequest()->get('page', 1);
         $limit    = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
-        $criteria = $this->buildFilterCriteria(
-            [
-                'id' => ['=', $emailId]
-            ],
-            [
-                'id' => new IdentifierToReferenceFilter($this->getDoctrine(), $manager->getMetadata()->getName())
-            ]
-        );
+        $criteria = $this->buildFilterCriteria(['id' => ['=', $emailId]]);
 
         return $this->handleGetListRequest($page, $limit, $criteria);
     }

@@ -142,15 +142,15 @@ class AssociationManager
      * Returns a query builder that could be used for fetching the list of entities
      * associated with $associationOwnerClass entities found by $filters and $joins
      *
-     * @param string      $associationOwnerClass    The FQCN of the entity that is the owning side of the association
-     * @param mixed|null  $filters                  Criteria is used to filter entities which are association owners
-     *                                              e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins                    Additional associations required to filter owning side entities
-     * @param array       $associationTargets       The list of fields responsible to store associations
-     *                                              Array format: [target_entity_class => field_name]
-     * @param int         $limit                    The maximum number of items per page
-     * @param int         $page                     The page number
-     * @param string|null $orderBy                  The ordering expression for the result
+     * @param string      $associationOwnerClass The FQCN of the entity that is the owning side of the association
+     * @param mixed|null  $filters               Criteria is used to filter entities which are association owners
+     *                                           e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null  $joins                 Additional associations required to filter owning side entities
+     * @param array       $associationTargets    The list of fields responsible to store associations
+     *                                           Array format: [target_entity_class => field_name]
+     * @param int         $limit                 The maximum number of items per page
+     * @param int         $page                  The page number
+     * @param string|null $orderBy               The ordering expression for the result
      *
      * @return SqlQueryBuilder
      */
@@ -182,6 +182,100 @@ class AssociationManager
                         . ($nameExpr ?: '\'\'') . ' AS entityTitle',
                         $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass),
                         str_replace('\'', '\'\'', $entityClass)
+                    )
+                )
+                ->innerJoin('e.' . $fieldName, 'target');
+            $this->doctrineHelper->applyJoins($subQb, $joins);
+
+            // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
+            // http://www.doctrine-project.org/jira/browse/DDC-2798
+            // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
+            QueryBuilderHelper::addCriteria($subQb, $subCriteria);
+            // $subQb->addCriteria($criteria);
+
+            $subQuery = $subQb->getQuery();
+
+            $subQueries[] = QueryUtils::getExecutableSql($subQuery);
+
+            if (empty($selectStmt)) {
+                $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
+                $selectStmt = sprintf(
+                    'entity.%s AS id, entity.%s AS entity, entity.%s AS title',
+                    QueryUtils::getColumnNameByAlias($mapping, 'entityId'),
+                    QueryUtils::getColumnNameByAlias($mapping, 'entityClass'),
+                    QueryUtils::getColumnNameByAlias($mapping, 'entityTitle')
+                );
+            }
+        }
+
+        $rsm = new ResultSetMapping();
+        $rsm
+            ->addScalarResult('id', 'id', Type::INTEGER)
+            ->addScalarResult('entity', 'entity')
+            ->addScalarResult('title', 'title');
+        $qb = new SqlQueryBuilder($em, $rsm);
+        $qb
+            ->select($selectStmt)
+            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
+        if (null !== $limit) {
+            $qb->setMaxResults($limit);
+            if (null !== $page) {
+                $qb->setFirstResult($this->doctrineHelper->getPageOffset($page, $limit));
+            }
+        }
+        if ($orderBy) {
+            $qb->orderBy($orderBy);
+        }
+
+        return $qb;
+    }
+
+    /**
+     * Returns a query builder that could be used for fetching the list of entities
+     * associated with $associationOwnerClass entities found by $filters and $joins
+     *
+     * @param string      $associationTargetClass The FQCN of the entity that is the owning side of the association
+     * @param mixed|null  $filters                Criteria is used to filter entities which are association owners
+     *                                            e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null  $joins                  Additional associations required to filter owning side entities
+     * @param array       $associationOwners      The list of fields responsible to store associations between
+     *                                            the given target and association owners
+     *                                            Array format: [owner_entity_class => field_name]
+     * @param int         $limit                  The maximum number of items per page
+     * @param int         $page                   The page number
+     * @param string|null $orderBy                The ordering expression for the result
+     *
+     * @return SqlQueryBuilder
+     */
+    public function getMultiAssociationOwnersQueryBuilder(
+        $associationTargetClass,
+        $filters,
+        $joins,
+        $associationOwners,
+        $limit = null,
+        $page = null,
+        $orderBy = null
+    ) {
+        $em       = $this->doctrineHelper->getEntityManager($associationTargetClass);
+        $criteria = $this->doctrineHelper->normalizeCriteria($filters);
+
+        $selectStmt        = null;
+        $subQueries        = [];
+        $targetIdFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($associationTargetClass);
+        foreach ($associationOwners as $ownerClass => $fieldName) {
+            // dispatch oro_api.request.get_list.before event
+            $event = new GetListBefore($this->cloneCriteria($criteria), $associationTargetClass);
+            $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
+            $subCriteria = $event->getCriteria();
+
+            $nameExpr = $this->getNameFormatter()->getFormattedNameDQL('e', $ownerClass);
+            $subQb    = $em->getRepository($ownerClass)->createQueryBuilder('e')
+                ->select(
+                    sprintf(
+                        'target.%s AS id, e.id AS entityId, \'%s\' AS entityClass, '
+                        . ($nameExpr ?: '\'\'') . ' AS entityTitle',
+                        $targetIdFieldName,
+                        str_replace('\'', '\'\'', $ownerClass)
                     )
                 )
                 ->innerJoin('e.' . $fieldName, 'target');

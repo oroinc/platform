@@ -44,35 +44,37 @@ class ActivityRelationRouteOptionsResolver implements RouteOptionsResolverInterf
      */
     public function resolve(Route $route, RouteCollectionAccessor $routeCollectionAccessor)
     {
-        if ($route->getOption('group') !== 'activity_relations'
-            || !$this->hasAttribute($route, self::ACTIVITY_PLACEHOLDER)
-        ) {
+        if ($route->getOption('group') !== 'activity_relations') {
             return;
         }
 
-        $activities = array_map(
-            function (ConfigInterface $config) {
-                // convert to entity alias
-                return $this->entityAliasResolver->getPluralAlias(
-                    $config->getId()->getClassName()
-                );
-            },
-            $this->groupingConfigProvider->filter(
+        if ($this->hasAttribute($route, self::ACTIVITY_PLACEHOLDER)) {
+            $activities = array_map(
                 function (ConfigInterface $config) {
-                    // filter activity entities
-                    $groups = $config->get('groups');
+                    // convert to entity alias
+                    return $this->entityAliasResolver->getPluralAlias(
+                        $config->getId()->getClassName()
+                    );
+                },
+                $this->groupingConfigProvider->filter(
+                    function (ConfigInterface $config) {
+                        // filter activity entities
+                        $groups = $config->get('groups');
 
-                    return
-                        !empty($groups)
-                        && in_array(ActivityScope::GROUP_ACTIVITY, $groups, true);
-                }
-            )
-        );
+                        return
+                            !empty($groups)
+                            && in_array(ActivityScope::GROUP_ACTIVITY, $groups, true);
+                    }
+                )
+            );
 
-        $this->adjustRoutes($route, $routeCollectionAccessor, $activities);
+            $this->adjustRoutes($route, $routeCollectionAccessor, $activities);
 
-        $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
-        $this->completeRouteRequirements($route);
+            $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
+            $this->completeRouteRequirements($route);
+        } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
+            $this->completeRouteRequirements($route);
+        }
     }
 
     /**

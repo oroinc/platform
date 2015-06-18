@@ -14,8 +14,8 @@ class ActivityEntityApiEntityManager extends ApiEntityManager
     protected $activityManager;
 
     /**
-     * @param ObjectManager    $om
-     * @param ActivityManager  $activityManager
+     * @param ObjectManager   $om
+     * @param ActivityManager $activityManager
      */
     public function __construct(ObjectManager $om, ActivityManager $activityManager)
     {

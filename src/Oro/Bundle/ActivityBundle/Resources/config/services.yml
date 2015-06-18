@@ -7,10 +7,12 @@ parameters:
     oro_activity.widget_provider.activities.main.class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
     oro_activity.widget_provider.activities.menu.class: Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
     oro_activity.widget_provider.actions.class:         Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider
+    oro_activity.manager.activity.api.class:            Oro\Bundle\ActivityBundle\Entity\Manager\ActivityApiEntityManager
     oro_activity.manager.activity_search.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager
     oro_activity.manager.activity_entity.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
     oro_activity.handler.delete.activity_entity.class:  Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandler
     oro_activity.form.handler.activity_entity.api.class:  Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
+    oro_activity.manager.activity_target.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
 
 services:
     oro_activity.manager:
@@ -75,6 +77,13 @@ services:
         tags:
             - { name: routing.options_resolver }
 
+    oro_activity.manager.activity.api:
+        class: %oro_activity.manager.activity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+
     oro_activity.manager.activity_entity.api:
         class: %oro_activity.manager.activity_entity.api.class%
         parent: oro_soap.manager.entity_manager.abstract
@@ -111,3 +120,10 @@ services:
         arguments:
             - relations
             - 'oro_related_entity_standalone_collection_api'
+
+    oro_activity.manager.activity_target.api:
+        class: %oro_activity.manager.activity_target.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
