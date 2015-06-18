@@ -26,6 +26,14 @@
         ),
         'name': 'sent',
         'label': 'oro.dashboard.recent_emails.sent'|trans
+    },
+    {
+        'url': path(
+            'oro_email_dashboard_recent_emails',
+            {'widget': widgetName, 'activeTab': 'new', 'contentType': 'tab'}
+        ),
+        'name': 'new',
+        'label': 'oro.dashboard.recent_emails.new'|trans
     }] %}
 
     {{ parent() }}

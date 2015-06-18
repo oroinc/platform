@@ -4,6 +4,7 @@ oro:
             title:       Recent Emails
             inbox:       Inbox
             sent:        Sent
+            new:         New Emails
             view_all:    View All
             description: This widget allows you to see most recent additions to your inbox and outbox
 
