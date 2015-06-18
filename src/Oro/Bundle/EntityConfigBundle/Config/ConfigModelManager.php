@@ -418,11 +418,11 @@ class ConfigModelManager
      */
     protected function ensureFieldLocalCacheWarmed($className)
     {
-        if (!isset($this->fieldLocalCache[$className])) {
-            $this->fieldLocalCache[$className] = [];
+        if (empty($this->fieldLocalCache[$className])) {
 
             $entityModel = $this->findEntityModel($className);
             if ($entityModel) {
+                $this->fieldLocalCache[$className] = [];
                 $fields = $entityModel->getFields();
                 foreach ($fields as $model) {
                     $this->fieldLocalCache[$className][$model->getFieldName()] = $model;
