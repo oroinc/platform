@@ -246,6 +246,16 @@ class Email extends ExtendEmail
     }
 
     /**
+     * Set entity created date/time
+     *
+     * @param \DateTime $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+    /**
      * Get email subject
      *
      * @return string
@@ -606,7 +616,7 @@ class Email extends ExtendEmail
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->created = $this->created ?: new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**

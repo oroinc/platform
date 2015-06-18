@@ -106,7 +106,7 @@ define([
                 this.title = options.title;
             }
 
-            this.originalTitle = $(document).prop('title');
+            this.originalTitle = $('head title').text();
 
             this.gridName = options.gridName;
             this.collection = options.collection;
@@ -697,7 +697,8 @@ define([
                 return;
             }
 
-            $(document).prop('title', this._createTitle());
+            var newTitle = this._createTitle();
+            mediator.execute('adjustTitle', newTitle, true);
         }
     });
 

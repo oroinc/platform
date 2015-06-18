@@ -27,6 +27,7 @@ services:
             - @session
             - @oro_ui.router
             - @oro_entity.doctrine_helper
+            - @event_dispatcher
 
     oro_form.provider.html_tag_provider:
         class: %oro_form.provider.html_tag_provider.class%

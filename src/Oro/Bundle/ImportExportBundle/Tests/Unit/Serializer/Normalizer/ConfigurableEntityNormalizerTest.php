@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
 
@@ -29,7 +31,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
-            ->setMethods(array('hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'))
+            ->setMethods(['hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'])
             ->getMock();
 
         $this->normalizer = new ConfigurableEntityNormalizer($this->fieldHelper);
@@ -60,14 +62,14 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function supportDenormalizationDataProvider()
     {
-        return array(
-            array(null, null, false, false),
-            array('test', null, false, false),
-            array('test', 'stdClass', false, false),
-            array(array(), null, false, false),
-            array(array(), 'stdClass', false, false),
-            array(array(), 'stdClass', true, true)
-        );
+        return [
+            [null, null, false, false],
+            ['test', null, false, false],
+            ['test', 'stdClass', false, false],
+            [[], null, false, false],
+            [[], 'stdClass', false, false],
+            [[], 'stdClass', true, true]
+        ];
     }
 
     /**
@@ -95,14 +97,14 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function supportsNormalizationDataProvider()
     {
-        return array(
-            array(null, false, false),
-            array(null, true, false),
-            array('test', false, false),
-            array('test', true, false),
-            array(new \stdClass(), false, false),
-            array(new \stdClass(), true, true),
-        );
+        return [
+            [null, false, false],
+            [null, true, false],
+            ['test', false, false],
+            ['test', true, false],
+            [new \stdClass(), false, false],
+            [new \stdClass(), true, true],
+        ];
     }
 
     // @codingStandardsIgnoreStart
@@ -141,10 +143,10 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
         $format = null;
         $entityName = get_class($object);
 
-        $fieldsValueMap = array(
+        $fieldsValueMap = [
             $entityName => $fields,
-            'DateTime' => array()
-        );
+            'DateTime' => []
+        ];
 
         $this->fieldHelper->expects($this->atLeastOnce())
             ->method('getFields')
@@ -159,10 +161,20 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $this->fieldHelper->expects($this->any())
+            ->method('getObjectValue')
+            ->will(
+                $this->returnCallback(
+                    function ($object, $field) {
+                        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+                        return $propertyAccessor->getValue($object, $field);
+                    }
+                )
+            );
 
-        $configValueMap = array();
-        $normalizedMap = array();
-        $hasConfigMap = array();
+        $configValueMap = [];
+        $normalizedMap = [];
+        $hasConfigMap = [];
         foreach ($fields as $field) {
             $fieldName = $field['name'];
 
@@ -172,15 +184,15 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                 if (isset($field['fieldContext'])) {
                     $fieldContext = $field['fieldContext'];
                 }
-                $normalizedMap[] = array($fieldValue, null, $fieldContext, $field['normalizedValue']);
+                $normalizedMap[] = [$fieldValue, null, $fieldContext, $field['normalizedValue']];
             }
 
             if (isset($field['related_entity_type'])) {
-                $hasConfigMap[] = array($field['related_entity_type'], true);
+                $hasConfigMap[] = [$field['related_entity_type'], true];
             }
 
             foreach ($fieldsImportConfig[$fieldName] as $configKey => $configValue) {
-                $configValueMap[] = array($entityName, $fieldName, $configKey, null, $configValue);
+                $configValueMap[] = [$entityName, $fieldName, $configKey, null, $configValue];
             }
         }
         $this->fieldHelper->expects($this->any())
@@ -211,179 +223,179 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function normalizeDataProvider()
     {
-        $object = (object) array(
+        $object = (object) [
             'fieldString' => 'string',
             'excluded' => 'excluded',
             'id' => 'id',
             'nonId' => 'nonId',
             'objectNoIds' => new \DateTime()
-        );
+        ];
         $object->relatedObjectWithId = clone $object;
 
-        return array(
-            'simple' => array(
+        return [
+            'simple' => [
                 $object,
-                array(),
-                array(
-                    array(
+                [],
+                [
+                    [
                         'name' => 'fieldString'
-                    )
-                ),
-                array(
-                    'fieldString' => array(
+                    ]
+                ],
+                [
+                    'fieldString' => [
                         'excluded' => false
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     'fieldString' => 'string'
-                )
-            ),
-            'simple_with_excluded' => array(
+                ]
+            ],
+            'simple_with_excluded' => [
                 $object,
-                array(),
-                array(
-                    array(
+                [],
+                [
+                    [
                         'name' => 'fieldString'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'id'
-                    )
-                ),
-                array(
-                    'fieldString' => array(
+                    ]
+                ],
+                [
+                    'fieldString' => [
                         'excluded' => true
-                    ),
-                    'id' => array(
+                    ],
+                    'id' => [
                         'excluded' => false
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     'id' => 'id'
-                )
-            ),
-            'with_identity' => array(
+                ]
+            ],
+            'with_identity' => [
                 $object,
-                array(
+                [
                     'mode' => ConfigurableEntityNormalizer::SHORT_MODE
-                ),
-                array(
-                    array(
+                ],
+                [
+                    [
                         'name' => 'fieldString'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'nonId'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'id'
-                    )
-                ),
-                array(
-                    'fieldString' => array(
+                    ]
+                ],
+                [
+                    'fieldString' => [
                         'excluded' => false
-                    ),
-                    'nonId' => array(
+                    ],
+                    'nonId' => [
                         'identity' => false,
-                    ),
-                    'id' => array(
+                    ],
+                    'id' => [
                         'identity' => true,
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     'id' => 'id'
-                )
-            ),
-            'with_object_full_non_identity' => array(
+                ]
+            ],
+            'with_object_full_non_identity' => [
                 $object,
-                array(),
-                array(
-                    array(
+                [],
+                [
+                    [
                         'name' => 'relatedObjectWithId',
                         'normalizedValue' => 'obj1',
                         'related_entity_type' => 'stdClass',
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-one',
-                        'fieldContext' => array(
+                        'fieldContext' => [
                             'fieldName' => 'relatedObjectWithId',
                             'mode' => ConfigurableEntityNormalizer::FULL_MODE
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'name' => 'objectNoIds',
                         'normalizedValue' => 'obj2',
                         'related_entity_type' => 'DateTime',
                         'related_entity_name' => 'DateTime',
                         'relation_type' => 'ref-one',
-                        'fieldContext' => array(
+                        'fieldContext' => [
                             'fieldName' => 'objectNoIds',
                             'mode' => ConfigurableEntityNormalizer::FULL_MODE
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'name' => 'id'
-                    )
-                ),
-                array(
-                    'relatedObjectWithId' => array(
+                    ]
+                ],
+                [
+                    'relatedObjectWithId' => [
                         'full' => true
-                    ),
-                    'objectNoIds' => array(
+                    ],
+                    'objectNoIds' => [
                         'full' => true
-                    ),
-                    'id' => array(
+                    ],
+                    'id' => [
                         'identity' => true,
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     'id' => 'id',
                     'relatedObjectWithId' => 'obj1',
                     'objectNoIds' => 'obj2'
-                )
-            ),
-            'object_relation_short_with_non_identity' => array(
+                ]
+            ],
+            'object_relation_short_with_non_identity' => [
                 $object,
-                array(),
-                array(
-                    array(
+                [],
+                [
+                    [
                         'name' => 'relatedObjectWithId',
                         'normalizedValue' => 'obj1',
-                        'fieldContext' => array(
+                        'fieldContext' => [
                             'fieldName' => 'relatedObjectWithId',
                             'mode' => ConfigurableEntityNormalizer::SHORT_MODE
-                        ),
+                        ],
                         'related_entity_type' => 'stdClass',
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-one',
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'objectNoIds',
                         'normalizedValue' => 'obj2',
-                        'fieldContext' => array(
+                        'fieldContext' => [
                             'fieldName' => 'objectNoIds',
                             'mode' => ConfigurableEntityNormalizer::SHORT_MODE
-                        ),
+                        ],
                         'related_entity_type' => 'DateTime',
                         'related_entity_name' => 'DateTime',
                         'relation_type' => 'ref-one',
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'id'
-                    )
-                ),
-                array(
-                    'relatedObjectWithId' => array(
-                    ),
-                    'objectNoIds' => array(
-                    ),
-                    'id' => array(
+                    ]
+                ],
+                [
+                    'relatedObjectWithId' => [
+                    ],
+                    'objectNoIds' => [
+                    ],
+                    'id' => [
                         'identity' => true,
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     'id' => 'id',
                     'relatedObjectWithId' => 'obj1'
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
     /**
@@ -395,9 +407,9 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDenormalize($data, $class, $fields, $expected)
     {
-        $context = array();
+        $context = [];
 
-        $denormalizedMap = array();
+        $denormalizedMap = [];
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
@@ -409,7 +421,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                 if (array_key_exists('type', $field) && in_array($field['type'], ['date', 'datetime', 'time'], true)) {
                     $context = array_merge($context, ['type' => $field['type']]);
                 }
-                $denormalizedMap[] = array($fieldValue, $entityClass, null, $context, $field['denormalizedValue']);
+                $denormalizedMap[] = [$fieldValue, $entityClass, null, $context, $field['denormalizedValue']];
             }
         }
 
@@ -441,67 +453,67 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
         $expected->obj = 'dObj';
         $expected->collection = 'dCollection';
 
-        return array(
-            array(
-                array(
+        return [
+            [
+                [
                     'id' => 1,
                     'name' => 'test',
                     'created' => new \DateTime('2011-11-11'),
                     'birthday' => new \DateTime('2011-11-11'),
                     'time' => new \DateTime('2011-11-11 12:12:12'),
-                    'obj' => (object) array('key' => 'val'),
-                    'collection' => array(1, 2),
+                    'obj' => (object) ['key' => 'val'],
+                    'collection' => [1, 2],
                     'unknown' => 'not_included'
-                ),
+                ],
                 'Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub',
-                array(
-                    array(
+                [
+                    [
                         'name' => 'id'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'name'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'created',
                         'related_entity_name' => 'DateTime',
                         'relation_type' => null,
                         'type' => 'datetime',
                         'denormalizedValue' => 'dDateTime',
                         'expectedEntityClass' => 'DateTime'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'birthday',
                         'related_entity_name' => 'DateTime',
                         'relation_type' => null,
                         'type' => 'date',
                         'denormalizedValue' => 'dDate',
                         'expectedEntityClass' => 'DateTime'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'time',
                         'related_entity_name' => 'DateTime',
                         'relation_type' => null,
                         'type' => 'time',
                         'denormalizedValue' => 'dTime',
                         'expectedEntityClass' => 'DateTime'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'obj',
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-one',
                         'denormalizedValue' => 'dObj',
                         'expectedEntityClass' => 'stdClass'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'collection',
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-many',
                         'denormalizedValue' => 'dCollection',
                         'expectedEntityClass' => 'ArrayCollection<stdClass>'
-                    ),
-                ),
+                    ],
+                ],
                 $expected
-            )
-        );
+            ]
+        ];
     }
 }
