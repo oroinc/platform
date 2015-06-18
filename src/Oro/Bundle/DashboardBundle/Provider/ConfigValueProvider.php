@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Provider;
 
 class ConfigValueProvider
 {
-    /** @var array */
+    /** @var ConfigValueConverterAbstract[] */
     protected $converters;
 
     /**
@@ -17,11 +17,11 @@ class ConfigValueProvider
     }
 
     /**
-     * @param       $widgetConfig
-     * @param       $formType
-     * @param null  $value
-     * @param array $config
-     * @param array $options
+     * @param array  $widgetConfig
+     * @param string $formType
+     * @param null   $value
+     * @param array  $config
+     * @param array  $options
      *
      * @return string
      */

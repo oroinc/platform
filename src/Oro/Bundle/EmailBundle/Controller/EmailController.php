@@ -49,13 +49,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-
-        // TODO Should be refactored in CRM-2482
-        $em = $this->getDoctrine()->getManager();
-        $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
-        if ($emailUser) {
-            $this->getEmailManager()->setEmailUserSeen($emailUser);
-        }
+        $this->setSeenStatus($entity);
 
         return [
             'entity' => $entity,
@@ -74,6 +68,8 @@ class EmailController extends Controller
     public function viewThreadAction(Email $entity)
     {
         $this->assertEmailViewGranted($entity);
+
+        $this->setSeenStatus($entity);
 
         return ['entity' => $entity];
     }
@@ -239,6 +235,7 @@ class EmailController extends Controller
      * Link attachment to entity
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_user_edit")
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
@@ -365,7 +362,6 @@ class EmailController extends Controller
 
         if ($emailUser) {
             $this->getEmailManager()->toggleEmailUserSeen($emailUser);
-            $this->getEmailManager()->updateChangeStatusAt($emailUser);
         }
 
         return new JsonResponse(['successful' => (bool)$emailUser]);
@@ -530,5 +526,19 @@ class EmailController extends Controller
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
+    }
+
+    /**
+     * @param Email $entity
+     */
+    protected function setSeenStatus(Email $entity)
+    {
+        // todo: CRM-2482 - move to manager
+        $emailUser = $this->getDoctrine()->getManager()
+            ->getRepository('OroEmailBundle:EmailUser')
+            ->findByEmailAndOwner($entity, $this->getUser());
+        if ($emailUser) {
+            $this->getEmailManager()->setEmailUserSeen($emailUser);
+        }
     }
 }

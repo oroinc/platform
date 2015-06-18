@@ -43,7 +43,7 @@ define(function (require) {
             var view = this.view,
                 $el = $(e.currentTarget),
                 entityName = $el.val(),
-                entityLabel = $el.find(":selected").data('label');
+                entityLabel = $el.find(':selected').data('label');
 
             if (!this.view.isEmpty()) {
                 if (this.confirm) {

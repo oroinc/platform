@@ -10,7 +10,7 @@ class ConfigApiManager
     /** @var ProviderInterface */
     protected $configProvider;
 
-    /** @var ConfigManager */
+    /** @var ConfigManager[] */
     protected $configManagers;
 
     /**
@@ -57,8 +57,13 @@ class ConfigApiManager
         $variables = $this->configProvider->getApiTree($path)->getVariables(true);
         $result    = [];
         foreach ($variables as $variable) {
+            $value = $configManager->get($variable->getKey());
+            $dataTransformer = $this->configProvider->getDataTransformer($variable->getKey());
+            if ($dataTransformer !== null) {
+                $value = $dataTransformer->transform($value);
+            }
             $var          = $variable->toArray();
-            $var['value'] = $this->getTypedValue($variable->getType(), $configManager->get($variable->getKey()));
+            $var['value'] = $this->getTypedValue($variable->getType(), $value);
             $var          = array_merge($var, $configManager->getInfo($variable->getKey()));
             $result[]     = $var;
         }

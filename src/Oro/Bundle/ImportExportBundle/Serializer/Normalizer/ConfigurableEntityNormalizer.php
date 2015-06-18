@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -104,7 +104,6 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $fields = $this->fieldHelper->getFields($entityName, true);
 
         $result = [];
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($fields as $field) {
             $fieldName = $field['name'];
 
@@ -112,7 +111,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                 continue;
             }
 
-            $fieldValue = $propertyAccessor->getValue($object, $fieldName);
+            $fieldValue = $this->fieldHelper->getObjectValue($object, $fieldName);
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
 

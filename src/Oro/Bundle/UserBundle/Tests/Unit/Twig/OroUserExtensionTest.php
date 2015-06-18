@@ -17,6 +17,11 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $genderProvider;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityContext;
+
     protected function setUp()
     {
         $this->genderProvider = $this->getMock(
@@ -27,12 +32,15 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->twigExtension = new OroUserExtension($this->genderProvider);
+        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+
+        $this->twigExtension = new OroUserExtension($this->genderProvider, $this->securityContext);
     }
 
     protected function tearDown()
     {
         unset($this->genderProvider);
+        unset($this->securityContext);
         unset($this->twigExtension);
     }
 
@@ -45,6 +53,7 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $expectedFunctions = array(
             'oro_gender'       => 'getGenderLabel',
+            'get_current_user' => 'getCurrentUser',
         );
 
         $actualFunctions = $this->twigExtension->getFunctions();
@@ -52,8 +61,11 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
 
         foreach ($expectedFunctions as $twigFunction => $internalMethod) {
             $this->assertArrayHasKey($twigFunction, $actualFunctions);
-            $this->assertInstanceOf('\Twig_Function_Method', $actualFunctions[$twigFunction]);
-            $this->assertAttributeEquals($internalMethod, 'method', $actualFunctions[$twigFunction]);
+            $this->assertInstanceOf('\Twig_SimpleFunction', $actualFunctions[$twigFunction]);
+            $this->assertEquals(
+                [$this->twigExtension, $internalMethod],
+                $actualFunctions[$twigFunction]->getCallable()
+            );
         }
     }
 

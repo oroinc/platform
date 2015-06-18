@@ -12,6 +12,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
+use Oro\Bundle\EntityBundle\ORM\SqlQuery;
 
 class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,9 +30,9 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     public function testCalculateCount(
         $dql,
         $expectedCountQuery,
-        array $sqlParameters = array(),
-        array $types = array(),
-        array $queryParameters = array()
+        array $sqlParameters = [],
+        array $types = [],
+        array $queryParameters = []
     ) {
         /** @var $entityManager EntityManager|\PHPUnit_Framework_MockObject_MockObject */
         /** @var $connection Connection|\PHPUnit_Framework_MockObject_MockObject */
@@ -62,33 +63,95 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
      */
     public function getCountDataProvider()
     {
-        return array(
-            'empty'               => array(
+        return [
+            'empty'               => [
                 'dql'                => 'SELECT e FROM Stub:Entity e',
                 'expectedCountQuery' => 'SELECT count(@0_.a) AS sclr0 FROM  @0_',
-            ),
-            'empty with group by' => array(
+            ],
+            'empty with group by' => [
                 'dql'                => 'SELECT e FROM Stub:Entity e GROUP BY e.b',
                 'expectedCountQuery' => 'SELECT COUNT(*) FROM ' .
                     '(SELECT @0_.a AS a0, @0_.b AS b1 FROM  @0_ GROUP BY @0_.b) AS e',
-            ),
-            'single parameters'   => array(
+            ],
+            'single parameters'   => [
                 'dql'                => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
                 'expectedCountQuery' => 'SELECT count(@0_.a) AS sclr0 FROM  @0_ WHERE @0_.a = ? AND @0_.b = ?',
-                'sqlParameters'      => array(1, 2),
-                'types'              => array(Type::INTEGER, Type::INTEGER),
-                'queryParameters'    => array('a' => 1, 'b' => 2),
-            ),
-            'multiple parameters' => array(
+                'sqlParameters'      => [1, 2],
+                'types'              => [Type::INTEGER, Type::INTEGER],
+                'queryParameters'    => ['a' => 1, 'b' => 2],
+            ],
+            'multiple parameters' => [
                 'dql'
                     => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
                 'expectedCountQuery'
                     => 'SELECT DISTINCT count(DISTINCT @0_.a) AS sclr0 FROM  @0_ WHERE @0_.a = ? AND @0_.b = ?',
-                'sqlParameters'      => array(3, 3),
-                'types'              => array(Type::INTEGER, Type::INTEGER),
-                'queryParameters'    => array('value' => 3),
-            ),
+                'sqlParameters'      => [3, 3],
+                'types'              => [Type::INTEGER, Type::INTEGER],
+                'queryParameters'    => ['value' => 3],
+            ],
+        ];
+    }
+
+    /**
+     * @param string $sql
+     * @param bool   $useWalker
+     *
+     * @dataProvider getSqlCountDataProvider
+     */
+    public function testCalculateCountForSqlQuery($sql, $useWalker)
+    {
+        /** @var $entityManager EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var $statement Statement|\PHPUnit_Framework_MockObject_MockObject */
+        list($entityManager, , $statement) = $this->prepareMocks();
+
+        $dbalQb = $this->getMock(
+            'Doctrine\DBAL\Query\QueryBuilder',
+            ['getSQL', 'resetQueryParts', 'select', 'from', 'execute'],
+            [],
+            '',
+            false
         );
+
+        $query = new SqlQuery($entityManager);
+        $query->setQueryBuilder($dbalQb);
+
+        $dbalQb->expects($this->once())
+            ->method('getSQL')
+            ->will($this->returnValue($sql));
+        $dbalQb->expects($this->once())
+            ->method('resetQueryParts')
+            ->will($this->returnSelf());
+        $dbalQb->expects($this->once())
+            ->method('select')
+            ->with('COUNT(*)')
+            ->will($this->returnSelf());
+        $dbalQb->expects($this->once())
+            ->method('from')
+            ->with('(' . $sql . ')', 'e')
+            ->will($this->returnSelf());
+        $dbalQb->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($statement));
+
+        $statement->expects($this->once())
+            ->method('fetchColumn')
+            ->will($this->returnValue(self::TEST_COUNT));
+
+        $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, $useWalker));
+    }
+
+    public function getSqlCountDataProvider()
+    {
+        return [
+            [
+                'sql'       => 'SELECT id FROM test',
+                'useWalker' => false
+            ],
+            [
+                'sql'       => 'SELECT id FROM test',
+                'useWalker' => true
+            ]
+        ];
     }
 
     /**
@@ -101,22 +164,22 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
         $configuration->addEntityNamespace('Stub', 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub');
 
         $classMetadata = new ClassMetadata('Entity');
-        $classMetadata->mapField(array('fieldName' => 'a', 'columnName' => 'a'));
-        $classMetadata->mapField(array('fieldName' => 'b', 'columnName' => 'b'));
-        $classMetadata->setIdentifier(array('a'));
+        $classMetadata->mapField(['fieldName' => 'a', 'columnName' => 'a']);
+        $classMetadata->mapField(['fieldName' => 'b', 'columnName' => 'b']);
+        $classMetadata->setIdentifier(['a']);
 
         $platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
-            ->setMethods(array())
+            ->setMethods([])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
         $statement = $this->getMockBuilder('Doctrine\DBAL\Statement')
-            ->setMethods(array('fetch', 'fetchColumn', 'closeCursor'))
+            ->setMethods(['fetch', 'fetchColumn', 'closeCursor'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $driverConnection = $this->getMockBuilder('Doctrine\DBAL\Driver\Connection')
-            ->setMethods(array('query'))
+            ->setMethods(['query'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $driverConnection->expects($this->any())
@@ -124,7 +187,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($statement));
 
         $driver = $this->getMockBuilder('Doctrine\DBAL\Driver')
-            ->setMethods(array('connect', 'getDatabasePlatform'))
+            ->setMethods(['connect', 'getDatabasePlatform'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $driver->expects($this->any())
@@ -135,8 +198,8 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($platform));
 
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->setMethods(array('getDatabasePlatform', 'executeQuery'))
-            ->setConstructorArgs(array(array(), $driver))
+            ->setMethods(['getDatabasePlatform', 'executeQuery'])
+            ->setConstructorArgs([[], $driver])
             ->getMock();
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
@@ -144,12 +207,12 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
 
         /** @var UnitOfWork $unitOfWork */
         $unitOfWork = $this->getMockBuilder('UnitOfWork')
-            ->setMethods(array('getEntityPersister'))
+            ->setMethods(['getEntityPersister'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(array('getConfiguration', 'getClassMetadata', 'getConnection', 'getUnitOfWork'))
+            ->setMethods(['getConfiguration', 'getClassMetadata', 'getConnection', 'getUnitOfWork'])
             ->disableOriginalConstructor()
             ->getMock();
         $entityManager->expects($this->any())
@@ -165,6 +228,28 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($unitOfWork));
 
-        return array($entityManager, $connection, $statement);
+        return [$entityManager, $connection, $statement];
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "integer" given
+     */
+    // @codingStandardsIgnoreEnd
+    public function testCalculateCountForInvalidQueryType()
+    {
+        QueryCountCalculator::calculateCount(123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "integer" given
+     */
+    // @codingStandardsIgnoreEnd
+    public function testCalculateCountForInvalidQueryTypeAndUseWalker()
+    {
+        QueryCountCalculator::calculateCount(123, true);
     }
 }

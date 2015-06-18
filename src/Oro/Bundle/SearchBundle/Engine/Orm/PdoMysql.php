@@ -55,15 +55,19 @@ class PdoMysql extends BaseDriver
      * @param  integer      $index
      * @param  array        $searchCondition
      * @param  boolean      $setOrderBy
+     *
      * @return string
      */
     protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
-        $words = $this->getWords($this->filterTextFieldValue($searchCondition['fieldValue']));
+        $words = $this->getWords(
+            $this->filterTextFieldValue($searchCondition['fieldValue']),
+            $searchCondition['condition']
+        );
 
         // TODO Need to clarify search requirements in scope of CRM-214
         if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
-            $whereExpr = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
+            $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
             $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
             if ($shortWords) {
                 $whereExpr = $qb->expr()->orX(
@@ -84,17 +88,32 @@ class PdoMysql extends BaseDriver
      * Get array of words retrieved from $value string
      *
      * @param  string $value
+     * @param  string $searchCondition
+     *
      * @return array
      */
-    protected function getWords($value)
+    protected function getWords($value, $searchCondition)
     {
-        return array_filter(explode(' ', $value));
+        $results = array_filter(explode(' ', $value));
+        $results = array_map(
+            function ($word) use ($searchCondition) {
+                if ($searchCondition === Query::OPERATOR_CONTAINS && filter_var($word, FILTER_VALIDATE_EMAIL)) {
+                    $word = sprintf('"%s"', $word);
+                }
+
+                return $word;
+            },
+            $results
+        );
+
+        return $results;
     }
 
     /**
      * Get words that have length less than $this->fullTextMinWordLength
      *
      * @param  array $words
+     *
      * @return array
      */
     protected function getWordsLessThanFullTextMinWordLength(array $words)
@@ -121,7 +140,7 @@ class PdoMysql extends BaseDriver
     protected function getFullTextMinWordLength()
     {
         if (null === $this->fullTextMinWordLength) {
-            $this->fullTextMinWordLength = (int) $this->em->getConnection()->fetchColumn(
+            $this->fullTextMinWordLength = (int)$this->em->getConnection()->fetchColumn(
                 "SHOW VARIABLES LIKE 'ft_min_word_len'",
                 [],
                 1
@@ -140,6 +159,7 @@ class PdoMysql extends BaseDriver
      * @param  string       $index
      * @param  array        $searchCondition
      * @param  bool         $setOrderBy
+     *
      * @return string
      */
     protected function createMatchAgainstWordsExpr(
@@ -176,7 +196,7 @@ class PdoMysql extends BaseDriver
             )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
         }
 
-        return (string) $result;
+        return (string)$result;
     }
 
     /**
@@ -185,8 +205,9 @@ class PdoMysql extends BaseDriver
      *
      * @param QueryBuilder $qb
      * @param array        $words
-     * @param $index
-     * @param  array  $searchCondition
+     * @param              $index
+     * @param  array       $searchCondition
+     *
      * @return string
      */
     protected function createLikeWordsExpr(
@@ -207,18 +228,19 @@ class PdoMysql extends BaseDriver
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
             $fieldParameter = 'field' . $index;
-            $result = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
+            $result         = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
             $qb->setParameter($fieldParameter, $fieldValue);
         }
 
-        return (string) $result;
+        return (string)$result;
     }
 
     /**
      * @param  QueryBuilder $qb
      * @param  int          $index
-     * @param  array        $words,
+     * @param  array        $words
      * @param  array        $searchCondition
+     *
      * @return string
      */
     protected function createNotLikeWordsExpr(
@@ -248,6 +270,7 @@ class PdoMysql extends BaseDriver
 
     /**
      * @param  array $fieldName
+     *
      * @return bool
      */
     protected function isConcreteField($fieldName)
@@ -257,6 +280,7 @@ class PdoMysql extends BaseDriver
 
     /**
      * @param  array $fieldName
+     *
      * @return bool
      */
     protected function isAllDataField($fieldName)
