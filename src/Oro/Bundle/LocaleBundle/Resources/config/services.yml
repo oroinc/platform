@@ -33,6 +33,8 @@ parameters:
     oro_locale.twig.address.class: Oro\Bundle\LocaleBundle\Twig\AddressExtension
     oro_locale.twig.number.class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
 
+    oro_locale.formatter.datetime.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
+
 services:
     oro_locale.cache:
             parent: oro.cache.abstract
@@ -215,3 +217,11 @@ services:
             - @oro_locale.formatter.number
         tags:
             - { name: twig.extension }
+
+    oro_locale.format.datetime:
+        class: %oro_locale.formatter.datetime.class%
+        arguments:
+            - @oro_locale.formatter.date_time
+            - @translator
+        tags:
+            - { name: oro_formatter, formatter: datetime }

@@ -24,6 +24,11 @@ parameters:
     oro_attachment.provider.attachment.class:             Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
     oro_attachment.config.class:                          Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
+    oro_attachment.emailtemplate.variable_provider.entity.class: Oro\Bundle\AttachmentBundle\Provider\EntityImageFieldsProvider
+
+    oro_attachment.twig.formatter.base64_content.class:   Oro\Bundle\AttachmentBundle\Twig\Formatter\ImageContentFormatter
+    oro_attachment.twig.formatter.image_url.class:        Oro\Bundle\AttachmentBundle\Twig\Formatter\ImageUrlFormatter
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
@@ -140,3 +145,18 @@ services:
         arguments:
             - @oro_entity_config.provider.attachment
             - @oro_entity_config.provider.entity
+
+    oro_attachment.twig.formatter.base64_content:
+        class: %oro_attachment.twig.formatter.base64_content.class%
+        arguments:
+          - @oro_attachment.manager
+          - @file_locator
+        tags:
+          - { name: oro_formatter, formatter: inline_content }
+
+    oro_attachment.twig.formatter.image_url:
+        class: %oro_attachment.twig.formatter.image_url.class%
+        arguments:
+          - @oro_attachment.manager
+        tags:
+          - { name: oro_formatter, formatter: image_url }
