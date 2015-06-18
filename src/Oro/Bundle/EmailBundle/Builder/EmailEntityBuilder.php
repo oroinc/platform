@@ -454,8 +454,8 @@ class EmailEntityBuilder
      */
     public function setObject($obj)
     {
-        if ($obj instanceof Email) {
-            $this->batch->addEmail($obj);
+        if ($obj instanceof EmailUser) {
+            $this->batch->addEmailUser($obj);
         } elseif ($obj instanceof EmailAddress) {
             $this->batch->addAddress($obj);
         } elseif ($obj instanceof EmailFolder) {
@@ -463,7 +463,7 @@ class EmailEntityBuilder
         } else {
             throw new UnexpectedTypeException(
                 $obj,
-                'Oro\Bundle\EmailBundle\Entity\Email'
+                'Oro\Bundle\EmailBundle\Entity\EmailUser'
                 . ', Oro\Bundle\EmailBundle\Entity\EmailAddress'
                 . ' or Oro\Bundle\EmailBundle\Entity\EmailFolder'
             );

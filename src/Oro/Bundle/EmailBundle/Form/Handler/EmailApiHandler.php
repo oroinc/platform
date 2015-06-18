@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormInterface;
@@ -15,13 +16,14 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Form\Model\EmailApi as EmailModel;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -114,6 +116,9 @@ class EmailApiHandler extends ApiFormHandler
      */
     protected function processEmailModel(EmailModel $model)
     {
+        /**
+         * TODO EmailEntityBuilder::email or emailUser should be user here
+         */
         $this->assertModel($model);
 
         $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -122,12 +127,7 @@ class EmailApiHandler extends ApiFormHandler
         $this->ensureEmailEntitySet($model);
 
         $email = $model->getEntity();
-        $this->emailEntityBuilder->setObject($email);
 
-        // Folder
-        if ($model->getFolders()) {
-            $this->processFolders($email, $model->getFolders());
-        }
         // Subject
         if ($model->getSubject()) {
             $this->processString($email, 'Subject', $model->getSubject());
@@ -166,13 +166,6 @@ class EmailApiHandler extends ApiFormHandler
         } elseif (!$email->getId()) {
             $email->setSentAt($messageDate);
         }
-        // ReceivedAt
-        // todo CRM-2480
-        if ($model->getReceivedAt()) {
-            $email->setReceivedAt($model->getReceivedAt());
-        } elseif (!$email->getId()) {
-            $email->setReceivedAt($messageDate);
-        }
         // InternalDate
         if ($model->getInternalDate()) {
             $email->setInternalDate($model->getInternalDate());
@@ -186,10 +179,6 @@ class EmailApiHandler extends ApiFormHandler
         // Head
         if (null !== $model->isHead()) {
             $this->processHead($email, $model->isHead());
-        }
-        // Seen
-        if (null !== $model->isSeen()) {
-            $email->setSeen($model->isSeen());
         }
         // MessageId
         if (null !== $model->getMessageId()) {
@@ -210,6 +199,22 @@ class EmailApiHandler extends ApiFormHandler
         // Refs
         if (null !== $model->getRefs()) {
             $this->processRefs($email, $model->getRefs());
+        }
+
+        // process EmailUser entities for each folder
+        $emailUsers = $this->processFolders($email, $model->getFolders());
+        foreach ($emailUsers as $emailUser) {
+            // ReceivedAt
+            if ($model->getReceivedAt()) {
+                $emailUser->setReceivedAt($model->getReceivedAt());
+            } elseif (!$email->getId()) {
+                $emailUser->setReceivedAt($messageDate);
+            }
+            // Seen
+            if (null !== $model->isSeen()) {
+                $emailUser->setSeen($model->isSeen());
+            }
+            $this->emailEntityBuilder->setObject($emailUser);
         }
 
         $this->emailEntityBuilder->getBatch()->persist($this->entityManager);
@@ -268,36 +273,39 @@ class EmailApiHandler extends ApiFormHandler
         if (!$this->emailOrigin) {
             /** @var User $originOwner */
             $originOwner = $this->securityFacade->getLoggedUser();
+            $organization = $this->securityFacade->getOrganization();
             $originName  = 'API_User_' . $originOwner->getId();
 
             $origins = $originOwner->getEmailOrigins()->filter(
-                function ($item) use ($originName) {
+                function ($item) use ($originName, $organization) {
                     return
                         $item instanceof InternalEmailOrigin
                         && $item->getName() === $originName
-                        && $item->getOrganization() === $this->securityFacade->getOrganization();
+                        && $item->getOrganization() === $organization;
                 }
             );
 
-            // todo CRM-2480
             $this->emailOrigin = !$origins->isEmpty()
                 ? $origins->first()
-                : $this->createEmailOrigin($originOwner, $originName);
+                : $this->createEmailOrigin($originOwner, $organization, $originName);
         }
 
         return $this->emailOrigin;
     }
 
     /**
-     * @param User   $originOwner
-     * @param string $originName
+     * @param User                  $originOwner
+     * @param OrganizationInterface $organization
+     * @param string                $originName
      *
      * @return InternalEmailOrigin
      */
-    protected function createEmailOrigin(User $originOwner, $originName)
+    protected function createEmailOrigin(User $originOwner, OrganizationInterface $organization, $originName)
     {
         $origin = new InternalEmailOrigin();
         $origin->setName($originName);
+        $origin->setOwner($originOwner);
+        $origin->setOrganization($organization);
 
         $originOwner->addEmailOrigin($origin);
 
@@ -309,14 +317,16 @@ class EmailApiHandler extends ApiFormHandler
     /**
      * @param Email $email
      * @param array $folders
+     *
+     * @return EmailUser[]
      */
     protected function processFolders(Email $email, $folders)
     {
         $apiOrigin = $this->getEmailOrigin();
+        $emailUserList = [];
         foreach ($folders as $item) {
             $origin = $item['origin'] ?: $this->getEmailOrigin();
-            if ($origin->getId() && $origin->getId() != $apiOrigin->getId()) {
-                // skip folders from non API origins
+            if ($origin->getId() && $origin->getId() !== $apiOrigin->getId()) {
                 continue;
             }
 
@@ -328,9 +338,16 @@ class EmailApiHandler extends ApiFormHandler
                 $this->emailEntityBuilder->setFolder($folder);
             }
 
-            // todo CRM-2480
-            $email->addFolder($folder);
+            $emailUser = new EmailUser();
+            $emailUser->setEmail($email);
+            $emailUser->setOwner($apiOrigin->getOwner());
+            $emailUser->setOrganization($apiOrigin->getOrganization());
+            $emailUser->setFolder($folder);
+
+            $emailUserList[] = $emailUser;
         }
+
+        return $emailUserList;
     }
 
     /**
