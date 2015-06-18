@@ -47,6 +47,10 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
         $user2 = $this->createUser('Brenda', 'Brock');
         $user3 = $this->createUser('Shawn', 'Bryson');
 
+        $this->setReference('user_1', $user1);
+        $this->setReference('user_2', $user2);
+        $this->setReference('user_3', $user3);
+
         $email1 = $this->createEmail(
             'Test Email 1',
             'email1@orocrm-pro.func-test',

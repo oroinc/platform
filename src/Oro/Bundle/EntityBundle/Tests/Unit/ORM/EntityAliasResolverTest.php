@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
@@ -43,7 +43,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage An alias for "Test\UnknownEntity" entity not found.
      */
     public function testGetAliasForUnknownEntity()
@@ -52,7 +52,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage An alias for "Test\UnknownEntity" entity not found.
      */
     public function testGetAliasCacheForUnknownEntity()
@@ -66,7 +66,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
         try {
             $this->entityAliasResolver->getAlias('Test\UnknownEntity');
-        } catch (NotFoundEntityAliasException $e) {
+        } catch (EntityAliasNotFoundException $e) {
             // ignore the first call
         }
 
@@ -75,7 +75,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage A plural alias for "Test\UnknownEntity" entity not found.
      */
     public function testGetPluralAliasForUnknownEntity()
@@ -84,7 +84,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage A plural alias for "Test\UnknownEntity" entity not found.
      */
     public function testGetPluralAliasCacheForUnknownEntity()
@@ -98,7 +98,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
         try {
             $this->entityAliasResolver->getPluralAlias('Test\UnknownEntity');
-        } catch (NotFoundEntityAliasException $e) {
+        } catch (EntityAliasNotFoundException $e) {
             // ignore the first call
         }
 
@@ -107,7 +107,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage The alias "unknown" is not associated with any entity class.
      */
     public function testGetClassByAliasForUnknownAlias()
@@ -120,7 +120,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage The alias "unknown" is not associated with any entity class.
      */
     public function testGetClassByAliasCacheForUnknownAlias()
@@ -131,7 +131,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
         try {
             $this->entityAliasResolver->getClassByAlias('unknown');
-        } catch (NotFoundEntityAliasException $e) {
+        } catch (EntityAliasNotFoundException $e) {
             // ignore the first fail
         }
 
@@ -140,7 +140,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage The plural alias "unknown" is not associated with any entity class.
      */
     public function testGetClassByPluralAliasForUnknownAlias()
@@ -153,7 +153,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotFoundEntityAliasException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage The plural alias "unknown" is not associated with any entity class.
      */
     public function testGetClassByPluralAliasCacheForUnknownAlias()
@@ -164,7 +164,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
         try {
             $this->entityAliasResolver->getClassByPluralAlias('unknown');
-        } catch (NotFoundEntityAliasException $e) {
+        } catch (EntityAliasNotFoundException $e) {
             // ignore the first fail
         }
 

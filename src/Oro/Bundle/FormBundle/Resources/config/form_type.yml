@@ -18,7 +18,7 @@ parameters:
     oro_form.type.color_table.class:                             Oro\Bundle\FormBundle\Form\Type\OroColorTableType
     oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
     oro_form.type.download_links.class:                          Oro\Bundle\FormBundle\Form\Type\DownloadLinksType
-    oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\AbstractApiType
+    oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\DecoratorApiType
     oro_form.type.rich_text.class:                               Oro\Bundle\FormBundle\Form\Type\OroRichTextType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
@@ -32,6 +32,9 @@ parameters:
     oro_form.extension.data_transformer.class:                   Oro\Bundle\FormBundle\Form\Extension\DataTransformerExtension
 
     oro_form.form_handler.api.class:                             Oro\Bundle\FormBundle\Form\Handler\ApiFormHandler
+
+    oro_form.validator.entity_class.class:                       Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator
+    oro_form.validator.related_entity.class:                       Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator
 
 services:
     # Form types
@@ -223,6 +226,7 @@ services:
 
     oro_form.type.api:
         class: %oro_form.type.api.class%
+        abstract: true
         tags:
             - { name: form.type, alias: oro_api_type }
 
@@ -232,3 +236,47 @@ services:
         arguments:
             - @request
             - @doctrine.orm.entity_manager
+
+    oro_form.validator.entity_class:
+        class: %oro_form.validator.entity_class.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: validator.constraint_validator, alias: oro_form.entity_class_validator }
+
+    oro_form.validator.related_entity:
+        class: %oro_form.validator.related_entity.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: validator.constraint_validator, alias: oro_form.related_entity_validator }
+
+    oro_form.related_entity.form.transformer.api:
+        class: Oro\Bundle\FormBundle\Form\DataTransformer\RelatedEntityTransformer
+        public: false
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_alias_resolver
+            - @oro_security.security_facade
+
+    oro_form.related_entity.form.type.api:
+        class: Oro\Bundle\FormBundle\Form\Type\RelatedEntityApiType
+        arguments:
+            - @oro_form.related_entity.form.transformer.api
+        tags:
+            - { name: form.type, alias: oro_related_entity_api }
+
+    oro_form.related_entity_collection.form.type.api:
+        class: Oro\Bundle\FormBundle\Form\Type\RelatedEntityCollectionApiType
+        tags:
+            - { name: form.type, alias: oro_related_entity_collection_api }
+
+    oro_form.related_entity_standalone_collection.form.type.api:
+        parent: oro_form.type.api
+        arguments:
+            - oro_related_entity_standalone_collection_api
+            - @oro_form.related_entity_collection.form.type.api
+        tags:
+            - { name: form.type, alias: oro_related_entity_standalone_collection_api }
