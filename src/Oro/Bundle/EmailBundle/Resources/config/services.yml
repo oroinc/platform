@@ -549,6 +549,6 @@ services:
     oro_email.acl.voter.email_voter:
         class: %oro_email.acl.voter.email_voter.class%
         arguments:
-            - @oro_security.security_facade
+            - @service_container
         tags:
             - { name: security.voter }
