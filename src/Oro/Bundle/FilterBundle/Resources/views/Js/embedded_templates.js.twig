@@ -50,7 +50,11 @@
 
 <script type="text/template" id="select-field-template-embedded">
     <div class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>
+        <% if (choices.length > 1) { %>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>
+        <% } else { %>
+            <span><%= selectedChoiceLabel %></span>
+        <% } %>
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
             <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>

@@ -30,7 +30,7 @@ define([
                     });
                     $.extend(true, $dataAuditCondition.data('options'), {
                         fieldChoice: this.options.fieldChoiceOptions,
-                        filters: this.options.metadata.filters,
+                        filters: this.options.auditFilters,
                         hierarchy: this.options.metadata.hierarchy
                     });
                 }

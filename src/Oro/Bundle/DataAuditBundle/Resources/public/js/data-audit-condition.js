@@ -67,6 +67,9 @@ define([
             this.$changeStateChoice = $('<span>')
                 .css('display', 'inline-block')
                 .html(this.auditTypeFilter.render().$el);
+            this.$interval = $('<span>').html(__('oro.dataaudit.data_audit_condition.in_the_interval'));
+            this.$value = $('<span>').html(__('oro.dataaudit.data_audit_condition.value'));
+            this.$valueThat = $('<span>').html(__('oro.dataaudit.data_audit_condition.value_that'));
 
             var filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
@@ -112,12 +115,26 @@ define([
             this.$filterContainer.hide();
             this.$auditFilterContainer.css('display', 'inline');
             this.auditFilter.$el.find('> .dropdown:last').before(this.$changeStateChoice);
+            this.$interval.prevUntil().show();
+            this.$changeStateChoice.after(this.$interval);
         },
 
         _renderChangedToValueChoice: function () {
             this.$filterContainer.show();
             this.$auditFilterContainer.css('display', 'block');
             this.filter.$el.find('> .dropdown:last').before(this.$changeStateChoice);
+
+            var selectedField = this.element.find('input.select').select2('val');
+            var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', selectedField);
+
+            if (_.contains(['date', 'datetime'], conditions.type)) {
+                this.$changeStateChoice.after(this.$value);
+            } else {
+                this.$changeStateChoice.after(this.$valueThat);
+            }
+
+            this.auditFilter.$el.find('> .dropdown:last').before(this.$interval);
+            this.$interval.prevUntil().hide();
         },
 
         _getFilterCriterion: function () {

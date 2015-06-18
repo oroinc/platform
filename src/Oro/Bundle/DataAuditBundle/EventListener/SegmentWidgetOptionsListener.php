@@ -39,9 +39,20 @@ class SegmentWidgetOptionsListener
         $widgetOptions = $event->getWidgetOptions();
         $fieldsLoader = $widgetOptions['fieldsLoader'];
 
+        $auditFilters = array_map(function ($filter) {
+            if (isset($filter['dateParts'], $filter['dateParts']['value'])) {
+                $filter['dateParts'] = [
+                    'value' => $filter['dateParts']['value'],
+                ];
+            }
+
+            return $filter;
+        }, $widgetOptions['metadata']['filters']);
+
         $event->setWidgetOptions(array_merge_recursive(
             $widgetOptions,
             [
+                'auditFilters'      => $auditFilters,
                 'auditFieldsLoader' => [
                     'entityChoice'      => $fieldsLoader['entityChoice'],
                     'loadingMaskParent' => $fieldsLoader['loadingMaskParent'],
