@@ -71,6 +71,6 @@ class EmailVoter implements VoterInterface
             }
         }
 
-        return self::ACCESS_ABSTAIN;
+        return self::ACCESS_DENIED;
     }
 }
