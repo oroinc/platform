@@ -59,15 +59,6 @@ define(function (require) {
 
             this.fields = $(this.options.fieldsSelectors.join(','));
             this.fields.on('blur', _.bind(this._updateElementsMetaData, this));
-            /*this.fields
-                .droppable({
-                    drop: function Drop(event, ui) {
-                        var variable = ui.draggable.text(),
-                            $targetEl = $(this);
-
-                        $targetEl.val($targetEl.val() + variable);
-                    }
-                });*/
 
             this.lastElement = $(this.options.fieldsSelectors[this.options.defaultFieldIndex]);
         },

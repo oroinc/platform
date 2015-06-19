@@ -5,17 +5,21 @@ define(function (require) {
     var EmailTemplateEditorView,
         $ = require('jquery'),
         _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
         BaseView = require('oroui/js/app/views/base/view');
 
     EmailTemplateEditorView = BaseView.extend({
         options: {
-            typeSwitcher: 'input[name*="type"]', //selector of type switcher
+            typeSwitcher: 'input[name*="type"]', //type (Html or Plain) switcher selector
             hasWysiwyg: false, //is wysiwyg editor enabled in System->Configuration
             isWysiwygEnabled: false, //true if 'type' is set to 'Html'
-            editorComponents: [], //collection of editor(s) view components
             emailVariableView: {} // link to app/views/email-variable-view
+        },
+        listen: {
+            'email-variable-view:click-variable mediator': '_onVariableClick'
+        },
+        events: {
+            'change input[name*=type]': '_onTypeChange'
         },
 
         initialize: function (options) {
@@ -31,47 +35,42 @@ define(function (require) {
         },
 
         afterLayoutInit: function () {
-            this.options.hasWysiwyg = $(this.el).find('textarea[name*="content"]:first').data('wysiwygEnabled') == true;
+            this.options.hasWysiwyg = this.$('textarea[name*="content"]:first').data('wysiwygEnabled') == true;
             if (this.options.hasWysiwyg) {
-                this.options.isWysiwygEnabled = $(this.options.typeSwitcher).filter(':checked').val() === 'html';
-                this.options.emailVariableView = this.componentManager.get('email-template-variables');
+                this.options.isWysiwygEnabled = this.$(this.options.typeSwitcher).filter(':checked').val() === 'html';
+                this.options.emailVariableView = this.pageComponent('email-template-variables');
 
-                this._collectEditors();
-                this._initTypeSwitcher();
-                this._listenToVariableClickHandler();
+                this._onEditorBlur();
+
+                if (this.options.isWysiwygEnabled == false) {
+                    this._switchWysiwygEditor(false);
+                }
             }
         },
 
-        _listenToVariableClickHandler: function () {
-            mediator.on(
-                'email-variable-view:click-variable',
-                _.bind(function(field, value) {
-                    var fieldId = field.data('id');
-                    if (this.options.isWysiwygEnabled && !_.isUndefined(fieldId)) {
-                        _.each(
-                            this.options.editorComponents,
-                            function (editor) {
-                                if (editor.view.el.id === fieldId) {
-                                    editor.view.tinymceInstance.execCommand('mceInsertContent', false, value);
-                                    return;
-                                }
-                            }
-                        )
+        _onVariableClick: function (field, value) {
+            var fieldId = field.data('id');
+            if (this.options.isWysiwygEnabled && !_.isUndefined(fieldId)) {
+                this.getComponentManager().forEachComponent(function (component) {
+                    if (!_.isUndefined(component.view)
+                        && !_.isUndefined(component.view.tinymceConnected)
+                        && component.view.tinymceConnected === true
+                        && component.view.el.id === fieldId
+                    ) {
+                        component.view.tinymceInstance.execCommand('mceInsertContent', false, value);
                     }
-                }, this)
-            )
+                }, this);
+            }
         },
 
-        _collectEditors: function () {
-            this.options.editorComponents = [];
-            if (this.options.hasWysiwyg) {
-                _.each(this.componentManager.components, function (component) {
-                    if (!_.isUndefined(component.component.view)
-                        && !_.isUndefined(component.component.view.tinymceConnected)
-                        && component.component.view.tinymceConnected === true
+        _onEditorBlur: function () {
+            if (this.options.hasWysiwyg && this.options.isWysiwygEnabled) {
+                this.getComponentManager().forEachComponent(function (component) {
+                    if (!_.isUndefined(component.view)
+                        && !_.isUndefined(component.view.tinymceConnected)
+                        && component.view.tinymceConnected === true
                     ) {
-                        this.options.editorComponents.push(component.component);
-                        $(component.component.view.tinymceInstance.getBody()).on(
+                        $(component.view.tinymceInstance.getBody()).on(
                             'blur',
                             _.bind(
                                 function (e) {
@@ -85,38 +84,28 @@ define(function (require) {
             }
         },
 
-        _initTypeSwitcher: function () {
-            var switcher = $(this.el).find(this.options.typeSwitcher);
-            switcher.on('change', _.bind(this._handleTypeChange, this));
-            if (this.options.isWysiwygEnabled == false) {
-                this._switchWysiwygEditor(false);
-            }
-        },
-
-        _handleTypeChange: function (e) {
-            var type = $(e.target).val();
+        _onTypeChange: function (e) {
             if (this.options.hasWysiwyg) {
+                var type = $(e.target).val();
                 if (type === 'txt') {
                     this._switchWysiwygEditor(false);
                 }
                 if (type === 'html') {
                     this._switchWysiwygEditor(true);
-                    this._collectEditors();
+                    this._onEditorBlur();
                 }
             }
         },
 
-        _switchWysiwygEditor: function (enable) {
-            this.options.isWysiwygEnabled = enable;
-            _.each(this.options.editorComponents, function (editor) {
-                if (enable) {
-                    editor.view.setEnabled(true);
-                } else {
-                    editor.view.setEnabled(false);
+        _switchWysiwygEditor: function (enabled) {
+            this.options.isWysiwygEnabled = enabled;
+            this.getComponentManager().forEachComponent(function (component) {
+                if (!_.isUndefined(component.view) && !_.isUndefined(component.view.tinymceConnected)) {
+                    component.view.setEnabled(enabled);
                 }
-            })
-        }
+            }, this);
 
+        }
     });
 
     return EmailTemplateEditorView;
