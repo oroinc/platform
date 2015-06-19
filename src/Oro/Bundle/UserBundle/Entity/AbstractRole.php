@@ -20,15 +20,15 @@ abstract class AbstractRole extends BaseRole
      * Set role name only for newly created role
      *
      * @param  string $role Role name
+     * @param bool $generateUnique
      * @return $this
      */
-    public function setRole($role)
+    public function setRole($role, $generateUnique = true)
     {
-        $this->role = (string)strtoupper(preg_replace('/[^\w\-]/i', '_', uniqid($role . '_')));
-
-        // every role should be prefixed with role prefix
-        if (strpos($this->role, $this->getPrefix()) !== 0) {
-            $this->role = $this->getPrefix() . $this->role;
+        if ($generateUnique) {
+            $this->role = $this->generateUniqueRole($role);
+        } else {
+            $this->role = $this->addPrefix($this->normalize($role));
         }
 
         return $this;
@@ -45,5 +45,49 @@ abstract class AbstractRole extends BaseRole
     public function __toString()
     {
         return (string)$this->getLabel();
+    }
+
+    /**
+     * @param string $role
+     * @return string
+     */
+    public function generateUniqueRole($role = '')
+    {
+        $role = $this->normalize($role);
+        $role = $this->addPrefix($role);
+        $role = $this->addUniqueSuffix($role);
+
+        return $role;
+    }
+
+    /**
+     * @param string $role
+     * @return string
+     */
+    protected function normalize($role)
+    {
+        return strtoupper(preg_replace('/[^\w\-]/i', '_', $role));
+    }
+
+    /**
+     * @param string $role
+     * @return string
+     */
+    protected function addUniqueSuffix($role)
+    {
+        return uniqid(rtrim($role, '_') . '_');
+    }
+
+    /**
+     * @param string $role
+     * @return string
+     */
+    protected function addPrefix($role)
+    {
+        if (strpos($role, $this->getPrefix()) !== 0) {
+            $role = $this->getPrefix() . $role;
+        }
+
+        return $role;
     }
 }

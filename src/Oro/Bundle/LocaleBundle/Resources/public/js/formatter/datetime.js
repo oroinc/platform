@@ -37,6 +37,11 @@ define(['../locale-settings', 'moment'
         timezoneOffset: localeSettings.getTimeZoneOffset(),
 
         /**
+         * @property {string}
+         */
+        timezone: localeSettings.getTimeZone(),
+
+        /**
          * @returns {string}
          */
         getDateFormat: function () {
@@ -222,7 +227,8 @@ define(['../locale-settings', 'moment'
          * @returns {string}
          */
         formatDateTime: function (value) {
-            return this.getMomentForBackendDateTime(value).format(this.getDateTimeFormat());
+            return this.getMomentForBackendDateTime(value).tz(this.timezone)
+                .format(this.getDateTimeFormat());
         },
 
         /**
@@ -237,12 +243,13 @@ define(['../locale-settings', 'moment'
 
         /**
          * Get moment object based on formatted backend date time string
+         * (returns moment in UTC time zone)
          *
          * @param {string} value
-         * @returns {moment}
+         * @returns {moment} in UTC time zone
          */
         getMomentForBackendDateTime: function (value) {
-            var momentDateTime = moment.utc(value).zone(this.timezoneOffset);
+            var momentDateTime = moment.utc(value);
             if (!momentDateTime.isValid()) {
                 throw new Error('Invalid backend datetime ' + value);
             }
@@ -267,11 +274,12 @@ define(['../locale-settings', 'moment'
 
         /**
          * @param {string} value
-         * @param {string} [timezoneOffset]
+         * @param {string=} timezone name of time zone
          * @returns {string}
          */
-        convertDateTimeToBackendFormat: function (value, timezoneOffset) {
-            return this.getMomentForFrontendDateTime(value, timezoneOffset).format(this.backendFormats.datetime);
+        convertDateTimeToBackendFormat: function (value, timezone) {
+            return this.getMomentForFrontendDateTime(value, timezone).utc()
+                .format(this.backendFormats.datetime);
         },
 
         /**
@@ -328,39 +336,26 @@ define(['../locale-settings', 'moment'
 
         /**
          * Get moment object based on formatted frontend date time string
+         * (returns moment in custom time zone, by default it is system time zone)
          *
          * @param {string} value
-         * @param {string} [timezoneOffset]
-         * @returns {moment}
+         * @param {string=} timezone
+         * @returns {moment} in custom time zone (by default it is system time zone)
          */
-        getMomentForFrontendDateTime: function (value, timezoneOffset) {
-            if (this.isDateObject(value)) {
-                value = this.formatDateTime(value);
-            } else if (!this.isDateTimeValid(value)) {
-                throw new Error('Invalid frontend datetime ' + value);
-            }
-
-            timezoneOffset = timezoneOffset || this.timezoneOffset;
-
-            var datetimeFormat = this.getDateTimeFormat();
-            // tell which timezone must be used
-            if (datetimeFormat.indexOf('Z') === -1) {
-                datetimeFormat += ' Z';
-                value += ' ' + timezoneOffset;
-            }
-
-            return moment.utc(value, datetimeFormat).zone(timezoneOffset);
+        getMomentForFrontendDateTime: function (value, timezone) {
+            timezone = timezone || this.timezone;
+            return moment(value, this.getDateTimeFormat()).tz(timezone, true);
         },
 
         /**
          * Get Date object based on formatted frontend date time string
          *
          * @param {string} value
-         * @param {string} [timezoneOffset]
+         * @param {string=} timezone name of time zone
          * @returns {Date}
          */
-        unformatDateTime: function (value, timezoneOffset) {
-            return this.getMomentForFrontendDateTime(value, timezoneOffset).toDate();
+        unformatDateTime: function (value, timezone) {
+            return this.getMomentForFrontendDateTime(value, timezone).toDate();
         },
 
         /**
@@ -371,7 +366,7 @@ define(['../locale-settings', 'moment'
          * @returns {boolean}
          */
         isDateObject: function (obj) {
-            return Object.prototype.toString.call(obj) == '[object Date]'
+            return Object.prototype.toString.call(obj) === '[object Date]';
         }
-    }
+    };
 });
