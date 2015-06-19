@@ -6,11 +6,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\RequestContextAwareInterface;
 
 class LocaleListener implements EventSubscriberInterface
 {
-    const API_PREFIX = '/api/rest';
+    const API_PREFIX = '/api/rest/';
 
     /**
      * @param GetResponseEvent $event
@@ -19,8 +18,9 @@ class LocaleListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($request->get('_locale') && $this->isApiRequest($request)) {
-            $request->setLocale($request->get('_locale'));
+        $locale = $request->query->get('_locale');
+        if ($locale && $this->isApiRequest($request)) {
+            $request->setLocale(str_replace('-', '_', $locale));
         }
     }
 
@@ -31,7 +31,7 @@ class LocaleListener implements EventSubscriberInterface
      */
     protected function isApiRequest(Request $request)
     {
-        return strpos($request->getPathInfo(), self::API_PREFIX . '/') === 0;
+        return strpos($request->getPathInfo(), self::API_PREFIX) === 0;
     }
 
     /**
