@@ -22,7 +22,7 @@ class EmailSearchApiEntityManager extends ActivitySearchApiEntityManager
         $queryBuilder->from($from);
 
         if (isset($criteria['email'])) {
-            $queryBuilder->andWhere('email', SearchQueryBuilder::OPERATOR_NOT_CONTAINS, $criteria['email']);
+            $queryBuilder->andWhere('email', SearchQueryBuilder::OPERATOR_CONTAINS, $criteria['email']);
         }
 
         $queryBuilder->setMaxResults($limit);
