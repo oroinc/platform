@@ -30,8 +30,8 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     {
         $customLocale = 'fr';
 
-        $request = new Request(['_locale' => $customLocale]);
-        //$request->server->set('REQUEST_URI', '/api/rest/test');
+        $request = new Request(['locale' => $customLocale]);
+        $request->server->set('REQUEST_URI', '/api/rest/test');
         $request->setDefaultLocale($this->defaultLocale);
 
         $this->listener = new LocaleListener();
