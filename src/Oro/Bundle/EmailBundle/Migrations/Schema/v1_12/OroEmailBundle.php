@@ -20,6 +20,6 @@ class OroEmailBundle implements Migration
     public static function addEmbeddedContentIdField(Schema $schema)
     {
         $table = $schema->getTable('oro_email_attachment');
-        $table->addColumn('embedded_content_id', 'string', ['length' => 255]);
+        $table->addColumn('embedded_content_id', 'string', ['length' => 255, 'notnull' => false]);
     }
 }
