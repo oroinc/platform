@@ -70,7 +70,6 @@ parameters:
 
     oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
     oro_email.listener.email_body_add_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener
-    oro_email.listener.email_origin_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailOriginListener
 
     # Validators
     oro_email.validator.email_template_syntax_validator.class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
@@ -518,13 +517,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_email.email_body_added, method: linkToScope, priority: 10 }
             - { name: kernel.event_listener, event: oro_email.email_body_added, method: updateActivityDescription, priority: 20 }
-
-    oro_email.listener.email_origin_listener:
-        class: %oro_email.listener.email_origin_listener.class%
-        arguments:
-            - @service_container
-        tags:
-            - { name: doctrine.event_listener, event: prePersist, method: prePersist }
 
     oro_email.provider.email_attachment_provider:
         class: %oro_email.provider.email_attachment_provider.class%

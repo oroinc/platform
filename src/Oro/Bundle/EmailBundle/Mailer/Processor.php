@@ -231,7 +231,7 @@ class Processor
     public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
         $originKey = $originName . $email;
-        $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization() !== null
+        $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
             ? $this->securityFacade->getOrganization()
             : null;
         if (!array_key_exists($originKey, $this->origins)) {
@@ -251,7 +251,7 @@ class Processor
 
                 $origin = $origins->isEmpty() ? null : $origins->first();
                 if ($origin == null) {
-                    $origin = $this->createUserInternalOrigin($emailOwner, $this->securityFacade->getOrganization());
+                    $origin = $this->createUserInternalOrigin($emailOwner, $organization);
                 }
             } else {
                 $origin = $this->getEntityManager()

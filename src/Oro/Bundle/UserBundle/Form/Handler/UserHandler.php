@@ -93,7 +93,9 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         $this->flashBag          = $flashBag;
         $this->translator        = $translator;
         $this->logger            = $logger;
-        $this->securityFacade    = $serviceLink->getService();
+        if ($serviceLink !== null) {
+            $this->securityFacade = $serviceLink->getService();
+        }
     }
 
     /**
