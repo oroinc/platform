@@ -28,7 +28,6 @@ parameters:
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
-    oro_email.event_listener.activity_condition_options_listener.class: Oro\Bundle\EmailBundle\EventListener\ActivityConditionOptionsListener
 
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
@@ -542,8 +541,3 @@ services:
 
     oro_email.email_body_type_transformer:
         class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailBodyTypeApiTransformer
-
-    oro_email.event_listener.activity_condition_options_listener:
-        class: %oro_email.event_listener.activity_condition_options_listener.class%
-        tags:
-            - { name: kernel.event_listener, event: oro_activity_list.activity_condition_options_load, method: onLoad }
