@@ -539,6 +539,9 @@
     {% if pageComponent.options is defined %}
         data-page-component-options="{{ pageComponent.options|json_encode }}"
     {% endif %}
+    {% if pageComponent.layout is defined %}
+        data-layout="{{ pageComponent.layout }}"
+    {% endif %}
 {% endmacro %}
 
 {#
