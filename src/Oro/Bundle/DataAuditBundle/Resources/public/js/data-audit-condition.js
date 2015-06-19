@@ -28,8 +28,9 @@ define([
 
             this._on(this.$fieldChoice, {
                 changed: function (e, fieldId) {
+                    this.element.data('value', {});
                     if (this.auditFilter) {
-                        this.auditFilter.reset();
+                        this.element.on('changed', _.bind(this.auditFilter.reset, this.auditFilter));
                     }
                     this._renderChangeStateChoice();
                 }
