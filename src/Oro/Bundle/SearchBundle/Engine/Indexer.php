@@ -331,9 +331,20 @@ class Indexer
      */
     public function advancedSearch($searchString)
     {
+        $query = $this->advancedSearchQuery($searchString);
+
+        return $this->query($query);
+    }
+
+    /**
+     * @param  string $searchString
+     * @return Query
+     */
+    public function advancedSearchQuery($searchString)
+    {
         $parser = new Parser($this->mapper->getMappingConfig());
 
-        return $this->query($parser->getQueryFromString($searchString));
+        return $parser->getQueryFromString($searchString);
     }
 
     /**
