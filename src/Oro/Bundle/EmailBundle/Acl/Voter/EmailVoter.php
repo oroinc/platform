@@ -100,8 +100,6 @@ class EmailVoter implements VoterInterface
         }
         if ($objectClass === EmailAttachment::CLASS_NAME) {
             $object = $object->getEmailBody()->getEmail();
-
-            return $object;
         }
 
         return $object;
