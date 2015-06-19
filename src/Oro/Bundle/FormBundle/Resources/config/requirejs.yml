@@ -65,7 +65,6 @@ config:
         'oro/select2-autocomplete-component': 'bundles/oroform/js/app/components/select2-autocomplete-component.js'
         'oro/select2-relation-component': 'bundles/oroform/js/app/components/select2-relation-component.js'
         'oro/select2-grid-component': 'bundles/oroform/js/app/components/select2-grid-component.js'
-        'oro/select2-acl-user-autocomplete-component': 'bundles/oroform/js/app/components/select2-acl-user-autocomplete-component.js'
 build:
     paths:
         'tinymce/tinymce.min': 'empty:'

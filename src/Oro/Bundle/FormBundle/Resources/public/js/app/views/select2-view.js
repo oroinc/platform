@@ -22,7 +22,7 @@ define(function (require) {
          * @param {Object} options
          */
         initialize: function (options) {
-            this.select2Config = _.result(options, 'select2Config') || this.select2Config;
+            this.select2Config = _.result(options, 'select2Config') || _.extend({}, this.select2Config);
         },
 
         render: function () {

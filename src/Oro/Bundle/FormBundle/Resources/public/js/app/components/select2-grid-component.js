@@ -2,7 +2,7 @@ define(function (require) {
     'use strict';
     var Select2GridComponent,
         _ = require('underscore'),
-        Select2Component = require('./select2-component');
+        Select2Component = require('oro/select2-component');
     Select2GridComponent = Select2Component.extend({
         preConfig: function (config) {
             Select2GridComponent.__super__.preConfig.call(this, config);
@@ -21,7 +21,7 @@ define(function (require) {
                     } else {
                         sortByKey = grid.sort_by || config.properties[0];
                         result[gridName + '[_pager][_page]'] = page;
-                        result[gridName + '[_pager][_per_page]'] = perPage;
+                        result[gridName + '[_pager][_per_page]'] = that.perPage;
                         result[gridName + '[_sort_by][' + sortByKey + ']'] = grid.sort_order || 'ASC';
                         result[gridName + '[_filter][' + config.properties[0] + '][type]'] = 1;
                         result[gridName + '[_filter][' + config.properties[0] + '][value]'] = query;

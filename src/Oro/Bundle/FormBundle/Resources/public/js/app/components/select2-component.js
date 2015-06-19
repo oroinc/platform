@@ -24,7 +24,6 @@ define(function (require) {
             this.perPage = _.result(config, 'per_page') || this.perPage;
             this.url = _.result(options, 'url') || '';
             this.excluded = _.result(options, 'excluded') || this.excluded;
-            console.log(config)
             config = this.preConfig(config);
             config = this.setConfig(config);
             if (options._sourceElement.is('select') || config.query || config.ajax || config.data || config.tags) {
