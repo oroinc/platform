@@ -247,8 +247,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         EmailFolder $folder,
         $isSeen = false,
         User $owner = null,
-        OrganizationInterface $organization = null)
-    {
+        OrganizationInterface $organization = null
+    ) {
         $emailUser = $this->emailEntityBuilder->emailUser(
             $email->getSubject(),
             $email->getFrom(),

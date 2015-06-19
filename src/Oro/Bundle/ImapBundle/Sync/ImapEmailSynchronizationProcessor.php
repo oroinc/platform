@@ -333,8 +333,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $email,
                 $folderType,
                 (int) $this->currentUser->getId(),
-                $this->currentOrganization)
-            ) {
+                $this->currentOrganization
+            )) {
                 continue;
             }
 
