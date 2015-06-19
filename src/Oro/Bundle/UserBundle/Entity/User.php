@@ -846,6 +846,8 @@ class User extends ExtendUser implements
      */
     public function setTags($tags)
     {
+        $this->tags = new ArrayCollection();
+
         foreach ($tags as $tag) {
             if (!$this->getTags()->contains($tag)) {
                 $this->getTags()->add($tag);
