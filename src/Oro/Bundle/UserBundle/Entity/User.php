@@ -832,7 +832,11 @@ class User extends ExtendUser implements
      */
     public function getTags()
     {
-        return $this->tags ?: new ArrayCollection();
+        if (!$this->tags) {
+            $this->tags = new ArrayCollection();
+        }
+
+        return $this->tags;
     }
 
     /**
@@ -842,7 +846,11 @@ class User extends ExtendUser implements
      */
     public function setTags($tags)
     {
-        $this->tags = $tags;
+        foreach ($tags as $tag) {
+            if (!$this->getTags()->contains($tag)) {
+                $this->getTags()->add($tag);
+            }
+        }
 
         return $this;
     }

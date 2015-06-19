@@ -358,7 +358,10 @@ class UserTest extends AbstractUserTest
         $tags = ['tag1', 'tag2'];
         $user->setTags($tags);
 
-        $this->assertEquals($tags, $user->getTags());
+        $newTags = ['tag2', 'tag3'];
+        $user->setTags($newTags);
+
+        $this->assertEquals(['tag1', 'tag2', 'tag3'], $user->getTags()->toArray());
     }
 
     public function testGetNotificationEmails()
