@@ -24,9 +24,6 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\UserBundle\Entity\User;
-
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -43,12 +40,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
     /** @var ImapEmailManager */
     protected $manager;
-
-    /** @var User */
-    protected $currentUser;
-
-    /** @var OrganizationInterface */
-    protected $currentOrganization;
 
     /**
      * Constructor
@@ -115,21 +106,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
-    }
-
-    /**
-     * @param EmailOrigin $emailOrigin
-     */
-    protected function initEnv(EmailOrigin $emailOrigin)
-    {
-        $this->currentUser = $this->em->getReference(
-            'Oro\Bundle\UserBundle\Entity\User',
-            $emailOrigin->getOwner()->getId()
-        );
-        $this->currentOrganization = $this->em->getReference(
-            'Oro\Bundle\OrganizationBundle\Entity\Organization',
-            $emailOrigin->getOrganization()->getId()
-        );
     }
 
     /**
@@ -403,13 +379,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
-     * @param User            $owner
      */
     protected function saveEmails(
         array $emails,
-        ImapEmailFolder $imapFolder,
-        User $owner,
-        OrganizationInterface $organization
+        ImapEmailFolder $imapFolder
     ) {
         $this->emailEntityBuilder->removeEmails();
 
@@ -461,8 +434,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                             $email,
                             $folder,
                             $email->hasFlag("\\Seen"),
-                            $owner,
-                            $organization
+                            $this->currentUser,
+                            $this->currentOrganization
                         )->getEmail(),
                         $imapFolder
                     );
