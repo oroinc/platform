@@ -6,13 +6,15 @@ define(function (require) {
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
         Select2 = require('jquery.select2'),
+        Select2View = require('oroform/js/app/views/select2-view'),
         BaseComponent = require('oroui/js/app/components/base/component');
     Select2Component = BaseComponent.extend({
 
         url: '',
         perPage: 10,
-        $el: null,
         excluded: [],
+        view: null,
+        ViewType: Select2View,
 
         /**
          * @constructor
@@ -20,14 +22,14 @@ define(function (require) {
          */
         initialize: function (options) {
             var config = options.configs;
-            this.$el = options._sourceElement;
-            this.perPage = _.result(config, 'per_page', this.perPage);
-            this.url = _.result(options, 'url', '');
-            this.excluded = _.result(options, 'excluded', this.excluded);
+            this.perPage = _.result(config, 'per_page') || this.perPage;
+            this.url = _.result(options, 'url') || '';
+            this.excluded = _.result(options, 'excluded') || this.excluded;
+            console.log(config.component)
             config = this.preConfig(config);
             config = this.setConfig(config);
-            if (this.$el.is('select') || config.query || config.ajax || config.data || config.tags) {
-                this.$el.select2(config).trigger('select2-init');
+            if (options._sourceElement.is('select') || config.query || config.ajax || config.data || config.tags) {
+                this.view = new this.ViewType({el: options._sourceElement, select2Config: config});
             }
         },
 
@@ -57,7 +59,7 @@ define(function (require) {
             // configure AJAX object if it exists
             if (config.ajax !== undefined) {
                 config.minimumInputLength = 0;
-                config.initSelection = _.result(config, 'initSelection', _.bind(initSelection, config));
+                config.initSelection = _.result(config, 'initSelection') || _.bind(initSelection, config);
                 if (that.excluded){
                     config.ajax.results = _.wrap(config.ajax.results, function (func, data, page) {
                         var response = func.call(this, data, page);
@@ -67,7 +69,7 @@ define(function (require) {
                         return response;
                     });
                 }
-                config.ajax.quietMillis = _.result(config.ajax, 'quietMillis', 700);
+                config.ajax.quietMillis = _.result(config.ajax, 'quietMillis') || 700;
             } else {
                 // configure non AJAX based Select2
                 if (config.minimumResultsForSearch === undefined) {

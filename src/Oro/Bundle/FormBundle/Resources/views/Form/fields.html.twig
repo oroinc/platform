@@ -3,9 +3,10 @@
 {% block genemu_jqueryselect2_widget %}
     {% if configs.grid is defined and configs.grid.name is defined %}
         {% set url = path('oro_datagrid_index', {'gridName': configs.grid.name}) %}
-    {% else %}
-        {% set routeParameters = configs.route_parameters is defined ? configs.route_parameters : [] %}
-        {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, routeParameters) : '' %}
+    {% elseif configs.route_name is defined and configs.route_name %}
+        {% set url = path(configs.route_name, configs.route_parameters | default([])) %}
+    {%  else %}
+        {% set url = '' %}
     {% endif %}
     {% if configs.placeholder is defined %}
         {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
@@ -17,30 +18,21 @@
         {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
     {% endif %}
     {% if configs.component is defined %}
-        {% set component = configs.component %}
-    {% else %}
-        {% set component = 'oroform/js/app/components/select2-component' %}
+        {% set component = 'oro/select2-'~configs.component~'-component' %}
+    {%  else %}
+        {% set component = 'oro/select2-component' %}
     {% endif %}
-    {% set options = {'configs': configs, 'url': url, 'oro_tag_create_granted': resource_granted('oro_tag_create')} %}
+    {% if component_options is not defined %}
+        {% set component_options = {} %}
+    {% endif %}
+    {% set component_options = component_options|merge({'configs': configs, 'url': url}) %}
     {% if excluded is defined %}
-        {% set options = options|merge({'excluded': excluded }) %}
-    {% endif %}
-    {% if value is defined %}
-        {% set options = options|merge({'value': value }) %}
-    {% endif %}
-    {% if suggestions is defined %}
-        {% set options = options|merge({'suggestions': suggestions }) %}
-    {% endif %}
-    {% if channel_id is defined or channel_field_name is defined %}
-        {% set options = options|merge({'channel_id': channel_id, 'channel_field_name': channel_field_name}) %}
-    {% endif %}
-    {% if marketing_list_id is defined %}
-        {% set options = options|merge({'marketing_list_id': marketing_list_id}) %}
+        {% set component_options = component_options|merge({'excluded': excluded }) %}
     {% endif %}
     {{ form_widget(form, { 'attr': {
         'class': 'select2',
         'data-page-component-module': component,
-        'data-page-component-options': options|json_encode|raw
+        'data-page-component-options': component_options|json_encode|raw
     } }) }}
 {% endblock %}
 

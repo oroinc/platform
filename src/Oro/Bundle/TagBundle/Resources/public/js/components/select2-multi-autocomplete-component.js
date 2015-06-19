@@ -3,11 +3,11 @@ define(function (require) {
     var Select2MultiAutocompleteComponent,
         $ = require('jquery'),
         __ = require('orotranslation/js/translator'),
-        Select2AutocompleteComponent = require('oroform/js/app/components/select2-autocomplete-component');
+        Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
     Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
         oroTagCreateGranted: false,
         initialize: function (options) {
-            this.oroTagCreateGranted = _.result(options, 'oro_tag_create_granted', this.oroTagCreateGranted);
+            this.oroTagCreateGranted = _.result(options, 'oro_tag_create_granted') || this.oroTagCreateGranted;
             Select2MultiAutocompleteComponent.__super__.initialize.call(this, options);
         },
         preConfig: function (config) {

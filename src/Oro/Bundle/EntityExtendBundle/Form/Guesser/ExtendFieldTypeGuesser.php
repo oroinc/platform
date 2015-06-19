@@ -134,7 +134,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 $options['entity_class'] = $extendConfig->get('target_entity');
                 $options['configs']      = [
                     'placeholder'   => 'oro.form.choose_value',
-                    'component'  => 'oroform/js/app/components/select2-relation-component',
+                    'component'  => 'relation',
                     'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
                     'target_field'  => $extendConfig->get('target_field'),
                     'properties'    => [$extendConfig->get('target_field')],

@@ -1,3 +1,4 @@
 config:
     paths:
         'orouser/js/init-user': 'bundles/orouser/js/init-user.js'
+        'oro/select2-acl-user-multiselect-component': 'bundles/orouser/js/components/select2-acl-user-multiselect-component.js'

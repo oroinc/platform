@@ -81,7 +81,7 @@ class CalendarController extends Controller
                             'entity_id'               => $calendar->getId(),
                             'entity_name'             => 'OroCalendarBundle:Calendar',
                             'excludeCurrent'          => true,
-                            'component'               => 'oroform/js/app/components/select2-acl-user-autocomplete-component',
+                            'component'               => 'acl-user-autocomplete',
                             'permission'              => 'VIEW',
                             'placeholder'             => 'oro.calendar.form.choose_user_to_add_calendar',
                             'result_template_twig'    => 'OroCalendarBundle:Calendar:Autocomplete/result.html.twig',
