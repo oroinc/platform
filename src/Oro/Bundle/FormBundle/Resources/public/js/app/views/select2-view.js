@@ -1,13 +1,12 @@
 /*jslint nomen: true*/
 /*global define*/
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view'
-], function ($, _, BaseView) {
+define(function (require) {
     'use strict';
 
-    var Select2View;
+    var Select2View,
+        _ = require('underscore'),
+        BaseView = require('oroui/js/app/views/base/view');
+    require('jquery.select2');
     Select2View = BaseView.extend({
 
         /**

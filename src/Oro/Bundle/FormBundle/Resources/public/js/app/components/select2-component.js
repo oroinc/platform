@@ -5,7 +5,6 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
-        Select2 = require('jquery.select2'),
         Select2View = require('oroform/js/app/views/select2-view'),
         BaseComponent = require('oroui/js/app/components/base/component');
     Select2Component = BaseComponent.extend({
@@ -25,7 +24,7 @@ define(function (require) {
             this.perPage = _.result(config, 'per_page') || this.perPage;
             this.url = _.result(options, 'url') || '';
             this.excluded = _.result(options, 'excluded') || this.excluded;
-            console.log(config.component)
+            console.log(config)
             config = this.preConfig(config);
             config = this.setConfig(config);
             if (options._sourceElement.is('select') || config.query || config.ajax || config.data || config.tags) {
@@ -35,7 +34,7 @@ define(function (require) {
 
         preConfig: function (config) {
             var that = this;
-            if(this.url) {
+            if (this.url) {
                 config.ajax = {
                     url: this.url,
                     data: function (query, page) {
@@ -49,7 +48,7 @@ define(function (require) {
                     results: function (data, page) {
                         return data;
                     }
-                }
+                };
             }
             return config;
         },
@@ -106,7 +105,7 @@ define(function (require) {
                 escapeMarkup: function (m) { return m; },
                 dropdownAutoWidth: true,
                 openOnEnter: null
-            })
+            });
 
             return config;
         },

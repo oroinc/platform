@@ -1,6 +1,7 @@
 define(function (require) {
     'use strict';
     var Select2GridComponent,
+        _ = require('underscore'),
         Select2Component = require('./select2-component');
     Select2GridComponent = Select2Component.extend({
         preConfig: function (config) {

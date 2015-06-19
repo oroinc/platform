@@ -2,6 +2,7 @@ define(function (require) {
     'use strict';
     var Select2MultiAutocompleteComponent,
         $ = require('jquery'),
+        _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
     Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
@@ -16,18 +17,17 @@ define(function (require) {
             config.maximumInputLength = 50;
 
             config.createSearchChoice = function(term, data) {
-                if (
-                    $(data).filter(function() {
-                        return this.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
-                    }).length === 0 && that.oroTagCreateGranted
-                ) {
+                var match = _.find(data, function(item) {
+                        return item.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
+                    });
+                if (typeof match == 'undefined' && that.oroTagCreateGranted) {
                     return {
                         id: term,
                         name: term
                     };
                 }
                 return null;
-            }
+            };
 
             if (!this.oroTagCreateGranted) {
                 config.placeholder = __('oro.tag.form.choose_tag');
