@@ -59,7 +59,7 @@ class ConfigurationController extends FOSRestController
      *      resource=true,
      *      filters={
      *          {"name"="scope", "dataType"="string", "description"="Scope name. By default - user"},
-     *          {"name"="_locale", "dataType"="string", "description"="Locale of the configuration value"}
+     *          {"name"="locale", "dataType"="string", "description"="The preferred locale for configuration values"}
      *      }
      * )
      * @AclAncestor("oro_config_system")
