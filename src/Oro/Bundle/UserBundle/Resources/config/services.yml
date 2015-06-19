@@ -1,4 +1,5 @@
 parameters:
+    oro_user.manager.base.class:                  Oro\Bundle\UserBundle\Entity\BaseUserManager
     oro_user.manager.class:                       Oro\Bundle\UserBundle\Entity\UserManager
     oro_user.manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.status.manager.class:                Oro\Bundle\UserBundle\Entity\Manager\StatusManager
@@ -31,8 +32,11 @@ parameters:
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
 services:
     oro_user.manager:
-        class:                        %oro_user.manager.class%
-        arguments:                    [%oro_user.entity.class%, "@doctrine.orm.entity_manager", "@security.encoder_factory"]
+        class: %oro_user.manager.class%
+        arguments:
+            - %oro_user.entity.class%
+            - @doctrine
+            - @security.encoder_factory
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%
@@ -69,6 +73,7 @@ services:
         arguments:                    ["@oro_security.link.sid_manager"]
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: prePersist }
 
     oro_user.twig.user_extension:
         class:                        %oro_user.twig.user_extension.class%
@@ -214,6 +219,8 @@ services:
 
     oro_user.placeholder.filter:
         class: %oro_user.placeholder.filter.class%
+        arguments:
+            - @oro_security.security_facade
 
     oro_user.password_change.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract

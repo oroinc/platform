@@ -1,32 +1,47 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Entity;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UserManagerTest extends \PHPUnit_Framework_TestCase
 {
     const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
-    const TEST_NAME  = 'Jack';
-    const TEST_EMAIL = 'jack@jackmail.net';
-
-    /**
-     * @var User
-     */
-    protected $user;
 
     /**
      * @var UserManager
      */
     protected $userManager;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager
+     */
     protected $om;
-    protected $repository;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     */
+    protected $registry;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|EncoderFactoryInterface
+     */
+    protected $ef;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     */
+    protected $metadata;
 
     protected function setUp()
     {
@@ -34,178 +49,147 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 
-        $ef    = new EncoderFactory(array(static::USER_CLASS => new MessageDigestPasswordEncoder('sha512')));
-        $class = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $this->ef = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
+        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValue($this->om));
 
-        $this->om         = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $this->om->expects($this->any())->method('getClassMetadata')->willReturn($this->metadata);
+
+        $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $this->ef);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->ef, $this->om, $this->registry, $this->userManager, $this->metadata);
+    }
+
+    public function testGetApi()
+    {
+        $user = new User();
+        $organization = new Organization();
+        $userApi = new UserApi();
+
+        $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->om
             ->expects($this->any())
             ->method('getRepository')
-            ->withAnyParameters()
-            ->will($this->returnValue($this->repository));
+            ->with('OroUserBundle:UserApi')
+            ->will($this->returnValue($repository));
 
+        $repository->expects($this->once())
+            ->method('getApi')
+            ->with($user, $organization)
+            ->will($this->returnValue($userApi));
+
+        $this->assertSame($userApi, $this->userManager->getApi($user, $organization));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Default user role not found
+     */
+    public function testUpdateUserUnsupported()
+    {
+        $user = new User();
+
+        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
+            ->willReturn('Symfony\Component\Security\Core\Role\RoleInterface');
+        $this->om->expects($this->never())
+            ->method('persist')
+            ->with($this->equalTo($user));
+        $this->om->expects($this->never())
+            ->method('flush');
+        $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->om
             ->expects($this->any())
-            ->method('getClassMetadata')
-            ->with($this->equalTo(static::USER_CLASS))
-            ->will($this->returnValue($class));
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
 
-        $class->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue(static::USER_CLASS));
-
-        $this->userManager = new UserManager(static::USER_CLASS, $this->om, $ef);
-    }
-
-    public function testGetClass()
-    {
-        $this->assertEquals(static::USER_CLASS, $this->userManager->getClass());
-    }
-
-    public function testCreateUser()
-    {
-        $this->assertInstanceof(static::USER_CLASS, $this->getUser());
-    }
-
-    public function testDeleteUser()
-    {
-        $user = $this->getUser();
-
-        $this->om->expects($this->once())->method('remove')->with($this->equalTo($user));
-        $this->om->expects($this->once())->method('flush');
-
-        $this->userManager->deleteUser($user);
+        $this->userManager->updateUser($user);
     }
 
     public function testUpdateUser()
     {
-        $user = $this->getUser()
-            ->setUsername(self::TEST_NAME)
-            ->setEmail(self::TEST_EMAIL)
-            ->setPlainPassword('password');
+        $password = 'password';
+        $encodedPassword = 'encodedPassword';
+        $email = 'test@test.com';
+
+        $user = new User();
+        $user
+            ->setUsername($email)
+            ->setEmail($email)
+            ->setPlainPassword($password);
+
+        $encoder = $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
+        $encoder->expects($this->once())
+            ->method('encodePassword')
+            ->with($user->getPlainPassword(), $user->getSalt())
+            ->will($this->returnValue($encodedPassword));
+
+        $this->ef->expects($this->once())
+            ->method('getEncoder')
+            ->with($user)
+            ->will($this->returnValue($encoder));
 
         $this->om->expects($this->once())->method('persist')->with($this->equalTo($user));
         $this->om->expects($this->once())->method('flush');
 
-        $this->repository
+        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
+            ->willReturn('Symfony\Component\Security\Core\Role\RoleInterface');
+        $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->om
+            ->expects($this->any())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $repository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with($this->equalTo(array('role' => User::ROLE_DEFAULT)))
+            ->with($this->equalTo(['role' => User::ROLE_DEFAULT]))
             ->will($this->returnValue(new Role(User::ROLE_DEFAULT)));
 
         $this->userManager->updateUser($user);
 
-        $this->assertEquals(self::TEST_EMAIL, $user->getEmail());
-    }
-
-    public function testFindUserBy()
-    {
-        $crit = array('id' => 0);
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue(array()));
-
-        $this->userManager->findUserBy($crit);
-    }
-
-    public function testFindUsers()
-    {
-        $this->repository
-            ->expects($this->once())
-            ->method('findAll')
-            ->will($this->returnValue(array()));
-
-        $this->userManager->findUsers();
-    }
-
-    public function testFindUserByUsername()
-    {
-        $crit = array('username' => self::TEST_NAME);
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue(array()));
-
-        $this->userManager->findUserByUsernameOrEmail(self::TEST_NAME);
-    }
-
-    public function testFindUserByEmail()
-    {
-        $crit = array('email' => self::TEST_EMAIL);
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue(array()));
-
-        $this->userManager->findUserByUsernameOrEmail(self::TEST_EMAIL);
-    }
-
-    public function testFindUserByToken()
-    {
-        $crit = array('confirmationToken' => self::TEST_NAME);
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue(array()));
-
-        $this->userManager->findUserByConfirmationToken(self::TEST_NAME);
-    }
-
-    public function testReloadUser()
-    {
-        $user = $this->getUser();
-
-        $this->om
-            ->expects($this->once())
-            ->method('refresh')
-            ->with($this->equalTo($user));
-
-        $this->userManager->reloadUser($user);
-    }
-
-    public function testRefreshUser()
-    {
-        $user = $this->getUser();
-        $crit = array('id' => $user->getId());
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue(array()));
-
-        $this->userManager->refreshUser($user);
+        $this->assertEquals($email, $user->getEmail());
+        $this->assertEquals($encodedPassword, $user->getPassword());
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Expected Symfony\Component\Security\Core\Role\RoleInterface, \stdClass given
      */
-    public function testLoadUserByUsername()
+    public function testNotSupportedRole()
     {
-        $crit = array('username' => self::TEST_NAME);
+        $user = new User();
 
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue(array()));
+        $this->metadata->expects($this->once())->method('getAssociationTargetClass')
+            ->willReturn('\stdClass');
+        $this->om->expects($this->never())
+            ->method('persist')
+            ->with($this->equalTo($user));
+        $this->om->expects($this->never())
+            ->method('flush');
+        $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->om
+            ->expects($this->any())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
 
-        $this->userManager->loadUserByUsername(self::TEST_NAME);
-    }
-
-    protected function getUser()
-    {
-        return $this->userManager->createUser();
+        $this->userManager->updateUser($user);
     }
 }
