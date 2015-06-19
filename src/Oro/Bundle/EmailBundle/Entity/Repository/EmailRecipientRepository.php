@@ -31,4 +31,37 @@ class EmailRecipientRepository extends EntityRepository
 
         return $result;
     }
+
+    /**
+     * @param array $senderEmails
+     * @return array wit keys: 'name', 'email'
+     */
+    public function getEmailsUsedInLast30Days(array $senderEmails = [])
+    {
+        if (!$senderEmails) {
+            return [];
+        }
+
+        $emailQb = $this->_em->getRepository('Oro\Bundle\EmailBundle\Entity\Email')->createQueryBuilder('e');
+        $emailQb
+            ->select('MAX(r.id) AS id')
+            ->join('e.fromEmailAddress', 'fe')
+            ->join('e.recipients', 'r')
+            ->join('r.emailAddress', 'a')
+            ->andWhere('e.sentAt > :from')
+            ->andWhere($emailQb->expr()->in('fe.email', ':senders'))
+            ->groupBy('a.email')
+        ;
+
+        $recepientsQb = $this->createQueryBuilder('re');
+        $recepientsQb
+            ->select('re.name, ea.email')
+            ->join('re.emailAddress', 'ea')
+            ->where($recepientsQb->expr()->in('re.id', $emailQb->getDQL()))
+            ->setParameter('from', new \DateTime('-30 days'))
+            ->setParameter('senders', $senderEmails)
+        ;
+
+        return $recepientsQb->getQuery()->getResult();
+    }
 }
