@@ -301,10 +301,4 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $result);
         $this->assertSame($result->first(), $organization);
     }
-
-    public function testGetDefaultRole()
-    {
-        $this->assertInternalType('string', $this->getUser()->getDefaultRole());
-        $this->assertEquals('ROLE_USER', $this->getUser()->getDefaultRole());
-    }
 }
