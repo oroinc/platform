@@ -55,7 +55,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = $this->createLoader();
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $found = $resource->getFound($bundleClass);
         sort($found);
@@ -78,13 +78,13 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = $this->createLoader();
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $loadTime = $this->getLastMTime($bundleDir) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
-        $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
+        $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
     public function testIsResourceFreshExistingFileWasChanged()
@@ -96,13 +96,13 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = $this->createLoader();
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $loadTime = $this->getLastMTime($bundleDir) - 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
-        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
+        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
     public function testIsResourceFreshNewFileWasAdded()
@@ -116,16 +116,16 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = $this->createLoader();
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $loadTime = $this->getLastMTime($bundleDir) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $filePath = $bundleDir . '/' . $relativeFilePath;
         mkdir(dirname($filePath));
         file_put_contents($filePath, 'test: tmp');
-        $result = $loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime);
+        $result = $loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime);
         unlink($filePath);
         rmdir(dirname($filePath));
         $this->assertFalse($result);
@@ -142,18 +142,18 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = $this->createLoader();
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
 
         $filePath = $bundleDir . '/' . $relativeFilePath;
         mkdir(dirname($filePath));
         file_put_contents($filePath, 'test: tmp');
         $loadTime = $this->getLastMTime($bundleDir) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
-        $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+        $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
         unlink($filePath);
         rmdir(dirname($filePath));
 
-        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
+        $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
     /**

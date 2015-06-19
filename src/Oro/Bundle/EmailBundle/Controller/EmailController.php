@@ -232,7 +232,7 @@ class EmailController extends Controller
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
      * @Acl(
-     *      id="oro_email_edit",
+     *      id="oro_email_update",
      *      type="entity",
      *      class="OroEmailBundle:Email",
      *      permission="EDIT"

@@ -31,9 +31,13 @@ Add Resources/config/oro/routing.yml file to every bundle for which you want to 
 Add following rule to application's `routing.yml`:
 
 ``` yml
-oro_auto_routing:
+oro_auto_routing: # to load bundles
     resource: .
     type:     oro_auto
+    
+oro_expose:       # to load exposed assets
+    resource: .
+    type:     oro_expose
 ```
 
 All routes from your bundles will be imported automatically.

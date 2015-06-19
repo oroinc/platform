@@ -53,6 +53,11 @@ class SearchHandler implements SearchHandlerInterface
     protected $aclHelper;
 
     /**
+     * @var int
+     */
+    protected $latestFoundIdsCount = 0;
+
+    /**
      * @param string $entityName
      * @param array  $properties
      */
@@ -123,10 +128,10 @@ class SearchHandler implements SearchHandlerInterface
     {
         $this->checkAllDependenciesInjected();
 
-        $page    = (int)$page > 0 ? (int)$page : 1;
+        $page = (int)$page > 0 ? (int)$page : 1;
         $perPage = (int)$perPage > 0 ? (int)$perPage : 10;
         $firstResult = ($page - 1) * $perPage;
-        $perPage += 1;
+        $perPage++;
 
         if ($searchById) {
             $items = $this->findById($query);
@@ -134,7 +139,7 @@ class SearchHandler implements SearchHandlerInterface
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
 
-        $hasMore = count($items) == $perPage;
+        $hasMore = $this->latestFoundIdsCount === $perPage;
         if ($hasMore) {
             $items = array_slice($items, 0, $perPage - 1);
         }
@@ -205,6 +210,8 @@ class SearchHandler implements SearchHandlerInterface
         foreach ($elements as $element) {
             $ids[] = $element->getRecordId();
         }
+
+        $this->latestFoundIdsCount = count($ids);
 
         return $ids;
     }

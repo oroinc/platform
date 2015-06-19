@@ -5,6 +5,17 @@ require([
 ], function (BaseController, tools) {
     'use strict';
 
+    /**
+     * Init ShortcutsView
+     */
+    BaseController.loadBeforeAction([
+        'oronavigation/js/app/views/shortcuts-view'
+    ], function (ShortcutsView) {
+        BaseController.addToReuse('shortcuts', ShortcutsView, {
+            el: '.shortcuts .input'
+        });
+    });
+
     // following functionality is related only to desktop version
 
     if(tools.isMobile()) {

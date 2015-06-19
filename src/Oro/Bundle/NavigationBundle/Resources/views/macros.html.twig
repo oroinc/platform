@@ -1,0 +1,28 @@
+{% macro renderClientLink(config, urlParameters) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {{
+        UI.clientLink({
+            'dataUrl': path(config.dataUrl, urlParameters),
+            'aCss': config.aCss,
+            'iCss': config.iCss,
+            'label' : config.label|trans,
+            'widget' : {
+                'type' : config.widget.type,
+                'multiple' : config.widget.multiple,
+                'refresh-widget-alias': config.widget.refreshWidgetAlias,
+                'reload-grid-name': config.widget.reloadGridName,
+                'options' : {
+                    'alias': config.widget.options.alias,
+                    'dialogOptions' : {
+                        'title' : config.widget.options.dialogOptions.title|trans,
+                        'allowMaximize': config.widget.options.dialogOptions.allowMaximize,
+                        'allowMinimize': config.widget.options.dialogOptions.allowMinimize,
+                        'dblclick': config.widget.options.dialogOptions.dblclick,
+                        'maximizedHeightDecreaseBy': config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
+                        'width': config.widget.options.dialogOptions.width
+                    }
+                }
+            }
+        })
+    }}
+{% endmacro %}

@@ -24,7 +24,7 @@ define(function (require) {
         options: {
             childTemplate: '[id^=<%= id %>_]',
             optionsTemplate: '<%= field %>(<%= group %>,<%= name %>,<%= type %>)',
-            fieldsLoaderSelector: '#oro_report_form_entity',
+            fieldsLoaderSelector: '[data-ftid=oro_report_form_entity]',
             fieldsTableIdentifier: 'item-container'
         },
 
@@ -84,9 +84,10 @@ define(function (require) {
          * @param {String} id
          */
         validateSelect2: function (id) {
-            var self = this;
-            var childSelector = this.childSelectorTemplate({id: id});
-            $('#' + id).find(childSelector).each(function () {
+            var self = this,
+                $element = $('#' + id),
+                childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
+            $element.find(childSelector).each(function () {
                 var value = $(this).val();
                 if (value) {
                     var name = _.first(value.split('('));
@@ -101,9 +102,10 @@ define(function (require) {
          * @param {String} id
          */
         initSelect2: function (id) {
-            var childSelector = this.childSelectorTemplate({id: id});
-            var self = this;
-            $('#' + id).find(childSelector).each(function () {
+            var self = this,
+                $element = $('#' + id),
+                childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
+            $element.find(childSelector).each(function () {
                 var exclude = $(this).data('type-filter');
                 $(this).select2({
                     collapsibleResults: true,

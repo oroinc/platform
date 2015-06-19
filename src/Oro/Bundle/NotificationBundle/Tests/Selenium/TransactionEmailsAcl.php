@@ -49,7 +49,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - User Management - System');
+            ->assertTitle('All - Users - User Management - System');
 
         return $username;
     }
@@ -74,7 +74,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
             ->setGroups(array('Marketing'))
             ->save()
             ->assertMessage('Email notification rule saved')
-            ->assertTitle('Notification Rules - Emails - System')
+            ->assertTitle('All - Notification Rules - Emails - System')
             ->close();
 
         return $email;

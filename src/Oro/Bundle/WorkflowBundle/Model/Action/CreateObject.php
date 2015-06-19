@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
 class CreateObject extends AbstractAction
@@ -38,7 +39,7 @@ class CreateObject extends AbstractAction
         if (empty($options[self::OPTION_KEY_ATTRIBUTE])) {
             throw new InvalidParameterException('Attribute name parameter is required');
         }
-        if (!$options[self::OPTION_KEY_ATTRIBUTE] instanceof PropertyPath) {
+        if (!$options[self::OPTION_KEY_ATTRIBUTE] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Attribute must be valid property definition.');
         }
 

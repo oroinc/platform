@@ -75,12 +75,21 @@ class CumulativeResource implements ResourceInterface, \Serializable
             $this->isFresh          = true;
 
             $bundles = CumulativeResourceManager::getInstance()->getBundles();
-            foreach ($bundles as $bundleClass) {
+            $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
+            foreach ($bundles as $bundleName => $bundleClass) {
                 $reflection = new \ReflectionClass($bundleClass);
                 $bundleDir  = dirname($reflection->getFilename());
+
+                $bundleAppDir = '';
+                /**
+                 * This case needs for tests(without app root directory).
+                 */
+                if (is_dir($appRootDir)) {
+                    $bundleAppDir = $appRootDir . '/Resources/' . $bundleName;
+                }
                 /** @var CumulativeResourceLoader $loader */
                 foreach ($this->resourceLoaders as $loader) {
-                    if (!$loader->isResourceFresh($bundleClass, $bundleDir, $this, $timestamp)) {
+                    if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $this, $timestamp)) {
                         $this->isFresh = false;
                         break;
                     }

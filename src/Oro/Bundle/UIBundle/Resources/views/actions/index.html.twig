@@ -20,7 +20,8 @@
                     </div>
                 </div>
                 <div class="pull-right title-buttons-container invisible"
-                         data-page-component-module="oroui/js/app/components/hidden-initialization-component"
+                         data-page-component-module="oroui/js/app/components/view-component"
+                         data-page-component-options="{{ {'view': 'oroui/js/app/views/hidden-initialization-view'}|json_encode }}"
                          data-layout="separate">
                     {% placeholder index_navButtons_before with buttonsPlaceholderData %}
                     {% block navButtons %}{% endblock navButtons %}

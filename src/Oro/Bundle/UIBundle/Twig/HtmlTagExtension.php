@@ -2,29 +2,23 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class HtmlTagExtension extends \Twig_Extension
 {
-    /**
-     * @var HtmlTagProvider
-     */
+    /** @var HtmlTagProvider */
     protected $htmlTagProvider;
 
-    /**
-     * @var string
-     */
-    protected $cacheDir;
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
 
     /**
-     * @param HtmlTagProvider $htmlTagProvider
-     * @param string $cacheDir
+     * @param HtmlTagHelper $htmlTagHelper
      */
-    public function __construct(HtmlTagProvider $htmlTagProvider, $cacheDir = null)
+    public function __construct(HtmlTagHelper $htmlTagHelper)
     {
-        $this->htmlTagProvider = $htmlTagProvider;
-        $this->cacheDir = $cacheDir;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -45,19 +39,18 @@ class HtmlTagExtension extends \Twig_Extension
      */
     public function tagFilter($string)
     {
-        return strip_tags($string, $this->htmlTagProvider->getAllowedTags());
+        return $this->htmlTagHelper->stripTags($string);
     }
 
     /**
-     * Filter is inteded to purify script, style etc tags and content of them
+     * Filter is intended to purify script, style etc tags and content of them
      *
      * @param string $string
      * @return string
      */
     public function htmlPurify($string)
     {
-        $transformer = new SanitizeHTMLTransformer(null, $this->cacheDir);
-        return $transformer->transform($string);
+        return $this->htmlTagHelper->purify($string);
     }
 
     /**

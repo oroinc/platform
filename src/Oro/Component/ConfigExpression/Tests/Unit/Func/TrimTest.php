@@ -4,9 +4,10 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 class TrimTest extends \PHPUnit_Framework_TestCase
 {

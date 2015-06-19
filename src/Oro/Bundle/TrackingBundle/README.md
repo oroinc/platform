@@ -163,7 +163,7 @@ class TestCustomerIdentification implements TrackingEventIdentifierInterface
 
 User can crate reports based on tracked event data.
 
-The main entity for this data is **Visitor event**. This entity have next fields:
+The main entity for this data is **Visitor event** - parsed web event data related to customer, campaign order or other customer data. This entity have next fields:
 
  - **Type**. Virtual string field. Type of event. Each tracking website can use own list of event types.
  
@@ -196,3 +196,5 @@ The main entity for this data is **Visitor event**. This entity have next fields
  - **Tracking website** Link to website tracking config record.
  
  - List of connected records to the event event entity.
+
+Additionally, there is **Tracking Event** table - original web event data recorded from the website

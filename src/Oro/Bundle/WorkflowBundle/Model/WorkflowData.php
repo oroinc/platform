@@ -4,10 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityNotFoundException;
+
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -34,12 +37,12 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Constructor
      */
-    public function __construct(array $data = array())
+    public function __construct(array $data = [])
     {
         $this->data = $data;
         $this->modified = false;
-        $this->mapping = array();
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->mapping = [];
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -58,12 +61,12 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Get mapped field path by field name.
      *
-     * @param string|PropertyPath $propertyPath
+     * @param string|PropertyPathInterface $propertyPath
      * @return null|string
      */
     protected function getMappedPath($propertyPath)
     {
-        if ($propertyPath instanceof PropertyPath) {
+        if ($propertyPath instanceof PropertyPathInterface) {
             return $propertyPath;
         }
 
@@ -121,7 +124,9 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         try {
             $propertyPath = $this->getMappedPath($name);
-            if ($changeModified && $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value) {
+            if ($changeModified
+                && (!$this->has($name) || $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value)
+            ) {
                 $this->modified = true;
             }
             $this->propertyAccessor->setValue($this->data, $propertyPath, $value);
@@ -175,13 +180,13 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param array $names Optional list of names of values that should be filtered
      * @return array
      */
-    public function getValues(array $names = array())
+    public function getValues(array $names = [])
     {
         if (!$names) {
             return $this->data;
         }
 
-        $result = array();
+        $result = [];
 
         /** @var Attribute $attribute */
         foreach ($names as $name) {
@@ -203,10 +208,11 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
             return true;
         } else {
             try {
-                return null !== $this->propertyAccessor->getValue($this->data, $this->getMappedPath($name));
+                $this->propertyAccessor->getValue($this->data, $this->getMappedPath($name));
             } catch (NoSuchPropertyException $e) {
                 return false;
             }
+            return true;
         }
     }
 

@@ -2,25 +2,18 @@
 
 {% block list %}
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
-        <script type="text/javascript">
-            require(['jquery', 'oronavigation/js/shortcuts/view'],
-            function($, ShortcutsView) {
-                $(function() {
-                    /** @type {oronavigation.shortcuts.View} */
-                    new ShortcutsView({
-                        el: '.shortcuts .input',
-                        source: {{ options.source|json_encode|raw }}
-                    });
-                });
-            });
-        </script>
             <div class="dropdown header-dropdown-shortcut header-utility-dropdown">
                 <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="icon-share-sign"></i></a>
                 <ul class="dropdown-menu">
                     <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
                     <li class="dark">
                         <form>
-                            <input type="text" placeholder="{{ 'oro.navigation.shortcuts.placeholder'|trans }}" class="input">
+                            <input type="text"
+                                   placeholder="{{ 'oro.navigation.shortcuts.placeholder'|trans }}"
+                                   data-source-url={{ options.source|json_encode|raw }} class="input"
+                                   data-entity-class="{{ oro_class_name(app.user, true) }}"
+                                   data-entity-id="{{ app.user.id }}"
+                            >
                             <div class="clearfix">
                                 <div class="extra-small">{{ 'oro.navigation.shortcuts.example'|trans }}
                                     <a href="{{ options.details }}">{{ 'oro.navigation.shortcuts.see_all'|trans }}</a>

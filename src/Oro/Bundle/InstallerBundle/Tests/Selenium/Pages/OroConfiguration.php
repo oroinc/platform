@@ -14,29 +14,38 @@ class OroConfiguration extends AbstractPage
     public function __construct($testCase, $redirect = true)
     {
         parent::__construct($testCase, $redirect);
-        $this->host = $this->test->byId('oro_installer_configuration_database_oro_installer_database_host');
-        $this->port = $this->test->byId('oro_installer_configuration_database_oro_installer_database_port');
-        $this->password = $this->test->byId('oro_installer_configuration_database_oro_installer_database_password');
-        $this->user = $this->test->byId('oro_installer_configuration_database_oro_installer_database_user');
-        $this->database = $this->test->byId('oro_installer_configuration_database_oro_installer_database_name');
+        $this->host = $this->test
+            ->byXPath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_host']");
+        $this->port = $this->test
+            ->byXPath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_port']");
+        $this->password = $this->test
+            ->byXPath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_password']");
+        $this->user = $this->test
+            ->byXPath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_user']");
+        $this->database = $this->test
+            ->byXPath("//*[@data-ftid='oro_installer_configuration_database_oro_installer_database_name']");
     }
 
     public function next()
     {
-        $this->test->moveto($this->test->byXpath("//button[@class = 'primary button next']"));
-        $this->test->byXpath("//button[@class = 'primary button next']")->click();
+        $this->test->moveto($this->test->byXPath("//button[@class = 'primary button next']"));
+        $this->test->byXPath("//button[@class = 'primary button next']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Database initialization - Oro Application installation');
-        $s = microtime(true);
+        //waiting
+        $startTime = microtime(true);
         do {
             sleep(5);
-            //$this->waitPageToLoad();
-            $e = microtime(true);
-            $this->test->assertTrue(($e-$s) <= (int)(MAX_EXECUTION_TIME / 1000));
+            $endTime = microtime(true);
+            $this->test->assertLessThanOrEqual(
+                (int)(MAX_EXECUTION_TIME / 1000),
+                $endTime-$startTime,
+                "Maximal time execution is exceeded"
+            );
         } while ($this->isElementPresent("//a[@class = 'button next primary disabled']"));
 
-        $this->test->moveto($this->test->byXpath("//a[@class = 'button next primary']"));
-        $this->test->byXpath("//a[@class = 'button next primary']")->click();
+        $this->test->moveto($this->test->byXPath("//a[@class = 'button next primary']"));
+        $this->test->byXPath("//a[@class = 'button next primary']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Administration setup - Oro Application installation');
         return new OroAdministration($this->test);

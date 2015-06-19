@@ -302,7 +302,12 @@ define(function (require) {
                 });
             });
             scrollStateModel.on('change:scrollTop', function (model, val) {
-                otherScroll[0].scrollTop = scrollContainer[0].scrollTop = val;
+                if (otherScroll[0].scrollTop !== val) {
+                    otherScroll[0].scrollTop = val;
+                }
+                if (scrollContainer[0].scrollTop !== val) {
+                    scrollContainer[0].scrollTop = val;
+                }
             }, this);
 
             function updateScroll(e) {

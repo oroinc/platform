@@ -4,7 +4,7 @@
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
             },
-            fieldsLoaderSelector: '#' ~ params.entity_choice_id
+            fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']'
         }
     } %}
     {% set segmentConditionOptions = {
@@ -16,14 +16,14 @@
                     quietMillis: 100,
                 }
             },
-            fieldsLoaderSelector: '#' ~ params.entity_choice_id,
+            fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
             currentSegment: params.currentSegmentId|default(null),
             pageLimit: params.page_limit|default(10)
         }
     } %}
     {% set conditionBuilderOptions = {
         criteriaListSelector: '#' ~ params.criteria_list_id,
-        entityChoiceSelector: '#' ~ params.entity_choice_id,
+        entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
         onFieldsUpdate: {
             toggleCriteria: ['condition-item', 'condition-segment', 'conditions-group']
         }
@@ -131,10 +131,10 @@
     {% endif %}
 
     {% set widgetOptions = {
-        valueSource: '#' ~ type ~ '_form_definition',
+        valueSource: '[data-ftid=' ~ type ~ '_form_definition]',
         fieldsLoader: {
-            entityChoice:      '#' ~ type ~ '_form_entity',
-            loadingMaskParent: '#' ~ form.vars.name,
+            entityChoice:      '[data-ftid=' ~ type ~ '_form_entity]',
+            loadingMaskParent: '#' ~ form.vars.id,
             router:            'oro_api_querydesigner_fields_entity',
             routingParams:     entityFieldsRouteParams,
             fieldsData:        fieldsData,

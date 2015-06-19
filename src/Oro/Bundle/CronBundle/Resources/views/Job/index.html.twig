@@ -5,10 +5,14 @@
 {% set pageTitle = 'oro.cron.header.jobs'|trans %}
 
 {% block content_datagrid %}
-    <script type="text/javascript">
-        require(['orocron/js/init-job']);
-    </script>
-    <div class="container-fluid">
+    {% set options = {
+        view: 'orocron/js/app/views/job-queue-view',
+        name: 'job-queue',
+        intervalUpdate: 30000
+    } %}
+    <div class="container-fluid"
+            data-page-component-module="oroui/js/app/components/view-component"
+            data-page-component-options="{{ options|json_encode }}">
         <div class="row-fluid">
             <div class="span10">
                 {{ parent() }}

@@ -2,7 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\ConfigurationPass;
 
-use Oro\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * Passes through configuration array and replaces parameter strings ($parameter.name)

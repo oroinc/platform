@@ -14,6 +14,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @translator
+            - @oro_security.security_facade
 
     oro_datagrid.mass_action.parameters_parser:
         class: %oro_datagrid.mass_action.parameters_parser.class%
@@ -23,6 +24,7 @@ services:
         arguments:
             - @service_container
             - @oro_datagrid.datagrid.manager
+            - @oro_security.acl_helper
 
     oro_datagrid.extension.mass_action.type.ajax:
         class: %oro_datagrid.extension.mass_action.type.ajax.class%

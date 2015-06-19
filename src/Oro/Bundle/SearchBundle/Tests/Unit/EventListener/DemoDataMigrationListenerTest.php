@@ -126,6 +126,10 @@ class DemoDataMigrationListenerTest extends \PHPUnit_Framework_TestCase
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
         if ($fixturesType) {
             $input->expects($this->any())
+                ->method('hasOption')
+                ->with('fixtures-type')
+                ->willReturn(true);
+            $input->expects($this->any())
                 ->method('getOption')
                 ->with('fixtures-type')
                 ->will($this->returnValue($fixturesType));

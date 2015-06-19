@@ -4,8 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ConfigExpression;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted;
 
@@ -290,7 +291,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
                 'options'  => ['VIEW', new PropertyPath('entity')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'acl\', [\'VIEW\', '
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'entity\', [\'entity\'])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'entity\', [\'entity\'], [false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];

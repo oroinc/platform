@@ -1,7 +1,19 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
+{% import 'OroEmailBundle::actions.html.twig' as EmailActions %}
 
 {% set name = app.user|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name }}) %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_email_create') %}
+        <div class="btn-group">
+            {{ EmailActions.createEmailButton({
+                entityClass: oro_class_name(app.user, true),
+                entityId: app.user.id})
+            }}
+        </div>
+    {% endif %}
+{% endblock %}
 
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
 {% set gridName = 'user-email-grid' %}

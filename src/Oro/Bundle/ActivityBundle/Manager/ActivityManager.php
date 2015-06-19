@@ -5,11 +5,16 @@ namespace Oro\Bundle\ActivityBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
+use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -30,25 +35,42 @@ class ActivityManager
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider      $activityConfigProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
+     * @param AssociationManager  $associationManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $activityConfigProvider,
         ConfigProvider $entityConfigProvider,
-        ConfigProvider $extendConfigProvider
+        ConfigProvider $extendConfigProvider,
+        AssociationManager $associationManager
     ) {
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
         $this->activityConfigProvider = $activityConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
         $this->extendConfigProvider   = $extendConfigProvider;
+        $this->associationManager     = $associationManager;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -105,6 +127,11 @@ class ActivityManager
         ) {
             $activityEntity->addActivityTarget($targetEntity);
 
+            if ($this->eventDispatcher) {
+                $event = new ActivityEvent($activityEntity, $targetEntity);
+                $this->eventDispatcher->dispatch(Events::ADD_ACTIVITY, $event);
+            }
+
             return true;
         }
 
@@ -149,6 +176,10 @@ class ActivityManager
             && $activityEntity->hasActivityTarget($targetEntity)
         ) {
             $activityEntity->removeActivityTarget($targetEntity);
+            if ($this->eventDispatcher) {
+                $event = new ActivityEvent($activityEntity, $targetEntity);
+                $this->eventDispatcher->dispatch(Events::REMOVE_ACTIVITY, $event);
+            }
 
             return true;
         }
@@ -179,6 +210,23 @@ class ActivityManager
         }
 
         return $hasChanges;
+    }
+
+    /**
+     * Returns the list of fields responsible to store activity associations for the given activity entity type
+     *
+     * @param string $activityClassName
+     *
+     * @return array [target_entity_class => field_name]
+     */
+    public function getActivityTargets($activityClassName)
+    {
+        return $this->associationManager->getAssociationTargets(
+            $activityClassName,
+            $this->associationManager->getMultiOwnerFilter('activity', 'activities'),
+            RelationType::MANY_TO_MANY,
+            ActivityScope::ASSOCIATION_KIND
+        );
     }
 
     /**
