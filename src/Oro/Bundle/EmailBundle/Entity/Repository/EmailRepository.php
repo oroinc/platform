@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 
-
 class EmailRepository extends EntityRepository
 {
     /**
