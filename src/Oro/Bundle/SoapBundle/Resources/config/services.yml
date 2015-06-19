@@ -11,6 +11,8 @@ parameters:
     oro_soap.entity_accessor.class:               Oro\Bundle\SoapBundle\Serializer\EntityDataAccessor
     oro_soap.entity_data_transformer.class:       Oro\Bundle\SoapBundle\Serializer\EntityDataTransformer
 
+    oro_soap.locale_listener.class:               Oro\Bundle\SoapBundle\EventListener\LocaleListener
+
 services:
     oro_soap.loader:
         class: %oro_soap.loader.class%
@@ -82,3 +84,9 @@ services:
         class: %oro_soap.entity_data_transformer.class%
         arguments:
             - @service_container
+
+    # event listeners
+    oro_soap.locale_listener:
+        class: %oro_soap.locale_listener.class%
+        tags:
+            - { name: kernel.event_subscriber }
