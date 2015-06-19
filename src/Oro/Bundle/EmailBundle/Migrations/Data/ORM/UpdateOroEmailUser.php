@@ -11,19 +11,9 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class UpdateOroEmailUser extends AbstractFixture implements DependentFixtureInterface
+class UpdateOroEmailUser extends AbstractFixture
 {
     const BATCH_SIZE = 100;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
-    {
-        return [
-            'Oro\Bundle\EmailBundle\Migrations\Data\ORM\LoadInternalEmailOrigins',
-        ];
-    }
 
     /**
      * {@inheritdoc}

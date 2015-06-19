@@ -513,11 +513,7 @@ class User extends ExtendUser implements
     /**
      * @var EmailOrigin[]|ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"all"})
-     * @ORM\JoinTable(name="oro_user_email_origin",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"all"})
      */
     protected $emailOrigins;
 
@@ -556,6 +552,13 @@ class User extends ExtendUser implements
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var OrganizationInterface
+     *
+     * Organization that user logged in
+     */
+    protected $currentOrganization;
 
     public function __construct()
     {
@@ -1672,7 +1675,9 @@ class User extends ExtendUser implements
     {
         $items = $this->emailOrigins->filter(
             function ($item) {
-                return $item instanceof ImapEmailOrigin;
+                return
+                    $item instanceof ImapEmailOrigin
+                    && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );
 
@@ -1764,5 +1769,25 @@ class User extends ExtendUser implements
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return $this
+     */
+    public function setCurrentOrganization(OrganizationInterface $organization)
+    {
+        $this->currentOrganization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return OrganizationInterface
+     */
+    public function getCurrentOrganization()
+    {
+        return $this->currentOrganization;
     }
 }

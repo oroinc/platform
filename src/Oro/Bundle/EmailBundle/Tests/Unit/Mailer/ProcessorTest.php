@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -12,6 +13,7 @@ use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
  * Class ProcessorTest
@@ -47,6 +49,12 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var Processor */
     protected $emailProcessor;
 
+    /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacadeLink;
+
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -72,6 +80,25 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->setMethods(['getLoggedUser', 'getOrganization'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacadeLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->setMethods(['getService'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacadeLink->expects($this->any())
+            ->method('getService')
+            ->will($this->returnValue($this->securityFacade));
+
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganization')
+            ->will($this->returnValue($this->getTestOrganization()));
+
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with('OroEmailBundle:Email')
@@ -84,6 +111,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->emailEntityBuilder,
             $this->emailOwnerProvider,
             $this->emailActivityManager,
+            $this->securityFacadeLink,
             $this->dispatcher
         );
     }
@@ -390,9 +418,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $method = $processor->getMethod('createUserInternalOrigin');
         $method->setAccessible(true);
 
-        $origin = $method->invokeArgs($this->emailProcessor, [$this->getTestUser()]);
+        $origin = $method->invokeArgs($this->emailProcessor, [$this->getTestUser(), $this->getTestOrganization()]);
+        $testOrigin = $this->getTestOrigin();
+        $testOrigin->getOwner()->addEmailOrigin($testOrigin);
 
-        $this->assertEquals($this->getTestOrigin(), $origin);
+        $this->assertEquals($testOrigin, $origin);
     }
 
     public function testProcessOwnerUserWithoutOrigin()
@@ -474,6 +504,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                         $this->emailEntityBuilder,
                         $this->emailOwnerProvider,
                         $this->emailActivityManager,
+                        $this->securityFacadeLink,
                         $this->dispatcher
                     ]
                 )
@@ -508,6 +539,14 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         return $user;
     }
 
+    protected function getTestOrganization()
+    {
+        $organization = new Organization();
+        $organization->setId(1);
+
+        return $organization;
+    }
+
     protected function getTestOrigin()
     {
         $outboxFolder = new EmailFolder();
@@ -519,7 +558,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $origin = new InternalEmailOrigin();
         $origin
             ->setName('BAP_User_1')
-            ->addFolder($outboxFolder);
+            ->addFolder($outboxFolder)
+            ->setOwner($this->getTestUser())
+            ->setOrganization($this->getTestOrganization());
 
         return $origin;
     }

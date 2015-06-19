@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
@@ -15,13 +14,17 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Class Processor
@@ -53,6 +56,9 @@ class Processor
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -66,6 +72,7 @@ class Processor
      * @param EmailEntityBuilder $emailEntityBuilder
      * @param EmailOwnerProvider $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
+     * @param ServiceLink $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
@@ -75,6 +82,7 @@ class Processor
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
+        ServiceLink $serviceLink,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->doctrineHelper = $doctrineHelper;
@@ -83,6 +91,7 @@ class Processor
         $this->emailEntityBuilder = $emailEntityBuilder;
         $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
+        $this->securityFacade = $serviceLink->getService();
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -133,7 +142,9 @@ class Processor
             $messageDate,
             Email::NORMAL_IMPORTANCE,
             $model->getCc(),
-            $model->getBcc()
+            $model->getBcc(),
+            $origin->getOwner(),
+            $origin->getOrganization()
         );
 
         $emailUser->setFolder($origin->getFolder(FolderType::SENT));
@@ -220,6 +231,9 @@ class Processor
     public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
         $originKey = $originName . $email;
+        $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
+            ? $this->securityFacade->getOrganization()
+            : null;
         if (!array_key_exists($originKey, $this->origins)) {
             $emailOwner = $this->emailOwnerProvider->findEmailOwner(
                 $this->getEntityManager(),
@@ -228,14 +242,16 @@ class Processor
 
             if ($emailOwner instanceof User) {
                 $origins = $emailOwner->getEmailOrigins()->filter(
-                    function ($item) {
-                        return $item instanceof InternalEmailOrigin;
+                    function ($item) use ($organization) {
+                        return
+                            $item instanceof InternalEmailOrigin
+                            && (!$organization || $item->getOrganization() === $organization);
                     }
                 );
 
                 $origin = $origins->isEmpty() ? null : $origins->first();
-                if ($origin == null) {
-                    $origin = $this->createUserInternalOrigin($emailOwner);
+                if ($origin === null) {
+                    $origin = $this->createUserInternalOrigin($emailOwner, $organization);
                 }
             } else {
                 $origin = $this->getEntityManager()
@@ -250,10 +266,15 @@ class Processor
 
     /**
      * @param User $emailOwner
+     * @param OrganizationInterface $organization
+     *
      * @return InternalEmailOrigin
      */
-    protected function createUserInternalOrigin(User $emailOwner)
+    protected function createUserInternalOrigin(User $emailOwner, OrganizationInterface $organization = null)
     {
+        $organization = $organization
+            ? $organization
+            : $emailOwner->getOrganization();
         $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
 
         $outboxFolder = new EmailFolder();
@@ -265,7 +286,9 @@ class Processor
         $origin = new InternalEmailOrigin();
         $origin
             ->setName($originName)
-            ->addFolder($outboxFolder);
+            ->addFolder($outboxFolder)
+            ->setOwner($emailOwner)
+            ->setOrganization($organization);
 
         $emailOwner->addEmailOrigin($origin);
 
