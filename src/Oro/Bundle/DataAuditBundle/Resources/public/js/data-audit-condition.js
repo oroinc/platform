@@ -30,7 +30,7 @@ define([
                 changed: function (e, fieldId) {
                     this.element.data('value', {});
                     if (this.auditFilter) {
-                        this.element.on('changed', _.bind(this.auditFilter.reset, this.auditFilter));
+                        this.element.one('changed', _.bind(this.auditFilter.reset, this.auditFilter));
                     }
                     this._renderChangeStateChoice();
                 }

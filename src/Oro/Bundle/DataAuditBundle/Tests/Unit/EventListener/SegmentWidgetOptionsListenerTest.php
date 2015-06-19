@@ -23,7 +23,6 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
     public function testListener()
     {
         $options = [
-            'filters'      => [],
             'column'       => [],
             'extensions'   => [],
             'fieldsLoader' => [
@@ -31,12 +30,22 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
                 'loadingMaskParent' => 'loadingMask',
                 'confirmMessage'    => 'confirmMessage',
             ],
+            'metadata' => [
+                'filters' => [
+                    'date' => [
+                        'type'      => 'date',
+                        'dateParts' => [
+                            'value'  => 'val',
+                            'source' => 'sour',
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $auditFields = json_encode(['field1', 'field2']);
 
         $expectedOptions = [
-            'filters'    => [],
             'column'     => [],
             'extensions' => [
                 'orodataaudit/js/app/components/segment-component-extension',
@@ -53,6 +62,25 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
                 'router'            => 'oro_api_get_audit_fields',
                 'routingParams'    => [],
                 'fieldsData'        => $auditFields,
+            ],
+            'metadata' => [
+                'filters' => [
+                    'date' => [
+                        'type'      => 'date',
+                        'dateParts' => [
+                            'value'  => 'val',
+                            'source' => 'sour',
+                        ],
+                    ],
+                ],
+            ],
+            'auditFilters' => [
+                'date' => [
+                    'type'      => 'date',
+                    'dateParts' => [
+                        'value'  => 'val',
+                    ],
+                ],
             ],
         ];
 
