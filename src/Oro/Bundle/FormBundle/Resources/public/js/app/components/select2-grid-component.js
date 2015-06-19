@@ -21,7 +21,7 @@ define(function (require) {
                     } else {
                         sortByKey = grid.sort_by || config.properties[0];
                         result[gridName + '[_pager][_page]'] = page;
-                        result[gridName + '[_pager][_per_page]'] = perPage;
+                        result[gridName + '[_pager][_per_page]'] = that.perPage;
                         result[gridName + '[_sort_by][' + sortByKey + ']'] = grid.sort_order || 'ASC';
                         result[gridName + '[_filter][' + config.properties[0] + '][type]'] = 1;
                         result[gridName + '[_filter][' + config.properties[0] + '][value]'] = query;
