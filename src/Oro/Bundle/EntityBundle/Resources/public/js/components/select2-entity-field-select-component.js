@@ -5,7 +5,6 @@ define(function (require) {
         Select2EntityFieldComponent = require('oro/select2-entity-field-component');
     Select2EntityFieldSelectComponent = Select2EntityFieldComponent.extend({
         initialize: function (options) {
-            debugger;
             this.util = new EntityFieldUtil(options._sourceElement);
             Select2EntityFieldSelectComponent.__super__.initialize.call(this, options);
         },
