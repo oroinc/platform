@@ -276,7 +276,7 @@ class EmailController extends RestController
      *      description="Add new association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_edit")
+     * @AclAncestor("oro_email_email_create")
      */
     public function postAssociationsAction()
     {
