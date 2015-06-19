@@ -1,0 +1,3 @@
+[submodule "src/Oro/Bundle/LDAPBundle"]
+	path = src/Oro/Bundle/LDAPBundle
+	url = https://github.com/laboro/OroLDAPBundle.git
