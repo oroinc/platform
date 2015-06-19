@@ -213,7 +213,6 @@ define(function (require) {
          * @private
          */
         _applyDraggable: function ($el) {
-            //$el.find('a.variable').draggable({helper: 'clone'});
             $el.find('a.variable').on('dragstart', function (e) {
                 var dt = e.originalEvent.dataTransfer;
                 for (var i = 0; i < dt.types.length; i++) {
