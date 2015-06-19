@@ -109,16 +109,14 @@ class AuditFilter extends EntityFilter
             ->setParameter($this->objectClassParam, $objectClass)
             ->setMaxResults(1);
 
-        if ($data['auditFilter']['type'] === static::TYPE_CHANGED_TO_VALUE) {
-            $auditQb
-                ->join(
-                    sprintf('%s.fields', $this->auditAlias),
-                    $this->auditFieldAlias,
-                    Expr\Join::WITH,
-                    sprintf('%s.field = :%s', $this->auditFieldAlias, $this->fieldParam)
-                )
-                ->setParameter($this->fieldParam, $fieldName);
-        }
+        $auditQb
+            ->join(
+                sprintf('%s.fields', $this->auditAlias),
+                $this->auditFieldAlias,
+                Expr\Join::WITH,
+                sprintf('%s.field = :%s', $this->auditFieldAlias, $this->fieldParam)
+            )
+            ->setParameter($this->fieldParam, $fieldName);
 
         $auditDs = new OrmFilterDatasourceAdapter($auditQb);
         $this->applyFilter(
