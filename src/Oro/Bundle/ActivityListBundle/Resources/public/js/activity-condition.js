@@ -184,7 +184,7 @@ define([
                 return;
             }
 
-            var data = {};
+            var data = this.$fieldsLoader.data('fields');
             data['$activity'] = {
                 fields: [],
                 fieldsIndex: {},
