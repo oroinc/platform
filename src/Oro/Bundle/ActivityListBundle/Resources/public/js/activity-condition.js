@@ -73,7 +73,17 @@ define([
                     throw new Error('Cannot find filter "datetime"');
                 }
 
-                this.element.prepend(this.$activityChoice, '-', this.$typeChoice, '-');
+                this.$typeChoice.find('.filter-select, .filter-item').contents().filter(function() {
+                    return (this.nodeType == 3 && !/\S/.test(this.nodeValue));
+                }).remove();
+
+                this.element.prepend(this.$activityChoice, '-&nbsp;', this.$typeChoice);
+
+                this.element.one('changed', _.bind(function () {
+                    this.element.find('.select2-choice').contents().filter(function() {
+                        return (this.nodeType == 3 && !/\S/.test(this.nodeValue));
+                    }).remove();
+                }, this));
 
                 this._updateFieldChoice();
                 if (data && data.columnName) {
