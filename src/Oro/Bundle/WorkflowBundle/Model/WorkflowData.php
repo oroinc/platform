@@ -4,11 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityNotFoundException;
+
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -40,7 +42,7 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
         $this->data = $data;
         $this->modified = false;
         $this->mapping = [];
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -122,7 +124,9 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         try {
             $propertyPath = $this->getMappedPath($name);
-            if ($changeModified && $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value) {
+            if ($changeModified
+                && (!$this->has($name) || $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value)
+            ) {
                 $this->modified = true;
             }
             $this->propertyAccessor->setValue($this->data, $propertyPath, $value);
@@ -204,10 +208,11 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
             return true;
         } else {
             try {
-                return null !== $this->propertyAccessor->getValue($this->data, $this->getMappedPath($name));
+                $this->propertyAccessor->getValue($this->data, $this->getMappedPath($name));
             } catch (NoSuchPropertyException $e) {
                 return false;
             }
+            return true;
         }
     }
 

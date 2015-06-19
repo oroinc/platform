@@ -127,8 +127,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFlush()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $model     = new EntityConfigModel(self::ENTITY_CLASS);
+        $model = new EntityConfigModel(self::ENTITY_CLASS);
 
         $entityConfigId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $entityConfig   = new Config($entityConfigId);
@@ -142,8 +141,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
                         'label' => ['options' => ['indexed' => true]]
                     ]
                 ]
-            ],
-            $container
+            ]
         );
         $this->entityConfigProvider->expects($this->once())
             ->method('getPropertyConfig')
@@ -159,8 +157,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
                         'attr1' => []
                     ]
                 ]
-            ],
-            $container
+            ]
         );
         $this->testConfigProvider->expects($this->once())
             ->method('getPropertyConfig')

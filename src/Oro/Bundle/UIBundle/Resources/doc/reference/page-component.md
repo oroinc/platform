@@ -10,10 +10,11 @@ Page Component
 Page Component is an invisible component that takes responsibility of the controller for certain functionality. It accepts options object, performs initialization actions, and, at appropriate time, destroys initialized elements (views, models, collections, or even sub-components).
 
 ## Definition
-To define PageComponent for a block define two data-attributes for the HTML node:
+To define PageComponent for a block define several data-attributes for the HTML node:
 
  - `data-page-component-module` with the name of the module
- - `data-page-component-options` and with safe JSON-string
+ - `data-page-component-options` with safe JSON-string
+ - `data-page-component-name` optional, allows to get access to the component by name
 
 ```twig
 {% set options  = {
@@ -26,14 +27,14 @@ To define PageComponent for a block define two data-attributes for the HTML node
 
 ## How it works
 
-`PageController` loads a page, triggering `'page:update'` event. Once all global views have updated their content, `PageController` executes `'layout:init'` handler. This handler performs an action for the container it passes (`document.body` in this case), one of such actions is `initPageComponents`. The method responsible for this action:
+`PageController` loads a page, triggering `'page:update'` event. Global views (`PageRegionView`) have updated their contents. And once it is done — each `PageRegionView` executes `initLayout` method for it's layout element (in common case it's the view element). Inside this method, the view excutes `'layout:init'` handler, that initializes system UI-controls (such as ScrollSpy, ToolTips, PopOvers and other), after that invokes `initPageComponents` method, that initializes components defined in HTML. This method:
 
  - collects all elements with proper data-attributes.
  - loads defined modules of PageComponents.
  - initializes PageComponents, executing init method with passed-in options.
- - once all components are initialized, resolves `initialization` promise with passed array of components.
+ - returns promise object, allowing handle initialization process.
 
-`PageController` handles this promise and attaches all received components to itself in order to dispose them once controller got disposed.
+`PageController` handles promises from all global views and once they all resolved — triggers next event `'page:afterChange'`.
 
 ## Development
 There are two kinds of PageComponents:
