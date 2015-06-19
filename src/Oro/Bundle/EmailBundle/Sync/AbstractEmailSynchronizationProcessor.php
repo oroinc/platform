@@ -41,6 +41,12 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /** @var int Timestamp when last batch was saved. */
     protected $dbBatchSaveTimestamp = 0;
 
+    /** @var User */
+    protected $currentUser;
+
+    /** @var OrganizationInterface */
+    protected $currentOrganization;
+
     /**
      * Constructor
      *
@@ -67,9 +73,10 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     abstract public function process(EmailOrigin $origin, $syncStartTime);
 
     /**
-     * @param EmailHeader $email
-     * @param string      $folderType
-     * @param int|null    $userId
+     * @param EmailHeader           $email
+     * @param string                $folderType
+     * @param int|null              $userId
+     * @param OrganizationInterface $organization
      *
      * @return bool
      */
@@ -291,6 +298,21 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         }
 
         return ($folderType1 === $folderType2);
+    }
+
+    /**
+     * @param EmailOrigin $emailOrigin
+     */
+    protected function initEnv(EmailOrigin $emailOrigin)
+    {
+        $this->currentUser = $this->em->getReference(
+            'Oro\Bundle\UserBundle\Entity\User',
+            $emailOrigin->getOwner()->getId()
+        );
+        $this->currentOrganization = $this->em->getReference(
+            'Oro\Bundle\OrganizationBundle\Entity\Organization',
+            $emailOrigin->getOrganization()->getId()
+        );
     }
 
     /**
