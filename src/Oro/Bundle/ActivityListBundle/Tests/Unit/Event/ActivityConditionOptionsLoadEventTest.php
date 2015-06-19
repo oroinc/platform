@@ -20,6 +20,6 @@ class ActivityConditionOptionsLoadEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($originalOptions, $event->getOptions());
 
         $event->setOptions($modifiedOptions);
-        $this->assertEquals($modifiedOptions, $modifiedOptions);
+        $this->assertEquals($modifiedOptions, $event->getOptions());
     }
 }

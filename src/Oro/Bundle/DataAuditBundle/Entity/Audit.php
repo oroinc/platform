@@ -225,6 +225,8 @@ class Audit extends AbstractLogEntry
     /**
      * Get field
      *
+     * @param string $field
+     *
      * @return AuditField|false
      */
     public function getField($field)
