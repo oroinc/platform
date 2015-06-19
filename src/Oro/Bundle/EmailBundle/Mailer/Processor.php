@@ -250,7 +250,7 @@ class Processor
                 );
 
                 $origin = $origins->isEmpty() ? null : $origins->first();
-                if ($origin == null) {
+                if ($origin === null) {
                     $origin = $this->createUserInternalOrigin($emailOwner, $this->securityFacade->getOrganization());
                 }
             } else {

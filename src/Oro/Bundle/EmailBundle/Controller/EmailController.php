@@ -202,10 +202,11 @@ class EmailController extends Controller
      * Get the given email body content
      *
      * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_view")
      */
     public function bodyAction(EmailBody $entity)
     {
-        $this->assertEmailAccessGranted('VIEW', $entity->getEmail());
+//        $this->assertEmailAccessGranted('VIEW', $entity->getEmail());
 
         return new Response($entity->getBodyContent());
     }
@@ -214,10 +215,11 @@ class EmailController extends Controller
      * Get a response for download the given email attachment
      *
      * @Route("/attachment/{id}", name="oro_email_attachment", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_view")
      */
     public function attachmentAction(EmailAttachment $entity)
     {
-        $this->assertEmailAccessGranted('VIEW', $entity->getEmailBody()->getEmail());
+//        $this->assertEmailAccessGranted('VIEW', $entity->getEmailBody()->getEmail());
 
         $response = new Response();
         $response->headers->set('Content-Type', $entity->getContentType());
@@ -241,7 +243,7 @@ class EmailController extends Controller
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
-        $this->assertEmailAccessGranted('EDIT', $emailAttachment->getEmailBody()->getEmail());
+//        $this->assertEmailAccessGranted('EDIT', $emailAttachment->getEmailBody()->getEmail());
 
         try {
             $entity = $this->getTargetEntity();
@@ -298,13 +300,14 @@ class EmailController extends Controller
     /**
      * @Route("/context/{id}", name="oro_email_context", requirements={"id"="\d+"})
      * @Template("OroEmailBundle:Email:context.html.twig")
+     * @AclAncestor("oro_email_email_view")
+     *
      * @param Email $emailEntity
+     *
      * @return array
      */
     public function contextAction(Email $emailEntity)
     {
-        $this->assertEmailAccessGranted('VIEW', $emailEntity);
-
         $entityTargets = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($emailEntity);
         return [
             'sourceEntity' => $emailEntity,
@@ -478,16 +481,16 @@ class EmailController extends Controller
         return $enabledAttachment && $createGrant;
     }
 
-    /**
-     * @param string $attribute
-     * @param Email $entity
-     *
-     * @throws AccessDeniedException
-     */
-    protected function assertEmailAccessGranted($attribute, Email $entity)
-    {
-        if (!$this->get('oro_security.security_facade')->isGranted($attribute, $entity)) {
-            throw new AccessDeniedException();
-        }
-    }
+//    /**
+//     * @param string $attribute
+//     * @param Email $entity
+//     *
+//     * @throws AccessDeniedException
+//     */
+//    protected function assertEmailAccessGranted($attribute, Email $entity)
+//    {
+//        if (!$this->get('oro_security.security_facade')->isGranted($attribute, $entity)) {
+//            throw new AccessDeniedException();
+//        }
+//    }
 }

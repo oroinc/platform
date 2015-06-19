@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Acl\Voter;
 
-use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Component\DependencyInjection\Container;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -79,7 +81,10 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['Oro\Bundle\EmailBundle\Entity\Email', true],
-            [EmailVoter::SUPPORTED_CLASS, true],
+            ['Oro\Bundle\EmailBundle\Entity\EmailBody', true],
+            ['Oro\Bundle\EmailBundle\Entity\EmailAttachment', true],
+            [EmailBody::CLASS_NAME, true],
+            [EmailAttachment::CLASS_NAME, true],
             ['Some\Unsupported\Class', false]
         ];
     }
@@ -107,7 +112,7 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
                 ->willReturn(true);
         }
 
-        $result = $atLeastOneGranted ? EmailVoter::ACCESS_GRANTED : EmailVoter::ACCESS_ABSTAIN;
+        $result = $atLeastOneGranted ? EmailVoter::ACCESS_GRANTED : EmailVoter::ACCESS_DENIED;
         $this->assertEquals($result, $this->emailVoter->vote($token, $email, $attributes));
     }
 
