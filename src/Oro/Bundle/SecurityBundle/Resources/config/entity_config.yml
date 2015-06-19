@@ -7,3 +7,25 @@ oro_entity_config:
                         auditable: false
                 permissions: ~
                 group_name: ~
+
+                # This attribute determines within which group an object can be shared. For example,
+                # if share_scope=[organization] than user can share the object only to organizations.
+                # Role permission "Share" says who can share, "Share Scope" says how object can be shared.
+                share_scopes:
+                    options:
+                        priority: 250
+                        default_value: ['5']
+                    form:
+                        type: choice
+                        options:
+                            block: associations
+                            required: false
+                            multiple: true
+                            expanded: true
+                            label: 'oro.security.share_scopes.label'
+                            choices:
+                                '1': 'oro.security.share_scopes.system'
+                                '2': 'oro.security.share_scopes.organization'
+                                '3': 'oro.security.share_scopes.division'
+                                '4': 'oro.security.share_scopes.business_unit'
+                                '5': 'oro.security.share_scopes.user'
