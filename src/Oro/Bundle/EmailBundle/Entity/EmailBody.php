@@ -16,6 +16,8 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailBody
 {
+    const CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\EmailBody';
+
     /**
      * @var integer
      *

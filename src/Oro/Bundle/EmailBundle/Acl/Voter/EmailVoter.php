@@ -3,15 +3,25 @@
 namespace Oro\Bundle\EmailBundle\Acl\Voter;
 
 use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 
 class EmailVoter implements VoterInterface
 {
-    const SUPPORTED_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
+    /**
+     * @var array
+     */
+    protected static $supportedClasses = [
+        'Oro\Bundle\EmailBundle\Entity\Email',
+        'Oro\Bundle\EmailBundle\Entity\EmailBody',
+        'Oro\Bundle\EmailBundle\Entity\EmailAttachment'
+    ];
 
     /**
      * @var ContainerInterface
@@ -31,7 +41,7 @@ class EmailVoter implements VoterInterface
      */
     public function supportsAttribute($attribute)
     {
-        return in_array($attribute, ['VIEW', 'EDIT']);
+        return in_array($attribute, ['VIEW', 'EDIT'], true);
     }
 
     /**
@@ -39,7 +49,7 @@ class EmailVoter implements VoterInterface
      */
     public function supportsClass($class)
     {
-        return $class === self::SUPPORTED_CLASS;
+        return in_array($class, self::$supportedClasses, true);
     }
 
     /**
@@ -51,7 +61,8 @@ class EmailVoter implements VoterInterface
             return self::ACCESS_ABSTAIN;
         }
 
-        if (!$this->supportsClass(ClassUtils::getClass($object))) {
+        $objectClass = ClassUtils::getClass($object);
+        if (!$this->supportsClass($objectClass)) {
             return self::ACCESS_ABSTAIN;
         }
 
@@ -60,6 +71,8 @@ class EmailVoter implements VoterInterface
                 return self::ACCESS_ABSTAIN;
             }
         }
+
+        $object = $this->convertToSupportedObject($object, $objectClass);
 
         /** @var EmailUser[] $emailUsers */
         $emailUsers = $object->getEmailUsers();
@@ -72,5 +85,23 @@ class EmailVoter implements VoterInterface
         }
 
         return self::ACCESS_DENIED;
+    }
+
+    /**
+     * @param $object
+     * @param $objectClass
+     *
+     * @return mixed
+     */
+    protected function convertToSupportedObject($object, $objectClass)
+    {
+        if ($objectClass === EmailBody::CLASS_NAME) {
+            $object = $object->getEmail();
+        }
+        if ($objectClass === EmailAttachment::CLASS_NAME) {
+            $object = $object->getEmailBody()->getEmail();
+        }
+
+        return $object;
     }
 }
