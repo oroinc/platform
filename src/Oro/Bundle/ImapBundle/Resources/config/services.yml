@@ -55,6 +55,7 @@ services:
         arguments:
             - @doctrine
             - @oro_email.email.entity.builder
+            - @oro_email.email.address.helper
 
     oro_imap.form.type.configuration:
         class: %oro_imap.form.type.configuration.class%

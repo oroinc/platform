@@ -24,7 +24,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Tools\EmailHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
@@ -59,7 +58,7 @@ class EmailController extends RestController
      *      description="Get all emails",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function cgetAction()
@@ -87,7 +86,7 @@ class EmailController extends RestController
      *      description="Get email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAction($id)
@@ -104,7 +103,7 @@ class EmailController extends RestController
      *      description="Update email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_update")
+     * @AclAncestor("oro_email_email_edit")
      * @return Response
      */
     public function putAction($id)
@@ -119,7 +118,7 @@ class EmailController extends RestController
      *      description="Create new email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_create")
+     * @AclAncestor("oro_email_email_edit")
      */
     public function postAction()
     {
@@ -134,7 +133,12 @@ class EmailController extends RestController
         $manager = $this->getManager();
         $qb = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
 
-        $entities = array_filter($qb->getQuery()->getResult(), [$this->getEmailHelper(), 'isEmailViewGranted']);
+        $entities = array_filter(
+            $qb->getQuery()->getResult(),
+            function ($entity) {
+                return $this->get('oro_security.security_facade')->isGranted('VIEW', $entity);
+            }
+        );
         $result = $this->getPreparedItems($entities);
 
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
@@ -151,7 +155,7 @@ class EmailController extends RestController
      *          404="Activity association was not found",
      *      }
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAssociationAction($entityId)
@@ -165,7 +169,7 @@ class EmailController extends RestController
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
-        if (!$this->assertEmailViewGranted($entity)) {
+        if (!$this->assertEmailAccessGranted('VIEW', $entity)) {
             return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
         }
 
@@ -188,7 +192,7 @@ class EmailController extends RestController
      *          404="Activity association was not found",
      *      }
      * )
-     * @AclAncestor("oro_email_email_user_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAssociationsDataAction($entityId)
@@ -199,7 +203,7 @@ class EmailController extends RestController
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
-        if (!$this->assertEmailViewGranted($entity)) {
+        if (!$this->assertEmailAccessGranted('VIEW', $entity)) {
             return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
         }
 
@@ -272,7 +276,7 @@ class EmailController extends RestController
      *      description="Add new association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_create")
      */
     public function postAssociationsAction()
     {
@@ -299,7 +303,7 @@ class EmailController extends RestController
             ], Codes::HTTP_NOT_FOUND));
         }
 
-        if (!$this->getEmailHelper()->isEmailEditGranted($entity)) {
+        if (!$this->assertEmailAccessGranted('EDIT', $entity)) {
             return $this->handleView($this->view([
                 'status'  => 'error',
                 'message' => $translator->trans('oro.email.forbidden', ['%id%'=>$entityId])
@@ -345,7 +349,7 @@ class EmailController extends RestController
      *      description="Delete Association",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
+     * @AclAncestor("oro_email_email_edit")
      *
      * @Delete("/emails/{entityId}/associations/{targetClassName}/{targetId}")
      *
@@ -365,7 +369,7 @@ class EmailController extends RestController
             ], Codes::HTTP_NOT_FOUND));
         }
 
-        if (!$this->getEmailHelper()->isEmailEditGranted($entity)) {
+        if (!$this->assertEmailAccessGranted('EDIT', $entity)) {
             return $this->handleView($this->view([
                 'status'  => 'error',
                 'message' => $translator->trans('oro.email.forbidden', ['%id%'=>$entityId])
@@ -402,7 +406,7 @@ class EmailController extends RestController
 
         $result = $manager->find($id);
         if ($result) {
-            if (!$this->assertEmailViewGranted($result)) {
+            if (!$this->assertEmailAccessGranted('VIEW', $result)) {
                 return $this->handleView($this->view('', Codes::HTTP_FORBIDDEN));
             }
 
@@ -415,16 +419,6 @@ class EmailController extends RestController
             ['result' => $result],
             $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
         );
-    }
-
-    /**
-     * @param Email $entity
-     *
-     * @return bool
-     */
-    protected function assertEmailViewGranted(Email $entity)
-    {
-        return $this->getEmailHelper()->isEmailViewGranted($entity);
     }
 
     /**
@@ -521,10 +515,13 @@ class EmailController extends RestController
     }
 
     /**
-     * @return EmailHelper
+     * @param string $attribute
+     * @param Email $email
+     *
+     * @return bool
      */
-    protected function getEmailHelper()
+    protected function assertEmailAccessGranted($attribute, Email $email)
     {
-        return $this->get('oro_email.email_helper');
+        return $this->get('oro_security.security_facade')->isGranted($attribute, $email);
     }
 }
