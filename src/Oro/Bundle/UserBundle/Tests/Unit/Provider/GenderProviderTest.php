@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Provider;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Model\Gender;

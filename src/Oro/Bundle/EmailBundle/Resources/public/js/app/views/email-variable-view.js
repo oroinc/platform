@@ -7,7 +7,8 @@ define(function (require) {
         document = window.document,
         $ = require('jquery'),
         _ = require('underscore'),
-        BaseView= require('oroui/js/app/views/base/view');
+        mediator = require('oroui/js/mediator'),
+        BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
     /**
@@ -58,15 +59,6 @@ define(function (require) {
 
             this.fields = $(this.options.fieldsSelectors.join(','));
             this.fields.on('blur', _.bind(this._updateElementsMetaData, this));
-            this.fields
-                .droppable({
-                    drop: function Drop(event, ui) {
-                        var variable = ui.draggable.text(),
-                            $targetEl = $(this);
-
-                        $targetEl.val($targetEl.val() + variable);
-                    }
-                });
 
             this.lastElement = $(this.options.fieldsSelectors[this.options.defaultFieldIndex]);
         },
@@ -221,7 +213,14 @@ define(function (require) {
          * @private
          */
         _applyDraggable: function ($el) {
-            $el.find('a.variable').draggable({helper: 'clone'});
+            $el.find('a.variable').on('dragstart', function (e) {
+                var dt = e.originalEvent.dataTransfer;
+                for (var i = 0; i < dt.types.length; i++) {
+                    var type = dt.types[i];
+                    dt.clearData(type);
+                }
+                dt.setData('text', $(e.currentTarget).text());
+            });
         },
 
         /**
@@ -260,13 +259,15 @@ define(function (require) {
          */
         _handleVariableClick: function (e) {
             var field = this.fields.filter(document.activeElement);
+            var value = $(e.currentTarget).html();
 
             if (!field.length && this.lastElement && this.lastElement.is(':visible')) {
                 field = this.lastElement;
             }
 
             if (field) {
-                field.val(field.val() + $(e.currentTarget).html());
+                field.val(field.val() + value);
+                mediator.trigger('email-variable-view:click-variable', field, value);
             }
         },
 
