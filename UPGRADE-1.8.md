@@ -26,6 +26,7 @@ UPGRADE FROM 1.7 to 1.8
 ####FormBundle
  - `Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension` by default adds unique suffix to id attribute of each form type
  - `Oro\Bundle\FormBundle\Model\UpdateHandler` triggers events that can be used to modify data and interrupt processing, also this handler has new constructor argument used to inject EventDispatcher
+ - `Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType` removed support for `extra_config` and `extra_modules` options, use `component` option instead (the value reflects what js-module will be used as Select2Component)
 
 ####SyncBundle
 Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. Instead the following websocket configuration is used:
@@ -48,7 +49,13 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
  - Macros `scrollData` in `Oro/Bundle/UIBundle/Resources/views/macros.html.twig` triggers event `oro_ui.scroll_data.before.<pageIdentifier>` before data rendering
 
 ####LocaleBundle
-* Deprecated method {{localeSettings.getTimeZoneShift()}} (calendar-view.js, formatter/datetime.js, datepicker/datetimepicker-view-mixin.js)
-* Deprecated method {{dateTimeFormatter.applyTimeZoneCorrection()}} (calendar-view.js, jquery-ui-datepicker-l10n.js)
-* Deprecated method {{calendarView.options.timezone}} and {{calendarView.applyTzCorrection()}}
-* Deprecated method {{datetimepickerViewMixin.timezoneShift}}
+- Deprecated method {{localeSettings.getTimeZoneShift()}} (calendar-view.js, formatter/datetime.js, datepicker/datetimepicker-view-mixin.js)
+- Deprecated method {{dateTimeFormatter.applyTimeZoneCorrection()}} (calendar-view.js, jquery-ui-datepicker-l10n.js)
+- Deprecated method {{calendarView.options.timezone}} and {{calendarView.applyTzCorrection()}}
+- Deprecated method {{datetimepickerViewMixin.timezoneShift}}
+
+####UserBundle
+- `Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface` is no longer extends `Symfony\Component\Security\Core\User\UserInterface`. 
+- `Oro\Bundle\UserBundle\Entity\User` is based on `Oro\Bundle\UserBundle\Entity\AbstractUser` and implements `Symfony\Component\Security\Core\User\UserInterface` using `Oro\Bundle\UserBundle\Entity\UserInterface` directly
+- `Oro\Bundle\UserBundle\Entity\PasswordRecoveryInterface` introduced to cover all required data for password recovery
+- `Oro\Bundle\UserBundle\Entity\UserInterface` method `public function addRole(RoleInterface $role)` signature changed to use `Symfony\Component\Security\Core\Role\RoleInterface`

@@ -120,6 +120,8 @@ services:
     # Autocomplete form type
     oro_tag.form.type.tag_autocomplete:
         class: %oro_tag.form.type.tag_autocomplete.class%
+        arguments:
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_tag_autocomplete }
 
