@@ -42,7 +42,7 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
     /**
      * {@inheritdoc}
      */
-    public function resolve(Route $route, RouteCollectionAccessor $routeCollectionAccessor)
+    public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
         if ($route->getOption('group') !== 'activity_association') {
             return;
@@ -68,7 +68,7 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
                 )
             );
 
-            $this->adjustRoutes($route, $routeCollectionAccessor, $activities);
+            $this->adjustRoutes($route, $routes, $activities);
 
             $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
             $this->completeRouteRequirements($route);
@@ -79,26 +79,23 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
 
     /**
      * @param Route                   $route
-     * @param RouteCollectionAccessor $routeCollectionAccessor
+     * @param RouteCollectionAccessor $routes
      * @param string[]                $activities
      */
-    protected function adjustRoutes(
-        Route $route,
-        RouteCollectionAccessor $routeCollectionAccessor,
-        $activities
-    ) {
-        $routeName = $routeCollectionAccessor->getName($route);
+    protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $activities)
+    {
+        $routeName = $routes->getName($route);
 
         foreach ($activities as $activity) {
-            $existingRoute = $routeCollectionAccessor->getByPath(
+            $existingRoute = $routes->getByPath(
                 str_replace(self::ACTIVITY_PLACEHOLDER, $activity, $route->getPath()),
                 $route->getMethods()
             );
             if ($existingRoute) {
                 // move existing route before the current route
-                $existingRouteName = $routeCollectionAccessor->getName($existingRoute);
-                $routeCollectionAccessor->remove($existingRouteName);
-                $routeCollectionAccessor->insert(
+                $existingRouteName = $routes->getName($existingRoute);
+                $routes->remove($existingRouteName);
+                $routes->insert(
                     $existingRouteName,
                     $existingRoute,
                     $routeName,
@@ -106,12 +103,12 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
                 );
             } else {
                 // add an additional strict route based on the base route and current activity
-                $strictRoute = $routeCollectionAccessor->cloneRoute($route);
+                $strictRoute = $routes->cloneRoute($route);
                 $strictRoute->setPath(str_replace(self::ACTIVITY_PLACEHOLDER, $activity, $strictRoute->getPath()));
                 $strictRoute->setDefault(self::ACTIVITY_ATTRIBUTE, $activity);
                 $this->completeRouteRequirements($strictRoute);
-                $routeCollectionAccessor->insert(
-                    $routeCollectionAccessor->generateRouteName($routeName),
+                $routes->insert(
+                    $routes->generateRouteName($routeName),
                     $strictRoute,
                     $routeName,
                     true
