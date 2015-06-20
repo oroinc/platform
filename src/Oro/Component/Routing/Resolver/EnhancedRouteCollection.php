@@ -8,12 +8,12 @@ use Symfony\Component\Routing\RouteCollection;
 class EnhancedRouteCollection extends RouteCollection
 {
     /**
-     * Adds a new route near to the specified target route.
+     * Adds a new route near the specified target route.
      * If the target route name is empty adds a new route to the beginning or end of the route collection.
      *
      * @param string $routeName       The route name
      * @param Route  $route           A Route instance
-     * @param string $targetRouteName The name of a route near to which the new route should be added
+     * @param string $targetRouteName The name of a route near which the new route should be added
      * @param bool   $prepend         Determines whether the new route should be added before or after the target route
      */
     public function insert($routeName, Route $route, $targetRouteName, $prepend = false)
@@ -44,7 +44,7 @@ class EnhancedRouteCollection extends RouteCollection
      */
     protected function setRoutes(array $routes)
     {
-        // unfortunately $routes property is private and there is no any way
+        // unfortunately $routes property is private and there is no other way
         // to insert a route at the specified position except to use the reflection
         $r = new \ReflectionClass('Symfony\Component\Routing\RouteCollection');
         $p = $r->getProperty('routes');

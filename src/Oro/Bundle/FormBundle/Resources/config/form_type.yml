@@ -34,7 +34,7 @@ parameters:
     oro_form.form_handler.api.class:                             Oro\Bundle\FormBundle\Form\Handler\ApiFormHandler
 
     oro_form.validator.entity_class.class:                       Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator
-    oro_form.validator.related_entity.class:                       Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator
+    oro_form.validator.related_entity.class:                     Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator
 
 services:
     # Form types
