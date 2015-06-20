@@ -31,6 +31,7 @@ parameters:
     oro_entity.entity_alias_resolver.class:                  Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
     oro_entity.entity_alias_config_bag.class:                Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag
     oro_entity.entity_alias_provider.class:                  Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
+    oro_entity.entity_class_name_helper.class:                  Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
 
 services:
     oro_entity.listener.navigation_listener:
@@ -190,6 +191,7 @@ services:
     oro_entity.routing_helper:
         class: %oro_entity.routing_helper.class%
         arguments:
+            - @oro_entity.entity_class_name_helper
             - @oro_entity.doctrine_helper
             - @router
 
@@ -240,3 +242,8 @@ services:
             - @oro_entity.entity_alias_config_bag
         tags:
             - { name: entity.alias_provider, priority: 100 }
+
+    oro_entity.entity_class_name_helper:
+        class: %oro_entity.entity_class_name_helper.class%
+        arguments:
+            - @oro_entity.entity_alias_resolver

@@ -90,7 +90,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'POST',
             $url,
             [
-                'relations' => [
+                'targets' => [
                     ['entity' => 'user', 'id' => $this->getReference('user_1')->getId()]
                 ]
             ]

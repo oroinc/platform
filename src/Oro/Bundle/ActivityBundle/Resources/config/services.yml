@@ -118,7 +118,7 @@ services:
         factory_method: createNamed
         factory_service: form.factory
         arguments:
-            - relations
+            - targets
             - 'oro_related_entity_standalone_collection_api'
 
     oro_activity.manager.activity_target.api:

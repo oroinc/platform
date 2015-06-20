@@ -37,7 +37,7 @@ services:
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
             - [setDoctrineHelper, [@oro_entity.doctrine_helper]]
-            - [setEntityAliasResolver, [@oro_entity.entity_alias_resolver]]
+            - [setEntityClassNameHelper, [@oro_entity.entity_class_name_helper]]
             - [setEntitySerializer, [@oro_soap.entity_serializer]]
 
     oro_soap.handler.include_delegate:

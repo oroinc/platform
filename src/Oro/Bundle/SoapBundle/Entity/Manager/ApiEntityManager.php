@@ -13,9 +13,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
@@ -38,8 +38,8 @@ class ApiEntityManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
 
     /** @var EntitySerializer */
     protected $entitySerializer;
@@ -70,25 +70,6 @@ class ApiEntityManager
     }
 
     /**
-     * Resolves the entity class name
-     *
-     * @param string $entityName  The name or the plural alias of the entity
-     * @param bool   $pluralAlias Determines whether the entity name may be a singular of plural alias
-     *
-     * @return string The FQCN of an entity
-     */
-    public function resolveEntityClass($entityName, $pluralAlias = false)
-    {
-        if (false === strpos($entityName, '\\')) {
-            $entityName = $pluralAlias
-                ? $this->entityAliasResolver->getClassByPluralAlias($entityName)
-                : $this->entityAliasResolver->getClassByAlias($entityName);
-        }
-
-        return $entityName;
-    }
-
-    /**
      * Sets a event dispatcher
      *
      * @param EventDispatcher $eventDispatcher
@@ -109,13 +90,13 @@ class ApiEntityManager
     }
 
     /**
-     * Sets the entity alias resolver
+     * Sets the entity class name helper
      *
-     * @param EntityAliasResolver $entityAliasResolver
+     * @param EntityClassNameHelper $entityClassNameHelper
      */
-    public function setEntityAliasResolver(EntityAliasResolver $entityAliasResolver)
+    public function setEntityClassNameHelper(EntityClassNameHelper $entityClassNameHelper)
     {
-        $this->entityAliasResolver = $entityAliasResolver;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
@@ -126,6 +107,19 @@ class ApiEntityManager
     public function setEntitySerializer(EntitySerializer $entitySerializer)
     {
         $this->entitySerializer = $entitySerializer;
+    }
+
+    /**
+     * Resolves the entity class name
+     *
+     * @param string $entityName    The class name, url-safe class name, alias or plural alias of the entity
+     * @param bool   $isPluralAlias Determines whether the entity name may be a singular of plural alias
+     *
+     * @return string The FQCN of an entity
+     */
+    public function resolveEntityClass($entityName, $isPluralAlias = false)
+    {
+        return $this->entityClassNameHelper->resolveEntityClass($entityName, $isPluralAlias);
     }
 
     /**

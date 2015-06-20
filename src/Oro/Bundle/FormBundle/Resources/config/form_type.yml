@@ -241,7 +241,7 @@ services:
         class: %oro_form.validator.entity_class.class%
         arguments:
             - @oro_entity.doctrine_helper
-            - @oro_entity.entity_alias_resolver
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: validator.constraint_validator, alias: oro_form.entity_class_validator }
 
@@ -249,7 +249,7 @@ services:
         class: %oro_form.validator.related_entity.class%
         arguments:
             - @oro_entity.doctrine_helper
-            - @oro_entity.entity_alias_resolver
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: validator.constraint_validator, alias: oro_form.related_entity_validator }
 
@@ -258,7 +258,7 @@ services:
         public: false
         arguments:
             - @oro_entity.doctrine_helper
-            - @oro_entity.entity_alias_resolver
+            - @oro_entity.entity_class_name_helper
             - @oro_security.security_facade
 
     oro_form.related_entity.form.type.api:

@@ -280,7 +280,7 @@ class ActivityManager
     public function getActivityTargetsQueryBuilder(
         $activityClassName,
         $filters,
-        $joins,
+        $joins = null,
         $limit = null,
         $page = null,
         $orderBy = null
