@@ -87,7 +87,11 @@ class EmailApiEntityManager extends ApiEntityManager
         $criteria = Criteria::create();
         $criteria->andWhere(Criteria::expr()->eq('id', $email->getId()));
 
-        $qb     = $this->activityManager->getActivityTargetsQueryBuilder($this->class, $criteria);
+        $qb = $this->activityManager->getActivityTargetsQueryBuilder($this->class, $criteria);
+        if (null === $qb) {
+            return [];
+        }
+
         $result = $qb->getQuery()->getResult();
         if (empty($result)) {
             return $result;

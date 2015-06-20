@@ -230,7 +230,7 @@ class ApiEntityManager
      * @param null  $orderBy
      * @param array $joins
      *
-     * @return QueryBuilder|SqlQueryBuilder|SearchQuery
+     * @return QueryBuilder|SqlQueryBuilder|SearchQuery|null
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {

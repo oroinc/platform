@@ -42,31 +42,35 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $qb         = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
         $totalCount = null;
 
-        if ($manager->isSerializerConfigured()) {
-            $result = $manager->serialize($qb);
-        } elseif ($qb instanceof QueryBuilder) {
-            $result = $this->getPreparedItems($qb->getQuery()->getResult());
-        } elseif ($qb instanceof SqlQueryBuilder) {
-            $result = $this->getPreparedItems($qb->getQuery()->getResult());
-        } elseif ($qb instanceof SearchQuery) {
-            $searchResult = $this->container->get('oro_search.index')->query($qb);
+        if (null !== $qb) {
+            if ($manager->isSerializerConfigured()) {
+                $result = $manager->serialize($qb);
+            } elseif ($qb instanceof QueryBuilder) {
+                $result = $this->getPreparedItems($qb->getQuery()->getResult());
+            } elseif ($qb instanceof SqlQueryBuilder) {
+                $result = $this->getPreparedItems($qb->getQuery()->getResult());
+            } elseif ($qb instanceof SearchQuery) {
+                $searchResult = $this->container->get('oro_search.index')->query($qb);
 
-            $dispatcher = $this->get('event_dispatcher');
-            foreach ($searchResult->getElements() as $item) {
-                $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+                $dispatcher = $this->get('event_dispatcher');
+                foreach ($searchResult->getElements() as $item) {
+                    $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+                }
+
+                $result       = $this->getPreparedItems($searchResult->toArray());
+                $totalCount   = function () use ($searchResult) {
+                    return $searchResult->getRecordsCount();
+                };
+            } else {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Unsupported query type: %s.',
+                        is_object($qb) ? get_class($qb) : gettype($qb)
+                    )
+                );
             }
-
-            $result       = $this->getPreparedItems($searchResult->toArray());
-            $totalCount   = function () use ($searchResult) {
-                return $searchResult->getRecordsCount();
-            };
         } else {
-            throw new \RuntimeException(
-                sprintf(
-                    'Unsupported query type: %s.',
-                    is_object($qb) ? get_class($qb) : gettype($qb)
-                )
-            );
+            $result = [];
         }
 
         $responseContext = ['result' => $result, 'query' => $qb];
