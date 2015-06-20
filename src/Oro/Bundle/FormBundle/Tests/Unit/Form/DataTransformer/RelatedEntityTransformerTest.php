@@ -13,7 +13,7 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityAliasResolver;
+    protected $entityClassNameHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
@@ -23,19 +23,19 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper      = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade        = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->transformer = new RelatedEntityTransformer(
             $this->doctrineHelper,
-            $this->entityAliasResolver,
+            $this->entityClassNameHelper,
             $this->securityFacade
         );
     }
@@ -122,19 +122,21 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
         $value  = ['id' => 123, 'entity' => 'Test\Entity'];
         $entity = new \stdClass();
 
-        $this->entityAliasResolver->expects($this->never())
-            ->method('getClassByAlias');
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
+            ->with($value['entity'])
+            ->willReturn($value['entity']);
 
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
-            ->with('Test\Entity')
+            ->with($value['entity'])
             ->willReturn($repo);
         $repo->expects($this->once())
             ->method('find')
-            ->with(123)
+            ->with($value['id'])
             ->willReturn($entity);
 
         $this->securityFacade->expects($this->once())
@@ -150,8 +152,8 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
         $value  = ['id' => 123, 'entity' => 'alias'];
         $entity = new \stdClass();
 
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getClassByAlias')
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
             ->with('alias')
             ->willReturn('Test\Entity');
 
@@ -164,7 +166,7 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($repo);
         $repo->expects($this->once())
             ->method('find')
-            ->with(123)
+            ->with($value['id'])
             ->willReturn($entity);
 
         $this->securityFacade->expects($this->once())
@@ -179,19 +181,21 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $value = ['id' => 123, 'entity' => 'Test\Entity'];
 
-        $this->entityAliasResolver->expects($this->never())
-            ->method('getClassByAlias');
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
+            ->with($value['entity'])
+            ->willReturn($value['entity']);
 
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
-            ->with('Test\Entity')
+            ->with($value['entity'])
             ->willReturn($repo);
         $repo->expects($this->once())
             ->method('find')
-            ->with(123)
+            ->with($value['id'])
             ->willReturn(null);
 
         $this->securityFacade->expects($this->never())
@@ -204,13 +208,15 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $value = ['id' => 123, 'entity' => 'Test\Entity'];
 
-        $this->entityAliasResolver->expects($this->never())
-            ->method('getClassByAlias');
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
+            ->with($value['entity'])
+            ->willReturn($value['entity']);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
-            ->with('Test\Entity')
-            ->will($this->throwException(new NotManageableEntityException('Test\Entity')));
+            ->with($value['entity'])
+            ->will($this->throwException(new NotManageableEntityException($value['entity'])));
 
         $this->securityFacade->expects($this->never())
             ->method('isGranted');
@@ -223,19 +229,21 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
         $value  = ['id' => 123, 'entity' => 'Test\Entity'];
         $entity = new \stdClass();
 
-        $this->entityAliasResolver->expects($this->never())
-            ->method('getClassByAlias');
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
+            ->with($value['entity'])
+            ->willReturn($value['entity']);
 
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
-            ->with('Test\Entity')
+            ->with($value['entity'])
             ->willReturn($repo);
         $repo->expects($this->once())
             ->method('find')
-            ->with(123)
+            ->with($value['id'])
             ->willReturn($entity);
 
         $this->securityFacade->expects($this->once())

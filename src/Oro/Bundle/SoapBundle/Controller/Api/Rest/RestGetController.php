@@ -389,4 +389,12 @@ abstract class RestGetController extends FOSRestController implements EntityMana
 
         return $response;
     }
+
+    /**
+     * @return Response
+     */
+    protected function buildNotFoundResponse()
+    {
+        return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
+    }
 }

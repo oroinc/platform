@@ -14,6 +14,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 /**
  * @RouteResource("entity_alias")
@@ -37,7 +38,17 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
     {
         /** @var EntityAliasResolver $resolver */
         $resolver = $this->get('oro_entity.entity_alias_resolver');
-        $result = $resolver->getAll();
+        /** @var EntityClassNameHelper $entityClassNameHelper */
+        $entityClassNameHelper = $this->get('oro_entity.entity_class_name_helper');
+
+        $result = [];
+        foreach ($resolver->getAll() as $className => $entityAlias) {
+            $result[$className] = [
+                'alias'       => $entityAlias->getAlias(),
+                'pluralAlias' => $entityAlias->getPluralAlias(),
+                'urlSafeName' => $entityClassNameHelper->getUrlSafeClassName($className)
+            ];
+        }
 
         return $this->handleView($this->view($result, Codes::HTTP_OK));
     }

@@ -12,23 +12,23 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityAliasResolver;
+    protected $entityClassNameHelper;
 
     /** @var EntityClassValidator */
     protected $validator;
 
     protected function setUp()
     {
-        $this->doctrineHelper      = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->validator = new EntityClassValidator(
             $this->doctrineHelper,
-            $this->entityAliasResolver
+            $this->entityClassNameHelper
         );
     }
 
@@ -45,6 +45,10 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->never())
             ->method('addViolation');
 
+        $this->entityClassNameHelper->expects($this->any())
+            ->method('resolveEntityClass')
+            ->with($value)
+            ->willReturn($value);
         $this->doctrineHelper->expects($this->any())
             ->method('isManageableEntity')
             ->with($value)
@@ -78,8 +82,8 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->never())
             ->method('addViolation');
 
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getClassByAlias')
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
             ->with($value)
             ->willReturn('Test\Entity');
         $this->doctrineHelper->expects($this->once())
@@ -103,8 +107,8 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->once())
             ->method('addViolation');
 
-        $this->entityAliasResolver->expects($this->once())
-            ->method('getClassByAlias')
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
             ->with($value)
             ->will($this->throwException(new EntityAliasNotFoundException()));
         $this->doctrineHelper->expects($this->never())
@@ -126,6 +130,10 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->once())
             ->method('addViolation');
 
+        $this->entityClassNameHelper->expects($this->once())
+            ->method('resolveEntityClass')
+            ->with($value)
+            ->willReturn($value);
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
             ->with($value)
