@@ -56,7 +56,7 @@ class EntityExtension extends \Twig_Extension
         $className = ClassUtils::getRealClass($object);
 
         return $escape
-            ? $this->entityRoutingHelper->encodeClassName($className)
+            ? $this->entityRoutingHelper->getUrlSafeClassName($className)
             : $className;
     }
 

@@ -59,7 +59,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetClassName($expectedClass, $object)
     {
         $this->entityRoutingHelper->expects($this->never())
-            ->method('encodeClassName');
+            ->method('getUrlSafeClassName');
 
         $this->assertEquals($expectedClass, $this->twigExtension->getClassName($object));
     }
@@ -93,7 +93,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedClass = str_replace('\\', '_', $class);
 
         $this->entityRoutingHelper->expects($this->once())
-            ->method('encodeClassName')
+            ->method('getUrlSafeClassName')
             ->with($class)
             ->will($this->returnValue($expectedClass));
 
@@ -135,7 +135,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($objectId));
 
         $this->entityRoutingHelper->expects($this->once())
-            ->method('encodeClassName')
+            ->method('getUrlSafeClassName')
             ->with($class)
             ->will($this->returnValue($expectedClass));
         $this->entityRoutingHelper->expects($this->once())

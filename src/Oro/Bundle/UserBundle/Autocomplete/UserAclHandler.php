@@ -91,7 +91,7 @@ class UserAclHandler implements SearchHandlerInterface
     public function search($query, $page, $perPage, $searchById = false)
     {
         list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
-        $entityClass = $this->decodeClassName($entityClass);
+        $entityClass = $this->resolveEntityClass($entityClass);
 
         $hasMore  = false;
         $object   = $entityId
@@ -357,7 +357,7 @@ class UserAclHandler implements SearchHandlerInterface
      *
      * @return string The class name
      *
-     * @deprecated since 1.6. Will be removed in 2.0. Use oro_entity.routing_helper->decodeClassName($entityName);
+     * @deprecated since 1.6. Will be removed in 2.0. Use oro_entity.routing_helper->resolveEntityClass($entityName);
      */
     public function decodeClassName($className)
     {

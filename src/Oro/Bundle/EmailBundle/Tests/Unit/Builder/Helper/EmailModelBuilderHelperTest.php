@@ -429,7 +429,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Class';
 
         $this->entityRoutingHelper->expects($this->once())
-            ->method('decodeClassName')
+            ->method('resolveEntityClass')
             ->with($className)
             ->willReturn($className);
 

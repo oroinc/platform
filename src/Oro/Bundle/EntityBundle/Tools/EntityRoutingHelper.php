@@ -51,7 +51,7 @@ class EntityRoutingHelper
      *
      * @return string The encoded class name
      *
-     * @deprecated since 1.9, use getUrlSafeClassName
+     * @deprecated since 1.8, use getUrlSafeClassName
      */
     public function encodeClassName($className)
     {
@@ -65,7 +65,7 @@ class EntityRoutingHelper
      *
      * @return string The class name
      *
-     * @deprecated since 1.9, use resolveEntityClass
+     * @deprecated since 1.8, use resolveEntityClass
      */
     public function decodeClassName($className)
     {

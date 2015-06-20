@@ -197,7 +197,7 @@ class EmailModelBuilderHelper
      */
     public function decodeClassName($className)
     {
-        return $this->entityRoutingHelper->decodeClassName($className);
+        return $this->entityRoutingHelper->resolveEntityClass($className);
     }
 
     /**
