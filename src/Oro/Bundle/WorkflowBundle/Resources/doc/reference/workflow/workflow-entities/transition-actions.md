@@ -319,11 +319,11 @@ Format Name
 
 **Alias:** format_name
 
-**Description:** Format object that implements locale name interfaces based on locale settings.
+**Description:** Format entity name based on locale settings.
 
 **Parameters:**
  - attribute - target path where result of action will be saved;
- - object - object that implements locale name interface;
+ - object - entity;
 
 **Configuration Example**
 ```

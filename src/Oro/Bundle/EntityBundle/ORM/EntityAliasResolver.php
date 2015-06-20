@@ -188,7 +188,7 @@ class EntityAliasResolver implements WarmableInterface
             . 'you can use "entity_aliases" or "entity_alias_exclusions" section in the '
             . '"Resources/config/oro/entity.yml" of your bundle '
             . 'or create a service to provide aliases for conflicting classes '
-            . 'and register it with the tag "entity.alias_provider" in DI container.';
+            . 'and register it with the tag "oro_entity.alias_provider" in DI container.';
     }
 
     /**

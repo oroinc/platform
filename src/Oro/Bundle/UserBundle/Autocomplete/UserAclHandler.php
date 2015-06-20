@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
-use Doctrine\ORM\Query;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
@@ -44,8 +43,8 @@ class UserAclHandler implements SearchHandlerInterface
     /** @var array */
     protected $fields = [];
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var AclVoter */
     protected $aclVoter;
@@ -91,7 +90,7 @@ class UserAclHandler implements SearchHandlerInterface
     public function search($query, $page, $perPage, $searchById = false)
     {
         list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
-        $entityClass = $this->resolveEntityClass($entityClass);
+        $entityClass = $this->decodeClassName($entityClass);
 
         $hasMore  = false;
         $object   = $entityId
@@ -174,11 +173,11 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param NameFormatter $nameFormatter
+     * @param EntityNameResolver $entityNameResolver
      */
-    public function setNameFormatter(NameFormatter $nameFormatter)
+    public function setEntityNameResolver(EntityNameResolver $entityNameResolver)
     {
-        $this->nameFormatter = $nameFormatter;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -193,10 +192,10 @@ class UserAclHandler implements SearchHandlerInterface
 
         $result['avatar'] = $this->getUserAvatar($user);
 
-        if (!$this->nameFormatter) {
-            throw new \RuntimeException('Name formatter must be configured');
+        if (!$this->entityNameResolver) {
+            throw new \RuntimeException('Name resolver must be configured');
         }
-        $result['fullName'] = $this->nameFormatter->format($user);
+        $result['fullName'] = $this->entityNameResolver->getName($user);
 
         return $result;
     }

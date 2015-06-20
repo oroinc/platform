@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Twig;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class EntityExtension extends \Twig_Extension
@@ -15,16 +16,22 @@ class EntityExtension extends \Twig_Extension
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
+
     /**
      * @param EntityIdAccessor    $entityIdAccessor
      * @param EntityRoutingHelper $entityRoutingHelper
+     * @param EntityNameResolver  $entityNameResolver
      */
     public function __construct(
         EntityIdAccessor $entityIdAccessor,
-        EntityRoutingHelper $entityRoutingHelper
+        EntityRoutingHelper $entityRoutingHelper,
+        EntityNameResolver $entityNameResolver
     ) {
         $this->entityIdAccessor    = $entityIdAccessor;
         $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->entityNameResolver  = $entityNameResolver;
     }
 
     /**
@@ -35,6 +42,16 @@ class EntityExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('oro_class_name', [$this, 'getClassName']),
             new \Twig_SimpleFunction('oro_action_params', [$this, 'getActionParams'])
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return [
+            new \Twig_SimpleFilter('oro_format_name', [$this, 'getEntityName'], ['is_safe' => ['html']])
         ];
     }
 
@@ -60,6 +77,12 @@ class EntityExtension extends \Twig_Extension
             : $className;
     }
 
+    /**
+     * @param object      $object
+     * @param string|null $action
+     *
+     * @return array
+     */
     public function getActionParams($object, $action = null)
     {
         if (!is_object($object)) {
@@ -71,6 +94,19 @@ class EntityExtension extends \Twig_Extension
             $this->entityIdAccessor->getIdentifier($object),
             $action
         );
+    }
+
+    /**
+     * Returns a text representation of the given entity.
+     *
+     * @param object $object
+     * @param string $locale
+     *
+     * @return string
+     */
+    public function getEntityName($object, $locale = null)
+    {
+        return $this->entityNameResolver->getName($object, null, $locale);
     }
 
     /**

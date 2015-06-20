@@ -33,7 +33,7 @@ class AssociationManagerTest extends OrmTestCase
     private $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $nameFormatter;
+    private $entityNameResolver;
 
     /** @var AssociationManager */
     private $associationManager;
@@ -66,23 +66,16 @@ class AssociationManagerTest extends OrmTestCase
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
-        $this->doctrineHelper = new DoctrineHelper($doctrine);
-        $this->nameFormatter  = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+        $this->doctrineHelper     = new DoctrineHelper($doctrine);
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $nameFormatterLink    =
-            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $nameFormatterLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->nameFormatter);
 
         $this->associationManager = new AssociationManager(
             $this->configManager,
             $this->eventDispatcher,
             $this->doctrineHelper,
-            $nameFormatterLink
+            $this->entityNameResolver
         );
     }
 
@@ -385,13 +378,13 @@ class AssociationManagerTest extends OrmTestCase
                 }
             );
 
-        $this->nameFormatter->expects($this->at(0))
-            ->method('getFormattedNameDQL')
-            ->with('target', $targetClass1)
+        $this->entityNameResolver->expects($this->at(0))
+            ->method('getNameDQL')
+            ->with($targetClass1, 'target')
             ->willReturn('CONCAT(target.firstName, CONCAT(\' \', target.lastName))');
-        $this->nameFormatter->expects($this->at(1))
-            ->method('getFormattedNameDQL')
-            ->with('target', $targetClass2)
+        $this->entityNameResolver->expects($this->at(1))
+            ->method('getNameDQL')
+            ->with($targetClass2, 'target')
             ->willReturn('CONCAT(target.firstName, CONCAT(\' \', target.lastName))');
 
         $result = $this->associationManager->getMultiAssociationsQueryBuilder(
@@ -455,13 +448,13 @@ class AssociationManagerTest extends OrmTestCase
                 }
             );
 
-        $this->nameFormatter->expects($this->at(0))
-            ->method('getFormattedNameDQL')
-            ->with('e', $ownerClass1)
+        $this->entityNameResolver->expects($this->at(0))
+            ->method('getNameDQL')
+            ->with($ownerClass1, 'e')
             ->willReturn('e.name');
-        $this->nameFormatter->expects($this->at(1))
-            ->method('getFormattedNameDQL')
-            ->with('e', $ownerClass2)
+        $this->entityNameResolver->expects($this->at(1))
+            ->method('getNameDQL')
+            ->with($ownerClass2, 'e')
             ->willReturn('e.name');
 
         $result = $this->associationManager->getMultiAssociationOwnersQueryBuilder(

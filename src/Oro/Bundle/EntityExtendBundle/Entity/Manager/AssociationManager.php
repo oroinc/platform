@@ -12,12 +12,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
 
 class AssociationManager
@@ -31,25 +30,25 @@ class AssociationManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ServiceLink */
-    protected $nameFormatterLink;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /**
-     * @param ConfigManager   $configManager
-     * @param EventDispatcher $eventDispatcher
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ServiceLink     $nameFormatterLink
+     * @param ConfigManager      $configManager
+     * @param EventDispatcher    $eventDispatcher
+     * @param DoctrineHelper     $doctrineHelper
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ConfigManager $configManager,
         EventDispatcher $eventDispatcher,
         DoctrineHelper $doctrineHelper,
-        ServiceLink $nameFormatterLink
+        EntityNameResolver $entityNameResolver
     ) {
-        $this->configManager     = $configManager;
-        $this->eventDispatcher   = $eventDispatcher;
-        $this->doctrineHelper    = $doctrineHelper;
-        $this->nameFormatterLink = $nameFormatterLink;
+        $this->configManager      = $configManager;
+        $this->eventDispatcher    = $eventDispatcher;
+        $this->doctrineHelper     = $doctrineHelper;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -174,7 +173,7 @@ class AssociationManager
             $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
             $subCriteria = $event->getCriteria();
 
-            $nameExpr = $this->getNameFormatter()->getFormattedNameDQL('target', $entityClass);
+            $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'target');
             $subQb    = $em->getRepository($associationOwnerClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
@@ -268,7 +267,7 @@ class AssociationManager
             $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
             $subCriteria = $event->getCriteria();
 
-            $nameExpr = $this->getNameFormatter()->getFormattedNameDQL('e', $ownerClass);
+            $nameExpr = $this->entityNameResolver->getNameDQL($ownerClass, 'e');
             $subQb    = $em->getRepository($ownerClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
@@ -350,14 +349,6 @@ class AssociationManager
                 $relation['target_entity'],
                 $associationKind
             );
-    }
-
-    /**
-     * @return DQLNameFormatter
-     */
-    protected function getNameFormatter()
-    {
-        return $this->nameFormatterLink->getService();
     }
 
     /**
