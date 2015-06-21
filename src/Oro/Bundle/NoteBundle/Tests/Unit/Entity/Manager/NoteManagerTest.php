@@ -19,7 +19,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
     protected $aclHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $attachmentManager;
@@ -29,19 +29,19 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->em                = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->em                 = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade    = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->aclHelper         = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+        $this->aclHelper          = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nameFormatter     = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+        $this->attachmentManager  = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -49,7 +49,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->securityFacade,
             $this->aclHelper,
-            $this->nameFormatter,
+            $this->entityNameResolver,
             $this->attachmentManager
         );
     }
@@ -137,12 +137,12 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
             ->with('VIEW', $this->identicalTo($updatedBy))
             ->will($this->returnValue(false));
 
-        $this->nameFormatter->expects($this->at(0))
-            ->method('format')
+        $this->entityNameResolver->expects($this->at(0))
+            ->method('getName')
             ->with($this->identicalTo($createdBy))
             ->will($this->returnValue('User1'));
-        $this->nameFormatter->expects($this->at(1))
-            ->method('format')
+        $this->entityNameResolver->expects($this->at(1))
+            ->method('getName')
             ->with($this->identicalTo($updatedBy))
             ->will($this->returnValue('User2'));
 

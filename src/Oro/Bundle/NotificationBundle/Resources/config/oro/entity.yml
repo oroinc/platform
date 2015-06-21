@@ -1,0 +1,11 @@
+oro_entity:
+    entity_aliases:
+        Oro\Bundle\NotificationBundle\Entity\Event:
+            alias:        notificationevent
+            plural_alias: notificationevents
+        Oro\Bundle\NotificationBundle\Entity\RecipientList:
+            alias:        notificationrecipientlist
+            plural_alias: notificationrecipientlist
+
+    entity_alias_exclusions:
+        - Oro\Bundle\NotificationBundle\Entity\SpoolItem

@@ -7,7 +7,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-class ApiFormHandler
+use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
+
+class ApiFormHandler implements FormAwareInterface
 {
     /**
      * @var FormInterface
@@ -35,6 +37,14 @@ class ApiFormHandler
         $this->form          = $form;
         $this->request       = $request;
         $this->entityManager = $entityManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        return $this->form;
     }
 
     /**

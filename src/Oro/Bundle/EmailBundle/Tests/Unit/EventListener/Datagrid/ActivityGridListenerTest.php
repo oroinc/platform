@@ -50,7 +50,7 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getParameters')
             ->will($this->returnValue($parameters));
         $this->entityRoutingHelper->expects($this->once())
-            ->method('decodeClassName')
+            ->method('resolveEntityClass')
             ->with($encodedEntityClass)
             ->will($this->returnValue($entityClass));
 
@@ -90,7 +90,7 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getParameters')
             ->will($this->returnValue($parameters));
         $this->entityRoutingHelper->expects($this->once())
-            ->method('decodeClassName')
+            ->method('resolveEntityClass')
             ->with($encodedEntityClass)
             ->will($this->returnValue($entityClass));
 

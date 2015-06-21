@@ -1,0 +1,4 @@
+oro_entity:
+    entity_alias_exclusions:
+        - Oro\Bundle\ConfigBundle\Entity\Config
+        - Oro\Bundle\ConfigBundle\Entity\ConfigValue

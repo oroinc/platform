@@ -7,6 +7,12 @@ parameters:
     oro_activity.widget_provider.activities.main.class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
     oro_activity.widget_provider.activities.menu.class: Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
     oro_activity.widget_provider.actions.class:         Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider
+    oro_activity.manager.activity.api.class:            Oro\Bundle\ActivityBundle\Entity\Manager\ActivityApiEntityManager
+    oro_activity.manager.activity_search.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager
+    oro_activity.manager.activity_entity.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
+    oro_activity.handler.delete.activity_entity.class:  Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandler
+    oro_activity.form.handler.activity_entity.api.class:  Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
+    oro_activity.manager.activity_target.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
 
 services:
     oro_activity.manager:
@@ -15,6 +21,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_entity.orm.entity_class_resolver
             - @oro_entity_config.provider.activity
+            - @oro_entity_config.provider.grouping
             - @oro_entity_config.provider.entity
             - @oro_entity_config.provider.extend
             - @oro_entity_extend.association_manager
@@ -60,3 +67,63 @@ services:
             - @oro_ui.placeholder.provider
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
+
+    oro_activity.routing.options_resolver.activity_association:
+        class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver
+        public: false
+        arguments:
+            - @oro_entity_config.provider.grouping
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: routing.options_resolver }
+
+    oro_activity.manager.activity.api:
+        class: %oro_activity.manager.activity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+
+    oro_activity.manager.activity_entity.api:
+        class: %oro_activity.manager.activity_entity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+
+    oro_activity.manager.activity_search.api:
+        class: %oro_activity.manager.activity_search.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @oro_search.index
+
+    oro_activity.handler.delete.activity_entity:
+        class: %oro_activity.handler.delete.activity_entity.class%
+        parent: oro_soap.handler.delete.abstract
+        calls:
+            - [setSecurityFacade, [@oro_security.security_facade]]
+
+    oro_activity.form.handler.activity_entity.api:
+        class: %oro_activity.form.handler.activity_entity.api.class%
+        scope: request
+        arguments:
+            - @oro_activity.form.activity_entity.api
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_activity.form.activity_entity.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - targets
+            - 'oro_related_entity_standalone_collection_api'
+
+    oro_activity.manager.activity_target.api:
+        class: %oro_activity.manager.activity_target.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager

@@ -101,7 +101,7 @@ class EmailTemplateController extends RestController
         $token        = $securityContext->getToken();
         $organization = $token->getOrganizationContext();
 
-        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
