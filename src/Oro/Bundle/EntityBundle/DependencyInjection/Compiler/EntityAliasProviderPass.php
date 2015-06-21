@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class EntityAliasProviderPass implements CompilerPassInterface
 {
     const RESOLVER_SERVICE = 'oro_entity.entity_alias_resolver';
-    const PROVIDER_TAG_NAME = 'entity.alias_provider';
+    const PROVIDER_TAG_NAME = 'oro_entity.alias_provider';
 
     /**
      * {@inheritdoc}

@@ -348,7 +348,7 @@ services:
             - @oro_entity_config.config_manager
             - @event_dispatcher
             - @oro_entity.doctrine_helper
-            - @oro_entity_extend.dql.formatter.name.link
+            - @oro_entity.entity_name_resolver
         lazy: true
 
     oro_entity_extend.dql.formatter.name.link:
@@ -362,4 +362,4 @@ services:
             - @oro_entity.entity_alias_config_bag
             - @oro_entity_config.config_manager
         tags:
-            - { name: entity.alias_provider, priority: 90 }
+            - { name: oro_entity.alias_provider, priority: 90 }

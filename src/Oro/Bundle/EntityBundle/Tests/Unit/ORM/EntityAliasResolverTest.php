@@ -367,7 +367,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
             . 'used for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
             . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the tag "entity.alias_provider" in DI container.'
+            . 'with the tag "oro_entity.alias_provider" in DI container.'
         );
 
         $this->entityAliasResolver->getAll();
@@ -435,7 +435,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
             . 'used for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
             . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the tag "entity.alias_provider" in DI container.'
+            . 'with the tag "oro_entity.alias_provider" in DI container.'
         );
 
         $this->entityAliasResolver->getAll();
@@ -503,7 +503,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
             . 'used as an alias for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
             . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the tag "entity.alias_provider" in DI container.'
+            . 'with the tag "oro_entity.alias_provider" in DI container.'
         );
 
         $this->entityAliasResolver->getAll();
@@ -571,7 +571,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
             . 'used as a plural alias for the entity "Test\Entity1". To solve this problem you can use "entity_aliases"'
             . ' or "entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
             . 'create a service to provide aliases for conflicting classes and register it '
-            . 'with the tag "entity.alias_provider" in DI container.'
+            . 'with the tag "oro_entity.alias_provider" in DI container.'
         );
 
         $this->entityAliasResolver->getAll();

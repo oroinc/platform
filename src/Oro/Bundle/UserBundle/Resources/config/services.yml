@@ -119,7 +119,7 @@ services:
             - @oro_security.ownership_tree_provider
             - @?security.acl.voter.basic_permissions
         calls:
-            - [ setNameFormatter, [@oro_locale.formatter.name] ]
+            - [ setEntityNameResolver, [@oro_entity.entity_name_resolver] ]
 
     oro_user.autocomplete.user.search_acl_handler:
         parent: oro_user.autocomplete.user.search_acl_handler.abstract

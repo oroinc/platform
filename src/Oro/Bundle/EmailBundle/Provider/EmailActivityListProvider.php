@@ -14,6 +14,7 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -34,8 +35,8 @@ class EmailActivityListProvider implements
     /** @var ServiceLink */
     protected $doctrineRegistryLink;
 
-    /** @var ServiceLink */
-    protected $nameFormatterLink;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var Router */
     protected $router;
@@ -52,7 +53,7 @@ class EmailActivityListProvider implements
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
-     * @param ServiceLink         $nameFormatterLink
+     * @param EntityNameResolver  $entityNameResolver
      * @param Router              $router
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
@@ -61,7 +62,7 @@ class EmailActivityListProvider implements
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $doctrineRegistryLink,
-        ServiceLink $nameFormatterLink,
+        EntityNameResolver $entityNameResolver,
         Router $router,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
@@ -69,7 +70,7 @@ class EmailActivityListProvider implements
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
-        $this->nameFormatterLink    = $nameFormatterLink;
+        $this->entityNameResolver   = $entityNameResolver;
         $this->router               = $router;
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
@@ -206,7 +207,7 @@ class EmailActivityListProvider implements
 
         if ($email->getFromEmailAddress()->hasOwner()) {
             $owner = $email->getFromEmailAddress()->getOwner();
-            $data['headOwnerName'] = $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
+            $data['headOwnerName'] = $data['ownerName'] = $this->entityNameResolver->getName($owner);
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
                 ->getRoute('view');
             if (null !== $route) {

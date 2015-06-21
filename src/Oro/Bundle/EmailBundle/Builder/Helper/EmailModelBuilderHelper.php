@@ -13,18 +13,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 
 /**
- * Class EmailModelBuilderHelper
- *
- * @package Oro\Bundle\EmailBundle\Builder\Helper
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailModelBuilderHelper
@@ -40,9 +36,9 @@ class EmailModelBuilderHelper
     protected $emailAddressHelper;
 
     /**
-     * @var NameFormatter
+     * @var EntityNameResolver
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
      * @var SecurityContext
@@ -72,7 +68,7 @@ class EmailModelBuilderHelper
     /**
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param EmailAddressHelper  $emailAddressHelper
-     * @param NameFormatter       $nameFormatter
+     * @param EntityNameResolver  $entityNameResolver
      * @param SecurityContext     $securityContext
      * @param EmailAddressManager $emailAddressManager
      * @param EntityManager       $entityManager
@@ -82,7 +78,7 @@ class EmailModelBuilderHelper
     public function __construct(
         EntityRoutingHelper $entityRoutingHelper,
         EmailAddressHelper $emailAddressHelper,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         SecurityContext $securityContext,
         EmailAddressManager $emailAddressManager,
         EntityManager $entityManager,
@@ -91,7 +87,7 @@ class EmailModelBuilderHelper
     ) {
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->emailAddressHelper  = $emailAddressHelper;
-        $this->nameFormatter       = $nameFormatter;
+        $this->entityNameResolver  = $entityNameResolver;
         $this->securityContext     = $securityContext;
         $this->emailAddressManager = $emailAddressManager;
         $this->entityManager       = $entityManager;
@@ -118,7 +114,7 @@ class EmailModelBuilderHelper
                     if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
                         return;
                     }
-                    $ownerName = $this->nameFormatter->format($owner);
+                    $ownerName = $this->entityNameResolver->getName($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
 
@@ -134,7 +130,7 @@ class EmailModelBuilderHelper
                     if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
                         return;
                     }
-                    $ownerName = $this->nameFormatter->format($owner);
+                    $ownerName = $this->entityNameResolver->getName($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
                     }
@@ -209,7 +205,7 @@ class EmailModelBuilderHelper
     {
         return $this->emailAddressHelper->buildFullEmailAddress(
             $user->getEmail(),
-            $this->nameFormatter->format($user)
+            $this->entityNameResolver->getName($user)
         );
     }
 

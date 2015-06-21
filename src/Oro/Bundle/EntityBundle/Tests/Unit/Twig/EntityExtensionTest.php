@@ -14,6 +14,9 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityRoutingHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityNameResolver;
+
     /** @var EntityExtension */
     protected $twigExtension;
 
@@ -25,8 +28,15 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->entityNameResolver  = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->twigExtension = new EntityExtension($this->entityIdAccessor, $this->entityRoutingHelper);
+        $this->twigExtension = new EntityExtension(
+            $this->entityIdAccessor,
+            $this->entityRoutingHelper,
+            $this->entityNameResolver
+        );
     }
 
     protected function tearDown()
@@ -48,6 +58,16 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_action_params', $function->getName());
         $this->assertEquals([$this->twigExtension, 'getActionParams'], $function->getCallable());
+    }
+
+    public function testGetFilters()
+    {
+        $filters = $this->twigExtension->getFilters();
+
+        $this->assertCount(1, $filters);
+
+        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
+        $this->assertEquals('oro_format_name', $filters[0]->getName());
     }
 
     /**
@@ -146,6 +166,23 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $expected,
             $this->twigExtension->getActionParams($object, $action)
+        );
+    }
+
+    public function testGetEntityName()
+    {
+        $entity         = new \stdClass();
+        $locale         = 'fr_CA';
+        $expectedResult = 'John Doe';
+
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
+            ->with($this->identicalTo($entity), null, $locale)
+            ->will($this->returnValue($expectedResult));
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->twigExtension->getEntityName($entity, $locale)
         );
     }
 
