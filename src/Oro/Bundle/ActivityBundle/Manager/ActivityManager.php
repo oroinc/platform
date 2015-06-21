@@ -20,6 +20,9 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ActivityManager
 {
     /** @var DoctrineHelper */
