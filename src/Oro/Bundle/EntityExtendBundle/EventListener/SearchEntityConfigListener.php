@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Type;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -73,9 +74,22 @@ class SearchEntityConfigListener
      */
     protected function addReindexJob($entityClass)
     {
-        $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entityClass]);
-        $em  = $this->registry->getManager();
-        $em->persist($job);
-        $em->flush($job);
+        $job = $this->registry->getRepository('JMSJobQueueBundle:Job')->createQueryBuilder('job')
+            ->select('job')
+            ->where('job.command = :command')
+            ->andWhere('job.args = :args')
+            ->andWhere('job.state in (\'pending\', \'running\')')
+            ->setParameter('command', ReindexCommand::COMMAND_NAME)
+            ->setParameter('args', ['class' => $entityClass], Type::JSON_ARRAY)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$job) {
+            $job = new Job(ReindexCommand::COMMAND_NAME, ['class' => $entityClass]);
+            $em  = $this->registry->getManager();
+            $em->persist($job);
+            $em->flush($job);
+        }
     }
 }

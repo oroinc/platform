@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\Entity;
 
-use Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException;
-use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider;
-use Oro\Bundle\SSOBundle\Tests\Unit\Stub\TestingUser;
-use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Serializer\Exception\Exception;
+
+use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider;
+use Oro\Bundle\SSOBundle\Tests\Unit\Stub\TestingUser;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,11 +28,30 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $userManager;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $om;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $repository;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $cm;
 
+    /**
+     * @var OAuthUserProvider
+     */
     protected $oauthProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $registry;
 
     protected function setUp()
     {
@@ -61,11 +81,17 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo(static::USER_CLASS))
             ->will($this->returnValue($class));
 
+
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValue($this->om));
+
         $class->expects($this->any())
             ->method('getName')
             ->will($this->returnValue(static::USER_CLASS));
 
-        $this->userManager = new UserManager(static::USER_CLASS, $this->om, $ef);
+        $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $ef);
 
         $this->oauthProvider = new OAuthUserProvider($this->userManager, $this->cm);
     }
@@ -132,7 +158,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testLoadUserByOAuthShouldReturnExceptionIfUserIsDisabled()
     {
@@ -279,7 +305,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException
+     * @expectedException \Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException
      */
     public function testLoadUserByOAuthShouldThrowExceptionIfEmailDomainIsDisabled()
     {

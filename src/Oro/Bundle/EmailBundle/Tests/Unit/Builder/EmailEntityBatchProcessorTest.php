@@ -85,17 +85,6 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->batch->addFolder($folder2);
     }
 
-    public function testAddOrigin()
-    {
-        $origin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')->getMock();
-        $origin->expects($this->any())->method('getId')->will($this->returnValue(1));
-        $this->batch->addOrigin($origin);
-        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'origins'));
-
-        $this->assertEquals(1, $this->batch->getOrigin(1)->getId());
-        $this->assertNull($this->batch->getOrigin(123));
-    }
-
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -103,7 +92,6 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $origin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')->getMock();
         $origin->expects($this->any())->method('getId')->will($this->returnValue(1));
-        $this->batch->addOrigin($origin);
 
         $folder = new EmailFolder();
         $folder->setName('Exist');

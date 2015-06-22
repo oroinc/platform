@@ -21,6 +21,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -232,7 +233,7 @@ class EmailController extends Controller
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
      * @Acl(
-     *      id="oro_email_edit",
+     *      id="oro_email_update",
      *      type="entity",
      *      class="OroEmailBundle:Email",
      *      permission="EDIT"
@@ -425,11 +426,12 @@ class EmailController extends Controller
      */
     protected function getTargetEntityConfig($encode = true)
     {
+        /** @var EntityRoutingHelper $entityRoutingHelper */
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
         $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
         if ($encode) {
-            $targetEntityClass = $entityRoutingHelper->encodeClassName($targetEntityClass);
+            $targetEntityClass = $entityRoutingHelper->getUrlSafeClassName($targetEntityClass);
         }
         if (null === $targetEntityClass || null === $targetEntityId) {
             return [];

@@ -2,39 +2,47 @@
 
 namespace Oro\Bundle\SoapBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
+use Oro\Bundle\SoapBundle\Serializer\EntitySerializer;
 
 class ApiEntityManager
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $class;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $om;
 
-    /**
-     * @var ClassMetadata|ClassMetadataInfo
-     */
+    /** @var ClassMetadata|ClassMetadataInfo */
     protected $metadata;
 
-    /**
-     * @var EventDispatcher
-     */
+    /** @var EventDispatcher */
     protected $eventDispatcher;
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
+
+    /** @var EntitySerializer */
+    protected $entitySerializer;
 
     /**
      * Constructor
@@ -44,8 +52,20 @@ class ApiEntityManager
      */
     public function __construct($class, ObjectManager $om)
     {
-        $this->om       = $om;
-        $this->metadata = $this->om->getClassMetadata($class);
+        $this->om = $om;
+        if ($class) {
+            $this->setClass($class);
+        }
+    }
+
+    /**
+     * Sets the type of the entity this manager is responsible for
+     *
+     * @param string $entityClass The FQCN of an entity
+     */
+    public function setClass($entityClass)
+    {
+        $this->metadata = $this->om->getClassMetadata($entityClass);
         $this->class    = $this->metadata->getName();
     }
 
@@ -57,6 +77,49 @@ class ApiEntityManager
     public function setEventDispatcher(EventDispatcher $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * Sets the doctrine helper
+     *
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * Sets the entity class name helper
+     *
+     * @param EntityClassNameHelper $entityClassNameHelper
+     */
+    public function setEntityClassNameHelper(EntityClassNameHelper $entityClassNameHelper)
+    {
+        $this->entityClassNameHelper = $entityClassNameHelper;
+    }
+
+    /**
+     * Sets the entity serializer
+     *
+     * @param EntitySerializer $entitySerializer
+     */
+    public function setEntitySerializer(EntitySerializer $entitySerializer)
+    {
+        $this->entitySerializer = $entitySerializer;
+    }
+
+    /**
+     * Resolves the entity class name
+     *
+     * @param string $entityName    The class name, url-safe class name, alias or plural alias of the entity
+     * @param bool   $isPluralAlias Determines whether the entity name may be a singular of plural alias
+     *
+     * @return string The FQCN of an entity
+     */
+    public function resolveEntityClass($entityName, $isPluralAlias = false)
+    {
+        return $this->entityClassNameHelper->resolveEntityClass($entityName, $isPluralAlias);
     }
 
     /**
@@ -89,16 +152,18 @@ class ApiEntityManager
     {
         $object = $this->getRepository()->find($id);
 
-        // dispatch oro_api.request.find.after event
-        $event = new FindAfter($object);
-        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+        if ($object) {
+            $this->checkFoundEntity($object);
+        }
 
         return $object;
     }
 
     /**
-     * @param  object                    $entity
+     * @param object $entity
+     *
      * @return int
+     *
      * @throws \InvalidArgumentException
      */
     public function getEntityId($entity)
@@ -165,20 +230,15 @@ class ApiEntityManager
      * @param null  $orderBy
      * @param array $joins
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder|SqlQueryBuilder|SearchQuery|null
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
         $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
 
         $qb = $this->getRepository()->createQueryBuilder('e');
+        $this->applyJoins($qb, $joins);
 
-        if (count($joins) > 0) {
-            $qb->distinct(true);
-        }
-        foreach ($joins as $join) {
-            $qb->leftJoin('e.' . $join, $join);
-        }
         // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
         // http://www.doctrine-project.org/jira/browse/DDC-2798
         // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
@@ -186,6 +246,77 @@ class ApiEntityManager
         // $qb->addCriteria($criteria);
 
         return $qb;
+    }
+
+    /**
+     * Serializes the list of entities
+     *
+     * @param QueryBuilder $qb A query builder is used to get data
+     *
+     * @return array
+     */
+    public function serialize(QueryBuilder $qb)
+    {
+        return $this->entitySerializer->serialize($qb, $this->getSerializationConfig());
+    }
+
+    /**
+     * Serializes single entity
+     *
+     * @param mixed $id Entity id
+     *
+     * @return array|null
+     */
+    public function serializeOne($id)
+    {
+        $qb = $this->getRepository()->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', $id);
+
+        $config = $this->getSerializationConfig();
+        $this->entitySerializer->prepareQuery($qb, $config);
+        $entity = $qb->getQuery()->getResult();
+        if (!$entity) {
+            return null;
+        }
+
+        $this->checkFoundEntity($entity[0]);
+
+        $serialized = $this->entitySerializer->serializeEntities((array)$entity, $this->class, $config);
+
+        return $serialized[0];
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @throws AccessDeniedException if access to the given entity is denied
+     */
+    protected function checkFoundEntity($entity)
+    {
+        // dispatch oro_api.request.find.after event
+        $event = new FindAfter($entity);
+        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+    }
+
+    /**
+     * Indicates whether the entity serializer is configured
+     *
+     * @return bool
+     */
+    public function isSerializerConfigured()
+    {
+        return null !== $this->getSerializationConfig();
+    }
+
+    /**
+     * Returns the configuration of the entity serializer is used for process GET reruests
+     *
+     * @return array|null
+     */
+    protected function getSerializationConfig()
+    {
+        return null;
     }
 
     /**
@@ -198,17 +329,9 @@ class ApiEntityManager
      */
     protected function prepareQueryCriteria($limit = 10, $page = 1, $criteria = [], $orderBy = null)
     {
-        $page    = $page > 0 ? $page : 1;
-        $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
+        $page = $page > 0 ? $page : 1;
 
-        if (is_array($criteria)) {
-            $newCriteria = new Criteria();
-            foreach ($criteria as $fieldName => $value) {
-                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
-            }
-
-            $criteria = $newCriteria;
-        }
+        $criteria = $this->normalizeCriteria($criteria);
 
         // dispatch oro_api.request.get_list.before event
         $event = new GetListBefore($criteria, $this->class);
@@ -224,6 +347,29 @@ class ApiEntityManager
     }
 
     /**
+     * Checks the given criteria and converts them to Criteria object if needed
+     *
+     * @param Criteria|array|null $criteria
+     *
+     * @return Criteria
+     */
+    protected function normalizeCriteria($criteria)
+    {
+        return $this->doctrineHelper->normalizeCriteria($criteria);
+    }
+
+    /**
+     * Applies the given joins for the query builder
+     *
+     * @param QueryBuilder $qb
+     * @param array|null   $joins
+     */
+    protected function applyJoins($qb, $joins)
+    {
+        $this->doctrineHelper->applyJoins($qb, $joins);
+    }
+
+    /**
      * Get order by
      *
      * @param $orderBy
@@ -231,25 +377,20 @@ class ApiEntityManager
      */
     protected function getOrderBy($orderBy)
     {
-        return $orderBy ? $orderBy : $this->getDefaultOrderBy();
+        return $orderBy ?: $this->getDefaultOrderBy();
     }
 
     /**
-     * Get offset by page
+     * Calculates the page offset
      *
-     * @param  int|null $page
-     * @param  int      $limit
+     * @param int $page  The page number
+     * @param int $limit The maximum number of items per page
+     *
      * @return int
      */
     protected function getOffset($page, $limit)
     {
-        if (!$page !== null) {
-            $page = $page > 0
-                ? ($page - 1) * $limit
-                : 0;
-        }
-
-        return $page;
+        return $this->doctrineHelper->getPageOffset($page, $limit);
     }
 
     /**
@@ -260,7 +401,7 @@ class ApiEntityManager
     protected function getDefaultOrderBy()
     {
         $ids = $this->metadata->getIdentifierFieldNames();
-        $orderBy = $ids ? array() : null;
+        $orderBy = $ids ? [] : null;
         foreach ($ids as $pk) {
             $orderBy[$pk] = 'ASC';
         }

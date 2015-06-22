@@ -12,9 +12,24 @@ class EmailControllerTest extends WebTestCase
 {
     const INCORRECT_ID = -1;
 
+    /** @var array */
+    protected $email = [
+        'folders'    => [
+            ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
+        ],
+        'subject'    => 'New email',
+        'messageId'  => 'test@email-bundle.func-test',
+        'from'       => '"Address 1" <1@example.com>',
+        'to'         => ['"Address 2" <2@example.com>', '3@example.com'],
+        'cc'         => '2@example.com; "Address 3" <3@example.com>',
+        'importance' => 'low',
+        'body'       => 'Test body',
+        'bodyType'   => 'text'
+    ];
+
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData']);
     }
 
@@ -23,14 +38,25 @@ class EmailControllerTest extends WebTestCase
      */
     public function testCget()
     {
-        $this->client->request(
-            'GET',
-            $this->getUrl(
-                'oro_api_get_emails'
-            )
-        );
+        $url = $this->getUrl('oro_api_get_emails');
+        $this->client->request('GET', $url);
 
-        $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $emails = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($emails);
+        $this->assertCount(10, $emails);
+
+        $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId']);
+        $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId']);
+        $this->assertCount(9, $this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
+        $this->assertCount(2, $this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
+        $this->assertCount(8, $this->getJsonResponseContent($this->client->getResponse(), 200));
     }
 
     public function testGet()
@@ -46,110 +72,131 @@ class EmailControllerTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result['id']);
         $this->assertEquals('My Web Store Introduction', $result['subject']);
-        $this->assertContains('Thank you for signing up to My Web Store!', $result['emailBody']['content']);
+        $this->assertContains('Thank you for signing up to My Web Store!', $result['body']);
 
         return $result['id'];
     }
 
-    public function testGetAssociation()
-    {
-        $this->getAssosiaction(self::INCORRECT_ID);
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
-
-        $id = $this->getReference('email_1')->getId();
-        $this->getAssosiaction($id);
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-
-        $this->assertNotEmpty($result);
-        $this->assertCount(2, $result);
-    }
-
-    public function testDeleteAssociation()
-    {
-        $userId = $this->getReference('simple_user2')->getId();
-        $this->deleteAssociation(self::INCORRECT_ID, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
-
-        $id = $this->getReference('email_1')->getId();
-        $userId = $this->getReference('simple_user2')->getId();
-        $this->deleteAssociation($id, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        return  $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        $this->assertCount(1, $result);
-    }
-
-    public function testPostAssociation()
-    {
-        $userId = $this->getReference('simple_user2')->getId();
-        $this->postAssociation(self::INCORRECT_ID, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
-
-        $id = $this->getReference('email_1')->getId();
-        $userId = $this->getReference('simple_user2')->getId();
-
-        $this->getAssosiaction($id);
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertCount(1, $result);
-
-        $this->postAssociation($id, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->getAssosiaction($id);
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertNotEmpty($result);
-        $this->assertCount(2, $result);
-    }
-
-
-    protected function getAssosiactionData($id)
+    public function testGetEmailContext()
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_email_associations_data', ['entityId' => $id])
+            $this->getUrl('oro_api_get_email_context', ['id' => $this->getReference('email_1')->getId()])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        return $result;
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertCount(2, $entities);
     }
 
-
-    protected function getAssosiaction($id)
+    public function testCreateEmail()
     {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_email_association', ['entityId' => $id])
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
+        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertTrue($email['head']);
+        $this->assertFalse($email['seen']);
+
+        return $response['id'];
+    }
+
+    /**
+     * @depends testCreateEmail
+     *
+     * @param integer $id
+     */
+    public function testCreateForExistingEmail($id)
+    {
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->assertEquals($response['id'], $id, 'Existing email should be updated');
+    }
+
+    /**
+     * @depends testCreateEmail
+     */
+    public function testCreateForExistingEmailButWithChangedProtectedProperty()
+    {
+        $newEmail = array_merge($this->email, ['subject' => 'New subject']);
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
+
+        $this->assertEquals(
+            $response['message'],
+            'The Subject cannot be changed for already existing email.'
+            . ' Existing value: "New email". New value: "New subject".'
         );
     }
 
-    protected function deleteAssociation($enityId, $targetClassName, $targetId)
+    /**
+     * @depends testCreateEmail
+     *
+     * @param integer $id
+     *
+     * @return int
+     */
+    public function testUpdateEmail($id)
     {
-        $param = [
-            'entityId' => $enityId,
-            'targetClassName'=>$targetClassName,
-            'targetId'=>$targetId
+        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
+        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($email['seen']);
+
+        $folders   = $email['folders'];
+        $folders[] = [
+            'fullName' => 'INBOX \ Folder1',
+            'name'     => 'Folder1',
+            'type'     => 'inbox'
+        ];
+        $folders[] = [
+            'origin'   => $folders[0]['origin'],
+            'fullName' => 'INBOX \ Folder2',
+            'name'     => 'Folder2',
+            'type'     => 'inbox'
         ];
 
+
         $this->client->request(
-            'DELETE',
-            $this->getUrl('oro_api_delete_email_association', $param)
+            'PUT',
+            $this->getUrl('oro_api_put_email', ['id' => $id]),
+            [
+                'seen'    => 1,
+                'folders' => $folders
+            ]
         );
+        $result = $this->client->getResponse();
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+
+        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
+        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertCount(3, $email['folders']);
+        $this->assertTrue($email['seen']);
+
+        return $id;
     }
 
-    protected function postAssociation($enityId, $targetClassName, $targetId)
+    /**
+     * @depends testUpdateEmail
+     *
+     * @param integer $id
+     */
+    public function testUpdateEmailProtectedProperty($id)
     {
-        $param = [
-            'entityId' => $enityId,
-            'targetClassName'=>$targetClassName,
-            'targetId'=>$targetId
-        ];
-
         $this->client->request(
-            'POST',
-            $this->getUrl('oro_api_post_email_associations', $param)
+            'PUT',
+            $this->getUrl('oro_api_put_email', ['id' => $id]),
+            [
+                'head' => 0
+            ]
+        );
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
+
+        $this->assertEquals(
+            $response['message'],
+            'The Head cannot be changed for already existing email.'
+            . ' Existing value: "true". New value: "false".'
         );
     }
 }

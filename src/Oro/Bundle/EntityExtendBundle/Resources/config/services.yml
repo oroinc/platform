@@ -39,6 +39,8 @@ parameters:
     oro_entity_extend.importexport.normalizer.enum.class:     Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
     oro_entity_extend.listener.before_map_object_search_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener
     oro_entity_extend.listener.search_entity_config_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
+    oro_entity_extend.association_manager.class:              Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager
+    oro_entity_extend.entity_alias_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -326,15 +328,38 @@ services:
             - { name: oro_importexport.normalizer, priority: 20 }
 
     oro_entity_extend.listener.before_map_object_search_listener:
-          class: %oro_entity_extend.listener.before_map_object_search_listener.class%
-          arguments:
+        class: %oro_entity_extend.listener.before_map_object_search_listener.class%
+        arguments:
             - @oro_entity_config.config_manager
-          tags:
-              - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: prepareEntityMapEvent }
+        tags:
+            - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: prepareEntityMapEvent }
 
     oro_entity_extend.listener.search_entity_config_listener:
-            class: %oro_entity_extend.listener.search_entity_config_listener.class%
-            arguments:
-                - @doctrine
-            tags:
-                - { name: kernel.event_listener, event: entity_config.persist.config, method: persistConfig, priority: -255 }
+        class: %oro_entity_extend.listener.search_entity_config_listener.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: kernel.event_listener, event: entity_config.persist.config, method: persistConfig, priority: -255 }
+
+    oro_entity_extend.association_manager:
+        class: %oro_entity_extend.association_manager.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            - @event_dispatcher
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_name_resolver
+        lazy: true
+
+    oro_entity_extend.dql.formatter.name.link:
+        tags:
+            - { name: oro_service_link, service: oro_locale.dql.formatter.name }
+
+    oro_entity_extend.entity_alias_provider:
+        class: %oro_entity_extend.entity_alias_provider.class%
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_config_bag
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity.alias_provider, priority: 90 }

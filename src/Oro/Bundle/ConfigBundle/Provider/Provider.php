@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
@@ -14,8 +15,8 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 abstract class Provider implements ProviderInterface
 {
-    /** @var array */
-    protected $config;
+    /** @var ConfigBag */
+    protected $configBag;
 
     /** @var array */
     protected $processedTrees = array();
@@ -27,12 +28,12 @@ abstract class Provider implements ProviderInterface
     protected $securityFacade;
 
     /**
-     * @param array          $config
+     * @param ConfigBag      $configBag
      * @param SecurityFacade $securityFacade
      */
-    public function __construct($config, SecurityFacade $securityFacade)
+    public function __construct(ConfigBag $configBag, SecurityFacade $securityFacade)
     {
-        $this->config         = $config;
+        $this->configBag      = $configBag;
         $this->securityFacade = $securityFacade;
     }
 
@@ -43,7 +44,8 @@ abstract class Provider implements ProviderInterface
     {
         $sections = empty($path) ? [] : explode('/', $path);
         array_unshift($sections, ProcessorDecorator::API_TREE_ROOT);
-        $tree            = & $this->config;
+
+        $tree            = $this->configBag->getConfig();
         $rootSectionName = null;
         foreach ($sections as $section) {
             if (!isset($tree[$section])) {
@@ -88,11 +90,12 @@ abstract class Provider implements ProviderInterface
     protected function getTreeData($treeName, $correctFieldsLevel)
     {
         if (!isset($this->processedTrees[$treeName])) {
-            if (!isset($this->config[ProcessorDecorator::TREE_ROOT][$treeName])) {
+            $treeRoot = $this->configBag->getTreeRoot($treeName);
+            if ($treeRoot === false) {
                 throw new ItemNotFoundException(sprintf('Tree "%s" is not defined.', $treeName));
             }
 
-            $definition                             = $this->config[ProcessorDecorator::TREE_ROOT][$treeName];
+            $definition                             = $treeRoot;
             $data                                   = $this->buildGroupNode($definition, $correctFieldsLevel);
             $tree                                   = new GroupNodeDefinition($treeName, $definition, $data);
             $this->processedTrees[$tree->getName()] = $tree;
@@ -117,11 +120,11 @@ abstract class Provider implements ProviderInterface
         $level++;
         foreach ($nodes as $name => $node) {
             if (is_array($node) && isset($node['children'])) {
-                if (!isset($this->config[ProcessorDecorator::GROUPS_NODE][$name])) {
+                $group = $this->configBag->getGroupsNode($name);
+                if ($group === false) {
                     throw new ItemNotFoundException(sprintf('Group "%s" is not defined.', $name));
                 }
 
-                $group = $this->config[ProcessorDecorator::GROUPS_NODE][$name];
                 $data  = $this->buildGroupNode($node['children'], $correctFieldsLevel, $level);
                 $node  = new GroupNodeDefinition($name, array_merge($group, $nodes[$name]), $data);
                 $node->setLevel($level);
@@ -150,11 +153,12 @@ abstract class Provider implements ProviderInterface
      */
     protected function buildFieldNode($node)
     {
-        if (!isset($this->config[ProcessorDecorator::FIELDS_ROOT][$node])) {
+        $fieldsRoot = $this->configBag->getFieldsRoot($node);
+        if ($fieldsRoot === false) {
             throw new ItemNotFoundException(sprintf('Field "%s" is not defined.', $node));
         }
 
-        return new FieldNodeDefinition($node, $this->config[ProcessorDecorator::FIELDS_ROOT][$node]);
+        return new FieldNodeDefinition($node, $fieldsRoot);
     }
 
     /**
@@ -194,5 +198,13 @@ abstract class Provider implements ProviderInterface
         }
 
         return $section;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataTransformer($key)
+    {
+        return $this->configBag->getDataTransformer($key);
     }
 }

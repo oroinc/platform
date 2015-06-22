@@ -1,0 +1,9 @@
+oro_entity:
+    entity_alias_exclusions:
+        - Oro\Bundle\SearchBundle\Entity\IndexDatetime
+        - Oro\Bundle\SearchBundle\Entity\IndexDecimal
+        - Oro\Bundle\SearchBundle\Entity\IndexInteger
+        - Oro\Bundle\SearchBundle\Entity\IndexText
+        - Oro\Bundle\SearchBundle\Entity\Item
+        - Oro\Bundle\SearchBundle\Entity\Query
+        - Oro\Bundle\SearchBundle\Entity\UpdateEntity

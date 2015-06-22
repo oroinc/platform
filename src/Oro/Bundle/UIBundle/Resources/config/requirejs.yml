@@ -76,6 +76,12 @@ config:
             'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/jquery-timepicker-l10n':
             'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker'
+        'chaplin':
+            'backbone': 'backbone'
+        'oroui/js/app/components/base/component':
+            'backbone': 'backbone'
+            'chaplin': 'chaplin'
+
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'

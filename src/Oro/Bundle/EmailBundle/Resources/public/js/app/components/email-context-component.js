@@ -5,6 +5,8 @@ define(function (require) {
     var EmailContextComponent,
         $ = require('jquery'),
         _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
+        routing = require('routing'),
         widgetManager = require('oroui/js/widget-manager'),
         messenger = require('oroui/js/messenger'),
         mediator = require('oroui/js/mediator'),
@@ -66,18 +68,20 @@ define(function (require) {
 
             gridWidget._showLoading();
             $.ajax({
-                url: this.options.apiUrl,
+                url: routing.generate('oro_api_post_activity_relation', {
+                    activity: 'emails', id: this.options.sourceEntityId
+                }),
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                    entityId: this.options.sourceEntityId,
-                    targetClassName: contextTargetClass,
-                    targetId: id
+                    targets: [{ entity: contextTargetClass, id: id }]
                 }
-            }).done(function (response) {
-                messenger.notificationFlashMessage(response.status, response.message);
+            }).done(function () {
+                messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
                 mediator.trigger('widget_success:activity_list:item:update');
                 mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
+            }).fail(function (response) {
+                messenger.showErrorMessage(__('oro.ui.item_add_error'), response.responseJSON || {});
             }).always(function () {
                 gridWidget._hideLoading();
                 if (!dialogWidgetName) {

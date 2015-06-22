@@ -16,9 +16,9 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -39,8 +39,8 @@ class CommentApiManager extends ApiEntityManager
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var AttachmentManager */
     protected $attachmentManager;
@@ -52,32 +52,32 @@ class CommentApiManager extends ApiEntityManager
     protected $configManager;
 
     /**
-     * @param Registry          $doctrine
-     * @param SecurityFacade    $securityFacade
-     * @param NameFormatter     $nameFormatter
-     * @param Pager             $pager
-     * @param EventDispatcher   $eventDispatcher
-     * @param AttachmentManager $attachmentManager
-     * @param AclHelper         $aclHelper
-     * @param ConfigManager     $configManager
+     * @param Registry           $doctrine
+     * @param SecurityFacade     $securityFacade
+     * @param EntityNameResolver $entityNameResolver
+     * @param Pager              $pager
+     * @param EventDispatcher    $eventDispatcher
+     * @param AttachmentManager  $attachmentManager
+     * @param AclHelper          $aclHelper
+     * @param ConfigManager      $configManager
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         Pager $pager,
         EventDispatcher $eventDispatcher,
         AttachmentManager $attachmentManager,
         AclHelper $aclHelper,
         ConfigManager $configManager
     ) {
-        $this->em                = $doctrine->getManager();
-        $this->securityFacade    = $securityFacade;
-        $this->nameFormatter     = $nameFormatter;
-        $this->pager             = $pager;
-        $this->attachmentManager = $attachmentManager;
-        $this->aclHelper         = $aclHelper;
-        $this->configManager     = $configManager;
+        $this->em                 = $doctrine->getManager();
+        $this->securityFacade     = $securityFacade;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->pager              = $pager;
+        $this->attachmentManager  = $attachmentManager;
+        $this->aclHelper          = $aclHelper;
+        $this->configManager      = $configManager;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -180,7 +180,7 @@ class CommentApiManager extends ApiEntityManager
         $ownerId   = '';
 
         if ($entity->getOwner()) {
-            $ownerName = $this->nameFormatter->format($entity->getOwner());
+            $ownerName = $this->entityNameResolver->getName($entity->getOwner());
             $ownerId   = $entity->getOwner()->getId();
         }
 
@@ -188,7 +188,7 @@ class CommentApiManager extends ApiEntityManager
         $editorId   = '';
 
         if ($entity->getUpdatedBy()) {
-            $editorName = $this->nameFormatter->format($entity->getUpdatedBy());
+            $editorName = $this->entityNameResolver->getName($entity->getUpdatedBy());
             $editorId   = $entity->getUpdatedBy()->getId();
         }
 

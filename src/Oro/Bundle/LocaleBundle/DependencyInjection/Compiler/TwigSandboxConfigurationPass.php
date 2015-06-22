@@ -14,7 +14,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
     const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
     const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.email_renderer';
     const DATE_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.date_time';
-    const NAME_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.name';
+    const NAME_FORMAT_EXTENSION_SERVICE_KEY = 'oro_entity.twig.extension.entity';
     const INTL_EXTENSION_SERVICE_KEY = 'twig.extension.intl';
 
     /**

@@ -10,6 +10,11 @@
   -ms-user-select: none;
   user-select: none;
 }
+.workflow-step-editor, .workflow-step-viewer {
+  [role="tabpanel"] {
+    padding: 20px;
+  }
+}
 .workflow-step-editor {
   margin-top: -28px;
 }
@@ -27,6 +32,7 @@
   .jsplumb-box {
     z-index: 100;
     position: absolute;
+    cursor: move;
     border: 1px solid #4F719A;
     border-radius: 5px;
     width: @box-width;
@@ -105,7 +111,6 @@
 
   &.workflow-flowchart-editor {
     .jsplumb-box {
-      cursor: move;
       &:hover {
         background: #7C99BE;
       }

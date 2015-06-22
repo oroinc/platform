@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -21,40 +22,46 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityClassNameHelper = new EntityClassNameHelper($entityAliasResolver);
+
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->urlGenerator   = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
 
         $this->entityRoutingHelper = new EntityRoutingHelper(
+            $entityClassNameHelper,
             $this->doctrineHelper,
             $this->urlGenerator
         );
     }
 
     /**
-     * @dataProvider encodeClassNameProvider
+     * @dataProvider getUrlSafeClassNameProvider
      */
-    public function testEncodeClassName($src, $expected)
+    public function testGetUrlSafeClassName($src, $expected)
     {
         $this->assertEquals(
             $expected,
-            $this->entityRoutingHelper->encodeClassName($src)
+            $this->entityRoutingHelper->getUrlSafeClassName($src)
         );
     }
 
     /**
-     * @dataProvider decodeClassNameProvider
+     * @dataProvider resolveEntityClassProvider
      */
-    public function testDecodeClassName($src, $expected)
+    public function testResolveEntityClass($src, $expected)
     {
         $this->assertEquals(
             $expected,
-            $this->entityRoutingHelper->decodeClassName($src)
+            $this->entityRoutingHelper->resolveEntityClass($src)
         );
     }
 
-    public function encodeClassNameProvider()
+    public function getUrlSafeClassNameProvider()
     {
         return [
             ['Acme\Bundle\TestClass', 'Acme_Bundle_TestClass'],
@@ -62,7 +69,7 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function decodeClassNameProvider()
+    public function resolveEntityClassProvider()
     {
         return [
             ['Acme_Bundle_TestClass', 'Acme\Bundle\TestClass'],

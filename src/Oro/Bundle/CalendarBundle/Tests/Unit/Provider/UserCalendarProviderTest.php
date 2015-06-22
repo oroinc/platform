@@ -14,7 +14,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarEventNormalizer;
@@ -27,7 +27,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper          = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nameFormatter           = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver      = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $this->calendarEventNormalizer =
@@ -37,7 +37,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->provider = new UserCalendarProvider(
             $this->doctrineHelper,
-            $this->nameFormatter,
+            $this->entityNameResolver,
             $this->calendarEventNormalizer
         );
     }
@@ -104,12 +104,12 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getResult')
             ->will($this->returnValue($calendars));
 
-        $this->nameFormatter->expects($this->at(0))
-            ->method('format')
+        $this->entityNameResolver->expects($this->at(0))
+            ->method('getName')
             ->with($this->identicalTo($user1))
             ->will($this->returnValue('John Doo'));
-        $this->nameFormatter->expects($this->at(1))
-            ->method('format')
+        $this->entityNameResolver->expects($this->at(1))
+            ->method('getName')
             ->with($this->identicalTo($user2))
             ->will($this->returnValue('John Smith'));
 

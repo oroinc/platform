@@ -19,11 +19,11 @@ abstract class SoapController extends SoapGetController implements
     SoapApiCrudInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function handleUpdateRequest($id)
     {
-        return $this->processForm($this->getEntity($id));
+        return null !== $this->processForm($this->getEntity($id));
     }
 
     /**
@@ -35,7 +35,7 @@ abstract class SoapController extends SoapGetController implements
     public function handleCreateRequest()
     {
         $entity = call_user_func_array(array($this, 'createEntity'), func_get_args());
-        $this->processForm($entity);
+        $entity = $this->processForm($entity);
 
         return $this->getManager()->getEntityId($entity);
     }
@@ -52,7 +52,7 @@ abstract class SoapController extends SoapGetController implements
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function handleDeleteRequest($id)
     {
@@ -70,18 +70,25 @@ abstract class SoapController extends SoapGetController implements
     /**
      * Form processing
      *
-     * @param  mixed      $entity Entity object
-     * @return bool       True on success
+     * @param  mixed $entity Entity object
+     *
+     * @return mixed The instance of saved entity
+     *
      * @throws \SoapFault
      */
     protected function processForm($entity)
     {
         $this->fixRequestAttributes($entity);
-        if (!$this->getFormHandler()->process($entity)) {
-            throw new \SoapFault('BAD_REQUEST', $this->getFormErrors($this->getForm()));
+
+        $result = $this->getFormHandler()->process($entity);
+        if (is_object($result)) {
+            return $result;
+        } elseif (true === $result) {
+            // some form handlers may return true/false rather that saved entity
+            return $entity;
         }
 
-        return true;
+        throw new \SoapFault('BAD_REQUEST', $this->getFormErrors($this->getForm()));
     }
 
     /**

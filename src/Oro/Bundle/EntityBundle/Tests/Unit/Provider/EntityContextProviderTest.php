@@ -83,7 +83,7 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->configProvider->expects($this->any())
             ->method('getConfig')
-            ->with($this->routingHelper->encodeClassName($this->entityClass))
+            ->with($this->routingHelper->getUrlSafeClassName($this->entityClass))
             ->will($this->returnValue($this->configProvider));
 
         $this->configProvider->expects($this->any())

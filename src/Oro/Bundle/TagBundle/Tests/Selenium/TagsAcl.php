@@ -63,7 +63,7 @@ class TagsAcl extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - User Management - System');
+            ->assertTitle('All - Users - User Management - System');
 
         return $userName;
     }
@@ -81,11 +81,11 @@ class TagsAcl extends Selenium2TestCase
         $login->openTags('Oro\Bundle\TagBundle')
             ->add()
             ->assertTitle('Create Tag - Tags - System')
-            ->setTagname($tagName)
+            ->setTagName($tagName)
             ->setOwner('admin')
             ->save()
             ->assertMessage('Tag saved')
-            ->assertTitle('Tags - System')
+            ->assertTitle('All - Tags - System')
             ->close();
 
         return $tagName;

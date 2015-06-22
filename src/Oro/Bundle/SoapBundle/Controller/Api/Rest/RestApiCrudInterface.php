@@ -11,25 +11,25 @@ interface RestApiCrudInterface extends RestApiReadInterface
     const ACTION_DELETE = 'delete';
 
     /**
-     * Create item.
+     * Handles CREATE request for a single item
      *
      * @return Response
      */
     public function handleCreateRequest();
 
     /**
-     * Update item.
+     * Handles UPDATE request for a single item
      *
-     * @param  mixed $id
+     * @param mixed $id The id of an entity to be updated
      *
      * @return Response
      */
     public function handleUpdateRequest($id);
 
     /**
-     * Delete item.
+     * Handles DELETE request for a single item
      *
-     * @param  mixed $id
+     * @param mixed $id The id of an entity to be deleted
      *
      * @return Response
      */
