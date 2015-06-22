@@ -33,7 +33,7 @@ class AclPermissionController extends Controller
     public function aclAccessLevelsAction($oid)
     {
         if (strpos($oid, 'entity:') === 0) {
-            $oid = $this->get('oro_entity.routing_helper')->resolveEntityClass($oid);
+            $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass(substr($oid, 7));
         }
 
         $levels = $this
