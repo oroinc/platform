@@ -25,6 +25,7 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Tools\EmailHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 
 /**
  * Class EmailController
@@ -369,6 +370,26 @@ class EmailController extends Controller
         }
 
         return new JsonResponse(['successful' => (bool)$emailUser]);
+    }
+
+    /**
+     * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
+     * @AclAncestor("oro_email_email_mark")
+     *
+     */
+    public function markMassActionAction($gridName, $actionName)
+    {
+        /** @var MassActionDispatcher $massActionDispatcher */
+        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
+
+        $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $this->getRequest());
+
+        $data = [
+            'successful' => $response->isSuccessful(),
+            'message'    => $response->getMessage()
+        ];
+
+        return new JsonResponse(array_merge($data, $response->getOptions()));
     }
 
     /**
