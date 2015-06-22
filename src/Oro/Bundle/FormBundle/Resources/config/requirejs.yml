@@ -50,12 +50,10 @@ config:
 
         'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
 
-        'oroform/js/select2-config': 'bundles/oroform/js/select2-config.js'
         'oroform/js/multiple-entity': 'bundles/oroform/js/multiple-entity.js'
         'oroform/js/multiple-entity/view': 'bundles/oroform/js/multiple-entity/view.js'
         'oroform/js/multiple-entity/model': 'bundles/oroform/js/multiple-entity/model.js'
         'oroform/js/multiple-entity/collection': 'bundles/oroform/js/multiple-entity/collection.js'
-        'oroform/js/select2_relevancy_order_handler': 'bundles/oroform/js/select2-relevancy-order-handler.js'
         'oroform/js/create-select-type-handler': 'bundles/oroform/js/create-select-type-handler.js'
         'oroform/js/select-create-inline-type-handler': 'bundles/oroform/js/select-create-inline-type-handler.js'
 
@@ -66,6 +64,10 @@ config:
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
         'oroform/js/app/views/datepair-view': 'bundles/oroform/js/app/views/datepair-view.js'
+        'oro/select2-component': 'bundles/oroform/js/app/components/select2-component.js'
+        'oro/select2-autocomplete-component': 'bundles/oroform/js/app/components/select2-autocomplete-component.js'
+        'oro/select2-relation-component': 'bundles/oroform/js/app/components/select2-relation-component.js'
+        'oro/select2-grid-component': 'bundles/oroform/js/app/components/select2-grid-component.js'
 build:
     paths:
         'tinymce/tinymce.min': 'empty:'

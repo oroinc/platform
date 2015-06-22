@@ -37,6 +37,10 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('oro_entity.exclusions', $config['exclusions']);
         $container->setParameter('oro_entity.virtual_fields', $config['virtual_fields']);
         $container->setParameter('oro_entity.virtual_relations', $config['virtual_relations']);
+        $container->setParameter('oro_entity.entity_aliases', $config['entity_aliases']);
+        $container->setParameter('oro_entity.entity_alias_exclusions', $config['entity_alias_exclusions']);
+        $container->setParameter('oro_entity.entity_name_formats', $config['entity_name_formats']);
+        $container->setParameter('oro_entity.entity_name_format.default', 'full');
     }
 
     /**
@@ -87,16 +91,33 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
         $virtualFields = [];
         $virtualRelations = [];
         $exclusions = [];
+        $entityAliases = [];
+        $entityAliasExclusions = [];
+        $textRepresentationTypes = [];
         foreach ($resources as $resource) {
             $virtualFields = $this->mergeEntityConfiguration($resource, 'virtual_fields', $virtualFields);
             $virtualRelations = $this->mergeEntityConfiguration($resource, 'virtual_relations', $virtualRelations);
             $exclusions = $this->mergeEntityConfiguration($resource, 'exclusions', $exclusions);
+            $entityAliases = $this->mergeEntityConfiguration($resource, 'entity_aliases', $entityAliases);
+            $entityAliasExclusions = $this->mergeEntityConfiguration(
+                $resource,
+                'entity_alias_exclusions',
+                $entityAliasExclusions
+            );
+            $textRepresentationTypes = $this->mergeEntityConfiguration(
+                $resource,
+                'entity_name_formats',
+                $textRepresentationTypes
+            );
         }
 
         return [
             'exclusions' => $exclusions,
             'virtual_fields' => $virtualFields,
             'virtual_relations' => $virtualRelations,
+            'entity_aliases' => $entityAliases,
+            'entity_alias_exclusions' => $entityAliasExclusions,
+            'entity_name_formats' => $textRepresentationTypes
         ];
     }
 

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
@@ -14,10 +14,6 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 /**
- * Class LoggedUserVariablesProvider
- *
- * @package Oro\Bundle\EmailBundle\Provider
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
@@ -28,8 +24,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -37,18 +33,19 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /**
      * @param TranslatorInterface $translator
      * @param SecurityFacade      $securityFacade
-     * @param NameFormatter       $nameFormatter
+     * @param EntityNameResolver  $entityNameResolver
+     * @param ConfigManager       $configManager
      */
     public function __construct(
         TranslatorInterface $translator,
         SecurityFacade $securityFacade,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         ConfigManager $configManager
     ) {
-        $this->translator     = $translator;
-        $this->securityFacade = $securityFacade;
-        $this->nameFormatter  = $nameFormatter;
-        $this->configManager  = $configManager;
+        $this->translator         = $translator;
+        $this->securityFacade     = $securityFacade;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->configManager      = $configManager;
     }
 
     /**
@@ -186,7 +183,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     {
         if ($user instanceof FullNameInterface) {
             if ($addValue) {
-                $val = $this->nameFormatter->format($user);
+                $val = $this->entityNameResolver->getName($user);
             } else {
                 $val = [
                     'type'  => 'string',

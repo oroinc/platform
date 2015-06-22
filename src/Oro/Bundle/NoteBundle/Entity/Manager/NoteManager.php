@@ -5,7 +5,7 @@ namespace Oro\Bundle\NoteBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -23,31 +23,31 @@ class NoteManager
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var AttachmentManager */
     protected $attachmentManager;
 
     /**
-     * @param EntityManager     $em
-     * @param SecurityFacade    $securityFacade
-     * @param AclHelper         $aclHelper
-     * @param NameFormatter     $nameFormatter
-     * @param AttachmentManager $attachmentManager
+     * @param EntityManager      $em
+     * @param SecurityFacade     $securityFacade
+     * @param AclHelper          $aclHelper
+     * @param EntityNameResolver $entityNameResolver
+     * @param AttachmentManager  $attachmentManager
      */
     public function __construct(
         EntityManager $em,
         SecurityFacade $securityFacade,
         AclHelper $aclHelper,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         AttachmentManager $attachmentManager
     ) {
-        $this->em                = $em;
-        $this->securityFacade    = $securityFacade;
-        $this->aclHelper         = $aclHelper;
-        $this->nameFormatter     = $nameFormatter;
-        $this->attachmentManager = $attachmentManager;
+        $this->em                 = $em;
+        $this->securityFacade     = $securityFacade;
+        $this->aclHelper          = $aclHelper;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->attachmentManager  = $attachmentManager;
     }
 
     /**
@@ -110,7 +110,7 @@ class NoteManager
     protected function addUser(array &$result, $attrName, $user)
     {
         if ($user) {
-            $result[$attrName]               = $this->nameFormatter->format($user);
+            $result[$attrName]               = $this->entityNameResolver->getName($user);
             $result[$attrName . '_id']       = $user->getId();
             $result[$attrName . '_viewable'] = $this->securityFacade->isGranted('VIEW', $user);
             $avatar                          = $user->getAvatar();

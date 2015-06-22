@@ -101,7 +101,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                         ['@add' => null]
                     ]
                 ],
-                '$exception' => '"add" action requires at least 3 argument(s) to be passed, 1 given at "actions.0"'
+                '$exception' => '"add" method requires at least 3 argument(s) to be passed, 1 given at "actions.0"'
             ],
             '@addTree with invalid structure'                                => [
                 '$data'      => [
@@ -137,7 +137,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ],
-                '$exception' => 'Unknown argument(s) for "add" action given: test at "actions.1"'
+                '$exception' => 'Unknown argument(s) for "add" method given: test at "actions.1"'
             ],
         ];
     }

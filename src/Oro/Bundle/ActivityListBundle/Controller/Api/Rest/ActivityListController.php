@@ -45,7 +45,7 @@ class ActivityListController extends RestController
      */
     public function cgetAction($entityClass, $entityId)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $this->getRequest()->get('filter');
 
         $results = [

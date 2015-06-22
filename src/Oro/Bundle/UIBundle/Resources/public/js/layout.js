@@ -7,11 +7,11 @@ define(function (require) {
     var layout, pageRenderedCbPool, document, console,
         $ = require('jquery'),
         _ = require('underscore'),
-        bootstrap = require('bootstrap'),
         __ = require('orotranslation/js/translator'),
         scrollspy = require('oroui/js/scrollspy'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
+    require('bootstrap');
     require('jquery-ui');
     require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
@@ -67,18 +67,11 @@ define(function (require) {
          *  - tooltips
          *  - popovers
          *  - scrollspy
-         *  - page components
          *
          * @param {string|HTMLElement|jQuery.Element} container
-         * @param {Backbone.View|Chaplin.View} parentView
-         * @returns {jQuery.Promise}
          */
-        init: function (container, parentView) {
-            var promise, $container;
-
-            if (!parentView) {
-                throw new Error('Parent view is required for page components initialization');
-            }
+        init: function (container) {
+            var $container;
 
             $container = $(container);
             this.styleForm($container);
@@ -88,163 +81,6 @@ define(function (require) {
             $container.find('[data-toggle="tooltip"]').tooltip();
 
             this.initPopover($container.find('label'));
-
-            promise = this.initPageComponents($container, parentView);
-            this._bindContainerChanges($container, parentView);
-
-            return promise;
-        },
-
-        /**
-         * Initializes components defined in HTML of the container
-         * and attaches them to passed parent view instance
-         *
-         * @param {jQuery.Element} $container
-         * @param {Backbone.View|Chaplin.View} parentView
-         * @returns {jQuery.Promise}
-         */
-        initPageComponents: function ($container, parentView) {
-            var loadPromises, initDeferred, $pageComponentNodes, preloadQueue;
-            // console.groupCollapsed('container', $container.attr('class'), {html: $container.clone().html('')[0].outerHTML});
-            loadPromises = [];
-            initDeferred = $.Deferred();
-            $pageComponentNodes = $container.find('[data-page-component-module]');
-
-            if ($pageComponentNodes.length) {
-                preloadQueue = [];
-                $pageComponentNodes.each(function () {
-                    var $elem, module, name, options, loadDeferred, $separateLayout;
-
-                    $elem = $(this);
-                    module = $elem.data('pageComponentModule');
-                    // find nearest marked container with separate layout
-                    $separateLayout = $elem.closest('[data-layout="separate"]');
-                    // if it placed inside container - prevent component creation from here
-                    if ($separateLayout.length &&
-                            $.contains($container[0], $separateLayout[0]) &&
-                            this !== $separateLayout[0]) {
-                        // optimize load time - push components to preload queue
-                        preloadQueue.push(module);
-                        return;
-                    }
-
-                    // console.log('pageComponent', $container.attr('class'), {html: $elem.clone().html('')[0].outerHTML});
-                    name = $elem.data('pageComponentName');
-                    options = $elem.data('pageComponentOptions') || {};
-                    options._sourceElement = $elem;
-                    if (name) {
-                        options.name = name;
-                    }
-                    options.parent = parentView;
-
-                    $elem
-                        .attr('data-bound-component', module)
-                        .removeData('pageComponentModule')
-                        .removeData('pageComponentOptions')
-                        .removeAttr('data-page-component-module')
-                        .removeAttr('data-page-component-options');
-                    loadDeferred = $.Deferred();
-
-                    require([module], function (component) {
-                        var result;
-                        if (parentView.disposed) {
-                            loadDeferred.resolve();
-                            return;
-                        }
-                        if (typeof component.init === 'function') {
-                            result = component.init(options);
-                        } else {
-                            result = component(options);
-                        }
-                        loadDeferred.resolve(result);
-                    }, function (error) {
-                        if (tools.debug) {
-                            if (console && console.log) {
-                                console.log(error.stack);
-                            }
-                            throw error;
-                        } else {
-                            // prevent interface from blocking by loader in production mode
-                            mediator.execute('showMessage', 'error',
-                                __('Cannot load module ') + '"' + error.requireModules[0] + '"'
-                            );
-                            loadDeferred.resolve();
-                        }
-                    });
-
-                    loadPromises.push(loadDeferred.promise());
-                });
-
-                // optimize load time - preload components in separate layouts
-                require(preloadQueue, _.noop);
-
-                $.when.apply($, loadPromises).always(function () {
-                    var initPromises = _.flatten(_.toArray(arguments), true);
-                    $.when.apply($, initPromises).always(function () {
-                        var components = _.compact(_.flatten(_.toArray(arguments), true));
-                        initDeferred.resolve(components);
-                    });
-                });
-            } else {
-                initDeferred.resolve();
-            }
-            // console.groupEnd();
-            return initDeferred.promise();
-        },
-
-        /**
-         * Subscribes to the container changes events
-         *  - on 'content:changed' event -- updates layout
-         *  - on 'content:remove' event -- disposes related components (if they are left undisposed)
-         *
-         * @param {jQuery.Element} $container
-         * @param {Backbone.View|Chaplin.View} parentView
-         * @protected
-         */
-        _bindContainerChanges: function ($container, parentView) {
-            var namespace = '.init-components',
-                parentViewDataKey = 'pageComponentRelatedView',
-                storedParentView = $container.data(parentViewDataKey);
-
-            if (storedParentView && storedParentView !== parentView) {
-                throw new Error('Attempt to init container with another parent view');
-            } else if (storedParentView) {
-                // handlers are already bound
-                return;
-            }
-
-            $container.data(parentViewDataKey, parentView);
-
-            // if the container catches content changed event -- updates its layout
-            $container.on('content:changed' + namespace, function (e) {
-                if (e.isDefaultPrevented()) {
-                    return;
-                }
-                e.preventDefault();
-                layout.init($container, parentView);
-            });
-
-            // if the container catches content remove event -- disposes related components
-            $container.on('content:remove' + namespace, function (e) {
-                if (e.isDefaultPrevented()) {
-                    return;
-                }
-                e.preventDefault();
-                $(e.target).find('[data-bound-component]').each(function () {
-                    var $elem = $(this),
-                        component = $elem.data('componentInstance');
-                    if (component) {
-                        component.dispose();
-                    }
-                });
-            });
-
-            // once parent view gets disposed -- break the container bound
-            parentView.once('dispose', function () {
-                $container.removeData(parentViewDataKey);
-                $container.off(namespace);
-            });
-
         },
 
         initPopover: function (container) {

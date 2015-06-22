@@ -243,7 +243,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $testCount = 22;
 
-        $entityClass = uniqid('testClassName');
+        $entityClass = 'Test\Class';
         $controller  = $this->getMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface');
         $context     = $this->createContext($controller);
         $om          = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
