@@ -24,8 +24,6 @@ parameters:
     oro_attachment.provider.attachment.class:             Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
     oro_attachment.config.class:                          Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
-    oro_attachment.emailtemplate.variable_provider.entity.class: Oro\Bundle\AttachmentBundle\Provider\EntityImageFieldsProvider
-
     oro_attachment.twig.formatter.base64_content.class:   Oro\Bundle\AttachmentBundle\Twig\Formatter\ImageContentFormatter
     oro_attachment.twig.formatter.image_url.class:        Oro\Bundle\AttachmentBundle\Twig\Formatter\ImageUrlFormatter
 

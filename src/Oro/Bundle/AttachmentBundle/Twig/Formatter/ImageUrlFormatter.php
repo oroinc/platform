@@ -11,9 +11,6 @@ class ImageUrlFormatter implements FormatterInterface
     const WIDTH_ATTRIBUTE  = 'width';
     const HEIGHT_ATTRIBUTE = 'height';
 
-    const DEFAULT_WIDTH  = 100;
-    const DEFAULT_HEIGHT = 100;
-
     /** @var AttachmentManager */
     protected $manager;
 
@@ -38,14 +35,14 @@ class ImageUrlFormatter implements FormatterInterface
      */
     public function format($parameter, array $formatterArguments = [])
     {
-        $height = self::DEFAULT_HEIGHT;
+        $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT;
         if (array_key_exists(self::HEIGHT_ATTRIBUTE, $formatterArguments)) {
-            $height = $formatterArguments[self::HEIGHT_ATTRIBUTE];
+            $height = (int) $formatterArguments[self::HEIGHT_ATTRIBUTE];
         }
 
-        $width = self::DEFAULT_WIDTH;
+        $width = AttachmentManager::DEFAULT_IMAGE_WIDTH;
         if (array_key_exists(self::WIDTH_ATTRIBUTE, $formatterArguments)) {
-            $width = $formatterArguments[self::WIDTH_ATTRIBUTE];
+            $width = (int) $formatterArguments[self::WIDTH_ATTRIBUTE];
         }
 
         return $this->manager->getResizedImageUrl($parameter, $width, $height);

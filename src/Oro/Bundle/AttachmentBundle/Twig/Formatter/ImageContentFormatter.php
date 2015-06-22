@@ -68,7 +68,6 @@ class ImageContentFormatter implements FormatterInterface
         return true;
     }
 
-
     /**
      * @param string $mimeType
      * @param string $content
