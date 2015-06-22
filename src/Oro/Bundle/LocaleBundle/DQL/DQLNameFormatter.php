@@ -42,12 +42,13 @@ class DQLNameFormatter
     }
 
     /**
-     * @param string $alias     Alias in SELECT or JOIN statement
-     * @param string $className Entity FQCN
+     * @param string      $alias     Alias in SELECT or JOIN statement
+     * @param string      $className Entity FQCN
+     * @param string|null $locale
      *
      * @return string
      */
-    public function getFormattedNameDQL($alias, $className)
+    public function getFormattedNameDQL($alias, $className, $locale = null)
     {
         $nameFormat = $this->nameFormatter->getNameFormat();
         $nameParts  = $this->extractNamePartsPaths($className, $alias);

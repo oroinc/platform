@@ -83,12 +83,12 @@ class RoleListener
             return true;
         }
 
-        $roleValue = strtoupper($role->getPrefix() . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand())));
+        $roleValue = $role->generateUniqueRole();
         if ($repository->findOneBy(['role' => $roleValue])) {
             return false;
         }
 
-        $role->setRole($roleValue);
+        $role->setRole($roleValue, false);
 
         return true;
     }

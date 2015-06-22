@@ -25,7 +25,7 @@ define([
             this.template = _.template($('#email-context-activity-list').html());
             this.$container = options.$container;
             this.$containerContextTargets = $(options.$container.context).find('.email-context-activity-items');
-            this.collection = new EmailContextActivityCollection('oro_api_delete_email_association');
+            this.collection = new EmailContextActivityCollection('oro_api_delete_activity_relation');
             this.initEvents();
 
             if (this.options.contextTargets) {
@@ -52,7 +52,7 @@ define([
 
         doRefresh: function() {
             var self = this;
-            var  url = routing.generate('oro_api_get_email_associations_data', {entityId: this.options.entityId });
+            var  url = routing.generate('oro_api_get_email_context', {id: this.options.entityId });
             $.ajax({
                 method: 'GET',
                 url: url,
@@ -91,12 +91,7 @@ define([
                 $view.find('i.icon-remove').click(function() {
                     model.destroy({
                         success: function(model, response) {
-                            if (response.status != 'success') {
-                                var $view = self.$containerContextTargets.find('[data-cid="' + model.cid + '"]');
-                                $view.remove();
-                                self.render();
-                            }
-                            messenger.notificationFlashMessage(response.status, response.message);
+                            messenger.notificationFlashMessage('success', __('oro.email.contexts.removed'));
 
                             if (self.options.target &&
                                 model.get('targetClassName') == self.options.target.className &&
@@ -107,11 +102,7 @@ define([
                             }
                         },
                         error: function(model, response) {
-                            if (response.status == 'error') {
-                                messenger.notificationFlashMessage('error', response.message);
-                            } else {
-                                messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
-                            }
+                            messenger.showErrorMessage(__('oro.ui.item_delete_error'), response.responseJSON || {});
                         }
                     });
                 });

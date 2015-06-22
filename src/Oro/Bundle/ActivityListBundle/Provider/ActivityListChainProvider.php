@@ -192,7 +192,7 @@ class ActivityListChainProvider
             }
 
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
-            $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
+            $templates[$this->routingHelper->getUrlSafeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
                 'template'     => $template,

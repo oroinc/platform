@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
@@ -20,15 +20,15 @@ class SendEmail extends AbstractSendEmail
      * @param ContextAccessor    $contextAccessor
      * @param Processor          $emailProcessor
      * @param EmailAddressHelper $emailAddressHelper
-     * @param NameFormatter      $nameFormatter
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
         EmailAddressHelper $emailAddressHelper,
-        NameFormatter $nameFormatter
+        EntityNameResolver $entityNameResolver
     ) {
-        parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $nameFormatter);
+        parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $entityNameResolver);
 
     }
 

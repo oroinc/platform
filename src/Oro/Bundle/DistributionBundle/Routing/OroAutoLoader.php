@@ -2,38 +2,37 @@
 
 namespace Oro\Bundle\DistributionBundle\Routing;
 
-use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-use Symfony\Component\Routing\RouteCollection;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+
+use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 
 class OroAutoLoader extends AbstractLoader
 {
     /**
-     * {@inheritdoc}
+     * @param KernelInterface               $kernel
+     * @param RouteOptionsResolverInterface $routeOptionsResolver
      */
-    public function load($file, $type = null)
-    {
-        $routes = new RouteCollection();
-        $bundles = $this->kernel->getBundles();
-
-        foreach ($bundles as $bundle) {
-            try {
-                $path = $this->locator->locate('Resources/config/oro/routing.yml', $bundle->getPath());
-            } catch (\InvalidArgumentException $e) {
-                continue;
-            }
-
-            $routes->addCollection(parent::load($path, $type));
-        }
-
-        return $this->dispatchEvent(RouteCollectionEvent::AUTOLOAD, $routes);
+    public function __construct(
+        KernelInterface $kernel,
+        RouteOptionsResolverInterface $routeOptionsResolver
+    ) {
+        parent::__construct(
+            $kernel,
+            $routeOptionsResolver,
+            ['Resources/config/oro/routing.yml'],
+            'oro_auto'
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function load($file, $type = null)
     {
-        return 'oro_auto' === $type;
+        $routes = parent::load($file, $type);
+
+        return $this->dispatchEvent(RouteCollectionEvent::AUTOLOAD, $routes);
     }
 }

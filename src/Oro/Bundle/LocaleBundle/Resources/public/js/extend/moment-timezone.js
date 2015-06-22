@@ -8,7 +8,7 @@ define(function (require) {
      * Getter/Setter for moment's timezone
      *
      * @param {string} name of timezone
-     * @param {boolean} keepTime flag if datetime have to be preserved as it is on timezone change
+     * @param {boolean=} keepTime flag if datetime have to be preserved as it is on timezone change
      * @returns {Moment|string|undefined} updated moment object or timezone name (if it is defined)
      */
     moment.fn.tz = function (name, keepTime) {
