@@ -16,6 +16,8 @@ parameters:
 
     oro_locale.dql.formatter.name.class:  Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter
 
+    oro_locale.entity_name_provider.class: Oro\Bundle\LocaleBundle\Provider\EntityNameProvider
+
     oro_locale.form.type.country.class:  Oro\Bundle\LocaleBundle\Form\Type\CountryType
     oro_locale.form.type.currency.class: Oro\Bundle\LocaleBundle\Form\Type\CurrencyType
     oro_locale.form.type.locale.class:   Oro\Bundle\LocaleBundle\Form\Type\LocaleType
@@ -29,7 +31,6 @@ parameters:
     oro_locale.twig.locale.class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
     oro_locale.twig.calendar.class: Oro\Bundle\LocaleBundle\Twig\CalendarExtension
     oro_locale.twig.date_time.class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
-    oro_locale.twig.name.class: Oro\Bundle\LocaleBundle\Twig\NameExtension
     oro_locale.twig.address.class: Oro\Bundle\LocaleBundle\Twig\AddressExtension
     oro_locale.twig.number.class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
 
@@ -144,6 +145,10 @@ services:
         arguments:
             - @oro_locale.settings
 
+    oro_locale.formatter.name.link:
+        tags:
+            - { name: oro_service_link, service: oro_locale.formatter.name }
+
     oro_locale.formatter.address:
         class: %oro_locale.formatter.address.class%
         arguments:
@@ -165,6 +170,10 @@ services:
         class: %oro_locale.dql.formatter.name.class%
         arguments:
             - @oro_locale.formatter.name
+
+    oro_locale.dql.formatter.name.link:
+        tags:
+            - { name: oro_service_link, service: oro_locale.dql.formatter.name }
 
     # Twig extensions
     oro_locale.twig.date_format:
@@ -195,13 +204,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_locale.twig.name:
-        class: %oro_locale.twig.name.class%
-        arguments:
-            - @oro_locale.formatter.name
-        tags:
-            - { name: twig.extension }
-
     oro_locale.twig.address:
         class: %oro_locale.twig.address.class%
         arguments:
@@ -215,3 +217,12 @@ services:
             - @oro_locale.formatter.number
         tags:
             - { name: twig.extension }
+
+    oro_locale.entity_name_provider:
+        class: %oro_locale.entity_name_provider.class%
+        public: false
+        arguments:
+            - @oro_locale.formatter.name.link
+            - @oro_locale.dql.formatter.name.link
+        tags:
+            - { name: oro_entity.name_provider, priority: 90 }

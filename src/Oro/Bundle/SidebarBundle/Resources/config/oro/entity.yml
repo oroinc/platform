@@ -1,0 +1,5 @@
+oro_entity:
+    entity_aliases:
+        Oro\Bundle\SidebarBundle\Entity\Widget:
+            alias:        sidebarwidget
+            plural_alias: sidebarwidgets

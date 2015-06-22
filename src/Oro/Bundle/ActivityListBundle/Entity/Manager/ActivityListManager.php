@@ -17,7 +17,7 @@ use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActivityListManager
@@ -31,8 +31,8 @@ class ActivityListManager
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var ConfigManager */
     protected $config;
@@ -49,7 +49,7 @@ class ActivityListManager
     /**
      * @param Registry                  $doctrine
      * @param SecurityFacade            $securityFacade
-     * @param NameFormatter             $nameFormatter
+     * @param EntityNameResolver        $entityNameResolver
      * @param Pager                     $pager
      * @param ConfigManager             $config
      * @param ActivityListChainProvider $provider
@@ -60,7 +60,7 @@ class ActivityListManager
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         Pager $pager,
         ConfigManager $config,
         ActivityListChainProvider $provider,
@@ -70,7 +70,7 @@ class ActivityListManager
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
-        $this->nameFormatter            = $nameFormatter;
+        $this->entityNameResolver       = $entityNameResolver;
         $this->pager                    = $pager;
         $this->config                   = $config;
         $this->chainProvider            = $provider;
@@ -180,14 +180,14 @@ class ActivityListManager
         $ownerName = '';
         $ownerId   = '';
         if ($entity->getOwner()) {
-            $ownerName = $this->nameFormatter->format($entity->getOwner());
+            $ownerName = $this->entityNameResolver->getName($entity->getOwner());
             $ownerId   = $entity->getOwner()->getId();
         }
 
         $editorName = '';
         $editorId   = '';
         if ($entity->getEditor()) {
-            $editorName = $this->nameFormatter->format($entity->getEditor());
+            $editorName = $this->entityNameResolver->getName($entity->getEditor());
             $editorId   = $entity->getEditor()->getId();
         }
 

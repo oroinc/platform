@@ -2,39 +2,25 @@
 
 namespace Oro\Bundle\DistributionBundle\Routing;
 
-use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
+
+use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
 
 use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 
-abstract class AbstractLoader extends YamlFileLoader
+abstract class AbstractLoader extends CumulativeRoutingFileLoader
 {
-    /**
-     * @var KernelInterface
-     */
-    protected $kernel;
-
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /**
-     * @param FileLocatorInterface $locator
-     * @param KernelInterface $kernel
-     * @param EventDispatcherInterface|null $eventDispatcher
+     * Sets the event dispatcher
+     *
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(
-        FileLocatorInterface $locator,
-        KernelInterface $kernel,
-        EventDispatcherInterface $eventDispatcher = null
-    ) {
-        parent::__construct($locator);
-
-        $this->kernel = $kernel;
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher = null)
+    {
         $this->eventDispatcher = $eventDispatcher;
     }
 
