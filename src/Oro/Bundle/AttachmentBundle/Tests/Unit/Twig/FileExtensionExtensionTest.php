@@ -70,20 +70,6 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetFilters()
-    {
-        $result = $this->extension->getFilters();
-        $filters = [
-            'base64_encode',
-            'filtered_image_url'
-        ];
-
-        /** @var $filter \Twig_SimpleFilter */
-        foreach ($result as $filter) {
-            $this->assertTrue(in_array($filter->getName(), $filters));
-        }
-    }
-
     public function testGetName()
     {
         $this->assertEquals('oro_attachment_file', $this->extension->getName());
@@ -263,19 +249,5 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFileUrl');
 
         $this->extension->getImageView($environment, $parentEntity, $attachmentId);
-    }
-
-    public function testGetsBase64Content()
-    {
-        $file = new File();
-        $file->setMimeType('image/png');
-        $this->manager->expects($this->once())
-            ->method('getContent')
-            ->willReturn(file_get_contents(__DIR__ . '/../Fixtures/testFile/test.png'));
-        $expectedResult = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAA1BMVEX///+'
-            . 'nxBvIAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB98GEAgrLyNXN+0AAAAmaVRYdENvbW1lbnQAAAAAA'
-            . 'ENyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjleRfWwAAAAxJREFUCNdjYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==';
-
-        $this->assertEquals($expectedResult, $this->extension->getBase64Content($file));
     }
 }

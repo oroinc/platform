@@ -43,17 +43,6 @@ class FileExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getFilters()
-    {
-        return [
-            new \Twig_SimpleFilter('base64_encode', [$this, 'getBase64Content']),
-            new \Twig_SimpleFilter('filtered_image_url', [$this, 'getFilteredImageUrl']),
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
@@ -261,25 +250,9 @@ class FileExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function getFilteredImageUrl(File $attachment, $filterName = 'avatar_med')
+    public function getFilteredImageUrl(File $attachment, $filterName)
     {
         return $this->manager->getFilteredImageUrl($attachment, $filterName);
-    }
-
-    /**
-     * Returns base64 encoded file content
-     *
-     * @param File $attachment
-     *
-     * @return string
-     */
-    public function getBase64Content(File $attachment)
-    {
-        return sprintf(
-            'data:%s;base64,%s',
-            $attachment->getMimeType(),
-            base64_encode($this->manager->getContent($attachment))
-        );
     }
 
     /**
