@@ -54,7 +54,7 @@ define([
             var self = this;
             var  url = routing.generate('oro_api_get_email_associations_data', {entityId: this.options.entityId });
             $.ajax({
-                method: "GET",
+                method: 'GET',
                 url: url,
                 success:function(r) {
                     self.collection.reset();

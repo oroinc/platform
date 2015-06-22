@@ -37,36 +37,39 @@ class OroAdministration extends AbstractPage
     {
         parent::__construct($testCase, $redirect);
 
-        $this->organization = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_organization_name']");
-        $this->username = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_username']");
-        $this->passwordFirst = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_plainPassword_first']");
-        $this->passwordSecond = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_plainPassword_second']");
-        $this->email = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_email']");
-        $this->firstName = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_firstName']");
-        $this->lastName = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_lastName']");
-        $this->loadFixtures = $this->test->byXpath("//*[@data-ftid='oro_installer_setup_loadFixtures']");
+        $this->organization = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_organization_name']");
+        $this->username = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_username']");
+        $this->passwordFirst = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_plainPassword_first']");
+        $this->passwordSecond = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_plainPassword_second']");
+        $this->email = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_email']");
+        $this->firstName = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_firstName']");
+        $this->lastName = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_lastName']");
+        $this->loadFixtures = $this->test->byXPath("//*[@data-ftid='oro_installer_setup_loadFixtures']");
     }
 
     public function next()
     {
-        $this->test->moveto($this->test->byXpath("//button[@class = 'primary button icon-settings']"));
-        $this->test->byXpath("//button[@class = 'primary button icon-settings']")->click();
+        $this->test->moveto($this->test->byXPath("//button[@class = 'primary button icon-settings']"));
+        $this->test->byXPath("//button[@class = 'primary button icon-settings']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Installation - Oro Application installation');
         //waiting
-        $s = microtime(true);
+        $startTime = microtime(true);
         do {
             sleep(5);
-            //$this->waitPageToLoad();
-            $e = microtime(true);
-            $this->test->assertTrue(($e-$s) <= (int)(MAX_EXECUTION_TIME / 1000));
+            $endTime = microtime(true);
+            $this->test->assertLessThanOrEqual(
+                (int)(MAX_EXECUTION_TIME / 1000),
+                $endTime-$startTime,
+                "Maximal time execution is exceeded"
+            );
         } while ($this->isElementPresent("//a[@class = 'button next primary disabled']"));
 
-        $this->test->moveto($this->test->byXpath("//a[@class = 'button next primary']"));
-        $this->test->byXpath("//a[@class = 'button next primary']")->click();
+        $this->test->moveto($this->test->byXPath("//a[@class = 'button next primary']"));
+        $this->test->byXPath("//a[@class = 'button next primary']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Finish - Oro Application installation');
-        
+
         return new OroFinish($this->test);
     }
 

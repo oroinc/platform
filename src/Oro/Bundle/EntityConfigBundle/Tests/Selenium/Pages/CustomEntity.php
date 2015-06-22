@@ -13,7 +13,7 @@ class CustomEntity extends AbstractPageEntity
 {
     public function setTargetEntity($entity)
     {
-        $target = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_entity']");
+        $target = $this->test->byXPath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_entity']");
         $target = $this->test->select($target);
         $target->selectOptionByLabel($entity);
         $this->waitForAjax();
@@ -22,7 +22,7 @@ class CustomEntity extends AbstractPageEntity
 
     public function setTargetField($field)
     {
-        $target = $this->test->byXpath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_field']");
+        $target = $this->test->byXPath("//*[@data-ftid='oro_entity_config_type_extend_relation_target_field']");
         $target = $this->test->select($target);
         $target->selectOptionByLabel($field);
         $this->waitForAjax();
@@ -37,7 +37,7 @@ class CustomEntity extends AbstractPageEntity
     public function setRelation($data, $fields)
     {
         $relation = $this->test->select(
-            $this->test->byXpath(
+            $this->test->byXPath(
                 "//div[@class='control-group extend-rel-target-field']/label[normalize-space(text())=" .
                 "'{$data}']/following-sibling::div/select"
             )
@@ -54,7 +54,7 @@ class CustomEntity extends AbstractPageEntity
      */
     public function addRelation($fieldName)
     {
-        $this->test->byXpath(
+        $this->test->byXPath(
             "//div[@class='control-group']/label[normalize-space(text()) = " .
             "'{$fieldName}']/following-sibling::div//button[@class='btn btn-medium add-btn']"
         )->click();
@@ -69,7 +69,7 @@ class CustomEntity extends AbstractPageEntity
      */
     public function selectEntity($entityData = array())
     {
-        $element = $this->test->byXpath(
+        $element = $this->test->byXPath(
             "//tr[td[normalize-space(text())='{$entityData[0]}'] and td[normalize-space(text())=" .
             "'{$entityData[1]}']]//td[contains(@class,'boolean-cell')]/input"
         );
@@ -82,7 +82,7 @@ class CustomEntity extends AbstractPageEntity
 
     public function confirmSelection()
     {
-        $this->test->byXpath("//button[@data-action-name='select']")->click();
+        $this->test->byXPath("//button[@data-action-name='select']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
@@ -96,7 +96,7 @@ class CustomEntity extends AbstractPageEntity
      */
     public function setStringField($fieldName, $value)
     {
-        $field = $this->test->byXpath(
+        $field = $this->test->byXPath(
             "//div[@class='control-group']/label[normalize-space(text()) = '{$fieldName}']" .
             "/following-sibling::div/input"
         );
@@ -116,11 +116,11 @@ class CustomEntity extends AbstractPageEntity
         $flag = 0;
         foreach ($options as $option) {
             $field = $this->test
-                ->byXpath("//*[@data-ftid='oro_entity_config_type_enum_enum_options_{$flag}_label']");
+                ->byXPath("//*[@data-ftid='oro_entity_config_type_enum_enum_options_{$flag}_label']");
             $field->clear();
             $field->value($option);
             if ($flag < count($options)-1) {
-                $this->test->byXpath("//div[@class='control-group']//a[normalize-space(text()) = 'Add']")->click();
+                $this->test->byXPath("//div[@class='control-group']//a[normalize-space(text()) = 'Add']")->click();
                 $this->waitForAjax();
                 $flag++;
             }

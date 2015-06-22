@@ -4,10 +4,10 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Parser;
-use Doctrine\ORM\Query\Parameter;
-use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
+
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
+use Oro\Bundle\EntityBundle\ORM\SqlQuery;
 
 /**
  * Calculates total count of query records
@@ -20,17 +20,18 @@ class QueryCountCalculator
     /**
      * Calculates total count of query records
      *
-     * @param Query $query
-     * @param bool  $useWalker
+     * @param Query|SqlQuery $query
+     * @param bool           $useWalker
      *
      * @return integer
      */
-    public static function calculateCount(Query $query, $useWalker = null)
+    public static function calculateCount($query, $useWalker = null)
     {
         /** @var QueryCountCalculator $instance */
         $instance = new static();
 
         $instance->setUseWalker($useWalker);
+
         return $instance->getCount($query);
     }
 
@@ -50,11 +51,11 @@ class QueryCountCalculator
      * Calculates total count of query records
      * Notes: this method do not make any modifications of the given query
      *
-     * @param Query $query
+     * @param Query|SqlQuery $query
      *
      * @return integer
      */
-    public function getCount(Query $query)
+    public function getCount($query)
     {
         if ($this->useWalker($query)) {
             if (!$query->contains('DISTINCT')) {
@@ -84,89 +85,55 @@ class QueryCountCalculator
                 $result = 0;
             }
         } else {
-            $parser            = new Parser($query);
-            $parserResult      = $parser->parse();
-            $parameterMappings = $parserResult->getParameterMappings();
-            list($sqlParameters, $parameterTypes) = $this->processParameterMappings($query, $parameterMappings);
+            if ($query instanceof Query) {
+                $parserResult      = QueryUtils::parseQuery($query);
+                $parameterMappings = $parserResult->getParameterMappings();
+                list($params, $types) = QueryUtils::processParameterMappings($query, $parameterMappings);
 
-            $statement = $query->getEntityManager()->getConnection()->executeQuery(
-                'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
-                $sqlParameters,
-                $parameterTypes
-            );
-            $result    = $statement->fetchColumn();
+                $statement = $query->getEntityManager()->getConnection()->executeQuery(
+                    'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
+                    $params,
+                    $types
+                );
+            } elseif ($query instanceof SqlQuery) {
+                $countQuery = clone $query->getQueryBuilder();
+                $statement  = $countQuery->resetQueryParts()
+                    ->select('COUNT(*)')
+                    ->from('(' . $query->getSQL() . ')', 'e')
+                    ->execute();
+            } else {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "%s" given',
+                        is_object($query) ? get_class($query) : gettype($query)
+                    )
+                );
+            }
+
+            $result = $statement->fetchColumn();
         }
 
         return $result ? (int)$result : 0;
     }
 
     /**
-     * @param Query $query
-     * @param array $paramMappings
-     *
-     * @return array
-     * @throws QueryException
-     */
-    protected function processParameterMappings(Query $query, $paramMappings)
-    {
-        $sqlParams = array();
-        $types     = array();
-
-        /** @var Parameter $parameter */
-        foreach ($query->getParameters() as $parameter) {
-            $key = $parameter->getName();
-
-            if (!isset($paramMappings[$key])) {
-                throw QueryException::unknownParameter($key);
-            }
-
-            $value = $query->processParameterValue($parameter->getValue());
-            $type  = ($parameter->getValue() === $value)
-                ? $parameter->getType()
-                : Query\ParameterTypeInferer::inferType($value);
-
-            foreach ($paramMappings[$key] as $position) {
-                $types[$position] = $type;
-            }
-
-            $sqlPositions = $paramMappings[$key];
-            $value        = array($value);
-            $countValue   = count($value);
-
-            for ($i = 0, $l = count($sqlPositions); $i < $l; $i++) {
-                $sqlParams[$sqlPositions[$i]] = $value[($i % $countValue)];
-            }
-        }
-
-        if (count($sqlParams) != count($types)) {
-            throw QueryException::parameterTypeMismatch();
-        }
-
-        if ($sqlParams) {
-            ksort($sqlParams);
-            $sqlParams = array_values($sqlParams);
-
-            ksort($types);
-            $types = array_values($types);
-        }
-
-        return array($sqlParams, $types);
-    }
-
-    /**
      * If flag to use walker not set manually we try to figure out if it will not brake query logic
      *
-     * @param Query $query
+     * @param Query|SqlQuery $query
      *
      * @return bool
      */
-    private function useWalker(Query $query)
+    private function useWalker($query)
     {
-        if (null === $this->shouldUseWalker) {
-            return !$query->contains('GROUP BY') && null === $query->getMaxResults();
+        if ($query instanceof Query) {
+            if (null === $this->shouldUseWalker) {
+                return !$query->contains('GROUP BY') && null === $query->getMaxResults();
+            }
+
+            return $this->shouldUseWalker;
         }
 
-        return $this->shouldUseWalker;
+        return false;
     }
 
     /**

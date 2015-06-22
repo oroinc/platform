@@ -17,14 +17,14 @@ class UsersTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
-            ->assertTitle('Users - User Management - System')
+            ->assertTitle('All - Users - User Management - System')
             ->add()
             ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
-            ->setFirstpassword('123123q')
-            ->setSecondpassword('123123q')
+            ->setFirstPassword('123123q')
+            ->setSecondPassword('123123q')
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
@@ -35,7 +35,7 @@ class UsersTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - User Management - System');
+            ->assertTitle('All - Users - User Management - System');
 
         return $username;
     }
@@ -62,7 +62,7 @@ class UsersTest extends Selenium2TestCase
             ->save()
             ->assertMessage('User saved')
             ->toGrid()
-            ->assertTitle('Users - User Management - System')
+            ->assertTitle('All - Users - User Management - System')
             ->close();
 
         return $newUsername;
@@ -95,7 +95,7 @@ class UsersTest extends Selenium2TestCase
             ->filterBy('Username', $username)
             ->open(array($username))
             ->delete()
-            ->assertTitle('Users - User Management - System')
+            ->assertTitle('All - Users - User Management - System')
             ->assertMessage('User deleted');
 
         $login->openUsers('Oro\Bundle\UserBundle')

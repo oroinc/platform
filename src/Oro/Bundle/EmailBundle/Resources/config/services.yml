@@ -5,7 +5,6 @@ parameters:
     oro_email.email_folder.model.class:           Oro\Bundle\EmailBundle\Model\FolderType
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
     oro_email.email_holder_helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
-    oro_email.email_helper.class:                 Oro\Bundle\EmailBundle\Tools\EmailHelper
     oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
@@ -81,6 +80,7 @@ parameters:
 
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
+    oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
 
 services:
     oro_email.entity.cache.warmer:
@@ -115,12 +115,6 @@ services:
         class: %oro_email.email_holder_helper.class%
         arguments:
             - @oro_entity_config.provider.extend
-
-    oro_email.email_helper:
-        class: %oro_email.email_helper.class%
-        arguments:
-            - @oro_security.security_facade.link
-            - %kernel.cache_dir%
 
     oro_email.email.address.helper:
         class: %oro_email.email.address.helper.class%
@@ -368,6 +362,7 @@ services:
             - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
+            - @oro_security.security_facade.link
             - @event_dispatcher
 
     oro_email.workflow.action.send_email:
@@ -551,3 +546,16 @@ services:
         arguments:
             - @knp_gaufrette.filesystem_map
             - @oro_email.form.factory
+
+    oro_email.email_importance_transformer:
+        class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailImportanceApiTransformer
+
+    oro_email.email_body_type_transformer:
+        class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailBodyTypeApiTransformer
+
+    oro_email.acl.voter.email_voter:
+        class: %oro_email.acl.voter.email_voter.class%
+        arguments:
+            - @service_container
+        tags:
+            - { name: security.voter }

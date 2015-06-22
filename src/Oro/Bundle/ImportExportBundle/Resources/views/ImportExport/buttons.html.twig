@@ -10,11 +10,26 @@
         {% set options = {} %}
     {% endif %}
 
+    {% set defaultRouteParams = {'options': options} %}
+
+    {% if importJob is defined %}
+        {% set defaultRouteParams = defaultRouteParams|merge({'importJob': importJob}) %}
+    {% endif %}
+    {% if importValidateJob is defined %}
+        {% set defaultRouteParams = defaultRouteParams|merge({'importValidateJob': importValidateJob}) %}
+    {% endif %}
+    {% if exportJob is defined %}
+        {% set defaultRouteParams = defaultRouteParams|merge({'exportJob': exportJob}) %}
+    {% endif %}
+    {% if exportTemplateJob is defined %}
+        {% set defaultRouteParams = defaultRouteParams|merge({'exportTemplateJob': exportTemplateJob}) %}
+    {% endif %}
+
     {% if exportAllowed %}
         <div class="btn-group">
             <a type="button"
                class="btn export-btn icons-holder-text no-hash"
-               href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor, 'options': options}) }}">
+               href="{{ path('oro_importexport_export_instant', defaultRouteParams|merge({'processorAlias': exportProcessor})) }}">
                 <i class="icon-upload-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
@@ -25,14 +40,14 @@
             {% set buttonsHtml %}
                 <a type="button"
                    class="btn import-btn icons-holder-text no-hash"
-                   href="{{ path('oro_importexport_import_form', {'entity': entity_class, 'options': options}) }}">
+                   href="{{ path('oro_importexport_import_form', defaultRouteParams|merge({'entity': entity_class})) }}">
                     <i class="icon-download-alt hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
                 </a>
                 {% if hasExportTemplateProcessor %}
                     <a type="button"
                        class="btn icons-holder-text no-hash"
                        target="_blank"
-                       href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor, 'options': options}) }}">
+                       href="{{ path('oro_importexport_export_template', defaultRouteParams|merge({'processorAlias': exportTemplateProcessor})) }}">
                         <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
                     </a>
                 {% endif %}

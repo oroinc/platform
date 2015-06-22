@@ -118,6 +118,6 @@ class SeleniumContext extends BehatSeleniumContext
         $users = new User($this, false);
         $users->assertMessage($message)
             ->toGrid()
-            ->assertTitle('Users - User Management - System');
+            ->assertTitle('All - Users - User Management - System');
     }
 }

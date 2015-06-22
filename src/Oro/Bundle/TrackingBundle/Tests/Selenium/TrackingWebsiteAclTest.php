@@ -27,7 +27,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->assertTitle('Create Role - Roles - User Management - System')
             ->save()
             ->assertMessage('Role saved')
-            ->assertTitle('Roles - User Management - System')
+            ->assertTitle('All - Roles - User Management - System')
             ->close();
 
         return ($randomPrefix);
@@ -63,7 +63,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - User Management - System');
+            ->assertTitle('All - Users - User Management - System');
 
         return $username;
     }
@@ -144,7 +144,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
         /** @var TrackingWebsites $login */
         $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
             ->filterBy('Identifier', $identifier)
-            ->checkActionMenu('Delete')
+            ->assertNoActionMenu('Delete')
             ->open(array($identifier))
             ->assertElementNotPresent(
                 "//div[@class='pull-left btn-group icons-holder']/a[@title='Delete Tracking Website']"
@@ -166,7 +166,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
         /** @var TrackingWebsites $login */
         $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
             ->filterBy('Identifier', $identifier)
-            ->checkActionMenu('Update')
+            ->assertNoActionMenu('Update')
             ->open(array($identifier))
             ->assertElementNotPresent(
                 "//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit Tracking Website']"

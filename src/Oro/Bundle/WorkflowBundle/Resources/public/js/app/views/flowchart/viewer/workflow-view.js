@@ -36,6 +36,10 @@ define(function (require) {
 
         className: 'workflow-flowchart-viewer',
 
+        defaultConnectionConfiguration: {
+            detachable: false
+        },
+
         findStepModelByElement: function (el) {
             var stepCollectionView = this.stepCollectionView;
             return this.model.get('steps').find(function (model) {
@@ -48,6 +52,7 @@ define(function (require) {
             this.$el.addClass(this.className);
             var stepCollectionView,
                 transitionOverlayView = this.transitionOverlayView,
+                defaultConnectionConfiguration = this.defaultConnectionConfiguration,
                 StepView = this.stepView,
                 TransitionView = this.transitionView,
                 that = this,
@@ -75,7 +80,8 @@ define(function (require) {
                         areaView: that,
                         stepCollection: steps,
                         stepCollectionView: stepCollectionView,
-                        transitionOverlayView: transitionOverlayView
+                        transitionOverlayView: transitionOverlayView,
+                        defaultConnectionConfiguration: _.extend({}, defaultConnectionConfiguration)
                     }, options);
                     return new TransitionView(options);
                 },

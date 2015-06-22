@@ -397,7 +397,7 @@ class Query
             preg_replace(
                 '/ +/',
                 self::DELIMITER,
-                preg_replace('/[^\w:*]/u', self::DELIMITER, $inputString)
+                preg_replace('/[^\w:*@.]/u', self::DELIMITER, $inputString)
             )
         );
 

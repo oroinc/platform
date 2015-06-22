@@ -11,7 +11,8 @@
         "symfony/symfony": ">=2.1",
         "oro/config": "dev-master",
         "oro/requirejs-bundle": "dev-master",
-        "oro/config-bundle": "dev-master"
+        "oro/config-bundle": "dev-master",
+        "oro/moment-timezone": "0.3.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\LocaleBundle": "" }

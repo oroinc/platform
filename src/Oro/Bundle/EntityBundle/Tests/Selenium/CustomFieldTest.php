@@ -19,7 +19,7 @@ class CustomFieldTest extends Selenium2TestCase
         array('type' => 'Boolean', 'value' => 'Yes'),
         array('type' => 'Currency', 'value' => '100.00'),
         array('type' => 'Date', 'value' => 'Apr 9, 2014'),
-//        array('type' => 'DateTime', 'value' => 'Dec 25, 2014, 12:15 AM'),
+        array('type' => 'DateTime', 'value' => 'Dec 25, 2014, 12:15 AM'),
         array('type' => 'Decimal', 'value' => '0.55'),
         array('type' => 'Float', 'value' => '500.1'),
         array('type' => 'Integer', 'value' => '100500'),
@@ -59,11 +59,10 @@ class CustomFieldTest extends Selenium2TestCase
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', 'admin')
             ->open(array('admin'))
-            ->edit()
-            /** @var ConfigEntities $login */
-            ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
+            ->edit();
+        /** @var ConfigEntity $login */
+        $login = $login->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
-            /** @var ConfigEntity $login */
             $login->checkEntityField(strtolower($field['type']).'_field');
         }
     }
@@ -78,11 +77,10 @@ class CustomFieldTest extends Selenium2TestCase
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', 'admin')
             ->open(array('admin'))
-            ->edit()
-            /** @var ConfigEntities $login */
-            ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
+            ->edit();
+        /** @var ConfigEntity $login */
+        $login = $login->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
-            /** @var ConfigEntity $login */
             $login->setCustomField(strtolower($field['type']).'_field', $field['value']);
         }
         $login->save()

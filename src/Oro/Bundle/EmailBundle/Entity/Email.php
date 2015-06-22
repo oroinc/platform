@@ -36,7 +36,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          },
  *          "activity"={
  *              "route"="oro_email_activity_view",
- *              "acl"="oro_email_email_user_view",
+ *              "acl"="oro_email_email_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
  *          },
@@ -243,6 +243,16 @@ class Email extends ExtendEmail
     public function getCreated()
     {
         return $this->created;
+    }
+
+    /**
+     * Set entity created date/time
+     *
+     * @param \DateTime $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
     }
 
     /**
@@ -606,7 +616,7 @@ class Email extends ExtendEmail
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->created = $this->created ?: new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**

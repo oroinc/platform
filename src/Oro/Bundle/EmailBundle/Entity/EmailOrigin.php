@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+
 /**
  * Email Origin
  *
@@ -71,6 +74,22 @@ abstract class EmailOrigin
      */
     protected $syncCount;
 
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="emailOrigins", cascade={"remove"})
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $owner;
+
+    /**
+     * @var OrganizationInterface
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", cascade={"remove"})
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $organization;
+
     public function __construct()
     {
         $this->folders   = new ArrayCollection();
@@ -90,16 +109,19 @@ abstract class EmailOrigin
     /**
      * Get an email folder
      *
-     * @param string $type Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
+     * @param string      $type     Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
+     * @param string|null $fullName
      *
      * @return EmailFolder|null
      */
-    public function getFolder($type)
+    public function getFolder($type, $fullName = null)
     {
         return $this->folders
             ->filter(
-                function (EmailFolder $folder) use (&$type) {
-                    return $folder->getType() === $type;
+                function (EmailFolder $folder) use ($type, $fullName) {
+                    return
+                        $folder->getType() === $type
+                        && (empty($fullName) || $folder->getFullName() === $fullName);
                 }
             )->first();
     }
@@ -228,5 +250,45 @@ abstract class EmailOrigin
     public function __toString()
     {
         return (string)$this->id;
+    }
+
+    /**
+     * @return OrganizationInterface
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return $this
+     */
+    public function setOrganization(OrganizationInterface $organization)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function setOwner($user)
+    {
+        $this->owner = $user;
+
+        return $this;
     }
 }
