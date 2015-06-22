@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class FullNameSearchHandler extends SearchHandler
 {
     /**
-     * @var NameFormatter
+     * @var EntityNameResolver
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
-     * @param NameFormatter $nameFormatter
+     * @param EntityNameResolver $entityNameResolver
      */
-    public function setNameFormatter(NameFormatter $nameFormatter)
+    public function setEntityNameResolver(EntityNameResolver $entityNameResolver)
     {
-        $this->nameFormatter = $nameFormatter;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -39,10 +39,10 @@ class FullNameSearchHandler extends SearchHandler
      */
     protected function getFullName($entity)
     {
-        if (!$this->nameFormatter) {
-            throw new \RuntimeException('Name formatter must be configured');
+        if (!$this->entityNameResolver) {
+            throw new \RuntimeException('Name resolver must be configured');
         }
-        return $this->nameFormatter->format($entity);
+        return $this->entityNameResolver->getName($entity);
     }
 
     /**

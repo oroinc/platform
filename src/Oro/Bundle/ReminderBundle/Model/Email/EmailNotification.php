@@ -5,7 +5,7 @@ namespace Oro\Bundle\ReminderBundle\Model\Email;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -32,25 +32,25 @@ class EmailNotification implements SenderAwareEmailNotificationInterface
     protected $reminder;
 
     /**
-     * @var NameFormatter
+     * @var EntityNameResolver
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
      * Constructor
      *
-     * @param ObjectManager  $em
-     * @param ConfigProvider $configProvider
-     * @param NameFormatter  $nameFormatter
+     * @param ObjectManager      $em
+     * @param ConfigProvider     $configProvider
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ObjectManager $em,
         ConfigProvider $configProvider,
-        NameFormatter $nameFormatter
+        EntityNameResolver $entityNameResolver
     ) {
         $this->em = $em;
         $this->configProvider = $configProvider;
-        $this->nameFormatter = $nameFormatter;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -109,7 +109,7 @@ class EmailNotification implements SenderAwareEmailNotificationInterface
     {
         $sender = $this->getReminder()->getSender();
         if ($sender) {
-            return $this->nameFormatter->format($sender);
+            return $this->entityNameResolver->getName($sender);
         }
 
         return null;

@@ -14,3 +14,7 @@ oro_entity:
                     join:
                         left:
                             - { join: entity.groups, alias: target }
+
+    entity_name_formats:
+        html:
+            fallback: long

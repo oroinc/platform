@@ -546,7 +546,7 @@
             'entityId': entity.id,
             'targetId': item.id,
             "targetClassName": itemClassNameEncoded,
-            'title': item|oro_format_name|default(item.email)|default(item.id),
+            'title': item|oro_format_name,
             'icon': oro_entity_config_value(itemClassName, 'icon' ),
             'link': oro_entity_metadata_value(itemClassName, 'routeView') ? path(oro_entity_route(itemClassName), {id:item.id} ) : false
         } %}

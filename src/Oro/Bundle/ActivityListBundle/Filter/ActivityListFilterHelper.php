@@ -62,7 +62,7 @@ class ActivityListFilterHelper
 
             $filterData['activityType']['value'] = array_map(
                 function ($activityClass) use ($routingHelper) {
-                    return $routingHelper->decodeClassName($activityClass);
+                    return $routingHelper->resolveEntityClass($activityClass);
                 },
                 $filterData['activityType']['value']
             );

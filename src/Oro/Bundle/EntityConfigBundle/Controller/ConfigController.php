@@ -269,7 +269,7 @@ class ConfigController extends Controller
         $fields = [];
         if ($id) {
             $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-            $className           = $entityRoutingHelper->decodeClassName($id);
+            $className           = $entityRoutingHelper->resolveEntityClass($id);
 
             /** @var EntityFieldProvider $fieldProvider */
             $fieldProvider = $this->get('oro_entity.entity_field_provider');
@@ -421,7 +421,7 @@ class ConfigController extends Controller
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $link = $this->generateUrl(
                     'oro_entity_index',
-                    ['entityName' => $this->getRoutingHelper()->decodeClassName($entity->getClassName())]
+                    ['entityName' => $this->getRoutingHelper()->getUrlSafeClassName($entity->getClassName())]
                 );
             }
         }

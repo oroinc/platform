@@ -12,7 +12,6 @@ use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivity
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityGroupedProvider;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +25,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $pager;
@@ -51,17 +50,17 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->doctrine       = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+        $this->doctrine           = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
-        $this->nameFormatter  = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()->getMock();
-        $this->pager          = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
+        $this->pager              = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
             ->disableOriginalConstructor()->getMock();
-        $this->config         = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->config             = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper     = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()->getMock();
         $this->provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()->getMock();
@@ -78,7 +77,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityListManager = new ActivityListManager(
             $this->doctrine,
             $this->securityFacade,
-            $this->nameFormatter,
+            $this->entityNameResolver,
             $this->pager,
             $this->config,
             $this->provider,
@@ -218,7 +217,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $testItem->setRelatedActivityClass('Acme\TestBundle\Entity\TestEntity');
         $testItem->setRelatedActivityId(127);
 
-        $this->nameFormatter->expects($this->any())->method('format')
+        $this->entityNameResolver->expects($this->any())->method('getName')
             ->willReturnCallback(
                 function ($user) {
                     if ($user->getId() === 15) {
