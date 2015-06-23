@@ -58,7 +58,7 @@ class EntityContextProvider
             if (!empty($className) && $entity->supportActivityTarget($className)) {
                 $entityTargets[] = [
                     'label' => $targetEntity['label'],
-                    'className' => $this->routingHelper->encodeClassName($targetEntity['name']),
+                    'className' => $this->routingHelper->getUrlSafeClassName($targetEntity['name']),
                     'first' => !(bool) $i,
                     'gridName' => $this->getContextGridByEntity($className)
                 ];
@@ -77,7 +77,7 @@ class EntityContextProvider
     public function getContextGridByEntity($entityClass)
     {
         if (!empty($entityClass)) {
-            $entityClass = $this->routingHelper->decodeClassName($entityClass);
+            $entityClass = $this->routingHelper->resolveEntityClass($entityClass);
             $config = $this->entityConfigProvider->getConfig($entityClass);
             $gridName = $config->get('context-grid');
             if ($gridName) {

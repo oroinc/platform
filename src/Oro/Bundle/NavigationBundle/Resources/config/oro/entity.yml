@@ -1,0 +1,5 @@
+oro_entity:
+    entity_aliases:
+        Oro\Bundle\NavigationBundle\Entity\Title:
+            alias:        pagetitle
+            plural_alias: pagetitles

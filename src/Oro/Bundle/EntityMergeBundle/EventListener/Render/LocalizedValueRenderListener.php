@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityMergeBundle\EventListener\Render;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
@@ -27,9 +27,9 @@ class LocalizedValueRenderListener
     protected $dateTimeFormatter;
 
     /**
-     * @var NameFormatter
+     * @var EntityNameResolver
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
      * @var NumberFormatter
@@ -39,18 +39,18 @@ class LocalizedValueRenderListener
     /**
      * @param AddressFormatter $addressFormatter
      * @param DateTimeFormatter $dateTimeFormatter
-     * @param NameFormatter $nameFormatter
+     * @param EntityNameResolver $entityNameResolver
      * @param NumberFormatter $numberFormatter
      */
     public function __construct(
         AddressFormatter $addressFormatter,
         DateTimeFormatter $dateTimeFormatter,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         NumberFormatter $numberFormatter
     ) {
         $this->addressFormatter = $addressFormatter;
         $this->dateTimeFormatter = $dateTimeFormatter;
-        $this->nameFormatter = $nameFormatter;
+        $this->entityNameResolver = $entityNameResolver;
         $this->numberFormatter = $numberFormatter;
     }
 
@@ -70,7 +70,7 @@ class LocalizedValueRenderListener
             $originalValue instanceof LastNameInterface ||
             $originalValue instanceof NameSuffixInterface
         ) {
-            $fieldValueEvent->setConvertedValue($this->nameFormatter->format($originalValue));
+            $fieldValueEvent->setConvertedValue($this->entityNameResolver->getName($originalValue));
         } elseif ($originalValue instanceof \DateTime) {
             $dateType = $metadata->get('render_date_type');
             $timeType = $metadata->get('render_time_type');

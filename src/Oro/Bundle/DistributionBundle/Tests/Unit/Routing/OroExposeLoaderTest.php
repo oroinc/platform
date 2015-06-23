@@ -13,7 +13,11 @@ class OroExposeLoaderTest extends AbstractLoaderTest
      */
     public function getLoader()
     {
-        return new OroExposeLoader($this->locator, $this->kernel, $this->eventDispatcher);
+        $loader = new OroExposeLoader($this->kernel, $this->routeOptionsResolver);
+        $loader->setResolver($this->loaderResolver);
+        $loader->setEventDispatcher($this->eventDispatcher);
+
+        return $loader;
     }
 
     /**
@@ -21,7 +25,10 @@ class OroExposeLoaderTest extends AbstractLoaderTest
      */
     public function getLoaderWithoutEventDispatcher()
     {
-        return new OroExposeLoader($this->locator, $this->kernel);
+        $loader = new OroExposeLoader($this->kernel, $this->routeOptionsResolver);
+        $loader->setResolver($this->loaderResolver);
+
+        return $loader;
     }
 
     public function testSupports()

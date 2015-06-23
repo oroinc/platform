@@ -9,7 +9,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * The helper class intended to use in controllers that works with entities
@@ -21,6 +20,9 @@ class EntityRoutingHelper
     const PARAM_ENTITY_CLASS = 'entityClass';
     const PARAM_ENTITY_ID = 'entityId';
 
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -28,13 +30,18 @@ class EntityRoutingHelper
     protected $urlGenerator;
 
     /**
+     * @param EntityClassNameHelper $entityClassNameHelper
      * @param DoctrineHelper        $doctrineHelper
      * @param UrlGeneratorInterface $urlGenerator
      */
-    public function __construct(DoctrineHelper $doctrineHelper, UrlGeneratorInterface $urlGenerator)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->urlGenerator   = $urlGenerator;
+    public function __construct(
+        EntityClassNameHelper $entityClassNameHelper,
+        DoctrineHelper $doctrineHelper,
+        UrlGeneratorInterface $urlGenerator
+    ) {
+        $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->doctrineHelper        = $doctrineHelper;
+        $this->urlGenerator          = $urlGenerator;
     }
 
     /**
@@ -43,10 +50,12 @@ class EntityRoutingHelper
      * @param string $className The class name
      *
      * @return string The encoded class name
+     *
+     * @deprecated since 1.8, use getUrlSafeClassName
      */
     public function encodeClassName($className)
     {
-        return str_replace('\\', '_', $className);
+        return $this->entityClassNameHelper->getUrlSafeClassName($className);
     }
 
     /**
@@ -55,16 +64,37 @@ class EntityRoutingHelper
      * @param string $className The encoded class name
      *
      * @return string The class name
+     *
+     * @deprecated since 1.8, use resolveEntityClass
      */
     public function decodeClassName($className)
     {
-        $result = str_replace('_', '\\', $className);
-        if (strpos($result, ExtendHelper::ENTITY_NAMESPACE) === 0) {
-            // a custom entity can contain _ in class name
-            $result = ExtendHelper::ENTITY_NAMESPACE . substr($className, strlen(ExtendHelper::ENTITY_NAMESPACE));
-        }
+        return $this->entityClassNameHelper->resolveEntityClass($className, true);
+    }
 
-        return $result;
+    /**
+     * Converts the class name to a form that can be safely used in URL
+     *
+     * @param string $className The class name
+     *
+     * @return string The URL-safe representation of a class name
+     */
+    public function getUrlSafeClassName($className)
+    {
+        return $this->entityClassNameHelper->getUrlSafeClassName($className);
+    }
+
+    /**
+     * Resolves the entity class name
+     *
+     * @param string $entityName    The class name, url-safe class name, alias or plural alias of the entity
+     * @param bool   $isPluralAlias Determines whether the entity name may be a singular of plural alias
+     *
+     * @return string The FQCN of an entity
+     */
+    public function resolveEntityClass($entityName, $isPluralAlias = true)
+    {
+        return $this->entityClassNameHelper->resolveEntityClass($entityName, $isPluralAlias);
     }
 
     /**
@@ -91,7 +121,7 @@ class EntityRoutingHelper
     {
         $className = $request->query->get($paramName);
         if ($className) {
-            $className = $this->decodeClassName($className);
+            $className = $this->resolveEntityClass($className);
         }
 
         return $className;
@@ -159,7 +189,7 @@ class EntityRoutingHelper
     public function getRouteParameters($entityClass, $entityId, $action = null)
     {
         $params = [
-            self::PARAM_ENTITY_CLASS => $this->encodeClassName($entityClass),
+            self::PARAM_ENTITY_CLASS => $this->getUrlSafeClassName($entityClass),
             self::PARAM_ENTITY_ID    => (string)$entityId
         ];
         if ($action) {
@@ -182,7 +212,7 @@ class EntityRoutingHelper
      */
     public function getEntity($entityClass, $entityId)
     {
-        $entityClass = $this->decodeClassName($entityClass);
+        $entityClass = $this->resolveEntityClass($entityClass);
 
         $entity = null;
         try {
@@ -213,7 +243,7 @@ class EntityRoutingHelper
      */
     public function getEntityReference($entityClass, $entityId = null)
     {
-        $entityClass = $this->decodeClassName($entityClass);
+        $entityClass = $this->resolveEntityClass($entityClass);
 
         try {
             $entity = $entityId

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
-use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
@@ -16,8 +15,8 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var EmailOwnerProviderStorage */
     protected $registry;
 
-    /** @var DQLNameFormatter|\PHPUnit_Framework_MockObject_MockObject */
-    protected $formatter;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityNameResolver;
 
     /** @var EmailQueryFactory */
     protected $factory;
@@ -25,15 +24,16 @@ class EmailQueryFactoryTest extends OrmTestCase
     public function setUp()
     {
         $this->registry  = new EmailOwnerProviderStorage();
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()->getMock();
 
-        $this->factory = new EmailQueryFactory($this->registry, $this->formatter);
+        $this->factory = new EmailQueryFactory($this->registry, $this->entityNameResolver);
     }
 
     public function tearDown()
     {
-        unset($this->factory, $this->formatter, $this->registry);
+        unset($this->factory, $this->entityNameResolver, $this->registry);
     }
 
     public function testPrepareQueryWithoutRroviders()
@@ -58,8 +58,8 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->will($this->returnValue(self::TEST_ENTITY));
         $this->registry->addProvider($provider);
 
-        $this->formatter->expects($this->once())->method('getFormattedNameDQL')
-            ->with($this->equalTo('owner1'), $this->equalTo(self::TEST_ENTITY))
+        $this->entityNameResolver->expects($this->once())->method('getNameDQL')
+            ->with(self::TEST_ENTITY, 'owner1')
             ->will($this->returnValue(self::TEST_NAME_DQL_FORMATTED));
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
