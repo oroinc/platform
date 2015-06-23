@@ -100,4 +100,17 @@ class OwnershipMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('org', $metadata->getOwnerFieldName());
         $this->assertEquals('org_id', $metadata->getOwnerColumnName());
     }
+
+    public function testSetState()
+    {
+        $metadata = new OwnershipMetadata('ORGANIZATION', 'org', 'org_id');
+        $restoredMetadata = $metadata->__set_state(
+            [
+                'ownerType' => $metadata->getOwnerType(),
+                'ownerFieldName' => $metadata->getOwnerFieldName(),
+                'ownerColumnName' => $metadata->getOwnerColumnName(),
+            ]
+        );
+        $this->assertEquals($metadata, $restoredMetadata);
+    }
 }

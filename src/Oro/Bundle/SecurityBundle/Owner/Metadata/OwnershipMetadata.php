@@ -228,7 +228,7 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
                 $this->ownerFieldName,
                 $this->ownerColumnName,
                 $this->organizationFieldName,
-                $this->organizationColumnName
+                $this->organizationColumnName,
             ]
         );
     }
@@ -257,11 +257,9 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     public static function __set_state($data)
     {
         $result = new static();
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($data as $property => $value) {
-            $propertyAccessor->setValue($result, $property, $value);
+            $result->{$property} = $value;
         }
-        unset($propertyAccessor);
 
         return $result;
     }
