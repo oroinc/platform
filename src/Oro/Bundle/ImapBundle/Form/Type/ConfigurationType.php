@@ -8,7 +8,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -20,9 +19,13 @@ class ConfigurationType extends AbstractType
     /** @var Mcrypt */
     protected $encryptor;
 
-    public function __construct(Mcrypt $encryptor)
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    public function __construct(Mcrypt $encryptor, SecurityFacade $securityFacade)
     {
         $this->encryptor = $encryptor;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -30,9 +33,49 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // pre-populate password, imap origin change
+        $this->addPrepopulatePasswordEventListener($builder);
+        $this->addOwnerOrganizationEventListener($builder);
+
+        $builder
+            ->add(
+                'host',
+                'text',
+                array('label' => 'oro.imap.configuration.host.label', 'required' => true)
+            )
+            ->add(
+                'port',
+                'number',
+                array('label' => 'oro.imap.configuration.port.label', 'required' => true)
+            )
+            ->add(
+                'ssl',
+                'choice',
+                array(
+                    'label'       => 'oro.imap.configuration.ssl.label',
+                    'choices'     => array('ssl' => 'SSL', 'tls' => 'TLS'),
+                    'empty_data'  => null,
+                    'empty_value' => '',
+                    'required'    => false
+                )
+            )
+            ->add(
+                'user',
+                'text',
+                array('label' => 'oro.imap.configuration.user.label', 'required' => true)
+            )
+            ->add(
+                'password',
+                'password',
+                array('label' => 'oro.imap.configuration.password.label', 'required' => true)
+            )
+            ->add('check_connection', new CheckButtonType());
+    }
+
+    protected function addPrepopulatePasswordEventListener(FormBuilderInterface $builder)
+    {
         $encryptor = $this->encryptor;
 
-        // pre-populate password, imap origin change
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($encryptor) {
@@ -70,40 +113,27 @@ class ConfigurationType extends AbstractType
                 }
             }
         );
+    }
 
-        $builder
-            ->add(
-                'host',
-                'text',
-                array('label' => 'oro.imap.configuration.host.label', 'required' => true)
-            )
-            ->add(
-                'port',
-                'number',
-                array('label' => 'oro.imap.configuration.port.label', 'required' => true)
-            )
-            ->add(
-                'ssl',
-                'choice',
-                array(
-                    'label'       => 'oro.imap.configuration.ssl.label',
-                    'choices'     => array('ssl' => 'SSL', 'tls' => 'TLS'),
-                    'empty_data'  => null,
-                    'empty_value' => '',
-                    'required'    => false
-                )
-            )
-            ->add(
-                'user',
-                'text',
-                array('label' => 'oro.imap.configuration.user.label', 'required' => true)
-            )
-            ->add(
-                'password',
-                'password',
-                array('label' => 'oro.imap.configuration.password.label', 'required' => true)
-            )
-            ->add('check_connection', new CheckButtonType());
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addOwnerOrganizationEventListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) {
+            /** @var ImapEmailOrigin $data */
+            $data = $event->getData();
+            if ($data->getOwner() === null) {
+                $data->setOwner($this->securityFacade->getLoggedUser());
+            }
+            if ($data->getOrganization() === null) {
+                $organization = $this->securityFacade->getOrganization()
+                    ? $this->securityFacade->getOrganization()
+                    : $this->securityFacade->getLoggedUser()->getOrganization();
+                $data->setOrganization($organization);
+            }
+            $event->setData($data);
+        });
     }
 
     /**
