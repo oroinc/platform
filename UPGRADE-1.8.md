@@ -11,7 +11,30 @@ UPGRADE FROM 1.7 to 1.8
 ####EntityBundle
 - Entity aliases are introduced. You can use `php app/console oro:entity-alias:debug` CLI command to see all aliases. In most cases aliases are generated automatically, but you can use `entity_aliases` and `entity_alias_exclusions` section in the `Resources/config/oro/entity.yml` of your bundle to define your rules.
 - Methods `encodeClassName` and `decodeClassName` of `Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper` are deprecated. Use `getUrlSafeClassName` and `resolveEntityClass` instead. Also `Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper` can be used for same purposes.
-- The entity name resolver service was introduced to allow configuring an entity name formatting more flexible. Now `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` is used instead of `Oro\Bundle\LocaleBundle\Formatter\NameFormatter` and `Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter`.
+- The entity name resolver service was introduced to allow configuring an entity name formatting more flexible. Now `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` is used instead of `Oro\Bundle\LocaleBundle\Formatter\NameFormatter` and `Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter`. The list of affected services:
+
+| Service ID | Class Name |
+|------------|------------|
+| oro_activity_list.manager | Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager |
+| oro_calendar.calendar_event_manager | Oro\Bundle\CalendarBundle\Manager\CalendarEventManager |
+| oro_calendar.calendar_provider.user | Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider |
+| oro_calendar.autocomplete.user_calendar_handler | Oro\Bundle\CalendarBundle\Autocomplete\UserCalendarHandler |
+| oro_comment.comment.api_manager | Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager |
+| oro_email.email.model.builder.helper | Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper |
+| oro_email.emailtemplate.variable_provider.user | Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider |
+| oro_email.datagrid_query_factory | Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory |
+| oro_email.workflow.action.send_email | Oro\Bundle\EmailBundle\Workflow\Action\SendEmail |
+| oro_email.workflow.action.send_email_template | Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate |
+| oro_email.activity_list.provider | Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider |
+| oro_entity_merge.listener.render.localized_value_render | Oro\Bundle\EntityMergeBundle\EventListener\Render\LocalizedValueRenderListener |
+| oro_form.autocomplete.full_name.search_handler | Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler |
+| oro_note.manager | Oro\Bundle\NoteBundle\Entity\Manager\NoteManager |
+| oro_reminder.model.email_notification | Oro\Bundle\ReminderBundle\Model\Email\EmailNotification |
+| oro_user.autocomplete.user.search_acl_handler.abstract | Oro\Bundle\UserBundle\Autocomplete\UserAclHandler |
+| oro_workflow.action.format_name | Oro\Bundle\WorkflowBundle\Model\Action\FormatName |
+| orocrm_account.form.type.account | OroCRM\Bundle\AccountBundle\Form\Type\AccountType |
+| orocrm_account.form.type.account.api | OroCRM\Bundle\AccountBundle\Form\Type\AccountApiType |
+| orocrm_case.view_factory | OroCRM\Bundle\CaseBundle\Model\ViewFactory |
 
 ####EntityConfigBundle
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
@@ -64,3 +87,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\UserBundle\Entity\User` is based on `Oro\Bundle\UserBundle\Entity\AbstractUser` and implements `Symfony\Component\Security\Core\User\UserInterface` using `Oro\Bundle\UserBundle\Entity\UserInterface` directly
 - `Oro\Bundle\UserBundle\Entity\PasswordRecoveryInterface` introduced to cover all required data for password recovery
 - `Oro\Bundle\UserBundle\Entity\UserInterface` method `public function addRole(RoleInterface $role)` signature changed to use `Symfony\Component\Security\Core\Role\RoleInterface`
+- `Oro\Bundle\UserBundle\Mailer\Processor` is now based on `Oro\Bundle\UserBundle\Mailer\BaseProcessor`
+- `Oro\Bundle\UserBundle\Mailer\Processor` - first argument `$user` of `sendChangePasswordEmail`, `sendResetPasswordEmail` and `sendResetPasswordAsAdminEmail` methods must implement `Oro\Bundle\UserBundle\Entity\UserInterface`
+- First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly
