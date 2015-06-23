@@ -144,7 +144,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     }
 
     /**
-     * @param $options
+     * @param array $options
      */
     protected function handleThreadEmails($options)
     {
