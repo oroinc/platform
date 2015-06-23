@@ -33,7 +33,7 @@ define([
          */
         criteriaValueSelectors: {
             value: 'input[name="value"]',
-            type: 'input[type="hidden"]'
+            type: 'input[type="hidden"]:last'
         },
 
         /**
