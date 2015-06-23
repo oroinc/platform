@@ -10,7 +10,7 @@ define(function (require) {
     NoteView = BaseView.extend({
         autoRender: true,
         listen: {
-            'parentResize': 'onParentResize'
+            'component:parentResize': 'onParentResize'
         },
         render: function () {
             this._deferredRender();
@@ -23,7 +23,9 @@ define(function (require) {
         onParentResize: function () {
             var editor = this.getComponentManager().get('oro_note_form_message');
             if (editor) {
-                debugger;
+                editor.view.setHeight(this.$el.closest('.ui-widget-content').innerHeight());
+            } else {
+                throw new Error('Could not find message editor');
             }
         }
     });
