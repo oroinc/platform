@@ -4,7 +4,7 @@ query_designer:
 
     filters:
         string:
-            applicable: [{type: string}, {type: text}]
+            applicable: [{type: string}, {type: text}, {type: ref-one}]
             type:       string
             query_type: [all]
         number:
@@ -46,4 +46,8 @@ query_designer:
                 default_value: Any
                 class: ''
             init_module: oroquerydesigner/js/enum-filter-initialized
+            query_type: [all]
+        manyToMany:
+            type: many-to-many
+            applicable: [{type: manyToMany}]
             query_type: [all]
