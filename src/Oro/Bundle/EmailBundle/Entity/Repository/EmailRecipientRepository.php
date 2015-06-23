@@ -34,9 +34,12 @@ class EmailRecipientRepository extends EntityRepository
 
     /**
      * @param array $senderEmails
-     * @return array wit keys: 'name', 'email'
+     * @param string|null $query
+     * @param int $limit
+     *
+     * @return array
      */
-    public function getEmailsUsedInLast30Days(array $senderEmails = [])
+    public function getEmailsUsedInLast30Days(array $senderEmails = [], $query = null, $limit = 100)
     {
         if (!$senderEmails) {
             return [];
@@ -50,18 +53,30 @@ class EmailRecipientRepository extends EntityRepository
             ->join('r.emailAddress', 'a')
             ->andWhere('e.sentAt > :from')
             ->andWhere($emailQb->expr()->in('fe.email', ':senders'))
-            ->groupBy('a.email')
-        ;
+            ->groupBy('a.email');
 
         $recepientsQb = $this->createQueryBuilder('re');
         $recepientsQb
             ->select('re.name, ea.email')
             ->join('re.emailAddress', 'ea')
             ->where($recepientsQb->expr()->in('re.id', $emailQb->getDQL()))
+            ->setMaxResults($limit)
             ->setParameter('from', new \DateTime('-30 days'))
-            ->setParameter('senders', $senderEmails)
-        ;
+            ->setParameter('senders', $senderEmails);
 
-        return $recepientsQb->getQuery()->getResult();
+        if ($query) {
+            $recepientsQb
+                ->andWhere($recepientsQb->expr()->like('re.name', ':query'))
+                ->setParameter('query', sprintf('%%%s%%', $query));
+        }
+
+        $emails = $recepientsQb->getQuery()->getResult();
+
+        $result = [];
+        foreach ($emails as $email) {
+            $result[$email['email']] = $email['name'];
+        }
+
+        return $result;
     }
 }

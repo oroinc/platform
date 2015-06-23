@@ -50,10 +50,9 @@ class EmailType extends AbstractType
             )
             ->add(
                 'to',
-                'oro_email_email_address',
+                'oro_email_email_address_recipients',
                 [
                     'required' => false,
-                    'multiple' => true,
                     'attr' => ['class' => 'taggable-field forged-required']
                 ]
             )
