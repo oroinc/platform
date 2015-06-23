@@ -5,6 +5,7 @@ parameters:
         user: "OroUserBundle:User"
 
     oro_security.owner.entity_owner_accessor.class:                       Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor
+    oro_security.owner.metadata_provider.chain.class:                     Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider
     oro_security.owner.ownership_metadata_provider.class:                 Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider
     oro_security.owner.ownership_config_subscriber.class:                 Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigSubscriber
     oro_security.owner.ownership_metadata_provider.cache.warmer.class:    Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheWarmer
@@ -16,6 +17,9 @@ services:
         arguments:
             - @oro_security.owner.ownership_metadata_provider
 
+    oro_security.owner.metadata_provider.chain:
+        class: %oro_security.owner.metadata_provider.chain.class%
+
     oro_security.owner.ownership_metadata_provider:
         class: %oro_security.owner.ownership_metadata_provider.class%
         arguments:
@@ -23,6 +27,8 @@ services:
             - @oro_entity_config.provider.ownership
             - @oro_entity.orm.entity_class_resolver
             - @oro_security.owner.ownership_metadata_provider.cache
+        tags:
+            - { name: oro_security.owner.metadata_provider }
 
     oro_security.owner.ownership_metadata_provider.link:
         tags:

@@ -6,15 +6,15 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 /**
  * This class provides access to the ownership metadata of a domain object
  */
-class OwnershipMetadataProvider
+class OwnershipMetadataProvider extends AbstractMetadataProvider
 {
     /**
      * @var string
@@ -30,28 +30,6 @@ class OwnershipMetadataProvider
      * @var string
      */
     protected $userClass;
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @var CacheProvider
-     */
-    protected $cache;
-
-    /**
-     * @var array
-     *         key = class name
-     *         value = OwnershipMetadata or true if an entity has no ownership config
-     */
-    protected $localCache;
-
-    /**
-     * @var OwnershipMetadata
-     */
-    protected $noOwnershipMetadata;
 
     /**
      * Constructor
@@ -86,135 +64,85 @@ class OwnershipMetadataProvider
     }
 
     /**
-     * Get the ownership related metadata for the given entity
-     *
-     * @param string $className
-     *
-     * @return OwnershipMetadata
+     * {@inheritDoc}
      */
-    public function getMetadata($className)
+    public function getSystemLevelClass()
     {
-        $this->ensureMetadataLoaded($className);
-
-        $result = $this->localCache[$className];
-        if ($result === true) {
-            return $this->noOwnershipMetadata;
-        }
-
-        return $result;
+        // TODO: Implement getSystemLevelClass() method.
+        throw new \Exception('Implement getSystemLevelClass() method.');
     }
 
     /**
-     * Warms up the cache
-     *
-     * If the class name is specified this method warms up cache for this class only
-     *
-     * @param string|null $className
+     * {@inheritDoc}
      */
-    public function warmUpCache($className = null)
+    public function getGlobalLevelClass()
     {
-        if ($className === null) {
-            $configs = $this->configProvider->getConfigs();
-            foreach ($configs as $config) {
-                $this->ensureMetadataLoaded($config->getId()->getClassName());
-            }
-        } else {
-            $this->ensureMetadataLoaded($className);
-        }
-    }
-
-    /**
-     * Clears the ownership metadata cache
-     *
-     * If the class name is not specified this method clears all cached data
-     *
-     * @param string|null $className
-     */
-    public function clearCache($className = null)
-    {
-        if ($this->cache) {
-            if ($className !== null) {
-                $this->cache->delete($className);
-            } else {
-                $this->cache->deleteAll();
-            }
-        }
+        return $this->organizationClass;
     }
 
     /**
      * Gets the class name of the organization entity
      *
      * @return string
+     *
+     * @deprecated since 1.8, use getGlobalLevelClass instead
      */
     public function getOrganizationClass()
     {
-        return $this->organizationClass;
+        return $this->getGlobalLevelClass();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLocalLevelClass($deep = false)
+    {
+        return $this->businessUnitClass;
     }
 
     /**
      * Gets the class name of the business unit entity
      *
      * @return string
+     *
+     * @deprecated since 1.8, use getLocalLevelClass instead
      */
     public function getBusinessUnitClass()
     {
-        return $this->businessUnitClass;
+        return $this->getLocalLevelClass();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBasicLevelClass()
+    {
+        return $this->userClass;
     }
 
     /**
      * Gets the class name of the user entity
      *
      * @return string
+     *
+     * @deprecated since 1.8, use getBasicLevelClass instead
      */
     public function getUserClass()
     {
-        return $this->userClass;
+        return $this->getBasicLevelClass();
     }
 
     /**
-     * Makes sure that metadata for the given class are loaded
-     *
-     * @param string $className
-     *
-     * @throws InvalidConfigurationException
+     * {@inheritDoc}
      */
-    protected function ensureMetadataLoaded($className)
+    public function supports()
     {
-        if (!isset($this->localCache[$className])) {
-            $data = null;
-            if ($this->cache) {
-                $data = $this->cache->fetch($className);
-            }
-            if (!$data) {
-                if ($this->configProvider->hasConfig($className)) {
-                    $config = $this->configProvider->getConfig($className);
-                    try {
-                        $data = $this->getOwnershipMetadata($config);
-                    } catch (\InvalidArgumentException $ex) {
-                        throw new InvalidConfigurationException(
-                            sprintf('Invalid entity ownership configuration for "%s".', $className),
-                            0,
-                            $ex
-                        );
-                    }
-                }
-                if (!$data) {
-                    $data = true;
-                }
-
-                if ($this->cache) {
-                    $this->cache->save($className, $data);
-                }
-            }
-
-            $this->localCache[$className] = $data;
-        }
+        // TODO: Implement isSupports() method (like return $token->getUser instanceof User).
+        return true;
     }
 
     /**
-     * @param ConfigInterface $config
-     *
-     * @return OwnershipMetadata
+     * {@inheritDoc}
      */
     protected function getOwnershipMetadata(ConfigInterface $config)
     {
