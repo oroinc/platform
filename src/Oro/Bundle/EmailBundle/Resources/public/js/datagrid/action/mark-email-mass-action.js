@@ -11,7 +11,7 @@ define([
     var MarkAction;
 
     /**
-     * Delete action with confirm dialog, triggers REST DELETE request
+     * Mark email as read/unread
      *
      * @export  oro/datagrid/action/mark-email-mass-action
      * @class   oro.datagrid.action.MarkAction
