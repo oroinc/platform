@@ -1,4 +1,5 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 <div class="widget-content">
     {% if saved %}
         <script type="text/javascript">
@@ -18,7 +19,11 @@
         });
         </script>
     {% else %}
-        <div class="form-container">
+        <div class="form-container" {{ UI.renderPageComponentAttributes({
+            'module': 'oroui/js/app/components/view-component',
+            'options': {'view': 'oronote/js/app/views/note-dialog-view'},
+            'layout': 'separate'
+        }) }}>
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
                 <fieldset class="form-horizontal control-group">
                     {{ form_widget(form.message) }}
