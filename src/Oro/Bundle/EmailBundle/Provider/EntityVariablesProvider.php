@@ -10,6 +10,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 
 class EntityVariablesProvider implements EntityVariablesProviderInterface
 {
@@ -22,6 +23,9 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var FormatterManager */
+    protected $formatterManager;
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -30,17 +34,20 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
      * @param ConfigProvider      $emailConfigProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ManagerRegistry     $doctrine
+     * @param FormatterManager    $formatterManager
      */
     public function __construct(
         TranslatorInterface $translator,
         ConfigProvider $emailConfigProvider,
         ConfigProvider $entityConfigProvider,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        FormatterManager $formatterManager
     ) {
         $this->translator           = $translator;
         $this->emailConfigProvider  = $emailConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->doctrine             = $doctrine;
+        $this->formatterManager     = $formatterManager;
     }
 
     /**
@@ -93,6 +100,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
     /**
      * @param string $entityClass
+     *
      * @return array
      */
     protected function getEntityVariableDefinitions($entityClass)
@@ -142,6 +150,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
     /**
      * @param string $entityClass
+     *
      * @return array
      */
     protected function getEntityVariableGetters($entityClass)
@@ -167,7 +176,13 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
                 continue;
             }
 
-            $result[$varName] = $getter;
+            $resultGetter = $getter;
+            $formatters   = $this->formatterManager->guessFormatters($fieldId);
+            if ($formatters && count($formatters)) {
+                $resultGetter = array_merge(['property_path' => $getter], $formatters);
+            }
+
+            $result[$varName] = $resultGetter;
         }
 
         return $result;
