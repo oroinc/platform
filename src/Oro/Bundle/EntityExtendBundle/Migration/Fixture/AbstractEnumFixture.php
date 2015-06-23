@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Fixture;
+namespace Oro\Bundle\EntityExtendBundle\Migration\Fixture;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 abstract class AbstractEnumFixture extends AbstractFixture
 {
@@ -14,8 +15,9 @@ abstract class AbstractEnumFixture extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
+        $className = ExtendHelper::buildEnumValueClassName($this->getEnumCode());
         /** @var EnumValueRepository $enumRepo */
-        $enumRepo = $manager->getRepository($this->getClassName());
+        $enumRepo = $manager->getRepository($className);
 
         $priority = 1;
         foreach ($this->getData() as $id => $name) {
@@ -45,9 +47,10 @@ abstract class AbstractEnumFixture extends AbstractFixture
     abstract protected function getData();
 
     /**
-     * Returns a class name of an extend entity
+     * Returns an enum code of an extend entity
      *
      * @return string
      */
-    abstract protected function getClassName();
+    abstract protected function getEnumCode();
+
 }

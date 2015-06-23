@@ -1,6 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixture;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Fixture;
+
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\EntityExtendBundle\Migration\Fixture\AbstractEnumFixture;
 
 class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
 {
@@ -8,27 +12,24 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
     const ID_2 = 'id2';
     const VALUE_1 = 'value1';
     const VALUE_2 = 'value2';
+    const ENUM_CODE = 'enum_code';
+    const EXTEND_ENTITY_NAME = 'Extend\Entity\EV_Enum_Code';
 
     public function testLoadData()
     {
-        $stub = $this->getMockForAbstractClass(
-            'Oro\Bundle\EntityExtendBundle\Fixture\AbstractEnumFixture',
-            [],
-            '',
-            true,
-            true,
-            true,
-            ['getDefaultValue']
-        );
-
+        /** @var AbstractEnumFixture|\PHPUnit_Framework_MockObject_MockObject $stub */
+        $stub = $this
+            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\Fixture\AbstractEnumFixture')
+            ->setMethods(['getDefaultValue'])
+            ->getMockForAbstractClass();
         $stub
             ->expects($this->once())
             ->method('getData')
             ->willReturn($this->getData());
         $stub
             ->expects($this->once())
-            ->method('getClassName')
-            ->willReturn('ClassName');
+            ->method('getEnumCode')
+            ->willReturn(self::ENUM_CODE);
         $stub
             ->expects($this->any())
             ->method('getDefaultValue')
@@ -40,7 +41,7 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    private function getData()
+    protected function getData()
     {
         return [
             self::ID_1 => self::VALUE_1,
@@ -49,9 +50,9 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return ObjectManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function mockObjectManager()
+    protected function mockObjectManager()
     {
         $enumRepositoryMock = $this
             ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository')
@@ -70,7 +71,7 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
         $objectManagerMock
             ->expects($this->any())
             ->method('getRepository')
-            ->with('ClassName')
+            ->with(self::EXTEND_ENTITY_NAME)
             ->willReturn($enumRepositoryMock);
 
         return $objectManagerMock;
