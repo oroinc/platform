@@ -27,6 +27,7 @@ parameters:
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
     oro_user.mailer.processor.class:              Oro\Bundle\UserBundle\Mailer\Processor
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
+    oro_user.listener.email_recipients_load.listener.class: Oro\Bundle\UserBundle\EventListener\EmailRecipientsLoadListener
 
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
 services:
@@ -243,3 +244,11 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-for-context-grid, method: onBuildAfter }
+
+    oro_user.listener.email_recipients_load.listener:
+        class: %oro_user.listener.email_recipients_load.listener.class%
+        arguments:
+            - @doctrine
+            - @translator
+        tags:
+            - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: onLoad }

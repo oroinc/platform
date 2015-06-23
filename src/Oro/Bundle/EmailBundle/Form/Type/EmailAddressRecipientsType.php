@@ -22,6 +22,7 @@ class EmailAddressRecipientsType extends AbstractType
                 'route_name'         => 'oro_api_get_email_recipient_autocomplete',
                 'separator'          => ';',
                 'minimumInputLength' => 1,
+                'per_page'           => 100,
             ]
         ]);
     }

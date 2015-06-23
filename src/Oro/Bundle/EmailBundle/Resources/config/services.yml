@@ -28,6 +28,7 @@ parameters:
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
+    oro_email.listener.email_recipients_load.listener.class: Oro\Bundle\EmailBundle\EventListener\EmailRecipientsLoadListener
 
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
@@ -44,6 +45,8 @@ parameters:
     oro_email.emailtemplate.variable_provider.system.class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
     oro_email.emailtemplate.variable_provider.user.class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
     oro_email.activity_list.provider.class: Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider
+    oro_email.related_emails.provider.class: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider
+    oro_email.email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider
 
     # Cache keys
     oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'
@@ -494,6 +497,27 @@ services:
            - @oro_ui.html_tag_helper
         tags:
            - {name: oro_activity_list.provider, priority: 30}
+
+    oro_email.related_emails.provider:
+        class: %oro_email.related_emails.provider.class%
+        arguments:
+            - @doctrine
+            - @oro_entity_config.provider.entity
+
+    oro_email.email_recipients.provider:
+        class: %oro_email.email_recipients.provider.class%
+        arguments:
+            - @event_dispatcher
+
+    oro_email.listener.email_recipients_load.listener:
+        class: %oro_email.listener.email_recipients_load.listener.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_email.related_emails.provider
+            - @doctrine
+            - @translator
+        tags:
+            - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: onLoad }
 
     oro_email.link.formatter.name:
         tags:

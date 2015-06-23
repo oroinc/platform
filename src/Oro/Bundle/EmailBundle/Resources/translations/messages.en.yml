@@ -8,6 +8,8 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        autocomplete:
+            recently_used: Recently used
         controller.emailtemplate.saved.message: "Template saved"
         form:
             choose_template:                     ""

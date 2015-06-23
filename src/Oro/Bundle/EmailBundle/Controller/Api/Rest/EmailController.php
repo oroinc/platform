@@ -13,6 +13,7 @@ use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -20,6 +21,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
@@ -390,5 +392,27 @@ class EmailController extends RestController
     public function getFormHandler()
     {
         return $this->get('oro_email.form.handler.email.api');
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function getRecipientAutocompleteAction(Request $request)
+    {
+        $query = $request->query->get('query');
+        $limit = $request->query->get('per_page', 100);
+        $results = $this->getEmailRecipientsProvider()->getEmailRecipients($query, $limit);
+
+        return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
+    }
+
+    /**
+     * @return EmailRecipientsProvider
+     */
+    protected function getEmailRecipientsProvider()
+    {
+        return $this->get('oro_email.email_recipients.provider');
     }
 }
