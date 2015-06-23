@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Exception;
 
-class NotManageableEntityException extends RuntimeException
+class NotManageableEntityException extends RuntimeException implements EntityExceptionInterface
 {
     public function __construct($className)
     {

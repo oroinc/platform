@@ -29,7 +29,7 @@ services:
         arguments:
             - @doctrine
             - @oro_security.security_facade
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @oro_datagrid.extension.pager.orm.pager
             - @event_dispatcher
             - @oro_attachment.manager

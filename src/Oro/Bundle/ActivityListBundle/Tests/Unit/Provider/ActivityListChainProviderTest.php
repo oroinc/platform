@@ -150,7 +150,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $entityConfig->set('label', 'test_label');
         $entityConfigProvider->expects($this->once())->method('getConfig')->willReturn($entityConfig);
         $this->translator->expects($this->once())->method('trans')->with('test_label')->willReturn('test_label');
-        $this->routeHelper->expects($this->once())->method('encodeClassName')
+        $this->routeHelper->expects($this->once())->method('getUrlSafeClassName')
             ->willReturn('Test_Entity');
         $this->configManager->expects($this->once())->method('getProvider')->willReturn($entityConfigProvider);
 

@@ -35,7 +35,7 @@ class AuditController extends Controller
     {
         return [
             'gridName'    => 'audit-log-grid',
-            'entityClass' => $this->get('oro_entity.routing_helper')->decodeClassName($entity),
+            'entityClass' => $this->get('oro_entity.routing_helper')->resolveEntityClass($entity),
             'entityId'    => $id,
         ];
     }
@@ -63,7 +63,7 @@ class AuditController extends Controller
 
         return [
             'gridName'    => 'auditfield-log-grid',
-            'entityClass' => $this->get('oro_entity.routing_helper')->decodeClassName($entity),
+            'entityClass' => $this->get('oro_entity.routing_helper')->resolveEntityClass($entity),
             'fieldName'   => $fieldName->getFieldName(),
             'entityId'    => $id,
         ];

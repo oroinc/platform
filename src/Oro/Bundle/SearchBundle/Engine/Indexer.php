@@ -125,9 +125,10 @@ class Indexer
      * @param  integer $maxResults
      * @param  string  $from
      * @param  integer $page
-     * @return Result
+     *
+     * @return Query
      */
-    public function simpleSearch($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
+    public function getSimpleSearchQuery($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
     {
         $searchString = trim($searchString);
         $query = $this->select();
@@ -153,6 +154,21 @@ class Indexer
         } elseif ($offset > 0) {
             $query->setFirstResult($offset);
         }
+
+        return $query;
+    }
+
+    /**
+     * @param  string  $searchString
+     * @param  integer $offset
+     * @param  integer $maxResults
+     * @param  string  $from
+     * @param  integer $page
+     * @return Result
+     */
+    public function simpleSearch($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
+    {
+        $query = $this->getSimpleSearchQuery($searchString, $offset, $maxResults, $from, $page);
 
         return $this->query($query);
     }

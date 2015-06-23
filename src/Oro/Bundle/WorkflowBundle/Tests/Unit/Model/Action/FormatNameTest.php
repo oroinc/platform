@@ -19,17 +19,17 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $formatter;
+    protected $entityNameResolver;
 
     protected function setUp()
     {
         $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->action = new FormatName($this->contextAccessor, $this->formatter);
+        $this->action = new FormatName($this->contextAccessor, $this->entityNameResolver);
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -68,8 +68,8 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
         $context = array();
         $options = array('object' => $object, 'attribute' => $attribute);
         $this->assertEquals($this->action, $this->action->initialize($options));
-        $this->formatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($object)
             ->will($this->returnValue('FORMATTED'));
         $this->contextAccessor->expects($this->once())

@@ -18,7 +18,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarConfig;
@@ -28,16 +28,16 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper     = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nameFormatter  = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calendarConfig    =
+        $this->calendarConfig     =
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
                 ->disableOriginalConstructor()
                 ->getMock();
@@ -45,7 +45,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new CalendarEventManager(
             $this->doctrineHelper,
             $this->securityFacade,
-            $this->nameFormatter,
+            $this->entityNameResolver,
             $this->calendarConfig
         );
     }
@@ -143,8 +143,8 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getArrayResult')
             ->will($this->returnValue($calendars));
 
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($this->identicalTo($user))
             ->will($this->returnValue('name1'));
 
