@@ -115,7 +115,7 @@ class EntityReader extends IteratorBasedReader
     protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, Organization $organization = null)
     {
         if ($organization) {
-            $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getOrganizationFieldName();
+            $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getGlobalOwnerFieldName();
             if ($organizationField) {
                 $queryBuilder->andWhere('o.' . $organizationField . ' = :organization')
                     ->setParameter('organization', $organization);

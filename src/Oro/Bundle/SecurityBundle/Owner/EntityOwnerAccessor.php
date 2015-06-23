@@ -88,9 +88,9 @@ class EntityOwnerAccessor
 
         $result = null;
         $metadata = $this->metadataProvider->getMetadata(ClassUtils::getClass($object));
-        if ($metadata->getOrganizationFieldName()) {
+        if ($metadata->getGlobalOwnerFieldName()) {
             $accessor = PropertyAccess::createPropertyAccessor();
-            $result = $accessor->getValue($object, $metadata->getOrganizationFieldName());
+            $result = $accessor->getValue($object, $metadata->getGlobalOwnerFieldName());
         }
 
         return $result;

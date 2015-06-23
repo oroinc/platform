@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 /**
  * This class represents the entity ownership metadata
  */
-class OwnershipMetadata implements \Serializable
+class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
 {
     const OWNER_TYPE_NONE = 0;
     const OWNER_TYPE_ORGANIZATION = 1;
@@ -54,42 +56,33 @@ class OwnershipMetadata implements \Serializable
         $organizationFieldName = '',
         $organizationColumnName = ''
     ) {
-        switch ($ownerType) {
-            case 'ORGANIZATION':
-                $this->ownerType = self::OWNER_TYPE_ORGANIZATION;
-                break;
-            case 'BUSINESS_UNIT':
-                $this->ownerType = self::OWNER_TYPE_BUSINESS_UNIT;
-                break;
-            case 'USER':
-                $this->ownerType = self::OWNER_TYPE_USER;
-                break;
-            case 'NONE':
-                $this->ownerType = self::OWNER_TYPE_NONE;
-                break;
-            default:
-                if (!empty($ownerType)) {
-                    throw new \InvalidArgumentException(sprintf('Unknown owner type: %s.', $ownerType));
-                }
-                $this->ownerType = self::OWNER_TYPE_NONE;
-                break;
+        $const = sprintf('static::OWNER_TYPE_%s', strtoupper($ownerType));
+
+        if (defined($const)) {
+            $this->ownerType = constant($const);
+        } else {
+            if (!empty($ownerType)) {
+                throw new \InvalidArgumentException(sprintf('Unknown owner type: %s.', $ownerType));
+            }
+            $this->ownerType = self::OWNER_TYPE_NONE;
         }
-        if ($this->ownerType !== self::OWNER_TYPE_NONE && empty($ownerFieldName)) {
+
+        $this->ownerFieldName = $ownerFieldName;
+        if ($this->ownerType !== self::OWNER_TYPE_NONE && empty($this->ownerFieldName)) {
             throw new \InvalidArgumentException('The owner field name must not be empty.');
         }
-        $this->ownerFieldName = $ownerFieldName;
-        if ($this->ownerType !== self::OWNER_TYPE_NONE && empty($ownerColumnName)) {
+
+        $this->ownerColumnName = $ownerColumnName;
+        if ($this->ownerType !== self::OWNER_TYPE_NONE && empty($this->ownerColumnName)) {
             throw new \InvalidArgumentException('The owner column name must not be empty.');
         }
-        $this->ownerColumnName = $ownerColumnName;
+
         $this->organizationColumnName = $organizationColumnName;
         $this->organizationFieldName = $organizationFieldName;
     }
 
     /**
-     * Gets an owner type for an entity is represented this metadata object
-     *
-     * @return int Can be a value of one of OwnershipMetadata::OWNER_TYPE_* constants
+     * {@inheritdoc}
      */
     public function getOwnerType()
     {
@@ -97,9 +90,7 @@ class OwnershipMetadata implements \Serializable
     }
 
     /**
-     * Indicates whether the entity has an owner
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasOwner()
     {
@@ -110,8 +101,18 @@ class OwnershipMetadata implements \Serializable
      * Indicates whether the ownership of the entity is Organization
      *
      * @return bool
+     *
+     * @deprecated since 1.8, use isGlobalLevelOwned method instead
      */
     public function isOrganizationOwned()
+    {
+        return $this->isGlobalLevelOwned();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isGlobalLevelOwned()
     {
         return $this->ownerType === self::OWNER_TYPE_ORGANIZATION;
     }
@@ -120,8 +121,18 @@ class OwnershipMetadata implements \Serializable
      * Indicates whether the ownership of the entity is BusinessUnit
      *
      * @return bool
+     *
+     * @deprecated since 1.8, use isLocalLevelOwned and isDeepLevelOwned method instead
      */
     public function isBusinessUnitOwned()
+    {
+        return $this->isLocalLevelOwned();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isLocalLevelOwned($deep = false)
     {
         return $this->ownerType === self::OWNER_TYPE_BUSINESS_UNIT;
     }
@@ -130,16 +141,32 @@ class OwnershipMetadata implements \Serializable
      * Indicates whether the ownership of the entity is User
      *
      * @return bool
+     *
+     * @deprecated since 1.8, use isBasicLevelOwned method instead
      */
     public function isUserOwned()
+    {
+        return $this->isBasicLevelOwned();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isBasicLevelOwned()
     {
         return $this->ownerType === self::OWNER_TYPE_USER;
     }
 
     /**
-     * Gets the name of the field is used to store the entity owner
-     *
-     * @return string
+     * {@inheritdoc}
+     */
+    public function isSystemLevelOwned()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getOwnerFieldName()
     {
@@ -147,9 +174,7 @@ class OwnershipMetadata implements \Serializable
     }
 
     /**
-     * Gets the name of the database column is used to store the entity owner
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getOwnerColumnName()
     {
@@ -158,16 +183,36 @@ class OwnershipMetadata implements \Serializable
 
     /**
      * @return string
+     *
+     * @deprecated since 1.8, use getGlobalOwnerColumnName method instead
      */
     public function getOrganizationColumnName()
+    {
+        return $this->getGlobalOwnerColumnName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGlobalOwnerColumnName()
     {
         return $this->organizationColumnName;
     }
 
     /**
      * @return string
+     *
+     * @deprecated since 1.8, use getGlobalOwnerFieldName method instead
      */
     public function getOrganizationFieldName()
+    {
+        return $this->getGlobalOwnerFieldName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGlobalOwnerFieldName()
     {
         return $this->organizationFieldName;
     }
@@ -178,13 +223,13 @@ class OwnershipMetadata implements \Serializable
     public function serialize()
     {
         return serialize(
-            array(
+            [
                 $this->ownerType,
                 $this->ownerFieldName,
                 $this->ownerColumnName,
                 $this->organizationFieldName,
                 $this->organizationColumnName
-            )
+            ]
         );
     }
 
@@ -206,17 +251,17 @@ class OwnershipMetadata implements \Serializable
      * The __set_state handler
      *
      * @param array $data Initialization array
-     * @return OwnershipMetadata A new instance of a OwnershipMetadata object
+     * @return OwnershipMetadataInterface A new instance of a OwnershipMetadataInterface object
      */
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result                  = new OwnershipMetadata();
-        $result->ownerType       = $data['ownerType'];
-        $result->ownerFieldName  = $data['ownerFieldName'];
-        $result->ownerColumnName = $data['ownerColumnName'];
-        $result->organizationColumnName = $data['organizationColumnName'];
-        $result->organizationFieldName = $data['organizationFieldName'];
+        $result = new static();
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($data as $property => $value) {
+            $propertyAccessor->setValue($result, $property, $value);
+        }
+        unset($propertyAccessor);
 
         return $result;
     }
