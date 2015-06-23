@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -339,40 +340,25 @@ class EmailController extends Controller
 
     /**
      * @Route("/toggle_seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
-     * @param Email $emailEntity
+     * @AclAncestor("oro_email_email_edit")
+     * @param EmailUser $emailUserEntity
      * @return array
      */
-    public function toggleSeenAction(Email $emailEntity)
+    public function toggleSeenAction(EmailUser $emailUserEntity)
     {
-        if (!$this->getEmailHelper()->isEmailEditGranted($emailEntity)) {
-            return new JsonResponse(
-                [
-                    'message' => $this
-                        ->get('translator')
-                        ->trans('oro.email.datagrid.emails.action.enable_to_change_status'),
-                    'successful' => false
-                ]
-            );
+        if ($emailUserEntity) {
+            $this->getEmailManager()->toggleEmailUserSeen($emailUserEntity);
         }
     
-        $emailUser = $this
-            ->get('doctrine')
-            ->getRepository('OroEmailBundle:EmailUser')
-            ->findByEmailAndOwner($emailEntity, $this->getUser());
-    
-        if ($emailUser) {
-            $this->getEmailManager()->toggleEmailUserSeen($emailUser);
-        }
-    
-        return new JsonResponse(['successful' => (bool)$emailUser]);
+        return new JsonResponse(['successful' => (bool)$emailUserEntity]);
     }
 
     /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
-     * @AclAncestor("oro_email_email_mark")
+     * @AclAncestor("oro_email_email_edit")
      *
      */
-    public function markMassActionAction($gridName, $actionName)
+    public function markMassAction($gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');

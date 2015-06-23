@@ -59,9 +59,24 @@ class EmailManager
      */
     public function toggleEmailUserSeen(EmailUser $entity)
     {
-        $entity->setSeen(!((bool) $entity->isSeen()));
+        $seen = !((bool) $entity->isSeen());
+        $entity->setSeen($seen);
         $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($entity);
+
+        if ($entity->getEmail()->getThread()->getId()) {
+            $threadedEmailUserBuilder = $this
+                ->em
+                ->getRepository('OroEmailBundle:EmailUser')
+                ->getEmailUserByThreadId([$entity->getEmail()->getThread()->getId()], $entity->getOwner());
+
+            $threadedEmailUserList = $threadedEmailUserBuilder->getQuery()->getResult();
+            foreach ($threadedEmailUserList as $threadedEmailUser) {
+                $threadedEmailUser->setSeen($seen);
+                $this->em->persist($threadedEmailUser);
+            }
+        }
+
         $this->em->flush();
     }
 

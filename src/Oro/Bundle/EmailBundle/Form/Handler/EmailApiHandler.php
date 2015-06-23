@@ -210,6 +210,12 @@ class EmailApiHandler extends ApiFormHandler
             } elseif (!$email->getId()) {
                 $emailUser->setReceivedAt($messageDate);
             }
+            // ChangedStatusAt
+            if ($model->getChangedStatusAt()) {
+                $emailUser->setChangedStatusAt($model->getChangedStatusAt());
+            } elseif (!$email->getId()) {
+                $emailUser->setChangedStatusAt($messageDate);
+            }
             // Seen
             if (null !== $model->isSeen()) {
                 $emailUser->setSeen($model->isSeen());

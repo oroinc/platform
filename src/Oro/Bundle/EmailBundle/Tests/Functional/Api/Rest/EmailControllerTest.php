@@ -26,6 +26,7 @@ class EmailControllerTest extends WebTestCase
         'body'       => 'Test body',
         'bodyType'   => 'text',
         'receivedAt' => '2015-06-19 12:17:51',
+        'changedStatusAt' => '2015-06-19 12:17:51'
     ];
 
     protected function setUp()
@@ -51,13 +52,13 @@ class EmailControllerTest extends WebTestCase
         $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId']);
-        $this->assertCount(9, $this->getJsonResponseContent($this->client->getResponse(), 200));
+        $this->assertCount(10, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
         $this->assertCount(2, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
-        $this->assertCount(8, $this->getJsonResponseContent($this->client->getResponse(), 200));
+        $this->assertCount(10, $this->getJsonResponseContent($this->client->getResponse(), 200));
     }
 
     public function testGet()
@@ -245,6 +246,7 @@ class EmailControllerTest extends WebTestCase
             [
                 'seen'    => 1,
                 'receivedAt' => '2015-06-19 12:17:51',
+                'changedStatusAt' => '2015-06-19 12:17:51',
                 'folders' => $folders
             ]
         );
