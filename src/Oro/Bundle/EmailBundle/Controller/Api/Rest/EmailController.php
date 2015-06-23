@@ -403,8 +403,14 @@ class EmailController extends RestController
     {
         $query = $request->query->get('query');
         if ($request->query->get('search_by_id', false)) {
+            $id = $query;
+            $matches = [];
+            if (preg_match('/<(.+)>/', $query, $matches)) {
+                $id = $matches[1];
+            }
+
             $results = [
-                'id'   => $query,
+                'id'   => $id,
                 'text' => $query,
             ];
         } else {
