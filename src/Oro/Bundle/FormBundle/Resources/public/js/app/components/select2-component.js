@@ -171,7 +171,7 @@ define(function (require) {
         var elementData = _.filter(
             selectedData,
             function (item) {
-                return item !== undefined && item.name !== undefined && item.name !== null;
+                return _.result(item, 'fullName') || _.result(item, 'name');
             }
         );
 
