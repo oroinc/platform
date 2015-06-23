@@ -244,6 +244,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         $emailEntity
             ->addFolder($folder)
             ->setMessageId($email->getMessageId())
+            ->setMessageIdArray($email->getMessageIdArray())
             ->setRefs($email->getRefs())
             ->setXMessageId($email->getXMessageId())
             ->setXThreadId($email->getXThreadId())

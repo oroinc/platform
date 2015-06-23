@@ -162,10 +162,12 @@ class ImapEmailManager
                 ->setReceivedAt($this->getReceivedAt($headers))
                 ->setInternalDate($this->getDateTime($headers, 'InternalDate'))
                 ->setImportance($this->getImportance($headers))
-                ->setMessageId($this->getString($headers, 'Message-ID'))
                 ->setRefs($this->getReferences($headers, 'References'))
                 ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'));
+
+            $messageId = $this->getMessageId($headers, 'Message-ID');
+            $this->setMessageId($email, $messageId);
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);
             }
@@ -220,6 +222,63 @@ class ImapEmailManager
                     implode(', ', $values)
                 )
             );
+        }
+
+        return $header->getFieldValue();
+    }
+
+    /**
+     * Set Massage Id to Oro\Bundle\ImapBundle\Manager\DTO\Email;
+     *
+     * @param Email        $email     - Email
+     * @param string|array $messageId - MessageId
+     *
+     * @return $this
+     */
+    protected function setMessageId(Email &$email, $messageId)
+    {
+        $messageId = [
+            '<ed0dd55e0dd045191f1fda9594b647a3@oro-enterprise.lan>',
+            '<ed0dd55e0d1045191f1fda9594b647a3@oro-enterprise.lan>'
+        ];
+        if (is_array($messageId)) {
+            if (count($messageId) > 1) {
+                $email->setMessageIdArray($messageId);
+                $email->setMessageId(reset($messageId));
+            }
+
+            if (count($messageId) > 1) {
+                $email->setMessageId(reset($messageId));
+            }
+        } else {
+            $email->setMessageId($messageId);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set Massage Id from Headers
+     *
+     * @param Headers $headers - Headers
+     * @param string  $name    - Key in $headers
+     *
+     * @return array|string
+     */
+    protected function getMessageId(Headers $headers, $name)
+    {
+        $header = $headers->get($name);
+        if ($header === false) {
+            return '';
+        } elseif ($header instanceof \ArrayIterator) {
+            $values = [];
+            $header->rewind();
+            while ($header->valid()) {
+                $values[] = $header->current()->getFieldValue();
+                $header->next();
+            }
+
+            return $values;
         }
 
         return $header->getFieldValue();

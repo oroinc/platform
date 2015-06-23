@@ -59,6 +59,11 @@ class EmailHeader
     /**
      * @var string
      */
+    protected $messageIdArray;
+
+    /**
+     * @var string
+     */
     protected $refs;
 
     /**
@@ -382,4 +387,30 @@ class EmailHeader
 
         return $this;
     }
+
+    /**
+     * Get array values of email Message-ID header
+     *
+     * @return string
+     */
+    public function getMessageIdArray()
+    {
+        return explode(',', $this->messageIdArray);
+    }
+
+    /**
+     * Set array values of email Message-ID header
+     *
+     * @param array $messageIdArray
+     *
+     * @return self
+     */
+    public function setMessageIdArray($messageIdArray)
+    {
+
+        $this->messageIdArray = implode(',', $messageIdArray);
+
+        return $this;
+    }
+
 }
