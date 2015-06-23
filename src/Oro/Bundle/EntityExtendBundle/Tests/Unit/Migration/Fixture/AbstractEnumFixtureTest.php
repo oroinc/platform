@@ -45,7 +45,7 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
     {
         return [
             self::ID_1 => self::VALUE_1,
-            self::ID_2 => self::VALUE_2,
+            self::ID_2 => self::VALUE_2
         ];
     }
 

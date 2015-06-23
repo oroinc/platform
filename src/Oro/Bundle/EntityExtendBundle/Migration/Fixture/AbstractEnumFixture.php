@@ -52,5 +52,4 @@ abstract class AbstractEnumFixture extends AbstractFixture
      * @return string
      */
     abstract protected function getEnumCode();
-
 }
