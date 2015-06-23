@@ -402,8 +402,15 @@ class EmailController extends RestController
     public function getRecipientAutocompleteAction(Request $request)
     {
         $query = $request->query->get('query');
-        $limit = $request->query->get('per_page', 100);
-        $results = $this->getEmailRecipientsProvider()->getEmailRecipients($query, $limit);
+        if ($request->query->get('search_by_id', false)) {
+            $results = [
+                'id'   => $query,
+                'text' => $query,
+            ];
+        } else {
+            $limit = $request->query->get('per_page', 100);
+            $results = $this->getEmailRecipientsProvider()->getEmailRecipients($query, $limit);
+        }
 
         return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
     }
