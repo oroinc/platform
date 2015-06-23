@@ -52,6 +52,9 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
         array(\IntlDateFormatter::NONE,   null,                       self::LOCALE_RU, "H:mm"),
     );
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     */
     protected function setUp()
     {
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
@@ -68,15 +71,21 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
             ->getMock();
 
         $this->translator->method('trans')
-            ->will($this->returnCallback(function($one, $two, $tree, $locale){
-                if ($locale == self::LOCALE_EN)
-                    return 'MMM d';
+            ->will(
+                $this->returnCallback(
+                    function ($one, $two, $tree, $locale) {
+                        if ($locale == self::LOCALE_EN) {
+                            return 'MMM d';
+                        }
 
-                if ($locale == self::LOCALE_RU)
-                    return 'd.MMM';
+                        if ($locale == self::LOCALE_RU) {
+                            return 'd.MMM';
+                        }
 
-                return '';
-            }));
+                        return '';
+                    }
+                )
+            );
 
         $this->converter = $this->createFormatConverter();
     }

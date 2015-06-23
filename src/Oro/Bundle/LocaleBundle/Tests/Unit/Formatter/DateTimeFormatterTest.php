@@ -22,7 +22,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
         $translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
