@@ -258,16 +258,27 @@ define(function (require) {
          * @param {Event} e
          */
         _handleVariableClick: function (e) {
-            var field = this.fields.filter(document.activeElement);
-            var value = $(e.currentTarget).html();
+            var value,
+                start,
+                end,
+                field = this.fields.filter(document.activeElement),
+                variable = $(e.currentTarget).html();
 
+            e.preventDefault();
             if (!field.length && this.lastElement && this.lastElement.is(':visible')) {
                 field = this.lastElement;
             }
 
             if (field) {
-                field.val(field.val() + value);
-                mediator.trigger('email-variable-view:click-variable', field, value);
+                value = field.val();
+                if('selectionStart' in field[0]) {
+                    start = field[0].selectionStart;
+                    end = field[0].selectionEnd;
+                    field.val(value.substring(0, start) + variable + value.substring(end));
+                } else {
+                    field.val(value + variable);
+                }
+                mediator.trigger('email-variable-view:click-variable', field, variable);
             }
         },
 
