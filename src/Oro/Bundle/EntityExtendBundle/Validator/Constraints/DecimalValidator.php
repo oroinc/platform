@@ -9,8 +9,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class DecimalValidator extends ConstraintValidator
 {
     /**
-     * @param mixed $value
-     * @param Decimal $constraint
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
@@ -22,22 +21,19 @@ class DecimalValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'numeric');
         }
 
-        $invalid = false;
-
-        $intPart      = intval(floor(abs($value)));
+        $intPart      = (int)(floor(abs($value)));
         $fractionPart = abs($value) - $intPart;
 
-        if (($intPart > 0 && strlen((string) $intPart) > ($constraint->precision - $constraint->scale))
-            || ($fractionPart > 0 && strlen(substr(strrchr((string) $fractionPart, '.'), 1)) > $constraint->scale)
+        if (($intPart > 0 && strlen((string)$intPart) > ($constraint->precision - $constraint->scale))
+            || ($fractionPart > 0 && strlen(substr(strrchr((string)$fractionPart, '.'), 1)) > $constraint->scale)
         ) {
-            $invalid = true;
-        }
-
-        if ($invalid) {
-            $this->context->addViolation($constraint->message, [
-                '{{ precision }}' => $constraint->precision,
-                '{{ scale }}'     => $constraint->scale,
-            ]);
+            $this->context->addViolation(
+                $constraint->message,
+                [
+                    '{{ precision }}' => $constraint->precision,
+                    '{{ scale }}'     => $constraint->scale
+                ]
+            );
         }
     }
 }
