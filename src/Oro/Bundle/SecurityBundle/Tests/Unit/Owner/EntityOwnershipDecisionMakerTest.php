@@ -13,6 +13,12 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount:)
+ */
 class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -198,6 +204,9 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
     }
 
+    /**
+     * @deprecated
+     */
     public function testIsOrganization()
     {
         $this->assertFalse($this->decisionMaker->isOrganization(null));
@@ -213,6 +222,24 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testIsGlobalLevelEntity()
+    {
+        $this->assertFalse($this->decisionMaker->isGlobalLevelEntity(null));
+        $this->assertFalse($this->decisionMaker->isGlobalLevelEntity('test'));
+        $this->assertFalse($this->decisionMaker->isGlobalLevelEntity(new User('')));
+        $this->assertTrue($this->decisionMaker->isGlobalLevelEntity(new Organization('')));
+        $this->assertTrue(
+            $this->decisionMaker->isGlobalLevelEntity(
+                $this->getMockBuilder('Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization')
+                    ->disableOriginalConstructor()
+                    ->getMock()
+            )
+        );
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsBusinessUnit()
     {
         $this->assertFalse($this->decisionMaker->isBusinessUnit(null));
@@ -228,6 +255,24 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testIsLocalLevelEntity()
+    {
+        $this->assertFalse($this->decisionMaker->isLocalLevelEntity(null));
+        $this->assertFalse($this->decisionMaker->isLocalLevelEntity('test'));
+        $this->assertFalse($this->decisionMaker->isLocalLevelEntity(new User('')));
+        $this->assertTrue($this->decisionMaker->isLocalLevelEntity(new BusinessUnit('')));
+        $this->assertTrue(
+            $this->decisionMaker->isLocalLevelEntity(
+                $this->getMockBuilder('Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit')
+                    ->disableOriginalConstructor()
+                    ->getMock()
+            )
+        );
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsUser()
     {
         $this->assertFalse($this->decisionMaker->isUser(null));
@@ -243,8 +288,24 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testIsBasicLevelEntity()
+    {
+        $this->assertFalse($this->decisionMaker->isBasicLevelEntity(null));
+        $this->assertFalse($this->decisionMaker->isBasicLevelEntity('test'));
+        $this->assertFalse($this->decisionMaker->isBasicLevelEntity(new BusinessUnit('')));
+        $this->assertTrue($this->decisionMaker->isBasicLevelEntity(new User('')));
+        $this->assertTrue(
+            $this->decisionMaker->isBasicLevelEntity(
+                $this->getMockBuilder('Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User')
+                    ->disableOriginalConstructor()
+                    ->getMock()
+            )
+        );
+    }
+    
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @deprecated
      */
     public function testIsAssociatedWithOrganizationNullUser()
     {
@@ -253,6 +314,15 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     */
+    public function testIsAssociatedWithGlobalLevelEntityNullUser()
+    {
+        $this->decisionMaker->isAssociatedWithGlobalLevelEntity(null, null);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @deprecated
      */
     public function testIsAssociatedWithOrganizationNullObject()
     {
@@ -263,6 +333,16 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
      */
+    public function testIsAssociatedWithGlobalLevelEntityNullObject()
+    {
+        $user = new User('user');
+        $this->decisionMaker->isAssociatedWithGlobalLevelEntity($user, null);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitNullUser()
     {
         $this->decisionMaker->isAssociatedWithBusinessUnit(null, null);
@@ -270,6 +350,15 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     */
+    public function testIsAssociatedWithLocalLevelEntityNullUser()
+    {
+        $this->decisionMaker->isAssociatedWithLocalLevelEntity(null, null);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @deprecated
      */
     public function testIsAssociatedWithBusinessUnitNullObject()
     {
@@ -280,6 +369,16 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
      */
+    public function testIsAssociatedWithLocalLevelEntityNullObject()
+    {
+        $user = new User('user');
+        $this->decisionMaker->isAssociatedWithLocalLevelEntity($user, null);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @deprecated
+     */
     public function testIsAssociatedWithUserNullUser()
     {
         $this->decisionMaker->isAssociatedWithUser(null, null);
@@ -287,6 +386,16 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @deprecated
+     */
+    public function testIsAssociatedWithBasicLevelEntityNullUser()
+    {
+        $this->decisionMaker->isAssociatedWithBasicLevelEntity(null, null);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @deprecated
      */
     public function testIsAssociatedWithUserNullObject()
     {
@@ -294,24 +403,63 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->decisionMaker->isAssociatedWithUser($user, null);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     */
+    public function testIsAssociatedWithBasicLevelEntityNullObject()
+    {
+        $user = new User('user');
+        $this->decisionMaker->isAssociatedWithBasicLevelEntity($user, null);
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithOrganizationForSystemObject()
     {
         $user = new User('user');
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($user, new \stdClass()));
     }
 
+    public function testIsAssociatedWithGlobalLevelEntityForSystemObject()
+    {
+        $user = new User('user');
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($user, new \stdClass()));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitForSystemObject()
     {
         $user = new User('user');
         $this->assertFalse($this->decisionMaker->isAssociatedWithBusinessUnit($user, new \stdClass()));
     }
 
+    public function testIsAssociatedWithLocalLevelEntityForSystemObject()
+    {
+        $user = new User('user');
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($user, new \stdClass()));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithUserForSystemObject()
     {
         $user = new User('user');
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($user, new \stdClass()));
     }
 
+    public function testIsAssociatedWithBasicLevelEntityForSystemObject()
+    {
+        $user = new User('user');
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($user, new \stdClass()));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithOrganizationForOrganizationObject()
     {
         $this->buildTestTree();
@@ -325,6 +473,22 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user411, $this->org4));
     }
 
+    public function testIsAssociatedWithGlobalLevelEntityForOrganizationObject()
+    {
+        $this->buildTestTree();
+
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $this->org1));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $this->org2));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $this->org3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user31, $this->org3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $this->org3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $this->org4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user411, $this->org4));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithOrganizationForUserObject()
     {
         $this->buildTestTree();
@@ -341,6 +505,25 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user411, $this->user411));
     }
 
+    public function testIsAssociatedWithGlobalLevelEntityForUserObject()
+    {
+        $this->buildTestTree();
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $this->user1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $this->user2));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $this->user3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user31, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $this->user4));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $this->user3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $this->user411));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user411, $this->user411));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithOrganizationForOrganizationOwnedObject()
     {
         $this->buildTestTree();
@@ -367,6 +550,35 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj4));
     }
 
+    public function testIsAssociatedWithGlobalLevelEntityForOrganizationOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
+        );
+
+        $obj = new TestEntity(1);
+        $obj1 = new TestEntity(1, $this->org1);
+        $obj2 = new TestEntity(1, $this->org2);
+        $obj3 = new TestEntity(1, $this->org3);
+        $obj4 = new TestEntity(1, $this->org4);
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj4));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithOrganizationForBusinessUnitOwnedObject()
     {
         $this->buildTestTree();
@@ -400,6 +612,40 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj411));
     }
 
+
+    public function testIsAssociatedWithGlobalLevelEntityForBusinessUnitOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
+        );
+
+        $obj = new TestEntity(1, null, $this->org1);
+        $obj1 = new TestEntity(1, $this->bu1, $this->org1);
+        $obj2 = new TestEntity(1, $this->bu2, $this->org2);
+        $obj3 = new TestEntity(1, $this->bu3, $this->org3);
+        $obj31 = new TestEntity(1, $this->bu31, $this->org3);
+        $obj4 = new TestEntity(1, $this->bu4, $this->org4);
+        $obj41 = new TestEntity(1, $this->bu41, $this->org4);
+        $obj411 = new TestEntity(1, $this->bu411, $this->org4);
+
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj41));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj411));
+    }
+
     public function testIsAssociatedWithOrganizationForUserOwnedObject()
     {
         $this->buildTestTree();
@@ -431,6 +677,40 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj411));
     }
 
+    public function testIsAssociatedWithGlobalLevelEntityForUserOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization')
+        );
+
+        $obj = new TestEntity(1, null, $this->org1);
+        $obj1 = new TestEntity(1, $this->user1, $this->org1);
+        $obj2 = new TestEntity(1, $this->user2, $this->org2);
+        $obj3 = new TestEntity(1, $this->user3, $this->org3);
+        $obj31 = new TestEntity(1, $this->user31, $this->org3);
+        $obj4 = new TestEntity(1, $this->user4, $this->org4);
+        $obj411 = new TestEntity(1, $this->user411, $this->org4);
+
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user3, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj411));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitForOrganizationObject()
     {
         $this->buildTestTree();
@@ -442,6 +722,20 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $this->org4));
     }
 
+    public function testIsAssociatedWithLocalLevelEntityForOrganizationObject()
+    {
+        $this->buildTestTree();
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $this->org1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $this->org2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $this->org3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->org3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->org4));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitForBusinessUnitObject()
     {
         $this->buildTestTree();
@@ -461,6 +755,28 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $this->bu411, true));
     }
 
+    public function testIsAssociatedWithLocalLevelEntityForBusinessUnitObject()
+    {
+        $this->buildTestTree();
+
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $this->bu1));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $this->bu2));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $this->bu3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu3, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu31, true));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu4, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu41));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu41, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu411));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu411, true));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitForUserObject()
     {
         $this->buildTestTree();
@@ -485,6 +801,33 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user411, $this->user411, true));
     }
 
+    public function testIsAssociatedWithLocalLevelEntityForUserObject()
+    {
+        $this->buildTestTree();
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $this->user1));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $this->user2));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $this->user3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $this->user3, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $this->user31, true));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user31, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user31, $this->user31, true));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user4, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user3, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user31, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user411));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->user411, true));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user411, $this->user411));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user411, $this->user411, true));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitForOrganizationOwnedObject()
     {
         $this->buildTestTree();
@@ -511,6 +854,35 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $obj4));
     }
 
+    public function testIsAssociatedWithLocalLevelEntityForOrganizationOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
+        );
+
+        $obj = new TestEntity(1);
+        $obj1 = new TestEntity(1, $this->org1);
+        $obj2 = new TestEntity(1, $this->org2);
+        $obj3 = new TestEntity(1, $this->org3);
+        $obj4 = new TestEntity(1, $this->org4);
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj4));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitForBusinessUnitOwnedObject()
     {
         $this->buildTestTree();
@@ -548,6 +920,46 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $obj411, true));
     }
 
+    public function testIsAssociatedWithLocalLevelEntityForBusinessUnitOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
+        );
+
+        $obj = new TestEntity(1, null, $this->org1);
+        $obj1 = new TestEntity(1, $this->bu1, $this->org1);
+        $obj2 = new TestEntity(1, $this->bu2, $this->org2);
+        $obj3 = new TestEntity(1, $this->bu3, $this->org3);
+        $obj31 = new TestEntity(1, $this->bu31, $this->org3);
+        $obj4 = new TestEntity(1, $this->bu4, $this->org4);
+        $obj41 = new TestEntity(1, $this->bu41, $this->org4);
+        $obj411 = new TestEntity(1, $this->bu411, $this->org4);
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj3, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj31, true));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj4, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj41));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj41, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj411));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj411, true));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithBusinessUnitForUserOwnedObject()
     {
         $this->buildTestTree();
@@ -583,6 +995,44 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $obj411, true));
     }
 
+    public function testIsAssociatedWithLocalLevelEntityForUserOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization')
+        );
+
+        $obj = new TestEntity(1, null, $this->org1);
+        $obj1 = new TestEntity(1, $this->user1, $this->org1);
+        $obj2 = new TestEntity(1, $this->user2, $this->org2);
+        $obj3 = new TestEntity(1, $this->user3, $this->org3);
+        $obj31 = new TestEntity(1, $this->user31, $this->org3);
+        $obj4 = new TestEntity(1, $this->user4, $this->org4);
+        $obj411 = new TestEntity(1, $this->user411, $this->org4);
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user3, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj3, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj31, true));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj4, true));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj411));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj411, true));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithUserForUserObject()
     {
         $this->buildTestTree();
@@ -598,6 +1048,24 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithUser($this->user411, $this->user411));
     }
 
+    public function testIsAssociatedWithBasicLevelEntityForUserObject()
+    {
+        $this->buildTestTree();
+
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user1, $this->user1));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user2, $this->user2));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $this->user3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user31, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $this->user4));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $this->user3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $this->user411));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user411, $this->user411));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithUserForOrganizationOwnedObject()
     {
         $this->buildTestTree();
@@ -624,6 +1092,35 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($this->user4, $obj4));
     }
 
+    public function testIsAssociatedWithBasicLevelEntityForOrganizationOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
+        );
+
+        $obj = new TestEntity(1);
+        $obj1 = new TestEntity(1, $this->org1);
+        $obj2 = new TestEntity(1, $this->org2);
+        $obj3 = new TestEntity(1, $this->org3);
+        $obj4 = new TestEntity(1, $this->org4);
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user1, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user2, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj4));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithUserForBusinessUnitOwnedObject()
     {
         $this->buildTestTree();
@@ -657,6 +1154,42 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($this->user4, $obj411));
     }
 
+    public function testIsAssociatedWithBasicLevelEntityForBusinessUnitOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
+        );
+
+        $obj = new TestEntity(1);
+        $obj1 = new TestEntity(1, $this->bu1);
+        $obj2 = new TestEntity(1, $this->bu2);
+        $obj3 = new TestEntity(1, $this->bu3);
+        $obj31 = new TestEntity(1, $this->bu31);
+        $obj4 = new TestEntity(1, $this->bu4);
+        $obj41 = new TestEntity(1, $this->bu41);
+        $obj411 = new TestEntity(1, $this->bu411);
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user1, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user2, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj4));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj41));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj411));
+    }
+
+    /**
+     * @deprecated
+     */
     public function testIsAssociatedWithUserForUserOwnedObject()
     {
         $this->buildTestTree();
@@ -686,5 +1219,36 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($this->user4, $obj31));
         $this->assertTrue($this->decisionMaker->isAssociatedWithUser($this->user4, $obj4));
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($this->user4, $obj411));
+    }
+
+    public function testIsAssociatedWithBasicLevelEntityForUserOwnedObject()
+    {
+        $this->buildTestTree();
+
+        $this->metadataProvider->setMetadata(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            new OwnershipMetadata('USER', 'owner', 'owner_id')
+        );
+
+        $obj = new TestEntity(1);
+        $obj1 = new TestEntity(1, $this->user1);
+        $obj2 = new TestEntity(1, $this->user2);
+        $obj3 = new TestEntity(1, $this->user3);
+        $obj31 = new TestEntity(1, $this->user31);
+        $obj4 = new TestEntity(1, $this->user4);
+        $obj411 = new TestEntity(1, $this->user411);
+
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user1, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user1, $obj1));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user2, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user2, $obj2));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user3, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj4));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj411));
     }
 }

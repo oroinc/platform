@@ -45,7 +45,7 @@ class EntityAclExtension extends AbstractAclExtension
     protected $entityMetadataProvider;
 
     /**
-     * @var OwnershipDecisionMakerInterface
+     * @var AccessLevelOwnershipDecisionMakerInterface
      */
     protected $decisionMaker;
 
@@ -72,14 +72,14 @@ class EntityAclExtension extends AbstractAclExtension
      * @param EntityClassResolver             $entityClassResolver
      * @param EntitySecurityMetadataProvider  $entityMetadataProvider
      * @param OwnershipMetadataProvider       $metadataProvider
-     * @param OwnershipDecisionMakerInterface $decisionMaker
+     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
         OwnershipMetadataProvider $metadataProvider,
-        OwnershipDecisionMakerInterface $decisionMaker
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker
     ) {
         $this->objectIdAccessor       = $objectIdAccessor;
         $this->entityClassResolver    = $entityClassResolver;
@@ -471,14 +471,14 @@ class EntityAclExtension extends AbstractAclExtension
 
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-            $result = $this->decisionMaker->isAssociatedWithUser(
+            $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                 $securityToken->getUser(),
                 $object,
                 $organization
             );
         } else {
             if ($metadata->isUserOwned()) {
-                $result = $this->decisionMaker->isAssociatedWithUser(
+                $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                     $securityToken->getUser(),
                     $object,
                     $organization
@@ -486,21 +486,21 @@ class EntityAclExtension extends AbstractAclExtension
             }
             if (!$result) {
                 if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         false,
                         $organization
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         true,
                         $organization
                     );
                 } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithOrganization(
+                    $result = $this->decisionMaker->isAssociatedWithGlobalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         $organization
