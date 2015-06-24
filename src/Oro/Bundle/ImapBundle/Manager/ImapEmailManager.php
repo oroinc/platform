@@ -239,7 +239,7 @@ class ImapEmailManager
     {
         if (is_array($messageId)) {
             if (count($messageId) > 1) {
-                $email->setMessageIdArray($messageId);
+                $email->setMessageMultiId($messageId);
                 $email->setMessageId(reset($messageId));
             }
 

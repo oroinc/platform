@@ -249,8 +249,8 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $email = $this->manager->convertToEmail($msg);
 
         $this->assertNotEmpty($email->getMessageId());
-        $this->assertInternalType('array', $email->getMessageIdArray());
-        $this->assertCount(2, $email->getMessageIdArray());
+        $this->assertInternalType('array', $email->getMessageMultiId());
+        $this->assertCount(2, $email->getMessageMultiId());
     }
 
     public function testConvertToEmailWithMultiValueMessageIdOne()
@@ -289,8 +289,8 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $email = $this->manager->convertToEmail($msg);
 
         $this->assertNotEmpty($email->getMessageId());
-        $this->assertInternalType('array', $email->getMessageIdArray());
-        $this->assertCount(0, $email->getMessageIdArray());
+        $this->assertInternalType('array', $email->getMessageMultiId());
+        $this->assertCount(0, $email->getMessageMultiId());
     }
 
 

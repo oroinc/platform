@@ -59,7 +59,7 @@ class EmailHeader
     /**
      * @var string
      */
-    protected $messageIdArray;
+    protected $messageMultiId;
 
     /**
      * @var string
@@ -393,9 +393,9 @@ class EmailHeader
      *
      * @return string
      */
-    public function getMessageIdArray()
+    public function getMessageMultiId()
     {
-        $value = unserialize($this->messageIdArray);
+        $value = unserialize($this->messageMultiId);
 
         return $value ?: [];
     }
@@ -407,9 +407,9 @@ class EmailHeader
      *
      * @return self
      */
-    public function setMessageIdArray($messageIdArray)
+    public function setMessageMultiId($messageIdArray)
     {
-        $this->messageIdArray = serialize($messageIdArray);
+        $this->messageMultiId = serialize($messageIdArray);
 
         return $this;
     }
