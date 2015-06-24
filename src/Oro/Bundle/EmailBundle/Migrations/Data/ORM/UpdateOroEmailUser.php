@@ -33,12 +33,13 @@ class UpdateOroEmailUser extends AbstractFixture
             /** @var EmailUser $emailUser */
             $emailUser = $manager->getRepository('OroEmailBundle:EmailUser')->findOneBy(['email' => $entity]);
             $folder = $emailUser->getFolder();
+            $origin = $folder->getOrigin();
             $email = $emailUser->getEmail();
             $baseOwner = $email->getFromEmailAddress()->getOwner();
 
             if ($baseOwner instanceof User) {
-                $emailUser->setOwner($baseOwner);
-                $emailUser->setOrganization($baseOwner->getOrganization());
+                $emailUser->setOwner($origin->getOwner());
+                $emailUser->setOrganization($origin->getOrganization());
                 $itemsCount++;
                 $entities[] = $emailUser;
             }

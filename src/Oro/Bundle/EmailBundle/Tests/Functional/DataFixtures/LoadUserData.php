@@ -33,7 +33,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     {
         $userManager = $this->container->get('oro_user.manager');
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $role  = $manager->getRepository('OroUserBundle:Role')->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
+        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
