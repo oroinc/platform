@@ -231,9 +231,9 @@ class AssociationManager
 
     /**
      * Returns a query builder that could be used for fetching the list of entities
-     * associated with $associationOwnerClass entities found by $filters and $joins
+     * associated with $associationTargetClass entities found by $filters and $joins
      *
-     * @param string      $associationTargetClass The FQCN of the entity that is the owning side of the association
+     * @param string      $associationTargetClass The FQCN of the entity that is the target side of the association
      * @param mixed|null  $filters                Criteria is used to filter entities which are association owners
      *                                            e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
      * @param array|null  $joins                  Additional associations required to filter owning side entities
