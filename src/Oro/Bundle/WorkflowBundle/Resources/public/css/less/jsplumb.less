@@ -1,6 +1,9 @@
 @import "./variables";
 
-._jsPlumb_drag_select *, .workflow-step, [data-role=transition-overlay], .workflow-flowchart {
+._jsPlumb_drag_select *,
+.workflow-step,
+.workflow-transition-overlay,
+.workflow-flowchart {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -8,13 +11,19 @@
   -ms-user-select: none;
   user-select: none;
 }
-.workflow-step-editor, .workflow-step-viewer {
-  [role="tabpanel"] {
-    padding: 20px;
+.workflow-step-editor,
+.workflow-step-viewer {
+  border-top: 1px solid #f1f1f1;
+  .workflow-table-container {
+    padding-top: 20px;
+    margin-right: -10px;
   }
-}
-.workflow-step-editor {
-  margin-top: -28px;
+  .workflow-flowchart-container {
+    padding: 20px;
+    background-color: #fafafa;
+    border: 1px solid #f1f1f1;
+    border-top-width: 0;
+  }
 }
 .workflow-flowchart {
   position: relative;

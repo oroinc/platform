@@ -167,31 +167,22 @@
                 list-style: none;
             }
         </style>
-        <div role="tabpanel" class="workflow-step-viewer oro-tabs">
-
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active"><a href="#chart-view" aria-controls="chart-view" role="tab" data-toggle="tab">Chart</a></li>
-                <li role="presentation"><a href="#table-view" aria-controls="table-view" role="tab" data-toggle="tab">Table</a></li>
-            </ul>
-
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="chart-view">
-                    <div class="workflow-flowchart clearfix"></div>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="table-view">
+        <div class="workflow-step-viewer row-fluid clearfix">
+            <div class="span5">
+                <div class="workflow-table-container">
                     <div class="workflow-definition-steps-list-container clearfix">
                         <div class="grid-container steps-list">
                             <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                                 <thead>
-                                    <th class="label-column"><span>{{ "Step"|trans }}</span></th>
-                                    <th><span>{{ "Transitions"|trans }}</span></th>
-                                    <th>
-                                        <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
-                                            {{ "Position"|trans }}
-                                        </span>
-                                    </th>
+                                    <tr>
+                                        <th class="label-column"><span>{{ "Step"|trans }}</span></th>
+                                        <th><span>{{ "Transitions"|trans }}</span></th>
+                                        <th>
+                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                                {{ "Position"|trans }}
+                                            </span>
+                                        </th>
+                                    </tr>
                                 </thead>
                                 <tbody class="item-container">
                                 {% set startTransitionNames = [] %}
@@ -201,10 +192,10 @@
                                     {% endif %}
                                 {% endfor %}
                                 {% set startStep = [{
-                                'label': '(' ~ 'Start'|trans ~ ')',
-                                'order': -1,
-                                'is_final': false,
-                                'allowed_transitions': startTransitionNames
+                                    'label': '(' ~ 'Start'|trans ~ ')',
+                                    'order': -1,
+                                    'is_final': false,
+                                    'allowed_transitions': startTransitionNames
                                 }] %}
 
                                 {% if entity.configuration.steps is defined %}
@@ -242,9 +233,9 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                    <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
-                                        {{ stepData.order }}
-                                    </span>
+                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                                {{ stepData.order }}
+                                            </span>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -254,7 +245,11 @@
                     </div>
                 </div>
             </div>
-
+            <div class="span7">
+                <div class="workflow-flowchart-container">
+                    <div class="workflow-flowchart clearfix"></div>
+                <div>
+            </div>
         </div>
     {% endset %}
 
@@ -270,7 +265,6 @@
             'title': 'Configuration'|trans,
             'subblocks': [
                 {
-                    'title': 'Workflow steps and transitions'|trans,
                     'data':  [workflowStepsAndTransitions]
                 },
             ]
