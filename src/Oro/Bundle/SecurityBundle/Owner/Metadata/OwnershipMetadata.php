@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 /**
  * This class represents the entity ownership metadata
  */

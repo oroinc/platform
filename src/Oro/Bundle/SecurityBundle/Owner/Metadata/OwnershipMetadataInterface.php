@@ -74,7 +74,6 @@ interface OwnershipMetadataInterface
      */
     public function getOwnerColumnName();
 
-
     /**
      * @return string
      */
