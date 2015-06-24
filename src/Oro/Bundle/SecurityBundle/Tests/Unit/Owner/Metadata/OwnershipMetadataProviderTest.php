@@ -253,7 +253,10 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ),
             $this->configProvider
         );
-        $provider->setSecurityFacade($securityFacade);
+
+        if ($securityFacade) {
+            $provider->setSecurityFacade($securityFacade);
+        }
 
         $this->assertEquals($expectedResult, $provider->supports());
     }
