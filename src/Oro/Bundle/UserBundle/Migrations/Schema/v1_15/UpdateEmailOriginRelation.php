@@ -34,7 +34,7 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
             $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 
