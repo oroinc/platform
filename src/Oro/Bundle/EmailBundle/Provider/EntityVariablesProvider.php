@@ -142,6 +142,11 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
                 }
             }
 
+            $formatters = $this->formatterManager->guessFormatters($fieldId);
+            if ($formatters) {
+                $var = array_merge($var, $formatters);
+            }
+
             $result[$varName] = $var;
         }
 

@@ -34,6 +34,25 @@
             <% }); %>
         </ul>
     </script>
+    <script type="text/template" id="oro-email-template-variables-entity-variable-template">
+        <li>
+            <a href="javascript:void(0);"
+               class="variable"
+               title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
+            >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
+            <span>(</span>
+            <ul class="caption">
+                <% for (var i = 1; i < breadcrumbs.length; i++) { %>
+                <li>
+                    <span><%= pathLabels[breadcrumbs[i]] %></span>
+                    <span>/</span>
+                </li>
+                <% } %>
+                <li><%= variable.label %></li>
+            </ul>
+            <span>)</span>
+        </li>
+    </script>
     <script type="text/template" id="oro-email-template-variables-entity-template">
         <% var breadcrumbs = path.split('/'); breadcrumbs[0] = root; %>
         <ul class="breadcrumb">
@@ -60,24 +79,36 @@
             <li>
                 <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
                 <ul class="nav nav-list">
-                    <% _.each(fields, function(variable, varName) { %>
-                    <li>
-                        <a href="javascript:void(0);"
-                           class="variable"
-                           title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
-                        <span>(</span>
-                        <ul class="caption">
-                            <% for (var i = 1; i < breadcrumbs.length; i++) { %>
-                            <li>
-                                <span><%= pathLabels[breadcrumbs[i]] %></span>
-                                <span>/</span>
-                            </li>
-                            <% } %>
-                            <li><%= variable.label %></li>
-                        </ul>
-                        <span>)</span>
-                    </li>
-                    <% }); %>
+                <% var variableTemplate =  _.template($('#oro-email-template-variables-entity-variable-template').html()) %>
+                <% _.each(fields, function(variable, varName) { %>
+                    <%= variableTemplate({
+                        varValue:    varPrefix + '.' + varName,
+                        breadcrumbs: breadcrumbs,
+                        pathLabels:  pathLabels,
+                        variable:    variable
+                    }) %>
+                    <% if (!_.isUndefined(variable.default_formatter)) { %>
+                        <%= variableTemplate({
+                            varValue:    varPrefix + '.' + varName + '|oro_format(\'' + variable.default_formatter + '\')',
+                            breadcrumbs: breadcrumbs,
+                            pathLabels:  pathLabels,
+                            variable:    variable
+                        }) %>
+                    <% }; %>
+                    <% if (!_.isUndefined(variable.formatters)) { %>
+                        <% _.each(variable.formatters, function(formatterName) { %>
+                            <% if (!_.isUndefined(variable.default_formatter) && formatterName === variable.default_formatter) { %>
+                                <% return; %>
+                            <% }; %>
+                            <%= variableTemplate({
+                                varValue:    varPrefix + '.' + varName + '|oro_format(\'' + formatterName + '\')',
+                                breadcrumbs: breadcrumbs,
+                                pathLabels:  pathLabels,
+                                variable:    variable
+                            }) %>
+                        <% }); %>
+                    <% }; %>
+                <% }); %>
                 </ul>
             </li>
             <% } %>
