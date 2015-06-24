@@ -39,7 +39,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ->setInternalDate($internalDate)
             ->setImportance(1)
             ->setMessageId('testMessageId')
-            ->setMessageMultiId(['testMessageId1','testMessageId2'])
+            ->setMultiMessageId(['testMessageId1','testMessageId2'])
             ->setXMessageId('testXMessageId')
             ->setXThreadId('testXThreadId');
 
@@ -59,8 +59,8 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testMessageId', $obj->getMessageId());
         $this->assertEquals('testXMessageId', $obj->getXMessageId());
         $this->assertEquals('testXThreadId', $obj->getXThreadId());
-        $this->assertCount(2, $obj->getMessageMultiId());
-        $this->assertInternalType('array', $obj->getMessageMultiId());
+        $this->assertCount(2, $obj->getMultiMessageId());
+        $this->assertInternalType('array', $obj->getMultiMessageId());
 
         $srcBodyContent = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Content')
             ->disableOriginalConstructor()

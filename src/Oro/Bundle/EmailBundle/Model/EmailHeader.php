@@ -59,7 +59,7 @@ class EmailHeader
     /**
      * @var string
      */
-    protected $messageMultiId;
+    protected $multiMessageId;
 
     /**
      * @var string
@@ -393,21 +393,21 @@ class EmailHeader
      *
      * @return array|null
      */
-    public function getMessageMultiId()
+    public function getMultiMessageId()
     {
-        return $this->messageMultiId ? unserialize($this->messageMultiId) : null;
+        return $this->multiMessageId ? unserialize($this->multiMessageId) : null;
     }
 
     /**
      * Set array values of email Message-ID header
      *
-     * @param array $messageMultiId - array of message id
+     * @param array|null $messageMultiId - array of message id
      *
      * @return self
      */
-    public function setMessageMultiId($messageMultiId)
+    public function setMultiMessageId($messageMultiId)
     {
-        $this->messageMultiId = $messageMultiId ? serialize($messageMultiId): null;
+        $this->multiMessageId = $messageMultiId ? serialize($messageMultiId): null;
 
         return $this;
     }
