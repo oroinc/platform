@@ -50,6 +50,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $origin->setName('simple_user_origin_name');
         $origin->setIsActive(true);
         $origin->addFolder($folder);
+        $origin->setOwner($user);
+        $origin->setOrganization($organization);
         $user->addEmailOrigin($origin);
 
         $userManager->updateUser($user);
@@ -68,6 +70,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $origin2->setName('simple_user_origin_name_2');
         $origin2->setIsActive(true);
         $origin2->addFolder($folder2);
+        $origin2->setOwner($user2);
+        $origin2->setOrganization($organization);
         $user2->addEmailOrigin($origin);
 
         $userManager->updateUser($user2);

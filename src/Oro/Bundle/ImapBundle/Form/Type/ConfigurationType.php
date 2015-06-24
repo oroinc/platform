@@ -123,16 +123,18 @@ class ConfigurationType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) {
             /** @var ImapEmailOrigin $data */
             $data = $event->getData();
-            if ($data->getOwner() === null) {
-                $data->setOwner($this->securityFacade->getLoggedUser());
+            if ($data !== null) {
+                if ($data->getOwner() === null) {
+                    $data->setOwner($this->securityFacade->getLoggedUser());
+                }
+                if ($data->getOrganization() === null) {
+                    $organization = $this->securityFacade->getOrganization()
+                        ? $this->securityFacade->getOrganization()
+                        : $this->securityFacade->getLoggedUser()->getOrganization();
+                    $data->setOrganization($organization);
+                }
+                $event->setData($data);
             }
-            if ($data->getOrganization() === null) {
-                $organization = $this->securityFacade->getOrganization()
-                    ? $this->securityFacade->getOrganization()
-                    : $this->securityFacade->getLoggedUser()->getOrganization();
-                $data->setOrganization($organization);
-            }
-            $event->setData($data);
         });
     }
 

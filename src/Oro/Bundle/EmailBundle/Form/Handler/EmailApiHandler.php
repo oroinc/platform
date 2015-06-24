@@ -117,7 +117,7 @@ class EmailApiHandler extends ApiFormHandler
     protected function processEmailModel(EmailModel $model)
     {
         /**
-         * TODO EmailEntityBuilder::email or emailUser should be user here
+         * TODO EmailEntityBuilder::email or EmailEntityBuilder::emailUser should be user here
          */
         $this->assertModel($model);
 
