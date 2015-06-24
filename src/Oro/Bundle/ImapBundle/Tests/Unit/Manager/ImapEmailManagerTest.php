@@ -187,9 +187,6 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $headers = $this->getMockBuilder('Zend\Mail\Headers')
             ->disableOriginalConstructor()
             ->getMock();
-        $msg->expects($this->once())
-            ->method('getHeaders')
-            ->will($this->returnValue($headers));
         $headers->expects($this->any())
             ->method('get')
             ->will(
@@ -202,7 +199,6 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                         ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
                         ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
                         ['Importance', false],
-//                        ['Message-ID', $this->getHeader('MessageId')],
                         ['References', $this->getHeader('References')],
                         ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
                         ['X-GM-THR-ID', $this->getMultiValueHeader(['XThrId1', 'XThrId2'])],
@@ -210,6 +206,9 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+        $msg->expects($this->once())
+            ->method('getHeaders')
+            ->will($this->returnValue($headers));
 
         $this->manager->convertToEmail($msg);
     }
@@ -292,8 +291,6 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $email->getMessageMultiId());
         $this->assertCount(0, $email->getMessageMultiId());
     }
-
-
 
     public function getEmailsProvider()
     {
