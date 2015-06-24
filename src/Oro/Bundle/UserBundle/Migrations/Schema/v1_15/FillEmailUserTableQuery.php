@@ -28,6 +28,12 @@ class FillEmailUserTableQuery extends ParametrizedMigrationQuery
         $this->doExecute($logger);
     }
 
+    /**
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $query = <<<SQL

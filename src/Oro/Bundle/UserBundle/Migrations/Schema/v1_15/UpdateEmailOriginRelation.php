@@ -18,6 +18,11 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
         self::addOwnerAndOrganizationColumns($schema);
     }
 
+    /**
+     * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
     public static function addOwnerAndOrganizationColumns(Schema $schema)
     {
         $table = $schema->getTable('oro_email_origin');
