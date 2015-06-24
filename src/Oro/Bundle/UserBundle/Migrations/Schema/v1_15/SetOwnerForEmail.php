@@ -16,6 +16,12 @@ class SetOwnerForEmail implements Migration, OrderedMigrationInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $queries->addPreQuery('UPDATE oro_email_origin eo SET eo.owner_id =
+          (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id)');
+        $queries->addPreQuery('UPDATE oro_email_origin eo SET eo.organization_id =
+          (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id)');
+        $queries->addPostQuery(new FillEmailUserTableQuery());
+
         self::addOwnerToOroEmail($schema);
     }
 

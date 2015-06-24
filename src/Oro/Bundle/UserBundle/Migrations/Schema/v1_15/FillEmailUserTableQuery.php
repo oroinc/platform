@@ -31,8 +31,8 @@ class FillEmailUserTableQuery extends ParametrizedMigrationQuery
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $query = <<<SQL
-INSERT INTO oro_email_user (folder_id, email_id, created_at, received, is_seen, owner_id, organization_id)
-SELECT f.id, e.email_id, e.created, e.received, e.is_seen, o.owner_id, o.organization_id
+INSERT INTO oro_email_user (folder_id, email_id, created_at, received, is_seen, user_owner_id, organization_id)
+SELECT f.id, e.id, e.created, e.received, e.is_seen, o.owner_id, o.organization_id
 FROM oro_email_to_folder etf
   LEFT JOIN oro_email e ON e.id = etf.email_id
   LEFT JOIN oro_email_folder f ON f.id =  etf.emailfolder_id
@@ -43,7 +43,5 @@ SQL;
         if (!$dryRun) {
             $this->connection->executeUpdate($query);
         }
-
-        // todo CRM-2480 drop oro_email_to_folder at the end of migration
     }
 }

@@ -50,34 +50,6 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         if ($emailBodyTable->hasColumn('email_id')) {
             $emailBodyTable->dropColumn('email_id');
         }
-
-        $emailTable = $schema->getTable('oro_email');
-
-        if ($emailTable->hasForeignKey('FK_2A30C17132C8A3DE')) {
-            $emailTable->removeForeignKey('FK_2A30C17132C8A3DE');
-        }
-        if ($emailTable->hasForeignKey('FK_2A30C1719EB185F9')) {
-            $emailTable->removeForeignKey('FK_2A30C1719EB185F9');
-        }
-        if ($emailTable->hasIndex('IDX_2A30C17132C8A3DE')) {
-            $emailTable->dropIndex('IDX_2A30C17132C8A3DE');
-        }
-        if ($emailTable->hasIndex('IDX_2A30C1719EB185F9')) {
-            $emailTable->dropIndex('IDX_2A30C1719EB185F9');
-        }
-
-        if ($emailTable->hasColumn('organization_id')) {
-            $emailTable->dropColumn('organization_id');
-        }
-        if ($emailTable->hasColumn('user_owner_id')) {
-            $emailTable->dropColumn('user_owner_id');
-        }
-        if ($emailTable->hasColumn('received')) {
-            $emailTable->dropColumn('received');
-        }
-        if ($emailTable->hasColumn('is_seen')) {
-            $emailTable->dropColumn('is_seen');
-        }
     }
 
     protected static function updateEmailUserTableFields(Schema $schema)
