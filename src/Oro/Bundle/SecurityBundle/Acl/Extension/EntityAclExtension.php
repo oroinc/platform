@@ -15,6 +15,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
@@ -45,7 +46,7 @@ class EntityAclExtension extends AbstractAclExtension
     protected $entityMetadataProvider;
 
     /**
-     * @var OwnershipDecisionMakerInterface
+     * @var AccessLevelOwnershipDecisionMakerInterface
      */
     protected $decisionMaker;
 
@@ -72,14 +73,14 @@ class EntityAclExtension extends AbstractAclExtension
      * @param EntityClassResolver             $entityClassResolver
      * @param EntitySecurityMetadataProvider  $entityMetadataProvider
      * @param MetadataProviderInterface       $metadataProvider
-     * @param OwnershipDecisionMakerInterface $decisionMaker
+     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
-        OwnershipDecisionMakerInterface $decisionMaker
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker
     ) {
         $this->objectIdAccessor       = $objectIdAccessor;
         $this->entityClassResolver    = $entityClassResolver;
@@ -164,13 +165,13 @@ class EntityAclExtension extends AbstractAclExtension
                     AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
                 );
             }
-            if ($metadata->isUserOwned()) {
+            if ($metadata->isBasicLevelOwned()) {
                 $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::BASIC_LEVEL;
-            } elseif ($metadata->isBusinessUnitOwned()) {
+            } elseif ($metadata->isLocalLevelOwned()) {
                 $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::LOCAL_LEVEL;
-            } elseif ($metadata->isOrganizationOwned()) {
+            } elseif ($metadata->isGlobalLevelOwned()) {
                 $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::GLOBAL_LEVEL;
             }
@@ -313,12 +314,12 @@ class EntityAclExtension extends AbstractAclExtension
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_SYSTEM');
                     }
-                } elseif ($metadata->isOrganizationOwned()) {
+                } elseif ($metadata->isGlobalLevelOwned()) {
                     if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_GLOBAL');
                     }
-                } elseif ($metadata->isBusinessUnitOwned()) {
+                } elseif ($metadata->isLocalLevelOwned()) {
                     if ($accessLevel < AccessLevel::LOCAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_LOCAL');
@@ -471,14 +472,14 @@ class EntityAclExtension extends AbstractAclExtension
 
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-            $result = $this->decisionMaker->isAssociatedWithUser(
+            $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                 $securityToken->getUser(),
                 $object,
                 $organization
             );
         } else {
-            if ($metadata->isUserOwned()) {
-                $result = $this->decisionMaker->isAssociatedWithUser(
+            if ($metadata->isBasicLevelOwned()) {
+                $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                     $securityToken->getUser(),
                     $object,
                     $organization
@@ -486,21 +487,21 @@ class EntityAclExtension extends AbstractAclExtension
             }
             if (!$result) {
                 if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         false,
                         $organization
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         true,
                         $organization
                     );
                 } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithOrganization(
+                    $result = $this->decisionMaker->isAssociatedWithGlobalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         $organization
@@ -652,17 +653,17 @@ class EntityAclExtension extends AbstractAclExtension
         }
 
         $identity = $this->permissionToMaskBuilderIdentity[$permission];
-        if ($metadata->isOrganizationOwned()) {
+        if ($metadata->isGlobalLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL');
-        } elseif ($metadata->isBusinessUnitOwned()) {
+        } elseif ($metadata->isLocalLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
                 | $this->getMaskBuilderConst($identity, 'GROUP_DEEP')
                 | $this->getMaskBuilderConst($identity, 'GROUP_LOCAL');
-        } elseif ($metadata->isUserOwned()) {
+        } elseif ($metadata->isBasicLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
@@ -679,7 +680,7 @@ class EntityAclExtension extends AbstractAclExtension
      *
      * @param mixed $object
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     protected function getMetadata($object)
     {
