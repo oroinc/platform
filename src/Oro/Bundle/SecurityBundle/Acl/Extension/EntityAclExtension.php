@@ -15,6 +15,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
@@ -164,13 +165,13 @@ class EntityAclExtension extends AbstractAclExtension
                     AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
                 );
             }
-            if ($metadata->isUserOwned()) {
+            if ($metadata->isBasicLevelOwned()) {
                 $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::BASIC_LEVEL;
-            } elseif ($metadata->isBusinessUnitOwned()) {
+            } elseif ($metadata->isLocalLevelOwned()) {
                 $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::LOCAL_LEVEL;
-            } elseif ($metadata->isOrganizationOwned()) {
+            } elseif ($metadata->isGlobalLevelOwned()) {
                 $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::GLOBAL_LEVEL;
             }
@@ -313,12 +314,12 @@ class EntityAclExtension extends AbstractAclExtension
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_SYSTEM');
                     }
-                } elseif ($metadata->isOrganizationOwned()) {
+                } elseif ($metadata->isGlobalLevelOwned()) {
                     if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_GLOBAL');
                     }
-                } elseif ($metadata->isBusinessUnitOwned()) {
+                } elseif ($metadata->isLocalLevelOwned()) {
                     if ($accessLevel < AccessLevel::LOCAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_LOCAL');
@@ -477,7 +478,7 @@ class EntityAclExtension extends AbstractAclExtension
                 $organization
             );
         } else {
-            if ($metadata->isUserOwned()) {
+            if ($metadata->isBasicLevelOwned()) {
                 $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                     $securityToken->getUser(),
                     $object,
@@ -652,17 +653,17 @@ class EntityAclExtension extends AbstractAclExtension
         }
 
         $identity = $this->permissionToMaskBuilderIdentity[$permission];
-        if ($metadata->isOrganizationOwned()) {
+        if ($metadata->isGlobalLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL');
-        } elseif ($metadata->isBusinessUnitOwned()) {
+        } elseif ($metadata->isLocalLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
                 | $this->getMaskBuilderConst($identity, 'GROUP_DEEP')
                 | $this->getMaskBuilderConst($identity, 'GROUP_LOCAL');
-        } elseif ($metadata->isUserOwned()) {
+        } elseif ($metadata->isBasicLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
@@ -679,7 +680,7 @@ class EntityAclExtension extends AbstractAclExtension
      *
      * @param mixed $object
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     protected function getMetadata($object)
     {
