@@ -90,3 +90,11 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\UserBundle\Mailer\Processor` is now based on `Oro\Bundle\UserBundle\Mailer\BaseProcessor`
 - `Oro\Bundle\UserBundle\Mailer\Processor` - first argument `$user` of `sendChangePasswordEmail`, `sendResetPasswordEmail` and `sendResetPasswordAsAdminEmail` methods must implement `Oro\Bundle\UserBundle\Entity\UserInterface`
 - First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly
+
+####SecurityBundle
+- Added `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` - chain for ownership metadata providers which implements new `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface` 
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` is based on `Oro\Bundle\SecurityBundle\Owner\Metadata\AbstractMetadataProvider` and implements `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` - added public method `setSecurityFacade(SecurityFacade $securityFacade)`
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` - methods `getOrganizationClass`, `getBusinessUnitClass` and `getUserClass` marked as deprecated and will be removed soon
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` added into `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` chain using tag `oro_security.owner.metadata_provider`
+- `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension` - fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`

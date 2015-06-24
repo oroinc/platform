@@ -10,6 +10,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * This class provides access to the ownership metadata of a domain object
@@ -30,6 +32,11 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      * @var string
      */
     protected $userClass;
+
+    /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
 
     /**
      * Constructor
@@ -64,12 +71,23 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
+     * @param SecurityFacade $securityFacade
+     *
+     * @return MetadataProviderInterface
+     */
+    public function setSecurityFacade(SecurityFacade $securityFacade)
+    {
+        $this->securityFacade = $securityFacade;
+
+        return $this;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getSystemLevelClass()
     {
-        // TODO: Implement getSystemLevelClass() method.
-        throw new \Exception('Implement getSystemLevelClass() method.');
+        throw new \BadMethodCallException('Method getSystemLevelClass() unsupported.');
     }
 
     /**
@@ -137,8 +155,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     public function supports()
     {
-        // TODO: Implement isSupports() method (like return $token->getUser instanceof User).
-        return true;
+        return $this->securityFacade && $this->securityFacade->getLoggedUser() instanceof User;
     }
 
     /**
