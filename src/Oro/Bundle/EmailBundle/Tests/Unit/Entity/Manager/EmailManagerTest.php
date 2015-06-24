@@ -89,7 +89,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getThread')
             ->will($this->returnValue($emailUser));
 
-        $emailUser->expects($this->exactly(2))
+        $emailUser->expects($this->once())
             ->method('getId')
             ->will($this->returnValue(1));
 

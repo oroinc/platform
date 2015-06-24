@@ -64,7 +64,7 @@ class EmailManager
         $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($entity);
 
-        if ($entity->getEmail()->getThread()->getId()) {
+        if ($entity->getEmail()->getThread()) {
             $threadedEmailUserBuilder = $this
                 ->em
                 ->getRepository('OroEmailBundle:EmailUser')
