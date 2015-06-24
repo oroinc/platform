@@ -10,19 +10,37 @@ define(function (require) {
 
         jsPlumbInstance: null,
 
-        defaults: {
-            Endpoint: ['Dot', {radius: 3}],
-            EndpointStyle: {fillStyle: '#4F719A'},
-            HoverPaintStyle: {strokeStyle: '#1e8151', lineWidth: 2},
-            ConnectionOverlays: [
-                ['Arrow', {
-                    location: 1,
-                    id: 'arrow',
-                    length: 12,
-                    width: 10,
-                    foldback: 0.7
-                }]
-            ]
+        /**
+         * @type {function(): Object|Object}
+         */
+        defaultsChartOptions: function () {
+            return {
+                Endpoint: ['Dot', {
+                    radius: 3,
+                    cssClass: 'workflow-transition-endpoint',
+                    hoverClass: 'workflow-transition-endpoint-hover'
+                }],
+                ConnectionOverlays: [
+                    ['Arrow', {
+                        location: 1,
+                        id: 'arrow',
+                        length: 12,
+                        width: 10,
+                        foldback: 0.7
+                    }]
+                ]
+            };
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function (options) {
+            this.defaultsChartOptions = _.extend(
+                _.result(this, 'defaultsChartOptions'),
+                options.chartOptions || {}
+            );
+            FlowchartJsPlubmAreaView.__super__.initialize.apply(this, arguments);
         },
 
         render: function () {
@@ -35,9 +53,10 @@ define(function (require) {
         },
 
         connect: function () {
-            var options = $.extend(true, {}, _.result(this, 'defaults'));
-            options.Container = this.id();
-            this.jsPlumbInstance = jsPlumb.getInstance(options);
+            var chartOptions = _.defaults({
+                container: this.id()
+            }, this.defaultsChartOptions);
+            this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
         }
     });
 

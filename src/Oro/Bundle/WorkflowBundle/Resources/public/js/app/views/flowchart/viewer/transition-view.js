@@ -1,5 +1,6 @@
 define(function (require) {
     'use strict';
+
     var _ = require('underscore'),
         FlowchartJsPlubmBaseView = require('../jsplumb/base-view'),
         FlowchartViewerTransitionView;
@@ -16,40 +17,43 @@ define(function (require) {
         connections: null,
 
         /**
-         * @type {Object}
+         * @type {function(): Object|Object}
          */
-        defaultConnectionConfiguration: {
-            detachable: false
-        },
-
-        /**
-         * @type {Object}
-         */
-        connectorStyle: {
-            strokeStyle: '#4F719A',
-            lineWidth: 2,
-            outlineColor: 'transparent',
-            outlineWidth: 7
-        },
-
-        /**
-         * @type {Object}
-         */
-        connectorHoverStyle: {
-
+        defaultConnectionOptions: function () {
+            return {
+                detachable: false,
+                paintStyle: {
+                    strokeStyle: '#dcdcdc',
+                    lineWidth: 2,
+                    outlineColor: 'transparent',
+                    outlineWidth: 7
+                },
+                hoverPaintStyle: {
+                    strokeStyle: '#caa37b'
+                },
+                endpointStyle: {
+                    fillStyle: '#dcdcdc'
+                },
+                endpointHoverStyle: {
+                    fillStyle: '#caa37b'
+                }
+            };
         },
 
         initialize: function (options) {
             this.connections = [];
+
             var optionKeysToCopy = ['areaView', 'stepCollection', 'stepCollectionView', 'transitionOverlayView'];
             if (optionKeysToCopy.length !== _.intersection(optionKeysToCopy, _.keys(options)).length) {
                 throw new Error(optionKeysToCopy.join(', ') + ' options are required');
             }
             _.extend(this, _.pick(options, optionKeysToCopy));
-            this.defaultConnectionConfiguration = _.extend({}, _.result(this, 'defaultConnectionConfiguration'));
-            if (options.defaultConnectionConfiguration) {
-                _.extend(this.defaultConnectionConfiguration, options.defaultConnectionConfiguration);
-            }
+
+            this.defaultConnectionOptions = _.extend(
+                _.result(this, 'defaultConnectionOptions'),
+                options.connectionOptions || {}
+            );
+
             FlowchartViewerTransitionView.__super__.initialize.apply(this, arguments);
         },
 
@@ -130,37 +134,33 @@ define(function (require) {
 
         createConnection: function (startStep, endStep) {
             var jsplumbConnection,
-                overlayView,
                 transitionModel = this.model,
                 areaView = this.areaView,
                 endEl = this.findElByStep(endStep),
-                startEl = this.findElByStep(startStep);
-
-            jsplumbConnection = this.areaView.jsPlumbInstance.connect(_.extend(
-                {},
-                this.defaultConnectionConfiguration,
-                {
+                startEl = this.findElByStep(startStep),
+                connectionOptions = _.defaults({
                     source: startEl,
                     target: endEl,
-                    paintStyle: _.result(this, 'connectorStyle'),
-                    hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
                     overlays: [
                         ['Custom', {
-                            create: _.bind(function () {
-                                overlayView = new this.transitionOverlayView({
+                            id: 'overlay',
+                            create: _.bind(function (connection) {
+                                var overlayView;
+                                connection.overlayView = overlayView = new this.transitionOverlayView({
                                     model: transitionModel,
                                     areaView: areaView,
                                     stepFrom: startStep
                                 });
                                 overlayView.render();
+                                connection.getOverlay('overlay').cssClass = _.result(overlayView, 'className');
                                 return overlayView.$el;
                             }, this),
                             location: 0.5
                         }]
                     ]
-                }
-            ));
-            jsplumbConnection.overlayView = overlayView;
+                }, this.defaultConnectionOptions);
+
+            jsplumbConnection = this.areaView.jsPlumbInstance.connect(connectionOptions);
             this.connections.push({
                 startStep: startStep,
                 endStep: endStep,

@@ -1,6 +1,8 @@
 define(function (require) {
     'use strict';
+
     var FlowchartEditorWorkflowView,
+        $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
@@ -16,13 +18,28 @@ define(function (require) {
         stepView: FlowchartEditorStepView,
         className: 'workflow-flowchart-editor',
 
-        defaultConnectionConfiguration: {
-            detachable: true
+        /**
+         * @type {function(): Object|Object}
+         */
+        defaultConnectionOptions: function () {
+            return {
+                detachable: true
+            };
         },
 
         connect: function () {
             FlowchartEditorWorkflowView.__super__.connect.apply(this, arguments);
+            this.jsPlumbInstance.bind('connectionDrag', _.bind(this.onConnectionDragStart, this));
+            this.jsPlumbInstance.bind('connectionDragStop', _.bind(this.onConnectionDragStop, this));
             this.jsPlumbInstance.bind('beforeDrop', _.bind(this.onBeforeConnectionDrop, this));
+        },
+
+        onConnectionDragStart: function (connection) {
+            this.$el.addClass('workflow-drag-connection');
+        },
+
+        onConnectionDragStop: function (connection) {
+            this.$el.removeClass('workflow-drag-connection');
         },
 
         onBeforeConnectionDrop: function (data) {
