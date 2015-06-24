@@ -14,7 +14,7 @@ interface MetadataProviderInterface
      *
      * @param string $className
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     public function getMetadata($className);
 

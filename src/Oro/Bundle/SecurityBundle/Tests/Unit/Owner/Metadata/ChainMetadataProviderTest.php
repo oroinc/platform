@@ -9,24 +9,36 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructionWithoutProviders()
     {
-        new ChainMetadataProvider();
+        $chain = new ChainMetadataProvider();
+
+        $this->assertAttributeCount(0, 'providers', $chain);
     }
 
-    public function testPassProviderThroughConstuctor()
+    public function testPassProviderThroughConstructor()
     {
         $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
         $chain = new ChainMetadataProvider([$provider]);
 
+        $this->assertAttributeCount(1, 'providers', $chain);
         $this->assertAttributeContains($provider, 'providers', $chain);
     }
 
-    public function testPassProvidersThoughAdder()
+    public function testAddProvider()
     {
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
-        $chain = new ChainMetadataProvider();
-        $chain->addProvider($provider);
+        $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
-        $this->assertAttributeContains($provider, 'providers', $chain);
+        $chain = new ChainMetadataProvider();
+        $chain->addProvider($provider1);
+
+        $this->assertAttributeCount(1, 'providers', $chain);
+        $this->assertAttributeContains($provider1, 'providers', $chain);
+
+        $chain->addProvider($provider2);
+
+        $this->assertAttributeCount(2, 'providers', $chain);
+        $this->assertAttributeContains($provider1, 'providers', $chain);
+        $this->assertAttributeContains($provider2, 'providers', $chain);
     }
 
     public function testSupports()
@@ -93,7 +105,7 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
      * @param bool $deep
      * @param string $levelClass
      */
-    public function testGetLevelClassE($levelClassMethod, $deep = false, $levelClass = 'stdClass')
+    public function testGetLevelClassException($levelClassMethod, $deep = false, $levelClass = 'stdClass')
     {
         $provider = $this->getMetadataProviderMock(false);
         $provider->expects($this->never())

@@ -2,25 +2,25 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata\Stub;
 
-use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\AbstractMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
 class StubMetadataProvider extends AbstractMetadataProvider
 {
     /**
-     * @param ConfigProvider      $configProvider
-     * @param CacheProvider|null  $cache
+     * {@inheritDoc}
      */
-    public function __construct(ConfigProvider $configProvider, CacheProvider $cache = null)
+    protected function setAccessLevelClasses(array $owningEntityNames, EntityClassResolver $entityClassResolver = null)
     {
-        $this->configProvider = $configProvider;
-        $this->cache = $cache;
+    }
+
+    /**
+     * Set instance of OwnershipMetadataInterface to `noOwnershipMetadata` property
+     */
+    protected function createNoOwnershipMetadata()
+    {
         $this->noOwnershipMetadata = new OwnershipMetadata();
     }
 
@@ -29,7 +29,7 @@ class StubMetadataProvider extends AbstractMetadataProvider
      */
     protected function getOwnershipMetadata(ConfigInterface $config)
     {
-        return new OwnershipMetadata();
+        return $this->noOwnershipMetadata;
     }
 
     /**
