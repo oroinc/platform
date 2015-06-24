@@ -60,6 +60,7 @@ services:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
         arguments:
             - @oro_locale.formatter.date_time
+            - @translator
         tags:
             - { name: oro_locale.format_converter.date_time, alias: jquery_ui }
 
