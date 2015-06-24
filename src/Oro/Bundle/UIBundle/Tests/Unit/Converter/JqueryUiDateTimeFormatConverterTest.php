@@ -12,7 +12,7 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
      */
     protected function createFormatConverter()
     {
-        return new JqueryUiDateTimeFormatConverter($this->formatter);
+        return new JqueryUiDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
     /**
@@ -38,6 +38,17 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
             'en custom'       => array("h:mm:ss TT", \IntlDateFormatter::MEDIUM, self::LOCALE_EN),
             'ru default'      => array("H:mm", null, self::LOCALE_RU),
             'ru custom'       => array("H:mm:ss", \IntlDateFormatter::MEDIUM, self::LOCALE_RU),
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDateFormatDayProvider()
+    {
+        return array(
+            'en default' => array("M d", self::LOCALE_EN),
+            'ru default' => array("d.M", self::LOCALE_RU),
         );
     }
 
