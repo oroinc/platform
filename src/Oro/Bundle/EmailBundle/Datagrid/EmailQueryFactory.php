@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 class EmailQueryFactory
@@ -12,20 +12,22 @@ class EmailQueryFactory
     /** @var EmailOwnerProviderStorage */
     protected $emailOwnerProviderStorage;
 
-    /** @var DQLNameFormatter */
-    protected $formatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var string */
     protected $fromEmailExpression;
 
     /**
-     * @param EmailOwnerProviderStorage                     $emailOwnerProviderStorage
-     * @param \Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter $formatter
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
+     * @param EntityNameResolver        $entityNameResolver
      */
-    public function __construct(EmailOwnerProviderStorage $emailOwnerProviderStorage, DQLNameFormatter $formatter)
-    {
+    public function __construct(
+        EmailOwnerProviderStorage $emailOwnerProviderStorage,
+        EntityNameResolver $entityNameResolver
+    ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
-        $this->formatter                 = $formatter;
+        $this->entityNameResolver        = $entityNameResolver;
     }
 
     /**
@@ -68,9 +70,9 @@ class EmailQueryFactory
         $expressionsByOwner = [];
         foreach ($providers as $provider) {
             $relationAlias                      = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
-            $expressionsByOwner[$relationAlias] = $this->formatter->getFormattedNameDQL(
-                $relationAlias,
-                $provider->getEmailOwnerClass()
+            $expressionsByOwner[$relationAlias] = $this->entityNameResolver->getNameDQL(
+                $provider->getEmailOwnerClass(),
+                $relationAlias
             );
         }
 

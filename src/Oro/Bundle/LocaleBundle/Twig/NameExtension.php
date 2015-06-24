@@ -2,40 +2,29 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Twig\EntityExtension;
 use Oro\Bundle\LocaleBundle\Model\NamePrefixInterface;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\MiddleNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\LocaleBundle\Model\NameSuffixInterface;
 
-class NameExtension extends \Twig_Extension
+/**
+ * @deprecated since 1.8, use Oro\Bundle\EntityBundle\Twig\EntityExtension
+ */
+class NameExtension
 {
     /**
-     * @var NameFormatter
+     * @var EntityExtension
      */
-    protected $formatter;
+    protected $entityExtension;
 
     /**
-     * @param NameFormatter $formatter
+     * @param EntityExtension $entityExtension
      */
-    public function __construct(NameFormatter $formatter)
+    public function __construct(EntityExtension $entityExtension)
     {
-        $this->formatter = $formatter;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFilters()
-    {
-        return array(
-            new \Twig_SimpleFilter(
-                'oro_format_name',
-                array($this, 'format'),
-                array('is_safe' => array('html'))
-            )
-        );
+        $this->entityExtension = $entityExtension;
     }
 
     /**
@@ -44,17 +33,11 @@ class NameExtension extends \Twig_Extension
      * @param NamePrefixInterface|FirstNameInterface|MiddleNameInterface|LastNameInterface|NameSuffixInterface $person
      * @param string $locale
      * @return string
+     *
+     * @deprecated since 1.8, use Oro\Bundle\EntityBundle\Twig\EntityExtension::getEntityName
      */
     public function format($person, $locale = null)
     {
-        return $this->formatter->format($person, $locale);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale_name';
+        return $this->entityExtension->getEntityName($person, $locale);
     }
 }

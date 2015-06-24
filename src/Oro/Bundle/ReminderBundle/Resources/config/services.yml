@@ -32,7 +32,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_entity_config.provider.reminder
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
 
     oro_reminder.send_processor.email:
         class: %oro_reminder.send_processor.email.class%

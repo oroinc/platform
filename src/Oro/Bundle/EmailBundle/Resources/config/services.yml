@@ -80,6 +80,7 @@ parameters:
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
     oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
+    oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
 services:
     oro_email.entity.cache.warmer:
@@ -150,7 +151,7 @@ services:
         arguments:
             - @oro_entity.routing_helper
             - @oro_email.email.address.helper
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @security.context
             - @oro_email.email.address.manager
             - @doctrine.orm.entity_manager
@@ -202,6 +203,10 @@ services:
         arguments:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @oro_entity_config.config_manager
+            - @oro_security.security_facade
+            - @router
 
     oro_email.direct_mailer:
         class: %oro_email.direct_mailer.class%
@@ -297,7 +302,7 @@ services:
         arguments:
             - @translator
             - @oro_security.security_facade
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @oro_config.user
         lazy: true
         tags:
@@ -329,7 +334,7 @@ services:
         class: %oro_email.datagrid_query_factory.class%
         arguments:
             - @oro_email.email.owner.provider.storage
-            - @oro_locale.dql.formatter.name
+            - @oro_entity.entity_name_resolver
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
@@ -370,7 +375,7 @@ services:
             - @oro_workflow.context_accessor
             - @oro_email.mailer.processor
             - @oro_email.email.address.helper
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
         calls:
             - [setLogger, [@logger]]
         tags:
@@ -382,7 +387,7 @@ services:
             - @oro_workflow.context_accessor
             - @oro_email.mailer.processor
             - @oro_email.email.address.helper
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @oro_email.email_renderer
             - @doctrine.orm.entity_manager
             - @validator
@@ -497,17 +502,13 @@ services:
         arguments:
            - @oro_entity.doctrine_helper
            - @oro_entity_config.link.entity_manager
-           - @oro_email.link.formatter.name
+           - @oro_entity.entity_name_resolver
            - @router
            - @oro_entity_config.config_manager
            - @oro_email.email.thread.provider
            - @oro_ui.html_tag_helper
         tags:
            - {name: oro_activity_list.provider, priority: 30}
-
-    oro_email.link.formatter.name:
-        tags:
-            - { name: oro_service_link,  service: oro_locale.formatter.name }
 
     oro_email.manager.email_attachment_manager:
         class: %oro_email.manager.email_attachment_manager.class%
@@ -558,3 +559,19 @@ services:
             - @service_container
         tags:
             - { name: security.voter }
+
+    oro_email.entity_alias_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
+        public: false
+        arguments:
+            - @oro_email.email.address.manager
+        tags:
+            - { name: oro_entity.alias_provider }
+
+    oro_email.manager.email_activity.api:
+        class: %oro_email.manager.email_activity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager

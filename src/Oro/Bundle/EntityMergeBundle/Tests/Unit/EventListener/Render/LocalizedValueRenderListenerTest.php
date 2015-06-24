@@ -24,7 +24,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -49,7 +49,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $this->numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
@@ -64,7 +64,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $this->target = new LocalizedValueRenderListener(
             $this->addressFormatter,
             $this->dateTimeFormatter,
-            $this->nameFormatter,
+            $this->entityNameResolver,
             $this->numberFormatter
         );
     }
@@ -93,7 +93,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $originalValue = 'not need to localize';
 
         $this->addressFormatter->expects($this->never())->method($this->anything());
-        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->entityNameResolver->expects($this->never())->method($this->anything());
         $this->dateTimeFormatter->expects($this->never())->method($this->anything());
         $this->numberFormatter->expects($this->never())->method($this->anything());
 
@@ -108,7 +108,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $localizedValue = '1%';
 
         $this->addressFormatter->expects($this->never())->method($this->anything());
-        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->entityNameResolver->expects($this->never())->method($this->anything());
         $this->dateTimeFormatter->expects($this->never())->method($this->anything());
         $this->numberFormatter->expects($this->once())
             ->method('format')
@@ -127,7 +127,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $testNumberStyle = 'number';
 
         $this->addressFormatter->expects($this->never())->method($this->anything());
-        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->entityNameResolver->expects($this->never())->method($this->anything());
         $this->dateTimeFormatter->expects($this->never())->method($this->anything());
         $this->numberFormatter->expects($this->once())
             ->method('format')
@@ -159,7 +159,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             ->with($originalValue)
             ->will($this->returnValue($localizedValue));
 
-        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->entityNameResolver->expects($this->never())->method($this->anything());
         $this->dateTimeFormatter->expects($this->never())->method($this->anything());
         $this->numberFormatter->expects($this->never())->method($this->anything());
 
@@ -174,7 +174,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $localizedValue = date('Y-m-d');
 
         $this->addressFormatter->expects($this->never())->method($this->anything());
-        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->entityNameResolver->expects($this->never())->method($this->anything());
         $this->dateTimeFormatter->expects($this->once())
             ->method('format')
             ->with($originalValue)
@@ -196,7 +196,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $testFormat = 'd_m_y';
 
         $this->addressFormatter->expects($this->never())->method($this->anything());
-        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->entityNameResolver->expects($this->never())->method($this->anything());
         $this->dateTimeFormatter->expects($this->once())
             ->method('format')
             ->with($originalValue, $testDateType, $testTimeType, null, null, $testFormat)
@@ -227,8 +227,8 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $localizedValue = 'name';
 
         $this->addressFormatter->expects($this->never())->method($this->anything());
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($originalValue)
             ->will($this->returnValue($localizedValue));
         $this->dateTimeFormatter->expects($this->never())->method($this->anything());
