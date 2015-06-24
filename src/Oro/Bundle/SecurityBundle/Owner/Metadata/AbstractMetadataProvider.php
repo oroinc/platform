@@ -29,7 +29,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
     protected $localCache = [];
 
     /**
-     * @var OwnershipMetadata
+     * @var OwnershipMetadataInterface
      */
     protected $noOwnershipMetadata;
 
@@ -128,7 +128,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
     /**
      * @param ConfigInterface $config
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     abstract protected function getOwnershipMetadata(ConfigInterface $config);
 }
