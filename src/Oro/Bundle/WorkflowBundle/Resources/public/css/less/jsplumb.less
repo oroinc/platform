@@ -1,5 +1,14 @@
 @import "./variables";
 
+/* mixins */
+#workflow {
+  .hover-block {
+    border: 1px solid @hover-border-color;
+    #gradient > .vertical-three-colors(@hover-gradient-start-color, @hover-gradient-middle-color, 3%, @hover-gradient-end-color);
+  }
+}
+
+/* styles */
 ._jsPlumb_drag_select *,
 .workflow-step,
 .workflow-transition-overlay,
@@ -126,6 +135,9 @@
         display: none;
       }
     }
+    .workflow-step.connection-source {
+      #workflow > .hover-block();
+    }
   }
   .workflow-step,
   .workflow-transition-overlay {
@@ -134,10 +146,9 @@
     &._jsPlumb_hover,
     &._jsPlumb_source_hover,
     &._jsPlumb_target_hover,
-    &.jsplumb-drag-hover,
+    &:not(.start-step).jsplumb-drag-hover,
     &:hover {
-      border: 1px solid @hover-border-color;
-      #gradient > .vertical-three-colors(@hover-gradient-start-color, @hover-gradient-middle-color, 3%, @hover-gradient-end-color);
+      #workflow > .hover-block();
       color: #fff;
     }
     .step-label,
@@ -171,9 +182,9 @@
   }
 
   .workflow-transition-endpoint {
-    display: none
+    opacity: 0;
   }
   .workflow-transition-endpoint-hover {
-    display: block
+    opacity: 1;
   }
 }

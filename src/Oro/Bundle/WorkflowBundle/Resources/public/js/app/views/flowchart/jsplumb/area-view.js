@@ -15,11 +15,27 @@ define(function (require) {
          */
         defaultsChartOptions: function () {
             return {
+                detachable: false,
                 Endpoint: ['Dot', {
                     radius: 3,
                     cssClass: 'workflow-transition-endpoint',
                     hoverClass: 'workflow-transition-endpoint-hover'
                 }],
+                PaintStyle: {
+                    strokeStyle: '#caa37b',
+                    lineWidth: 2,
+                    outlineColor: 'transparent',
+                    outlineWidth: 7
+                },
+                HoverPaintStyle: {
+                    strokeStyle: '#caa37b'
+                },
+                EndpointStyle: {
+                    fillStyle: '#dcdcdc'
+                },
+                EndpointHoverStyle: {
+                    fillStyle: '#caa37b'
+                },
                 ConnectionOverlays: [
                     ['Arrow', {
                         location: 1,

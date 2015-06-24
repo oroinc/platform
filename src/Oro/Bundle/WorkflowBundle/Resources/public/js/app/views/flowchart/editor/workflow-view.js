@@ -35,10 +35,12 @@ define(function (require) {
         },
 
         onConnectionDragStart: function (connection) {
+            $('#' + connection.sourceId).addClass('connection-source');
             this.$el.addClass('workflow-drag-connection');
         },
 
         onConnectionDragStop: function (connection) {
+            $('#' + connection.sourceId).removeClass('connection-source');
             this.$el.removeClass('workflow-drag-connection');
         },
 

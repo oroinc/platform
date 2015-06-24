@@ -21,21 +21,11 @@ define(function (require) {
          */
         defaultConnectionOptions: function () {
             return {
-                detachable: false,
                 paintStyle: {
                     strokeStyle: '#dcdcdc',
                     lineWidth: 2,
                     outlineColor: 'transparent',
                     outlineWidth: 7
-                },
-                hoverPaintStyle: {
-                    strokeStyle: '#caa37b'
-                },
-                endpointStyle: {
-                    fillStyle: '#dcdcdc'
-                },
-                endpointHoverStyle: {
-                    fillStyle: '#caa37b'
                 }
             };
         },
