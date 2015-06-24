@@ -20,6 +20,7 @@ class UpdateOroEmailUser extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
+        return;
         $queryBuilder = $manager->getRepository('OroEmailBundle:Email')
             ->createQueryBuilder('e')
             ->select('e');

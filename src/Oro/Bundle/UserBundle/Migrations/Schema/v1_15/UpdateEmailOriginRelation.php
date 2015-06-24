@@ -15,10 +15,10 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addOwnerAndOrganizationColumns($schema, $queries);
+        self::addOwnerAndOrganizationColumns($schema);
     }
 
-    public static function addOwnerAndOrganizationColumns(Schema $schema, QueryBag $queries)
+    public static function addOwnerAndOrganizationColumns(Schema $schema)
     {
         $table = $schema->getTable('oro_email_origin');
         $table->addColumn('owner_id', 'integer', ['notnull' => false]);

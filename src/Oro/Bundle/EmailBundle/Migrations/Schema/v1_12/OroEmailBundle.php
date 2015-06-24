@@ -115,7 +115,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     public static function addPostQueries(QueryBag $queries)
     {
         $queries->addPostQuery(new UpdateEmailBodyRelationQuery());
-        $queries->addPostQuery(new FillEmailUserTableQuery());
         $queries->addPostQuery(new DeleteEmailPermissionConfig());
     }
 }

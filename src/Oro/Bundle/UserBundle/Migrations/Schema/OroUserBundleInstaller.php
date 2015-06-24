@@ -108,7 +108,7 @@ class OroUserBundleInstaller implements
 
         $this->addOroAccessGroupIndexes($schema);
 
-        EmailOrigin::addOwnerAndOrganizationColumns($schema, $queries);
+        EmailOrigin::addOwnerAndOrganizationColumns($schema);
         SetOwnerForEmail::addOwnerToOroEmail($schema);
     }
 

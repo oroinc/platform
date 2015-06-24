@@ -6,9 +6,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class SetOwnerForEmail implements Migration
+class SetOwnerForEmail implements Migration, OrderedMigrationInterface
 {
     /**
      * {@inheritDoc}
@@ -46,5 +47,13 @@ class SetOwnerForEmail implements Migration
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_91F5CFF69EB185F9'
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOrder()
+    {
+        return 1;
     }
 }
