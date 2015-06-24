@@ -26,7 +26,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
      *          key = class name
      *          value = Metadata or true if an entity has no ownership config
      */
-    protected $localCache;
+    protected $localCache = [];
 
     /**
      * @var OwnershipMetadata
