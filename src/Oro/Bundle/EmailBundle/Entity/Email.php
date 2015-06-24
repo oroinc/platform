@@ -568,7 +568,7 @@ class Email extends ExtendEmail
     /**
      * Get array values of email Message-ID header
      *
-     * @return string
+     * @return array|false
      */
     public function getMessageMultiId()
     {
