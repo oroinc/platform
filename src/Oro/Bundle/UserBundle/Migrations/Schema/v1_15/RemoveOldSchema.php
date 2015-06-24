@@ -15,6 +15,8 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $schema->dropTable('oro_user_email_origin');
+
         self::execute($schema);
     }
 
@@ -25,7 +27,6 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
      */
     public static function execute(Schema $schema)
     {
-        $schema->dropTable('oro_user_email_origin');
         $schema->dropTable('oro_email_to_folder');
 
         $emailTable = $schema->getTable('oro_email');
