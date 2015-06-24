@@ -15,12 +15,12 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addPreQuery('UPDATE oro_email_origin eo SET eo.owner_id =
-          (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id)');
-        $queries->addPreQuery('UPDATE oro_email_origin eo SET eo.organization_id =
-          (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id)');
-
         $schema->dropTable('oro_user_email_origin');
+        $schema->dropTable('oro_email_to_folder');
+
+        $emailTable = $schema->getTable('oro_email');
+        $emailTable->dropColumn('is_seen');
+        $emailTable->dropColumn('received');
     }
 
     /**
