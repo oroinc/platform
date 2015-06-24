@@ -109,6 +109,7 @@ class OwnershipMetadataTest extends \PHPUnit_Framework_TestCase
                 'ownerType' => $metadata->getOwnerType(),
                 'ownerFieldName' => $metadata->getOwnerFieldName(),
                 'ownerColumnName' => $metadata->getOwnerColumnName(),
+                'not_exists' => true
             ]
         );
         $this->assertEquals($metadata, $restoredMetadata);

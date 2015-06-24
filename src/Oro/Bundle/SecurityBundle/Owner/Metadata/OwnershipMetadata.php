@@ -258,7 +258,9 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     {
         $result = new static();
         foreach ($data as $property => $value) {
-            $result->{$property} = $value;
+            if (property_exists($result, $property)) {
+                $result->{$property} = $value;
+            }
         }
 
         return $result;
