@@ -49,7 +49,7 @@ class OwnershipMetadataProvider
     protected $localCache;
 
     /**
-     * @var OwnershipMetadata
+     * @var OwnershipMetadataInterface
      */
     protected $noOwnershipMetadata;
 
@@ -90,7 +90,7 @@ class OwnershipMetadataProvider
      *
      * @param string $className
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     public function getMetadata($className)
     {
@@ -214,7 +214,7 @@ class OwnershipMetadataProvider
     /**
      * @param ConfigInterface $config
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     protected function getOwnershipMetadata(ConfigInterface $config)
     {

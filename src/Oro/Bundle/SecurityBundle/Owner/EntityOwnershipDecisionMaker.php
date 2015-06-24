@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -137,7 +137,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         }
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
-        if ($metadata->isOrganizationOwned()) {
+        if ($metadata->isGlobalLevelOwned()) {
             return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds);
         } else {
             return in_array(
@@ -185,9 +185,9 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         }
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
-        if ($metadata->isBusinessUnitOwned()) {
+        if ($metadata->isLocalLevelOwned()) {
             return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep, $organizationId);
-        } elseif ($metadata->isUserOwned()) {
+        } elseif ($metadata->isBasicLevelOwned()) {
             $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($ownerId, $organizationId);
             if (empty($ownerBusinessUnitIds)) {
                 return false;
@@ -227,7 +227,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         }
 
         $metadata = $this->getObjectMetadata($domainObject);
-        if ($metadata->isUserOwned()) {
+        if ($metadata->isBasicLevelOwned()) {
             $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
 
             return $userId === $ownerId;
@@ -375,7 +375,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * Gets metadata for the given domain object
      *
      * @param  object $domainObject
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     protected function getObjectMetadata($domainObject)
     {
