@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig\Formatter;
+namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Twig\Formatter\ImageUrlFormatter;
+use Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter;
 
-class ImageUrlFormatterTest extends \PHPUnit_Framework_TestCase
+class ImageSrcFormatterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ImageUrlFormatter */
+    /** @var ImageSrcFormatter */
     protected $formatter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -20,12 +20,12 @@ class ImageUrlFormatterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formatter = new ImageUrlFormatter($this->manager);
+        $this->formatter = new ImageSrcFormatter($this->manager);
     }
 
     public function testGetFormatterName()
     {
-        $this->assertEquals('image_url', $this->formatter->getFormatterName());
+        $this->assertEquals('image_src', $this->formatter->getFormatterName());
     }
 
     public function testFormat()
@@ -35,8 +35,9 @@ class ImageUrlFormatterTest extends \PHPUnit_Framework_TestCase
         $this->manager
             ->expects($this->once())
             ->method('getResizedImageUrl')
-            ->with($file, ImageUrlFormatter::DEFAULT_WIDTH, ImageUrlFormatter::DEFAULT_HEIGHT);
-        $this->formatter->format($file);
+            ->with($file, 100, 100)
+            ->willReturn('http://test.com/image.png');
+        $this->assertEquals('http://test.com/image.png', $this->formatter->format($file));
     }
 
     public function testGetSupportedTypes()

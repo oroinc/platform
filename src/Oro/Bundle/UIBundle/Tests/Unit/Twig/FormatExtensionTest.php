@@ -22,7 +22,7 @@ class FormatExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFilters()
     {
         $this->assertEquals(
-            [new \Twig_SimpleFilter('oro_format', [$this->extension, 'format'])],
+            [new \Twig_SimpleFilter('oro_format', [$this->extension, 'format'], ['is_safe' => ['html']])],
             $this->extension->getFilters()
         );
     }

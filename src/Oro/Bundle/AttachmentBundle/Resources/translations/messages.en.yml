@@ -55,3 +55,6 @@ oro:
             data_type:
                 file:  File
                 image: Image
+    formatter:
+        image_link:
+            default: N/A
