@@ -14,13 +14,6 @@ class TranslationControllerTest extends WebTestCase
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
-    public function testGetListWithoutParameters()
-    {
-        $this->client->request('GET', $this->getUrl('oro_api_get_translations'));
-
-        $this->getJsonResponseContent($this->client->getResponse(), 400);
-    }
-
     public function testGetListWithTotalCount()
     {
         $this->client->request(

@@ -64,12 +64,7 @@ class TranslationController extends FOSRestController
     {
         $page   = (int)$this->getRequest()->get('page', 1);
         $limit  = (int)$this->getRequest()->get('limit', RestGetController::ITEMS_PER_PAGE);
-        $domain = $this->getRequest()->get('domain', null);
-        if ($domain === null) {
-            throw new BadRequestHttpException(
-                'Domain parameter should be specified.'
-            );
-        }
+        $domain = $this->getRequest()->get('domain');
 
         $result = $this->get('translator.default')->getTranslations([$domain]);
 
