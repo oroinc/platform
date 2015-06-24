@@ -52,6 +52,7 @@ class EmailAddressRecipientsType extends AbstractType
                 'minimumInputLength' => 1,
                 'per_page'           => 100,
                 'containerCssClass'  => 'taggable-email',
+                'disable_sorting'    => true,
             ]
         ]);
     }

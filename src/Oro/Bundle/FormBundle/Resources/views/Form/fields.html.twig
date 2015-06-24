@@ -41,7 +41,9 @@
                     {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
                 {% endif %}
 
-                orderHandler.handle(select2Config);
+                {% if configs.disable_sorting is not defined or not configs.disable_sorting %}
+                    orderHandler.handle(select2Config);
+                {% endif %}
 
                 {% if excluded is not defined %}
                     {% set excluded = [] %}
