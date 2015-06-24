@@ -26,11 +26,11 @@ define([
 
             ViewNameModal.__super__.initialize.call(this, options);
 
-            this.events = _.extend({}, this.events, {'keydown #gridViewName': _.bind(this.closeOnEnter, this)});
+            this.events = _.extend({}, this.events, {'keydown #gridViewName': _.bind(this.onKeyDown, this)});
         },
 
-        closeOnEnter: function(e) {
-            if (e.which == 13) {
+        onKeyDown: function(e) {
+            if (e.which === 13) {
                 this.trigger('close');
                 this.trigger('ok');
             }
