@@ -1,6 +1,6 @@
 /*global define*/
-define(['../locale-settings', 'moment'
-    ], function (localeSettings, moment) {
+define(['../locale-settings', 'moment', 'orotranslation/js/translator'
+    ], function (localeSettings, moment, __) {
     'use strict';
 
     var datetimeVendor = 'moment';
@@ -16,6 +16,7 @@ define(['../locale-settings', 'moment'
          * @property {Object}
          */
         frontendFormats: {
+            'day':      localeSettings.getVendorDateTimeFormat(datetimeVendor, 'day'),
             'date':     localeSettings.getVendorDateTimeFormat(datetimeVendor, 'date'),
             'time':     localeSettings.getVendorDateTimeFormat(datetimeVendor, 'time'),
             'datetime': localeSettings.getVendorDateTimeFormat(datetimeVendor, 'datetime')
@@ -40,6 +41,13 @@ define(['../locale-settings', 'moment'
          * @property {string}
          */
         timezone: localeSettings.getTimeZone(),
+
+        /**
+         * @returns {string}
+         */
+        getDayFormat: function () {
+            return this.frontendFormats.day;
+        },
 
         /**
          * @returns {string}
@@ -229,6 +237,29 @@ define(['../locale-settings', 'moment'
         formatDateTime: function (value) {
             return this.getMomentForBackendDateTime(value).tz(this.timezone)
                 .format(this.getDateTimeFormat());
+        },
+
+        /**
+         * @param {string} value
+         * @returns {string}
+         */
+        formatSmartDateTime: function (value) {
+            var dateMoment = this.getMomentForBackendDateTime(value);
+            var dateOnly = this.formatDate(value);
+            var todayMoment = moment.utc().zone(this.timezoneOffset);
+
+            if (dateOnly == todayMoment.format(this.getDateFormat())) {
+                // same day, only show time
+                return dateMoment.format(this.getTimeFormat());
+            } else if (dateOnly == todayMoment.subtract(1, 'days').format(this.getDateFormat())) {
+                // yesterday
+                return __('Yesterday');
+            } else if (dateMoment.year() == todayMoment.year()) {
+                // same year, return only day and month
+                return dateMoment.format(this.getDayFormat());
+            }
+            // full date with year
+            return dateOnly;
         },
 
         /**

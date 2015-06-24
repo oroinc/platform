@@ -4,6 +4,7 @@ function($, localeSettings) {
     {% set dateTimeFormats = {} %}
     {% for formatterName in oro_datetime_formatter_list() %}
         {% set currentFormats = {
+            'day': oro_day_format(formatterName),
             'date': oro_date_format(formatterName),
             'time': oro_time_format(formatterName),
             'datetime': oro_datetime_format(formatterName),
