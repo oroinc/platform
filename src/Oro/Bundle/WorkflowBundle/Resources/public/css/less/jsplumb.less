@@ -1,8 +1,6 @@
-@box-width: 160px;
-@source-radius: 10px;
-@proportion: 1.618 * 1.5;
+@import "./variables";
 
-._jsPlumb_drag_select *, .jsplumb-box, [data-role=transition-overlay], .workflow-flowchart {
+._jsPlumb_drag_select *, .workflow-step, [data-role=transition-overlay], .workflow-flowchart {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -18,102 +16,155 @@
 .workflow-step-editor {
   margin-top: -28px;
 }
-.workflow-flowchart{
+.workflow-flowchart {
   position: relative;
   overflow-x: auto;
   height: 700px;
   overflow-y: hidden;
-  *[dropdown-state=opened] {
-    z-index: 700;
-  }
   ._jsPlumb_endpoint {
     z-index: 100;
   }
-  .jsplumb-box {
+}
+
+.workflow-flowchart {
+  /* step */
+  .workflow-step {
     z-index: 100;
     position: absolute;
     cursor: move;
-    border: 1px solid #4F719A;
-    border-radius: 5px;
-    width: @box-width;
-    height: @box-width / @proportion;
-    background: #B0CAEC;
-    -webkit-transform-style: preserve-3d;
-    -moz-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-
-    -webkit-transform-style: preserve-3d;
-    -moz-transform-style: preserve-3d;
-    transform-style: preserve-3d;
+    border-radius: 3px;
+    padding: 8px 18px;
+    height: 38px;
+    color: #fff;
+    border: 1px solid @step-border-color;
+    #gradient > .vertical(@step-gradient-start-color, @step-gradient-end-color);
     .step-label {
       text-align: center;
-      position: relative;
-      top: 50%;
-      -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-      transform: translateY(-50%);
-      font-size: 14px;
-    }
-    .dropdown {
-      text-align: left;
-      display: inline;
-      margin-left: -5px;
-    }
-    .dropdown-toggle {
-      cursor: pointer;
-      font-size: 14px;
-      :hover {
-        color: #555;
-      }
-      > i {
-        margin: 0;
-      }
-    }
-    &._jsPlumb_source_hover, &._jsPlumb_target_hover , &.jsplumb-drag-hover {
-      background: #D1E2BC;
+      font-size: 16px;
+      max-width: @step-label-max-width;
     }
     .jsplumb-source {
-      background: #EED591;
+      @source-radius: 8px;
       width: @source-radius * 2;
       height: @source-radius * 2;
       border-radius: @source-radius;
+      border: @source-radius / 2 solid @source-border-color;
       position: absolute;
-      margin-top: @box-width / @proportion - @source-radius;
-      margin-left: @box-width / 2 - @source-radius;
+      top: -@source-radius;
+      left: -@source-radius;
+      display: none;
+      #gradient > .vertical-three-colors(@source-gradient-start-color, @source-gradient-middle-color, 3%, @source-gradient-end-color);
       &:hover {
-        background: #DEC581;
+        #gradient > .vertical-three-colors(darken(@source-gradient-start-color, 5%), darken(@source-gradient-middle-color, 5%), 3%, darken(@source-gradient-end-color, 5%));
         cursor: pointer;
-        &:before {
-          content: "+";
-          line-height: 1em;
-          font-size: @source-radius * 2;
-          text-align: center;
-          width: @source-radius * 2;
-          display: block;
+      }
+    }
+    &:hover {
+      .jsplumb-source {
+        display: block;
+      }
+    }
+    &.dropdown {
+      .dropdown-toggle {
+        position: absolute;
+      }
+    }
+  }
+  .workflow-step.start-step {
+    border-radius: 50%;
+    height: 85px;
+    width: 85px;
+    border: 1px solid @start-step-border-color;
+    #gradient > .vertical(@start-step-gradient-start-color, @start-step-gradient-end-color);
+    .jsplumb-source {
+      top: 2px;
+      left: 2px;
+    }
+    .step-label {
+      margin-top: 50%;
+      width: 100%;
+    }
+  }
+  .workflow-step.final-step {
+    border: 1px solid @final-step-border-color;
+    #gradient > .vertical(@final-step-gradient-start-color, @final-step-gradient-end-color);
+  }
+
+  /* transition */
+  .workflow-transition-overlay {
+    padding: 3px 8px;
+    border-radius: 3px;
+    height: 28px;
+    border: 1px solid @transition-overlay-border-color;
+    #gradient > .vertical(@transition-overlay-gradient-start-color, @transition-overlay-gradient-end-color);
+    box-shadow: 0.749px 1.854px 7px 0 #ebebeb;
+    &:hover,
+    &._jsPlumb_hover {
+      z-index: 200;
+    }
+    .transition-label {
+      max-width: @transition-label-max-width;
+    }
+  }
+
+  /* common style for step and transition */
+  &.workflow-drag-connection {
+    .jsplumb-source {
+      display: block;
+    }
+    .workflow-step.start-step {
+      .jsplumb-source {
+        display: none;
+      }
+    }
+  }
+  .workflow-step,
+  .workflow-transition-overlay {
+    white-space: nowrap;
+    box-shadow: 0 3px 7px 0 #e8e8e8;
+    &._jsPlumb_hover,
+    &._jsPlumb_source_hover,
+    &._jsPlumb_target_hover,
+    &.jsplumb-drag-hover,
+    &:hover {
+      border: 1px solid @hover-border-color;
+      #gradient > .vertical-three-colors(@hover-gradient-start-color, @hover-gradient-middle-color, 3%, @hover-gradient-end-color);
+      color: #fff;
+    }
+    .step-label,
+    .transition-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+    }
+    &.dropdown {
+      .dropdown-menu {
+        min-width: 100%;
+      }
+      .dropdown-toggle {
+        vertical-align: top;
+        display: none;
+        cursor: pointer;
+        margin-left: 2px;
+      }
+      &:hover {
+        .dropdown-toggle {
+          display: inline-block;
         }
       }
     }
-  }
-  [data-role=transition-overlay] {
-    background-color: white;
-    opacity: 0.85;
-    padding: 0.3em;
-    border-radius: 0.5em;
-    border: 1px solid #4F719A;
-    -webkit-transform-style: preserve-3d;
-    -moz-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-
-    &:hover, &._jsplumb_hover {
-      z-index: 200;
-    }
-  }
-
-  &.workflow-flowchart-editor {
-    .jsplumb-box {
-      &:hover {
-        background: #7C99BE;
+    &.dropdown.open {
+      z-index: 101;
+      .dropdown-toggle {
+        display: inline-block;
       }
     }
+  }
+
+  .workflow-transition-endpoint {
+    display: none
+  }
+  .workflow-transition-endpoint-hover {
+    display: block
   }
 }
