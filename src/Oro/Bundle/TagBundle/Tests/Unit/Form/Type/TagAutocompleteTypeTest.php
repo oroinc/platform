@@ -14,7 +14,11 @@ class TagAutocompleteTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->type = new TagAutocompleteType();
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->type = new TagAutocompleteType($securityFacade);
     }
 
     protected function tearDown()

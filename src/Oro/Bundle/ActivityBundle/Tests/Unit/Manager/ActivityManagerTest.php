@@ -26,6 +26,9 @@ class ActivityManagerTest extends OrmTestCase
     protected $activityConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $groupingConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -75,6 +78,9 @@ class ActivityManagerTest extends OrmTestCase
         $this->activityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->entityConfigProvider   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -91,6 +97,7 @@ class ActivityManagerTest extends OrmTestCase
             new DoctrineHelper($doctrine),
             new EntityClassResolver($doctrine),
             $this->activityConfigProvider,
+            $this->groupingConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->associationManager

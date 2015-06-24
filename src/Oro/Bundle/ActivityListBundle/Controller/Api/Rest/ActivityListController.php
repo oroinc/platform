@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
@@ -45,7 +46,7 @@ class ActivityListController extends RestController
      */
     public function cgetAction($entityClass, $entityId)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $this->getRequest()->get('filter');
 
         $results = [
@@ -91,6 +92,25 @@ class ActivityListController extends RestController
     }
 
     /**
+     * Get ActivityList option
+     *
+     * @ApiDoc(
+     *      description="Returns ActivityList option",
+     *      resource=true,
+     *      statusCodes={
+     *          200="Returned when successful",
+     *      }
+     * )
+     * @return Response
+     */
+    public function getActivityListOptionAction()
+    {
+        $results = $this->getActivityListProvider()->getActivityListOption($this->get('oro_config.user'));
+
+        return new JsonResponse($results);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getManager()
@@ -112,5 +132,13 @@ class ActivityListController extends RestController
     public function getFormHandler()
     {
         throw new \BadMethodCallException('FormHandler is not available.');
+    }
+
+    /**
+     * @return ActivityListChainProvider
+     */
+    protected function getActivityListProvider()
+    {
+        return $this->get('oro_activity_list.provider.chain');
     }
 }

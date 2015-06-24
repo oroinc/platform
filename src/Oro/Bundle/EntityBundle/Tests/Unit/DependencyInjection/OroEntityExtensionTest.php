@@ -82,5 +82,40 @@ class OroEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             $virtualFields
         );
+
+        $entityAliases = $container->getParameter('oro_entity.entity_aliases');
+        $this->assertEquals(
+            [
+                'Test\Entity\Product' => [
+                    'alias'        => 'testproduct',
+                    'plural_alias' => 'testproducts'
+                ]
+            ],
+            $entityAliases
+        );
+
+        $entityAliasExclusions = $container->getParameter('oro_entity.entity_alias_exclusions');
+        $this->assertEquals(
+            [
+                'Test\Entity\Address'
+            ],
+            $entityAliasExclusions
+        );
+
+        $textRepresentationTypes = $container->getParameter('oro_entity.entity_name_formats');
+        $this->assertEquals(
+            [
+                'long' => [
+                    'fallback' => 'short'
+                ],
+                'short' => [
+                    'fallback' => null
+                ],
+                'html' => [
+                    'fallback' => 'long'
+                ]
+            ],
+            $textRepresentationTypes
+        );
     }
 }

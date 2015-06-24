@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Model;
 
-class ExtendUser
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
+
+class ExtendUser extends AbstractUser
 {
     /**
      * Constructor
@@ -13,5 +15,6 @@ class ExtendUser
      */
     public function __construct()
     {
+        parent::__construct();
     }
 }

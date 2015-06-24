@@ -1,0 +1,75 @@
+<?php
+
+namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
+
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Get;
+
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
+use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityApiEntityManager;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+
+/**
+ * @RouteResource("activity")
+ * @NamePrefix("oro_api_")
+ */
+class ActivityController extends RestGetController
+{
+    /**
+     * Returns activity types.
+     *
+     * @Get("/activities", name="")
+     *
+     * @ApiDoc(
+     *      description="Returns activity types",
+     *      resource=true
+     * )
+     *
+     * @return Response
+     */
+    public function getTypesAction()
+    {
+        $result = $this->getManager()->getActivityTypes();
+
+        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
+    }
+
+    /**
+     * Returns entity types which can be associated with the specified activity type.
+     *
+     * @param string $activity The type of the activity entity.
+     *
+     * @Get("/activities/{activity}", name="")
+     *
+     * @ApiDoc(
+     *      description="Returns entity types which can be associated with the specified activity type",
+     *      resource=true
+     * )
+     *
+     * @return Response
+     */
+    public function getTargetTypesAction($activity)
+    {
+        $manager = $this->getManager();
+        $manager->setClass($manager->resolveEntityClass($activity, true));
+
+
+        $result = $this->getManager()->getActivityTargetTypes();
+
+        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
+    }
+
+    /**
+     * Get entity manager
+     *
+     * @return ActivityApiEntityManager
+     */
+    public function getManager()
+    {
+        return $this->container->get('oro_activity.manager.activity.api');
+    }
+}

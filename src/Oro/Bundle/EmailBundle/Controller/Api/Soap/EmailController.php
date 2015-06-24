@@ -8,7 +8,6 @@ use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController;
 
@@ -91,79 +90,6 @@ class EmailController extends SoapGetController
     public function getEmailAttachment($id)
     {
         return $this->getEmailAttachmentContentEntity($id);
-    }
-
-    /**
-     * @Soap\Method("postAssociation")
-     * @Soap\Param("id", phpType = "int")
-     * @Soap\Param("targetClassName", phpType = "string")
-     * @Soap\Param("targetId", phpType = "int")
-     * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_email_edit")
-     */
-    public function postAssociationsAction($id, $targetClassName, $targetId)
-    {
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($id);
-        $translator = $this->container->get('translator');
-
-        if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', $translator->trans('oro.email.not_found', ['%id%'=>$id]));
-        }
-
-        $this->assertEmailAccessGranted('EDIT', $entity);
-
-        /**
-         * @var $entityRoutingHelper EntityRoutingHelper
-         */
-        $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
-        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
-
-        if ($entity->supportActivityTarget($targetClassName)) {
-            $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-
-            if (!$entity->hasActivityTarget($target)) {
-                $this->container->get('oro_email.email.manager')->deleteContextFromEmailThread($entity, $target);
-            } else {
-                throw new \SoapFault('BAD_REQUEST', $translator->trans('oro.email.contexts.added.already'));
-            }
-        } else {
-            throw new \SoapFault('BAD_REQUEST', $translator->trans('oro.email.contexts.type.not_supported'));
-        }
-
-        return $this->getManager()->getEntityId($entity);
-    }
-
-    /**
-     * @Soap\Method("deleteAssociation")
-     * @Soap\Param("id", phpType = "int")
-     * @Soap\Param("targetClassName", phpType = "string")
-     * @Soap\Param("targetId", phpType = "int")
-     * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_email_edit")
-     */
-    public function deleteAssociationAction($id, $targetClassName, $targetId)
-    {
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($id);
-        $translator = $this->container->get('translator');
-
-        if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', $translator->trans('oro.email.not_found', ['%id%'=>$id]));
-        }
-
-        $this->assertEmailAccessGranted('VIEW', $entity);
-
-        $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
-        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
-        $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-        $this->container->get('oro_email.email.manager')->deleteContextFromEmailThread($entity, $target);
-
-        return true;
     }
 
     /**

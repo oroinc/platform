@@ -18,12 +18,13 @@ define(function (require) {
         },
         url:function() {
             var param = {
-                'entityId': this.get('entityId'),
-                'targetClassName':  this.get('targetClassName'),
-                'targetId': this.get('targetId')
+                'activity': 'emails',
+                'id': this.get('entityId'),
+                'entity':  this.get('targetClassName'),
+                'entityId': this.get('targetId')
             };
 
-            return routing.generate('oro_api_delete_email_association', param)
+            return routing.generate('oro_api_delete_activity_relation', param);
         }
     });
 

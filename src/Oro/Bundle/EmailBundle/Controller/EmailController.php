@@ -23,6 +23,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
@@ -38,6 +39,7 @@ class EmailController extends Controller
 {
     /**
      * @Route("/view/{id}", name="oro_email_view", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_view")
      * @Template
      */
     public function viewAction(Email $entity)
@@ -204,8 +206,6 @@ class EmailController extends Controller
      */
     public function bodyAction(EmailBody $entity)
     {
-//        $this->assertEmailAccessGranted('VIEW', $entity->getEmail());
-
         return new Response($entity->getBodyContent());
     }
 
@@ -217,8 +217,6 @@ class EmailController extends Controller
      */
     public function attachmentAction(EmailAttachment $entity)
     {
-//        $this->assertEmailAccessGranted('VIEW', $entity->getEmailBody()->getEmail());
-
         $response = new Response();
         $response->headers->set('Content-Type', $entity->getContentType());
         $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $entity->getFileName()));
@@ -241,8 +239,6 @@ class EmailController extends Controller
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
-//        $this->assertEmailAccessGranted('EDIT', $emailAttachment->getEmailBody()->getEmail());
-
         try {
             $entity = $this->getTargetEntity();
             $this->get('oro_email.manager.email_attachment_manager')
@@ -462,11 +458,12 @@ class EmailController extends Controller
      */
     protected function getTargetEntityConfig($encode = true)
     {
+        /** @var EntityRoutingHelper $entityRoutingHelper */
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
         $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
         if ($encode) {
-            $targetEntityClass = $entityRoutingHelper->encodeClassName($targetEntityClass);
+            $targetEntityClass = $entityRoutingHelper->getUrlSafeClassName($targetEntityClass);
         }
         if (null === $targetEntityClass || null === $targetEntityId) {
             return [];
@@ -527,17 +524,4 @@ class EmailController extends Controller
             $this->getEmailManager()->setEmailUserSeen($emailUser);
         }
     }
-
-//    /**
-//     * @param string $attribute
-//     * @param Email $entity
-//     *
-//     * @throws AccessDeniedException
-//     */
-//    protected function assertEmailAccessGranted($attribute, Email $entity)
-//    {
-//        if (!$this->get('oro_security.security_facade')->isGranted($attribute, $entity)) {
-//            throw new AccessDeniedException();
-//        }
-//    }
 }
