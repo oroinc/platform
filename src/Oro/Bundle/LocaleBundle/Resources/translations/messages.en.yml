@@ -1,4 +1,6 @@
 oro.locale:
+    date_format:
+        day: "MMM d"
     address_format:
         region_name_type:
             parish: "parish"
