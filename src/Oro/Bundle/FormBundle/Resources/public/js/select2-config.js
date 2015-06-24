@@ -15,6 +15,16 @@ define(['jquery', 'underscore', 'oroui/js/tools'
         this.excluded = excluded;
     };
 
+    function dataHasText(data, text) {
+        return _.some(data, function (row) {
+            if (!row.hasOwnProperty('children')) {
+                return row.text.localeCompare(text) === 0;
+            }
+
+            return dataHasText(row.children, text);
+        });
+    }
+
     Select2Config.prototype = {
         getConfig: function () {
             var self = this;
@@ -85,7 +95,28 @@ define(['jquery', 'underscore', 'oroui/js/tools'
             if (this.config.openOnEnter === undefined) {
                 this.config.openOnEnter = null;
             }
+
+            this._configureTaggingIfAjaxWithTagging();
+
             return this.config;
+        },
+
+        _configureTaggingIfAjaxWithTagging: function () {
+            if (this.config.hasOwnProperty('createSearchChoice')
+                || !this.config.hasOwnProperty('ajax')
+                || !this.config.hasOwnProperty('tags')
+            ) {
+                return;
+            }
+
+            this.config.createSearchChoice = function (term, data) {
+                if (!dataHasText(data, term)) {
+                    return {
+                        id: term,
+                        text: term
+                    };
+                }
+            };
         },
 
         format: function(jsTemplate) {

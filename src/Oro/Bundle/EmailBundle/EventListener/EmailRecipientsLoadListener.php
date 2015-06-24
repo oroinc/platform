@@ -58,6 +58,9 @@ class EmailRecipientsLoadListener
         $userEmailAddresses = $this->relatedEmailsProvider->getEmails($user);
         $recentlyUsedEmails = $this->getEmailRecipientRepository()
             ->getEmailsUsedInLast30Days($userEmailAddresses, $query, $limit);
+        if (!$recentlyUsedEmails) {
+            return;
+        }
 
         $event->setResults(array_merge(
             $event->getResults(),

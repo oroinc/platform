@@ -40,6 +40,9 @@ class EmailRecipientsLoadListener
         }
 
         $userEmails = $this->getUserRepository()->getEmails($query, $limit);
+        if (!$userEmails) {
+            return;
+        }
 
         $event->setResults(array_merge(
             $event->getResults(),
