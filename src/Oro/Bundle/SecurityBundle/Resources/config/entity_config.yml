@@ -14,7 +14,7 @@ oro_entity_config:
                 share_scopes:
                     options:
                         priority: 250
-                        default_value: ['5']
+                        default_value: ['user']
                     form:
                         type: choice
                         options:
@@ -24,8 +24,8 @@ oro_entity_config:
                             expanded: true
                             label: 'oro.security.share_scopes.label'
                             choices:
-                                '1': 'oro.security.share_scopes.system'
-                                '2': 'oro.security.share_scopes.organization'
-                                '3': 'oro.security.share_scopes.division'
-                                '4': 'oro.security.share_scopes.business_unit'
-                                '5': 'oro.security.share_scopes.user'
+                                'system': 'oro.security.share_scopes.system'
+                                'organization': 'oro.security.share_scopes.organization'
+                                'division': 'oro.security.share_scopes.division'
+                                'business_unit': 'oro.security.share_scopes.business_unit'
+                                'user': 'oro.security.share_scopes.user'
