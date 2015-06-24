@@ -553,3 +553,8 @@ services:
                 alias: HINT_FILTER_BY_CURRENT_USER
                 tree_walker: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker
                 walker_hint_provider: oro_security.walker_hint_provider.current_user
+
+    # Disables postGenerateSchema event listener, which used to take care of acl tables. For now these tables are
+    # managed by platform entities.
+    security.acl.dbal.schema_listener:
+        synthetic: true
