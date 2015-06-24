@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
+use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber;
 
 class TypedAddressType extends AbstractType
 {
@@ -17,7 +17,10 @@ class TypedAddressType extends AbstractType
     {
         if ($options['single_form'] && $options['all_addresses_property_path']) {
             $builder->addEventSubscriber(
-                new FixAddressesPrimaryAndTypesSubscriber($options['all_addresses_property_path'])
+                new FixAddressesPrimarySubscriber($options['all_addresses_property_path'])
+            );
+            $builder->addEventSubscriber(
+                new FixAddressesTypesSubscriber($options['all_addresses_property_path'])
             );
         }
 
