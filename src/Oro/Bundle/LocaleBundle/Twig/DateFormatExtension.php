@@ -34,6 +34,7 @@ class DateFormatExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('oro_datetime_formatter_list', array($this, 'getDateTimeFormatterList')),
+            new \Twig_SimpleFunction('oro_day_format', array($this, 'getDayFormat')),
             new \Twig_SimpleFunction('oro_date_format', array($this, 'getDateFormat')),
             new \Twig_SimpleFunction('oro_time_format', array($this, 'getTimeFormat')),
             new \Twig_SimpleFunction('oro_datetime_format', array($this, 'getDateTimeFormat')),
@@ -46,6 +47,18 @@ class DateFormatExtension extends \Twig_Extension
     public function getDateTimeFormatterList()
     {
         return array_keys($this->converterRegistry->getFormatConverters());
+    }
+
+    /**
+     * @param string $type
+     * @param string|null $locale
+     * @return string
+     */
+    public function getDayFormat($type, $locale = null)
+    {
+        return $this->converterRegistry->getFormatConverter($type)->getDayFormat(
+            $locale
+        );
     }
 
     /**

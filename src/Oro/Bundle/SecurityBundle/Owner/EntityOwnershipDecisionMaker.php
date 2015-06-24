@@ -6,18 +6,21 @@ use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
 /**
- * This class implements OwnershipDecisionMakerInterface interface and allows to make ownership related
+ * This class implements AccessLevelOwnershipDecisionMakerInterface interface and allows to make ownership related
  * decisions using the tree of owners.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
+class EntityOwnershipDecisionMaker implements
+    OwnershipDecisionMakerInterface,
+    AccessLevelOwnershipDecisionMakerInterface
 {
     /**
      * @var OwnerTreeProvider
@@ -61,24 +64,52 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
     /**
      * {@inheritdoc}
+     * @deprecated since 1.8 Please use isGlobalLevelEntity() instead
      */
     public function isOrganization($domainObject)
+    {
+        return $this->isGlobalLevelEntity($domainObject);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isGlobalLevelEntity($domainObject)
     {
         return is_a($domainObject, $this->metadataProvider->getOrganizationClass());
     }
 
     /**
      * {@inheritdoc}
+     * @deprecated since 1.8 Please use isLocalLevelEntity() instead
      */
     public function isBusinessUnit($domainObject)
+    {
+        return $this->isLocalLevelEntity($domainObject);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isLocalLevelEntity($domainObject)
     {
         return is_a($domainObject, $this->metadataProvider->getBusinessUnitClass());
     }
 
     /**
      * {@inheritdoc}
+     * @deprecated since 1.8 Please use isBasicLevelEntity() instead
      */
     public function isUser($domainObject)
+    {
+        return $this->isBasicLevelEntity($domainObject);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return bool
+     */
+    public function isBasicLevelEntity($domainObject)
     {
         return is_a($domainObject, $this->metadataProvider->getUserClass());
     }
@@ -87,8 +118,19 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @deprecated since 1.8 Please use isAssociatedWithGlobalLevelEntity() instead
      */
     public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
+    {
+        return $this->isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
     {
         $tree = $this->treeProvider->getTree();
         $this->validateUserObject($user);
@@ -106,21 +148,21 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
         $allowedOrganizationIds = $organizationId ? [$organizationId] : $userOrganizationIds;
 
-        if ($this->isOrganization($domainObject)) {
+        if ($this->isGlobalLevelEntity($domainObject)) {
             return in_array(
                 $this->getObjectId($domainObject),
                 $allowedOrganizationIds
             );
         }
 
-        if ($this->isBusinessUnit($domainObject)) {
+        if ($this->isLocalLevelEntity($domainObject)) {
             return in_array(
                 $tree->getBusinessUnitOrganizationId($this->getObjectId($domainObject)),
                 $allowedOrganizationIds
             );
         }
 
-        if ($this->isUser($domainObject)) {
+        if ($this->isBasicLevelEntity($domainObject)) {
             $userId = $this->getObjectId($user);
             $objId = $this->getObjectId($domainObject);
             if ($userId === $objId) {
@@ -137,7 +179,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         }
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
-        if ($metadata->isOrganizationOwned()) {
+        if ($metadata->isGlobalLevelOwned()) {
             return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds);
         } else {
             return in_array(
@@ -151,8 +193,17 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
     /**
      * {@inheritdoc}
+     * @deprecated since 1.8 Please use isAssociatedWithDeepLevelEntity() instead
      */
     public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
+    {
+        return $this->isAssociatedWithLocalLevelEntity($user, $domainObject, $deep, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
     {
         $tree = $this->treeProvider->getTree();
         $this->validateUserObject($user);
@@ -163,7 +214,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
             $organizationId = $this->getObjectId($organization);
         }
 
-        if ($this->isBusinessUnit($domainObject)) {
+        if ($this->isLocalLevelEntity($domainObject)) {
             return $this->isUserBusinessUnit(
                 $this->getObjectId($user),
                 $this->getObjectId($domainObject),
@@ -172,7 +223,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
             );
         }
 
-        if ($this->isUser($domainObject)) {
+        if ($this->isBasicLevelEntity($domainObject)) {
             $userId = $this->getObjectId($user);
             if ($userId === $this->getObjectId($domainObject) && $tree->getUserBusinessUnitId($userId) !== null) {
                 return true;
@@ -185,9 +236,9 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         }
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
-        if ($metadata->isBusinessUnitOwned()) {
+        if ($metadata->isLocalLevelOwned()) {
             return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep, $organizationId);
-        } elseif ($metadata->isUserOwned()) {
+        } elseif ($metadata->isBasicLevelOwned()) {
             $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($ownerId, $organizationId);
             if (empty($ownerBusinessUnitIds)) {
                 return false;
@@ -206,8 +257,17 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
     /**
      * {@inheritdoc}
+     * @deprecated since 1.8 Please use isAssociatedWithBasicLevelEntity() instead
      */
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
+    {
+        return $this->isAssociatedWithBasicLevelEntity($user, $domainObject, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
     {
         $userId = $this->getObjectId($user);
         if ($organization
@@ -222,12 +282,12 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
-        if ($this->isUser($domainObject)) {
+        if ($this->isBasicLevelEntity($domainObject)) {
             return $this->getObjectId($domainObject) === $this->getObjectId($user);
         }
 
         $metadata = $this->getObjectMetadata($domainObject);
-        if ($metadata->isUserOwned()) {
+        if ($metadata->isBasicLevelOwned()) {
             $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
 
             return $userId === $ownerId;
@@ -304,7 +364,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      */
     protected function validateUserObject($user)
     {
-        if (!is_object($user) || !$this->isUser($user)) {
+        if (!is_object($user) || !$this->isBasicLevelEntity($user)) {
             throw new InvalidDomainObjectException(
                 sprintf(
                     '$user must be an instance of %s.',
@@ -375,7 +435,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * Gets metadata for the given domain object
      *
      * @param  object $domainObject
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     protected function getObjectMetadata($domainObject)
     {

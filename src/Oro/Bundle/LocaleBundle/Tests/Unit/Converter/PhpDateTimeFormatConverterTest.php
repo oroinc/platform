@@ -11,7 +11,7 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
      */
     protected function createFormatConverter()
     {
-        return new PhpDateTimeFormatConverter($this->formatter);
+        return new PhpDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
     /**
@@ -19,12 +19,12 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
      */
     public function getDateFormatDataProvider()
     {
-        return array(
-            'en default' => array('M j, Y', null, self::LOCALE_EN),
-            'en custom'  => array('F j, Y', \IntlDateFormatter::LONG, self::LOCALE_EN),
-            'ru default' => array('d.m.Y', null, self::LOCALE_RU),
-            'ru custom'  => array('j F Y г.', \IntlDateFormatter::LONG, self::LOCALE_RU),
-        );
+        return [
+            'en default' => ['M j, Y', null, self::LOCALE_EN],
+            'en custom' => ['F j, Y', \IntlDateFormatter::LONG, self::LOCALE_EN],
+            'ru default' => ['d.m.Y', null, self::LOCALE_RU],
+            'ru custom' => ['j F Y г.', \IntlDateFormatter::LONG, self::LOCALE_RU],
+        ];
     }
 
     /**
@@ -32,12 +32,12 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
      */
     public function getTimeFormatDataProvider()
     {
-        return array(
-            'en default' => array('g:i A', null, self::LOCALE_EN),
-            'en custom'  => array('g:i:s A', \IntlDateFormatter::MEDIUM, self::LOCALE_EN),
-            'ru default' => array('G:i', null, self::LOCALE_RU),
-            'ru custom'  => array('G:i:s', \IntlDateFormatter::MEDIUM, self::LOCALE_RU),
-        );
+        return [
+            'en default' => ['g:i A', null, self::LOCALE_EN],
+            'en custom' => ['g:i:s A', \IntlDateFormatter::MEDIUM, self::LOCALE_EN],
+            'ru default' => ['G:i', null, self::LOCALE_RU],
+            'ru custom' => ['G:i:s', \IntlDateFormatter::MEDIUM, self::LOCALE_RU],
+        ];
     }
 
     /**
@@ -45,21 +45,32 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
      */
     public function getDateTimeFormatDataProvider()
     {
-        return array(
-            'en default' => array('M j, Y g:i A', null, null, self::LOCALE_EN),
-            'en custom'  => array(
+        return [
+            'en default' => ['M j, Y g:i A', null, null, self::LOCALE_EN],
+            'en custom' => [
                 'F j, Y g:i:s A',
                 \IntlDateFormatter::LONG,
                 \IntlDateFormatter::MEDIUM,
                 self::LOCALE_EN
-            ),
-            'ru default' => array('d.m.Y G:i', null, null, self::LOCALE_RU),
-            'ru custom'  => array(
+            ],
+            'ru default' => ['d.m.Y G:i', null, null, self::LOCALE_RU],
+            'ru custom' => [
                 'j F Y г. G:i:s',
                 \IntlDateFormatter::LONG,
                 \IntlDateFormatter::MEDIUM,
                 self::LOCALE_RU
-            ),
-        );
+            ],
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDateFormatDayProvider()
+    {
+        return [
+            'en default' => ['M j', self::LOCALE_EN],
+            'ru default' => ["j.M", self::LOCALE_RU],
+        ];
     }
 }
