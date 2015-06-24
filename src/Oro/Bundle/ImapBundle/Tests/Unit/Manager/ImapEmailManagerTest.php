@@ -288,7 +288,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $email = $this->manager->convertToEmail($msg);
 
         $this->assertNotEmpty($email->getMessageId());
-        $this->assertFalse($email->getMessageMultiId());
+        $this->assertNull($email->getMessageMultiId());
     }
 
     public function getEmailsProvider()

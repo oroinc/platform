@@ -572,7 +572,7 @@ class Email extends ExtendEmail
      */
     public function getMessageMultiId()
     {
-        return unserialize($this->messageMultiId);
+        return $this->messageMultiId ? unserialize($this->messageMultiId) : null;
     }
 
     /**
@@ -584,7 +584,7 @@ class Email extends ExtendEmail
      */
     public function setMessageMultiId($messageMultiId)
     {
-        $this->messageMultiId = serialize($messageMultiId);
+        $this->messageMultiId = $messageMultiId ? serialize($messageMultiId): null;
 
         return $this;
     }

@@ -395,7 +395,7 @@ class EmailHeader
      */
     public function getMessageMultiId()
     {
-        return unserialize($this->messageMultiId);
+        return $this->messageMultiId ? unserialize($this->messageMultiId) : null;
     }
 
     /**
@@ -407,7 +407,7 @@ class EmailHeader
      */
     public function setMessageMultiId($messageMultiId)
     {
-        $this->messageMultiId = serialize($messageMultiId);
+        $this->messageMultiId = $messageMultiId ? serialize($messageMultiId): null;
 
         return $this;
     }
