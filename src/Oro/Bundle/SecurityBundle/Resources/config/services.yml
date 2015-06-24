@@ -193,6 +193,10 @@ services:
             - @oro_security.acl.object_id_accessor
             - @oro_security.owner.entity_owner_accessor
             - @oro_security.owner.ownership_metadata_provider
+        calls:
+            - [ setSecurityFacade, [ @oro_security.security_facade ] ]
+        tags:
+           - { name: oro_security.owner.ownership_decision_maker }
 
     oro_security.form.type.oro_acl_access_level_selector:
         class: %oro_security.type.oro_acl_access_level_selector.class%

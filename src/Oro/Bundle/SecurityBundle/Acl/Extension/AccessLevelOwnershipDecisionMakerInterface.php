@@ -69,4 +69,9 @@ interface AccessLevelOwnershipDecisionMakerInterface
      * @throws InvalidDomainObjectException
      */
     public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null);
+
+    /**
+     * @return bool
+     */
+    public function supports();
 }

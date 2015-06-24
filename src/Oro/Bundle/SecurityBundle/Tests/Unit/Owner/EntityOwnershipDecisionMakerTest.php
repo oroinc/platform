@@ -6,6 +6,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
@@ -1182,5 +1183,53 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj31));
         $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj4));
         $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj411));
+    }
+
+    /**
+     * @dataProvider supportsDataProvider
+     *
+     * @param SecurityFacade|null $securityFacade
+     * @param bool $expectedResult
+     */
+    public function testSupports($securityFacade, $expectedResult)
+    {
+        if ($securityFacade) {
+            $this->decisionMaker->setSecurityFacade($securityFacade);
+        }
+        $this->assertEquals($expectedResult, $this->decisionMaker->supports());
+    }
+    /**
+     * @return array
+     */
+    public function supportsDataProvider()
+    {
+        $securityFacadeWithoutUser = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacadeWithoutUser->expects($this->once())
+            ->method('getLoggedUser')
+            ->willReturn(new \stdClass());
+
+        $securityFacadeWithUser = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacadeWithUser->expects($this->once())
+            ->method('getLoggedUser')
+            ->willReturn(new User());
+
+        return [
+            'without security facade' => [
+                'securityFacade' => null,
+                'expectedResult' => false,
+            ],
+            'security facade with incorrect user class' => [
+                'securityFacade' => $securityFacadeWithoutUser,
+                'expectedResult' => false,
+            ],
+            'security facade with user class' => [
+                'securityFacade' => $securityFacadeWithUser,
+                'expectedResult' => true,
+            ],
+        ];
     }
 }
