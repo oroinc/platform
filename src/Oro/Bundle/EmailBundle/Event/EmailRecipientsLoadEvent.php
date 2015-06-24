@@ -8,6 +8,9 @@ class EmailRecipientsLoadEvent extends Event
 {
     const NAME = 'oro_email.email_recipients_load';
 
+    /** @var object|null */
+    protected $relatedEntity;
+
     /** @var string */
     protected $query;
 
@@ -18,13 +21,23 @@ class EmailRecipientsLoadEvent extends Event
     protected $results = [];
 
     /**
+     * @param object|null $relatedEntity
      * @param string $query
      * @param int $limit
      */
-    public function __construct($query, $limit)
+    public function __construct($relatedEntity, $query, $limit)
     {
+        $this->relatedEntity = $relatedEntity;
         $this->query = $query;
         $this->limit = $limit;
+    }
+
+    /**
+     * @return object|null
+     */
+    public function getRelatedEntity()
+    {
+        return $this->relatedEntity;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -401,6 +402,15 @@ class EmailController extends RestController
      */
     public function getRecipientAutocompleteAction(Request $request)
     {
+        $relatedEntity = null;
+
+        $entityClass = $request->query->get('entityClass');
+        $entityId = $request->query->get('entityId');
+        if ($entityClass && $entityId) {
+            $em = $this->getEntityManagerForClass($entityClass);
+            $relatedEntity = $em->getReference($entityClass, $entityId);
+        }
+
         $query = $request->query->get('query');
         if ($request->query->get('search_by_id', false)) {
             $id = $query;
@@ -415,7 +425,7 @@ class EmailController extends RestController
             ];
         } else {
             $limit = $request->query->get('per_page', 100);
-            $results = $this->getEmailRecipientsProvider()->getEmailRecipients($query, $limit);
+            $results = $this->getEmailRecipientsProvider()->getEmailRecipients($relatedEntity, $query, $limit);
         }
 
         return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
@@ -427,5 +437,15 @@ class EmailController extends RestController
     protected function getEmailRecipientsProvider()
     {
         return $this->get('oro_email.email_recipients.provider');
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return EntityManager
+     */
+    protected function getEntityManagerForClass($className)
+    {
+        return $this->getDoctrine()->getManagerForClass($className);
     }
 }

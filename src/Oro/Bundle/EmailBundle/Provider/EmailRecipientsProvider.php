@@ -20,18 +20,19 @@ class EmailRecipientsProvider
     }
 
     /**
+     * @param object|null $relatedEntity
      * @param string|null $query
      * @param int $limit
      *
      * @return array
      */
-    public function getEmailRecipients($query = null, $limit = 100)
+    public function getEmailRecipients($relatedEntity = null, $query = null, $limit = 100)
     {
         if (!$this->dispatcher->hasListeners(EmailRecipientsLoadEvent::NAME)) {
             return [];
         }
-        
-        $event = new EmailRecipientsLoadEvent($query, $limit);
+
+        $event = new EmailRecipientsLoadEvent($relatedEntity, $query, $limit);
         $this->dispatcher->dispatch(EmailRecipientsLoadEvent::NAME, $event);
 
         return $event->getResults();

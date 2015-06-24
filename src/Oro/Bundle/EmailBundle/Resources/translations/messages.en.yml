@@ -10,6 +10,7 @@ oro:
     email:
         autocomplete:
             recently_used: Recently used
+            contexts: Contexts
         controller.emailtemplate.saved.message: "Template saved"
         form:
             choose_template:                     ""
