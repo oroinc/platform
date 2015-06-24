@@ -64,7 +64,7 @@ class EntityOwnershipDecisionMaker implements
 
     /**
      * {@inheritdoc}
-     * @deprecated Please use isGlobalLevelEntity() instead
+     * @deprecated since 1.8 Please use isGlobalLevelEntity() instead
      */
     public function isOrganization($domainObject)
     {
@@ -81,7 +81,7 @@ class EntityOwnershipDecisionMaker implements
 
     /**
      * {@inheritdoc}
-     * @deprecated Please use isLocalLevelEntity() instead
+     * @deprecated since 1.8 Please use isLocalLevelEntity() instead
      */
     public function isBusinessUnit($domainObject)
     {
@@ -98,7 +98,7 @@ class EntityOwnershipDecisionMaker implements
 
     /**
      * {@inheritdoc}
-     * @deprecated Please use isBasicLevelEntity() instead
+     * @deprecated since 1.8 Please use isBasicLevelEntity() instead
      */
     public function isUser($domainObject)
     {
@@ -118,7 +118,7 @@ class EntityOwnershipDecisionMaker implements
      * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @deprecated Please use isAssociatedWithGlobalLevelEntity() instead
+     * @deprecated since 1.8 Please use isAssociatedWithGlobalLevelEntity() instead
      */
     public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
     {
@@ -193,7 +193,7 @@ class EntityOwnershipDecisionMaker implements
 
     /**
      * {@inheritdoc}
-     * @deprecated Please use isAssociatedWithDeepLevelEntity() instead
+     * @deprecated since 1.8 Please use isAssociatedWithDeepLevelEntity() instead
      */
     public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
@@ -257,7 +257,7 @@ class EntityOwnershipDecisionMaker implements
 
     /**
      * {@inheritdoc}
-     * @deprecated Please use isAssociatedWithBasicLevelEntity() instead
+     * @deprecated since 1.8 Please use isAssociatedWithBasicLevelEntity() instead
      */
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {

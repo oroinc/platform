@@ -38,7 +38,7 @@ interface AccessLevelOwnershipDecisionMakerInterface
      * Determines whether the given domain object is associated with
      * an any global level entity (e.g. organization) of the given user
      *
-     * @param  object                       $user
+     * @param  object|null                  $user
      * @param  object                       $domainObject
      * @param  object                       $organization
      * @return bool
@@ -50,10 +50,10 @@ interface AccessLevelOwnershipDecisionMakerInterface
      * Determines whether the given domain object is associated with
      * an any (e.g. business unit) of the given user
      *
-     * @param  object  $user
-     * @param  object  $domainObject
-     * @param  boolean $deep Specify whether subordinate business units should be checked. Defaults to false.
-     * @param  object  $organization
+     * @param  object|null  $user
+     * @param  object       $domainObject
+     * @param  boolean      $deep Specify whether subordinate business units should be checked. Defaults to false.
+     * @param  object       $organization
      * @return bool
      * @throws InvalidDomainObjectException
      */
@@ -62,7 +62,7 @@ interface AccessLevelOwnershipDecisionMakerInterface
     /**
      * Determines whether the given domain object is associated with the basic level entity
      *
-     * @param  object                       $user
+     * @param  object|null                  $user
      * @param  object                       $domainObject
      * @param  object                       $organization
      * @return bool

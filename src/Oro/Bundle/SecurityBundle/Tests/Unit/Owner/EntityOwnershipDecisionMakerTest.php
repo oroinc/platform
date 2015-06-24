@@ -17,7 +17,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- * @SuppressWarnings(PHPMD.ExcessivePublicCount:)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 {
@@ -204,9 +204,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsOrganization()
     {
         $this->assertFalse($this->decisionMaker->isOrganization(null));
@@ -237,9 +234,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsBusinessUnit()
     {
         $this->assertFalse($this->decisionMaker->isBusinessUnit(null));
@@ -270,9 +264,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsUser()
     {
         $this->assertFalse($this->decisionMaker->isUser(null));
@@ -305,7 +296,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
     
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @deprecated
      */
     public function testIsAssociatedWithOrganizationNullUser()
     {
@@ -322,7 +312,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @deprecated
      */
     public function testIsAssociatedWithOrganizationNullObject()
     {
@@ -341,7 +330,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @deprecated
      */
     public function testIsAssociatedWithBusinessUnitNullUser()
     {
@@ -358,7 +346,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @deprecated
      */
     public function testIsAssociatedWithBusinessUnitNullObject()
     {
@@ -377,7 +364,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @deprecated
      */
     public function testIsAssociatedWithUserNullUser()
     {
@@ -386,7 +372,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @deprecated
      */
     public function testIsAssociatedWithBasicLevelEntityNullUser()
     {
@@ -395,7 +380,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @deprecated
      */
     public function testIsAssociatedWithUserNullObject()
     {
@@ -412,9 +396,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->decisionMaker->isAssociatedWithBasicLevelEntity($user, null);
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithOrganizationForSystemObject()
     {
         $user = new User('user');
@@ -427,9 +408,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithGlobalLevelEntity($user, new \stdClass()));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithBusinessUnitForSystemObject()
     {
         $user = new User('user');
@@ -442,9 +420,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($user, new \stdClass()));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithUserForSystemObject()
     {
         $user = new User('user');
@@ -457,9 +432,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($user, new \stdClass()));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithOrganizationForOrganizationObject()
     {
         $this->buildTestTree();
@@ -486,9 +458,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user411, $this->org4));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithOrganizationForUserObject()
     {
         $this->buildTestTree();
@@ -521,9 +490,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user411, $this->user411));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithOrganizationForOrganizationOwnedObject()
     {
         $this->buildTestTree();
@@ -576,9 +542,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj4));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithOrganizationForBusinessUnitOwnedObject()
     {
         $this->buildTestTree();
@@ -611,7 +574,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj41));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj411));
     }
-
 
     public function testIsAssociatedWithGlobalLevelEntityForBusinessUnitOwnedObject()
     {
@@ -708,9 +670,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithGlobalLevelEntity($this->user4, $obj411));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithBusinessUnitForOrganizationObject()
     {
         $this->buildTestTree();
@@ -733,9 +692,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->org4));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithBusinessUnitForBusinessUnitObject()
     {
         $this->buildTestTree();
@@ -774,9 +730,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $this->bu411, true));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithBusinessUnitForUserObject()
     {
         $this->buildTestTree();
@@ -825,9 +778,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user411, $this->user411, true));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithBusinessUnitForOrganizationOwnedObject()
     {
         $this->buildTestTree();
@@ -880,9 +830,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj4));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithBusinessUnitForBusinessUnitOwnedObject()
     {
         $this->buildTestTree();
@@ -957,9 +904,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj411, true));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithBusinessUnitForUserOwnedObject()
     {
         $this->buildTestTree();
@@ -1030,9 +974,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithLocalLevelEntity($this->user4, $obj411, true));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithUserForUserObject()
     {
         $this->buildTestTree();
@@ -1063,9 +1004,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user411, $this->user411));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithUserForOrganizationOwnedObject()
     {
         $this->buildTestTree();
@@ -1118,9 +1056,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj4));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithUserForBusinessUnitOwnedObject()
     {
         $this->buildTestTree();
@@ -1187,9 +1122,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithBasicLevelEntity($this->user4, $obj411));
     }
 
-    /**
-     * @deprecated
-     */
     public function testIsAssociatedWithUserForUserOwnedObject()
     {
         $this->buildTestTree();
