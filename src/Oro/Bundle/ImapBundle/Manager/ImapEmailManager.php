@@ -237,17 +237,13 @@ class ImapEmailManager
      */
     protected function setMessageId(Email &$email, $messageId)
     {
-        $messageId = [
-            '<ed0dd55e0dd045191f1fda9594b647a3@oro-enterprise.lan>',
-            '<ed0dd55e0d1045191f1fda9594b647a3@oro-enterprise.lan>'
-        ];
         if (is_array($messageId)) {
             if (count($messageId) > 1) {
                 $email->setMessageIdArray($messageId);
                 $email->setMessageId(reset($messageId));
             }
 
-            if (count($messageId) > 1) {
+            if (count($messageId) === 1) {
                 $email->setMessageId(reset($messageId));
             }
         } else {

@@ -8,19 +8,34 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 
-class UpdateEmailSecurity implements Migration
+/**
+ * Class OroEmailBundle
+ * @package Oro\Bundle\EmailBundle\Migrations\Schema\v1_12
+ */
+class OroEmailBundle implements Migration
 {
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::addColumnMessageIdArray($schema);
+    }
+
+    /**
+     * It adds column message_id_array to table oro_email
+     * @param Schema $schema - Schema
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @return void
+     */
+    public static function addColumnMessageIdArray(Schema $schema)
+    {
         $table = $schema->getTable('oro_email');
         $table->addColumn(
             'message_id_array',
             'string',
             [
-                'notnull' => 'false',
+                'notnull' => false,
                 'length' => 255
             ]
         );

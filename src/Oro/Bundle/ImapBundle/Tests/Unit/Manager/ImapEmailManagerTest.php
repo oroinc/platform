@@ -202,11 +202,11 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                         ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
                         ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
                         ['Importance', false],
-                        ['Message-ID', $this->getHeader('MessageId')],
+//                        ['Message-ID', $this->getHeader('MessageId')],
                         ['References', $this->getHeader('References')],
                         ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
                         ['X-GM-THR-ID', $this->getMultiValueHeader(['XThrId1', 'XThrId2'])],
-                        ['X-GM-LABELS', false],
+                        ['X-GM-LABELS', false]
                     ]
                 )
             );
@@ -214,12 +214,93 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->convertToEmail($msg);
     }
 
+    public function testConvertToEmailWithMultiValueMessageId()
+    {
+        $msg = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Message')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $msg->expects($this->once())
+            ->method('getHeaders')
+            ->will($this->returnValue($headers));
+        $headers->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['UID', $this->getHeader('123')],
+                        ['Subject', $this->getHeader('Subject')],
+                        ['From', $this->getHeader('fromEmail')],
+                        ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
+                        ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
+                        ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
+                        ['Importance', false],
+                        ['Message-ID', $this->getMultiValueHeader(['MessageId1', 'MessageId2'])],
+                        ['References', $this->getHeader('References')],
+                        ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
+                        ['X-GM-THR-ID', $this->getHeader('XThrId1')],
+                        ['X-GM-LABELS', false]
+                    ]
+                )
+            );
+
+        $email = $this->manager->convertToEmail($msg);
+
+        $this->assertNotEmpty($email->getMessageId());
+        $this->assertInternalType('array', $email->getMessageIdArray());
+        $this->assertCount(2, $email->getMessageIdArray());
+    }
+
+    public function testConvertToEmailWithMultiValueMessageIdOne()
+    {
+        $msg = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Message')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $msg->expects($this->once())
+            ->method('getHeaders')
+            ->will($this->returnValue($headers));
+
+        $headers->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['UID', $this->getHeader('123')],
+                        ['Subject', $this->getHeader('Subject')],
+                        ['From', $this->getHeader('fromEmail')],
+                        ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
+                        ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
+                        ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
+                        ['Importance', false],
+                        ['Message-ID', $this->getMultiValueHeader(['MessageId1'])],
+                        ['References', $this->getHeader('References')],
+                        ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
+                        ['X-GM-THR-ID', $this->getHeader('XThrId1')],
+                        ['X-GM-LABELS', false]
+                    ]
+                )
+            );
+
+        $email = $this->manager->convertToEmail($msg);
+
+        $this->assertNotEmpty($email->getMessageId());
+        $this->assertInternalType('array', $email->getMessageIdArray());
+        $this->assertCount(0, $email->getMessageIdArray());
+    }
+
+
+
     public function getEmailsProvider()
     {
         return [
             ['Fri, 31 Jun 2011 10:59:59 +1100'],
             ['Fri, 31 Jun 2011 10:59:59 +11:00 (GMT+11:00)'],
-            ['Fri, 31 06 2011 10:59:59 +1100'],
+            ['Fri, 31 06 2011 10:59:59 +1100']
         ];
     }
 

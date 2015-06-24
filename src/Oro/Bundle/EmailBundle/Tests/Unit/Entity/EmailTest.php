@@ -165,6 +165,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['seen', ''],
             ['seen', 0],
             ['seen', 1],
+            ['messageIdArray', ['MessageId1','MessageId2']]
         ];
     }
 

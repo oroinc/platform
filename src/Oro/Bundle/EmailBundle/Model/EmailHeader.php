@@ -395,20 +395,21 @@ class EmailHeader
      */
     public function getMessageIdArray()
     {
-        return explode(',', $this->messageIdArray);
+        $value = unserialize($this->messageIdArray);
+
+        return $value ?: [];
     }
 
     /**
      * Set array values of email Message-ID header
      *
-     * @param array $messageIdArray
+     * @param array $messageIdArray - array of message id
      *
      * @return self
      */
     public function setMessageIdArray($messageIdArray)
     {
-
-        $this->messageIdArray = implode(',', $messageIdArray);
+        $this->messageIdArray = serialize($messageIdArray);
 
         return $this;
     }

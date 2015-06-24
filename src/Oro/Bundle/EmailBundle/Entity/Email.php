@@ -187,7 +187,7 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
-     * @ORM\Column(name="message_id_array", type="string", length=255)
+     * @ORM\Column(name="message_id_array", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
@@ -572,7 +572,7 @@ class Email extends ExtendEmail
      */
     public function getMessageIdArray()
     {
-        return explode(',', $this->messageIdArray);
+        return unserialize($this->messageIdArray);
     }
 
     /**
@@ -585,7 +585,7 @@ class Email extends ExtendEmail
     public function setMessageIdArray($messageIdArray)
     {
 
-        $this->messageIdArray = implode(',', $messageIdArray);
+        $this->messageIdArray = serialize($messageIdArray);
 
         return $this;
     }
