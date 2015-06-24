@@ -19,7 +19,7 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addColumnMessageIdArray($schema);
+        self::addColumnMessageMultiId($schema);
     }
 
     /**
@@ -28,7 +28,7 @@ class OroEmailBundle implements Migration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @return void
      */
-    public static function addColumnMessageIdArray(Schema $schema)
+    public static function addColumnMessageMultiId(Schema $schema)
     {
         $table = $schema->getTable('oro_email');
         $table->addColumn(

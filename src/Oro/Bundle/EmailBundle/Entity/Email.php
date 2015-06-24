@@ -578,13 +578,13 @@ class Email extends ExtendEmail
     /**
      * Set array values of email Message-ID header
      *
-     * @param array $messageIdArray
+     * @param array $messageMultiId
      *
      * @return Email
      */
-    public function setMessageMultiId($messageIdArray)
+    public function setMessageMultiId($messageMultiId)
     {
-        $this->messageMultiId = serialize($messageIdArray);
+        $this->messageMultiId = serialize($messageMultiId);
 
         return $this;
     }

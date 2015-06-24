@@ -403,13 +403,13 @@ class EmailHeader
     /**
      * Set array values of email Message-ID header
      *
-     * @param array $messageIdArray - array of message id
+     * @param array $messageMultiId - array of message id
      *
      * @return self
      */
-    public function setMessageMultiId($messageIdArray)
+    public function setMessageMultiId($messageMultiId)
     {
-        $this->messageMultiId = serialize($messageIdArray);
+        $this->messageMultiId = serialize($messageMultiId);
 
         return $this;
     }
