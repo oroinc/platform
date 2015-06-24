@@ -10,6 +10,8 @@ parameters:
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
     oro_activity_list.event_listener.actitity_list_changes_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListChangesListener
     oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
+    oro_activity_list.event_listener.segment_widget_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener
+    oro_activity_list.event_listener.segment_condition_builder_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener
 
     oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
     oro_activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
@@ -19,6 +21,9 @@ parameters:
     oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
 
     oro_activity_list.filter.helper.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
+
+    oro_activity_list.filter.activity_list.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
+    oro_activity_list.filter.datagrid_helper.class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
 
 services:
     oro_activity_list.manager:
@@ -80,6 +85,16 @@ services:
            - @oro_entity.routing_helper
            - @oro_ui.html_tag_helper
 
+    oro_activity_list.event_listener.segment_widget_options_listener:
+        class: %oro_activity_list.event_listener.segment_widget_options_listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_segment.widget_options_load, method: onLoad }
+
+    oro_activity_list.event_listener.segment_condition_builder_options_listener:
+        class: %oro_activity_list.event_listener.segment_condition_builder_options_listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_segment.condition_builder_options_load, method: onLoad }
+
     oro_activity_list.entity_config_dumper.extension:
         class: %oro_activity_list.entity_config_dumper.extension.class%
         arguments:
@@ -118,3 +133,28 @@ services:
             - @oro_filter.choice_filter
             - @oro_entity.routing_helper
             - @oro_activity_list.provider.chain
+
+    oro_activity_list.datagrid.builder.link:
+        tags:
+            - { name: oro_service_link,  service: oro_datagrid.datagrid.builder }
+
+    oro_activity_list.filter.activity_list:
+        class: %oro_activity_list.filter.activity_list.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+            - @oro_activity.manager
+            - @oro_activity_list.provider.chain
+            - @oro_activity_list.filter.helper
+            - @oro_entity.routing_helper
+            - @oro_query_designer.query_designer.manager
+            - @oro_activity_list.filter.datagrid_helper
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: activityList }
+
+    oro_activity_list.filter.datagrid_helper:
+        class: %oro_activity_list.filter.datagrid_helper.class%
+        arguments:
+            - @oro_query_designer.grid.datagrid_configuration_builder
+            - @oro_activity_list.datagrid.builder.link
+            - @event_dispatcher
