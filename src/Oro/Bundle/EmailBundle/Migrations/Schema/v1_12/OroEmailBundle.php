@@ -33,10 +33,9 @@ class OroEmailBundle implements Migration
         $table = $schema->getTable('oro_email');
         $table->addColumn(
             'multi_message_id',
-            'string',
+            'text',
             [
-                'notnull' => false,
-                'length' => 255
+                'notnull' => false
             ]
         );
     }

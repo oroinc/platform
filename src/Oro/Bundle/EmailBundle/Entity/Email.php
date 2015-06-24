@@ -187,7 +187,7 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
-     * @ORM\Column(name="multi_message_id", type="string", length=255, nullable=true)
+     * @ORM\Column(name="multi_message_id", type="text", nullable=true)
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
