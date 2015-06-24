@@ -91,6 +91,13 @@ class User extends ExtendUser implements
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $id;
 
@@ -369,6 +376,13 @@ class User extends ExtendUser implements
      * @var int
      *
      * @ORM\Column(name="login_count", type="integer", options={"default"=0, "unsigned"=true})
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $loginCount;
 
@@ -457,6 +471,13 @@ class User extends ExtendUser implements
      *
      * @ORM\OneToOne(targetEntity="Status")
      * @ORM\JoinColumn(name="status_id", referencedColumnName="id", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $currentStatus;
 
@@ -529,6 +550,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "entity"={
      *              "label"="oro.ui.created_at"
+     *          },
+     *          "importexport"={
+     *              "excluded"=true
      *          }
      *      }
      * )
@@ -543,6 +567,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "entity"={
      *              "label"="oro.ui.updated_at"
+     *          },
+     *          "importexport"={
+     *              "excluded"=true
      *          }
      *      }
      * )
