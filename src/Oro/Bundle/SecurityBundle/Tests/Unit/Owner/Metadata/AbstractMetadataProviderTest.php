@@ -30,17 +30,11 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->cache = $this->getMockForAbstractClass(
-            'Doctrine\Common\Cache\CacheProvider',
-            [],
-            '',
-            false,
-            true,
-            true,
-            ['delete', 'deleteAll']
-        );
+        $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+            ->setMethods(['delete', 'deleteAll'])
+            ->getMockForAbstractClass();
 
-        $this->provider = new StubMetadataProvider($this->configProvider, $this->cache);
+        $this->provider = new StubMetadataProvider([], $this->configProvider, null, $this->cache);
     }
 
     protected function tearDown()

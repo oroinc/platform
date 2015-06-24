@@ -14,6 +14,11 @@ class ChainMetadataProvider implements MetadataProviderInterface
     protected $providers;
 
     /**
+     * @var MetadataProviderInterface
+     */
+    protected $supportedProvider;
+
+    /**
      * @param MetadataProviderInterface[] $providers
      */
     public function __construct(array $providers = [])
@@ -94,9 +99,15 @@ class ChainMetadataProvider implements MetadataProviderInterface
      */
     protected function getSupportedProvider()
     {
+        if ($this->supportedProvider) {
+            return $this->supportedProvider;
+        }
+
         foreach ($this->providers as $provider) {
             if ($provider->supports()) {
-                return $provider;
+                $this->supportedProvider = $provider;
+
+                return $this->supportedProvider;
             }
         }
 

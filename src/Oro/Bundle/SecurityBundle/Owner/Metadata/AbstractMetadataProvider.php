@@ -6,6 +6,7 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -24,7 +25,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
     /**
      * @var array
      *          key = class name
-     *          value = Metadata or true if an entity has no ownership config
+     *          value = OwnershipMetadataInterface or true if an entity has no ownership config
      */
     protected $localCache = [];
 
@@ -32,6 +33,40 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
      * @var OwnershipMetadataInterface
      */
     protected $noOwnershipMetadata;
+
+    /**
+     * @param array               $owningEntityNames
+     * @param ConfigProvider      $configProvider
+     * @param EntityClassResolver $entityClassResolver
+     * @param CacheProvider|null  $cache
+     */
+    public function __construct(
+        array $owningEntityNames,
+        ConfigProvider $configProvider,
+        EntityClassResolver $entityClassResolver = null,
+        CacheProvider $cache = null
+    ) {
+        $this->setAccessLevelClasses($owningEntityNames, $entityClassResolver);
+        $this->configProvider = $configProvider;
+        $this->cache = $cache;
+        $this->createNoOwnershipMetadata();
+    }
+
+    /**
+     * @param array $owningEntityNames
+     *          key = class name
+     *          value = OwnershipMetadataInterface or true if an entity has no ownership config
+     * @param EntityClassResolver|null $entityClassResolver
+     */
+    abstract protected function setAccessLevelClasses(
+        array $owningEntityNames,
+        EntityClassResolver $entityClassResolver = null
+    );
+
+    /**
+     * Set instance of OwnershipMetadataInterface to `noOwnershipMetadata` property
+     */
+    abstract protected function createNoOwnershipMetadata();
 
     /**
      * {@inheritDoc}

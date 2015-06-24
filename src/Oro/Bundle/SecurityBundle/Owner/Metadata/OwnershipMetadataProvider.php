@@ -2,13 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -39,34 +34,26 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     protected $securityFacade;
 
     /**
-     * Constructor
-     *
-     * @param array               $owningEntityNames
-     * @param ConfigProvider      $configProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param CacheProvider|null  $cache
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * {@inheritDoc}
      */
-    public function __construct(
-        array $owningEntityNames,
-        ConfigProvider $configProvider,
-        EntityClassResolver $entityClassResolver = null,
-        CacheProvider $cache = null
-    ) {
-        $this->organizationClass = $entityClassResolver === null
-            ? $owningEntityNames['organization']
-            : $entityClassResolver->getEntityClass($owningEntityNames['organization']);
-        $this->businessUnitClass = $entityClassResolver === null
-            ? $owningEntityNames['business_unit']
-            : $entityClassResolver->getEntityClass($owningEntityNames['business_unit']);
-        $this->userClass         = $entityClassResolver === null
-            ? $owningEntityNames['user']
-            : $entityClassResolver->getEntityClass($owningEntityNames['user']);
+    protected function setAccessLevelClasses(array $owningEntityNames, EntityClassResolver $entityClassResolver = null)
+    {
+        if ($entityClassResolver === null) {
+            $this->organizationClass = $owningEntityNames['organization'];
+            $this->businessUnitClass = $owningEntityNames['business_unit'];
+            $this->userClass = $owningEntityNames['user'];
+        } else {
+            $this->organizationClass = $entityClassResolver->getEntityClass($owningEntityNames['organization']);
+            $this->businessUnitClass = $entityClassResolver->getEntityClass($owningEntityNames['business_unit']);
+            $this->userClass = $entityClassResolver->getEntityClass($owningEntityNames['user']);
+        }
+    }
 
-        $this->configProvider = $configProvider;
-        $this->cache          = $cache;
-
+    /**
+     * {@inheritDoc}
+     */
+    protected function createNoOwnershipMetadata()
+    {
         $this->noOwnershipMetadata = new OwnershipMetadata();
     }
 
