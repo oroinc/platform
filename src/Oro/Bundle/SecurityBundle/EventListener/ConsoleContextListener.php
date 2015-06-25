@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
@@ -18,6 +19,11 @@ class ConsoleContextListener
 {
     const OPTION_USER         = 'current-user';
     const OPTION_ORGANIZATION = 'current-organization';
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @var ManagerRegistry
@@ -35,18 +41,11 @@ class ConsoleContextListener
     protected $userManager;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param SecurityContextInterface $securityContext
-     * @param UserManager $userManager
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        ManagerRegistry $registry,
-        SecurityContextInterface $securityContext,
-        UserManager $userManager
-    ) {
-        $this->registry = $registry;
-        $this->securityContext = $securityContext;
-        $this->userManager = $userManager;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
     }
 
     /**
@@ -82,10 +81,10 @@ class ConsoleContextListener
             return;
         }
 
-        $token = $this->securityContext->getToken();
+        $token = $this->getSecurityContext()->getToken();
         if (!$token) {
             $token = new ConsoleToken();
-            $this->securityContext->setToken($token);
+            $this->getSecurityContext()->setToken($token);
         }
 
         $this->setUser($user, $token);
@@ -108,9 +107,9 @@ class ConsoleContextListener
 
         $userId = filter_var($user, FILTER_VALIDATE_INT);
         if ($userId) {
-            $userEntity = $this->registry->getRepository('OroUserBundle:User')->find($userId);
+            $userEntity = $this->getRegistry()->getRepository('OroUserBundle:User')->find($userId);
         } else {
-            $userEntity = $this->userManager->findUserByUsernameOrEmail($user);
+            $userEntity = $this->getUserManager()->findUserByUsernameOrEmail($user);
         }
 
         if ($userEntity) {
@@ -133,7 +132,7 @@ class ConsoleContextListener
             return;
         }
 
-        $organizationRepository = $this->registry->getRepository('OroOrganizationBundle:Organization');
+        $organizationRepository = $this->getRegistry()->getRepository('OroOrganizationBundle:Organization');
 
         $organizationId = filter_var($organization, FILTER_VALIDATE_INT);
         if ($organizationId) {
@@ -163,5 +162,41 @@ class ConsoleContextListener
                 sprintf('Can\'t find organization with identifier %s', $organization)
             );
         }
+    }
+
+    /**
+     * @return ManagerRegistry
+     */
+    protected function getRegistry()
+    {
+        if (!$this->registry) {
+            $this->registry = $this->container->get('doctrine');
+        }
+
+        return $this->registry;
+    }
+
+    /**
+     * @return SecurityContextInterface
+     */
+    protected function getSecurityContext()
+    {
+        if (!$this->securityContext) {
+            $this->securityContext = $this->container->get('security.context');
+        }
+
+        return $this->securityContext;
+    }
+
+    /**
+     * @return UserManager
+     */
+    protected function getUserManager()
+    {
+        if (!$this->userManager) {
+            $this->userManager = $this->container->get('oro_user.manager');
+        }
+
+        return $this->userManager;
     }
 }

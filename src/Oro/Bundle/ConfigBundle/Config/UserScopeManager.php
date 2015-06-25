@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * User config scope
  */
-class UserScopeManager extends AbstractScopeManager
+class UserScopeManager extends AbstractScopeManager implements ContainerAwareInterface
 {
     /**
      * @var SecurityContextInterface
@@ -18,6 +22,20 @@ class UserScopeManager extends AbstractScopeManager
      * @var int
      */
     protected $scopeId;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+        $this->security = $this->getSecurity();
+    }
 
     /**
      * {@inheritdoc}
@@ -38,9 +56,11 @@ class UserScopeManager extends AbstractScopeManager
     public function setScopeId($scopeId = null)
     {
         if (is_null($scopeId)) {
-            if ($token = $this->security->getToken()) {
-                if (is_object($user = $token->getUser())) {
-                    $scopeId = $user->getId() ? : 0;
+            $token = $this->getSecurity()->getToken();
+            if ($token) {
+                $user = $token->getUser();
+                if (is_object($user)) {
+                    $scopeId = $user->getId() ?: 0;
                 }
             }
         }
@@ -55,21 +75,14 @@ class UserScopeManager extends AbstractScopeManager
      * DI setter for security context
      *
      * @param SecurityContextInterface $security
+     *
+     * @deprecated since 1.8
      */
     public function setSecurity(SecurityContextInterface $security)
     {
         $this->security = $security;
 
-        // if we have a user - try to merge his scoped settings into global settings array
-        if ($token = $this->security->getToken()) {
-            if (is_object($user = $token->getUser())) {
-                foreach ($user->getGroups() as $group) {
-                    $this->loadStoredSettings('group', $group->getId());
-                }
-
-                $this->loadStoredSettings('user', $user->getId());
-            }
-        }
+        $this->loadUserStoredSettings($this->security->getToken());
     }
 
     /**
@@ -90,5 +103,45 @@ class UserScopeManager extends AbstractScopeManager
         }
 
         return $this->scopeId;
+    }
+
+    /**
+     * @return SecurityContextInterface
+     */
+    protected function getSecurity()
+    {
+        if (!$this->container) {
+            throw new \InvalidArgumentException('ContainerInterface is not injected');
+        }
+
+        if (!$this->security) {
+            $this->security = $this->container->get('security.context');
+        }
+
+        $this->loadUserStoredSettings($this->security->getToken());
+
+        return $this->security;
+    }
+
+    /**
+     * If we have a user - try to merge his scoped settings into global settings array
+     *
+     * @param TokenInterface|null $token
+     */
+    protected function loadUserStoredSettings(TokenInterface $token = null)
+    {
+        if (!$token) {
+            return;
+        }
+
+        /** @var User $user */
+        $user = $token->getUser();
+        if (is_object($user)) {
+            foreach ($user->getGroups() as $group) {
+                $this->loadStoredSettings('group', $group->getId());
+            }
+
+            $this->loadStoredSettings('user', $user->getId());
+        }
     }
 }

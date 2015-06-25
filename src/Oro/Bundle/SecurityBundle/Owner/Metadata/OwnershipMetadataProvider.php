@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -13,6 +15,20 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnershipMetadataProvider extends AbstractMetadataProvider
 {
+    /**
+     * @deprecated since 1.8, use getConfigProvider method instead
+     *
+     * @var ConfigProvider
+     */
+    protected $configProvider;
+
+    /**
+     * @deprecated since 1.8, use getCache method instead
+     *
+     * @var ConfigProvider
+     */
+    protected $cache;
+
     /**
      * @var string
      */
@@ -29,9 +45,25 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     protected $userClass;
 
     /**
-     * @var SecurityFacade
+     * @param array               $owningEntityNames
+     * @param ConfigProvider      $configProvider
+     * @param EntityClassResolver $entityClassResolver
+     * @param CacheProvider|null  $cache
+     *
+     * @deprecated since 1.8. $configProvider, $entityClassResolver, $cache will be removed
+     *      use getConfigProvider, getCache, getEntityClassResolver methods instead
      */
-    protected $securityFacade;
+    public function __construct(
+        array $owningEntityNames,
+        ConfigProvider $configProvider = null,
+        EntityClassResolver $entityClassResolver = null,
+        CacheProvider $cache = null
+    ) {
+        parent::__construct($owningEntityNames);
+
+        $this->configProvider = $configProvider;
+        $this->cache = $cache;
+    }
 
     /**
      * {@inheritDoc}
@@ -45,15 +77,9 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
             );
         }
 
-        if ($entityClassResolver === null) {
-            $this->organizationClass = $owningEntityNames['organization'];
-            $this->businessUnitClass = $owningEntityNames['business_unit'];
-            $this->userClass = $owningEntityNames['user'];
-        } else {
-            $this->organizationClass = $entityClassResolver->getEntityClass($owningEntityNames['organization']);
-            $this->businessUnitClass = $entityClassResolver->getEntityClass($owningEntityNames['business_unit']);
-            $this->userClass = $entityClassResolver->getEntityClass($owningEntityNames['user']);
-        }
+        $this->organizationClass = $this->getEntityClassResolver()->getEntityClass($owningEntityNames['organization']);
+        $this->businessUnitClass = $this->getEntityClassResolver()->getEntityClass($owningEntityNames['business_unit']);
+        $this->userClass = $this->getEntityClassResolver()->getEntityClass($owningEntityNames['user']);
     }
 
     /**
@@ -61,19 +87,11 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     protected function getNoOwnershipMetadata()
     {
-        return new OwnershipMetadata();
-    }
+        if (!$this->noOwnershipMetadata) {
+            $this->noOwnershipMetadata = new OwnershipMetadata();
+        }
 
-    /**
-     * @param SecurityFacade $securityFacade
-     *
-     * @return MetadataProviderInterface
-     */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
-    {
-        $this->securityFacade = $securityFacade;
-
-        return $this;
+        return $this->noOwnershipMetadata;
     }
 
     /**
@@ -149,7 +167,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     public function supports()
     {
-        return $this->securityFacade && $this->securityFacade->getLoggedUser() instanceof User;
+        return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
     }
 
     /**
@@ -168,14 +186,12 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
             $organizationColumnName = $ownerColumnName;
         }
 
-        $data = new OwnershipMetadata(
+        return new OwnershipMetadata(
             $ownerType,
             $ownerFieldName,
             $ownerColumnName,
             $organizationFieldName,
             $organizationColumnName
         );
-
-        return $data;
     }
 }

@@ -28,7 +28,7 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @oro_security.owner.ownership_metadata_provider.cache
         calls:
-            - [ setSecurityFacade, [ @oro_security.security_facade ] ]
+            - [ setContainer, [ @service_container ] ]
         tags:
             - { name: oro_security.owner.metadata_provider }
 

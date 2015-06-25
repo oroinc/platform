@@ -457,9 +457,7 @@ services:
     oro_security.listener.console_context_listener:
         class: %oro_security.listener.console_context_listener.class%
         arguments:
-            - @doctrine
-            - @security.context
-            - @oro_user.manager
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
