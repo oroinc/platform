@@ -34,6 +34,7 @@ class AclConfigurationPass implements CompilerPassInterface
 
     const ENTITY_ACL_EXTENSION = 'oro_security.acl.extension.entity';
     const CHAIN_OWNERSHIP_DECISION_MAKER = 'oro_security.owner.ownership_decision_maker.chain';
+    const CHAIN_METADATA_PROVIDER = 'oro_security.owner.metadata_provider.chain';
 
     /**
      * {@inheritDoc}
@@ -166,6 +167,24 @@ class AclConfigurationPass implements CompilerPassInterface
     }
 
     /**
+     * @param ContainerBuilder $container
+     */
+    protected function configureEntityAclExtension(ContainerBuilder $container)
+    {
+        if ($container->hasDefinition(self::ENTITY_ACL_EXTENSION)) {
+            $aclExtensionDef = $container->getDefinition(self::ENTITY_ACL_EXTENSION);
+            
+            if ($container->hasDefinition(self::CHAIN_METADATA_PROVIDER)) {
+                $aclExtensionDef->replaceArgument(3, new Reference(self::CHAIN_METADATA_PROVIDER));
+            }
+            
+            if ($container->hasDefinition(self::CHAIN_OWNERSHIP_DECISION_MAKER)) {
+                $aclExtensionDef->replaceArgument(4, new Reference(self::CHAIN_OWNERSHIP_DECISION_MAKER));
+            }
+        }
+    }
+
+    /**
      * Load ACL extensions and sort them by priority.
      *
      * @param  ContainerBuilder $container
@@ -200,18 +219,5 @@ class AclConfigurationPass implements CompilerPassInterface
             },
             $extensions
         );
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function configureEntityAclExtension(ContainerBuilder $container)
-    {
-        if ($container->hasDefinition(self::ENTITY_ACL_EXTENSION)
-            && $container->hasDefinition(self::CHAIN_OWNERSHIP_DECISION_MAKER)
-        ) {
-            $aclExtensionDef = $container->getDefinition(self::ENTITY_ACL_EXTENSION);
-            $aclExtensionDef->replaceArgument(4, new Reference(self::CHAIN_OWNERSHIP_DECISION_MAKER));
-        }
     }
 }

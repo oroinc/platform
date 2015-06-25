@@ -24,7 +24,8 @@ class EmailControllerTest extends WebTestCase
         'cc'         => '2@example.com; "Address 3" <3@example.com>',
         'importance' => 'low',
         'body'       => 'Test body',
-        'bodyType'   => 'text'
+        'bodyType'   => 'text',
+        'receivedAt' => '2015-06-19 12:17:51',
     ];
 
     protected function setUp()
@@ -96,7 +97,6 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
         $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertTrue($email['head']);
-        $this->assertFalse($email['seen']);
 
         return $response['id'];
     }
@@ -139,18 +139,13 @@ class EmailControllerTest extends WebTestCase
      */
     public function testUpdateEmail($id)
     {
-        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
-        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertFalse($email['seen']);
-
-        $folders   = $email['folders'];
+        $folders   = [];
         $folders[] = [
             'fullName' => 'INBOX \ Folder1',
             'name'     => 'Folder1',
             'type'     => 'inbox'
         ];
         $folders[] = [
-            'origin'   => $folders[0]['origin'],
             'fullName' => 'INBOX \ Folder2',
             'name'     => 'Folder2',
             'type'     => 'inbox'
@@ -162,6 +157,7 @@ class EmailControllerTest extends WebTestCase
             $this->getUrl('oro_api_put_email', ['id' => $id]),
             [
                 'seen'    => 1,
+                'receivedAt' => '2015-06-19 12:17:51',
                 'folders' => $folders
             ]
         );
@@ -169,10 +165,7 @@ class EmailControllerTest extends WebTestCase
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
-        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertCount(3, $email['folders']);
-        $this->assertTrue($email['seen']);
+        $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         return $id;
     }
