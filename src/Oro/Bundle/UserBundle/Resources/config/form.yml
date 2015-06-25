@@ -234,15 +234,21 @@ services:
         scope:                        request
         arguments:                    ["@oro_user.form.status", "@request", "@doctrine.orm.entity_manager", "@oro_user.manager"]
 
-    oro_user.form.handler.acl_role:
+    oro_user.form.handler.abstract.acl_role:
         class:                        %oro_user.form.handler.acl_role.class%
-        scope:                        prototype
+        abstract:                     true
         arguments:                    ["@form.factory", %oro_user.privileges%]
         calls:
             - [setAclManager, ["@oro_security.acl.manager"]]
             - [setAclPrivilegeRepository, ["@oro_security.acl.privilege_repository"]]
-            - [setEntityManager, ["@doctrine.orm.entity_manager"]]
+            - [setManagerRegistry, ["@doctrine"]]
+
+    oro_user.form.handler.acl_role:
+        parent: oro_user.form.handler.abstract.acl_role
+        scope: prototype
+        calls:
             - [setRequest, ["@request"]]
+            - [addExtensionFilter, ['action', '']]    # only default group actions are allowed
 
     oro_user.form.handler.set_password:
         class: %oro_user.form.handler.set_password.class%

@@ -90,6 +90,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\UserBundle\Mailer\Processor` is now based on `Oro\Bundle\UserBundle\Mailer\BaseProcessor`
 - `Oro\Bundle\UserBundle\Mailer\Processor` - first argument `$user` of `sendChangePasswordEmail`, `sendResetPasswordEmail` and `sendResetPasswordAsAdminEmail` methods must implement `Oro\Bundle\UserBundle\Entity\UserInterface`
 - First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly
+- `Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler` is now accepts Manager Registry instead of Entity Manager: method `setEntityManager` was replaced with `setManagerRegistry`
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata` usage
@@ -99,3 +100,4 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `isUserOwned` deprecated, use `isBasicLevelOwned` instead
     * `getOrganizationColumnName` deprecated, use `getGlobalOwnerColumnName` instead
     * `getOrganizationFieldName` deprecated, use `getGlobalOwnerFieldName` instead
+- ACL parameter `group_name` is now used to separate permissions in application scopes 

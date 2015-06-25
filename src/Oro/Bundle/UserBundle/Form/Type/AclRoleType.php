@@ -3,12 +3,8 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Symfony\Component\Form\AbstractType;
-
-use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
-use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class AclRoleType extends AbstractType
 {
@@ -42,9 +38,9 @@ class AclRoleType extends AbstractType
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $builder->add(
                 $fieldName,
-                new PrivilegeCollectionType(),
+                'oro_acl_collection',
                 array(
-                    'type' => new AclPrivilegeType(),
+                    'type' => 'oro_acl_privilege',
                     'allow_add' => true,
                     'prototype' => false,
                     'allow_delete' => false,
