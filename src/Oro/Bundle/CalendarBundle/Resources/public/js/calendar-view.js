@@ -9,6 +9,7 @@ define(function (require) {
         $               = require('jquery'),
         moment          = require('moment'),
         __              = require('orotranslation/js/translator'),
+        tools           = require('oroui/js/tools'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
         LoadingMask     = require('oroui/js/app/views/loading-mask-view'),
@@ -630,7 +631,8 @@ define(function (require) {
         },
 
         initializeFullCalendar: function () {
-            var options, keys, self, scrollTime;
+            var options, keys, self, scrollTime, fullCalendar,
+                calendarElement = this.getCalendarElement();
             // prepare options for jQuery FullCalendar control
             options = { // prepare options for jQuery FullCalendar control
                 timezone: this.options.timezone,
@@ -713,7 +715,12 @@ define(function (require) {
             }, this);
 
             // create jQuery FullCalendar control
-            this.getCalendarElement().fullCalendar(options);
+            calendarElement.fullCalendar(options);
+            fullCalendar = calendarElement.data('fullCalendar');
+            // to avoid scroll blocking on mobile remove dragstart event listener that is added in calendar view
+            if (_.isObject(fullCalendar) && tools.isMobile()) {
+                $(document).off('dragstart', fullCalendar.getView().documentDragStartProxy);
+            }
             this.updateLayout();
             this.enableEventLoading = true;
         },
