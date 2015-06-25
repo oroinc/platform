@@ -411,5 +411,4 @@ class EmailHeader
 
         return $this;
     }
-
 }
