@@ -11,8 +11,9 @@ use Doctrine\Common\Cache\FilesystemCache as BaseFilesystemCache;
  *    because $id passed to getFilename is quite unique itself.
  * 2) Provide a way to synchronize a cache between different processes.
  */
-class FilesystemCache extends BaseFilesystemCache implements SyncCacheInterface
+class FilesystemCache extends BaseFilesystemCache implements SyncCacheInterface, DirectoryAwareFileCacheInterface
 {
     use NamespaceVersionSyncTrait;
+    use DirectoryAwareFileCacheTrait;
     use ShortFileNameGeneratorTrait;
 }

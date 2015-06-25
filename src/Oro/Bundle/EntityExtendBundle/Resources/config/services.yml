@@ -48,6 +48,7 @@ services:
         class: %oro_entity_extend.entity.cache.warmer.class%
         arguments:
             - @oro_entity_extend.tools.dumper
+            - @oro_entity_config.config_manager
         tags:
             - { name: kernel.cache_warmer,  priority: 30 }
 
@@ -171,6 +172,7 @@ services:
             - @oro_entity_config.config_manager
             - @oro_entity_config.tools.command_executor
             - @logger
+            - %kernel.cache_dir%
 
     oro_entity_extend.extend.field_type_helper:
         class: %oro_entity_extend.extend.field_type_helper.class%

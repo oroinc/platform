@@ -69,6 +69,26 @@ class ExtendConfigDumper
     }
 
     /**
+     * Gets the cache directory
+     *
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+
+    /**
+     * Sets the cache directory
+     *
+     * @param string $cacheDir
+     */
+    public function setCacheDir($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
+    }
+
+    /**
      * @param AbstractEntityConfigDumperExtension $extension
      * @param int                                 $priority
      */
@@ -142,7 +162,19 @@ class ExtendConfigDumper
             }
         }
 
-        $this->entityGenerator->generate($schemas);
+        $cacheDir = $this->entityGenerator->getCacheDir();
+        if ($cacheDir === $this->cacheDir) {
+            $this->entityGenerator->generate($schemas);
+        } else {
+            $this->entityGenerator->setCacheDir($this->cacheDir);
+            try {
+                $this->entityGenerator->generate($schemas);
+                $this->entityGenerator->setCacheDir($cacheDir);
+            } catch (\Exception $e) {
+                $this->entityGenerator->setCacheDir($cacheDir);
+                throw $e;
+            }
+        }
     }
 
     /**

@@ -2,38 +2,39 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-
-class CacheWarmupCommand extends ContainerAwareCommand
+class CacheWarmupCommand extends AbstractCommand
 {
     const NAME = 'oro:entity-extend:cache:warmup';
 
     /**
-     * Console command configuration
+     * {@inheritdoc}
      */
     public function configure()
     {
         $this
             ->setName(self::NAME)
-            ->setDescription('Warms up the extended entity cache.');
+            ->setDescription('Warms up extended entity cache.')
+            ->addOption(
+                'cache-dir',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The cache directory'
+            );
     }
 
     /**
-     * Runs command
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return int|null|void
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Dump the configuration of extended entities to the cache');
+        $output->writeln('Warm up extended entity cache.');
 
-        /** @var ExtendConfigDumper $dumper */
-        $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->dump();
+        $this->cacheDir = $input->getOption('cache-dir');
+
+        $this->warmup($output);
     }
 }

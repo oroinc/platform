@@ -224,13 +224,7 @@ class CommandExecutor
      */
     protected function getPhp()
     {
-        $phpFinder = new PhpExecutableFinder();
-        $phpPath   = $phpFinder->find();
-        if (!$phpPath) {
-            throw new FileNotFoundException('The PHP executable could not be found.');
-        }
-
-        return $phpPath;
+        return self::getPhpExecutable();
     }
 
     /**
@@ -247,6 +241,23 @@ class CommandExecutor
     public function setDefaultTimeout($defaultTimeout)
     {
         $this->defaultTimeout = $defaultTimeout;
+    }
+
+    /**
+     * Finds the PHP executable.
+     *
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public static function getPhpExecutable()
+    {
+        $phpFinder = new PhpExecutableFinder();
+        $phpPath   = $phpFinder->find();
+        if (!$phpPath) {
+            throw new FileNotFoundException('The PHP executable could not be found.');
+        }
+
+        return $phpPath;
     }
 
     /**
