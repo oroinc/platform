@@ -54,10 +54,10 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
         $organizationFieldName = '',
         $organizationColumnName = ''
     ) {
-        $const = sprintf('static::OWNER_TYPE_%s', strtoupper($ownerType));
+        $constantName = $this->getConstantName($ownerType);
 
-        if (defined($const)) {
-            $this->ownerType = constant($const);
+        if (defined($constantName)) {
+            $this->ownerType = constant($constantName);
         } else {
             if (!empty($ownerType)) {
                 throw new \InvalidArgumentException(sprintf('Unknown owner type: %s.', $ownerType));
@@ -77,6 +77,15 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
 
         $this->organizationColumnName = $organizationColumnName;
         $this->organizationFieldName = $organizationFieldName;
+    }
+
+    /**
+     * @param string $ownerType
+     * @return string
+     */
+    protected function getConstantName($ownerType)
+    {
+        return sprintf('static::OWNER_TYPE_%s', strtoupper($ownerType));
     }
 
     /**
