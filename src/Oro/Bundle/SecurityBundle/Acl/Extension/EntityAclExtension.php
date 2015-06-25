@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -14,7 +15,6 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
@@ -370,11 +370,7 @@ class EntityAclExtension extends AbstractAclExtension
             }
         }
 
-        if ($object && $result === AccessLevel::SYSTEM_LEVEL) {
-            $result = $this->fixMaxAccessLevel($result, $object);
-        }
-
-        return $result;
+        return $this->metadataProvider->getMaxAccessLevel($result, $object);
     }
 
     /**
@@ -514,33 +510,16 @@ class EntityAclExtension extends AbstractAclExtension
     }
 
     /**
-     * Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
-     * if object have owner type OWNER_TYPE_BUSINESS_UNIT, OWNER_TYPE_USER or OWNER_TYPE_ORGANIZATION
-     *
      * @param int   $accessLevel Current object access level
      * @param mixed $object      Object for test
      *
      * @return int
+     *
+     * @deprecated since 1.8, use MetadataProviderInterface::getMaxAccessLevel instead
      */
     protected function fixMaxAccessLevel($accessLevel, $object)
     {
-        $metadata = $this->getMetadata($object);
-        if ($metadata->hasOwner()) {
-            $checkOwnerType = in_array(
-                $metadata->getOwnerType(),
-                [
-                    OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT,
-                    OwnershipMetadata::OWNER_TYPE_USER,
-                    OwnershipMetadata::OWNER_TYPE_ORGANIZATION
-                ]
-            );
-            if ($checkOwnerType) {
-                $accessLevel = AccessLevel::GLOBAL_LEVEL;
-            }
-        }
-
-        return $accessLevel;
-
+        return $this->metadataProvider->getMaxAccessLevel($accessLevel, $object);
     }
 
     /**

@@ -93,6 +93,14 @@ class ChainMetadataProvider implements MetadataProviderInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getMaxAccessLevel($accessLevel, $object = null)
+    {
+        return $this->getSupportedProvider()->getMaxAccessLevel($accessLevel, $object);
+    }
+
+    /**
      * @return MetadataProviderInterface
      *
      * @throws NoSupportsMetadataProviderException

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 
@@ -164,5 +165,22 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($metadata);
 
         return $provider;
+    }
+
+    public function testGetMaxAccessLevel()
+    {
+        $accessLevel = AccessLevel::SYSTEM_LEVEL;
+        $object = 'SomeClass';
+
+        $provider = $this->getMetadataProviderMock(true);
+        $provider->expects($this->once())
+            ->method('getMaxAccessLevel')
+            ->with($accessLevel, $object)
+            ->willReturn($accessLevel);
+
+        $chain = new ChainMetadataProvider();
+        $chain->addProvider($provider);
+
+        $this->assertEquals($accessLevel, $chain->getMaxAccessLevel($accessLevel, $object));
     }
 }

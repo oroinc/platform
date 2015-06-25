@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -341,6 +342,97 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
                     'business_unit' => 'AcmeBundle\Entity\BusinessUnit',
                     'user' => 'AcmeBundle\Entity\User',
                 ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getMaxAccessLevelDataProvider
+     *
+     * @param $accessLevel
+     * @param $object
+     * @param $expectedResult
+     */
+    public function testGetMaxAccessLevel($accessLevel, $object, $expectedResult)
+    {
+        if ($object && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
+            $config = new Config(new EntityConfigId('ownership', 'SomeClass'));
+            $config
+                ->set('owner_type', 'USER')
+                ->set('owner_field_name', 'test_field')
+                ->set('owner_column_name', 'test_column');
+
+            $this->configProvider->expects($this->once())
+                ->method('hasConfig')
+                ->with('SomeClass')
+                ->willReturn(true);
+            $this->configProvider->expects($this->once())
+                ->method('getConfig')
+                ->with('SomeClass')
+                ->willReturn($config);
+        }
+
+        $this->entityClassResolver = null;
+        $this->cache = null;
+
+        $this->assertEquals($expectedResult, $this->provider->getMaxAccessLevel($accessLevel, $object));
+    }
+
+    /**
+     * @return array
+     */
+    public function getMaxAccessLevelDataProvider()
+    {
+        return [
+            [
+                'accessLevel' => AccessLevel::GLOBAL_LEVEL,
+                'object' => 'SomeClass',
+                'expectedResult' => AccessLevel::GLOBAL_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::GLOBAL_LEVEL,
+                'object' => null,
+                'expectedResult' => AccessLevel::GLOBAL_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::DEEP_LEVEL,
+                'object' => 'SomeClass',
+                'expectedResult' => AccessLevel::DEEP_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::DEEP_LEVEL,
+                'object' => null,
+                'expectedResult' => AccessLevel::DEEP_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::LOCAL_LEVEL,
+                'object' => 'SomeClass',
+                'expectedResult' => AccessLevel::LOCAL_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::LOCAL_LEVEL,
+                'object' => null,
+                'expectedResult' => AccessLevel::LOCAL_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::BASIC_LEVEL,
+                'object' => 'SomeClass',
+                'expectedResult' => AccessLevel::BASIC_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::BASIC_LEVEL,
+                'object' => null,
+                'expectedResult' => AccessLevel::BASIC_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::SYSTEM_LEVEL,
+                'object' => 'SomeClass',
+                'expectedResult' => AccessLevel::GLOBAL_LEVEL
+            ],
+            [
+                'accessLevel' => AccessLevel::SYSTEM_LEVEL,
+                'object' => null,
+                'expectedResult' => AccessLevel::SYSTEM_LEVEL
             ],
         ];
     }

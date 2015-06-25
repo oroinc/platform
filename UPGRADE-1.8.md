@@ -113,4 +113,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `getBusinessUnitClass` deprecated, use `getLocalLevelClass` instead
     * `getUserClass` deprecated, use `getBasicLevelClass` instead
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` added into `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` chain using tag `oro_security.owner.metadata_provider`
-- `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension` - fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+- `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    * fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+    * `fixMaxAccessLevel` deprecated, use `MetadataProviderInterface::getMaxAccessLevel` instead
