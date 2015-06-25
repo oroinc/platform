@@ -80,7 +80,6 @@ class EmailThreadProvider
         if ($thread) {
             $emails = new ArrayCollection($this->getThreadEmails($entityManager, $entity));
             $criteria = new Criteria();
-            $criteria->andWhere($criteria->expr()->eq('seen', false));
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $criteria->setMaxResults(1);
             $unseenEmails = $emails->matching($criteria);
