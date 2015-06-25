@@ -24,6 +24,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStorage;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStatement;
 
 /**
  * Class AclWalker
@@ -33,6 +35,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 class AclWalker extends TreeWalkerAdapter
 {
     const ORO_ACL_CONDITION = 'oro_acl.condition';
+    const ORO_ACL_JOIN = 'oro_acl.join';
 
     const EXPECTED_TYPE = 12;
 
@@ -50,6 +53,15 @@ class AclWalker extends TreeWalkerAdapter
             if (!$aclCondition->isEmpty()) {
                 $this->addRequestConditions($AST, $aclCondition);
                 $this->processSubRequests($AST, $aclCondition);
+            }
+        }
+
+        if ($query->hasHint(self::ORO_ACL_JOIN)) {
+            /** @var AclJoinStorage $joinStorage */
+            $joinStorage = $query->getHint(self::ORO_ACL_JOIN);
+
+            if (!$joinStorage->isEmpty()) {
+                $this->addJoinRequest($AST, $joinStorage);
             }
         }
 
@@ -415,5 +427,18 @@ class AclWalker extends TreeWalkerAdapter
         }
 
         return $this->propertyAccessor;
+    }
+
+    /**
+     * @param SelectStatement $AST
+     * @param AclJoinStorage $joinStorage
+     */
+    protected function addJoinRequest($AST, $joinStorage)
+    {
+        $joinStatements = $joinStorage->getJoinStatements();
+        /** @var AclJoinStatement $joinStatement */
+        foreach ($joinStatements as $joinStatement) {
+            //TODO: in AEIV-81
+        }
     }
 }

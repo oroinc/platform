@@ -41,6 +41,9 @@ class OwnershipConditionDataBuilder
     /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
 
+    /** @var null|int|string */
+    protected $userId = null;
+
     /**
      * @param ServiceLink                    $securityContextLink
      * @param ObjectIdAccessor               $objectIdAccessor
@@ -196,10 +199,14 @@ class OwnershipConditionDataBuilder
     /**
      * Gets the id of logged in user
      *
-     * @return int|string
+     * @return int|string|null
      */
     public function getUserId()
     {
+        if ($this->userId) {
+            return $this->userId;
+        }
+
         $token = $this->getSecurityContext()->getToken();
         if (!$token) {
             return null;
@@ -384,5 +391,10 @@ class OwnershipConditionDataBuilder
     protected function getTree()
     {
         return $this->treeProvider->getTree();
+    }
+
+    public function getAclJoinData($entityName, $entityAlias, $permission)
+    {
+        //TODO: AEIV-81
     }
 }

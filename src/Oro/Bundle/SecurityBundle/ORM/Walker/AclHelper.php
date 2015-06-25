@@ -21,6 +21,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStorage;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStatement;
 use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
 
 /**
@@ -119,11 +121,12 @@ class AclHelper
 
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
-            list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission, $query);
+            list ($whereConditions, $joinConditions, $joinStatements) = $this->processSelect($ast, $permission, $query);
             $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : array());
             if ($ast->whereClause) {
                 $this->processSubselects($ast, $conditionStorage, $permission, $query);
             }
+            $joinStorage = new AclJoinStorage($joinStatements);
 
             // We have access level check conditions. So mark query for acl walker.
             if (!$conditionStorage->isEmpty()) {
@@ -136,6 +139,17 @@ class AclHelper
                     $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
                 }
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
+            }
+
+            if (!$joinStorage->isEmpty()) {
+                $query->setHint(
+                    Query::HINT_CUSTOM_TREE_WALKERS,
+                    array_merge(
+                        $query->getHints(),
+                        array(self::ORO_ACL_WALKER)
+                    )
+                );
+                $query->setHint(AclWalker::ORO_ACL_JOIN, $joinStorage);
             }
         }
 
@@ -229,6 +243,7 @@ class AclHelper
 
         $whereConditions = [];
         $joinConditions  = [];
+        $joinStatements  = [];
         $fromClause      = $isSubRequest ? $select->subselectFromClause : $select->fromClause;
 
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
@@ -240,6 +255,14 @@ class AclHelper
             );
             if ($condition) {
                 $whereConditions[] = $condition;
+            }
+
+            $joinStatement = $this->processRangeVariableDeclarationShare(
+                $identificationVariableDeclaration->rangeVariableDeclaration,
+                $permission
+            );
+            if ($joinStatement) {
+                $joinStatements[] = $joinStatement;
             }
 
             // check joins
@@ -276,7 +299,7 @@ class AclHelper
         $whereConditions = $event->getWhereConditions();
         $joinConditions  = $event->getJoinConditions();
 
-        return [$whereConditions, $joinConditions];
+        return [$whereConditions, $joinConditions, $joinStatements];
     }
 
     /**
@@ -445,5 +468,31 @@ class AclHelper
         }
 
         return $joinConditions;
+    }
+
+    /**
+     * Process where and join statement
+     *
+     * @param RangeVariableDeclaration $rangeVariableDeclaration
+     * @param string                   $permission
+     *
+     * @return null|AclJoinStatement
+     */
+    protected function processRangeVariableDeclarationShare(
+        RangeVariableDeclaration $rangeVariableDeclaration,
+        $permission
+    )
+    {
+        $entityName = $rangeVariableDeclaration->abstractSchemaName;
+        $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
+
+        $resultData = $this->builder->getAclJoinData($entityName, $entityAlias, $permission);
+
+        if (!empty($resultData)) {
+            list($join, $aclCondition) = $resultData;
+            return new AclJoinStatement($join, $aclCondition);
+        }
+
+        return null;
     }
 }
