@@ -38,6 +38,13 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     protected function setAccessLevelClasses(array $owningEntityNames, EntityClassResolver $entityClassResolver = null)
     {
+        if (!isset($owningEntityNames['organization'], $owningEntityNames['business_unit'], $owningEntityNames['user'])
+        ) {
+            throw new \InvalidArgumentException(
+                'Array parameter $owningEntityNames must contains `organization`, `business_unit` and `user` keys'
+            );
+        }
+
         if ($entityClassResolver === null) {
             $this->organizationClass = $owningEntityNames['organization'];
             $this->businessUnitClass = $owningEntityNames['business_unit'];
