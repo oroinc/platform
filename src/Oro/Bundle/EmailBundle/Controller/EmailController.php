@@ -258,6 +258,7 @@ class EmailController extends Controller
      * @Template
      *
      * @param Request $request
+     *
      * @return array
      */
     public function emailsAction(Request $request)
@@ -319,8 +320,10 @@ class EmailController extends Controller
     /**
      * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
      * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
+     *
      * @param string $entityClass
      * @param string $activityId
+     *
      * @return array
      */
     public function contextGridAction($activityId, $entityClass = null)
@@ -337,7 +340,9 @@ class EmailController extends Controller
     /**
      * @Route("/toggle_seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
+     *
      * @param EmailUser $emailUserEntity
+     *
      * @return array
      */
     public function toggleSeenAction(EmailUser $emailUserEntity)
