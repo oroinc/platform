@@ -72,6 +72,8 @@ class EmailEntityBuilder
      * @param OrganizationInterface|null $organization
      *
      * @return EmailUser
+     *
+     * @SuppressWarnings(ExcessiveParameterList)
      */
     public function emailUser(
         $subject,

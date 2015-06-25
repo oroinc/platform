@@ -397,11 +397,6 @@ class User extends ExtendUser implements
     protected $updatedAt;
 
     /**
-     * {@inheritdoc}
-     */
-    protected $organization;
-
-    /**
      * @var OrganizationInterface
      *
      * Organization that user logged in
