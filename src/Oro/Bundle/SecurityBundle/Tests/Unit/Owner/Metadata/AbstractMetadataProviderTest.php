@@ -4,11 +4,17 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata\Stub\StubMetadataProvider;
 
 class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
+    const SOME_CLASS = 'SomeClass';
+    const UNDEFINED_CLASS = 'UndefinedClass';
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
      */
@@ -24,6 +30,11 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $provider;
 
+    /**
+     * @var Config
+     */
+    protected $config;
+
     protected function setUp()
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -31,24 +42,26 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['delete', 'deleteAll'])
+            ->setMethods(['delete', 'deleteAll', 'fetch', 'save'])
             ->getMockForAbstractClass();
 
         $this->provider = new StubMetadataProvider([], $this->configProvider, null, $this->cache);
+
+        $this->config = new Config(new EntityConfigId('ownership', self::SOME_CLASS));
     }
 
     protected function tearDown()
     {
-        unset($this->configProvider, $this->cache, $this->provider);
+        unset($this->configProvider, $this->cache, $this->provider, $this->config);
     }
 
     public function testClearCache()
     {
         $this->cache->expects($this->once())
             ->method('delete')
-            ->with('SomeClass');
+            ->with(self::SOME_CLASS);
 
-        $this->provider->clearCache('SomeClass');
+        $this->provider->clearCache(self::SOME_CLASS);
     }
 
     public function testClearCacheAll()
@@ -57,5 +70,102 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->method('deleteAll');
 
         $this->provider->clearCache();
+    }
+
+    public function testGetMetadataWithoutCache()
+    {
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::SOME_CLASS)
+            ->willReturn(true);
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOME_CLASS)
+            ->willReturn($this->config);
+
+        $this->cache = null;
+
+        $this->assertEquals(new OwnershipMetadata(), $this->provider->getMetadata(self::SOME_CLASS));
+    }
+
+    public function testGetMetadataUndefinedClassWithCache()
+    {
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::UNDEFINED_CLASS)
+            ->willReturn(false);
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->cache->expects($this->at(0))
+            ->method('fetch')
+            ->with(self::UNDEFINED_CLASS)
+            ->willReturn(false);
+        $this->cache->expects($this->at(2))
+            ->method('fetch')
+            ->with(self::UNDEFINED_CLASS)
+            ->willReturn(true);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(self::UNDEFINED_CLASS, true);
+
+        $metadata = new OwnershipMetadata();
+        $providerWithCleanCache = clone $this->provider;
+
+        // no cache
+        $this->assertEquals($metadata, $this->provider->getMetadata(self::UNDEFINED_CLASS));
+        // local cache
+        $this->assertEquals($metadata, $this->provider->getMetadata(self::UNDEFINED_CLASS));
+        // cache
+        $this->assertEquals($metadata, $providerWithCleanCache->getMetadata(self::UNDEFINED_CLASS));
+    }
+
+    public function testWarmUpCacheWithoutClassName()
+    {
+        $configs = [$this->config];
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfigs')
+            ->willReturn($configs);
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::SOME_CLASS)
+            ->willReturn(true);
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOME_CLASS)
+            ->willReturn($this->config);
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with(self::SOME_CLASS)
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(self::SOME_CLASS);
+
+        $this->provider->warmUpCache();
+    }
+
+    public function testWarmUpCacheWithClassName()
+    {
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::SOME_CLASS)
+            ->willReturn(true);
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOME_CLASS)
+            ->willReturn($this->config);
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with(self::SOME_CLASS)
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(self::SOME_CLASS);
+
+        $this->provider->getMetadata(self::SOME_CLASS);
     }
 }
