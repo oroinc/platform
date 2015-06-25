@@ -34,13 +34,18 @@ class EmailRecipientRepository extends EntityRepository
 
     /**
      * @param array $senderEmails
+     * @param array $excludedEmails
      * @param string|null $query
      * @param int $limit
      *
      * @return array
      */
-    public function getEmailsUsedInLast30Days(array $senderEmails = [], $query = null, $limit = 100)
-    {
+    public function getEmailsUsedInLast30Days(
+        array $senderEmails = [],
+        array $excludedEmails = [],
+        $query = null,
+        $limit = 100
+    ) {
         if (!$senderEmails) {
             return [];
         }
@@ -55,6 +60,10 @@ class EmailRecipientRepository extends EntityRepository
             ->andWhere($emailQb->expr()->in('fe.email', ':senders'))
             ->groupBy('a.email');
 
+        if ($excludedEmails) {
+            $emailQb->andWhere($emailQb->expr()->notIn('a.email', ':excluded_emails'));
+        }
+
         $recepientsQb = $this->createQueryBuilder('re');
         $recepientsQb
             ->select('re.name, ea.email')
@@ -68,6 +77,10 @@ class EmailRecipientRepository extends EntityRepository
             $recepientsQb
                 ->andWhere($recepientsQb->expr()->like('re.name', ':query'))
                 ->setParameter('query', sprintf('%%%s%%', $query));
+        }
+
+        if ($excludedEmails) {
+            $recepientsQb->setParameter('excluded_emails', $excludedEmails);
         }
 
         $emails = $recepientsQb->getQuery()->getResult();

@@ -79,4 +79,29 @@ class EmailRecipientsLoadEvent extends Event
     {
         $this->results = $results;
     }
+
+    /**
+     * @return string[]
+     */
+    public function getEmails()
+    {
+        return $this->getEmailsFromData($this->results);
+    }
+
+    /**
+     * @param string[] $data
+     */
+    protected function getEmailsFromData(array $data)
+    {
+        $result = [];
+        foreach ($data as $record) {
+            if (isset($record['children'])) {
+                $result = array_merge($result, $this->getEmailsFromData($record['children']));
+            } else {
+                $result[] = $record['id'];
+            }
+        }
+
+        return $result;
+    }
 }

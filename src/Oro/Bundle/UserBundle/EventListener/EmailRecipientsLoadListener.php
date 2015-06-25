@@ -39,7 +39,7 @@ class EmailRecipientsLoadListener
             return;
         }
 
-        $userEmails = $this->getUserRepository()->getEmails($query, $limit);
+        $userEmails = $this->getUserRepository()->getEmails($event->getEmails(), $query, $limit);
         if (!$userEmails) {
             return;
         }
