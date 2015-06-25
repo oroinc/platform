@@ -100,7 +100,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `getOrganizationColumnName` deprecated, use `getGlobalOwnerColumnName` instead
     * `getOrganizationFieldName` deprecated, use `getGlobalOwnerFieldName` instead
 - `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder` method signature changed to use `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` instead of `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata`
-    * `protected function buildConstraintIfAccessIsGranted($targetEntityClassName, $accessLevel, OwnershipMetadata $metadata)`
-    * `protected function getOrganizationId(OwnershipMetadata $metadata = null)` 
-    * `protected function getCondition($idOrIds, OwnershipMetadata $metadata, $columnName = null, $ignoreOwner = false)`
-    * `protected function getColumnName(OwnershipMetadata $metadata, $columnName = null)`
+    * `protected function buildConstraintIfAccessIsGranted($targetEntityClassName, $accessLevel, OwnershipMetadataInterface $metadata)`
+    * `protected function getOrganizationId(OwnershipMetadataInterface $metadata = null)` 
+    * `protected function getCondition($idOrIds, OwnershipMetadataInterface $metadata, $columnName = null, $ignoreOwner = false)`
+    * `protected function getColumnName(OwnershipMetadataInterface $metadata, $columnName = null)`
