@@ -15,6 +15,7 @@ oro_menu_config:
             label: 'oro.email.menu.user_emails'
             route: 'oro_email_user_emails'
             extras:
+                routes: ['oro_email_thread_view']
                 position: 15
 
         # if exist option "dialog", then you need to add dialog_config options
