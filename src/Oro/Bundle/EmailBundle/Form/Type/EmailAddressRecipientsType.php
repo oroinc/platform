@@ -43,12 +43,12 @@ class EmailAddressRecipientsType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'tooltip' => false,
+            'tooltip'        => false,
+            'error_bubbling' => false,
             'configs' => [
                 'allowClear'         => true,
                 'multiple'           => true,
                 'route_name'         => 'oro_api_get_email_recipient_autocomplete',
-                'separator'          => ';',
                 'minimumInputLength' => 1,
                 'per_page'           => 100,
                 'containerCssClass'  => 'taggable-email',

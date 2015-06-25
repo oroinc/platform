@@ -58,13 +58,13 @@ class EmailType extends AbstractType
             )
             ->add(
                 'cc',
-                'oro_email_email_address',
-                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+                'oro_email_email_address_recipients',
+                ['required' => false, 'attr' => ['class' => 'taggable-field']]
             )
             ->add(
                 'bcc',
-                'oro_email_email_address',
-                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+                'oro_email_email_address_recipients',
+                ['required' => false, 'attr' => ['class' => 'taggable-field']]
             )
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
             ->add('body', 'oro_rich_text', ['required' => false, 'label' => 'oro.email.email_body.label'])
