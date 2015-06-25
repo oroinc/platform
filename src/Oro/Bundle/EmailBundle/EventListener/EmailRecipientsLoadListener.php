@@ -49,7 +49,7 @@ class EmailRecipientsLoadListener
     public function onLoad(EmailRecipientsLoadEvent $event)
     {
         $query = $event->getQuery();
-        $limit = $event->getLimit() - count($event->getResults());
+        $limit = $event->getRemainingLimit();
         
         if (!$limit || null === $user = $this->securityFacade->getLoggedUser()) {
             return;

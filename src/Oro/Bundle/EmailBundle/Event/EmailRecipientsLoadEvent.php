@@ -65,6 +65,14 @@ class EmailRecipientsLoadEvent extends Event
     }
 
     /**
+     * @return int
+     */
+    public function getRemainingLimit()
+    {
+        return $this->limit - count($this->getEmails());
+    }
+
+    /**
      * @return array
      */
     public function getResults()
