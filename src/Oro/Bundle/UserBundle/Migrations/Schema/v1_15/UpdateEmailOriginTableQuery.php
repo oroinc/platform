@@ -41,21 +41,21 @@ class UpdateEmailOriginTableQuery extends ParametrizedMigrationQuery
         $dbDriver = $this->connection->getDriver()->getName();
         switch ($dbDriver) {
             case DatabaseDriverInterface::DRIVER_POSTGRESQL:
-                $query = 'UPDATE oro_email_origin AS eo SET eo.owner_id =
-                  (SELECT ueo.user_id FROM oro_user_email_origin AS ueo WHERE ueo.origin_id = eo.id);
-                      UPDATE oro_email_origin AS eo SET eo.organization_id =
-                  (SELECT u.organization_id FROM oro_user AS u WHERE u.id = eo.owner_id)
-                  ';
-
+                $query = <<<SQL
+UPDATE oro_email_origin AS eo SET eo.owner_id = ueo.user_id
+  FROM oro_user_email_origin AS ueo WHERE ueo.origin_id = eo.id;
+UPDATE oro_email_origin AS eo SET eo.organization_id = u.organization_id
+  FROM oro_user AS u WHERE u.id = eo.owner_id)
+SQL;
                 break;
             case DatabaseDriverInterface::DRIVER_MYSQL:
             default:
-                $query = 'UPDATE oro_email_origin eo SET eo.owner_id =
-                  (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id);
-                      UPDATE oro_email_origin eo SET eo.organization_id =
-                  (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id)
-                  ';
-
+                $query = <<<SQL
+UPDATE oro_email_origin eo SET eo.owner_id =
+  (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id);
+UPDATE oro_email_origin eo SET eo.organization_id =
+  (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id)
+SQL;
                 break;
         }
 
