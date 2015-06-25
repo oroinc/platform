@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class EmailRecipientRepository extends EntityRepository
 {
@@ -33,6 +34,7 @@ class EmailRecipientRepository extends EntityRepository
     }
 
     /**
+     * @param AclHelper $aclHelper
      * @param array $senderEmails
      * @param array $excludedEmails
      * @param string|null $query
@@ -41,6 +43,7 @@ class EmailRecipientRepository extends EntityRepository
      * @return array
      */
     public function getEmailsUsedInLast30Days(
+        AclHelper $aclHelper,
         array $senderEmails = [],
         array $excludedEmails = [],
         $query = null,
@@ -83,7 +86,7 @@ class EmailRecipientRepository extends EntityRepository
             $recepientsQb->setParameter('excluded_emails', $excludedEmails);
         }
 
-        $emails = $recepientsQb->getQuery()->getResult();
+        $emails = $aclHelper->apply($recepientsQb)->getResult();
 
         $result = [];
         foreach ($emails as $email) {

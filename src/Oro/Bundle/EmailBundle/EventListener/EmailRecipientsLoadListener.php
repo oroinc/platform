@@ -10,11 +10,15 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Event\EmailRecipientsLoadEvent;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class EmailRecipientsLoadListener
 {
     /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var AclHelper */
+    protected $aclHelper;
 
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
@@ -27,17 +31,20 @@ class EmailRecipientsLoadListener
 
     /**
      * @param SecurityFacade $securityFacade
+     * @param AclHelper $aclHelper
      * @param RelatedEmailsProvider $relatedEmailsProvider
      * @param Registry $registry
      * @param TranslatorInterface $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
+        AclHelper $aclHelper,
         RelatedEmailsProvider $relatedEmailsProvider,
         Registry $registry,
         TranslatorInterface $translator
     ) {
         $this->securityFacade = $securityFacade;
+        $this->aclHelper = $aclHelper;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
         $this->registry = $registry;
         $this->translator = $translator;
@@ -57,7 +64,7 @@ class EmailRecipientsLoadListener
 
         $userEmailAddresses = $this->relatedEmailsProvider->getEmails($user);
         $recentlyUsedEmails = $this->getEmailRecipientRepository()
-            ->getEmailsUsedInLast30Days($userEmailAddresses, $event->getEmails(), $query, $limit);
+            ->getEmailsUsedInLast30Days($this->aclHelper, $userEmailAddresses, $event->getEmails(), $query, $limit);
         if (!$recentlyUsedEmails) {
             return;
         }

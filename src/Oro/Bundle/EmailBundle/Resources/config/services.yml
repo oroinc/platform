@@ -513,6 +513,7 @@ services:
         class: %oro_email.listener.email_recipients_load.listener.class%
         arguments:
             - @oro_security.security_facade
+            - @oro_security.acl_helper
             - @oro_email.related_emails.provider
             - @doctrine
             - @translator
