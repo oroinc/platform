@@ -27,7 +27,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
      * @param MetadataProviderInterface[] $providers
      * @param MetadataProviderInterface $defaultProvider
      */
-    public function __construct(array $providers, MetadataProviderInterface $defaultProvider = null)
+    public function __construct(array $providers = [], MetadataProviderInterface $defaultProvider = null)
     {
         $this->providers = new ArrayCollection($providers);
         $this->defaultProvider = $defaultProvider;
