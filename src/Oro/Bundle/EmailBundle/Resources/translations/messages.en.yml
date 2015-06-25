@@ -130,6 +130,8 @@ oro:
                     sent: Sent Mail
             filters:
                 new: New Mail
+            mark:
+                success_message: "{0} No entities were marked|{1} One entity was marked|]1,Inf[ %count% entities were marked"
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."

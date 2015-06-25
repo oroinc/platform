@@ -39,16 +39,19 @@ class EmailManager
     }
 
     /**
-     * Set email as seen
+     * Set email seen status
      *
      * @param EmailUser $entity
+     * @param bool $value
      */
-    public function setEmailUserSeen(EmailUser $entity)
+    public function setEmailUserSeen(EmailUser $entity, $value = true, $flush = false)
     {
-        if (!$entity->isSeen()) {
-            $entity->setSeen(true);
+        if ($entity->isSeen() !== $value) {
+            $entity->setSeen($value);
             $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
-            $this->em->flush();
+            if ($flush) {
+                $this->em->flush();
+            }
         }
     }
 
@@ -59,9 +62,23 @@ class EmailManager
      */
     public function toggleEmailUserSeen(EmailUser $entity)
     {
-        $entity->setSeen(!((bool) $entity->isSeen()));
-        $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $seen = !((bool) $entity->isSeen());
+        $this->setEmailUserSeen($entity, $seen);
         $this->em->persist($entity);
+
+        if ($entity->getEmail()->getThread() && $entity->getOwner()) {
+            $threadedEmailUserBuilder = $this
+                ->em
+                ->getRepository('OroEmailBundle:EmailUser')
+                ->getEmailUserByThreadId([$entity->getEmail()->getThread()->getId()], $entity->getOwner());
+
+            $threadedEmailUserList = $threadedEmailUserBuilder->getQuery()->getResult();
+            foreach ($threadedEmailUserList as $threadedEmailUser) {
+                $this->setEmailUserSeen($threadedEmailUser, $seen);
+                $this->em->persist($threadedEmailUser);
+            }
+        }
+
         $this->em->flush();
     }
 
