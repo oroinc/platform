@@ -24,6 +24,8 @@ class FormatterManager
     }
 
     /**
+     * Apply formatter to the parameter
+     *
      * @param mixed  $parameter
      * @param string $formatterName
      * @param array  $formatterArguments

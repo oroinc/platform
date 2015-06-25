@@ -59,7 +59,7 @@ class DateTimeValueFormatterTest extends \PHPUnit_Framework_TestCase
         $this->translator
             ->expects($this->once())
             ->method('trans')
-            ->with('oro.email.variable.not.found');
+            ->with('oro.locale.formatter.datetime.default');
         $this->formatter->getDefaultValue();
     }
 }

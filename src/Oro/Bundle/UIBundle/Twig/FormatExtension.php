@@ -23,7 +23,7 @@ class FormatExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_format', [$this, 'format']),
+            new \Twig_SimpleFilter('oro_format', [$this, 'format'], ['is_safe' => ['html']]),
         ];
     }
 

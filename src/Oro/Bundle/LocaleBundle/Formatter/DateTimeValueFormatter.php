@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 
 class DateTimeValueFormatter implements FormatterInterface
 {
@@ -60,6 +61,6 @@ class DateTimeValueFormatter implements FormatterInterface
      */
     public function getDefaultValue()
     {
-        return $this->translator->trans('oro.email.variable.not.found');
+        return $this->translator->trans('oro.locale.formatter.datetime.default');
     }
 }

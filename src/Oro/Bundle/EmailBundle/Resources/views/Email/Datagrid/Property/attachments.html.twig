@@ -1,5 +1,5 @@
-{% set thread = record.getValue('thread') %}
-{% set emailBody = record.getValue('emailBody') %}
+{% set thread = record.getValue('email.thread') %}
+{% set emailBody = record.getValue('email.emailBody') %}
 {% if thread is not null  %}
     {% set hasAttachments = oro_get_email_thread_attachments(thread)|length %}
 {% elseif emailBody is not null %}

@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Twig\Formatter;
+namespace Oro\Bundle\AttachmentBundle\Formatter;
 
-use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
+use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 
-class ImageUrlFormatter implements FormatterInterface
+class ImageSrcFormatter implements FormatterInterface
 {
     const WIDTH_ATTRIBUTE  = 'width';
     const HEIGHT_ATTRIBUTE = 'height';
@@ -27,7 +28,7 @@ class ImageUrlFormatter implements FormatterInterface
      */
     public function getFormatterName()
     {
-        return 'image_url';
+        return 'image_src';
     }
 
     /**
@@ -37,15 +38,23 @@ class ImageUrlFormatter implements FormatterInterface
     {
         $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT;
         if (array_key_exists(self::HEIGHT_ATTRIBUTE, $formatterArguments)) {
-            $height = (int) $formatterArguments[self::HEIGHT_ATTRIBUTE];
+            $height = (int)$formatterArguments[self::HEIGHT_ATTRIBUTE];
         }
 
         $width = AttachmentManager::DEFAULT_IMAGE_WIDTH;
         if (array_key_exists(self::WIDTH_ATTRIBUTE, $formatterArguments)) {
-            $width = (int) $formatterArguments[self::WIDTH_ATTRIBUTE];
+            $width = (int)$formatterArguments[self::WIDTH_ATTRIBUTE];
         }
 
-        return $this->manager->getResizedImageUrl($parameter, $width, $height);
+        return $this->manager->getResizedImageUrl($parameter, $width, $height, Router::ABSOLUTE_URL);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultValue()
+    {
+        return '#';
     }
 
     /**
@@ -62,13 +71,5 @@ class ImageUrlFormatter implements FormatterInterface
     public function isDefaultFormatter()
     {
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultValue()
-    {
-        return '#';
     }
 }

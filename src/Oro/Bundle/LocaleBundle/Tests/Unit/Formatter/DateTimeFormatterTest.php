@@ -21,7 +21,15 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formatter = new DateTimeFormatter($this->localeSettings);
+
+        $translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator->method('trans')
+            ->willReturn('MMM d');
+
+        $this->formatter = new DateTimeFormatter($this->localeSettings, $translator);
     }
 
     public function testEmptyDate()
