@@ -39,17 +39,15 @@ class EmailManager
     }
 
     /**
-     * Set email as seen
+     * Set email seen status
      *
      * @param EmailUser $entity
-     * @param bool $flush
-     * @param bool $force
-     * @param bool $forceValue
+     * @param bool $value
      */
-    public function setEmailUserSeen(EmailUser $entity, $flush = true, $force = false, $forceValue = true)
+    public function setEmailUserSeen(EmailUser $entity, $value = true, $flush = false)
     {
-        if (!$entity->isSeen() || $force) {
-            $entity->setSeen($forceValue);
+        if ($entity->isSeen() !== $value) {
+            $entity->setSeen($value);
             $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
             if ($flush) {
                 $this->em->flush();
@@ -65,8 +63,7 @@ class EmailManager
     public function toggleEmailUserSeen(EmailUser $entity)
     {
         $seen = !((bool) $entity->isSeen());
-        $entity->setSeen($seen);
-        $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->setEmailUserSeen($entity, $seen);
         $this->em->persist($entity);
 
         if ($entity->getEmail()->getThread() && $entity->getOwner()) {
@@ -77,8 +74,7 @@ class EmailManager
 
             $threadedEmailUserList = $threadedEmailUserBuilder->getQuery()->getResult();
             foreach ($threadedEmailUserList as $threadedEmailUser) {
-                $threadedEmailUser->setSeen($seen);
-                $threadedEmailUser->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
+                $this->setEmailUserSeen($threadedEmailUser, $seen);
                 $this->em->persist($threadedEmailUser);
             }
         }

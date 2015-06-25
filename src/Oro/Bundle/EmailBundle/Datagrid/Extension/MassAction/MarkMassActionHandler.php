@@ -136,7 +136,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
                 $entity = $entity[0];
 
                 if ($this->securityFacade->isGranted('EDIT', $entity)) {
-                    $this->emailManager->setEmailUserSeen($entity, false, true, $markType === self::MARK_READ);
+                    $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
                 }
 
                 if ($entity->getEmail()->getThread()) {
@@ -179,7 +179,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
             $entity = $entity[0];
 
             if ($this->securityFacade->isGranted('EDIT', $entity)) {
-                $this->emailManager->setEmailUserSeen($entity, false, true, $markType === self::MARK_READ);
+                $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
             }
             $this->entityManager->persist($entity);
 

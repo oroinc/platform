@@ -42,22 +42,78 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new EmailManager($this->em, $this->emailThreadManager, $this->emailThreadProvider);
     }
 
-    public function testSetEmailSeenNothingChanges()
+    /**
+     * @dataProvider dataProvider
+     *
+     * @param bool $isSeen
+     * @param bool $newSeen
+     * @param bool $seen
+     * @param bool $flush
+     * @param int $calls
+     * @param int $flushCalls
+     */
+    public function testSetEmailSeenChanges($isSeen, $newSeen, $seen, $flush, $calls, $flushCalls)
     {
         $emailUser = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
         $emailUser->expects($this->once())
             ->method('isSeen')
-            ->will($this->returnValue(true));
-        $emailUser->expects($this->never())
-            ->method('setSeen');
-        $this->emailThreadManager->expects($this->never())
-            ->method('updateThreadHead');
-        $this->em->expects($this->never())
+            ->will($this->returnValue($isSeen));
+        $emailUser->expects($this->exactly($calls))
+            ->method('setSeen')
+            ->with($newSeen);
+        $this->em->expects($this->exactly($flushCalls))
             ->method('flush');
-        $this->manager->setEmailUserSeen($emailUser);
+
+        $this->manager->setEmailUserSeen($emailUser, $seen, $flush);
     }
 
-    public function testSetEmailSeenChanges()
+    public function dataProvider()
+    {
+        return [
+            'unseen when seen with flush' => [
+                'isSeen' => true,
+                'newSeen' => false,
+                'seen' => false,
+                'flush' => true,
+                'calls' => 1,
+                'flushCalls' => 1
+            ],
+            'unseen when unseen with flush' => [
+                'isSeen' => false,
+                'newSeen' => false,
+                'seen' => false,
+                'flush' => true,
+                'calls' => 0,
+                'flushCalls' => 0
+            ],
+            'seen when unseen with flush' => [
+                'isSeen' => false,
+                'newSeen' => true,
+                'seen' => true,
+                'flush' => true,
+                'calls' => 1,
+                'flushCalls' => 1
+            ],
+            'seen when seen with flush' => [
+                'isSeen' => true,
+                'newSeen' => true,
+                'seen' => true,
+                'flush' => true,
+                'calls' => 0,
+                'flushCalls' => 0
+            ],
+            'seen when unseen without flush' => [
+                'isSeen' => false,
+                'newSeen' => true,
+                'seen' => true,
+                'flush' => false,
+                'calls' => 1,
+                'flushCalls' => 0
+            ]
+        ];
+    }
+
+    public function testSetEmailSeenChangesDefs()
     {
         $emailUser = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
         $emailUser->expects($this->once())
@@ -66,7 +122,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $emailUser->expects($this->once())
             ->method('setSeen')
             ->with(true);
-        $this->em->expects($this->once())
+        $this->em->expects($this->never())
             ->method('flush');
 
         $this->manager->setEmailUserSeen($emailUser);
@@ -96,7 +152,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $emailUser->expects($this->once())
             ->method('setSeen')
             ->with(false);
-        $emailUser->expects($this->once())
+        $emailUser->expects($this->exactly(2))
             ->method('isSeen')
             ->will($this->returnValue(true));
         $emailUser->expects($this->exactly(2))

@@ -524,7 +524,7 @@ class EmailController extends Controller
             ->getRepository('OroEmailBundle:EmailUser')
             ->findByEmailAndOwner($entity, $this->getUser());
         if ($emailUser) {
-            $this->getEmailManager()->setEmailUserSeen($emailUser);
+            $this->getEmailManager()->setEmailUserSeen($emailUser, true, true);
         }
     }
 }
