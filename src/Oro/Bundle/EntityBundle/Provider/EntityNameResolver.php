@@ -22,6 +22,8 @@ class EntityNameResolver
     /**
      * @param string $defaultFormat The default representation format
      * @param array  $config        The configuration of representation formats
+     *
+     * @throws \InvalidArgumentException if default format is not specified or does not exist
      */
     public function __construct($defaultFormat, array $config)
     {
