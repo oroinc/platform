@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
 class EmailManager
@@ -40,13 +41,12 @@ class EmailManager
     /**
      * Set email as seen
      *
-     * @param Email $entity
+     * @param EmailUser $entity
      */
-    public function setEmailSeen(Email $entity)
+    public function setEmailUserSeen(EmailUser $entity)
     {
         if (!$entity->isSeen()) {
             $entity->setSeen(true);
-            $this->em->persist($entity);
             $this->em->flush();
         }
     }

@@ -4,6 +4,8 @@ namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+
 class UserRepository extends EntityRepository
 {
     /**
@@ -21,5 +23,23 @@ class UserRepository extends EntityRepository
         }
 
         return (int)$queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param EmailOrigin $origin
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getOriginOwner(EmailOrigin $origin)
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->select('u')
+            ->innerJoin('u.emailOrigins', 'o')
+            ->where('o.id = :originId')
+            ->setParameter('originId', $origin->getId())
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }
