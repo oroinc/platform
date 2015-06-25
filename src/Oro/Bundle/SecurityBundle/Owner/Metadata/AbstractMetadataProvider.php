@@ -65,6 +65,8 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
 
     /**
      * Set instance of OwnershipMetadataInterface to `noOwnershipMetadata` property
+     *
+     * @return OwnershipMetadataInterface
      */
     abstract protected function getNoOwnershipMetadata();
 
