@@ -8,6 +8,8 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class EmailTest
@@ -82,16 +84,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bccRecipient === $recipients->first());
     }
 
-    public function testFolderGetterAndSetter()
-    {
-        $folder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
-
-        $entity = new Email();
-        $entity->addFolder($folder);
-
-        $this->assertTrue($folder === $entity->getFolders()->first());
-    }
-
     public function testEmailBodyGetterAndSetter()
     {
         $emailBody = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
@@ -156,7 +148,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         return [
             ['subject', 'testSubject'],
             ['fromName', 'testFromName'],
-            ['receivedAt', new \DateTime('now', new \DateTimeZone('UTC'))],
             ['sentAt', new \DateTime('now', new \DateTimeZone('UTC'))],
             ['importance', Email::HIGH_IMPORTANCE],
             ['internalDate', new \DateTime('now', new \DateTimeZone('UTC'))],
@@ -164,11 +155,11 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['xMessageId', 'testXMessageId'],
             ['thread', new EmailThread()],
             ['xThreadId', 'testxXThreadId'],
+            ['multiMessageId', ['MessageId1','MessageId2']],
             ['seen', true],
             ['seen', ''],
             ['seen', 0],
-            ['seen', 1],
-            ['multiMessageId', ['MessageId1','MessageId2']]
+            ['seen', 1]
         ];
     }
 
