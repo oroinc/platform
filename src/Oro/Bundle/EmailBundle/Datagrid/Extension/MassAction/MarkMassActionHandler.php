@@ -12,6 +12,9 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class MarkMassActionHandler implements MassActionHandlerInterface
 {
@@ -49,20 +52,32 @@ class MarkMassActionHandler implements MassActionHandlerInterface
      */
     protected $responseMessage = 'oro.email.datagrid.mark.success_message';
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var EmailManager */
+    protected $emailManager;
+
     /**
      * @param EntityManager $entityManager
      * @param TranslatorInterface $translator
      * @param SecurityContext $securityContext
+     * @param ServiceLink $securityFacadeLink
+     * @param EmailManager $emailManager
      */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
-        SecurityContext $securityContext
+        SecurityContext $securityContext,
+        ServiceLink $securityFacadeLink,
+        EmailManager $emailManager
     ) {
         $this->entityManager = $entityManager;
         $this->translator = $translator;
         $this->securityContext = $securityContext;
         $this->user = $this->securityContext->getToken()->getUser();
+        $this->securityFacade = $securityFacadeLink->getService();
+        $this->emailManager = $emailManager;
     }
 
     /**
@@ -119,10 +134,9 @@ class MarkMassActionHandler implements MassActionHandlerInterface
             foreach ($result as $entity) {
                 /** @var EmailUser $entity */
                 $entity = $entity[0];
-                if ($markType === self::MARK_READ) {
-                    $entity->setSeen(true);
-                } else {
-                    $entity->setSeen(false);
+
+                if ($this->securityFacade->isGranted('EDIT', $entity)) {
+                    $this->emailManager->setEmailUserSeen($entity, false, true, $markType === self::MARK_READ);
                 }
 
                 if ($entity->getEmail()->getThread()) {
@@ -163,10 +177,9 @@ class MarkMassActionHandler implements MassActionHandlerInterface
         $result = $queryBuilder->getQuery()->iterate();
         foreach ($result as $entity) {
             $entity = $entity[0];
-            if ($markType === self::MARK_READ) {
-                $entity->setSeen(true);
-            } else {
-                $entity->setSeen(false);
+
+            if ($this->securityFacade->isGranted('EDIT', $entity)) {
+                $this->emailManager->setEmailUserSeen($entity, false, true, $markType === self::MARK_READ);
             }
             $this->entityManager->persist($entity);
 

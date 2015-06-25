@@ -27,3 +27,5 @@ services:
             - @doctrine.orm.entity_manager
             - @translator
             - @security.context
+            - @oro_security.security_facade.link
+            - @oro_email.email.manager

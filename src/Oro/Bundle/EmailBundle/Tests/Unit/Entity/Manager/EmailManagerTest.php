@@ -77,17 +77,17 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $threadArray = [new EmailUser()];
 
         $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['getEmail', 'getThread', 'getId', 'setSeen', 'isSeen'])
+            ->setMethods(['getEmail', 'getThread', 'getId', 'setSeen', 'isSeen', 'getOwner'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $emailUser->expects($this->exactly(2))
             ->method('getEmail')
-            ->will($this->returnValue($emailUser));
+            ->will($this->returnSelf());
 
         $emailUser->expects($this->exactly(2))
             ->method('getThread')
-            ->will($this->returnValue($emailUser));
+            ->will($this->returnSelf());
 
         $emailUser->expects($this->once())
             ->method('getId')
@@ -98,6 +98,9 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->with(false);
         $emailUser->expects($this->once())
             ->method('isSeen')
+            ->will($this->returnValue(true));
+        $emailUser->expects($this->exactly(2))
+            ->method('getOwner')
             ->will($this->returnValue(true));
         $this->em->expects($this->once())
             ->method('flush');

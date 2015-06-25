@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +19,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
@@ -336,7 +336,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/toggle_seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_edit")
+     * @AclAncestor("oro_email_email_user_edit")
      * @param EmailUser $emailUserEntity
      * @return array
      */
@@ -351,8 +351,6 @@ class EmailController extends Controller
 
     /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
-     * @AclAncestor("oro_email_email_edit")
-     *
      */
     public function markMassAction($gridName, $actionName)
     {

@@ -42,13 +42,18 @@ class EmailManager
      * Set email as seen
      *
      * @param EmailUser $entity
+     * @param bool $flush
+     * @param bool $force
+     * @param bool $forceValue
      */
-    public function setEmailUserSeen(EmailUser $entity)
+    public function setEmailUserSeen(EmailUser $entity, $flush = true, $force = false, $forceValue = true)
     {
-        if (!$entity->isSeen()) {
-            $entity->setSeen(true);
+        if (!$entity->isSeen() || $force) {
+            $entity->setSeen($forceValue);
             $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
-            $this->em->flush();
+            if ($flush) {
+                $this->em->flush();
+            }
         }
     }
 
@@ -64,7 +69,7 @@ class EmailManager
         $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($entity);
 
-        if ($entity->getEmail()->getThread()) {
+        if ($entity->getEmail()->getThread() && $entity->getOwner()) {
             $threadedEmailUserBuilder = $this
                 ->em
                 ->getRepository('OroEmailBundle:EmailUser')
@@ -73,6 +78,7 @@ class EmailManager
             $threadedEmailUserList = $threadedEmailUserBuilder->getQuery()->getResult();
             foreach ($threadedEmailUserList as $threadedEmailUser) {
                 $threadedEmailUser->setSeen($seen);
+                $threadedEmailUser->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
                 $this->em->persist($threadedEmailUser);
             }
         }
