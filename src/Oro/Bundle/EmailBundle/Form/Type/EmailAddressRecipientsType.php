@@ -45,6 +45,7 @@ class EmailAddressRecipientsType extends AbstractType
         $resolver->setDefaults([
             'tooltip'        => false,
             'error_bubbling' => false,
+            'empty_data'     => [],
             'configs' => [
                 'allowClear'         => true,
                 'multiple'           => true,
