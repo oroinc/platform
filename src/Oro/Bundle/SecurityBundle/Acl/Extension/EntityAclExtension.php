@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
@@ -36,7 +36,7 @@ class EntityAclExtension extends AbstractAclExtension
     protected $entityClassResolver;
 
     /**
-     * @var OwnershipMetadataProvider
+     * @var MetadataProviderInterface
      */
     protected $metadataProvider;
 
@@ -72,14 +72,14 @@ class EntityAclExtension extends AbstractAclExtension
      * @param ObjectIdAccessor                $objectIdAccessor
      * @param EntityClassResolver             $entityClassResolver
      * @param EntitySecurityMetadataProvider  $entityMetadataProvider
-     * @param OwnershipMetadataProvider       $metadataProvider
+     * @param MetadataProviderInterface       $metadataProvider
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
-        OwnershipMetadataProvider $metadataProvider,
+        MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker
     ) {
         $this->objectIdAccessor       = $objectIdAccessor;
