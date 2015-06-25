@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig\Formatter;
+namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Twig\Formatter\ImageContentFormatter;
+use Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter;
 
-class ImageContentFormatterTest extends \PHPUnit_Framework_TestCase
+class ImageEncodedFormatterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ImageContentFormatter */
+    /** @var ImageEncodedFormatter */
     protected $formatter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -27,19 +27,20 @@ class ImageContentFormatterTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Symfony\Component\HttpKernel\Config\FileLocator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formatter   = new ImageContentFormatter($this->manager, $this->fileLocator);
+        $this->formatter   = new ImageEncodedFormatter($this->manager, $this->fileLocator);
     }
 
     public function testGetFormatterName()
     {
-        $this->assertEquals('inline_content', $this->formatter->getFormatterName());
+        $this->assertEquals('image_encoded', $this->formatter->getFormatterName());
     }
 
     public function testFormat()
     {
         $file = new File();
         $file->setMimeType('image/png');
-        $expected = 'data:image/png;base64,' . base64_encode('test');
+        $file->setOriginalFilename('test.png');
+        $expected = '<img src="data:image/png;base64,dGVzdA==" alt = "test.png"/>';
 
         $this->manager
             ->expects($this->once())
@@ -53,14 +54,14 @@ class ImageContentFormatterTest extends \PHPUnit_Framework_TestCase
     public function testGetDefaultValue()
     {
 
-        $expected = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAA1BMVEX///+'
+        $expected = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAA1BMVEX///+'
             . 'nxBvIAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB98GEAgrLyNXN+0AAAAmaVRYdENvbW1lbnQAAAAAA'
-            . 'ENyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjleRfWwAAAAxJREFUCNdjYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==';
+            . 'ENyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjleRfWwAAAAxJREFUCNdjYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==" />';
 
         $this->fileLocator
             ->expects($this->once())
             ->method('locate')
-            ->willReturn(__DIR__ . '/../../Fixtures/testFile/test.png');
+            ->willReturn(__DIR__ . '/../Fixtures/testFile/test.png');
 
         $this->assertEquals($expected, $this->formatter->getDefaultValue());
     }
