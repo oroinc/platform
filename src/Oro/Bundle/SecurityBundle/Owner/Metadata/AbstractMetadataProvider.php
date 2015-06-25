@@ -49,7 +49,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
         $this->setAccessLevelClasses($owningEntityNames, $entityClassResolver);
         $this->configProvider = $configProvider;
         $this->cache = $cache;
-        $this->createNoOwnershipMetadata();
+        $this->noOwnershipMetadata = $this->getNoOwnershipMetadata();
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface
     /**
      * Set instance of OwnershipMetadataInterface to `noOwnershipMetadata` property
      */
-    abstract protected function createNoOwnershipMetadata();
+    abstract protected function getNoOwnershipMetadata();
 
     /**
      * {@inheritDoc}

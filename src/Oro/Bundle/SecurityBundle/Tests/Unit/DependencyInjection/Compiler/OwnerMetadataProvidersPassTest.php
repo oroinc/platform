@@ -21,7 +21,10 @@ class OwnerMetadataProvidersPassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->compilerPass = new OwnerMetadataProvidersPass();
     }
 
