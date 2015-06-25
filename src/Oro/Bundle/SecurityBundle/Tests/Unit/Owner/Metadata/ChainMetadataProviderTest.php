@@ -104,6 +104,9 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
      * @param string $levelClassMethod
      * @param bool $deep
      * @param string $levelClass
+     *
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\NoSupportsMetadataProviderException
+     * @expectedExceptionMessage Found no supports provider in chain
      */
     public function testGetLevelClassException($levelClassMethod, $deep = false, $levelClass = 'stdClass')
     {
@@ -113,11 +116,6 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
         $chain = new ChainMetadataProvider();
         $chain->addProvider($provider);
-
-        $this->setExpectedException(
-            'Oro\Bundle\SecurityBundle\Exception\NoSupportsMetadataProviderException',
-            'Found no supports provider in chain'
-        );
 
         $this->assertEquals($levelClass, $chain->$levelClassMethod($deep));
     }
