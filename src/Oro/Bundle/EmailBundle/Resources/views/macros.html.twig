@@ -87,6 +87,9 @@
                         pathLabels:  pathLabels,
                         variable:    variable
                     }) %>
+                    {# shows variable with default formatter applied
+                     # code commented because it was rejected on demo but can be used in future implementation of variable formatters UI
+                     #
                     <% if (!_.isUndefined(variable.default_formatter)) { %>
                         <%= variableTemplate({
                             varValue:    varPrefix + '.' + varName + '|oro_format(\'' + variable.default_formatter + '\')',
@@ -95,6 +98,11 @@
                             variable:    variable
                         }) %>
                     <% }; %>
+                    #}
+
+                    {# shows variable with all posible formatters applied (skiping default formatter)
+                     # code commented because it was rejected on demo but can be used in future implementation of variable formatters UI
+                     #
                     <% if (!_.isUndefined(variable.formatters)) { %>
                         <% _.each(variable.formatters, function(formatterName) { %>
                             <% if (!_.isUndefined(variable.default_formatter) && formatterName === variable.default_formatter) { %>
@@ -108,6 +116,7 @@
                             }) %>
                         <% }); %>
                     <% }; %>
+                    #}
                 <% }); %>
                 </ul>
             </li>
