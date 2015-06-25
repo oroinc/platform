@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class FillEmailUserTableQuery extends ParametrizedMigrationQuery
+class UpdateEmailOriginTableQuery extends ParametrizedMigrationQuery
 {
     /**
      * {@inheritDoc}
@@ -37,28 +37,25 @@ class FillEmailUserTableQuery extends ParametrizedMigrationQuery
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
+
         $dbDriver = $this->connection->getDriver()->getName();
         switch ($dbDriver) {
             case DatabaseDriverInterface::DRIVER_POSTGRESQL:
-                $query = <<<SQL
-INSERT INTO oro_email_user (folder_id, email_id, created_at, received, is_seen, user_owner_id, organization_id)
-SELECT f.id, e.id, e.created, e.received, e.is_seen, o.owner_id, o.organization_id
-FROM oro_email_to_folder AS etf
-  LEFT JOIN oro_email AS e ON e.id = etf.email_id
-  LEFT JOIN oro_email_folder AS f ON f.id =  etf.emailfolder_id
-  LEFT JOIN oro_email_origin AS o ON o.id = f.origin_id
-SQL;
+                $query = 'UPDATE oro_email_origin AS eo SET eo.owner_id =
+                  (SELECT ueo.user_id FROM oro_user_email_origin AS ueo WHERE ueo.origin_id = eo.id);
+                      UPDATE oro_email_origin AS eo SET eo.organization_id =
+                  (SELECT u.organization_id FROM oro_user AS u WHERE u.id = eo.owner_id)
+                  ';
+
                 break;
             case DatabaseDriverInterface::DRIVER_MYSQL:
             default:
-                $query = <<<SQL
-INSERT INTO oro_email_user (folder_id, email_id, created_at, received, is_seen, user_owner_id, organization_id)
-SELECT f.id, e.id, e.created, e.received, e.is_seen, o.owner_id, o.organization_id
-FROM oro_email_to_folder etf
-  LEFT JOIN oro_email e ON e.id = etf.email_id
-  LEFT JOIN oro_email_folder f ON f.id =  etf.emailfolder_id
-  LEFT JOIN oro_email_origin o ON o.id = f.origin_id
-SQL;
+                $query = 'UPDATE oro_email_origin eo SET eo.owner_id =
+                  (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id);
+                      UPDATE oro_email_origin eo SET eo.organization_id =
+                  (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id)
+                  ';
+
                 break;
         }
 
