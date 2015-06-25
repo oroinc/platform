@@ -187,11 +187,11 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
-     * @ORM\Column(name="message_multi_id", type="string", length=255, nullable=true)
+     * @ORM\Column(name="multi_message_id", type="text", nullable=true)
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
-    protected $messageMultiId;
+    protected $multiMessageId;
 
     /**
      * @var string
@@ -570,21 +570,21 @@ class Email extends ExtendEmail
      *
      * @return array|null
      */
-    public function getMessageMultiId()
+    public function getMultiMessageId()
     {
-        return $this->messageMultiId ? unserialize($this->messageMultiId) : null;
+        return $this->multiMessageId ? unserialize($this->multiMessageId) : null;
     }
 
     /**
      * Set array values of email Message-ID header
      *
-     * @param array $messageMultiId
+     * @param array $multiMessageId
      *
      * @return Email
      */
-    public function setMessageMultiId($messageMultiId)
+    public function setMultiMessageId($multiMessageId)
     {
-        $this->messageMultiId = $messageMultiId ? serialize($messageMultiId): null;
+        $this->multiMessageId = $multiMessageId ? serialize($multiMessageId): null;
 
         return $this;
     }

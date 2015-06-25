@@ -148,6 +148,9 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
+    /**
+     * @return array
+     */
     public function propertiesDataProvider()
     {
         return [
@@ -165,7 +168,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['seen', ''],
             ['seen', 0],
             ['seen', 1],
-            ['messageMultiId', ['MessageId1','MessageId2']]
+            ['multiMessageId', ['MessageId1','MessageId2']]
         ];
     }
 

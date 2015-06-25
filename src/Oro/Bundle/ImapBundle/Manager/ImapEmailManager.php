@@ -93,7 +93,7 @@ class ImapEmailManager
      * Retrieve folders
      *
      * @param string|null $parentFolder The global name of a parent folder.
-     * @param bool        $recursive    True to get all subordinate folders
+     * @param bool $recursive True to get all subordinate folders
      *
      * @return Folder[]
      */
@@ -164,10 +164,10 @@ class ImapEmailManager
                 ->setImportance($this->getImportance($headers))
                 ->setRefs($this->getReferences($headers, 'References'))
                 ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
-                ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'));
+                ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'))
+                ->setMessageId($this->getMessageId($headers, 'Message-ID'))
+                ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'));
 
-            $messageId = $this->getMessageId($headers, 'Message-ID');
-            $this->setMessageId($email, $messageId);
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);
             }
@@ -196,7 +196,7 @@ class ImapEmailManager
      * Gets a string representation of an email header
      *
      * @param Headers $headers
-     * @param string  $name
+     * @param string $name
      *
      * @return string
      *
@@ -228,46 +228,15 @@ class ImapEmailManager
     }
 
     /**
-     * Set Massage Id to Oro\Bundle\ImapBundle\Manager\DTO\Email;
-     *
-     * @param Email        $email     - Email
-     * @param string|array $messageId - MessageId
-     *
-     * @return $this
+     * @param Headers $headers
+     * @param $name
+     * @return array|null
      */
-    protected function setMessageId(Email &$email, $messageId)
-    {
-        if (is_array($messageId)) {
-            if (count($messageId) > 1) {
-                $email->setMessageMultiId($messageId);
-                $email->setMessageId(reset($messageId));
-            }
-
-            if (count($messageId) === 1) {
-                $email->setMessageId(reset($messageId));
-            }
-        } else {
-            $email->setMessageId($messageId);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set Massage Id from Headers
-     *
-     * @param Headers $headers - Headers
-     * @param string  $name    - Key in $headers
-     *
-     * @return array|string
-     */
-    protected function getMessageId(Headers $headers, $name)
+    protected function getMultiMessageId(Headers $headers, $name)
     {
         $header = $headers->get($name);
-        if ($header === false) {
-            return '';
-        } elseif ($header instanceof \ArrayIterator) {
-            $values = [];
+        $values = [];
+        if ($header instanceof \ArrayIterator) {
             $header->rewind();
             while ($header->valid()) {
                 $values[] = $header->current()->getFieldValue();
@@ -277,6 +246,31 @@ class ImapEmailManager
             return $values;
         }
 
+        return null;
+    }
+
+    /**
+     * Set Massage Id from Headers
+     *
+     * @param Headers $headers - Headers
+     * @param string $name - Key in $headers
+     *
+     * @return array|string
+     */
+    protected function getMessageId(Headers $headers, $name)
+    {
+        $header = $headers->get($name);
+        if ($header === false) {
+            return '';
+        } elseif ($header instanceof \ArrayIterator) {
+            $header->rewind();
+            if ($header->valid()) {
+                return $header->current()->getFieldValue();
+            }
+
+            return '';
+        }
+
         return $header->getFieldValue();
     }
 
@@ -284,7 +278,7 @@ class ImapEmailManager
      * Gets a email references header
      *
      * @param Headers $headers
-     * @param string  $name
+     * @param string $name
      *
      * @return string|null
      */
@@ -311,7 +305,7 @@ class ImapEmailManager
      * Gets an email header as DateTime type
      *
      * @param Headers $headers
-     * @param string  $name
+     * @param string $name
      *
      * @return \DateTime
      */
@@ -357,14 +351,14 @@ class ImapEmailManager
      * Get an email recipients
      *
      * @param Headers $headers
-     * @param string  $name
+     * @param string $name
      *
      * @return string[]
      */
     protected function getRecipients(Headers $headers, $name)
     {
         $result = array();
-        $val    = $headers->get($name);
+        $val = $headers->get($name);
         if ($val instanceof AbstractAddressList) {
             /** @var AddressInterface $addr */
             foreach ($val->getAddressList() as $addr) {
