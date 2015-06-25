@@ -35,6 +35,24 @@ class EmailRecipientsProvider
         $event = new EmailRecipientsLoadEvent($relatedEntity, $query, $limit);
         $this->dispatcher->dispatch(EmailRecipientsLoadEvent::NAME, $event);
 
-        return $event->getResults();
+        return $this->valuesAsKeys($event->getResults());
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public function valuesAsKeys(array $data)
+    {
+        foreach ($data as $key => $record) {
+            if (isset($record['children'])) {
+                $data[$key]['children'] = $this->valuesAsKeys($record['children']);
+            } else {
+                $data[$key]['id'] = $record['text'];
+            }
+        }
+
+        return $data;
     }
 }
