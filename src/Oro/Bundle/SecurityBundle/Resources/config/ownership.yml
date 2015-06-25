@@ -10,6 +10,7 @@ parameters:
     oro_security.owner.ownership_config_subscriber.class:                 Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigSubscriber
     oro_security.owner.ownership_metadata_provider.cache.warmer.class:    Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheWarmer
     oro_security.owner.ownership_metadata_provider.cache.clearer.class:   Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheClearer
+    oro_security.owner.ownership_decision_maker.chain.class:              Oro\Bundle\SecurityBundle\Owner\ChainEntityOwnershipDecisionMaker
 
 services:
     oro_security.owner.entity_owner_accessor:
@@ -64,3 +65,6 @@ services:
             - @oro_security.owner.ownership_metadata_provider
         tags:
             - { name: kernel.cache_clearer }
+
+    oro_security.owner.ownership_decision_maker.chain:
+        class: %oro_security.owner.ownership_decision_maker.chain.class%
