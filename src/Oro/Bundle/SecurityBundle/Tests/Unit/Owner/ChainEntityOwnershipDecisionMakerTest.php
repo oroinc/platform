@@ -40,8 +40,6 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $chain->addOwnershipDecisionMaker($this->getOwnershipDecisionMakerMock(false));
         $this->assertFalse($chain->supports());
 
-        $chain = new ChainEntityOwnershipDecisionMaker();
-        $chain->addOwnershipDecisionMaker($this->getOwnershipDecisionMakerMock(false));
         $chain->addOwnershipDecisionMaker($this->getOwnershipDecisionMakerMock(true));
         $this->assertTrue($chain->supports());
     }
@@ -93,7 +91,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
             'negative isBasicLevelEntity' => [
                 'levelMethod' => 'isBasicLevelEntity',
                 'result' => false
-            ],
+            ]
         ];
     }
 
@@ -162,23 +160,23 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
             'negative isAssociatedWithGlobalLevelEntity' => [
                 'levelMethod' => 'isAssociatedWithGlobalLevelEntity',
                 'result' => false
-            ],
+            ]
         ];
     }
 
     /**
-     * @param bool $isSupports
+     * @param bool $supports
      * @return AccessLevelOwnershipDecisionMakerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getOwnershipDecisionMakerMock($isSupports = true)
+    protected function getOwnershipDecisionMakerMock($supports = true)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
         $maker = $this->getMock(
             'Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface'
         );
-        $maker->expects($this->once())
+        $maker->expects($this->atLeastOnce())
             ->method('supports')
-            ->willReturn($isSupports);
+            ->willReturn($supports);
 
         return $maker;
     }

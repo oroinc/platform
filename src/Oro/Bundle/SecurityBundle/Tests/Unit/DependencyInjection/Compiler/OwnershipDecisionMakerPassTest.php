@@ -68,7 +68,7 @@ class OwnershipDecisionMakerPassTest extends \PHPUnit_Framework_TestCase
             ->with(OwnershipDecisionMakerPass::TAG_NAME)
             ->willReturn([
                 'ownershipDecisionMaker' => [['class' => 'Test\Class1']],
-                'ownershipDecisionMaker2' => [['class' => 'Test\Class2']],
+                'ownershipDecisionMaker2' => [['class' => 'Test\Class2']]
             ]);
 
         $this->compilerPass->process($this->container);
