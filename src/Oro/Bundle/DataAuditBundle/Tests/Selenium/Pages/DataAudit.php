@@ -15,15 +15,13 @@ class DataAudit extends AbstractPageFilteredGrid
 {
     const URL = 'audit';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-
+        return $this;
     }
 
-    public function open($entityData = array())
+    public function entityView()
     {
-        return;
+        return $this;
     }
 }
