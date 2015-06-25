@@ -23,9 +23,12 @@ class OroEmailBundle implements Migration
 
     /**
      * It adds column multi_message_id to table oro_email
+     *
      * @param Schema $schema - Schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     *
      * @return void
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addColumnMultiMessageId(Schema $schema)
     {
