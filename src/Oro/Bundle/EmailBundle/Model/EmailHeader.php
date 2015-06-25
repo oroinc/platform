@@ -59,6 +59,11 @@ class EmailHeader
     /**
      * @var string
      */
+    protected $multiMessageId;
+
+    /**
+     * @var string
+     */
     protected $refs;
 
     /**
@@ -379,6 +384,30 @@ class EmailHeader
     public function setXThreadId($xThreadId)
     {
         $this->xThreadId = $xThreadId;
+
+        return $this;
+    }
+
+    /**
+     * Get array values of email Message-ID header
+     *
+     * @return array|null
+     */
+    public function getMultiMessageId()
+    {
+        return $this->multiMessageId ? unserialize($this->multiMessageId) : null;
+    }
+
+    /**
+     * Set array values of email Message-ID header
+     *
+     * @param array|null $multiMessageId - array of message id
+     *
+     * @return self
+     */
+    public function setMultiMessageId($multiMessageId)
+    {
+        $this->multiMessageId = $multiMessageId ? serialize($multiMessageId): null;
 
         return $this;
     }

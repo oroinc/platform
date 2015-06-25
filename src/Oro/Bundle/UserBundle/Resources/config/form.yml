@@ -194,6 +194,7 @@ services:
             - @session.flash_bag
             - @translator
             - @logger
+            - @oro_security.security_facade.link
         tags:
             - { name: oro_tag.tag_manager }
         calls:
