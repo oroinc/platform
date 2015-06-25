@@ -36,7 +36,7 @@ class EmailBodyBuilder
      * Sets an email body properties
      *
      * @param string $content
-     * @param bool $bodyIsText
+     * @param bool   $bodyIsText
      */
     public function setEmailBody($content, $bodyIsText)
     {
@@ -53,19 +53,21 @@ class EmailBodyBuilder
      * @param string $content
      * @param string $contentType
      * @param string $contentTransferEncoding
+     * @param null   $contentId
      * @throws \LogicException
      */
     public function addEmailAttachment(
         $fileName,
         $content,
         $contentType,
-        $contentTransferEncoding
+        $contentTransferEncoding,
+        $contentId = null
     ) {
         if ($this->emailBody === null) {
             throw new \LogicException('Call setEmailBody first.');
         }
 
-        $emailAttachment = new EmailAttachment();
+        $emailAttachment        = new EmailAttachment();
         $emailAttachmentContent = new EmailAttachmentContent();
 
         $emailAttachmentContent
@@ -76,7 +78,8 @@ class EmailBodyBuilder
         $emailAttachment
             ->setFileName($fileName)
             ->setContentType($contentType)
-            ->setContent($emailAttachmentContent);
+            ->setContent($emailAttachmentContent)
+            ->setEmbeddedContentId($contentId);
 
         $this->emailBody->addAttachment($emailAttachment);
     }

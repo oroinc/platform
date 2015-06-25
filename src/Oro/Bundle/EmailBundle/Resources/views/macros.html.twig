@@ -364,7 +364,8 @@
 #}
 {% macro attachments(attachments, target, hasGrantReattach) -%}
     {%- for attachment in attachments -%}
-        <li class="email-attachments-list-item">
+        {% if attachment.embeddedContentId is null %}
+            <li class="email-attachments-list-item">
             <div class="dropdown link-to-record">
                 <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
                     <i class="icon icon-file-alt"></i> {{ attachment.fileName|oro_format_filename }}
@@ -401,6 +402,7 @@
                 {% endif %}
             </div>
         </li>
+        {% endif %}
     {%- endfor -%}
 {%- endmacro %}
 
