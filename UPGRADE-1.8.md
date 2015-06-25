@@ -99,6 +99,11 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `isUserOwned` deprecated, use `isBasicLevelOwned` instead
     * `getOrganizationColumnName` deprecated, use `getGlobalOwnerColumnName` instead
     * `getOrganizationFieldName` deprecated, use `getGlobalOwnerFieldName` instead
+- `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder` method signature changed to use `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` instead of `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata`
+    * `protected function buildConstraintIfAccessIsGranted($targetEntityClassName, $accessLevel, OwnershipMetadataInterface $metadata)`
+    * `protected function getOrganizationId(OwnershipMetadataInterface $metadata = null)` 
+    * `protected function getCondition($idOrIds, OwnershipMetadataInterface $metadata, $columnName = null, $ignoreOwner = false)`
+    * `protected function getColumnName(OwnershipMetadataInterface $metadata, $columnName = null)`
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` usage
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` - chain for ownership metadata providers which implements new `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider`
