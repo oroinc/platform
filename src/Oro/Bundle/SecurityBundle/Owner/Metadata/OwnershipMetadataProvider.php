@@ -163,7 +163,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
         $organizationFieldName  = $config->get('organization_field_name');
         $organizationColumnName = $config->get('organization_column_name');
 
-        if (!$organizationFieldName && $ownerType == OwnershipType::OWNER_TYPE_ORGANIZATION) {
+        if (!$organizationFieldName && $ownerType === OwnershipType::OWNER_TYPE_ORGANIZATION) {
             $organizationFieldName  = $ownerFieldName;
             $organizationColumnName = $ownerColumnName;
         }

@@ -94,8 +94,11 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals('AcmeBundle\Entity\Organization', $provider->getGlobalLevelClass());
+        $this->assertEquals('AcmeBundle\Entity\Organization', $provider->getOrganizationClass());
         $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $provider->getLocalLevelClass());
+        $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $provider->getBusinessUnitClass());
         $this->assertEquals('AcmeBundle\Entity\User', $provider->getBasicLevelClass());
+        $this->assertEquals('AcmeBundle\Entity\User', $provider->getUserClass());
     }
 
     public function testOwnerClassesConfigWithoutEntityClassResolver()
@@ -110,8 +113,11 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals('AcmeBundle\Entity\Organization', $provider->getGlobalLevelClass());
+        $this->assertEquals('AcmeBundle\Entity\Organization', $provider->getOrganizationClass());
         $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $provider->getLocalLevelClass());
+        $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $provider->getBusinessUnitClass());
         $this->assertEquals('AcmeBundle\Entity\User', $provider->getBasicLevelClass());
+        $this->assertEquals('AcmeBundle\Entity\User', $provider->getUserClass());
     }
 
     public function testGetMetadataUndefinedClassWithoutCache()
@@ -293,6 +299,9 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function owningEntityNamesDataProvider()
     {
         return [
