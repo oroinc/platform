@@ -5,6 +5,8 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * This class provides access to the ownership metadata of a domain object
@@ -27,10 +29,22 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     protected $userClass;
 
     /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    /**
      * {@inheritDoc}
      */
     protected function setAccessLevelClasses(array $owningEntityNames, EntityClassResolver $entityClassResolver = null)
     {
+        if (!isset($owningEntityNames['organization'], $owningEntityNames['business_unit'], $owningEntityNames['user'])
+        ) {
+            throw new \InvalidArgumentException(
+                'Array parameter $owningEntityNames must contains `organization`, `business_unit` and `user` keys'
+            );
+        }
+
         if ($entityClassResolver === null) {
             $this->organizationClass = $owningEntityNames['organization'];
             $this->businessUnitClass = $owningEntityNames['business_unit'];
@@ -48,6 +62,18 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     protected function getNoOwnershipMetadata()
     {
         return new OwnershipMetadata();
+    }
+
+    /**
+     * @param SecurityFacade $securityFacade
+     *
+     * @return MetadataProviderInterface
+     */
+    public function setSecurityFacade(SecurityFacade $securityFacade)
+    {
+        $this->securityFacade = $securityFacade;
+
+        return $this;
     }
 
     /**
@@ -123,8 +149,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     public function supports()
     {
-        // TODO: Implement isSupports() method in BB-677.
-        return true;
+        return $this->securityFacade && $this->securityFacade->getLoggedUser() instanceof User;
     }
 
     /**
@@ -138,7 +163,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
         $organizationFieldName  = $config->get('organization_field_name');
         $organizationColumnName = $config->get('organization_column_name');
 
-        if (!$organizationFieldName && $ownerType == OwnershipType::OWNER_TYPE_ORGANIZATION) {
+        if (!$organizationFieldName && $ownerType === OwnershipType::OWNER_TYPE_ORGANIZATION) {
             $organizationFieldName  = $ownerFieldName;
             $organizationColumnName = $ownerColumnName;
         }
