@@ -166,6 +166,6 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(self::SOME_CLASS);
 
-        $this->provider->getMetadata(self::SOME_CLASS);
+        $this->provider->warmUpCache(self::SOME_CLASS);
     }
 }
