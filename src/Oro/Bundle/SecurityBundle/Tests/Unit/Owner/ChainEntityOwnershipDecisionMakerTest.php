@@ -53,12 +53,13 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
     public function testIsLevelEntity($levelMethod, $result)
     {
         $maker = $this->getOwnershipDecisionMakerMock(true);
-        $maker->expects($this->once())
+        $maker->expects($this->atLeastOnce())
             ->method($levelMethod)
             ->will($this->returnValue($result));
 
         $chain = new ChainEntityOwnershipDecisionMaker();
         $chain->addOwnershipDecisionMaker($maker);
+        $this->assertEquals($result, $chain->$levelMethod(new \stdClass()));
         $this->assertEquals($result, $chain->$levelMethod(new \stdClass()));
     }
 

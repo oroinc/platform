@@ -5,16 +5,19 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
-use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
-abstract class AbstractEntityOwnershipDecisionMaker implements
-    OwnershipDecisionMakerInterface,
-    AccessLevelOwnershipDecisionMakerInterface
+/**
+ * This class implements AccessLevelOwnershipDecisionMakerInterface interface and allows to make ownership related
+ * decisions using the tree of owners.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionMakerInterface
 {
     /**
      * @var OwnerTreeProvider
@@ -54,6 +57,244 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         $this->objectIdAccessor = $objectIdAccessor;
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->metadataProvider = $metadataProvider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isGlobalLevelEntity($domainObject)
+    {
+        return is_a($domainObject, $this->metadataProvider->getOrganizationClass());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isLocalLevelEntity($domainObject)
+    {
+        return is_a($domainObject, $this->metadataProvider->getBusinessUnitClass());
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return bool
+     */
+    public function isBasicLevelEntity($domainObject)
+    {
+        return is_a($domainObject, $this->metadataProvider->getUserClass());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
+    {
+        $tree = $this->treeProvider->getTree();
+        $this->validateUserObject($user);
+        $this->validateObject($domainObject);
+
+        $organizationId = null;
+        if ($organization) {
+            $organizationId = $this->getOrganizationId($organization);
+        }
+
+        $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
+        if (empty($userOrganizationIds) || ($organizationId && !in_array($organizationId, $userOrganizationIds))) {
+            return false;
+        }
+
+        $allowedOrganizationIds = $organizationId ? [$organizationId] : $userOrganizationIds;
+
+        if ($this->isGlobalLevelEntity($domainObject)) {
+            return in_array(
+                $this->getObjectId($domainObject),
+                $allowedOrganizationIds
+            );
+        }
+
+        if ($this->isLocalLevelEntity($domainObject)) {
+            return in_array(
+                $tree->getBusinessUnitOrganizationId($this->getObjectId($domainObject)),
+                $allowedOrganizationIds
+            );
+        }
+
+        if ($this->isBasicLevelEntity($domainObject)) {
+            $userId = $this->getObjectId($user);
+            $objId = $this->getObjectId($domainObject);
+            if ($userId === $objId) {
+                $userOrganizationId = $tree->getUserOrganizationId($userId);
+                $objOrganizationId = $tree->getUserOrganizationId($objId);
+
+                return $userOrganizationId !== null && $userOrganizationId === $objOrganizationId;
+            }
+        }
+
+        $metadata = $this->getObjectMetadata($domainObject);
+        if (!$metadata->hasOwner()) {
+            return false;
+        }
+
+        $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
+        if ($metadata->isGlobalLevelOwned()) {
+            return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds);
+        } else {
+            return in_array(
+                $this->getObjectId($this->entityOwnerAccessor->getOrganization($domainObject)),
+                $allowedOrganizationIds
+            );
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
+    {
+        $tree = $this->treeProvider->getTree();
+        $this->validateUserObject($user);
+        $this->validateObject($domainObject);
+
+        $organizationId = null;
+        if ($organization) {
+            $organizationId = $this->getObjectId($organization);
+        }
+
+        if ($this->isLocalLevelEntity($domainObject)) {
+            return $this->isUserBusinessUnit(
+                $this->getObjectId($user),
+                $this->getObjectId($domainObject),
+                $deep,
+                $organizationId
+            );
+        }
+
+        if ($this->isBasicLevelEntity($domainObject)) {
+            $userId = $this->getObjectId($user);
+            if ($userId === $this->getObjectId($domainObject) && $tree->getUserBusinessUnitId($userId) !== null) {
+                return true;
+            }
+        }
+
+        $metadata = $this->getObjectMetadata($domainObject);
+        if (!$metadata->hasOwner()) {
+            return false;
+        }
+
+        $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
+        if ($metadata->isLocalLevelOwned()) {
+            return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep, $organizationId);
+        } elseif ($metadata->isBasicLevelOwned()) {
+            $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($ownerId, $organizationId);
+            if (empty($ownerBusinessUnitIds)) {
+                return false;
+            }
+
+            return $this->isUserBusinessUnits(
+                $this->getObjectId($user),
+                $ownerBusinessUnitIds,
+                $deep,
+                $organizationId
+            );
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
+    {
+        $userId = $this->getObjectId($user);
+        if ($organization
+            && !in_array(
+                $this->getObjectId($organization),
+                $this->treeProvider->getTree()->getUserOrganizationIds($userId)
+            )
+        ) {
+            return false;
+        }
+
+        $this->validateUserObject($user);
+        $this->validateObject($domainObject);
+
+        if ($this->isBasicLevelEntity($domainObject)) {
+            return $this->getObjectId($domainObject) === $this->getObjectId($user);
+        }
+
+        $metadata = $this->getObjectMetadata($domainObject);
+        if ($metadata->isBasicLevelOwned()) {
+            $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
+
+            return $userId === $ownerId;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether the given user has a relation to the given business unit
+     *
+     * @param  int|string      $userId
+     * @param  int|string|null $ownerBusinessUnitIds
+     * @param  bool            $deep Specify whether subordinate business units should be checked. Defaults to false.
+     * @param  int|null        $organizationId
+     * @return bool
+     */
+    protected function isUserBusinessUnits($userId, $ownerBusinessUnitIds, $deep = false, $organizationId = null)
+    {
+        $userBusinessUnitIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId);
+        $familiarBusinessUnits = array_intersect($userBusinessUnitIds, $ownerBusinessUnitIds);
+        if (!empty($familiarBusinessUnits)) {
+            return true;
+        }
+        if ($deep) {
+            foreach ($userBusinessUnitIds as $buId) {
+                $familiarBusinessUnits = array_intersect(
+                    $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),
+                    $ownerBusinessUnitIds
+                );
+                if (!empty($familiarBusinessUnits)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether the given user has a relation to the given business unit
+     *
+     * @param  int|string      $userId
+     * @param  int|string|null $businessUnitId
+     * @param  bool            $deep Specify whether subordinate business units should be checked. Defaults to false.
+     * @param  int|null        $organizationId
+     * @return bool
+     */
+    protected function isUserBusinessUnit($userId, $businessUnitId, $deep = false, $organizationId = null)
+    {
+        if ($businessUnitId === null) {
+            return false;
+        }
+
+        foreach ($this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
+            if ($businessUnitId === $buId) {
+                return true;
+            }
+            if ($deep
+                && in_array($businessUnitId, $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId))
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
