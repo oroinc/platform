@@ -104,3 +104,13 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `protected function getOrganizationId(OwnershipMetadataInterface $metadata = null)` 
     * `protected function getCondition($idOrIds, OwnershipMetadataInterface $metadata, $columnName = null, $ignoreOwner = false)`
     * `protected function getColumnName(OwnershipMetadataInterface $metadata, $columnName = null)`
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` usage
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` - chain for ownership metadata providers which implements new `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider`
+    * is based on `Oro\Bundle\SecurityBundle\Owner\Metadata\AbstractMetadataProvider` and implements `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+    * added public method `setSecurityFacade(SecurityFacade $securityFacade)`
+    * `getOrganizationClass` deprecated, use `getGlobalLevelClass` instead
+    * `getBusinessUnitClass` deprecated, use `getLocalLevelClass` instead
+    * `getUserClass` deprecated, use `getBasicLevelClass` instead
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` added into `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` chain using tag `oro_security.owner.metadata_provider`
+- `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension` - fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`

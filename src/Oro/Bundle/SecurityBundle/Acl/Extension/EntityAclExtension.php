@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
@@ -36,7 +36,7 @@ class EntityAclExtension extends AbstractAclExtension
     protected $entityClassResolver;
 
     /**
-     * @var OwnershipMetadataProvider
+     * @var MetadataProviderInterface
      */
     protected $metadataProvider;
 
@@ -46,7 +46,7 @@ class EntityAclExtension extends AbstractAclExtension
     protected $entityMetadataProvider;
 
     /**
-     * @var OwnershipDecisionMakerInterface
+     * @var AccessLevelOwnershipDecisionMakerInterface
      */
     protected $decisionMaker;
 
@@ -72,15 +72,15 @@ class EntityAclExtension extends AbstractAclExtension
      * @param ObjectIdAccessor                $objectIdAccessor
      * @param EntityClassResolver             $entityClassResolver
      * @param EntitySecurityMetadataProvider  $entityMetadataProvider
-     * @param OwnershipMetadataProvider       $metadataProvider
-     * @param OwnershipDecisionMakerInterface $decisionMaker
+     * @param MetadataProviderInterface       $metadataProvider
+     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
-        OwnershipMetadataProvider $metadataProvider,
-        OwnershipDecisionMakerInterface $decisionMaker
+        MetadataProviderInterface $metadataProvider,
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker
     ) {
         $this->objectIdAccessor       = $objectIdAccessor;
         $this->entityClassResolver    = $entityClassResolver;
@@ -472,14 +472,14 @@ class EntityAclExtension extends AbstractAclExtension
 
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-            $result = $this->decisionMaker->isAssociatedWithUser(
+            $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                 $securityToken->getUser(),
                 $object,
                 $organization
             );
         } else {
             if ($metadata->isBasicLevelOwned()) {
-                $result = $this->decisionMaker->isAssociatedWithUser(
+                $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                     $securityToken->getUser(),
                     $object,
                     $organization
@@ -487,21 +487,21 @@ class EntityAclExtension extends AbstractAclExtension
             }
             if (!$result) {
                 if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         false,
                         $organization
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         true,
                         $organization
                     );
                 } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithOrganization(
+                    $result = $this->decisionMaker->isAssociatedWithGlobalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         $organization
