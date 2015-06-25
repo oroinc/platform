@@ -52,7 +52,13 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsLevelEntity($levelMethod, $result)
     {
-        $maker = $this->getOwnershipDecisionMakerMock(true);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
+        $maker = $this->getMock(
+            'Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface'
+        );
+        $maker->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $maker->expects($this->atLeastOnce())
             ->method($levelMethod)
             ->will($this->returnValue($result));
