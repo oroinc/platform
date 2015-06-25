@@ -42,9 +42,9 @@ class UpdateEmailOriginTableQuery extends ParametrizedMigrationQuery
         switch ($dbDriver) {
             case DatabaseDriverInterface::DRIVER_POSTGRESQL:
                 $query = <<<SQL
-UPDATE oro_email_origin AS eo SET eo.owner_id = ueo.user_id
+UPDATE oro_email_origin AS eo SET owner_id = ueo.user_id
   FROM oro_user_email_origin AS ueo WHERE ueo.origin_id = eo.id;
-UPDATE oro_email_origin AS eo SET eo.organization_id = u.organization_id
+UPDATE oro_email_origin AS eo SET organization_id = u.organization_id
   FROM oro_user AS u WHERE u.id = eo.owner_id;
 SQL;
                 break;
