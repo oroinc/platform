@@ -25,6 +25,15 @@ define([
             options.okText =  __('oro.datagrid.gridView.save_name');
 
             ViewNameModal.__super__.initialize.call(this, options);
+
+            this.events = _.extend({}, this.events, {'keydown #gridViewName': _.bind(this.onKeyDown, this)});
+        },
+
+        onKeyDown: function(e) {
+            if (e.which === 13) {
+                this.trigger('close');
+                this.trigger('ok');
+            }
         },
 
         setNameError: function(error) {

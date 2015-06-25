@@ -96,7 +96,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
         foreach ($this->templates as $index => $template) {
             $owner = $this->getReference('simple_user');
-            $simple_user2 = $this->getReference('simple_user2');
+            $simpleUser2 = $this->getReference('simple_user2');
             $origin = $this->mailerProcessor->getEmailOrigin($owner->getEmail());
 
             $emailUser = $this->emailEntityBuilder->emailUser(
@@ -113,7 +113,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
             $emailUser->setFolder($origin->getFolder(FolderType::SENT));
             $emailUser->getEmail()->addActivityTarget($owner);
-            $emailUser->getEmail()->addActivityTarget($simple_user2);
+            $emailUser->getEmail()->addActivityTarget($simpleUser2);
             $emailUser->getEmail()->setHead(true);
             $emailUser->setOrganization($owner->getOrganization());
             $emailUser->setOwner($owner);

@@ -6,15 +6,22 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class SetOwnerForEmail implements Migration
+class SetOwnerForEmail implements Migration, OrderedMigrationInterface
 {
     /**
      * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $queries->addPreQuery('UPDATE oro_email_origin eo SET eo.owner_id =
+          (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id)');
+        $queries->addPreQuery('UPDATE oro_email_origin eo SET eo.organization_id =
+          (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id)');
+        $queries->addPostQuery(new FillEmailUserTableQuery());
+
         self::addOwnerToOroEmail($schema);
     }
 
@@ -46,5 +53,13 @@ class SetOwnerForEmail implements Migration
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_91F5CFF69EB185F9'
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOrder()
+    {
+        return 1;
     }
 }

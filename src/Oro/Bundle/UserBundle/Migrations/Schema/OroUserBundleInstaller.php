@@ -20,6 +20,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganizati
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
 
 /**
@@ -108,8 +109,9 @@ class OroUserBundleInstaller implements
 
         $this->addOroAccessGroupIndexes($schema);
 
-        EmailOrigin::addOwnerAndOrganizationColumns($schema, $queries);
+        EmailOrigin::addOwnerAndOrganizationColumns($schema);
         SetOwnerForEmail::addOwnerToOroEmail($schema);
+        RemoveOldSchema::execute($schema);
     }
 
     /**

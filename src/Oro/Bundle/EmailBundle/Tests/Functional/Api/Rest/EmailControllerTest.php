@@ -74,7 +74,7 @@ class EmailControllerTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result['id']);
         $this->assertEquals('My Web Store Introduction', $result['subject']);
-        $this->assertContains('Thank you for signing up to My Web Store!', $result['emailBody']['content']);
+        $this->assertContains('Thank you for signing up to My Web Store!', $result['body']);
 
         return $result['id'];
     }
