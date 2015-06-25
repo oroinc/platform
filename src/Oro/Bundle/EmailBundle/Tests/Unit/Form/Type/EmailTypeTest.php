@@ -18,6 +18,9 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailTypeTest extends TypeTestCase
 {
@@ -43,9 +46,21 @@ class EmailTypeTest extends TypeTestCase
             ->method('getName')
             ->will($this->returnValue(TranslatableEntityType::NAME));
 
+        $user = new User();
+        $user->setEmail('John Smith <john@example.com>');
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacade->expects($this->any())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
         $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
+        $genemuChoiceType  = new Select2Type('choice');
         $emailTemplateList = new EmailTemplateSelectType();
         $attachmentsType   = new EmailAttachmentsType();
+        $emailAddressFromType       = new EmailAddressFromType($securityFacade);
+        $emailAddressRecipientsType = new EmailAddressRecipientsType();
 
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -87,6 +102,9 @@ class EmailTypeTest extends TypeTestCase
                     $attachmentsType->getName()   => $attachmentsType,
                     ContextsSelectType::NAME      => $contextsSelectType,
                     'genemu_jqueryselect2_hidden' => new Select2Type('hidden'),
+                    $genemuChoiceType->getName()  => $genemuChoiceType,
+                    $emailAddressFromType->getName()       => $emailAddressFromType,
+                    $emailAddressRecipientsType->getName() => $emailAddressRecipientsType,
                 ],
                 []
             )
@@ -155,7 +173,11 @@ class EmailTypeTest extends TypeTestCase
                 [
                     'gridName' => 'test_grid',
                     'from' => 'John Smith <john@example.com>',
-                    'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
+                    'to' => [
+                        'John Smith 1 <john1@example.com>',
+                        '"John Smith 2" <john2@example.com>',
+                        'john3@example.com',
+                    ],
                     'subject' => 'Test subject',
                     'type' => 'text',
                     'attachments' => new ArrayCollection(),
@@ -169,9 +191,21 @@ class EmailTypeTest extends TypeTestCase
                 [
                     'gridName' => 'test_grid',
                     'from' => 'John Smith <john@example.com>',
-                    'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
-                    'cc' => 'John Smith 4 <john4@example.com>; "John Smith 5" <john5@example.com>; john6@example.com',
-                    'bcc' => 'John Smith 7 <john7@example.com>; "John Smith 8" <john8@example.com>; john9@example.com',
+                    'to' => [
+                        'John Smith 1 <john1@example.com>',
+                        '"John Smith 2" <john2@example.com>',
+                        'john3@example.com',
+                    ],
+                    'cc' => [
+                        'John Smith 4 <john4@example.com>',
+                        '"John Smith 5" <john5@example.com>',
+                        'john6@example.com',
+                    ],
+                    'bcc' => [
+                        'John Smith 7 <john7@example.com>',
+                        '"John Smith 8" <john8@example.com>',
+                        'john9@example.com',
+                    ],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                     'type' => 'text',
