@@ -255,7 +255,7 @@ class ImapEmailManager
      * @param Headers $headers - Headers
      * @param string $name - Key in $headers
      *
-     * @return array|string
+     * @return string
      */
     protected function getMessageId(Headers $headers, $name)
     {
