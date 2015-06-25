@@ -17,11 +17,11 @@ class StubMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
-     * Set instance of OwnershipMetadataInterface to `noOwnershipMetadata` property
+     * {@inheritDoc}
      */
-    protected function createNoOwnershipMetadata()
+    protected function getNoOwnershipMetadata()
     {
-        $this->noOwnershipMetadata = new OwnershipMetadata();
+        return new OwnershipMetadata();
     }
 
     /**

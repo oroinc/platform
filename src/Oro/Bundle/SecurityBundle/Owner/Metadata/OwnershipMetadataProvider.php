@@ -52,9 +52,9 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     /**
      * {@inheritDoc}
      */
-    protected function createNoOwnershipMetadata()
+    protected function getNoOwnershipMetadata()
     {
-        $this->noOwnershipMetadata = new OwnershipMetadata();
+        return new OwnershipMetadata();
     }
 
     /**
