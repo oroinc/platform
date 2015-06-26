@@ -88,9 +88,9 @@ class DynamicFieldsExtension extends \Twig_Extension
             $fieldConfigId = $field->getId();
 
             $fieldName = $fieldConfigId->getFieldName();
+            $fieldType = $fieldConfigId->getFieldType();
 
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
-            $fieldType = $fieldConfigId->getFieldType();
 
             $event = new ValueRenderEvent($entity, $value, $fieldConfigId);
             $this->eventDispatcher->dispatch(

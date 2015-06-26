@@ -15,16 +15,4 @@ class PlaceholderFilter
     {
         return $obj instanceof $className;
     }
-
-    /**
-     * Checks if given parameters are equals
-     *
-     * @param string $a
-     * @param string $b
-     * @return bool
-     */
-    public function isEqual($a, $b)
-    {
-        return $a == $b;
-    }
 }
