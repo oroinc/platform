@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * User config scope

@@ -39,7 +39,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     /**
      * @var OwnershipMetadataInterface
      */
-    protected $noOwnershipMetadata;
+    private $noOwnershipMetadata;
 
     /**
      * @var ContainerInterface
