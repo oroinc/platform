@@ -55,6 +55,16 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($chain->supports());
     }
 
+    public function testSupportsWithDefault()
+    {
+        $chain = new ChainMetadataProvider();
+        $this->assertFalse($chain->supports());
+
+        $default = $this->getMetadataProviderMock(false);
+        $chain = new ChainMetadataProvider([], $default);
+        $this->assertTrue($chain->supports());
+    }
+
     public function testGetMetadata()
     {
         $metadataFromMockProvider1 = ['label' => 'testLabel1'];
@@ -68,6 +78,19 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $result);
         $this->assertEquals($metadataFromMockProvider2, $result);
+    }
+
+    public function testGetMetadataFromDefault()
+    {
+        $metadata = ['label' => 'testLabel1'];
+
+        $default = $this->getMetadataProviderMock(true, $metadata);
+        $chain = new ChainMetadataProvider([], $default);
+
+        $result = $chain->getMetadata('stdClass');
+
+        $this->assertInternalType('array', $result);
+        $this->assertEquals($metadata, $result);
     }
 
     /**
@@ -155,7 +178,7 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider */
         $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
-        $provider->expects($this->once())
+        $provider->expects($this->any())
             ->method('supports')
             ->willReturn($isSupports);
         $provider->expects($isSupports && count($metadata) ? $this->once() : $this->never())

@@ -40,6 +40,7 @@ UPGRADE FROM 1.7 to 1.8
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
 - IMPORTANT: if you use the service method links in your `entity_config.yml` they should be replaced with the direct service method call. For example `my_service_method_link` should be replaced with `@my_service->method`.
 - Removed the method `initConfig` of the class `Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer`.
+- `Oro\Bundle\ConfigBundle\Config\UserScopeManager` is no longer depends on `security.context`. It is retreived from `service.container` directly inside
 
 ####ImportExportBundle
  - `Oro\Bundle\ImportExportBundle\Context\ContextInterface` added $incrementBy integer parameter for methods: incrementReadCount, incrementAddCount, incrementUpdateCount, incrementReplaceCount, incrementDeleteCount, incrementErrorEntriesCount
@@ -115,4 +116,5 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `getUserClass` deprecated, use `getBasicLevelClass` instead
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` added into `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` chain using tag `oro_security.owner.metadata_provider`
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension` - fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+- `Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener` constructor changed, it now accepts `Symfony\Component\DependencyInjection\ContainerInterface` as an argument to get rid of circular reference
 - ACL parameter `group_name` is now used to separate permissions in application scopes 
