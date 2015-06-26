@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Cache\ClearableCache;
+
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
@@ -9,7 +11,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -66,6 +67,26 @@ class ExtendConfigDumper
         $this->fieldTypeHelper = $fieldTypeHelper;
         $this->entityGenerator = $entityGenerator;
         $this->cacheDir        = $cacheDir;
+    }
+
+    /**
+     * Gets the cache directory
+     *
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+
+    /**
+     * Sets the cache directory
+     *
+     * @param string $cacheDir
+     */
+    public function setCacheDir($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -142,7 +163,19 @@ class ExtendConfigDumper
             }
         }
 
-        $this->entityGenerator->generate($schemas);
+        $cacheDir = $this->entityGenerator->getCacheDir();
+        if ($cacheDir === $this->cacheDir) {
+            $this->entityGenerator->generate($schemas);
+        } else {
+            $this->entityGenerator->setCacheDir($this->cacheDir);
+            try {
+                $this->entityGenerator->generate($schemas);
+                $this->entityGenerator->setCacheDir($cacheDir);
+            } catch (\Exception $e) {
+                $this->entityGenerator->setCacheDir($cacheDir);
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -167,9 +200,10 @@ class ExtendConfigDumper
             $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         }
 
-        /** @var ExtendClassMetadataFactory $metadataFactory */
-        $metadataFactory = $this->em->getMetadataFactory();
-        $metadataFactory->clearCache();
+        $metadataCacheDriver = $this->em->getMetadataFactory()->getCacheDriver();
+        if ($metadataCacheDriver instanceof ClearableCache) {
+            $metadataCacheDriver->deleteAll();
+        }
     }
 
     /**
