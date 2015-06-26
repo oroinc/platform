@@ -107,6 +107,9 @@ class EmailFlagManager implements LoggerAwareInterface
     {
         $folder = $emailUser->getFolder();
         $origin = $folder->getOrigin();
+        if (!$origin || !$origin->isActive()) {
+            return null;
+        }
         $emailFlagManagerLoader = $this->selectorEmailFlagManager->select($origin);
 
         return $emailFlagManagerLoader->select($folder, $this->em);
