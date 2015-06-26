@@ -35,7 +35,6 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-        $this->security = $this->getSecurity();
     }
 
     /**
@@ -117,9 +116,9 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
 
         if (!$this->security) {
             $this->security = $this->container->get('security.context');
-        }
 
-        $this->loadUserStoredSettings($this->security->getToken());
+            $this->loadUserStoredSettings($this->security->getToken());
+        }
 
         return $this->security;
     }
