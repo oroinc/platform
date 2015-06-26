@@ -62,7 +62,7 @@ class EmailRecipientsLoadListener
             return;
         }
 
-        $userEmailAddresses = $this->relatedEmailsProvider->getEmails($user);
+        $userEmailAddresses = array_keys($this->relatedEmailsProvider->getEmails($user));
         $recentlyUsedEmails = $this->getEmailRecipientRepository()
             ->getEmailsUsedInLast30Days($this->aclHelper, $userEmailAddresses, $event->getEmails(), $query, $limit);
         if (!$recentlyUsedEmails) {

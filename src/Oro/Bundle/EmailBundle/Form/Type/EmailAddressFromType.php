@@ -49,7 +49,9 @@ class EmailAddressFromType extends AbstractType
             return [];
         }
 
-        return array_flip($this->relatedEmailsProvider->getEmails($user));
+        $emails = array_values($this->relatedEmailsProvider->getEmails($user));
+
+        return array_combine($emails, $emails);
     }
 
     /**

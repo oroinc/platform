@@ -12,6 +12,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class RelatedEmailsProvider
 {
@@ -24,19 +26,31 @@ class RelatedEmailsProvider
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var NameFormatter */
+    protected $nameFormatter;
+
+    /** @var EmailAddressHelper */
+    protected $emailAddressHelper;
+
     /**
      * @param Registry $registry
      * @param ConfigProvider $entityConfigProvider
      * @param SecurityFacade $securityFacade
+     * @param NameFormatter $nameFormatter
+     * @param EmailAddressHelper $emailAddressHelper
      */
     public function __construct(
         Registry $registry,
         ConfigProvider $entityConfigProvider,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        NameFormatter $nameFormatter,
+        EmailAddressHelper $emailAddressHelper
     ) {
         $this->registry = $registry;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->securityFacade = $securityFacade;
+        $this->nameFormatter = $nameFormatter;
+        $this->emailAddressHelper = $emailAddressHelper;
     }
 
     /**
@@ -112,14 +126,31 @@ class RelatedEmailsProvider
 
             foreach ($value as $email) {
                 if (is_scalar($email)) {
-                    $emails[] = $email;
+                    $emails[$email] = $this->formatEmail($object, $email);
                 } elseif ($email instanceof EmailInterface) {
-                    $emails[] = $email->getEmail();
+                    $emails[$email->getEmail()] = $this->formatEmail($email->getEmailOwner(), $email->getEmail());
                 }
             }
         }
 
-        return array_combine($emails, $emails);
+        return $emails;
+    }
+
+    /**
+     * @param object|null $owner
+     * @param string $email
+     *
+     * @return string
+     */
+    protected function formatEmail($owner, $email)
+    {
+        if (!$owner) {
+            return $email;
+        }
+
+        $ownerName = $this->nameFormatter->format($owner);
+
+        return $this->emailAddressHelper->buildFullEmailAddress($email, $ownerName);
     }
 
     /**
