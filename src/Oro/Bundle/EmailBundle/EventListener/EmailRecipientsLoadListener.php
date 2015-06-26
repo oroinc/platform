@@ -53,7 +53,7 @@ class EmailRecipientsLoadListener
     /**
      * @param EmailRecipientsLoadEvent $event
      */
-    public function onLoad(EmailRecipientsLoadEvent $event)
+    public function loadRecentEmails(EmailRecipientsLoadEvent $event)
     {
         $query = $event->getQuery();
         $limit = $event->getRemainingLimit();
@@ -78,6 +78,57 @@ class EmailRecipientsLoadListener
                 ],
             ]
         ));
+    }
+
+    /**
+     * @param EmailRecipientsLoadEvent $event
+     */
+    public function loadContextEmails(EmailRecipientsLoadEvent $event)
+    {
+        $query = $event->getQuery();
+        $limit = $event->getRemainingLimit();
+
+        if (!$limit || !$event->getRelatedEntity()) {
+            return;
+        }
+
+        $emails = $this->relatedEmailsProvider->getEmails($event->getRelatedEntity(), 2);
+
+        $excludedEmails = $event->getEmails();
+        $filteredEmails = array_filter($emails, function ($email) use ($query, $excludedEmails) {
+            return !in_array($email, $excludedEmails) && stripos($email, $query) !== false;
+        });
+        if (!$filteredEmails) {
+            return;
+        }
+
+        $id = $this->translator->trans('oro.email.autocomplete.contexts');
+        $resultsId = null;
+        $results = $event->getResults();
+        foreach ($results as $recordId => $record) {
+            if ($record['text'] === $id) {
+                $resultsId = $recordId;
+
+                break;
+            }
+        }
+
+        $children = $this->createResultFromEmails(array_splice($filteredEmails, 0, $limit));
+        if ($resultsId !== null) {
+            $results[$resultsId]['children'] = array_merge($results[$resultsId]['children'], $children);
+        } else {
+            $results = array_merge(
+                $results,
+                [
+                    [
+                        'text'     => $id,
+                        'children' => $children,
+                    ],
+                ]
+            );
+        }
+
+        $event->setResults($results);
     }
 
     /**
