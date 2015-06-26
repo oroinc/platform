@@ -59,7 +59,7 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
             $token = $this->getSecurity()->getToken();
             if ($token) {
                 $user = $token->getUser();
-                if (is_object($user)) {
+                if ($user instanceof User) {
                     $scopeId = $user->getId() ?: 0;
                 }
             }
@@ -136,7 +136,7 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
 
         /** @var User $user */
         $user = $token->getUser();
-        if (is_object($user)) {
+        if ($user instanceof User) {
             foreach ($user->getGroups() as $group) {
                 $this->loadStoredSettings('group', $group->getId());
             }
