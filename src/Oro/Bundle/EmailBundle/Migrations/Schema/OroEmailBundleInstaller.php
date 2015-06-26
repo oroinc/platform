@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_4\OroEmailBundle as OroEmailBund
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_7\OroEmailBundle as OroEmailBundle17;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_8\OroEmailBundle as OroEmailBundle18;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_9\OroEmailBundle as OroEmailBundle19;
-use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\OroEmailBundle as OroEmailBundle112;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_14\OroEmailBundle as OroEmailBundle114;
 
 class OroEmailBundleInstaller implements Installation
 {
@@ -63,6 +63,6 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle18::addAttachmentRelation($schema);
         OroEmailBundle19::changeAttachmentRelation($schema);
 
-        OroEmailBundle112::addEmbeddedContentIdField($schema);
+        OroEmailBundle114::addEmbeddedContentIdField($schema);
     }
 }
