@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
+use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
 use Zend\Mail\Headers;
 use Zend\Mail\Header\HeaderInterface;
 use Zend\Mail\Header\AbstractAddressList;
@@ -113,6 +114,26 @@ class ImapEmailManager
     {
         return new ImapEmailIterator(
             $this->connector->findItems($query),
+            $this
+        );
+    }
+
+    /**
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     *
+     * @return ImapEmailIterator
+     */
+    public function getUnseenEmails($startDate, $endDate)
+    {
+        $query = sprintf(
+            'UNSEEN SINCE "%s" BEFORE "%s"',
+            $startDate->format('d-M-Y'),
+            $endDate->format('d-M-Y')
+        );
+
+        return new ImapMessageIterator(
+            $this->connector->findIds($query),
             $this
         );
     }

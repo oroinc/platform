@@ -81,7 +81,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             // register the current folder in the entity builder
             $this->emailEntityBuilder->setFolder($folder);
 
-            // build a search query
+            // build search query for emails sync
             $sqb = $this->manager->getSearchQueryBuilder();
             if ($origin->getSynchronizedAt() && $folder->getSynchronizedAt()) {
                 if ($folder->getType() === FolderType::SENT) {
@@ -93,12 +93,15 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             // sync emails using this search query
             $lastSynchronizedAt = $this->syncEmails($imapFolder, $sqb->get());
-
-            // update synchronization date for the current folder
             $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
 
-            $this->em->flush($folder);
+            $endDate = $folder->getSynchronizedAt();
+            $startDate = clone $endDate;
+            $startDate = $startDate->modify('-1 month');
 
+            $this->checkFlags($imapFolder, $startDate, $endDate);
+
+            $this->em->flush($folder);
             $this->cleanUp(true, $imapFolder->getFolder());
         }
 
@@ -106,6 +109,38 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
+    }
+
+    /**
+     * @param ImapEmailFolder $imapFolder
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     */
+    protected function checkFlags(ImapEmailfolder $imapFolder, $startDate, $endDate)
+    {
+        $emails = $this->manager->getUnseenEmails($startDate, $endDate);
+
+        foreach ($emails as $email) {
+            echo $email->getId()->getUid();
+        }
+
+/*        if ($uids) {
+            var_dump($uids);
+            $qb = $this->em->createQueryBuilder();
+
+            $emailUserIds = $qb->select('email_users.id')
+                ->from('OroImapBundle:ImapEmail', 'ie')
+                ->leftJoin('ie.email', 'email')
+                ->leftJoin('email.emailUsers', 'email_users')
+                ->andWhere('ie.imapFolder = :imap_folder')
+                ->andWhere($qb->expr()->in('ie.uid', ':uids'))
+                ->setParameter('imap_folder', $imapFolder)
+                ->setParameter('uids', $uids)
+                ->getQuery()->getArrayResult();
+
+            var_dump($emailUserIds);
+            exit;
+        }*/
     }
 
     /**
