@@ -35,7 +35,6 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-        $this->security = $this->getSecurity();
     }
 
     /**
@@ -60,7 +59,7 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
             $token = $this->getSecurity()->getToken();
             if ($token) {
                 $user = $token->getUser();
-                if (is_object($user)) {
+                if ($user instanceof User) {
                     $scopeId = $user->getId() ?: 0;
                 }
             }
@@ -117,9 +116,9 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
 
         if (!$this->security) {
             $this->security = $this->container->get('security.context');
-        }
 
-        $this->loadUserStoredSettings($this->security->getToken());
+            $this->loadUserStoredSettings($this->security->getToken());
+        }
 
         return $this->security;
     }
@@ -137,7 +136,7 @@ class UserScopeManager extends AbstractScopeManager implements ContainerAwareInt
 
         /** @var User $user */
         $user = $token->getUser();
-        if (is_object($user)) {
+        if ($user instanceof User) {
             foreach ($user->getGroups() as $group) {
                 $this->loadStoredSettings('group', $group->getId());
             }

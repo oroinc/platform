@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -15,7 +16,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-class ConsoleContextListener
+class ConsoleContextListener implements ContainerAwareInterface
 {
     const OPTION_USER         = 'current-user';
     const OPTION_ORGANIZATION = 'current-organization';
@@ -23,29 +24,58 @@ class ConsoleContextListener
     /**
      * @var ContainerInterface
      */
-    protected $container;
+    private $container;
 
     /**
      * @var ManagerRegistry
      */
-    protected $registry;
+    private $registry;
 
     /**
      * @var SecurityContextInterface
      */
-    protected $securityContext;
+    private $securityContext;
 
     /**
      * @var UserManager
      */
-    protected $userManager;
+    private $userManager;
 
     /**
-     * @param ContainerInterface $container
+     * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer()
+    {
+        if (!$this->container) {
+            throw new \InvalidArgumentException('ContainerInterface is not injected');
+        }
+
+        return $this->container;
+    }
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param SecurityContextInterface $securityContext
+     * @param UserManager $userManager
+     *
+     * @deprecated since 1.8, inject @service_container via setContainer instead
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        SecurityContextInterface $securityContext,
+        UserManager $userManager
+    ) {
+        $this->registry = $registry;
+        $this->securityContext = $securityContext;
+        $this->userManager = $userManager;
     }
 
     /**
@@ -170,7 +200,7 @@ class ConsoleContextListener
     protected function getRegistry()
     {
         if (!$this->registry) {
-            $this->registry = $this->container->get('doctrine');
+            $this->registry = $this->getContainer()->get('doctrine');
         }
 
         return $this->registry;
@@ -182,7 +212,7 @@ class ConsoleContextListener
     protected function getSecurityContext()
     {
         if (!$this->securityContext) {
-            $this->securityContext = $this->container->get('security.context');
+            $this->securityContext = $this->getContainer()->get('security.context');
         }
 
         return $this->securityContext;
@@ -194,7 +224,7 @@ class ConsoleContextListener
     protected function getUserManager()
     {
         if (!$this->userManager) {
-            $this->userManager = $this->container->get('oro_user.manager');
+            $this->userManager = $this->getContainer()->get('oro_user.manager');
         }
 
         return $this->userManager;
