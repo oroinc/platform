@@ -115,4 +115,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `getUserClass` deprecated, use `getBasicLevelClass` instead
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` added into `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` chain using tag `oro_security.owner.metadata_provider`
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension` - fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
-- `Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener` constructor changed, it now accepts `Symfony\Component\DependencyInjection\ContainerInterface` as an argument to get rid of circular reference
+- Class methods and constructors deprecated, please inject `@service_container` and appropriate methods instead
+    * `Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener` defined using `oro_security.listener.console_context_listener` service
+    * `Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker` defined using `oro_security.owner.decision_maker` service
+    * `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` defined using `oro_security.owner.ownership_metadata_provider` service
