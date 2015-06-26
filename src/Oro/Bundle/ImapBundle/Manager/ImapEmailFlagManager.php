@@ -4,9 +4,9 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Zend\Mail\Storage;
 
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -53,6 +53,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     public function setFlags(EmailFolder $folder, Email $email, $flags)
     {
         $uid = $this->getUid($folder->getId(), $email->getId());
+        $this->connector->selectFolder($folder->getFullName());
         $this->connector->setFlags($uid, $flags);
     }
 

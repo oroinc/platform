@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
@@ -12,8 +15,10 @@ use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
  * Class EmailFlagManager
  * @package Oro\Bundle\EmailBundle\Manager
  */
-class EmailFlagManager
+class EmailFlagManager implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var EntityManager */
     protected $em;
 
@@ -77,10 +82,17 @@ class EmailFlagManager
      */
     public function changeStatusSeen(EmailUser $entity, $toSeen)
     {
-        if ($toSeen) {
-            $this->setSeen($entity);
-        } else {
-            $this->setUnseen($entity);
+        try {
+            if ($toSeen) {
+                $this->setSeen($entity);
+            } else {
+                $this->setUnseen($entity);
+            }
+        } catch (\Exception $ex) {
+            $this->logger->notice(
+                sprintf('Set email flag failed. EmailUser id: %d. Error: %s.', $entity->getId(), $ex->getMessage()),
+                ['exception' => $ex]
+            );
         }
     }
 
