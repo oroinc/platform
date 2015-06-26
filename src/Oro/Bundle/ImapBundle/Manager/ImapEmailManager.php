@@ -23,6 +23,7 @@ use Oro\Bundle\ImapBundle\Util\DateTimeParser;
  * @package Oro\Bundle\ImapBundle\Manager
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImapEmailManager
 {
