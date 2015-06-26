@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;

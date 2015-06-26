@@ -37,11 +37,6 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     protected $localCache = [];
 
     /**
-     * @var OwnershipMetadataInterface
-     */
-    private $noOwnershipMetadata;
-
-    /**
      * @var ContainerInterface
      */
     private $container;

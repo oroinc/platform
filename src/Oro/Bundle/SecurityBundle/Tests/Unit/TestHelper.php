@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class TestHelper
 {

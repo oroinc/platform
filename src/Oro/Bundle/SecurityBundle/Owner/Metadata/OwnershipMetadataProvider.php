@@ -45,6 +45,11 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     protected $userClass;
 
     /**
+     * @var OwnershipMetadataProvider
+     */
+    private $noOwnershipMetadata;
+
+    /**
      * @param array               $owningEntityNames
      * @param ConfigProvider      $configProvider
      * @param EntityClassResolver $entityClassResolver

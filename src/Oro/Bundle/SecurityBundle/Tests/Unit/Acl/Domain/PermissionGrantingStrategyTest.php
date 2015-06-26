@@ -12,7 +12,7 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\PermissionGrantingStrategyContext;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;

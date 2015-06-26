@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
