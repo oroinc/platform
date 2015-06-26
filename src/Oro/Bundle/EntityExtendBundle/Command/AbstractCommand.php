@@ -3,13 +3,13 @@
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Doctrine\Common\Cache\ClearableCache;
-use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
-use Symfony\Component\Console\Input\ArrayInput;
+
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application as ConsoleApplication;
 
+use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 

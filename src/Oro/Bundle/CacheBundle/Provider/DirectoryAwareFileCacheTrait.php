@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CacheBundle\Provider;
 
 /**
- * Provides an algorithm to generate short name of cache file.
+ * Allows to change a file cache directory.
  *
  * This trait can be used in a cache implementation bases on \Doctrine\Common\Cache\FileCache
  *

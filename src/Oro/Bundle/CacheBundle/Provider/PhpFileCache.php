@@ -10,6 +10,7 @@ use Doctrine\Common\Cache\PhpFileCache as BasePhpFileCache;
  *    We can do not use additional sha256 encoding used in the original FilesystemCache class
  *    because $id passed to getFilename is quite unique itself.
  * 2) Provide a way to synchronize a cache between different processes.
+ * 3) Allow to change a file cache directory.
  */
 class PhpFileCache extends BasePhpFileCache implements SyncCacheInterface, DirectoryAwareFileCacheInterface
 {
