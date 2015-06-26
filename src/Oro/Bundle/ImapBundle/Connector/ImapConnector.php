@@ -188,6 +188,7 @@ class ImapConnector
     {
         $this->ensureConnected();
         $id = $this->imap->getNumberByUniqueId($uid);
+
         try {
             $this->imap->setFlags($id, $flags);
         } catch (InvalidArgumentException $ex) {

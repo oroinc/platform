@@ -46,7 +46,8 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
      */
     public function setFlags(EmailFolder $folder, Email $email, $flags)
     {
-        $uid = $this->getUid($folder->getId(), $email->getId());
+        $repoImapEmail = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $uid = $repoImapEmail->getUid($folder->getId(), $email->getId());
         $this->connector->setFlags($uid, $flags);
     }
 
@@ -64,24 +65,5 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     public function setFlagSeen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [Storage::FLAG_SEEN]);
-    }
-
-    /**
-     * @param integer $folder - id of Folder
-     * @param integer $email  - id of Email
-     * @return integer|false
-     */
-    protected function getUid($folder, $email)
-    {
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
-        $query = $repo->createQueryBuilder('e')
-            ->select('e.uid')
-            ->innerJoin('e.imapFolder', 'if')
-            ->where('e.email = ?1 AND if.folder = ?2')
-            ->setParameter(1, $email)
-            ->setParameter(2, $folder)
-            ->getQuery();
-
-        return $query->getSingleScalarResult();
     }
 }

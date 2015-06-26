@@ -99,4 +99,23 @@ class ImapEmailRepository extends EntityRepository
 
         return $rows;
     }
+
+    /**
+     * @param integer $folder - id of Folder
+     * @param integer $email  - id of Email
+     *
+     * @return integer|false
+     */
+    public function getUid($folder, $email)
+    {
+        $query = $this->createQueryBuilder('e')
+            ->select('e.uid')
+            ->innerJoin('e.imapFolder', 'if')
+            ->where('e.email = ?1 AND if.folder = ?2')
+            ->setParameter(1, $email)
+            ->setParameter(2, $folder)
+            ->getQuery();
+
+        return $query->getSingleScalarResult();
+    }
 }
