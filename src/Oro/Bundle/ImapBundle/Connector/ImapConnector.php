@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Connector;
 
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
@@ -172,6 +173,29 @@ class ImapConnector
         $this->ensureConnected();
 
         return $this->imap->getUidValidity();
+    }
+
+    /**
+     * Set flags for massage in origin
+     *
+     * @param string $uid   - The UID of a message
+     * @param array  $flags - array of flags
+     *
+     * @return $this;
+     */
+    public function setFlags($uid, $flags)
+    {
+        $this->ensureConnected();
+        $id = $this->imap->getNumberByUniqueId($uid);
+        try {
+            $this->imap->setFlags($id, $flags);
+        } catch(InvalidArgumentException $ex) {
+            // TODO: add handler
+        } catch(\Exception $ex) {
+            // TODO: add handler
+        }
+
+        return $this;
     }
 
     /**

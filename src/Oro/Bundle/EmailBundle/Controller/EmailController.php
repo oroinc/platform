@@ -50,7 +50,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-        $this->setSeenStatus($entity);
+        $this->getEmailManager()->setSeenStatus($entity);
 
         return [
             'entity' => $entity,
@@ -68,7 +68,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        $this->setSeenStatus($entity);
+        $this->getEmailManager()->setSeenStatus($entity);
         
         return ['entity' => $entity];
     }
@@ -402,7 +402,7 @@ class EmailController extends Controller
         $responseData = [
             'entity' => $emailModel,
             'saved' => false,
-            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature'),
+            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature')
         ];
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;
@@ -512,19 +512,5 @@ class EmailController extends Controller
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
-    }
-
-    /**
-     * @param Email $entity
-     */
-    protected function setSeenStatus(Email $entity)
-    {
-        // todo: CRM-2482 - move to manager
-        $emailUser = $this->getDoctrine()->getManager()
-            ->getRepository('OroEmailBundle:EmailUser')
-            ->findByEmailAndOwner($entity, $this->getUser());
-        if ($emailUser) {
-            $this->getEmailManager()->setEmailUserSeen($emailUser, true, true);
-        }
     }
 }

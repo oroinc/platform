@@ -7,6 +7,8 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
+use Symfony\Component\Security\Core\SecurityContext;
 
 class EmailManager
 {
@@ -24,34 +26,69 @@ class EmailManager
     protected $em;
 
     /**
-     * @param EntityManager $em
-     * @param EmailThreadManager $emailThreadManager
-     * @param EmailThreadProvider $emailThreadProvider
+     * @var EmailFlagManager
+     */
+    protected $emailFlagManager;
+
+    /**
+     * @var SecurityContext
+     */
+    protected $securityContext;
+
+    /**
+     * Constructor
+     *
+     * @param EntityManager       $em                  - Entity Manager
+     * @param EmailThreadManager  $emailThreadManager  - Email Thread Manager
+     * @param EmailThreadProvider $emailThreadProvider - Email Thread Provider
+     * @param EmailFlagManager    $emailFlagManager    - Email Flag Manager
+     * @param SecurityContext     $securityContext     - Security Context
      */
     public function __construct(
         EntityManager $em,
         EmailThreadManager $emailThreadManager,
-        EmailThreadProvider $emailThreadProvider
+        EmailThreadProvider $emailThreadProvider,
+        EmailFlagManager $emailFlagManager,
+        SecurityContext $securityContext
     ) {
         $this->em = $em;
         $this->emailThreadManager = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
+        $this->emailFlagManager = $emailFlagManager;
+        $this->securityContext = $securityContext;
     }
 
     /**
      * Set email seen status
      *
-     * @param EmailUser $entity
-     * @param bool $value
+     * @param EmailUser $entity - entity
+     * @param bool      $value  - value for value filed EmailUser entity
+     * @param bool      $flush  - if $flush is true then method executes flush
+     *
+     * @return void
      */
     public function setEmailUserSeen(EmailUser $entity, $value = true, $flush = false)
     {
         if ($entity->isSeen() !== $value) {
+            $this->emailFlagManager->changeStatusSeen($entity, $value);
+
             $entity->setSeen($value);
             $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
             if ($flush) {
                 $this->em->flush();
             }
+        }
+    }
+
+    /**
+     * @param Email $entity
+     */
+    public function setSeenStatus(Email $entity)
+    {
+        $emailUser = $this->getCurrentEmailUser($entity);
+
+        if ($emailUser) {
+            $this->setEmailUserSeen($emailUser, true, true);
         }
     }
 
@@ -108,5 +145,21 @@ class EmailManager
         }
         $this->em->persist($entity);
         $this->em->flush();
+    }
+
+    /**
+     * Find EmilUser User logged in system
+     *
+     * @param Email $entity - entity Email
+     *
+     * @return null|EmailUser
+     */
+    protected function getCurrentEmailUser(Email $entity)
+    {
+        $user = $this->securityContext->getToken()->getUser();
+        $emailUser = $this->em->getRepository('OroEmailBundle:EmailUser')
+            ->findByEmailAndOwner($entity, $user);
+
+        return $emailUser;
     }
 }
