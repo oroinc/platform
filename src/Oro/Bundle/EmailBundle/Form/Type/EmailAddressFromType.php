@@ -6,8 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 
 class EmailAddressFromType extends AbstractType
 {
@@ -16,12 +16,17 @@ class EmailAddressFromType extends AbstractType
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var RelatedEmailsProvider */
+    protected $relatedEmailsProvider;
+
     /**
      * @param SecurityFacade $securityFacade
+     * @param RelatedEmailsProvider $relatedEmailsProvider
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(SecurityFacade $securityFacade, RelatedEmailsProvider $relatedEmailsProvider)
     {
         $this->securityFacade = $securityFacade;
+        $this->relatedEmailsProvider = $relatedEmailsProvider;
     }
 
     /**
@@ -44,13 +49,7 @@ class EmailAddressFromType extends AbstractType
             return [];
         }
 
-        $emails = array_map(function (Email $email) {
-            return $email->getEmail();
-        }, $user->getEmails()->toArray());
-
-        $allEmails = array_merge([$user->getEmail()], $emails);
-
-        return array_combine($allEmails, $allEmails);
+        return array_flip($this->relatedEmailsProvider->getEmails($user));
     }
 
     /**

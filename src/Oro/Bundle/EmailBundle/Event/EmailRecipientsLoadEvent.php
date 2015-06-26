@@ -51,14 +51,6 @@ class EmailRecipientsLoadEvent extends Event
     /**
      * @return int
      */
-    public function getOffset()
-    {
-        return $this->offset;
-    }
-
-    /**
-     * @return int
-     */
     public function getLimit()
     {
         return $this->limit;

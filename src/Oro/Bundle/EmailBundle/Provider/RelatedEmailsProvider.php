@@ -6,11 +6,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class RelatedEmailsProvider
 {
@@ -20,12 +20,22 @@ class RelatedEmailsProvider
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /**
+     * @param Registry $registry
+     * @param ConfigProvider $entityConfigProvider
+     */
     public function __construct(Registry $registry, ConfigProvider $entityConfigProvider)
     {
         $this->registry = $registry;
         $this->entityConfigProvider = $entityConfigProvider;
     }
 
+    /**
+     * @param object $object
+     * @param int $depth
+     *
+     * @return array
+     */
     public function getEmails($object, $depth = 1)
     {
         $emails = [];
