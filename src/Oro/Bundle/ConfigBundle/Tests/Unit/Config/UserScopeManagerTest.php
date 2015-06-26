@@ -135,7 +135,7 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
             [$this->om]
         );
 
-        $object->expects($this->exactly(3))->method('loadStoredSettings');
+        $object->expects($this->never())->method('loadStoredSettings');
 
         $object->setContainer($this->container);
 
@@ -151,7 +151,7 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
             [$this->om]
         );
 
-        $object->expects($this->exactly(6))->method('loadStoredSettings');
+        $object->expects($this->exactly(3))->method('loadStoredSettings');
 
         $object->setContainer($this->container);
         $object->setSecurity($this->security);
