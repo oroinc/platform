@@ -49,7 +49,7 @@ class EmailController extends RestController
      *      description="Get all emails",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function cgetAction()
@@ -69,7 +69,7 @@ class EmailController extends RestController
     }
 
     /**
-     * Get email.
+     * REST GET item
      *
      * @param string $id
      *
@@ -82,7 +82,7 @@ class EmailController extends RestController
      *      description="Get email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAction($id)
@@ -99,7 +99,7 @@ class EmailController extends RestController
      *      description="Update email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_update")
+     * @AclAncestor("oro_email_email_edit")
      * @return Response
      */
     public function putAction($id)
@@ -114,7 +114,7 @@ class EmailController extends RestController
      *      description="Create new email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_create")
+     * @AclAncestor("oro_email_email_edit")
      */
     public function postAction()
     {
@@ -131,7 +131,7 @@ class EmailController extends RestController
      *      resource=true
      * )
      *
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      *
      * @return Response
      */
@@ -142,6 +142,7 @@ class EmailController extends RestController
         if (!$email) {
             return $this->buildNotFoundResponse();
         }
+
 
         $result = $this->getManager()->getEmailContext($email);
 
@@ -172,5 +173,16 @@ class EmailController extends RestController
     public function getFormHandler()
     {
         return $this->get('oro_email.form.handler.email.api');
+    }
+
+    /**
+     * @param string $attribute
+     * @param Email $email
+     *
+     * @return bool
+     */
+    protected function assertEmailAccessGranted($attribute, Email $email)
+    {
+        return $this->get('oro_security.security_facade')->isGranted($attribute, $email);
     }
 }
