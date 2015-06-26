@@ -32,11 +32,23 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function (e) {
-            if (this.column.get("editable")) {
-                e.stopPropagation();
+        render: function () {
+            var render = SelectCell.__super__.render.apply(this, arguments);
+
+            if (this.column.get('editable')) {
+                this.enterEditMode();
             }
-            return SelectCell.__super__.enterEditMode.apply(this, arguments);
+
+            return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        exitEditMode: function () {
+            this.$el.removeClass("error");
+            this.stopListening(this.currentEditor);
+            delete this.currentEditor;
         }
     });
 
