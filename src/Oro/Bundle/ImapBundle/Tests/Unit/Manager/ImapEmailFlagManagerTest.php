@@ -19,7 +19,7 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $repo;
+    private $repoImapEmail;
 
     protected function setUp()
     {
@@ -31,7 +31,7 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repo = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository')
+        $this->repoImapEmail = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -42,15 +42,15 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
     {
         $folderId = 1;
         $emailId = 2;
-        $flags = ['UNSEEN'];
+        $flags = [];
 
-        $this->repo->expects($this->once())
+        $this->repoImapEmail->expects($this->once())
             ->method('getUid')
             ->will($this->returnValue(1))
             ->with($folderId,$emailId);
 
         $this->em->expects($this->once())
-            ->method('getRepository')->willReturn($this->repo);
+            ->method('getRepository')->willReturn($this->repoImapEmail);
 
         $this->connector->expects($this->once())
             ->method('setFlags')
@@ -75,15 +75,15 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
     {
         $folderId = 1;
         $emailId = 2;
-        $flags = [ImapEmailFlagManager::UNSEEN];
+        $flags = [ImapEmailFlagManager::FLAG_SEEN];
 
-        $this->repo->expects($this->once())
+        $this->repoImapEmail->expects($this->once())
             ->method('getUid')
             ->will($this->returnValue(1))
             ->with($folderId,$emailId);
 
         $this->em->expects($this->once())
-            ->method('getRepository')->willReturn($this->repo);
+            ->method('getRepository')->willReturn($this->repoImapEmail);
 
         $this->connector->expects($this->once())
             ->method('setFlags')
@@ -108,15 +108,15 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
     {
         $folderId = 1;
         $emailId = 2;
-        $flags = ['UNSEEN'];
+        $flags = [ImapEmailFlagManager::FLAG_UNSEEN];
 
-        $this->repo->expects($this->once())
+        $this->repoImapEmail->expects($this->once())
             ->method('getUid')
             ->will($this->returnValue(1))
             ->with($folderId,$emailId);
 
         $this->em->expects($this->once())
-            ->method('getRepository')->willReturn($repo);
+            ->method('getRepository')->willReturn($this->repoImapEmail);
 
         $this->connector->expects($this->once())
             ->method('setFlags')

@@ -202,4 +202,35 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->toggleEmailUserSeen($emailUser);
     }
+
+    public function testsetSeenStatus() {
+        $entity = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $owner      = $this->getMock($ownerClass);
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($owner);
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $repo = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
+        ->disableOriginalConstructor()->getMock();
+
+        $repo->expects($this->once())->method('findByEmailAndOwner')->willReturn(1);
+
+        $this->em->expects($this->once())->method('getRepository')->will($this->returnValue($repo));
+
+        $this->manager->setSeenStatus($entity);
+    }
 }
