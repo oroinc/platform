@@ -59,6 +59,37 @@ class EmailFolder
     protected $type;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="id_checked", type="boolean", options={"default"=false})
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $checked = false;
+
+    /**
+     * @var EmailFolder $folder
+     *
+     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="subFolders")
+     * @ORM\JoinColumn(
+     *  name="parent_folder_id", referencedColumnName="id",
+     *  nullable=true, onDelete="CASCADE")
+     * @JMS\Exclude
+     */
+    protected $parentFolder;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="EmailFolder",
+     *  mappedBy="parentFolder",
+     *  cascade={"persist", "remove"},
+     *  orphanRemoval=true)
+     */
+    protected $subFolders;
+
+    /**
      * @var EmailOrigin
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="folders")
@@ -88,6 +119,11 @@ class EmailFolder
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $emailUsers;
+
+    public function __construct()
+    {
+        $this->subFolders = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -167,6 +203,78 @@ class EmailFolder
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Is folder checked for sync
+     *
+     * @return bool
+     */
+    public function isChecked()
+    {
+        return $this->checked;
+    }
+
+    /**
+     * Set folder checked for sync
+     *
+     * @param boolean $checked
+     *
+     * @return $this
+     */
+    public function setChecked($checked)
+    {
+        $this->checked = (bool)$checked;
+
+        return $this;
+    }
+
+    /**
+     * Get sub folders
+     *
+     * @return EmailFolder[]
+     */
+    public function getSubFolders()
+    {
+        return $this->subFolders;
+    }
+
+    /**
+     * Add sub folder
+     *
+     * @param  EmailFolder $folder
+     *
+     * @return EmailOrigin
+     */
+    public function addSubFolder(EmailFolder $folder)
+    {
+        $this->subFolders->add($folder);
+
+        return $this;
+    }
+
+    /**
+     * Get parent folder
+     *
+     * @return EmailFolder[]
+     */
+    public function getParentFolder()
+    {
+        return $this->parentFolder;
+    }
+
+    /**
+     * Set parent folder
+     *
+     * @param  EmailFolder $folder
+     *
+     * @return EmailOrigin
+     */
+    public function setParentFolder(EmailFolder $folder)
+    {
+        $this->parentFolder = $folder;
 
         return $this;
     }
