@@ -11,6 +11,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class RelatedEmailsProvider
 {
@@ -20,14 +21,22 @@ class RelatedEmailsProvider
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param Registry $registry
      * @param ConfigProvider $entityConfigProvider
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(Registry $registry, ConfigProvider $entityConfigProvider)
-    {
+    public function __construct(
+        Registry $registry,
+        ConfigProvider $entityConfigProvider,
+        SecurityFacade $securityFacade
+    ) {
         $this->registry = $registry;
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -40,7 +49,7 @@ class RelatedEmailsProvider
     {
         $emails = [];
 
-        if (!$depth) {
+        if (!$depth || !$this->securityFacade->isGranted('VIEW', $object)) {
             return $emails;
         }
 
