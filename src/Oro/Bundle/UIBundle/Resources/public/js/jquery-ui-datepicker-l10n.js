@@ -37,7 +37,7 @@ define(function(require) {
     };
     $.datepicker.setDefaults($.datepicker.regional[locale]);
 
-    (function () {
+    (function() {
         var _gotoToday = $.datepicker._gotoToday,
             _updateDatepicker = $.datepicker._updateDatepicker;
 
@@ -45,7 +45,7 @@ define(function(require) {
          * Select today Date takes in account system timezone
          * @inheritDoc
          */
-        $.datepicker._gotoToday = function (id) {
+        $.datepicker._gotoToday = function(id) {
             var inst = this._getInst($(id)[0]),
                 now = moment.tz(localeSettings.getTimeZone());
 
@@ -65,7 +65,7 @@ define(function(require) {
          * Today Date highlight takes in account system timezone
          * @inheritDoc
          */
-        $.datepicker._updateDatepicker = function (inst) {
+        $.datepicker._updateDatepicker = function(inst) {
             var today = moment.tz(localeSettings.getTimeZone());
 
             _updateDatepicker.apply(this, arguments);

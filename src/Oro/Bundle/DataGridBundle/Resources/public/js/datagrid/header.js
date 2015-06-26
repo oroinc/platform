@@ -5,7 +5,7 @@ define([
     'backbone',
     'backgrid',
     './header-cell/header-cell'
-], function (_, Backbone, Backgrid, HeaderCell) {
+], function(_, Backbone, Backgrid, HeaderCell) {
     "use strict";
 
     var Header;
@@ -30,7 +30,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
             }
@@ -55,11 +55,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.row.cells, function (cell) {
+            _.each(this.row.cells, function(cell) {
                 cell.dispose();
             });
             delete this.row.cells;

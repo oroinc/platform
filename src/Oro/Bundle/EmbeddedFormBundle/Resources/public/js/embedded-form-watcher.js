@@ -6,23 +6,23 @@ define([
     'oroui/js/mediator',
     'orotranslation/js/translator',
     'oroui/js/delete-confirmation'
-], function ($, Backbone, routing, mediator, __, DeleteConfirmation) {
+], function($, Backbone, routing, mediator, __, DeleteConfirmation) {
 
-        var $formTypeField;
-        var $cssField;
-        var $successMessageField;
+    var $formTypeField;
+    var $cssField;
+    var $successMessageField;
 
-        var rememberedFormType;
-        var rememberedCss;
-        var rememberedSuccessMessage;
+    var rememberedFormType;
+    var rememberedCss;
+    var rememberedSuccessMessage;
 
-        var blockNextRequest;
+    var blockNextRequest;
 
-        function isFormStateChanged(currentCss, currentSuccessMessage) {
+    function isFormStateChanged(currentCss, currentSuccessMessage) {
             return !(currentCss === rememberedCss && currentSuccessMessage === rememberedSuccessMessage);
         }
 
-        function processFormTypeChange() {
+    function processFormTypeChange() {
             if (blockNextRequest) {
                 blockNextRequest = false;
                 return;
@@ -40,17 +40,17 @@ define([
                 okText: __('embedded_form.confirm_box.ok_text'),
                 content: __('embedded_form.confirm_box.content')
             });
-            confirm.on('ok', function () {
+            confirm.on('ok', function() {
                 requestDefaultFormTypeData(currentFormType);
             });
-            confirm.on('cancel', function () {
+            confirm.on('cancel', function() {
                 blockNextRequest = true;
                 $formTypeField.val(rememberedFormType).trigger('change');
             });
             confirm.open();
         }
 
-        function requestDefaultFormTypeData(formType) {
+    function requestDefaultFormTypeData(formType) {
             if (!formType) {
                 return;
             }
@@ -58,20 +58,20 @@ define([
             mediator.execute('showLoading');
             var url = routing.generate('oro_embedded_form_default_data', {'formType': formType});
             var css = $.get(url)
-                .done(function (data, code, response) {
+                .done(function(data, code, response) {
                     $cssField.val(data.css);
                     $successMessageField.val(data.successMessage);
 
                     rememberedCss = data.css;
                     rememberedSuccessMessage = data.successMessage;
                     rememberedFormType = formType;
-                }).always(function () {
+                }).always(function() {
                     mediator.execute('hideLoading');
                 });
         }
 
-        return Backbone.View.extend({
-            initialize: function (options) {
+    return Backbone.View.extend({
+            initialize: function(options) {
                 $formTypeField = $('#' + options.formTypeFieldId);
                 $cssField = $('#' + options.cssFieldId);
                 $successMessageField = $('#' + options.successMessageFieldId);
@@ -82,7 +82,7 @@ define([
 
                 blockNextRequest = false;
             },
-            startWatching: function (forceDataLoading) {
+            startWatching: function(forceDataLoading) {
                 $formTypeField.change(processFormTypeChange);
 
                 if (true === forceDataLoading) {
@@ -91,4 +91,4 @@ define([
             }
         });
 
-    });
+});

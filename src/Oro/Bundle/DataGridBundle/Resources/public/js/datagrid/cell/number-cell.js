@@ -4,7 +4,7 @@ define([
     'underscore',
     'backgrid',
     'orodatagrid/js/datagrid/formatter/number-formatter'
-], function (_, Backgrid, NumberFormatter) {
+], function(_, Backgrid, NumberFormatter) {
     'use strict';
 
     var NumberCell;
@@ -26,7 +26,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, options);
             NumberCell.__super__.initialize.apply(this, arguments);
             this.formatter = this.createFormatter();
@@ -37,14 +37,14 @@ define([
          *
          * @return {orodatagrid.datagrid.formatter.NumberFormatter}
          */
-        createFormatter: function () {
+        createFormatter: function() {
             return new this.formatterPrototype({style: this.style});
         },
 
         /**
          * @inheritDoc
          */
-        enterEditMode: function (e) {
+        enterEditMode: function(e) {
             if (this.column.get("editable")) {
                 e.stopPropagation();
             }

@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var TransitionsShortRowView,
@@ -27,7 +27,7 @@ define(function (require) {
             'change model': 'render'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-row-short-template').html();
             this.template = _.template(template);
@@ -38,7 +38,7 @@ define(function (require) {
             this.options.workflow.trigger('requestRemoveTransition', this.model);
         },
 
-        triggerEditTransition: function (e) {
+        triggerEditTransition: function(e) {
             e.preventDefault();
             this.options.workflow.trigger('requestEditTransition', this.model, this.options.stepFrom);
         },

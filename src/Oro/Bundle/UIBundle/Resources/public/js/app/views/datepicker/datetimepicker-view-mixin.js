@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var dateTimePickerViewMixin,
@@ -42,7 +42,7 @@ define(function (require) {
          * @returns {Object}
          * @protected
          */
-        _super: function () {
+        _super: function() {
             throw new Error('_super() should be defined');
         },
 
@@ -50,7 +50,7 @@ define(function (require) {
          * Initializes variable-date-time-picker view
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['timezone']));
             this._super().initialize.apply(this, arguments);
         },
@@ -63,7 +63,7 @@ define(function (require) {
          *
          * @override
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -82,7 +82,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        createFrontField: function (options) {
+        createFrontField: function(options) {
             var dialogBelowClass = 'datetimepicker-dialog-is-below';
             this._super().createFrontField.call(this, options);
             if (options.fieldsWrapper) {
@@ -94,9 +94,9 @@ define(function (require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
-            this.$frontDateField.on('blur', function (e) {
+            this.$frontDateField.on('blur', function(e) {
                 $(this).parent().removeClass(dialogBelowClass);
-            }).on('datepicker:dialogReposition', function (e, position) {
+            }).on('datepicker:dialogReposition', function(e, position) {
                 $(this).parent().toggleClass(dialogBelowClass, position === 'below');
             });
             this.$frontDateField.after(this.$frontTimeField);
@@ -107,23 +107,23 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initPickerWidget: function (options) {
+        initPickerWidget: function(options) {
             var widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
-            this.$frontTimeField.on('showTimepicker', function () {
+            this.$frontTimeField.on('showTimepicker', function() {
                 var $el = $(this),
                     needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
                 $el.parent().toggleClass('datetimepicker-dialog-is-below', needClass);
             });
-            this.$frontTimeField.on('hideTimepicker', function () {
+            this.$frontTimeField.on('hideTimepicker', function() {
                 $(this).parent().removeClass('datetimepicker-dialog-is-below');
             });
-            this.$frontDateField.on('blur', function () {
+            this.$frontDateField.on('blur', function() {
                 if ($(this).hasClass('error')) {
                     $(this).parent().removeClass('timepicker-error');
                 }
             });
-            this.$frontTimeField.on('blur', function () {
+            this.$frontTimeField.on('blur', function() {
                 $(this).parent().toggleClass('timepicker-error', $(this).hasClass('error'));
             });
             this._super().initPickerWidget.apply(this, arguments);
@@ -132,7 +132,7 @@ define(function (require) {
         /**
          * Destroys picker widget
          */
-        destroyTimePickerWidget: function () {
+        destroyTimePickerWidget: function() {
             this.$frontTimeField.timepicker('remove');
         },
 
@@ -141,7 +141,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        updateOrigin: function (e) {
+        updateOrigin: function(e) {
             this.checkConsistency(e.target);
             this._super().updateOrigin.apply(this, arguments);
             this.updateTimeFieldState();
@@ -150,7 +150,7 @@ define(function (require) {
         /**
          * Update front date and time fields values
          */
-        updateFront: function () {
+        updateFront: function() {
             this._super().updateFront.call(this);
             this.$frontTimeField.val(this.getFrontendFormattedTime());
             this.updateTimeFieldState();
@@ -161,7 +161,7 @@ define(function (require) {
          *
          * @param {HTMLElement} target
          */
-        checkConsistency: function (target) {
+        checkConsistency: function(target) {
             var date, time, isValidDate, isValidTime;
 
             date = this.$frontDateField.val();
@@ -194,7 +194,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedTime: function () {
+        getFrontendFormattedTime: function() {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
@@ -208,7 +208,7 @@ define(function (require) {
          *
          * @returns {moment}
          */
-        getFrontendMoment: function () {
+        getFrontendMoment: function() {
             var value, date, time, format, momentInstance;
             date = this.$frontDateField.val();
             time = this.$frontTimeField.val();
@@ -225,7 +225,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getBackendFormattedValue: function () {
+        getBackendFormattedValue: function() {
             var value = '',
                 momentInstance = this.getFrontendMoment(),
                 format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
@@ -240,7 +240,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedDate: function () {
+        getFrontendFormattedDate: function() {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
@@ -254,7 +254,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getTimeFormat: function () {
+        getTimeFormat: function() {
             return this.nativeMode ? this.nativeTimeFormat : datetimeFormatter.getTimeFormat();
         },
 
@@ -263,7 +263,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getSeparatorFormat: function () {
+        getSeparatorFormat: function() {
             return this.nativeMode ? ' ' : datetimeFormatter.getDateTimeFormatSeparator();
         },
 
@@ -272,7 +272,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getDateTimeFormat: function () {
+        getDateTimeFormat: function() {
             var dateFormat, timeFormat, separatorFormat;
             dateFormat = this.getDateFormat();
             timeFormat = this.getTimeFormat();

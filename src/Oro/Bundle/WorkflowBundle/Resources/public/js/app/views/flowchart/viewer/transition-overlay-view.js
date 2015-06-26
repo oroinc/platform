@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var FlowchartJsPlumbOverlayView = require('../jsplumb/overlay-view'),
         FlowchartViewerTransitionOverlayView;

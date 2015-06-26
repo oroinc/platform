@@ -1,11 +1,11 @@
 /*jslint nomen:true */
 /*global define, require*/
 define(['jquery', 'underscore', 'oroui/js/mediator'
-    ], function ($, _, mediator) {
+    ], function($, _, mediator) {
     'use strict';
 
-    var initHandler = function (collection) {
-        collection.on('beforeReset', function (collection, resp) {
+    var initHandler = function(collection) {
+        collection.on('beforeReset', function(collection, resp) {
             collection.state.totals = resp.options.totals;
         });
     };
@@ -22,11 +22,11 @@ define(['jquery', 'underscore', 'oroui/js/mediator'
          * @param {Object} [options.data] data for grid's collection
          * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function (deferred, options) {
-            options.gridPromise.done(function (grid) {
+        init: function(deferred, options) {
+            options.gridPromise.done(function(grid) {
                 initHandler(grid.collection);
                 deferred.resolve();
-            }).fail(function () {
+            }).fail(function() {
                 deferred.reject();
             });
         }

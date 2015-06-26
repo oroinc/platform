@@ -1,6 +1,6 @@
 /* global define */
 /** @exports WorkflowViewerComponent */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WorkflowViewerComponent,
@@ -18,14 +18,14 @@ define(function (require) {
     WorkflowViewerComponent = BaseComponent.extend(
         /** @lends WorkflowViewerComponent.prototype */{
 
-            initialize: function (options) {
+            initialize: function(options) {
                 WorkflowViewerComponent.__super__.initialize.apply(this, arguments);
                 this._sourceElement = options._sourceElement;
                 this.model = workflowModelFactory.createWorkflowModel(options);
                 this.initViews();
             },
 
-            initViews: function () {
+            initViews: function() {
                 flowchartTools.checkPositions(this.model);
                 this.flowchartView = new FlowchartViewerWorkflowView({
                     el: this._sourceElement.find('.workflow-flowchart'),

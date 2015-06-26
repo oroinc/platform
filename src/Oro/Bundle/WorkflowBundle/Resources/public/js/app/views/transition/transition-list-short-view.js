@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var TransitionsShortListView,
@@ -20,7 +20,7 @@ define(function (require) {
             stepFrom: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.rowViews = [];
 
@@ -52,7 +52,7 @@ define(function (require) {
         },
 
         resetView: function() {
-            _.each(this.rowViews, function (rowView) {
+            _.each(this.rowViews, function(rowView) {
                 rowView.remove();
             });
         },

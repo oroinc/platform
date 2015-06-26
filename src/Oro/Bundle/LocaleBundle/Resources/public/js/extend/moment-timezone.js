@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var moment = require('moment-timezone'),
@@ -11,7 +11,7 @@ define(function (require) {
      * @param {boolean=} keepTime flag if datetime have to be preserved as it is on timezone change
      * @returns {Moment|string|undefined} updated moment object or timezone name (if it is defined)
      */
-    moment.fn.tz = function (name, keepTime) {
+    moment.fn.tz = function(name, keepTime) {
         if (name) {
             this._z = moment.tz.zone(name);
             if (this._z) {

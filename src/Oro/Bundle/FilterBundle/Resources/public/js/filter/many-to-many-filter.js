@@ -2,7 +2,7 @@
 /*global define*/
 define([
     './choice-filter'
-], function (ChoiceFilter) {
+], function(ChoiceFilter) {
 
     /**
      * @export  oro/filter/many-to-many-filter

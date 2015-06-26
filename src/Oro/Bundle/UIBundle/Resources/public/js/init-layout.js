@@ -2,12 +2,12 @@
 /*jslint browser: true, nomen: true, vars: true*/
 /*global require*/
 
-require(['oroui/js/mediator'], function (mediator) {
+require(['oroui/js/mediator'], function(mediator) {
     'use strict';
-    mediator.once('page:afterChange', function () {
+    mediator.once('page:afterChange', function() {
         //@TODO remove delay, when afterChange event will
         // take in account rendering from inline scripts
-        setTimeout(function () {
+        setTimeout(function() {
             // emulates 'document ready state' for selenium tests
             document['page-rendered'] = true;
             mediator.trigger('page-rendered');
@@ -19,13 +19,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         'oroui/js/mediator', 'oroui/js/layout',
         'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
         'bootstrap', 'jquery-ui'
-    ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
+    ], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
     /* ============================================================
      * from layout.js
      * ============================================================ */
-    $(function () {
+    $(function() {
         var $pageTitle = $('#page-title');
         if ($pageTitle.size()) {
             document.title = $('<div.>').html($('#page-title').text()).text();
@@ -33,12 +33,12 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         layout.hideProgressBar();
 
         /* side bar functionality */
-        $('div.side-nav').each(function () {
+        $('div.side-nav').each(function() {
             var myParent = $(this),
                 myParentHolder = $(myParent).parent().height() - 18;
             $(myParent).height(myParentHolder);
             /* open close bar */
-            $(this).find("span.maximize-bar").click(function () {
+            $(this).find("span.maximize-bar").click(function() {
                 if (($(myParent).hasClass("side-nav-open")) || ($(myParent).hasClass("side-nav-locked"))) {
                     $(myParent).removeClass("side-nav-locked side-nav-open");
                     if ($(myParent).hasClass('left-panel')) {
@@ -65,7 +65,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             });
 
             /* lock&unlock bar */
-            $(this).find("span.lock-bar").click(function () {
+            $(this).find("span.lock-bar").click(function() {
                 if ($(this).hasClass("lock-bar-locked")) {
                     $(myParent).addClass("side-nav-open")
                         .removeClass("side-nav-locked");
@@ -88,9 +88,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             });
 
             /* open&close popup for bar items when bar is minimized. */
-            $(this).find('.bar-tools li').each(function () {
+            $(this).find('.bar-tools li').each(function() {
                 var myItem = $(this);
-                $(myItem).find('.sn-opener').click(function () {
+                $(myItem).find('.sn-opener').click(function() {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
 
                     var $barOverlay   = $('#bar-drop-overlay'),
@@ -100,16 +100,16 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                     $barOverlay.width(overlayWidth).height(overlayHeight);
                     $barOverlay.toggleClass('bar-open-overlay');
                 });
-                $(myItem).find("span.close").click(function () {
+                $(myItem).find("span.close").click(function() {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
                     $('#bar-drop-overlay').toggleClass('bar-open-overlay');
                 });
                 $('#bar-drop-overlay').on({
-                    click: function () {
+                    click: function() {
                         $(myItem).find("div.nav-box").animate({
                             opacity: 0,
                             display: 'none'
-                        }, function () {
+                        }, function() {
                             $(this).css({
                                 opacity: 1,
                                 display: 'none'
@@ -120,9 +120,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 });
             });
             /* open content for open bar */
-            $(myParent).find('ul.bar-tools > li').each(function () {
+            $(myParent).find('ul.bar-tools > li').each(function() {
                 var _barLi = $(this);
-                $(_barLi).find('span.open-bar-item').click(function () {
+                $(_barLi).find('span.open-bar-item').click(function() {
                     $(_barLi).find('div.nav-content').slideToggle();
                     $(_barLi).toggleClass('open-item');
                 });
@@ -133,18 +133,18 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
          * Oro Dropdown close prevent
          * ============================================================ */
         var dropdownToggles = $('.oro-dropdown-toggle');
-        dropdownToggles.click(function (e) {
+        dropdownToggles.click(function(e) {
             var $parent = $(this).parent().toggleClass('open');
             if ($parent.hasClass('open')) {
                 $parent.find('.dropdown-menu').focus();
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
-        $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
+        $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function(e) {
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
 
-        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function (e) {
+        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function(e) {
             if (e.keyCode === 27) {
                 $(e.currentTarget).parent().removeClass('open');
             }
@@ -157,12 +157,12 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         });
 
-        $(document).on('focus', '.select2-focusser, .select2-input', function (e) {
+        $(document).on('focus', '.select2-focusser, .select2-input', function(e) {
             $('.hasDatepicker').datepicker('hide')
         });
 
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
-        $('html').click(function (e) {
+        $('html').click(function(e) {
             var $target = $(e.target),
                 clickingTarget = null;
             if ($target.hasClass('dropdown') || $target.hasClass('oro-drop')) {
@@ -173,11 +173,11 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             $(openDropdownsSelector).not(clickingTarget).removeClass('open');
         });
 
-        $('#main-menu').mouseover(function () {
+        $('#main-menu').mouseover(function() {
             $(openDropdownsSelector).removeClass('open');
         });
 
-        mediator.on('page:beforeChange', function () {
+        mediator.on('page:beforeChange', function() {
             $('.dot-menu.dropdown.open, .nav .dropdown.open').removeClass('open');
             $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
         });
@@ -186,21 +186,21 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         });
 
         // fix + extend bootstrap.collapse functionality
-        $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function (e) {
+        $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function(e) {
             var $elem = $(e.target),
                 action = $elem.data('action').slice(10),
                 method = {'expand-all': 'show', 'collapse-all': 'hide'}[action],
                 $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
             $target.find('.collapse').collapse({toggle: false}).collapse(method);
         });
-        $(document).on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
+        $(document).on('click.collapse.data-api', '[data-toggle=collapse]', function(e) {
             var target, $toggle = $(this);
             target = $toggle.attr('data-target') || $toggle.attr('href');
             $toggle = $toggle.add('[data-target="' + target + '"], [href="' + target + '"]');
             $toggle.toggleClass('collapsed', !$(target).hasClass('in'));
         });
-        $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.accordion-body', function (e) {
-            if(e.target === e.currentTarget) {   // prevent processing if an event comes from child element
+        $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.accordion-body', function(e) {
+            if (e.target === e.currentTarget) {   // prevent processing if an event comes from child element
                 var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]:first');
                 $toggle.toggleClass('collapsed', e.type !== 'shown');
             }
@@ -211,13 +211,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
      * from height_fix.js
      * ============================================================ */
     //@TODO should be refactored in BAP-4020
-     $(function () {
+    $(function() {
         var anchor, content,
             initializeContent, adjustHeight,
             $main, $topPage, $leftPanel, $rightPanel;
 
         if (tools.isMobile()) {
-            adjustHeight = function () {
+            adjustHeight = function() {
                 layout.updateResponsiveLayout();
                 mediator.trigger('layout:reposition');
             }
@@ -226,7 +226,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             anchor = $('#bottom-anchor');
             content = false;
 
-            initializeContent = function () {
+            initializeContent = function() {
                 if (!content) {
                     content = $('.scrollable-container').filter(':parents(.ui-widget)');
                     if (!tools.isMobile()) {
@@ -241,7 +241,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             $topPage = $('#top-page');
             $leftPanel = $('#left-panel');
             $rightPanel = $('#right-panel');
-            adjustHeight = function () {
+            adjustHeight = function() {
                 initializeContent();
 
                 // set width for #main container
@@ -253,7 +253,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 var footerHeight = $('#footer:visible').height() || 0;
                 var fixContent = 1;
 
-                $(content.get().reverse()).each(function (pos, el) {
+                $(content.get().reverse()).each(function(pos, el) {
                     el = $(el);
                     el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
                 });
@@ -292,9 +292,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
 
             if ($('.sf-toolbar').length) {
-                adjustHeight = (function () {
+                adjustHeight = (function() {
                     var orig = adjustHeight;
-                    var waitForDebugBar = function (attempt) {
+                    var waitForDebugBar = function(attempt) {
                         if ($('.sf-toolbar').children().length) {
                             $('body').addClass('dev-mode');
                             _.delay(orig, 10);
@@ -303,7 +303,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                         }
                     };
 
-                    return _.wrap(adjustHeight, function (orig) {
+                    return _.wrap(adjustHeight, function(orig) {
                         $('body').removeClass('dev-mode');
                         orig();
                         waitForDebugBar(0);
@@ -312,7 +312,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         }
 
-        var adjustReloaded = function () {
+        var adjustReloaded = function() {
             content = false;
             adjustHeight();
         };
@@ -333,7 +333,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from form_buttons.js
      * ============================================================ */
-    $(document).on('click', '.action-button', function () {
+    $(document).on('click', '.action-button', function() {
         var actionInput = $('input[name = "input_action"]');
         actionInput.val($(this).attr('data-action'));
         $('#' + actionInput.attr('data-form-id')).submit();
@@ -342,8 +342,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from remove.confirm.js
      * ============================================================ */
-    $(function () {
-        $(document).on('click', '.remove-button', function (e) {
+    $(function() {
+        $(document).on('click', '.remove-button', function(e) {
             var el = $(this);
             if (!(el.is('[disabled]') || el.hasClass('disabled'))) {
                 var confirm,
@@ -353,13 +353,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                     content: message
                 });
 
-                confirm.on('ok', function () {
+                confirm.on('ok', function() {
                     mediator.execute('showLoading');
 
                     $.ajax({
                         url: el.data('url'),
                         type: 'DELETE',
-                        success: function (data) {
+                        success: function(data) {
                             el.trigger('removesuccess');
                             var redirectTo = el.data('redirect');
                             if (redirectTo) {
@@ -376,7 +376,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                                 mediator.execute('showFlashMessage', 'success', el.data('success-message'));
                             }
                         },
-                        error: function () {
+                        error: function() {
                             var message;
                             message = el.data('error-message') ||
                                 __('Unexpected error occurred. Please contact system administrator.');
@@ -395,7 +395,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from form/collection.js'
      * ============================================================ */
-    $(document).on('click', '.add-list-item', function (e) {
+    $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
         var $listContainer, prototypeName, index, html;
         $listContainer = $(this).siblings('.collection-fields-list');
@@ -407,7 +407,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             .data('last-index', index + 1);
     });
 
-    $(document).on('click', '.removeRow', function (e) {
+    $(document).on('click', '.removeRow', function(e) {
         e.preventDefault();
         $(this).closest('*[data-content]')
             .trigger('content:remove')

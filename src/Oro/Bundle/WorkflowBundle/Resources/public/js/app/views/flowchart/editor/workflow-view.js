@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var FlowchartEditorWorkflowView,
         _ = require('underscore'),
@@ -20,12 +20,12 @@ define(function (require) {
             detachable: true
         },
 
-        connect: function () {
+        connect: function() {
             FlowchartEditorWorkflowView.__super__.connect.apply(this, arguments);
             this.jsPlumbInstance.bind('beforeDrop', _.bind(this.onBeforeConnectionDrop, this));
         },
 
-        onBeforeConnectionDrop: function (data) {
+        onBeforeConnectionDrop: function(data) {
             var transitionModel, startingSteps, suspendedStep,
                 stepFrom = this.findStepModelByElement(data.connection.source),
                 stepTo = this.findStepModelByElement(data.connection.target);

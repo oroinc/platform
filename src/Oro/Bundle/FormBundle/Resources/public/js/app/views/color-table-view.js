@@ -1,7 +1,7 @@
 /*jslint nomen: true*/
 /*global define*/
 define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-view', 'oroui/js/tools/color-util'
-    ], function ($, _, BaseSimpleColorPickerView, colorUtil) {
+    ], function($, _, BaseSimpleColorPickerView, colorUtil) {
     'use strict';
 
     var ColorTableView = BaseSimpleColorPickerView.extend({
@@ -9,14 +9,14 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
          * @constructor
          * @param {object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             ColorTableView.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        _getSimpleColorPickerOptions: function (options) {
+        _getSimpleColorPickerOptions: function(options) {
             options = ColorTableView.__super__._getSimpleColorPickerOptions.call(this, options);
             return _.omit(options, ['picker']);
         },
@@ -24,10 +24,10 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         /**
          * @inheritDoc
          */
-        _getPickerOptions: function (options) {
+        _getPickerOptions: function(options) {
             options = ColorTableView.__super__._getPickerOptions.call(this, options.picker);
             return _.extend(options, {
-                change: _.bind(function (hex, opacity) {
+                change: _.bind(function(hex, opacity) {
                     if (this.$current && this.$current.data('color') !== hex) {
                         this.$el.simplecolorpicker('replaceColor', this.$current.data('color'), hex, this.$current);
                         this.$current.data('color', hex);
@@ -40,7 +40,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         /**
          * @inheritDoc
          */
-        _getPicker: function () {
+        _getPicker: function() {
             var pickerId = this.$el.prop('id') + '_picker';
             this.$parent.append('<span id="' + pickerId + '" style="display: none;"></span>');
             return this.$parent.find('#' + pickerId);
@@ -49,8 +49,8 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         /**
          * @inheritDoc
          */
-        _addPickerHandlers: function () {
-            this.$parent.on('click.' + this.cid, 'span.color', _.bind(function (e) {
+        _addPickerHandlers: function() {
+            this.$parent.on('click.' + this.cid, 'span.color', _.bind(function(e) {
                 e.preventDefault();
                 if (!this.$el.is(':disabled')) {
                     this.$current = $(e.currentTarget);

@@ -56,7 +56,7 @@ define(function(require) {
             this.listenTo(this.get('transitions'), 'add', this.setWorkflow);
         },
 
-        setWorkflow: function (item) {
+        setWorkflow: function(item) {
             item.setWorkflow(this);
         },
 

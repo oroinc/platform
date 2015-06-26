@@ -1,6 +1,6 @@
 /*global define*/
 define(['numeral', '../locale-settings', 'underscore'
-    ], function (numeral, localeSettings, _) {
+    ], function(numeral, localeSettings, _) {
     'use strict';
 
     /**
@@ -109,7 +109,7 @@ define(['numeral', '../locale-settings', 'underscore'
                 return doFormat(value, options, formattersChain);
             },
             formatInteger: function(value) {
-                var options = _.extend({},localeSettings.getNumberFormats('decimal'));
+                var options = _.extend({}, localeSettings.getNumberFormats('decimal'));
                 options.style = 'integer';
                 options.max_fraction_digits = 0;
                 options.min_fraction_digits = 0;
@@ -163,23 +163,23 @@ define(['numeral', '../locale-settings', 'underscore'
     };
 
     var numberFormatter = NumberFormatter();
-//    // decimal
-//    console.log('decimal', numberFormatter.formatDecimal(0));
-//    console.log('decimal', numberFormatter.formatDecimal(-123456789.123456));
-//    console.log('decimal', numberFormatter.formatDecimal(-123456789.123456));
-//
-//    // currency
-//    console.log('currency', numberFormatter.formatCurrency(123456789.123456));
-//    console.log('currency', numberFormatter.formatCurrency(-123456789.123456));
-//
-//    // integer
-//    console.log('currency', numberFormatter.formatCurrency(123456789.123456));
-//    console.log('integer', numberFormatter.formatInteger(-123456789.5));
-//
-//    // percent
-//    console.log('percent', numberFormatter.formatPercent(0.10));
-//    console.log('percent', numberFormatter.formatPercent(-0.10));
-//    console.log('percent', numberFormatter.formatPercent(1));
+    //    // decimal
+    //    console.log('decimal', numberFormatter.formatDecimal(0));
+    //    console.log('decimal', numberFormatter.formatDecimal(-123456789.123456));
+    //    console.log('decimal', numberFormatter.formatDecimal(-123456789.123456));
+    //
+    //    // currency
+    //    console.log('currency', numberFormatter.formatCurrency(123456789.123456));
+    //    console.log('currency', numberFormatter.formatCurrency(-123456789.123456));
+    //
+    //    // integer
+    //    console.log('currency', numberFormatter.formatCurrency(123456789.123456));
+    //    console.log('integer', numberFormatter.formatInteger(-123456789.5));
+    //
+    //    // percent
+    //    console.log('percent', numberFormatter.formatPercent(0.10));
+    //    console.log('percent', numberFormatter.formatPercent(-0.10));
+    //    console.log('percent', numberFormatter.formatPercent(1));
 
     return numberFormatter;
 });

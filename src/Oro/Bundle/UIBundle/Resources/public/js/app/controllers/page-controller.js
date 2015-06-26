@@ -7,7 +7,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/models/page-model'
-], function ($, _, Chaplin, __, BaseController, PageModel) {
+], function($, _, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
     var document, location, history, console, utils, mediator, PageController;
@@ -25,7 +25,7 @@ define([
          * Creates page model
          * @override
          */
-        initialize: function () {
+        initialize: function() {
             var page, isInAction;
             PageController.__super__.initialize.apply(this, arguments);
 
@@ -39,13 +39,13 @@ define([
             // application is in action till first 'page:afterChange' event
             isInAction = true;
 
-            this.subscribeEvent('page:beforeChange', function () {
+            this.subscribeEvent('page:beforeChange', function() {
                 isInAction = true;
             });
-            this.subscribeEvent('page:afterChange', function () {
+            this.subscribeEvent('page:afterChange', function() {
                 isInAction = false;
             });
-            mediator.setHandler('isInAction', function () {
+            mediator.setHandler('isInAction', function() {
                 return isInAction;
             });
         },
@@ -54,7 +54,7 @@ define([
          * Disposes page components
          * @override
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -70,7 +70,7 @@ define([
          * @param {Object} route
          * @param {Object} options
          */
-        index: function (params, route, options) {
+        index: function(params, route, options) {
             var url, cacheItem, args;
 
             url = this._combineRouteUrl(route);
@@ -122,7 +122,7 @@ define([
          * @returns {boolean}
          * @private
          */
-        _beforePageLoad: function (route, params, options) {
+        _beforePageLoad: function(route, params, options) {
             var oldRoute, newRoute, url, opts;
 
             oldRoute = route.previous;
@@ -135,7 +135,7 @@ define([
                 url = this._combineRouteUrl(newRoute);
                 opts = _.pick(options, ['forceStartup', 'changeURL', 'force', 'silent']);
                 opts.replace = true;
-                _.defer(function () {
+                _.defer(function() {
                     mediator.execute('redirectTo', {url: url}, opts);
                 });
                 return false;
@@ -151,7 +151,7 @@ define([
          * @param {XMLHttpRequest} jqXHR
          * @param {Object} options
          */
-        onPageRequest: function (model, jqXHR, options) {
+        onPageRequest: function(model, jqXHR, options) {
             this.publishEvent('page:request', options.actionArgs);
         },
 
@@ -164,7 +164,7 @@ define([
          * @param {Object} result
          * @param {Object} options
          */
-        onPageLoaded: function (model, result, options) {
+        onPageLoaded: function(model, result, options) {
             var pageData, actionArgs, jqXHR, self, updatePromises;
 
             self = this;
@@ -180,7 +180,7 @@ define([
             this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
 
             // once all views are have updated, trigger page:afterChange
-            $.when.apply($, updatePromises).done(_.debounce(function () {
+            $.when.apply($, updatePromises).done(_.debounce(function() {
                 self.publishEvent('page:afterChange');
             }, 0));
         },
@@ -193,7 +193,7 @@ define([
          * @param {*} error
          * @param {Object} options
          */
-        onPageInvalid: function (model, error, options) {
+        onPageInvalid: function(model, error, options) {
             var pathDesc;
             if (error.redirect) {
                 pathDesc = {url: error.location};
@@ -210,7 +210,7 @@ define([
          * @param {XMLHttpRequest} jqXHR
          * @param {Object} options
          */
-        onPageError: function (model, jqXHR, options) {
+        onPageError: function(model, jqXHR, options) {
             var rawData, data, payload;
             rawData = jqXHR.responseText;
             data = {};
@@ -255,7 +255,7 @@ define([
          * @param {Object=} options
          * @private
          */
-        _processRedirect: function (pathDesc, params, options) {
+        _processRedirect: function(pathDesc, params, options) {
             var url, parser, pathname, query;
             options = options || {};
             if (typeof pathDesc === 'object' && pathDesc.url != null) {
@@ -289,15 +289,15 @@ define([
          * @param {string} url
          * @private
          */
-        _setNavigationHandlers: function (url) {
+        _setNavigationHandlers: function(url) {
             mediator.setHandler('redirectTo', this._processRedirect, this);
 
-            mediator.setHandler('refreshPage', function (options) {
+            mediator.setHandler('refreshPage', function(options) {
                 var queue;
                 mediator.trigger('page:beforeRefresh', (queue = []));
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
-                $.when.apply($, queue).done(function (customOptions) {
+                $.when.apply($, queue).done(function(customOptions) {
                     _.extend(options, customOptions || {});
                     utils.redirectTo({url: url}, options);
                     mediator.trigger('page:afterRefresh');
@@ -314,7 +314,7 @@ define([
          * @param {number=} prevPos
          * @returns {Object}
          */
-        _parseRawData: function (rawData, prevPos) {
+        _parseRawData: function(rawData, prevPos) {
             var jsonStartPos, additionalData, dataObj, data;
             if (_.isUndefined(prevPos)) {
                 prevPos = -1;
@@ -358,7 +358,7 @@ define([
          * @param options
          * @private
          */
-        _submitPage: function (options) {
+        _submitPage: function(options) {
             this.publishEvent('page:beforeChange');
             options.actionArgs = options.actionArgs || {};
             _.defaults(options.actionArgs, {params: {}, route: {}, options: {}});

@@ -1,5 +1,5 @@
 var ORO = {
-    EmbedForm: function (options) {
+    EmbedForm: function(options) {
 
         var formContainer = document.getElementById(options.container);
         var iframe = document.createElement('iframe');

@@ -3,7 +3,7 @@ function PackageManager(Urls, util) {
     var InstallStatus = {INSTALLED: 0, ERROR: 1, CONFIRM: 2};
     var UpdateStatus = {UPDATED: 0, ERROR: 1};
 
-    var reflectUICallback = function () {
+    var reflectUICallback = function() {
     };
 
     function sendRequest(url, params, completeCallback) {
@@ -53,7 +53,7 @@ function PackageManager(Urls, util) {
                 util.confirm(
                     title,
                     message,
-                    function () {
+                    function() {
                         var params = response.params;
                         params['loadDemoData'] = $('#load-demo-data').is(':checked') ? 1 : 0;
 
@@ -67,7 +67,6 @@ function PackageManager(Urls, util) {
                 util.error('Unknown error');
                 reflectUICallback();
         }
-
 
     }
 
@@ -93,11 +92,11 @@ function PackageManager(Urls, util) {
     }
 
     var pm = {
-        install: function (params, _reflectUICallback) {
+        install: function(params, _reflectUICallback) {
             reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.install, params, installCompleteCallback);
         },
-        update: function (params, _reflectUICallback) {
+        update: function(params, _reflectUICallback) {
             reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.update, params, updateCompleteCallback);
         }

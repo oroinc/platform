@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var componentContainerMixin,
@@ -8,7 +8,7 @@ define(function (require) {
         /**
          * @returns {jQuery}
          */
-        getLayoutElement: function () {
+        getLayoutElement: function() {
             throw Error('"getLayoutElement" method have to be defined in the component container');
         },
 
@@ -17,7 +17,7 @@ define(function (require) {
          *
          * @returns {ComponentManager}
          */
-        getComponentManager: function () {
+        getComponentManager: function() {
             if (!this.componentManager) {
                 this.componentManager = new ComponentManager(this.getLayoutElement());
             }
@@ -31,7 +31,7 @@ define(function (require) {
          * @param {BaseComponent=} component to set
          * @param {HTMLElement=} el
          */
-        pageComponent: function (name, component, el) {
+        pageComponent: function(name, component, el) {
             if (this.disposed) {
                 component.dispose();
                 return;
@@ -50,21 +50,21 @@ define(function (require) {
         /**
          * @param {string} name component name to remove
          */
-        removePageComponent: function (name) {
+        removePageComponent: function(name) {
             this.getComponentManager().remove(name);
         },
 
         /**
          * Initializes all linked page components
          */
-        initPageComponents: function () {
+        initPageComponents: function() {
             return this.getComponentManager().init();
         },
 
         /**
          * Destroys all linked page components
          */
-        disposePageComponents: function () {
+        disposePageComponents: function() {
             if (this.disposed) {
                 return;
             }

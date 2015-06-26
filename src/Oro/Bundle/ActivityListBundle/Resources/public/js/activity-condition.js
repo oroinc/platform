@@ -19,10 +19,10 @@ define([
             extensions: [],
         },
 
-        _create: function () {
-            require(this.options.extensions, _.bind(function () {
+        _create: function() {
+            require(this.options.extensions, _.bind(function() {
                 var extensions = arguments;
-                _.each(extensions, function (extension) {
+                _.each(extensions, function(extension) {
                     extension.load(this);
                 }, this);
 
@@ -57,7 +57,7 @@ define([
 
                 var listOption = JSON.parse(this.options.listOption);
                 var typeChoices = {};
-                _.each(listOption, function (options, id) {
+                _.each(listOption, function(options, id) {
                     typeChoices[id] = options.label;
                 });
                 this.typeFilter = new MultiSelectFilter({
@@ -79,7 +79,7 @@ define([
 
                 this.element.prepend(this.$activityChoice, '-&nbsp;', this.$typeChoice);
 
-                this.element.one('changed', _.bind(function () {
+                this.element.one('changed', _.bind(function() {
                     this.element.find('.select2-choice').contents().filter(function() {
                         return (this.nodeType == 3 && !/\S/.test(this.nodeValue));
                     }).remove();
@@ -87,7 +87,7 @@ define([
 
                 this._updateFieldChoice();
                 if (data && data.columnName) {
-                    this.element.one('changed', _.bind(function () {
+                    this.element.one('changed', _.bind(function() {
                         this.filter.setValue(data.criterion.data.filter.data);
                         this.element.data('value', {
                             criterion: {
@@ -103,12 +103,12 @@ define([
                 this.typeFilter.on('update', _.bind(this._onUpdate, this));
 
                 this._on(this.$activityChoice, {
-                    change: function () {
+                    change: function() {
                         this.activityFilter.applyValue();
                     }
                 });
 
-                this.typeFilter.on('update', _.bind(function () {
+                this.typeFilter.on('update', _.bind(function() {
                     var oldEntity = this.$fieldChoice.data('entity');
                     var newEntity = this._getTypeChoiceEntity();
 
@@ -124,40 +124,40 @@ define([
                 }, this));
 
                 this._on(this.$typeChoice, {
-                    change: function (e) {
+                    change: function(e) {
                         this.typeFilter.applyValue();
                     }
                 });
 
                 this._on(this.$fieldsLoader, {
-                    change: function () {
+                    change: function() {
                         this.$fieldsLoader.data('activityFieldsUpdated', false);
                     }
                 });
             }, this));
         },
 
-        _getTypeChoiceEntity: function () {
+        _getTypeChoiceEntity: function() {
             return '$activity';
         },
 
-        _updateFieldChoice: function () {
+        _updateFieldChoice: function() {
             this._updateFieldsLoader();
             this.$fieldChoice.fieldChoice('updateData', this._getTypeChoiceEntity(), this.$fieldsLoader.data('fields'));
 
             var fieldChoice = this.$fieldChoice.fieldChoice().data('oroentity-fieldChoice');
             var originalSelect2Data = fieldChoice._select2Data;
-            fieldChoice._select2Data = function (path) {
+            fieldChoice._select2Data = function(path) {
                 var results = originalSelect2Data.apply(this, arguments);
                 if (_.isEmpty(results)) {
                     return results;
                 }
 
                 var fields = _.first(results).children;
-                var activities = _.filter(fields, function (item) {
+                var activities = _.filter(fields, function(item) {
                     return item.id[0] === '$';
                 });
-                fields = _.reject(fields, function (item) {
+                fields = _.reject(fields, function(item) {
                     return item.id[0] === '$';
                 });
 
@@ -174,7 +174,7 @@ define([
             };
 
             var originalGetApplicableConditions = fieldChoice.getApplicableConditions;
-            fieldChoice.getApplicableConditions = function (fieldId) {
+            fieldChoice.getApplicableConditions = function(fieldId) {
                 var result = originalGetApplicableConditions.apply(this, arguments);
                 if (_.isEmpty(result) && _.contains(['createdAt', 'updatedAt'], fieldId)) {
                     result = {
@@ -189,7 +189,7 @@ define([
             };
         },
 
-        _updateFieldsLoader: function () {
+        _updateFieldsLoader: function() {
             if (this.$fieldsLoader.data('activityFieldsUpdated')) {
                 return;
             }
@@ -208,7 +208,7 @@ define([
             this.$fieldsLoader.data('activityFieldsUpdated', true);
         },
 
-        _updateEntityWithActivityFields: function (entity) {
+        _updateEntityWithActivityFields: function(entity) {
             var fields = [
                 {
                     label: __('oro.activitylist.created_at.label'),
@@ -229,7 +229,7 @@ define([
             entity.fields.push(fields[0], fields[1]);
         },
 
-        _getFilterCriterion: function () {
+        _getFilterCriterion: function() {
             var filter = {
                 filter: this.filter.name,
                 data: this.filter.getValue()
@@ -250,7 +250,7 @@ define([
             };
         },
 
-        _onUpdate: function () {
+        _onUpdate: function() {
             var value;
 
             if (this.filter && !this.filter.isEmptyValue()) {
@@ -266,7 +266,7 @@ define([
             this.element.trigger('changed');
         },
 
-        _destroy: function () {
+        _destroy: function() {
             this._superApply(arguments);
 
             this.activityFilter.dispose();

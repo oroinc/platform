@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailItemView,
@@ -24,8 +24,8 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        render: function () {
-            this.initLayout().done(_.bind(function () {
+        render: function() {
+            this.initLayout().done(_.bind(function() {
                     var commentsComponent = this.pageComponent('comments');
                     if (commentsComponent) {
                         this.commentCount = this.fetchCommentsQuantity();
@@ -39,7 +39,7 @@ define(function (require) {
         /**
          * Refreshes email-body if there's email-body component
          */
-        refresh: function () {
+        refresh: function() {
             var emailBodyComponent = this.pageComponent('email-body');
             if (emailBodyComponent) {
                 emailBodyComponent.view.reattachBody();
@@ -49,7 +49,7 @@ define(function (require) {
         /**
          * Handles comments state change
          */
-        onCommentsStateChange: function () {
+        onCommentsStateChange: function() {
             var diff = this.fetchCommentsQuantity() - this.commentCount;
             if (diff === 0) {
                 return;
@@ -64,7 +64,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        onEmailHeadClick: function (e) {
+        onEmailHeadClick: function(e) {
             var $target,
                 exclude = 'a, .dropdown';
 
@@ -82,7 +82,7 @@ define(function (require) {
          *
          * @param {boolean=} flag expand or collapse flag (true to expand)
          */
-        toggle: function (flag) {
+        toggle: function(flag) {
             // if this is the last email, skip toggling
             if (this.$el.is(':last-child')) {
                 return;
@@ -97,7 +97,7 @@ define(function (require) {
         /**
          * Updates visual element of comments counter
          */
-        updateCommentsQuantity: function () {
+        updateCommentsQuantity: function() {
             var quantity = this.fetchCommentsQuantity();
             this.$('.comment-count').toggle(Boolean(quantity));
             this.$('.comment-count .count').text(quantity);
@@ -107,7 +107,7 @@ define(function (require) {
          * Fetches comments quantity related to the email
          * @returns {number}
          */
-        fetchCommentsQuantity: function () {
+        fetchCommentsQuantity: function() {
             var quantity = null,
                 commentsComponent = this.pageComponent('comments');
             if (commentsComponent) {

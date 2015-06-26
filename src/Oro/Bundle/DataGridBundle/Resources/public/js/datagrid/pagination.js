@@ -4,7 +4,7 @@ define([
     'jquery',
     'underscore',
     'backbone'
-], function ($, _, Backbone) {
+], function($, _, Backbone) {
     'use strict';
 
     var Pagination;
@@ -54,7 +54,7 @@ define([
          * @param {Object} options.fastForwardHandleConfig
          * @param {Number} options.windowSize
          */
-        initialize: function (options) {
+        initialize: function(options) {
             options = options || {};
 
             if (!options.collection) {
@@ -78,7 +78,7 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             this.enabled = false;
             this.render();
             return this;
@@ -89,7 +89,7 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             this.enabled = true;
             this.render();
             return this;
@@ -101,7 +101,7 @@ define([
          * @param {Event} e
          * @protected
          */
-        onChangePage: function (e) {
+        onChangePage: function(e) {
             e.preventDefault();
 
             if (!this.enabled) {
@@ -141,7 +141,7 @@ define([
          *
          * @return {Array.<Object>} an array of page handle objects hashes
          */
-        makeHandles: function (handles) {
+        makeHandles: function(handles) {
             handles = handles || [];
 
             var collection = this.collection;
@@ -191,7 +191,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             var state = this.collection.state;
 
             // prevent render if data is not loaded yet

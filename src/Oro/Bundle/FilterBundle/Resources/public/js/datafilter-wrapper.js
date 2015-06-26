@@ -3,7 +3,7 @@
 define([
     'jquery',
     'underscore'
-], function ($, _) {
+], function($, _) {
     'use strict';
 
     var dataFilterWrapper;
@@ -14,7 +14,7 @@ define([
          */
         popupCriteriaShowed: false,
 
-        _getWrapperTemplate: function () {
+        _getWrapperTemplate: function() {
             if (!this.wrapperTemplate) {
                 var wrapperTemplateSrc = $(this.wrapperTemplateSelector).text();
                 this.wrapperTemplate = _.template(wrapperTemplateSrc);
@@ -22,7 +22,7 @@ define([
             return this.wrapperTemplate;
         },
 
-        _wrap: function ($filter) {
+        _wrap: function($filter) {
             this.setElement(this._getWrapperTemplate()({
                 label: this.label,
                 showLabel: this.showLabel,
@@ -34,14 +34,14 @@ define([
 
             this._appendFilter($filter);
 
-            $('body').on('click' + this._eventNamespace(), _.bind(function (e) {
+            $('body').on('click' + this._eventNamespace(), _.bind(function(e) {
                 if (this.popupCriteriaShowed) {
                     this._onClickOutsideCriteria(e);
                 }
             }, this));
 
             // will be automatically unbound in backbone view's undelegateEvents() method
-            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', _.bind(function (e) {
+            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', _.bind(function(e) {
                 if (e.keyCode === 27) {
                     this._hideCriteria();
                 }
@@ -54,12 +54,12 @@ define([
          *  - removes properties which belongs to wrapper
          *  - calls original dispose method
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
             $('body').off(this._eventNamespace());
-            _.each(_.keys(dataFilterWrapper), function (prop) {
+            _.each(_.keys(dataFilterWrapper), function(prop) {
                 delete this[prop];
             }, this);
             this.constructor.__super__.dispose.call(this);
@@ -71,11 +71,11 @@ define([
          * @returns {string}
          * @protected
          */
-        _eventNamespace: function () {
+        _eventNamespace: function() {
             return '.delegateEvents' + this.cid;
         },
 
-        _appendFilter: function ($filter) {
+        _appendFilter: function($filter) {
             this.$(this.criteriaSelector).append($filter);
         }
     };

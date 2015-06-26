@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var TransitionEditView,
@@ -72,7 +72,7 @@ define(function (require) {
             'destroy model': 'remove'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
             var template = this.options.template || $('#transition-form-template').html();
@@ -142,8 +142,8 @@ define(function (require) {
 
             formOptions.attribute_fields = formOptions.attribute_fields || {};
 
-            var formOptionsData = formOptions.attribute_fields.hasOwnProperty(attributeName)
-                ? formOptions.attribute_fields[attributeName]
+            var formOptionsData = formOptions.attribute_fields.hasOwnProperty(attributeName) ?
+                formOptions.attribute_fields[attributeName]
                 : {};
             if (!formOptionsData && (data.required || data.label)) {
                 formOptionsData = {};

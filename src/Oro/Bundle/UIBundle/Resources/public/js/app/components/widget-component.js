@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WidgetComponent,
@@ -34,7 +34,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (options.initialized) {
                 // widget is initialized from server, there's nothing to do
                 return;
@@ -58,7 +58,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (!this.disposed && this.$element) {
                 this.$element.off('.' + this.cid);
             }
@@ -70,10 +70,10 @@ define(function (require) {
          *
          * @protected
          */
-        _bindOpenEvent: function () {
+        _bindOpenEvent: function() {
             var eventName, handler;
             eventName = this.options.createOnEvent;
-            handler = _.bind(function (e) {
+            handler = _.bind(function(e) {
                 e.preventDefault();
                 this.openWidget();
             }, this);
@@ -86,12 +86,12 @@ define(function (require) {
          *
          * @protected
          */
-        openWidget: function () {
+        openWidget: function() {
             var widgetModuleName;
             if (!this.widget) {
                 // defines module name and load the module, before open widget
                 widgetModuleName = mapWidgetModuleName(this.options.type);
-                tools.loadModules(widgetModuleName, function (Widget) {
+                tools.loadModules(widgetModuleName, function(Widget) {
                     this.widget = Widget;
                     this._openWidget();
                 }, this);
@@ -105,7 +105,7 @@ define(function (require) {
          *
          * @protected
          */
-        _openWidget: function () {
+        _openWidget: function() {
             var widget,
                 Widget = this.widget,
                 options = $.extend(true, {}, this.options.options);
@@ -122,7 +122,7 @@ define(function (require) {
 
             if (!this.options.multiple) {
                 this.opened = true;
-                this.listenTo(widget, 'widgetRemove', _.bind(function () {
+                this.listenTo(widget, 'widgetRemove', _.bind(function() {
                     this.opened = false;
                 }, this));
             }
@@ -145,7 +145,7 @@ define(function (require) {
          * @param {oroui.widget.AbstractWidget} widget
          * @protected
          */
-        _bindEnvironmentEvent: function (widget) {
+        _bindEnvironmentEvent: function(widget) {
             var reloadEvent = this.options['reload-event'],
                 reloadGridName = this.options['reload-grid-name'],
                 refreshWidgetAlias = this.options['refresh-widget-alias'],
@@ -154,21 +154,21 @@ define(function (require) {
             reloadEvent = reloadEvent || 'widget_success:' + (widget.getAlias() || widget.getWid());
 
             if (refreshWidgetAlias) {
-                widget.listenTo(mediator, reloadEvent, function () {
+                widget.listenTo(mediator, reloadEvent, function() {
                     mediator.trigger('widget:doRefresh:' + refreshWidgetAlias);
                 });
             }
 
             if (reloadWidgetAlias) {
-                widget.listenTo(mediator, reloadEvent, function () {
-                    mediator.execute('widgets:getByAliasAsync', reloadWidgetAlias, function (widget) {
+                widget.listenTo(mediator, reloadEvent, function() {
+                    mediator.execute('widgets:getByAliasAsync', reloadWidgetAlias, function(widget) {
                         widget.loadContent();
                     });
                 });
             }
 
             if (reloadGridName) {
-                widget.listenTo(mediator, reloadEvent, function () {
+                widget.listenTo(mediator, reloadEvent, function() {
                     mediator.trigger('datagrid:doRefresh:' + reloadGridName);
                 });
             }

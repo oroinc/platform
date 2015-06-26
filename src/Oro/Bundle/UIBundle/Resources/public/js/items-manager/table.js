@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, _, mediator) {
+define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _, mediator) {
     'use strict';
 
     /**
@@ -20,7 +20,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             sorting: true
         },
 
-        _create: function () {
+        _create: function() {
             var options = this.options;
 
             switch (typeof options.itemTemplate) {
@@ -55,11 +55,11 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             });
         },
 
-        reset: function () {
+        reset: function() {
             this.options.collection.reset();
         },
 
-        _initSorting: function () {
+        _initSorting: function() {
             if (!this.options.sorting) {
                 return;
             }
@@ -73,23 +73,23 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
                 containment: this.element.closest('.grid tbody'),
                 items: 'tr',
                 tolerance: 'pointer',
-                helper: function (e, ui) {
-                    ui.children().each(function () {
+                helper: function(e, ui) {
+                    ui.children().each(function() {
                         $(this).width($(this).width());
                     });
                     return ui;
                 },
-                stop: _.bind(function (e, ui) {
+                stop: _.bind(function(e, ui) {
                     this._sortCollection();
                 }, this)
             }).disableSelection();
         },
 
-        _sortCollection: function () {
+        _sortCollection: function() {
             var collectionChanged = false;
             var collection = this.options.collection;
 
-            _.each(this.element.find('tr'), function (el, index) {
+            _.each(this.element.find('tr'), function(el, index) {
                 var cid = $(el).data('cid');
                 var model = collection.at(index);
                 if (cid === model.cid) {
@@ -114,7 +114,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             }
         },
 
-        _onModelAdded: function (model) {
+        _onModelAdded: function(model) {
             this.element.append(this._renderModel(model));
             if (this.options.sorting) {
                 this.element.sortable('refresh');
@@ -128,7 +128,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             );
         },
 
-        _onModelChanged: function (model) {
+        _onModelChanged: function(model) {
             this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
 
             mediator.trigger(
@@ -139,7 +139,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             );
         },
 
-        _onModelDeleted: function (model) {
+        _onModelDeleted: function(model) {
             this.element.find('[data-cid="' + model.cid + '"]').remove();
 
             mediator.trigger(
@@ -150,7 +150,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             );
         },
 
-        _onResetCollection: function () {
+        _onResetCollection: function() {
             this.element.empty();
             this.options.collection.each(this._onModelAdded, this);
 
@@ -161,16 +161,16 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             );
         },
 
-        _renderModel: function (model) {
-            var data = _.extend({ cid: model.cid }, model.toJSON());
+        _renderModel: function(model) {
+            var data = _.extend({cid: model.cid}, model.toJSON());
             return this._itemRender(this.itemTemplate, data);
         },
 
-        _itemRender: function (tmpl, data) {
+        _itemRender: function(tmpl, data) {
             return tmpl(data);
         },
 
-        _onAction: function (ev) {
+        _onAction: function(ev) {
             ev.preventDefault();
 
             var $el = $(ev.currentTarget);
@@ -190,8 +190,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             }
         },
 
-        _getIdentifier: function()
-        {
+        _getIdentifier: function() {
             return _.first(_.first(this.element).className.split(' '));
         }
     });

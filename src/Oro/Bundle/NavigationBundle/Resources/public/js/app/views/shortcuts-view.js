@@ -1,6 +1,6 @@
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'routing', 'oroui/js/mediator', 'bootstrap'
-    ], function ($, _, __, BaseView, routing, mediator) {
+    ], function($, _, __, BaseView, routing, mediator) {
     'use strict';
 
     var ShortcutsView;
@@ -37,14 +37,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
             this.$el.typeahead({
                 source:_.bind(this.source, this),
-                matcher: function (item) {
+                matcher: function(item) {
                     return ~item.key.toLowerCase().indexOf(this.query.toLowerCase())
                 },
-                sorter: function (items) {
-                    var beginswith = []
-                        , caseSensitive = []
-                        , caseInsensitive = []
-                        , item;
+                sorter: function(items) {
+                    var beginswith = [] ,
+                        caseSensitive = [] ,
+                        caseInsensitive = [] ,
+                        item;
 
                     while (item = items.shift()) {
                         if (!item.key.toLowerCase().indexOf(this.query.toLowerCase())) {
@@ -58,9 +58,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
                     return beginswith.concat(caseSensitive, caseInsensitive)
                 },
-                render: function (items) {
+                render: function(items) {
                     var that = this;
-                    items = $(items).map(function (i, item) {
+                    items = $(items).map(function(i, item) {
                         var view;
 
                         if (item.item.dialog) {
@@ -109,7 +109,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                     items.first().addClass('active');
                     this.$menu.html(items);
                     return this
-                }, 'click': function (e) {
+                }, 'click': function(e) {
                     e.stopPropagation();
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
@@ -131,7 +131,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 process(this.cache[query]);
                 this.render();
             } else {
-                var url = routing.generate(this.sourceUrl, { 'query': query });
+                var url = routing.generate(this.sourceUrl, {'query': query});
                 $.get(url, _.bind(function(data) {
                     this.data = data;
                     var result = [];
@@ -162,7 +162,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             }
         },
 
-        getLayoutElement: function () {
+        getLayoutElement: function() {
             return this.$el.closest('.shortcuts');
         },
 

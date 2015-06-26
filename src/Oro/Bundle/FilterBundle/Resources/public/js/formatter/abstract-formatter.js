@@ -1,5 +1,5 @@
 /*global define*/
-define(function () {
+define(function() {
     'use strict';
 
     /**
@@ -13,7 +13,7 @@ define(function () {
      * @export  orofilter/js/formatter/abstract-formatter
      * @class   orofilter.formatter.AbstractFormatter
      */
-    var AbstractFormatter = function () {};
+    var AbstractFormatter = function() {};
 
     AbstractFormatter.prototype = {
         /**
@@ -23,7 +23,7 @@ define(function () {
          * @param {*} rawData
          * @return {string}
          */
-        fromRaw: function (rawData) {
+        fromRaw: function(rawData) {
             return rawData;
         },
 
@@ -38,7 +38,7 @@ define(function () {
          * @param {string} formattedData
          * @return {*|undefined}
          */
-        toRaw: function (formattedData) {
+        toRaw: function(formattedData) {
             return formattedData;
         }
     };

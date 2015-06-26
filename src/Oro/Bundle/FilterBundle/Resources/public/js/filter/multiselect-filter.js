@@ -5,7 +5,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     './select-filter'
-], function (_, __, tools, SelectFilter) {
+], function(_, __, tools, SelectFilter) {
     'use strict';
 
     // @const
@@ -48,7 +48,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
                     value: [FILTER_EMPTY_VALUE]
@@ -60,7 +60,7 @@ define([
         /**
          * @inheritDoc
          */
-        _onSelectChange: function () {
+        _onSelectChange: function() {
             MultiSelectFilter.__super__._onSelectChange.apply(this, arguments);
             this._setDropdownWidth();
         },
@@ -70,7 +70,7 @@ define([
          *
          * @protected
          */
-        _setDropdownWidth: function () {
+        _setDropdownWidth: function() {
             if (!this.cachedMinimumWidth) {
                 this.cachedMinimumWidth = Math.max(this.minimumDropdownWidth, this.selectWidget.getMinimumDropdownWidth()) + 24;
             }
@@ -90,7 +90,7 @@ define([
          * @param value
          * @return {*}
          */
-        setValue: function (value) {
+        setValue: function(value) {
             var normValue;
             normValue = this._normalizeValue(tools.deepClone(value));
             // prevent uncheck 'Any' value
@@ -104,7 +104,7 @@ define([
         /**
          * Updates checkboxes when user clicks on element corresponding empty value
          */
-        _normalizeValue: function (value) {
+        _normalizeValue: function(value) {
             // means that all checkboxes are unchecked
             if (value.value == null) {
                 value.value = [FILTER_EMPTY_VALUE];

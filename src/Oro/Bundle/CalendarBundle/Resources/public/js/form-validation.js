@@ -13,7 +13,7 @@ function($, _, __, tools) {
          * @param formFieldPrefix {string} [optional] A prefix of form field id. If it is not specified the form id
          *                                  will be used as the prefix.
          */
-        handleErrors: function (container, err, formFieldPrefix) {
+        handleErrors: function(container, err, formFieldPrefix) {
             if (_.isString(container)) {
                 container = $(container);
             }
@@ -63,7 +63,7 @@ function($, _, __, tools) {
          * @param container {jQuery|string} The jQuery object or jQuery selector for a element contains form fields.
          *                                  It may be form element itself or any element contains the form
          */
-        getFormFieldPrefix: function (container) {
+        getFormFieldPrefix: function(container) {
             var formFieldPrefix = '';
             var form = null;
             if (container.prop("tagName").toLowerCase() === 'form') {
@@ -87,7 +87,7 @@ function($, _, __, tools) {
          *
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
          */
-        removeFieldErrors: function (field) {
+        removeFieldErrors: function(field) {
             var $field     = $(field),
                 $container = $field.closest('.controls');
 
@@ -103,7 +103,7 @@ function($, _, __, tools) {
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
          * @param errorMessages {string[]|string} The localized error string(s).
          */
-        addFieldErrors: function (field, errorMessages) {
+        addFieldErrors: function(field, errorMessages) {
             var $field     = $(field),
                 $container = $field.closest('div.controls');
 
@@ -129,7 +129,7 @@ function($, _, __, tools) {
          * @param container {jQuery|string} The jQuery object or jQuery selector for a element contains form fields.
          *                                  It may be form element itself or any element contains the form
          */
-        removeErrors: function (container) {
+        removeErrors: function(container) {
             if (_.isString(container)) {
                 container = $(container);
             }
@@ -148,7 +148,7 @@ function($, _, __, tools) {
          *                                  It may be form element itself or any element contains the form
          * @param errorMessages {string[]|string} The localized error string(s).
          */
-        addErrors: function (container, errorMessages) {
+        addErrors: function(container, errorMessages) {
             if (_.isString(container)) {
                 container = $(container);
             }
@@ -176,7 +176,7 @@ function($, _, __, tools) {
          * @param container {jQuery|string} The jQuery object or jQuery selector for a element contains form fields.
          *                                  It may be form element itself or any element contains the form
          */
-        setFocusOnFirstErrorField: function (container) {
+        setFocusOnFirstErrorField: function(container) {
             if (_.isString(container)) {
                 container = $(container);
             }

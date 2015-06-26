@@ -6,7 +6,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/app/views/base/view',
     'oroui/js/tools'
-], function ($, _, __, BaseView, tools) {
+], function($, _, __, BaseView, tools) {
     'use strict';
 
     var AbstractFilter;
@@ -41,7 +41,6 @@ define([
          * @property
          */
         templateTheme: '',
-
 
         /**
          * Is filter can be disabled
@@ -112,7 +111,7 @@ define([
          * @param {Object} options
          * @param {Boolean} [options.enabled]
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
                 'templateSelector', 'templateTheme');
             _.extend(this, opts);
@@ -134,7 +133,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -148,7 +147,7 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             if (!this.enabled) {
                 this.enabled = true;
                 this.show();
@@ -162,7 +161,7 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             if (this.enabled) {
                 this.enabled = false;
                 this.hide();
@@ -177,7 +176,7 @@ define([
          *
          * @return {*}
          */
-        show: function () {
+        show: function() {
             this.$el.css('display', 'inline-block');
             return this;
         },
@@ -187,7 +186,7 @@ define([
          *
          * @return {*}
          */
-        hide: function () {
+        hide: function() {
             this.$el.hide();
             return this;
         },
@@ -197,7 +196,7 @@ define([
          *
          * @return {*}
          */
-        reset: function () {
+        reset: function() {
             this.setValue(this.emptyValue);
             return this;
         },
@@ -207,7 +206,7 @@ define([
          *
          * @return {Object}
          */
-        getValue: function () {
+        getValue: function() {
             return tools.deepClone(this.value);
         },
 
@@ -217,7 +216,7 @@ define([
          * @param value
          * @return {*}
          */
-        setValue: function (value) {
+        setValue: function(value) {
             if (!tools.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
                 this.value = tools.deepClone(value);
@@ -235,7 +234,7 @@ define([
          * @return {*}
          * @protected
          */
-        _formatRawValue: function (value) {
+        _formatRawValue: function(value) {
             return value;
         },
 
@@ -246,7 +245,7 @@ define([
          * @return {*}
          * @protected
          */
-        _formatDisplayValue: function (value) {
+        _formatDisplayValue: function(value) {
             return value;
         },
 
@@ -257,7 +256,7 @@ define([
          * @param {*} oldValue
          * @protected
          */
-        _onValueUpdated: function (newValue, oldValue) {
+        _onValueUpdated: function(newValue, oldValue) {
             this._triggerUpdate(newValue, oldValue);
         },
 
@@ -267,7 +266,7 @@ define([
          * @param {jQuery.Event} e
          * @private
          */
-        _onClickResetFilter: function (e) {
+        _onClickResetFilter: function(e) {
             e.stopPropagation();
             this.reset();
         },
@@ -279,7 +278,7 @@ define([
          * @param {*} oldValue
          * @protected
          */
-        _triggerUpdate: function (newValue, oldValue) {
+        _triggerUpdate: function(newValue, oldValue) {
             this.trigger('update');
         },
 
@@ -288,7 +287,7 @@ define([
          *
          * @return {Boolean}
          */
-        isEmpty: function () {
+        isEmpty: function() {
             return tools.isEqualsLoosely(this.getValue(), this.emptyValue);
         },
 
@@ -300,7 +299,7 @@ define([
          *
          * @return {Boolean}
          */
-        isEmptyValue: function () {
+        isEmptyValue: function() {
             if (_.has(this.emptyValue, 'value') && _.has(this.value, 'value')) {
                 return tools.isEqualsLoosely(this.value.value, this.emptyValue.value);
             }
@@ -314,12 +313,12 @@ define([
          * @return {*}
          * @protected
          */
-        _getInputValue: function (input) {
+        _getInputValue: function(input) {
             var result = undefined;
             var $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
-                    $input.each(function () {
+                    $input.each(function() {
                         if ($(this).is(':checked')) {
                             result = $(this).val();
                         }
@@ -340,11 +339,11 @@ define([
          * @protected
          * @return {*}
          */
-        _setInputValue: function (input, value) {
+        _setInputValue: function(input, value) {
             var $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
-                    $input.each(function () {
+                    $input.each(function() {
                         var $input = $(this);
                         if ($input.attr('value') == value) {
                             $input.attr('checked', true);
@@ -367,7 +366,7 @@ define([
          * @return {*}
          * @protected
          */
-        _updateDOMValue: function () {
+        _updateDOMValue: function() {
             return this._writeDOMValue(this._getDisplayValue());
         },
 
@@ -376,7 +375,7 @@ define([
          *
          * @return {String}
          */
-        _getCriteriaHint: function () {
+        _getCriteriaHint: function() {
             return '';
         },
 
@@ -386,7 +385,7 @@ define([
          * @return {*}
          * @protected
          */
-        _getDisplayValue: function () {
+        _getDisplayValue: function() {
             var value = (arguments.length > 0) ? arguments[0] : this.getValue();
             return this._formatDisplayValue(value);
         },
@@ -399,7 +398,7 @@ define([
          * @protected
          * @return {*}
          */
-        _writeDOMValue: function (value) {
+        _writeDOMValue: function(value) {
             throw new Error("Method _writeDOMValue is abstract and must be implemented");
             //this._setInputValue(inputValueSelector, value.value);
             //return this
@@ -411,7 +410,7 @@ define([
          * @return {Object}
          * @protected
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             throw new Error("Method _readDOMValue is abstract and must be implemented");
             //return { value: this._getInputValue(this.inputValueSelector) }
         },
@@ -423,7 +422,7 @@ define([
          * @param {Boolean} status
          * @protected
          */
-        _setButtonPressed: function (element, status) {
+        _setButtonPressed: function(element, status) {
             if (status) {
                 element.parent().addClass(this.buttonActiveClass);
             } else {
@@ -437,7 +436,7 @@ define([
          * @param {Event} e
          * @private
          */
-        _preventEnterProcessing: function (e) {
+        _preventEnterProcessing: function(e) {
             if (e.keyCode == 13) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -449,7 +448,7 @@ define([
          *
          * @public
          */
-        applyValue: function () {
+        applyValue: function() {
             this.setValue(this._formatRawValue(this._readDOMValue()));
         },
 
@@ -458,11 +457,11 @@ define([
          *
          * @private
          */
-        _defineTemplate: function () {
+        _defineTemplate: function() {
             this.template = this._getTemplate(this.templateSelector);
         },
 
-        _getTemplate: function (selector) {
+        _getTemplate: function(selector) {
             var theme = this.templateTheme,
                 src = theme && $(selector + '-' + theme).text() || $(selector).text();
 

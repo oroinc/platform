@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'jquery', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
-], function (_, $, __, datetimeFormatter) {
+], function(_, $, __, datetimeFormatter) {
     'use strict';
 
     var defaultParam = {
@@ -12,7 +12,7 @@ define(['underscore', 'jquery', 'orotranslation/js/translator', 'orolocale/js/fo
      */
     return [
         'Oro\\Bundle\\CalendarBundle\\Validator\\Constraints\\DateEarlierThan',
-        function (value, element, options) {
+        function(value, element, options) {
             /**
              * For example if elementId == date_selector_orocrm_campaign_form_startDate and options.field == endDate
              * then comparedElId will be date_selector_orocrm_campaign_form_endDate
@@ -31,7 +31,7 @@ define(['underscore', 'jquery', 'orotranslation/js/translator', 'orolocale/js/fo
 
             return !(secondDate < firstDate);
         },
-        function (param, element) {
+        function(param, element) {
             var value = String(this.elementValue(element)),
                 placeholders = {};
             param = _.extend({}, defaultParam, param);

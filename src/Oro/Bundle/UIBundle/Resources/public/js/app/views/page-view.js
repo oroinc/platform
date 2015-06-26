@@ -4,7 +4,7 @@ define([
     './base/view',
     'oroui/js/mediator',
     'oroui/js/tools/form-to-ajax-options'
-], function ($, BaseView, mediator, formToAjaxOptions) {
+], function($, BaseView, mediator, formToAjaxOptions) {
     'use strict';
 
     var PageView;
@@ -20,15 +20,15 @@ define([
             'page:error mediator': 'addErrorClass'
         },
 
-        removeErrorClass: function () {
+        removeErrorClass: function() {
             this.$el.removeClass('error-page');
         },
 
-        addErrorClass: function () {
+        addErrorClass: function() {
             this.$el.addClass('error-page');
         },
 
-        onSubmit: function (event) {
+        onSubmit: function(event) {
             var $form, url, method, data, options;
 
             if (event.isDefaultPrevented()) {
@@ -59,7 +59,7 @@ define([
                 $form.removeData('sent');
             } else {
                 options = formToAjaxOptions($form, {
-                    complete: function () {
+                    complete: function() {
                         $form.removeData('sent');
                     }
                 });
@@ -67,7 +67,7 @@ define([
             }
         },
 
-        onRefreshClick: function () {
+        onRefreshClick: function() {
             mediator.execute('refreshPage');
         }
     });

@@ -1,6 +1,6 @@
 /*jslint browser:true*/
 /*global define, FormData*/
-define(['jquery', 'jquery.form'], function ($) {
+define(['jquery', 'jquery.form'], function($) {
     'use strict';
 
     /**
@@ -54,7 +54,7 @@ define(['jquery', 'jquery.form'], function ($) {
             processData: false,
             cache: false,
             data: null,
-            beforeSend: function (xhr, options) {
+            beforeSend: function(xhr, options) {
                 options.data = formData;
                 if (beforeSend) {
                     return beforeSend.apply(this, arguments);

@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var FlowchartJsPlubmBoxView = require('../jsplumb/box-view'),
         $ = require('jquery'),
@@ -22,16 +22,16 @@ define(function (require) {
             maxConnections: 100
         },
 
-        connect: function () {
+        connect: function() {
             FlowchartViewerStepView.__super__.connect.apply(this, arguments);
             var instance = this.areaView.jsPlumbInstance;
 
-            instance.batch(_.bind(function () {
+            instance.batch(_.bind(function() {
                 // add element as source to jsPlumb
                 if (this.model.get('draggable') !== false) {
                     instance.draggable(this.$el, {
                         containment: 'parent',
-                        stop: _.bind(function (e) {
+                        stop: _.bind(function(e) {
                             // update model position when dragging stops
                             this.model.set({position: e.pos});
                         }, this)
@@ -42,18 +42,18 @@ define(function (require) {
             }, this));
         },
 
-        makeTarget: function () {
+        makeTarget: function() {
             var instance = this.areaView.jsPlumbInstance;
             instance.makeTarget(this.$el, $.extend(true, {}, _.result(this, 'targetDefaults')));
         },
 
-        makeSource: function () {
+        makeSource: function() {
             var instance = this.areaView.jsPlumbInstance;
             instance.makeSource(this.$el, $.extend(true,
                 {},
                 _.result(this, 'sourceDefaults'),
                 {
-                    onMaxConnections: function (info, e) {
+                    onMaxConnections: function(info, e) {
                         mediator.execute(
                             'showErrorMessage',
                             __('Maximum connections ({{ maxConnections }}) reached', info),

@@ -3,12 +3,12 @@
 define([
     'jquery',
     'underscore',
-], function ($, _) {
+], function($, _) {
 
     return {
-        load: function (Segment) {
+        load: function(Segment) {
             var originalConfigureFilters = Segment.configureFilters;
-            Segment.configureFilters = function () {
+            Segment.configureFilters = function() {
                 var $criteria = $(this.options.filters.criteriaList);
 
                 var $activityCondition = $criteria.find('[data-criteria=condition-activity]');

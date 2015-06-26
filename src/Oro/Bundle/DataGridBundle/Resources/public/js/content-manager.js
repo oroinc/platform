@@ -5,7 +5,7 @@ define([
     'backbone',
     'oroui/js/mediator',
     'orodatagrid/js/pageable-collection'
-], function (_, Backbone, mediator, PageableCollection) {
+], function(_, Backbone, mediator, PageableCollection) {
     'use strict';
 
     var contentManager;
@@ -18,7 +18,7 @@ define([
     }
 
     contentManager = {
-        get: function (gridName) {
+        get: function(gridName) {
             var key, collection, hash, isActual;
             key = PageableCollection.stateHashKey(gridName);
             collection = mediator.execute('pageCache:state:fetch', key);
@@ -31,10 +31,10 @@ define([
             return collection;
         },
 
-        trace: function (collection) {
+        trace: function(collection) {
             updateState(collection);
             contentManager.listenTo(collection, 'beforeReset', updateState);
-            mediator.once('page:beforeChange', function () {
+            mediator.once('page:beforeChange', function() {
                 contentManager.stopListening(collection);
             });
         }

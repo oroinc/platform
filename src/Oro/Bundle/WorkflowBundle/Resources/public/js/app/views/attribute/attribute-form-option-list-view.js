@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var AttributeFormOptionListView,
@@ -18,7 +18,7 @@ define(function (require) {
             'entity_field_template': null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-list-template').html();
             this.template = _.template(template);
@@ -40,7 +40,7 @@ define(function (require) {
             _.each(items, this.addItem, this);
         },
 
-        initList: function () {
+        initList: function() {
             if (!this.$listElBody) {
                 var listEl = $(this.template());
                 this.$listElBody = listEl.find(this.options.listElBodyEl);
@@ -68,9 +68,9 @@ define(function (require) {
                 data.entityField = data.property_path || data.attribute_name;
             }
 
-            var viewId = data.view_id
-                || (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name)
-                    ? this.rowViewsByAttribute[data.attribute_name]
+            var viewId = data.view_id ||
+                (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name) ?
+                    this.rowViewsByAttribute[data.attribute_name]
                     : null);
             if (!viewId) {
                 var rowView = new AttributeFormOptionRowView({
@@ -120,7 +120,7 @@ define(function (require) {
         },
 
         resetView: function() {
-            _.each(this.rowViews, function (rowView) {
+            _.each(this.rowViews, function(rowView) {
                 rowView.remove();
             });
             this.rowViews = {};

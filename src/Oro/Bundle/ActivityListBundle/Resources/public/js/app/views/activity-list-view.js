@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var ActivityListView,
@@ -39,7 +39,7 @@ define(function (require) {
             'toDelete collection': '_deleteItem'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
             _.defaults(this.options.messages, {
@@ -77,20 +77,20 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
 
             delete this.itemEditDialog;
 
-            mediator.off('widget:doRefresh:activity-list-widget', this._reload, this );
+            mediator.off('widget:doRefresh:activity-list-widget', this._reload, this);
             mediator.off('widget_success:activity_list:item:update', this._reload, this);
 
             ActivityListView.__super__.dispose.call(this);
         },
 
-        initItemView: function (model) {
+        initItemView: function(model) {
             var className = model.getRelatedActivityClass(),
                 configuration = this.options.configuration[className];
             if (this.itemView) {
@@ -105,7 +105,7 @@ define(function (require) {
             }
         },
 
-        refresh: function () {
+        refresh: function() {
             this.collection.setPage(1);
             this._setPageNumber();
             this._reload();
@@ -113,7 +113,7 @@ define(function (require) {
             mediator.trigger('widget_success:activity_list:refresh');
         },
 
-        _initPager: function () {
+        _initPager: function() {
             if (this.collection.getPageSize() < this.collection.getCount()) {
                 this._toggleNext(true);
             } else {
@@ -133,7 +133,7 @@ define(function (require) {
          * @protected
          * @override
          */
-        _getLoadingContainer: function () {
+        _getLoadingContainer: function() {
             var loadingContainer = this.options.loadingContainer;
             if (loadingContainer instanceof $) {
                 // fetches loading container from options
@@ -146,7 +146,7 @@ define(function (require) {
             return loadingContainer;
         },
 
-        goto_previous: function () {
+        goto_previous: function() {
             var currentPage = this.collection.getPage();
             if (currentPage > 1) {
                 var nextPage = currentPage - 1;
@@ -166,7 +166,7 @@ define(function (require) {
             }
         },
 
-        goto_page: function (e) {
+        goto_page: function(e) {
             var that = this.list,
                 currentPage = that.collection.getPage(),
                 maxPage = that.collection.pager.total,
@@ -192,7 +192,7 @@ define(function (require) {
             that._reload();
         },
 
-        goto_next: function () {
+        goto_next: function() {
             var currentPage = this.collection.getPage();
             if (currentPage < this.collection.pager.total) {
                 var nextPage = currentPage + 1;
@@ -209,14 +209,14 @@ define(function (require) {
             }
         },
 
-        _setPageNumber: function (pageNumber) {
+        _setPageNumber: function(pageNumber) {
             if (_.isUndefined(pageNumber)) {
                 pageNumber = 1;
             }
             $('.activity-list-widget .pagination-current').val(pageNumber);
         },
 
-        _togglePrevious: function (enable) {
+        _togglePrevious: function(enable) {
             if (_.isUndefined(enable)) {
                 $('.activity-list-widget .pagination-previous').addClass('disabled');
             } else {
@@ -224,7 +224,7 @@ define(function (require) {
             }
         },
 
-        _toggleNext: function (enable) {
+        _toggleNext: function(enable) {
             if (_.isUndefined(enable)) {
                 $('.activity-list-widget .pagination-next').addClass('disabled');
             } else {
@@ -232,7 +232,7 @@ define(function (require) {
             }
         },
 
-        _reload: function () {
+        _reload: function() {
             var itemViews;
             // please note that _hideLoading will be called in renderAllItems() function
             this._showLoading();
@@ -244,7 +244,7 @@ define(function (require) {
                 // store views state
                 this.oldViewStates = {};
                 itemViews = this.getItemViews();
-                this.oldViewStates = _.map(itemViews, function (view) {
+                this.oldViewStates = _.map(itemViews, function(view) {
                     return {
                         attrs: view.model.toJSON(),
                         collapsed: view.isCollapsed(),
@@ -255,7 +255,7 @@ define(function (require) {
                 this.collection.fetch({
                     reset: true,
                     success: _.bind(this._initPager, this),
-                    error: _.bind(function (collection, response) {
+                    error: _.bind(function(collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
                     }, this)
                 });
@@ -264,7 +264,7 @@ define(function (require) {
             }
         },
 
-        renderAllItems: function () {
+        renderAllItems: function() {
             var result, i, view, model, oldViewState, contentLoadedPromises, deferredContentLoading;
 
             result = ActivityListView.__super__.renderAllItems.apply(this, arguments);
@@ -290,7 +290,7 @@ define(function (require) {
                                 contentLoadedPromises.push(deferredContentLoading);
                                 view.model.once(
                                     'change:isContentLoading',
-                                    _.bind(function (view, deferredContentLoading) {
+                                    _.bind(function(view, deferredContentLoading) {
                                         // reset height
                                         view.$el.height('');
                                         deferredContentLoading.resolve();
@@ -303,28 +303,28 @@ define(function (require) {
                 delete this.oldViewStates;
             }
 
-            $.when.apply($, contentLoadedPromises).done(_.bind(function () {
+            $.when.apply($, contentLoadedPromises).done(_.bind(function() {
                 this._hideLoading();
             }, this));
 
             return result;
         },
 
-        _viewItem: function (model) {
+        _viewItem: function(model) {
             this._loadModelContentHTML(model, 'itemView');
         },
 
-        _viewGroup: function (model) {
+        _viewGroup: function(model) {
             this._loadModelContentHTML(model, 'groupView');
         },
 
-        _loadModelContentHTML: function (model, actionKey) {
+        _loadModelContentHTML: function(model, actionKey) {
             var url = this._getUrl(actionKey, model);
             if (model.get('is_loaded') === true) {
                 return;
             }
             model.loadContentHTML(url)
-                .fail(_.bind(function (response) {
+                .fail(_.bind(function(response) {
                     if (response.status === 403) {
                         this._showForbiddenActivityDataError(response.responseJSON || {});
                     } else {
@@ -333,7 +333,7 @@ define(function (require) {
                 }, this));
         },
 
-        _editItem: function (model) {
+        _editItem: function(model) {
             if (!this.itemEditDialog) {
                 var unescapeHTML = function unescapeHtml(unsafe) {
                     return unsafe
@@ -356,7 +356,7 @@ define(function (require) {
                         'resizable': false,
                         'width': 675,
                         'autoResize': true,
-                        'close': _.bind(function () {
+                        'close': _.bind(function() {
                             delete this.itemEditDialog;
                         }, this)
                     }
@@ -366,29 +366,29 @@ define(function (require) {
             }
         },
 
-        _deleteItem: function (model) {
+        _deleteItem: function(model) {
             var confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
-            confirm.on('ok', _.bind(function () {
+            confirm.on('ok', _.bind(function() {
                 this._onItemDelete(model);
             }, this));
             confirm.open();
         },
 
-        _onItemDelete: function (model) {
+        _onItemDelete: function(model) {
             this._showLoading();
             try {
                 model.destroy({
                     wait: true,
                     url: this._getUrl('itemDelete', model),
-                    success: _.bind(function () {
+                    success: _.bind(function() {
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
                         mediator.trigger('widget_success:activity_list:item:delete');
 
                         this._reload();
                     }, this),
-                    error: _.bind(function (model, response) {
+                    error: _.bind(function(model, response) {
                         if (!_.isUndefined(response.status) && response.status === 403) {
                             this._showForbiddenError(response.responseJSON || {});
                         } else {
@@ -411,41 +411,41 @@ define(function (require) {
          * @returns {string}
          * @protected
          */
-        _getUrl: function (actionKey, model) {
+        _getUrl: function(actionKey, model) {
             var className = model.getRelatedActivityClass();
             var route = this.options.configuration[className].routes[actionKey];
             return routing.generate(route, {'id': model.get('relatedActivityId')});
         },
 
-        _getMessage: function (labelKey) {
+        _getMessage: function(labelKey) {
             return this.options.messages[labelKey];
         },
 
-        _showLoading: function () {
+        _showLoading: function() {
             this.subview('loading').show();
         },
 
-        _hideLoading: function () {
+        _hideLoading: function() {
             this.subview('loading').hide();
         },
 
-        _showLoadItemsError: function (err) {
+        _showLoadItemsError: function(err) {
             this._showError(this.options.messages.loadItemsError, err);
         },
 
-        _showDeleteItemError: function (err) {
+        _showDeleteItemError: function(err) {
             this._showError(this.options.messages.deleteItemError, err);
         },
 
-        _showForbiddenActivityDataError: function (err) {
+        _showForbiddenActivityDataError: function(err) {
             this._showError(this.options.messages.forbiddenActivityDataError, err);
         },
 
-        _showForbiddenError: function (err) {
+        _showForbiddenError: function(err) {
             this._showError(this.options.messages.forbiddenError, err);
         },
 
-        _showError: function (message, err) {
+        _showError: function(message, err) {
             this._hideLoading();
             mediator.execute('showErrorMessage', message, err);
         }

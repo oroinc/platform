@@ -5,7 +5,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     'oroui/js/app/components/base/component'
-], function ($, _, __, tools, BaseComponent) {
+], function($, _, __, tools, BaseComponent) {
     'use strict';
 
     function ComponentManager($el) {
@@ -17,7 +17,7 @@ define([
     ComponentManager.prototype = {
         eventNamespace: '.component-manager',
 
-        init: function () {
+        init: function() {
             var promises,
                 elements = [],
                 modules = [];
@@ -29,7 +29,7 @@ define([
             // optimize load time - preload components in separate layouts
             require(modules, _.noop);
 
-            return $.when.apply($, _.compact(promises)).then(function () {
+            return $.when.apply($, _.compact(promises)).then(function() {
                 return _.compact(arguments);
             });
         },
@@ -41,11 +41,11 @@ define([
          *
          * @protected
          */
-        _bindContainerChangesEvents: function () {
+        _bindContainerChangesEvents: function() {
             var self = this;
 
             // if the container catches content changed event -- updates its layout
-            this.$el.on('content:changed' + this.eventNamespace, _.bind(function (e) {
+            this.$el.on('content:changed' + this.eventNamespace, _.bind(function(e) {
                 if (e.isDefaultPrevented()) {
                     return;
                 }
@@ -54,12 +54,12 @@ define([
             }, this));
 
             // if the container catches content remove event -- disposes related components
-            this.$el.on('content:remove' + this.eventNamespace, function (e) {
+            this.$el.on('content:remove' + this.eventNamespace, function(e) {
                 if (e.isDefaultPrevented()) {
                     return;
                 }
                 e.preventDefault();
-                $(e.target).find('[data-bound-component]').each(function () {
+                $(e.target).find('[data-bound-component]').each(function() {
                     var component = self.findComponent(this);
                     if (component) {
                         component.dispose();
@@ -75,10 +75,10 @@ define([
          * @param {Array.<string>} modules
          * @protected
          */
-        _analyseDom: function (elements, modules) {
+        _analyseDom: function(elements, modules) {
             var el = this.$el[0];
 
-            this.$el.find('[data-page-component-module]').each(function () {
+            this.$el.find('[data-page-component-module]').each(function() {
                 var $elem, $separateLayout;
 
                 $elem = $(this);
@@ -106,7 +106,7 @@ define([
          * @param {jQuery} $elem
          * @protected
          */
-        _readData: function ($elem) {
+        _readData: function($elem) {
             var data, name;
             data = {
                 module: $elem.data('pageComponentModule'),
@@ -126,7 +126,7 @@ define([
          * @param {jQuery} $elem
          * @protected
          */
-        _cleanupData: function ($elem) {
+        _cleanupData: function($elem) {
             $elem
                 .removeData('pageComponentModule')
                 .removeData('pageComponentOptions')
@@ -141,7 +141,7 @@ define([
          * @returns {Promise}
          * @protected
          */
-        _initComponent: function ($elem) {
+        _initComponent: function($elem) {
             var data, initDeferred;
             data = this._readData($elem);
             this._cleanupData($elem);
@@ -170,7 +170,7 @@ define([
          * @param {Function} Component
          * @protected
          */
-        _onComponentLoaded: function (initDeferred, options, Component) {
+        _onComponentLoaded: function(initDeferred, options, Component) {
             var component, name, $elem, message;
             if (this.disposed) {
                 initDeferred.resolve();
@@ -217,7 +217,7 @@ define([
          * @param {Error} error
          * @protected
          */
-        _onRequireJsError: function (initDeferred, error) {
+        _onRequireJsError: function(initDeferred, error) {
             var message = 'Cannot load module "' + error.requireModules[0] + '"';
             this._handleError(message, error);
             // prevent interface from blocking by loader
@@ -233,7 +233,7 @@ define([
          * @param {Error} error
          * @protected
          */
-        _handleError: function (message, error) {
+        _handleError: function(message, error) {
             if (tools.debug) {
                 if (console && console.error) {
                     console.error(message);
@@ -250,7 +250,7 @@ define([
          *
          * @param {string} name
          */
-        get: function (name) {
+        get: function(name) {
             if (name in this.components) {
                 return this.components[name].component;
             } else {
@@ -265,7 +265,7 @@ define([
          * @param {BaseComponent} component to set
          * @param {HTMLElement} el
          */
-        add: function (name, component, el) {
+        add: function(name, component, el) {
             if (this.disposed) {
                 // in case the manager already disposed -- dispose passed component as well
                 component.dispose();
@@ -276,7 +276,7 @@ define([
                 component: component,
                 el: el
             };
-            component.once('dispose', _.bind(function () {
+            component.once('dispose', _.bind(function() {
                 delete this.components[name];
             }, this));
             return component;
@@ -287,7 +287,7 @@ define([
          *
          * @param {string} name component name to remove
          */
-        remove: function (name) {
+        remove: function(name) {
             var item = this.components[name];
             delete this.components[name];
             if (item) {
@@ -298,8 +298,8 @@ define([
         /**
          * Destroys all linked components
          */
-        removeAll: function () {
-            _.each(this.components, function (item, name) {
+        removeAll: function() {
+            _.each(this.components, function(item, name) {
                 this.remove(name);
             }, this);
         },
@@ -307,7 +307,7 @@ define([
         /**
          * Disposes component manager
          */
-        dispose: function () {
+        dispose: function() {
             this.$el.off(this.eventNamespace);
             this.removeAll();
             delete this.$el;
@@ -321,8 +321,8 @@ define([
          * @param {HTMLElement} el
          * @returns {BaseComponent}
          */
-        findComponent: function (el) {
-            var item =  _.find(this.components, function (item) {
+        findComponent: function(el) {
+            var item =  _.find(this.components, function(item) {
                 return item.el === el;
             });
             if (item) {
@@ -336,8 +336,8 @@ define([
          * @param {Function} callback
          * @param {Object} context
          */
-        forEachComponent: function (callback, context) {
-            _.each(this.components, function (item) {
+        forEachComponent: function(callback, context) {
+            _.each(this.components, function(item) {
                 callback.apply(context, [item.component]);
             });
         }

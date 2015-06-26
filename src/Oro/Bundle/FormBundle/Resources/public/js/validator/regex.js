@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'orotranslation/js/translator'
-    ], function (_, __) {
+    ], function(_, __) {
     'use strict';
 
     var defaultParam = {
@@ -13,13 +13,13 @@ define(['underscore', 'orotranslation/js/translator'
      */
     return [
         'Regex',
-        function (value, element, param) {
+        function(value, element, param) {
             var parts = param.pattern.match(/^\/([\w\W]*?)\/(g?i?m?y?)$/),
                 pattern = new RegExp(parts[1], parts[2]);
             param = _.extend({}, defaultParam, param);
             return this.optional(element) || Boolean(param.match) === pattern.test(value);
         },
-        function (param, element) {
+        function(param, element) {
             var value = this.elementValue(element),
                 placeholders = {};
             param = _.extend({}, defaultParam, param);

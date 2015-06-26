@@ -5,7 +5,7 @@ define([
     'underscore',
     'oroui/js/tools',
     './abstract-filter'
-], function ($, _, tools, AbstractFilter) {
+], function($, _, tools, AbstractFilter) {
     'use strict';
 
     var EmptyFilter;
@@ -60,7 +60,7 @@ define([
          */
         caret: '<span class="caret"></span>',
 
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = _.pick(options || {}, 'caret');
             _.extend(this, opts);
 
@@ -73,7 +73,7 @@ define([
          * @param value
          * @return {*}
          */
-        setValue: function (value) {
+        setValue: function(value) {
             var oldValue = this.value;
             this.value = tools.deepClone(value);
             this._updateDOMValue();
@@ -88,8 +88,8 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onClickChoiceValue: function (e) {
-            $(e.currentTarget).parent().parent().find('li').each(function () {
+        _onClickChoiceValue: function(e) {
+            $(e.currentTarget).parent().parent().find('li').each(function() {
                 $(this).removeClass('active');
             });
             $(e.currentTarget).parent().addClass('active');
@@ -113,8 +113,8 @@ define([
          * Without this $select.val() or select.selectedValue returns wrong value
          * (tested with select.ui-datepicker-month)
          */
-        fixSelects: function () {
-            this.$('select').each(function () {
+        fixSelects: function() {
+            this.$('select').each(function() {
                 var $select = $(this);
                 if ($select.val()) {
                     return true;
@@ -130,7 +130,7 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onClickCriteriaSelector: function (e) {
+        _onClickCriteriaSelector: function(e) {
             e.stopPropagation();
             $('body').trigger('click');
             if (!this.popupCriteriaShowed) {
@@ -147,7 +147,7 @@ define([
          *
          * @protected
          */
-        _handleEmptyFilter: function () {
+        _handleEmptyFilter: function() {
             var container = this.$(this.criteriaSelector);
             var item = container.find(this.criteriaValueSelectors.value);
             var type = container.find(this.criteriaValueSelectors.type).val();
@@ -180,7 +180,7 @@ define([
         /**
          * @inheritDoc
          */
-        isEmptyValue: function () {
+        isEmptyValue: function() {
             if (this.isEmptyType(this.value.type)) {
                 return false;
             }

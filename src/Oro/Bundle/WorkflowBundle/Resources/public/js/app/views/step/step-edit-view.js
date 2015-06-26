@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var StepEditView,
@@ -26,7 +26,7 @@ define(function (require) {
             'destroy model': 'remove'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
             var template = this.options.template || $('#step-form-template').html();

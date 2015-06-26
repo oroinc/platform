@@ -4,7 +4,7 @@ define([
     'jquery',
     'underscore',
     'backgrid'
-], function ($, _, Backgrid) {
+], function($, _, Backgrid) {
     'use strict';
 
     var Row, document;
@@ -37,11 +37,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.cells, function (cell) {
+            _.each(this.cells, function(cell) {
                 cell.dispose();
             });
             delete this.cells;
@@ -54,7 +54,7 @@ define([
          *
          * @param {Event} e
          */
-        onClick: function (e) {
+        onClick: function(e) {
             var exclude = 'a, .dropdown',
                 $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
@@ -64,7 +64,7 @@ define([
 
             this.clickData.counter += 1;
             if (this.clickData.counter === 1 && !this._hasSelectedText()) {
-                _.delay(_.bind(function () {
+                _.delay(_.bind(function() {
                     if (!this._hasSelectedText() && this.clickData.counter === 1) {
                         this.trigger('clicked', this, e);
                     }
@@ -81,7 +81,7 @@ define([
          * @returns {string}
          * @return {boolean}
          */
-        _hasSelectedText: function () {
+        _hasSelectedText: function() {
             var text = "";
             if (_.isFunction(window.getSelection)) {
                 text = window.getSelection().toString();
@@ -94,7 +94,7 @@ define([
         /**
          * @inheritDoc
          */
-        makeCell: function (column) {
+        makeCell: function(column) {
             var cell = new (column.get("cell"))({
                 column: column,
                 model: this.model
@@ -113,7 +113,7 @@ define([
          * @param {Backgrid.Cell} cell
          * @private
          */
-        _listenToCellEvents: function (cell) {
+        _listenToCellEvents: function(cell) {
             if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
                 this.on('clicked', cell.onRowClicked, cell);
             }

@@ -4,7 +4,7 @@ define([
     'underscore',
     'backbone',
     'chaplin'
-], function (_, Backbone, Chaplin) {
+], function(_, Backbone, Chaplin) {
     'use strict';
 
     var mediator = Backbone.mediator = Chaplin.mediator;

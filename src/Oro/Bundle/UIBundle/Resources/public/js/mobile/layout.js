@@ -1,7 +1,7 @@
 /*jshint browser: true*/
 /*jslint browser: true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
     var $ = require('jquery'),
         _ = require('underscore'),
@@ -30,16 +30,16 @@ define(function (require) {
         var $body, forceHeaderLayoutUpdate,
             elementsWithKeyboardSelector = 'input[type=text], input[type=number], textarea, [content-editable]';
         $body = $('body');
-        forceHeaderLayoutUpdate = _.debounce(function () {
+        forceHeaderLayoutUpdate = _.debounce(function() {
             $(document).scrollTop($(document).scrollTop());
             mediator.trigger('layout:headerStateChange');
         }, 1);
         $(document)
-            .on('focus', elementsWithKeyboardSelector, function () {
+            .on('focus', elementsWithKeyboardSelector, function() {
                 $body.addClass('input-focused');
                 mediator.trigger('layout:headerStateChange');
             })
-            .on('blur', elementsWithKeyboardSelector, function () {
+            .on('blur', elementsWithKeyboardSelector, function() {
                 $body.removeClass('input-focused');
                 forceHeaderLayoutUpdate();
             });
@@ -62,15 +62,15 @@ define(function (require) {
             }
         }
 
-        mediator.on('widget_dialog:open', function (dialog) {
+        mediator.on('widget_dialog:open', function(dialog) {
             dialogs[dialog.cid] = dialog.getState() !== 'minimized';
             scrollUpdate();
         });
-        mediator.on('widget_dialog:close', function (dialog) {
+        mediator.on('widget_dialog:close', function(dialog) {
             delete dialogs[dialog.cid];
             scrollUpdate();
         });
-        mediator.on('widget_dialog:stateChange', function (dialog) {
+        mediator.on('widget_dialog:stateChange', function(dialog) {
             dialogs[dialog.cid] = dialog.getState() !== 'minimized';
             scrollUpdate();
         });
@@ -93,7 +93,7 @@ define(function (require) {
      * @name oro.mobile.layout
      */
     return {
-        init: function () {
+        init: function() {
             $(initLayout);
         }
     };

@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var moment = require('moment'),
@@ -17,7 +17,7 @@ define(function (require) {
         week : {
             dow : localeSettings.getCalendarFirstDayOfWeek() - 1
         },
-        meridiem : function (hours, minutes, isLower) {
+        meridiem : function(hours, minutes, isLower) {
             if (hours > 11) {
                 return isLower ? __('pm') : __('PM');
             } else {

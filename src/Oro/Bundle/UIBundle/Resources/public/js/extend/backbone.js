@@ -4,12 +4,12 @@ define([
     'underscore',
     'backbone',
     'oroui/js/app/components/base/component-container-mixin'
-], function (_, Backbone, componentContainerMixin) {
+], function(_, Backbone, componentContainerMixin) {
     'use strict';
 
     _.extend(Backbone.View.prototype, componentContainerMixin);
     Backbone.View.prototype.disposed = false;
-    Backbone.View.prototype.dispose = function () {
+    Backbone.View.prototype.dispose = function() {
         var prop, properties, subview, _i, _j, _len, _len1, _ref;
         if (this.disposed) {
             return;
@@ -40,13 +40,13 @@ define([
         this.disposed = true;
         return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
     };
-    Backbone.View.prototype.eventNamespace = function () {
+    Backbone.View.prototype.eventNamespace = function() {
         return '.delegateEvents' + this.cid;
     };
-    Backbone.View.prototype.getLayoutElement = function () {
+    Backbone.View.prototype.getLayoutElement = function() {
         return this.$el;
     };
-    Backbone.View.prototype.initLayout = function () {
+    Backbone.View.prototype.initLayout = function() {
         // initializes layout
         Backbone.mediator.execute('layout:init', this.getLayoutElement());
         // initializes page components
@@ -54,7 +54,7 @@ define([
     };
 
     Backbone.Model.prototype.disposed = false;
-    Backbone.Model.prototype.dispose = function () {
+    Backbone.Model.prototype.dispose = function() {
         var prop, properties, _i, _len;
         if (this.disposed) {
             return;
@@ -73,7 +73,7 @@ define([
     };
 
     Backbone.Collection.prototype.disposed = false;
-    Backbone.Collection.prototype.dispose = function () {
+    Backbone.Collection.prototype.dispose = function() {
         var prop, properties, _i, _len;
         if (this.disposed) {
             return;

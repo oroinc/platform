@@ -3,7 +3,7 @@
 define([
     'oro/datagrid/cell/html-cell',
     'orodatagrid/js/datagrid/formatter/phone-formatter'
-], function (HtmlCell, PhoneFormatter) {
+], function(HtmlCell, PhoneFormatter) {
     'use strict';
 
     var PhoneCell;
@@ -32,7 +32,7 @@ define([
         /**
          * If don't stop propagation click will select row
          */
-        stopPropagation: function (e) {
+        stopPropagation: function(e) {
             e.stopPropagation();
         }
     });

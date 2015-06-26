@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WorkflowManagementView,
@@ -30,7 +30,7 @@ define(function (require) {
             entities: []
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
             this.initStartStepSelector();
@@ -47,28 +47,28 @@ define(function (require) {
             this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
         },
 
-        render: function () {
+        render: function() {
             this.renderSteps();
             return this;
         },
 
-        renderSteps: function () {
+        renderSteps: function() {
             this.stepListView.render();
         },
 
-        onSubmit: function (e) {
+        onSubmit: function(e) {
             this.model.trigger('saveWorkflow', e);
         },
 
-        setSubmitActor: function (e) {
+        setSubmitActor: function(e) {
             this.submitActor = e.target;
         },
 
-        initStartStepSelector: function () {
+        initStartStepSelector: function() {
             var select2Options,
-                getSteps = _.bind(function (query) {
+                getSteps = _.bind(function(query) {
                 var steps = [];
-                _.each(this.model.get('steps').models, function (step) {
+                _.each(this.model.get('steps').models, function(step) {
                     // starting point is not allowed to be a start step
                     var stepLabel = step.get('label');
                     if (!step.get('_is_start') &&
@@ -90,7 +90,7 @@ define(function (require) {
                 'allowClear': true,
                 'query': getSteps,
                 'placeholder': __('Choose step...'),
-                'initSelection' : _.bind(function (element, callback) {
+                'initSelection' : _.bind(function(element, callback) {
                     var startStep = this.model.getStepByName(element.val());
                     callback({
                         id: startStep.get('name'),
@@ -102,16 +102,16 @@ define(function (require) {
             this.$startStepEl.select2(select2Options);
         },
 
-        initEntityFieldsLoader: function () {
+        initEntityFieldsLoader: function() {
             var confirm = new Confirmation({
                 title: __('Change Entity Confirmation'),
                 okText: __('Yes'),
                 content: __('oro.workflow.change_entity_confirmation')
             });
-            confirm.on('ok', _.bind(function () {
+            confirm.on('ok', _.bind(function() {
                 this.model.set('entity', this.$entitySelectEl.val());
             }, this));
-            confirm.on('cancel', _.bind(function () {
+            confirm.on('cancel', _.bind(function() {
                 this.$entitySelectEl.select2('val', this.model.get('entity'));
             }, this));
 
@@ -119,7 +119,7 @@ define(function (require) {
                 router: 'oro_workflow_api_rest_entity_get',
                 routingParams: {},
                 confirm: confirm,
-                requireConfirm: _.bind(function () {
+                requireConfirm: _.bind(function() {
                     return this.model.get('steps').length > 1 &&
                         (this.model.get('transitions').length +
                             this.model.get('transition_definitions').length +
@@ -127,20 +127,20 @@ define(function (require) {
                 }, this)
             });
 
-            this.$entitySelectEl.on('change', _.bind(function () {
+            this.$entitySelectEl.on('change', _.bind(function() {
                 if (!this.model.get('entity')) {
                     this.model.set('entity', this.$entitySelectEl.val());
                 }
             }, this));
 
-            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function (e) {
+            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
                 this.initEntityFieldsData($(e.target).data('fields'));
             }, this));
 
             this._preloadEntityFieldsData();
         },
 
-        _preloadEntityFieldsData: function () {
+        _preloadEntityFieldsData: function() {
             if (this.$entitySelectEl.val()) {
                 var fieldsData = this.$entitySelectEl.fieldsLoader('getFieldsData');
                 if (!fieldsData.length) {
@@ -151,34 +151,34 @@ define(function (require) {
             }
         },
 
-        addNewTransition: function () {
+        addNewTransition: function() {
             this.model.trigger('requestAddTransition');
         },
 
-        addNewStep: function () {
+        addNewStep: function() {
             this.model.trigger('requestAddStep');
         },
 
-        initEntityFieldsData: function (fields) {
+        initEntityFieldsData: function(fields) {
             this.model.setEntityFieldsData(fields);
         },
 
-        onStepRemove: function (step) {
+        onStepRemove: function(step) {
             //Deselect start_step if it was removed
             if (this.$startStepEl.val() === step.get('name')) {
                 this.$startStepEl.select2('val', '');
             }
         },
 
-        isEntitySelected: function () {
+        isEntitySelected: function() {
             return Boolean(this.$entitySelectEl.val());
         },
 
-        getEntitySelect: function () {
+        getEntitySelect: function() {
             return this.$entitySelectEl;
         },
 
-        valid: function () {
+        valid: function() {
             return this.$el.valid();
         }
     });

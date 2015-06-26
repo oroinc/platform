@@ -1,6 +1,6 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var Grid,
@@ -124,7 +124,7 @@ define(function (require) {
          * @param {oro.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
          * @throws {TypeError} If mandatory options are undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = options || {};
             this.subviews = [];
             this.pluginManager = new PluginManager(this);
@@ -183,7 +183,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             var subviews;
             if (this.disposed) {
                 return;
@@ -191,7 +191,7 @@ define(function (require) {
 
             this.pluginManager.dispose();
 
-            _.each(this.columns.models, function (column) {
+            _.each(this.columns.models, function(column) {
                 column.dispose();
             });
             this.columns.dispose();
@@ -201,7 +201,7 @@ define(function (require) {
             delete this.exportAction;
 
             subviews = ['header', 'body', 'footer', 'toolbar', 'loadingMask'];
-            _.each(subviews, function (viewName) {
+            _.each(subviews, function(viewName) {
                 this[viewName].dispose();
                 delete this[viewName];
             }, this);
@@ -214,9 +214,9 @@ define(function (require) {
          *
          * @private
          */
-        _initRowActions: function () {
+        _initRowActions: function() {
             if (!this.rowClickAction) {
-                this.rowClickAction = _.find(this.rowActions, function (action) {
+                this.rowClickAction = _.find(this.rowActions, function(action) {
                     return Boolean(action.prototype.rowAction);
                 });
             }
@@ -228,7 +228,7 @@ define(function (require) {
          * @return {Backgrid.Column}
          * @private
          */
-        _createActionsColumn: function () {
+        _createActionsColumn: function() {
             var column;
             column = new this.actionsColumn({
                 datagrid: this,
@@ -244,7 +244,7 @@ define(function (require) {
          * @return {Backgrid.Column}
          * @private
          */
-        _createSelectRowColumn: function () {
+        _createSelectRowColumn: function() {
             var coulmn;
             coulmn = new Backgrid.Column({
                 name:       "massAction",
@@ -263,7 +263,7 @@ define(function (require) {
          *
          * @returns {{selectedModels: *, inset: boolean}}
          */
-        getSelectionState: function () {
+        getSelectionState: function() {
             var selectAllHeader = this.header.row.cells[0];
             return selectAllHeader.getSelectionState();
         },
@@ -271,7 +271,7 @@ define(function (require) {
         /**
          * Resets selection state
          */
-        resetSelectionState: function () {
+        resetSelectionState: function() {
             this.collection.trigger('backgrid:selectNone');
         },
 
@@ -281,7 +281,7 @@ define(function (require) {
          * @return {orodatagrid.datagrid.Toolbar}
          * @private
          */
-        _createToolbar: function (options) {
+        _createToolbar: function(options) {
             var toolbarOptions, toolbar;
             toolbarOptions = {
                 collection:   this.collection,
@@ -300,7 +300,7 @@ define(function (require) {
          * @return {Array}
          * @private
          */
-        _getToolbarActions: function () {
+        _getToolbarActions: function() {
             var actions = [];
             if (this.toolbarOptions.addRefreshAction) {
                 actions.push(this.getRefreshAction());
@@ -317,7 +317,7 @@ define(function (require) {
          * @return {Array}
          * @private
          */
-        _getToolbarExtraActions: function () {
+        _getToolbarExtraActions: function() {
             var actions = [];
             if (!_.isEmpty(this.exportOptions)) {
                 actions.push(this.getExportAction());
@@ -330,7 +330,7 @@ define(function (require) {
          *
          * @return {oro.datagrid.action.RefreshCollectionAction}
          */
-        getRefreshAction: function () {
+        getRefreshAction: function() {
             if (!this.refreshAction) {
                 this.refreshAction = new RefreshCollectionAction({
                     datagrid: this,
@@ -341,13 +341,13 @@ define(function (require) {
                     }
                 });
 
-                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function () {
+                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function() {
                     if (this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
                 });
 
-                this.listenTo(this.refreshAction, 'preExecute', function (action, options) {
+                this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);
                 });
             }
@@ -360,7 +360,7 @@ define(function (require) {
          *
          * @return {oro.datagrid.action.ResetCollectionAction}
          */
-        getResetAction: function () {
+        getResetAction: function() {
             if (!this.resetAction) {
                 this.resetAction = new ResetCollectionAction({
                     datagrid: this,
@@ -371,13 +371,13 @@ define(function (require) {
                     }
                 });
 
-                this.listenTo(mediator, 'datagrid:doReset:' + this.name, function () {
+                this.listenTo(mediator, 'datagrid:doReset:' + this.name, function() {
                     if (this.$el.is(':visible')) {
                         this.resetAction.execute();
                     }
                 });
 
-                this.listenTo(this.resetAction, 'preExecute', function (action, options) {
+                this.listenTo(this.resetAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:reset:' + this.name, [action, options]);
                 });
             }
@@ -390,10 +390,10 @@ define(function (require) {
          *
          * @return {oro.datagrid.action.ExportAction}
          */
-        getExportAction: function () {
+        getExportAction: function() {
             if (!this.exportAction) {
                 var links = [];
-                _.each(this.exportOptions, function (val, key) {
+                _.each(this.exportOptions, function(val, key) {
                     links.push({
                         key: key,
                         label: val.label,
@@ -414,7 +414,7 @@ define(function (require) {
                     }
                 });
 
-                this.listenTo(this.exportAction, 'preExecute', function (action, options) {
+                this.listenTo(this.exportAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:export:' + this.name, [action, options]);
                 });
             }
@@ -427,12 +427,12 @@ define(function (require) {
          *
          * @private
          */
-        _listenToCollectionEvents: function () {
-            this.listenTo(this.collection, 'request', function (model, xhr) {
+        _listenToCollectionEvents: function() {
+            this.listenTo(this.collection, 'request', function(model, xhr) {
                 this._beforeRequest();
                 var self = this;
                 var always = xhr.always;
-                xhr.always = function () {
+                xhr.always = function() {
                     always.apply(this, arguments);
                     if (!self.disposed) {
                         self._afterRequest();
@@ -442,7 +442,7 @@ define(function (require) {
 
             this.listenTo(this.collection, 'remove', this._onRemove);
 
-            this.listenTo(this.collection, 'change', function (model) {
+            this.listenTo(this.collection, 'change', function(model) {
                 this.$el.trigger('datagrid:change:' + this.name, model);
             });
         },
@@ -452,8 +452,8 @@ define(function (require) {
          *
          * @private
          */
-        _listenToBodyEvents: function () {
-            this.listenTo(this.body, 'rowClicked', function (row) {
+        _listenToBodyEvents: function() {
+            this.listenTo(this.body, 'rowClicked', function(row) {
                 this.trigger('rowClicked', this, row);
                 this._runRowClickAction(row);
             });
@@ -465,7 +465,7 @@ define(function (require) {
          * @param {orodatagrid.datagrid.Row} row
          * @private
          */
-        _runRowClickAction: function (row) {
+        _runRowClickAction: function(row) {
             var action, config;
             if (!this.rowClickAction) {
                 return;
@@ -487,13 +487,13 @@ define(function (require) {
         /**
          * Listen to commands on mediator
          */
-        _listenToCommands: function () {
-            this.listenTo(mediator, 'datagrid:setParam:' + this.name, function (param, value) {
+        _listenToCommands: function() {
+            this.listenTo(mediator, 'datagrid:setParam:' + this.name, function(param, value) {
                 this.setAdditionalParameter(param, value);
             });
 
-            this.listenTo(mediator, 'datagrid:restoreState:' + this.name, function (columnName, dataField, included, excluded) {
-                this.collection.each(function (model) {
+            this.listenTo(mediator, 'datagrid:restoreState:' + this.name, function(columnName, dataField, included, excluded) {
+                this.collection.each(function(model) {
                     if (_.indexOf(included, model.get(dataField)) !== -1) {
                         model.set(columnName, true);
                     }
@@ -509,7 +509,7 @@ define(function (require) {
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             this.$el.html(this.template());
             this.$grid = this.$(this.selectors.grid);
 
@@ -520,7 +520,7 @@ define(function (require) {
 
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
-            this.initLayout().always(_.bind(function () {
+            this.initLayout().always(_.bind(function() {
                 this.rendered = true;
                 /**
                  * Backbone event. Fired when the grid has been successfully rendered.
@@ -541,7 +541,7 @@ define(function (require) {
         /**
          * Renders the grid's header, then footer, then finally the body.
          */
-        renderGrid: function () {
+        renderGrid: function() {
             this.$grid.append(this.header.render().$el);
             if (this.footer) {
                 this.$grid.append(this.footer.render().$el);
@@ -554,14 +554,14 @@ define(function (require) {
         /**
          * Renders grid toolbar.
          */
-        renderToolbar: function () {
+        renderToolbar: function() {
             this.$(this.selectors.toolbar).append(this.toolbar.render().$el);
         },
 
         /**
          * Renders loading mask.
          */
-        renderLoadingMask: function () {
+        renderLoadingMask: function() {
             if (this.loadingMask) {
                 this.loadingMask.dispose();
             }
@@ -573,7 +573,7 @@ define(function (require) {
         /**
          * Define no data block.
          */
-        _defineNoDataBlock: function () {
+        _defineNoDataBlock: function() {
             var placeholders = {entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()},
                 message = _.isEmpty(this.collection.state.filters) ?
                         'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
@@ -589,7 +589,7 @@ define(function (require) {
          *
          * @private
          */
-        _beforeRequest: function () {
+        _beforeRequest: function() {
             this.requestsCount += 1;
             this.showLoading();
         },
@@ -599,7 +599,7 @@ define(function (require) {
          *
          * @private
          */
-        _afterRequest: function () {
+        _afterRequest: function() {
             this.requestsCount -= 1;
             if (this.requestsCount === 0) {
                 this.hideLoading();
@@ -616,7 +616,7 @@ define(function (require) {
         /**
          * Show loading mask and disable toolbar
          */
-        showLoading: function () {
+        showLoading: function() {
             this.loadingMask.show();
             this.toolbar.disable();
             this.trigger('disable');
@@ -625,7 +625,7 @@ define(function (require) {
         /**
          * Hide loading mask and enable toolbar
          */
-        hideLoading: function () {
+        hideLoading: function() {
             this.loadingMask.hide();
             this.toolbar.enable();
             this.trigger('enable');
@@ -636,7 +636,7 @@ define(function (require) {
          *
          * @private
          */
-        renderNoDataBlock: function () {
+        renderNoDataBlock: function() {
             this._defineNoDataBlock();
             this.$el.toggleClass('no-data-visible', this.collection.models.length <= 0  || this.noColumnsFlag);
         },
@@ -646,7 +646,7 @@ define(function (require) {
          *
          * @private
          */
-        _onRemove: function (model) {
+        _onRemove: function(model) {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.name, model);
 
             this.collection.fetch({reset: true});
@@ -660,7 +660,7 @@ define(function (require) {
          * @param {String} name
          * @param value
          */
-        setAdditionalParameter: function (name, value) {
+        setAdditionalParameter: function(name, value) {
             var state = this.collection.state;
             if (!_.has(state, 'parameters')) {
                 state.parameters = {};
@@ -674,7 +674,7 @@ define(function (require) {
          *
          * @param {String} name
          */
-        removeAdditionalParameter: function (name) {
+        removeAdditionalParameter: function(name) {
             var state = this.collection.state;
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];

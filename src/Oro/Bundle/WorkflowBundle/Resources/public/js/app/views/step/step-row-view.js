@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var StepRowView,
@@ -28,7 +28,7 @@ define(function (require) {
             'destroy model': 'remove'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);

@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailAttachmentComponent,
@@ -68,7 +68,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -131,7 +131,7 @@ define(function (require) {
          * @param {string} selector
          * @returns {jQuery}
          */
-        findControlElement: function ($sourceElement, selector) {
+        findControlElement: function($sourceElement, selector) {
             return $sourceElement.parent().find(selector);
         }
     });

@@ -4,7 +4,7 @@ define([
     'underscore',
     'backbone',
     'chaplin'
-], function (_, Backbone, Chaplin) {
+], function(_, Backbone, Chaplin) {
     'use strict';
 
     var BaseComponent, componentOptions;
@@ -17,7 +17,7 @@ define([
      * @export oroui/js/app/components/base/component
      * @class oroui.app.components.base.Component
      */
-    BaseComponent = function (options) {
+    BaseComponent = function(options) {
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
         this.initialize(options);
@@ -63,14 +63,14 @@ define([
          *
          * @param {Object=} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             // should be defined in descendants
         },
 
         /**
          * Disposes the component
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -79,7 +79,7 @@ define([
             this.stopListening();
             this.off();
             // dispose and remove all own properties
-            _.each(this, function (item, name) {
+            _.each(this, function(item, name) {
                 if (item && typeof item.dispose === 'function') {
                     item.dispose();
                 }
@@ -95,7 +95,7 @@ define([
          *
          * @protected
          */
-        _deferredInit: function () {
+        _deferredInit: function() {
             this.deferredInit = $.Deferred();
         },
 
@@ -104,7 +104,7 @@ define([
          *
          * @protected
          */
-        _resolveDeferredInit: function () {
+        _resolveDeferredInit: function() {
             if (this.deferredInit) {
                 this.deferredInit.resolve(this);
             }

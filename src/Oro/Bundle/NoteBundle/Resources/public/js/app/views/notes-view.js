@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var NotesView,
@@ -38,7 +38,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
             _.defaults(this.options.messages, {
@@ -63,7 +63,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -71,23 +71,23 @@ define(function (require) {
             NotesView.__super__.dispose.call(this);
         },
 
-        expandAll: function () {
-            _.each(this.subviews, function (itemView) {
+        expandAll: function() {
+            _.each(this.subviews, function(itemView) {
                 itemView.toggle(false);
             });
         },
 
-        collapseAll: function () {
-            _.each(this.subviews, function (itemView) {
+        collapseAll: function() {
+            _.each(this.subviews, function(itemView) {
                 itemView.toggle(true);
             });
         },
 
-        refresh: function () {
+        refresh: function() {
             this._reload();
         },
 
-        toggleSorting: function (e) {
+        toggleSorting: function(e) {
             var $el = $(e.currentTarget),
                 titleAlt = $el.data('title-alt'),
                 iconAlt = $el.data('icon-alt');
@@ -99,25 +99,25 @@ define(function (require) {
             this._reload(this.collection.getSorting() === 'DESC' ? 'ASC' : 'DESC');
         },
 
-        _reload: function (sorting) {
+        _reload: function(sorting) {
             var state = {};
             if (!_.isUndefined(sorting)) {
                 this.collection.setSorting(sorting);
             }
             this._showLoading();
             try {
-                _.each(this.subviews, function (itemView) {
+                _.each(this.subviews, function(itemView) {
                     state[itemView.model.get('id')] = itemView.isCollapsed();
                 });
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(function () {
-                        _.each(this.subviews, function (itemView) {
+                    success: _.bind(function() {
+                        _.each(this.subviews, function(itemView) {
                             itemView.toggle(state[itemView.model.get('id')]);
                         });
                         this._hideLoading();
                     }, this),
-                    error: _.bind(function (collection, response) {
+                    error: _.bind(function(collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
                     }, this)
                 });
@@ -126,7 +126,7 @@ define(function (require) {
             }
         },
 
-        _addItem: function (e) {
+        _addItem: function(e) {
             var url = this._getUrl('createItem'),
                 routeAdditionalParams = $(e).data('route_additional_params') || {};
 
@@ -137,31 +137,31 @@ define(function (require) {
             this._openItemEditForm(this._getMessage('addDialogTitle'), url);
         },
 
-        _editItem: function (model) {
+        _editItem: function(model) {
             this._openItemEditForm(this._getMessage('editDialogTitle'), this._getUrl('updateItem', model));
         },
 
-        _deleteItem: function (model) {
+        _deleteItem: function(model) {
             var confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
-            confirm.on('ok', _.bind(function () {
+            confirm.on('ok', _.bind(function() {
                 this._onItemDelete(model);
             }, this));
             confirm.open();
         },
 
-        _onItemDelete: function (model) {
+        _onItemDelete: function(model) {
             this._showLoading();
             try {
                 model.destroy({
                     wait: true,
                     url: this._getUrl('deleteItem', model),
-                    success: _.bind(function () {
+                    success: _.bind(function() {
                         this._hideLoading();
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
                     }, this),
-                    error: _.bind(function (model, response) {
+                    error: _.bind(function(model, response) {
                         if (!_.isUndefined(response.status) && response.status === 403) {
                             this._showForbiddenError(response.responseJSON || {});
                         } else {
@@ -182,18 +182,18 @@ define(function (require) {
          * @returns {string}
          * @protected
          */
-        _getUrl: function (actionKey, model) {
+        _getUrl: function(actionKey, model) {
             if (_.isFunction(this.options.urls[actionKey])) {
                 return this.options.urls[actionKey](model);
             }
             return this.options.urls[actionKey];
         },
 
-        _getMessage: function (labelKey) {
+        _getMessage: function(labelKey) {
             return this.options.messages[labelKey];
         },
 
-        _openItemEditForm: function (title, url) {
+        _openItemEditForm: function(title, url) {
             if (!this.itemEditDialog) {
                 this.itemEditDialog = new DialogWidget({
                     'url': url,
@@ -205,13 +205,13 @@ define(function (require) {
                         'resizable': false,
                         'width': 675,
                         'autoResize': true,
-                        'close': _.bind(function () {
+                        'close': _.bind(function() {
                             delete this.itemEditDialog;
                         }, this)
                     }
                 });
                 this.itemEditDialog.render();
-                this.itemEditDialog.on('formSave', _.bind(function (response) {
+                this.itemEditDialog.on('formSave', _.bind(function(response) {
                     var model, insertPosition;
                     this.itemEditDialog.remove();
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
@@ -229,7 +229,7 @@ define(function (require) {
         /**
          * Shows loading indicator
          */
-        _showLoading: function () {
+        _showLoading: function() {
             this.subview('loadingMask', new LoadingMask({
                 container: this.$el
             }));
@@ -239,23 +239,23 @@ define(function (require) {
         /**
          * Hides loading indicator
          */
-        _hideLoading: function () {
+        _hideLoading: function() {
             this.removeSubview('loadingMask');
         },
 
-        _showLoadItemsError: function (err) {
+        _showLoadItemsError: function(err) {
             this._showError(this.options.messages.loadItemsError, err);
         },
 
-        _showDeleteItemError: function (err) {
+        _showDeleteItemError: function(err) {
             this._showError(this.options.messages.deleteItemError, err);
         },
 
-        _showForbiddenError: function (err) {
+        _showForbiddenError: function(err) {
             this._showError(this.options.messages.forbiddenError, err);
         },
 
-        _showError: function (message, err) {
+        _showError: function(message, err) {
             this._hideLoading();
             mediator.execute('showErrorMessage', message, err);
         }

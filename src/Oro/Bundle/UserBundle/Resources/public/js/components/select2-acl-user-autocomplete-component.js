@@ -1,9 +1,9 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var Select2AclUserAutocompleteComponent,
         Select2Component = require('oro/select2-component');
     Select2AclUserAutocompleteComponent = Select2Component.extend({
-        makeQuery: function (query, configs) {
+        makeQuery: function(query, configs) {
             var queryParts = [
                 query,
                 configs.entity_name,

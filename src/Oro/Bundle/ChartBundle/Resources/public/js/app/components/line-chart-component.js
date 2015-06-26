@@ -29,11 +29,11 @@ define(function(require) {
             var rawData = this.data;
 
             if (dataFormatter.isValueNumerical(xFormat)) {
-                rawData.sort(function(first, second){
-                    if(first.label == null){
+                rawData.sort(function(first, second) {
+                    if (first.label == null) {
                         return -1;
                     }
-                    if(second.label == null){
+                    if (second.label == null) {
                         return 1;
                     }
                     var firstLabel = dataFormatter.parseValue(first.label, xFormat);
@@ -107,7 +107,7 @@ define(function(require) {
                 markers: {
                     show: true,
                     position: 'ct',
-                    labelFormatter: function (pointData) {
+                    labelFormatter: function(pointData) {
                         return getYLabel(pointData.y);
                     }
                 },
@@ -128,14 +128,14 @@ define(function(require) {
                         mouse : {
                             track : true,
                             relative : true,
-                            trackFormatter: function (pointData) {
-                                return   getXLabel(pointData.x) + ': ' + getYLabel(pointData.y);
+                            trackFormatter: function(pointData) {
+                                return getXLabel(pointData.x) + ': ' + getYLabel(pointData.y);
                             }
                         },
                         yaxis: {
                             max: yMax,
                             min: yMin,
-                            tickFormatter: function (y) {
+                            tickFormatter: function(y) {
                                 return getYLabel(y);
                             },
                             title: options.data_schema.value.label
@@ -143,7 +143,7 @@ define(function(require) {
                         xaxis: {
                             max: xMax,
                             min: xMin,
-                            tickFormatter: function (x) {
+                            tickFormatter: function(x) {
                                 return getXLabel(x);
                             },
                             title: options.data_schema.label.label

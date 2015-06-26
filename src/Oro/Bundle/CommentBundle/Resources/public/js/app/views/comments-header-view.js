@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var CommentsHeaderView,
@@ -21,7 +21,7 @@ define(function (require) {
             'click a.load-more': 'onLoadMoreClick'
         },
 
-        onLoadMoreClick: function (e) {
+        onLoadMoreClick: function(e) {
             e.stopImmediatePropagation();
             this.$el.trigger('comment-load-more');
         }

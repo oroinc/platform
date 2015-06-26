@@ -5,7 +5,7 @@ define([
     'orotranslation/js/translator',
     'oro/datagrid/action/mass-action',
     'oroui/js/messenger'
-], function (_, __, MassAction, messenger) {
+], function(_, __, MassAction, messenger) {
     'use strict';
 
     var MergeMassAction;
@@ -25,7 +25,7 @@ define([
          * @param {Object} [options.launcherOptions] Options for new instance of launcher object
          * @constructor
          */
-        initialize: function (options) {
+        initialize: function(options) {
             MergeMassAction.__super__.initialize.apply(this, arguments);
             this.on('preExecute', this.onPreExecute, this);
         },
@@ -34,7 +34,7 @@ define([
          * @param {object} event Backbone event object
          * @param {object} options Additional param options needed to stop action
          */
-        onPreExecute: function (event, options) {
+        onPreExecute: function(event, options) {
             var selectionState, isInset, length, totalRecords, validationMessage, maxLength;
 
             maxLength = this.max_element_count;

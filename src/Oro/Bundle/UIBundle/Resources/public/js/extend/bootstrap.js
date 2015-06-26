@@ -2,7 +2,7 @@
 define([
     'jquery',
     'bootstrap'
-], function ($) {
+], function($) {
     'use strict';
 
     /**
@@ -16,7 +16,7 @@ define([
         var $el, globalHandlers;
         $el = $(element).on('click.dropdown.data-api', this.toggle);
         globalHandlers = {
-            'click.dropdown.data-api': function () {
+            'click.dropdown.data-api': function() {
                 $el.parent().removeClass('open');
             }
         };
@@ -25,19 +25,18 @@ define([
     }
 
     Dropdown.prototype = $.fn.dropdown.Constructor.prototype;
-    Dropdown.prototype.destroy = function () {
+    Dropdown.prototype.destroy = function() {
         var globalHandlers = this.data('globalHandlers');
         $('html').off(globalHandlers);
         this.removeData('dropdown');
         this.removeData('globalHandlers');
     };
 
-
     /*jslint ignore:start*/
-    $.fn.dropdown = function (option) {
-        return this.each(function () {
-            var $this = $(this)
-                , data = $this.data('dropdown')
+    $.fn.dropdown = function(option) {
+        return this.each(function() {
+            var $this = $(this) ,
+                data = $this.data('dropdown')
             if (!data) $this.data('dropdown', (data = new Dropdown(this)))
             if (typeof option == 'string') data[option].call($this)
         })
@@ -51,7 +50,7 @@ define([
      * Based on https://github.com/Khan/bootstrap/commit/378ab557e24b861579d2ec4ce6f04b9ea995ab74
      * Updated to support two modals on page
      */
-    $.fn.modal.Constructor.prototype.enforceFocus = function () {
+    $.fn.modal.Constructor.prototype.enforceFocus = function() {
         var that = this;
         $(document)
             .off('focusin.modal') // guard against infinite focus loop
@@ -71,7 +70,7 @@ define([
         origTypeahead = $.fn.typeahead.Constructor,
         origFnTypeahead = $.fn.typeahead;
 
-    Typeahead = function (element, options) {
+    Typeahead = function(element, options) {
         var opts = $.extend({}, $.fn.typeahead.defaults, options);
         this.click = opts.click || this.click;
         this.render = opts.render || this.render;
@@ -81,11 +80,11 @@ define([
     Typeahead.prototype = origTypeahead.prototype;
     Typeahead.prototype.constructor = Typeahead;
 
-    $.fn.typeahead = function (option) {
-        return this.each(function () {
-            var $this = $(this)
-                , data = $this.data('typeahead')
-                , options = typeof option == 'object' && option;
+    $.fn.typeahead = function(option) {
+        return this.each(function() {
+            var $this = $(this) ,
+                data = $this.data('typeahead') ,
+                options = typeof option == 'object' && option;
             if (!data) {
                 $this.data('typeahead', (data = new Typeahead(this, options)));
             }

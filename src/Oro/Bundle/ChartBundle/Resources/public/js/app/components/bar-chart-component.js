@@ -29,7 +29,7 @@ define(function(require) {
             var xLabels = [];
             var chartOptions;
 
-            for(var i in data) {
+            for (var i in data) {
                 chartData.push([xNumber++, parseInt(data[i]['value'])]);
                 xLabels.push(data[i]['label']);
             }
@@ -40,8 +40,8 @@ define(function(require) {
                 markers: {
                     show: true,
                     position: 'ct',
-                    labelFormatter: function (data) {
-                        if(formatter) {
+                    labelFormatter: function(data) {
+                        if (formatter) {
                             return numberFormatter[formatter](data.y);
                         } else {
                             return data.y;
@@ -65,10 +65,10 @@ define(function(require) {
                     mouse : {
                         track : true,
                         relative : true,
-                        trackFormatter: function (data) {
+                        trackFormatter: function(data) {
                             var yValue;
 
-                            if(formatter) {
+                            if (formatter) {
                                 yValue = numberFormatter[formatter](data.y);
                                 return numberFormatter[formatter](data.y);
                             } else {
@@ -80,8 +80,8 @@ define(function(require) {
                     },
                     yaxis: {
                         min: 0,
-                        tickFormatter: function (y) {
-                            if(formatter) {
+                        tickFormatter: function(y) {
+                            if (formatter) {
                                 return numberFormatter.formatCurrency(y);
                             } else {
                                 return y;
@@ -90,7 +90,7 @@ define(function(require) {
                     },
                     xaxis: {
                         noTicks: settings.xNoTicks,
-                        tickFormatter: function (x) {
+                        tickFormatter: function(x) {
                             return xLabels[parseInt(x)];
                         }
                     },

@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
-    ], function (_, Backbone, __, TagCollection) {
+    ], function(_, Backbone, __, TagCollection) {
     'use strict';
 
     var $ = Backbone.$;
@@ -36,7 +36,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
         /**
          * Constructor
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.collection = new TagCollection();
             this.listenTo(this.getCollection(), 'reset', this.render);
@@ -53,7 +53,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
          *
          * @returns {*}
          */
-        filter: function (e) {
+        filter: function(e) {
             var $el = $(e.target);
 
             // clear all active links
@@ -72,7 +72,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
          *
          * @returns {*}
          */
-        getCollection: function () {
+        getCollection: function() {
             return this.collection;
         },
 
@@ -81,7 +81,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
          *
          * @returns {}
          */
-        render: function () {
+        render: function() {
             this.$tagsHolder.html(
                 this.template(this.getCollection().getFilteredCollection(this.options.filter))
             );

@@ -6,7 +6,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/layout',
     'jquery-ui'
-], function ($, _, __, layout) {
+], function($, _, __, layout) {
     'use strict';
 
     /**
@@ -29,31 +29,31 @@ define([
                 '</ul></div>'
         },
 
-        _create: function () {
+        _create: function() {
             this.render();
             this._on({
                 'click .ui-datevariables-div a.ui_date_variable': 'onSelectVar'
             });
         },
 
-        _destroy: function () {
+        _destroy: function() {
             this.element.empty();
         },
 
-        setPart: function (part) {
+        setPart: function(part) {
             this.options.part = part;
 
             // re-render on change part
             this.render();
         },
 
-        onSelectVar: function (e) {
+        onSelectVar: function(e) {
             var variable = e.target.text;
             this.options.onSelect(variable);
             e.preventDefault();
         },
 
-        render: function () {
+        render: function() {
             var o               = this.options,
                 currentDatePart = o.part,
                 dateVars        = this._getVariablesByPart(currentDatePart),
@@ -74,7 +74,7 @@ define([
             layout.initPopover(this.element);
         },
 
-        _getVariablesByPart: function (datePart) {
+        _getVariablesByPart: function(datePart) {
             var dateVars = this.options.dateVars;
             return dateVars[datePart] ? dateVars[datePart] : dateVars['value'];
         }

@@ -4,7 +4,7 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/mediator'
-], function (_, __, mediator) {
+], function(_, __, mediator) {
     'use strict';
 
     function Util(entity, data) {
@@ -19,10 +19,10 @@ define([
      * @returns {Object}
      * @static
      */
-    Util.filterFields = function (fields, exclude) {
-        fields = _.filter(fields, function (item) {
+    Util.filterFields = function(fields, exclude) {
+        fields = _.filter(fields, function(item) {
             var result;
-            result = !_.some(exclude, function (rule) {
+            result = !_.some(exclude, function(rule) {
                 var result, cut;
                 // exclude can be a property name
                 if (_.isString(rule)) {
@@ -43,7 +43,7 @@ define([
         return fields;
     };
 
-    Util.errorHandler = (function () {
+    Util.errorHandler = (function() {
         var message, handler;
         message = __('oro.entity.not_exist');
         handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
@@ -52,7 +52,7 @@ define([
 
     Util.prototype = {
 
-        init: function (entity, data) {
+        init: function(entity, data) {
             this.entity = entity;
             this.data = data || {};
         },
@@ -86,7 +86,7 @@ define([
          * @param {boolean?} trim - flag, allows to omit last item if it's a field
          * @returns {Array.<Object>}
          */
-        pathToEntityChain: function (path, trim) {
+        pathToEntityChain: function(path, trim) {
             var chain, data, self = this;
             data = this.data;
 
@@ -105,7 +105,7 @@ define([
             }
 
             try {
-                _.each(path.split('+'), function (item, i) {
+                _.each(path.split('+'), function(item, i) {
                     var fieldName, entityName, pos;
 
                     if (i === 0) {
@@ -181,12 +181,12 @@ define([
          * @param {number=} end - number of chain-items which need to be ignored
          * @returns {string}
          */
-        entityChainToPath: function (chain, end) {
+        entityChainToPath: function(chain, end) {
             var path;
             end = end || chain.length;
 
             try {
-                chain = _.map(chain.slice(1, end), function (item) {
+                chain = _.map(chain.slice(1, end), function(item) {
                     var result = item.field.name;
                     if (item.entity) {
                         result += '+' + item.entity.name;
@@ -210,7 +210,7 @@ define([
          *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
          * @returns {Object}
          */
-        getApplicableConditions: function (fieldId) {
+        getApplicableConditions: function(fieldId) {
             var chain, result, entity;
             result = {};
 
@@ -247,9 +247,9 @@ define([
          * @param {string} path
          * @returns {string}
          */
-        getPropertyPathByPath: function (path) {
+        getPropertyPathByPath: function(path) {
             var propertyPathParts = [];
-            _.each(path.split('+'), function (item, i) {
+            _.each(path.split('+'), function(item, i) {
                 var part;
                 if (i === 0) {
                     // first item is always just a field name
@@ -279,7 +279,7 @@ define([
          * @param {string} pathData
          * @returns {string}
          */
-        getPathByPropertyPath: function (pathData) {
+        getPathByPropertyPath: function(pathData) {
             var entityData, fieldIdParts;
             if (!_.isArray(pathData)) {
                 pathData = pathData.split('.');
@@ -287,7 +287,7 @@ define([
 
             entityData = this.data[this.entity];
             try {
-                fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
+                fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function(fieldName) {
                     var fieldPartId, fieldsData;
                     fieldPartId = fieldName;
                     fieldsData = null;

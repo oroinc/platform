@@ -1,5 +1,5 @@
 /*global define*/
-define(['backbone'], function (Backbone) {
+define(['backbone'], function(Backbone) {
     'use strict';
 
     /**
@@ -31,7 +31,7 @@ define(['backbone'], function (Backbone) {
             active: false
         },
 
-        getSearchableString: function () {
+        getSearchableString: function() {
             return this.get('country') + ', ' +
                 this.get('city') + ', ' +
                 this.get('street') + ' ' + (this.get('street2') || '');

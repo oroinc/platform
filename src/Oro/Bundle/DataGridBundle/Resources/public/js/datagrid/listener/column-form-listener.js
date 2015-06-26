@@ -7,7 +7,7 @@ define([
     'oroui/js/mediator',
     'oroui/js/modal',
     './abstract-listener'
-], function ($, _, __, mediator, Modal, AbstractListener) {
+], function($, _, __, mediator, Modal, AbstractListener) {
     'use strict';
 
     var ColumnFormListener;
@@ -32,7 +32,7 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!_.has(options, 'selectors')) {
                 throw new Error('Field selectors is not specified');
             }
@@ -45,11 +45,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.confirmModal, function (modal) {
+            _.each(this.confirmModal, function(modal) {
                 modal.dispose();
             });
             delete this.confirmModal;
@@ -59,7 +59,7 @@ define([
         /**
          * Set datagrid instance
          */
-        setDatagridAndSubscribe: function () {
+        setDatagridAndSubscribe: function() {
             ColumnFormListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
 
             this._clearState();
@@ -68,7 +68,7 @@ define([
             /**
              * Restore include/exclude state from pagestate
              */
-            mediator.bind("pagestate_restored", function () {
+            mediator.bind("pagestate_restored", function() {
                 this._restoreState();
             }, this);
         },
@@ -76,7 +76,7 @@ define([
         /**
          * @inheritDoc
          */
-        getGridEvents: function () {
+        getGridEvents: function() {
             var events = ColumnFormListener.__super__.getGridEvents.call(this);
             events['preExecute:refresh:' + this.gridName] = _.bind(this._onExecuteRefreshAction, this);
             events['preExecute:reset:' + this.gridName] = _.bind(this._onExecuteResetAction, this);
@@ -90,7 +90,7 @@ define([
          * @param {Backbone.Model} model
          * @protected
          */
-        _processValue: function (id, model) {
+        _processValue: function(id, model) {
             var original = this.get('original');
             var included = this.get('included');
             var excluded = this.get('excluded');
@@ -132,7 +132,7 @@ define([
          *
          * @private
          */
-        _clearState: function () {
+        _clearState: function() {
             this.set('included', []);
             this.set('excluded', []);
             this.set('original', {});
@@ -143,7 +143,7 @@ define([
          *
          * @private
          */
-        _synchronizeState: function () {
+        _synchronizeState: function() {
             var included = this.get('included');
             var excluded = this.get('excluded');
             if (this.selectors.included) {
@@ -163,11 +163,11 @@ define([
          * @return {Array}
          * @private
          */
-        _explode: function (string) {
+        _explode: function(string) {
             if (!string) {
                 return [];
             }
-            return _.map(string.split(','), function (val) { return val ? parseInt(val, 10) : null; });
+            return _.map(string.split(','), function(val) { return val ? parseInt(val, 10) : null; });
         },
 
         /**
@@ -175,7 +175,7 @@ define([
           *
           * @private
           */
-        _restoreState: function () {
+        _restoreState: function() {
             var included = '';
             var excluded = '';
             if (this.selectors.included && $(this.selectors.included).length) {
@@ -201,7 +201,7 @@ define([
          * @param {Object} options
          * @private
          */
-        _onExecuteRefreshAction: function (e, action, options) {
+        _onExecuteRefreshAction: function(e, action, options) {
             this._confirmAction(action, options, 'refresh', {
                 title: __('Refresh Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to refresh grid?')
@@ -216,7 +216,7 @@ define([
          * @param {Object} options
          * @private
          */
-        _onExecuteResetAction: function (e, action, options) {
+        _onExecuteResetAction: function(e, action, options) {
             this._confirmAction(action, options, 'reset', {
                 title: __('Reset Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to reset grid?')
@@ -232,11 +232,11 @@ define([
          * @param {Object} confirmModalOptions Options for confirm dialog
          * @private
          */
-        _confirmAction: function (action, actionOptions, type, confirmModalOptions) {
+        _confirmAction: function(action, actionOptions, type, confirmModalOptions) {
             this.confirmed = this.confirmed || {};
             if (!this.confirmed[type] && this._hasChanges()) {
                 actionOptions.doExecute = false; // do not execute action until it's confirmed
-                this._openConfirmDialog(type, confirmModalOptions, function () {
+                this._openConfirmDialog(type, confirmModalOptions, function() {
                     // If confirmed, clear state and run action
                     this.confirmed[type] = true;
                     this._clearState();
@@ -253,14 +253,14 @@ define([
          * @return {Boolean}
          * @private
          */
-        _hasChanges: function () {
+        _hasChanges: function() {
             return !_.isEmpty(this.get('included')) || !_.isEmpty(this.get('excluded'));
         },
 
         /**
          * Opens confirm modal dialog
          */
-        _openConfirmDialog: function (type, options, callback) {
+        _openConfirmDialog: function(type, options, callback) {
             if (!this.confirmModal[type]) {
                 this.confirmModal[type] = new Modal(_.extend({
                     title: __('Confirmation'),
@@ -285,7 +285,7 @@ define([
      * @param {Object} [options.data] data for grid's collection
      * @param {Object} [options.metadata] configuration for the grid
      */
-    ColumnFormListener.init = function (deferred, options) {
+    ColumnFormListener.init = function(deferred, options) {
         var gridOptions, gridInitialization;
         gridOptions = options.metadata.options || {};
         gridInitialization = options.gridPromise;
@@ -293,7 +293,7 @@ define([
         var gridListenerOptions = gridOptions.rowSelection || gridOptions.columnListener; // for BC
 
         if (gridListenerOptions) {
-            gridInitialization.done(function (grid) {
+            gridInitialization.done(function(grid) {
                 var listener, listenerOptions;
                 listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
@@ -302,7 +302,7 @@ define([
 
                 listener = new ColumnFormListener(listenerOptions);
                 deferred.resolve(listener);
-            }).fail(function () {
+            }).fail(function() {
                 deferred.reject();
             });
         } else {

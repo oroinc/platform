@@ -5,7 +5,7 @@ define([
     'underscore',
     'chaplin',
     '../../models/base/collection'
-], function ($, _, Chaplin, BaseCollection) {
+], function($, _, Chaplin, BaseCollection) {
     'use strict';
 
     var BaseView;
@@ -16,7 +16,7 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend({
-        getTemplateFunction: function () {
+        getTemplateFunction: function() {
             var template, templateFunc;
             template = this.template;
             templateFunc = null;
@@ -32,7 +32,7 @@ define([
             return templateFunc;
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data;
             data = BaseView.__super__.getTemplateData.apply(this, arguments);
             if (!this.model && this.collection && this.collection instanceof BaseCollection) {
@@ -47,7 +47,7 @@ define([
          * @private
          * @override
          */
-        _ensureElement: function () {
+        _ensureElement: function() {
             var $el, el;
             el = this.el;
 
@@ -69,7 +69,7 @@ define([
          * @returns {jQuery|undefined}
          * @private
          */
-        _findRegionElem: function (name) {
+        _findRegionElem: function(name) {
             var $el, region, instance;
             region = Chaplin.mediator.execute('region:find', name);
             if (region != null) {

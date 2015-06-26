@@ -4,7 +4,7 @@ define([
     'jquery',
     'underscore',
     'backgrid'
-], function ($, _, Backgrid) {
+], function($, _, Backgrid) {
     'use strict';
 
     var ActionCell;
@@ -61,12 +61,12 @@ define([
         /**
          * Initialize cell actions and launchers
          */
-        initialize: function () {
+        initialize: function() {
             this.subviews = [];
 
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
-            _.each(this.actions, function (action) {
+            _.each(this.actions, function(action) {
                 this.listenTo(action, 'run', this.onActionRun);
             }, this);
 
@@ -77,7 +77,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -93,7 +93,7 @@ define([
          *
          * @param {oro.datagrid.action.AbstractAction} action
          */
-        onActionRun: function (action) {
+        onActionRun: function(action) {
             this.$('.dropdown.open').removeClass('open');
         },
 
@@ -102,13 +102,13 @@ define([
          *
          * @return {Array}
          */
-        createActions: function () {
+        createActions: function() {
             var result, actions, config;
             result = [];
             actions = this.column.get('actions');
             config = this.model.get('action_configuration');
 
-            _.each(actions, function (action, name) {
+            _.each(actions, function(action, name) {
                 // filter available actions for current row
                 if (!config || config[name] !== false) {
                     result.push(this.createAction(action));
@@ -124,7 +124,7 @@ define([
          * @param {Function} Action
          * @protected
          */
-        createAction: function (Action) {
+        createAction: function(Action) {
             return new Action({
                 model: this.model,
                 datagrid: this.column.get('datagrid')
@@ -136,10 +136,10 @@ define([
          *
          * @protected
          */
-        createLaunchers: function () {
+        createLaunchers: function() {
             var result = [];
 
-            _.each(this.actions, function (action) {
+            _.each(this.actions, function(action) {
                 var options, launcher;
                 options = {};
                 launcher = action.createLauncher(options);
@@ -152,7 +152,7 @@ define([
         /**
          * Render cell with actions
          */
-        render: function () {
+        render: function() {
             var launchers, $listsContainer;
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.launchers)) {
@@ -189,12 +189,12 @@ define([
          * @param {Object=} params
          * @return {jQuery} Rendered element wrapped with jQuery
          */
-        renderLaunchersList: function (launchers, params) {
+        renderLaunchersList: function(launchers, params) {
             var result, $launchersList;
             params = params || {};
             result = $(this.launchersListTemplate(params));
             $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
-            _.each(launchers, function (launcher) {
+            _.each(launchers, function(launcher) {
                 $launchersList.append(this.renderLauncherItem(launcher));
             }, this);
 
@@ -208,7 +208,7 @@ define([
          * @param {Object=} params
          * @return {jQuery} Rendered element wrapped with jQuery
          */
-        renderLauncherItem: function (launcher, params) {
+        renderLauncherItem: function(launcher, params) {
             var result, $launcherItem;
             params = params || {};
             result = $(this.launcherItemTemplate(params));
@@ -223,13 +223,13 @@ define([
          * @return {Object}
          * @protected
          */
-        getLaunchersByIcons: function () {
+        getLaunchersByIcons: function() {
             var launchers = {
                 withIcons: [],
                 withoutIcons: []
             };
 
-            _.each(this.launchers, function (launcher) {
+            _.each(this.launchers, function(launcher) {
                 if (launcher.icon) {
                     launchers.withIcons.push(launcher);
                 } else {
@@ -246,7 +246,7 @@ define([
          * @param {Event} e
          * @protected
          */
-        _toggleDropdown: function (e) {
+        _toggleDropdown: function(e) {
             this.$('.dropdown-toggle').dropdown('toggle');
             e.stopPropagation();
         }

@@ -4,7 +4,7 @@ define([
     'jquery',
     'underscore',
     'backbone'
-], function ($, _, Backbone) {
+], function($, _, Backbone) {
     'use strict';
 
     var ActionLauncher;
@@ -123,7 +123,7 @@ define([
          * @param {Array} [options.links]
          * @throws {TypeError} If mandatory option is undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts, linkSelector;
             opts = options || {};
 
@@ -183,7 +183,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -197,7 +197,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             var $el, label;
             this.$el.empty();
 
@@ -227,7 +227,7 @@ define([
          * @protected
          * @return {Boolean}
          */
-        onClick: function (e) {
+        onClick: function(e) {
             var $link, key;
             if (!this.enabled) {
                 return this.onClickReturnValue;
@@ -250,7 +250,7 @@ define([
             return this.onClickReturnValue;
         },
 
-        onToggle: function (e) {
+        onToggle: function(e) {
             var $link = $(e.currentTarget);
             if (!$link.closest('.btn-group').hasClass('open')) {
                 this.trigger('expand', this);
@@ -262,7 +262,7 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             this.enabled = false;
             this.$el.addClass('disabled');
             return this;
@@ -273,7 +273,7 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             this.enabled = true;
             this.$el.removeClass('disabled');
             return this;

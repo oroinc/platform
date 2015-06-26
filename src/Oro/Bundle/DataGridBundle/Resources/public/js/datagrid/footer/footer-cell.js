@@ -4,7 +4,7 @@ define([
     'underscore',
     'backbone',
     'backgrid'
-], function (_, Backbone, Backgrid) {
+], function(_, Backbone, Backgrid) {
     "use strict";
 
     var FooterCell;
@@ -28,7 +28,7 @@ define([
         /**
          * Initialize.
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
 
             this.column = options.column;
@@ -44,7 +44,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             var columnName, columnTotals, state, totals;
 
             this.$el.empty();

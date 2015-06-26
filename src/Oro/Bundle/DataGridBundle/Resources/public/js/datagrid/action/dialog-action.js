@@ -4,7 +4,7 @@ define([
     'orotranslation/js/translator',
     'oro/datagrid/action/model-action',
     'oroui/js/app/components/widget-component'
-], function (__, ModelAction, WidgetComponent) {
+], function(__, ModelAction, WidgetComponent) {
     'use strict';
 
     var DialogAction;
@@ -46,7 +46,7 @@ define([
          * @param {Object} options
          * @throws {TypeError} If model is undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             DialogAction.__super__.initialize.apply(this, arguments);
 
             // make own widgetOptions property from prototype
@@ -60,7 +60,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (!this.disposed) {
                 return;
             }
@@ -74,7 +74,7 @@ define([
         /**
          * @inheritDoc
          */
-        run: function () {
+        run: function() {
             if (!this.widgetComponent) {
                 this.widgetComponent = new WidgetComponent(this.widgetOptions);
             }

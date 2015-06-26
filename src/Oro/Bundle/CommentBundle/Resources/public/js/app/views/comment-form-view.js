@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var CommentFormView,
@@ -30,12 +30,12 @@ define(function (require) {
             'error model': 'onError'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.template = _.template($(options.template).html());
             CommentFormView.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
@@ -46,10 +46,10 @@ define(function (require) {
             return this;
         },
 
-        bindData: function () {
+        bindData: function() {
             var formView = this,
                 attrs = this.model.toJSON();
-            _.each(attrs, function (value, name) {
+            _.each(attrs, function(value, name) {
                 var $elem = formView.$('[name="' + name + '"]');
                 if ($elem) {
                     setValue($elem, value);
@@ -63,7 +63,7 @@ define(function (require) {
          * @param {Object=} options initial options
          * @returns {Object}
          */
-        fetchAjaxOptions: function (options) {
+        fetchAjaxOptions: function(options) {
             return formToAjaxOptions(this.$('form'), options);
         },
 
@@ -75,7 +75,7 @@ define(function (require) {
          * @param {Model} model
          * @param {Object} jqxhr
          */
-        onError: function (model, jqxhr) {
+        onError: function(model, jqxhr) {
             var validator;
             if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
                 validator = this.$('form').data('validator');
@@ -85,23 +85,23 @@ define(function (require) {
             }
         },
 
-        onSubmit: function (e) {
+        onSubmit: function(e) {
             e.stopPropagation();
             e.preventDefault();
             this.trigger('submit', this);
         },
 
-        onReset: function (e) {
+        onReset: function(e) {
             e.stopPropagation();
             e.preventDefault();
             this.render();
         },
 
-        removeAttachment: function (e) {
+        removeAttachment: function(e) {
             var itemView = this;
             e.stopPropagation();
             e.preventDefault();
-            this.model.removeAttachment().done(function () {
+            this.model.removeAttachment().done(function() {
                 itemView.$('.attachment-item').remove();
                 mediator.execute('showFlashMessage', 'success', __('oro.comment.attachment.delete_message'));
             });

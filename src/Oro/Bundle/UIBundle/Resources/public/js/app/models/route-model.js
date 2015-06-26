@@ -1,7 +1,7 @@
 /*jslint nomen:true, eqeq:true*/
 /*global define*/
 /** @lends RouteModel */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     /**
@@ -43,7 +43,7 @@ define(function (require) {
          * @inheritDoc
          * @member {Object}
          */
-        defaults: function () {
+        defaults: function() {
             return /** lends RouteModel.attributes */ {
                 /**
                  * Name of the route
@@ -68,16 +68,16 @@ define(function (require) {
          *
          * @returns {Array.<string>}
          */
-        getAcceptableParameters: function () {
+        getAcceptableParameters: function() {
             var route, variableTokens, routeParameters;
             if (!this.get('routeName')) {
                 throw new Error('routeName must be specified');
             }
             route = routing.getRoute(this.get('routeName'));
-            variableTokens = _.filter(route.tokens, function (tokenPart){
+            variableTokens = _.filter(route.tokens, function(tokenPart) {
                 return tokenPart[0] === 'variable';
             });
-            routeParameters = _.map(variableTokens, function (tokenPart) {
+            routeParameters = _.map(variableTokens, function(tokenPart) {
                 return tokenPart[3];
             });
             routeParameters.push.apply(routeParameters, this.get('routeQueryParameterNames'));
@@ -90,7 +90,7 @@ define(function (require) {
          * @param parameters {Object=} parameters to override
          * @returns {string} route url
          */
-        getUrl: function (parameters) {
+        getUrl: function(parameters) {
             var routeParameters = _.extend(this.toJSON(), parameters),
                 acceptableParameters = this.getAcceptableParameters();
             return routing.generate(this.get('routeName'), _.pick(routeParameters, acceptableParameters));

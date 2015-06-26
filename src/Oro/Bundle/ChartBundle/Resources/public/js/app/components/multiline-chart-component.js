@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var MultilineChartComponent,
@@ -29,8 +29,8 @@ define(function (require) {
             var rawData = this.data;
 
             if (dataFormatter.isValueNumerical(xFormat)) {
-                var sort = function (rawData) {
-                    rawData.sort(function (first, second) {
+                var sort = function(rawData) {
+                    rawData.sort(function(first, second) {
                         if (first.label == null) {
                             return -1;
                         }
@@ -57,8 +57,8 @@ define(function (require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[number]['label'] === null
-                            ? 'N/A'
+                        label = rawData[number]['label'] === null ?
+                            'N/A'
                             : rawData[number]['label'];
                     } else {
                         label = '';
@@ -71,8 +71,8 @@ define(function (require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[data]['value'] === null
-                            ? 'N/A'
+                        label = rawData[data]['value'] === null ?
+                            'N/A'
                             : rawData[data]['value'];
                     } else {
                         label = '';
@@ -81,7 +81,7 @@ define(function (require) {
                 return label;
             };
 
-            var makeChart = function (rawData, count, key) {
+            var makeChart = function(rawData, count, key) {
                 var chartData = [];
 
                 for (var i in rawData) {
@@ -107,7 +107,7 @@ define(function (require) {
                 };
             };
 
-            _.each(rawData, function (rawData, key) {
+            _.each(rawData, function(rawData, key) {
                 var result = makeChart(rawData, count, key);
                 count++;
 
@@ -127,16 +127,16 @@ define(function (require) {
                     mouse: {
                         track: true,
                         relative: true,
-                        trackFormatter: function (pointData) {
-                            return pointData.series.label
-                                + ', ' + getXLabel(pointData.x)
-                                + ': ' + getYLabel(pointData.y);
+                        trackFormatter: function(pointData) {
+                            return pointData.series.label +
+                                ', ' + getXLabel(pointData.x) +
+                                ': ' + getYLabel(pointData.y);
                         }
                     },
                     yaxis: {
                         autoscale: true,
                         autoscaleMargin: 1,
-                        tickFormatter: function (y) {
+                        tickFormatter: function(y) {
                             return getYLabel(y);
                         },
                         title: options.data_schema.value.label
@@ -144,7 +144,7 @@ define(function (require) {
                     xaxis: {
                         autoscale: true,
                         autoscaleMargin: 0,
-                        tickFormatter: function (x) {
+                        tickFormatter: function(x) {
                             return getXLabel(x);
                         },
                         title:   options.data_schema.label.label,

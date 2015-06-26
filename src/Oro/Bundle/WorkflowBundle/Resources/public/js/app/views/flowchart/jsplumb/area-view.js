@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var $ = require('jquery'),
         _ = require('underscore'),
@@ -25,7 +25,7 @@ define(function (require) {
             ]
         },
 
-        render: function () {
+        render: function() {
             // do nothing except connect()
             if (!this.isConnected) {
                 this.isConnected = true;
@@ -34,7 +34,7 @@ define(function (require) {
             return this;
         },
 
-        connect: function () {
+        connect: function() {
             var options = $.extend(true, {}, _.result(this, 'defaults'));
             options.Container = this.id();
             this.jsPlumbInstance = jsPlumb.getInstance(options);

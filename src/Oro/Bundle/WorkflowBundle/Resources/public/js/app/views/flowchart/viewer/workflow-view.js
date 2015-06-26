@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var FlowchartViewerWorkflowView,
         _ = require('underscore'),
@@ -40,14 +40,14 @@ define(function (require) {
             detachable: false
         },
 
-        findStepModelByElement: function (el) {
+        findStepModelByElement: function(el) {
             var stepCollectionView = this.stepCollectionView;
-            return this.model.get('steps').find(function (model) {
+            return this.model.get('steps').find(function(model) {
                 return stepCollectionView.getItemView(model).el === el;
             });
         },
 
-        connect: function () {
+        connect: function() {
             FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
             this.$el.addClass(this.className);
             var stepCollectionView,
@@ -62,7 +62,7 @@ define(function (require) {
                 collection: steps,
                 animationDuration: 0,
                 // pass areaView to each model
-                itemView: function (options) {
+                itemView: function(options) {
                     options = _.extend({
                         areaView: that
                     }, options);
@@ -75,7 +75,7 @@ define(function (require) {
                 collection: this.model.get('transitions'),
                 animationDuration: 0,
                 // pass areaView to each model
-                itemView: function (options) {
+                itemView: function(options) {
                     options = _.extend({
                         areaView: that,
                         stepCollection: steps,

@@ -6,7 +6,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/delete-confirmation',
     './model-action'
-], function (_, messenger, __, DeleteConfirmation, ModelAction) {
+], function(_, messenger, __, DeleteConfirmation, ModelAction) {
     'use strict';
 
     var DeleteAction;
@@ -34,22 +34,22 @@ define([
         /**
          * Execute delete model
          */
-        execute: function () {
+        execute: function() {
             this.getConfirmDialog(_.bind(this.doDelete, this)).open();
         },
 
         /**
          * Confirm delete item
          */
-        doDelete: function () {
+        doDelete: function() {
             this.model.destroy({
                 url: this.getLink(),
                 wait: true,
-                error: function () {
+                error: function() {
                     var messageText = __('You do not have permission to perform this action.');
                     messenger.notificationFlashMessage('error', messageText);
                 },
-                success: function () {
+                success: function() {
                     var messageText = __('Item deleted');
                     messenger.notificationFlashMessage('success', messageText);
                 }

@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone, mediator) {
+define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, mediator) {
     'use strict';
 
     $.widget('oroui.sideMenu', {
@@ -16,7 +16,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          *
          * @private
          */
-        _create: function () {
+        _create: function() {
             this.listener = $.extend({}, Backbone.Events);
             this._on({mainMenuUpdated: this._init});
 
@@ -29,7 +29,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          *
          * @private
          */
-        _destroy: function () {
+        _destroy: function() {
             this.listener.stopListening(mediator);
         },
 
@@ -38,7 +38,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          *
          * @private
          */
-        _init: function () {
+        _init: function() {
             // should be implemented in descendant
         },
 
@@ -47,7 +47,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          *
          * @private
          */
-        _convertToAccordion: function () {
+        _convertToAccordion: function() {
             var $groups, $root, self;
 
             $root = this.element.find(this.options.rootElement).first();
@@ -58,7 +58,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
             $groups.removeClass('dropdown').addClass('accordion-group');
 
             self = this;
-            $groups.add($root).each(function (i) {
+            $groups.add($root).each(function(i) {
                 var $group, $header, $target, targetId;
 
                 $group = $(this);
@@ -96,7 +96,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          *
          * @private
          */
-        _convertToDropdown: function () {
+        _convertToDropdown: function() {
             this.element.find('.accordion').removeClass('accordion');
             this.element.find('.accordion-body')
                 .removeClass('accordion-body collapse in')
@@ -113,7 +113,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          *
          * @param {jQuery.Event} e
          */
-        onToggle: function (e) {
+        onToggle: function(e) {
             e.stopPropagation();
             this._toggle();
         },
@@ -121,7 +121,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
         /**
          * Implements toggling process
          */
-        _toggle: function () {
+        _toggle: function() {
             // should be implemented in descendant
         },
 
@@ -132,7 +132,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          * @returns {string}
          * @private
          */
-        _getGroupId: function (i) {
+        _getGroupId: function(i) {
             return this.options.menuPrefix + '_' + i;
         }
     });

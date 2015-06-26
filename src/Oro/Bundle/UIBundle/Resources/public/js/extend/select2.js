@@ -1,7 +1,7 @@
 /*jshint browser:true, nomen:true*/
 /*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($, __, Select2) {
+define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($, __, Select2) {
     'use strict';
 
     /**
@@ -21,7 +21,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             parent = container.parent(),
             selection = this.val();
 
-        populate = function (results, container, depth, parentStack) {
+        populate = function(results, container, depth, parentStack) {
             var i, l, result, selectable, disabled, compound, node, label, innerContainer,
                 formatted, subId, parent, resultId;
             results = opts.sortResults(results, container, query);
@@ -83,7 +83,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
                 }
 
                 if (selection.indexOf(resultId) >= 0) {
-                    $.each(parentStack, function () {
+                    $.each(parentStack, function() {
                         this.addClass('in');
                     });
                 }
@@ -95,7 +95,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
         };
 
         parent.attr('id', parent.attr('id') || ('select2container_' + Date.now()));
-        container.on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
+        container.on('click.collapse.data-api', '[data-toggle=collapse]', function(e) {
             var $this = $(this),
                 target = $this.attr('data-target'),
                 option = $(target).data('collapse') ? 'toggle' : $this.data();
@@ -106,17 +106,17 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
     }
 
     // Override methods of AbstractSelect2 class
-    (function (prototype) {
+    (function(prototype) {
         var select2DropBelowClassName = 'select2-drop-below',
             positionDropdown = prototype.positionDropdown,
             close = prototype.close,
             prepareOpts = prototype.prepareOpts,
             init = prototype.init;
-        prototype.prepareOpts = function (options) {
+        prototype.prepareOpts = function(options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
                 var matcher = options.matcher || $.fn.select2.defaults.matcher;
-                options.matcher = function (term, text, option) {
+                options.matcher = function(term, text, option) {
                     return !option.children && matcher.apply(this, arguments);
                 };
             }
@@ -129,7 +129,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             return prepareOpts.call(this, options);
         };
 
-        prototype.positionDropdown = function(){
+        prototype.positionDropdown = function() {
             var dialogIsBelow,
                 $container = this.container;
             positionDropdown.apply(this, arguments);
@@ -137,15 +137,15 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
         };
 
-        prototype.close = function(){
+        prototype.close = function() {
             close.apply(this, arguments);
             this.container.parent().removeClass(select2DropBelowClassName);
         };
 
-        prototype.init = function () {
+        prototype.init = function() {
             init.apply(this, arguments);
             this.breadcrumbs = $('<ul class="select2-breadcrumbs"></ul>');
-            this.breadcrumbs.on('click', '.select2-breadcrumb-item', $.proxy(function (e) {
+            this.breadcrumbs.on('click', '.select2-breadcrumb-item', $.proxy(function(e) {
                 var data = $(e.currentTarget).data('select2-data');
                 this.pagePath = data.pagePath;
                 this.search.val('');
@@ -155,13 +155,13 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             this.dropdown.prepend(this.breadcrumbs);
         };
 
-        prototype.updateBreadcrumbs = function () {
+        prototype.updateBreadcrumbs = function() {
             var breadcrumbs = this.breadcrumbs,
                 opts = this.opts;
             breadcrumbs.empty();
             if ($.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
                 var items = opts.breadcrumbs(this.pagePath);
-                $.each(items, function (i, item) {
+                $.each(items, function(i, item) {
                     var $item = opts.formatBreadcrumbItem(item, {index: i, length: items.length});
                     $item = $("<li class='select2-breadcrumb-item'>" + $item + "</li>");
                     $item.data('select2-data', {pagePath: item.pagePath});
@@ -171,12 +171,12 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
         };
     }(Select2['class'].abstract.prototype));
 
-    (function (prototype) {
+    (function(prototype) {
         var onSelect = prototype.onSelect;
         var updateResults = prototype.updateResults;
         var clear = prototype.clear;
 
-        prototype.onSelect = function (data, options) {
+        prototype.onSelect = function(data, options) {
             if (data.id === undefined && data.pagePath) {
                 this.pagePath = data.pagePath;
                 this.search.val('');
@@ -192,7 +192,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             }
         };
 
-        prototype.updateResults = function (initial) {
+        prototype.updateResults = function(initial) {
             updateResults.apply(this, arguments);
             if (initial === true && this.opts.element.val()) {
                 this.pagePath = this.opts.element.val();
@@ -201,7 +201,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             this.positionDropdown();
         };
 
-        prototype.clear = function () {
+        prototype.clear = function() {
             this.pagePath = '';
             clear.apply(this, arguments);
         };
@@ -220,6 +220,6 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
         formatSearching: function() { return __('Searching...'); },
-        formatNoMatches: function () { return __('No matches found'); }
+        formatNoMatches: function() { return __('No matches found'); }
     });
 });

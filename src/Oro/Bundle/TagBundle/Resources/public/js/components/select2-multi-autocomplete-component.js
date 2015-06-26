@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var Select2MultiAutocompleteComponent,
         $ = require('jquery'),
@@ -7,11 +7,11 @@ define(function (require) {
         Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
     Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
         oroTagCreateGranted: false,
-        initialize: function (options) {
+        initialize: function(options) {
             this.oroTagCreateGranted = _.result(options, 'oro_tag_create_granted') || this.oroTagCreateGranted;
             Select2MultiAutocompleteComponent.__super__.initialize.call(this, options);
         },
-        preConfig: function (config) {
+        preConfig: function(config) {
             var that = this;
             Select2MultiAutocompleteComponent.__super__.preConfig.call(this, config);
             config.maximumInputLength = 50;

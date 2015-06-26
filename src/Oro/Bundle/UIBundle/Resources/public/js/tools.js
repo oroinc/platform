@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define, require*/
-define(['jquery', 'underscore'], function ($, _) {
+define(['jquery', 'underscore'], function($, _) {
     'use strict';
 
     /**
@@ -29,7 +29,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * @return {Object}
          */
         unpackFromQueryString: function(query) {
-            var setValue = function (root, path, value) {
+            var setValue = function(root, path, value) {
                 if (path.length > 1) {
                     var dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
@@ -114,10 +114,10 @@ define(['jquery', 'underscore'], function ($, _) {
          * @param {*} value2
          * @return {Boolean} TRUE if values are equal, otherwise - FALSE
          */
-        isEqualsLoosely: function (value1, value2) {
+        isEqualsLoosely: function(value1, value2) {
             if (!_.isObject(value1)) {
                 if (_.isNumber(value1) || _.isNumber(value2)) {
-                    var toNumber = function (v) {
+                    var toNumber = function(v) {
                         if (_.isString(v) && v == '') {
                             return NaN;
                         }
@@ -158,7 +158,7 @@ define(['jquery', 'underscore'], function ($, _) {
         /**
          * Are we currently on mobile
          */
-        isMobile: function () {
+        isMobile: function() {
             return $('body').hasClass('mobile-version');
         },
 
@@ -172,14 +172,14 @@ define(['jquery', 'underscore'], function ($, _) {
          * @param {function(Object)} callback
          * @param {Object=} context
          */
-        loadModules: function (modules, callback, context) {
+        loadModules: function(modules, callback, context) {
             var requirements, onLoadHandler;
             if (_.isObject(modules)) {
                 // if modules is an object of {formal_name: module_name}
                 requirements = _.values(modules);
-                onLoadHandler = function () {
+                onLoadHandler = function() {
                     // maps loaded modules into original object
-                    _.each(modules, _.bind(function (value, key) {
+                    _.each(modules, _.bind(function(value, key) {
                         modules[key] = this[value];
                     }, _.object(requirements, _.toArray(arguments))));
                     callback.call(context || null, modules);
@@ -187,7 +187,7 @@ define(['jquery', 'underscore'], function ($, _) {
             } else {
                 // if modules is an array of module_names or single module_name
                 requirements = !_.isArray(modules) ? [modules] : modules;
-                onLoadHandler = function () {
+                onLoadHandler = function() {
                     callback.apply(context || null, arguments);
                 }
             }
@@ -199,7 +199,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * Check if current page is an error page (404, 503, 504, etc.)
          * @returns {boolean}
          */
-        isErrorPage: function () {
+        isErrorPage: function() {
             return Boolean($('meta[name=error]').length);
         },
 
@@ -209,7 +209,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * @param {string} str
          * @param {string} flags
          */
-        safeRegExp: function (str, flags) {
+        safeRegExp: function(str, flags) {
             var expression;
             str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
             expression = new RegExp(str, flags);

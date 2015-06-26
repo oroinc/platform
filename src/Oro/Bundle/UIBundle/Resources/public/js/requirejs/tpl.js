@@ -16,8 +16,8 @@
  * ```
  */
 define({
-    load: function (name, parentRequire, onLoad) {
-        parentRequire(['text!' + name, 'underscore'], function (text, _) {
+    load: function(name, parentRequire, onLoad) {
+        parentRequire(['text!' + name, 'underscore'], function(text, _) {
             if (_) {
                 onLoad(_.template(text));
             } else {

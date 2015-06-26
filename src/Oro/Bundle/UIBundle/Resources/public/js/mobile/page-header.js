@@ -1,6 +1,6 @@
 /*global define*/
 define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../content-processor/dropdown-button'
-    ], function ($, mediator, __) {
+    ], function($, mediator, __) {
     'use strict';
 
     function updatePageHeader() {
@@ -10,7 +10,7 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../conte
                 moreLabel: __('oro.ui.page_header.button.more'),
                 minItemQuantity: 1
             },
-            label = $container.find('.btn').slice(0,2).text().replace(/\s{2,}/g, ' ');
+            label = $container.find('.btn').slice(0, 2).text().replace(/\s{2,}/g, ' ');
         if (label.length > 35) {
             options.minItemQuantity = 0;
         }
@@ -24,7 +24,7 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../conte
      * @name oro.mobile.pageHeader
      */
     return {
-        init: function () {
+        init: function() {
             updatePageHeader();
             mediator.on('page:afterChange', updatePageHeader);
         }

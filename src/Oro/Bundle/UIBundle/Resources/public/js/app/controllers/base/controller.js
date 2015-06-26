@@ -4,7 +4,7 @@ define([
     'jquery',
     'chaplin',
     'oroui/js/mediator'
-], function ($, Chaplin, mediator) {
+], function($, Chaplin, mediator) {
     'use strict';
 
     var BaseController, reuses, promiseLoads;
@@ -17,14 +17,14 @@ define([
          *
          * @override
          */
-        beforeAction: function (params, route, options) {
+        beforeAction: function(params, route, options) {
             var i, self;
 
             BaseController.__super__.beforeAction.apply(this, arguments);
 
             self = this;
 
-            return $.when.apply($, promiseLoads).then(function () {
+            return $.when.apply($, promiseLoads).then(function() {
                 // if it's first time route
                 if (!route.previous) {
                     // initializes page cache
@@ -44,7 +44,7 @@ define([
          * @returns {string}
          * @private
          */
-        _combineRouteUrl: function (route) {
+        _combineRouteUrl: function(route) {
             var url;
             url = Chaplin.mediator.execute('combineFullUrl', route.path, route.query);
             return url;
@@ -59,7 +59,7 @@ define([
              *
              * @param {Object} route
              */
-            init: function (route) {
+            init: function(route) {
                 var path, query, userName;
                 path = route.path;
                 query = route.query;
@@ -76,7 +76,7 @@ define([
              * @param {string=} path
              * @returns {Object|undefined}
              */
-            get: function (path) {
+            get: function(path) {
                 return Chaplin.mediator.execute({
                     name: 'pageCache:get',
                     silent: true
@@ -96,7 +96,7 @@ define([
      * Collects compositions to reuse before controller action
      * @static
      */
-    BaseController.addToReuse = function () {
+    BaseController.addToReuse = function() {
         var args = Array.prototype.slice.call(arguments, 0);
         reuses.push(args);
     };
@@ -110,11 +110,11 @@ define([
      * @returns {jQuery.Deferred}
      * @static
      */
-    BaseController.loadBeforeAction = function (modules, initCallback) {
+    BaseController.loadBeforeAction = function(modules, initCallback) {
         var deferredLoad, callback;
         deferredLoad = $.Deferred();
         promiseLoads.push(deferredLoad.promise());
-        callback = function () {
+        callback = function() {
             var args;
             args = Array.prototype.slice.call(arguments, 0);
             initCallback.apply(null, args);

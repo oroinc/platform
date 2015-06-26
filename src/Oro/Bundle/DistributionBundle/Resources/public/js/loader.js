@@ -3,17 +3,17 @@ function Loader(element) {
     var loadingElement = element;
 
     return {
-        setClickedElement: function (element) {
+        setClickedElement: function(element) {
             clickedElement = element;
         },
-        displayLoadingProgress: function () {
+        displayLoadingProgress: function() {
             if (clickedElement) {
                 clickedElement.hide();
                 loadingElement.insertAfter(clickedElement);
             }
             loadingElement.show();
         },
-        displayOriginalElement: function () {
+        displayOriginalElement: function() {
             clickedElement && clickedElement.show();
             loadingElement.hide();
         }

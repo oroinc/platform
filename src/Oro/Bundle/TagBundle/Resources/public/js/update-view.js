@@ -1,6 +1,6 @@
 /*global define*/
 define(['jquery', 'underscore', './view', 'json'
-    ], function ($, _, TagView) {
+    ], function($, _, TagView) {
     'use strict';
 
     /**
@@ -38,7 +38,7 @@ define(['jquery', 'underscore', './view', 'json'
          * @param {string} options.ownFieldId DomElement ID of hidden field with own tags
          * @throws {TypeError} If mandatory options are undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             options = options || {};
             this.options = _.defaults(options, this.options);
 
@@ -61,7 +61,7 @@ define(['jquery', 'underscore', './view', 'json'
 
             this._prepareCollections();
 
-            var onCollectionChange = _.bind(function () {
+            var onCollectionChange = _.bind(function() {
                 this.render();
                 this._updateHiddenInputs();
             }, this);
@@ -76,7 +76,7 @@ define(['jquery', 'underscore', './view', 'json'
          *
          * @returns {}
          */
-        render: function () {
+        render: function() {
             TagView.prototype.render.apply(this, arguments);
             var _this = this;
 
@@ -118,7 +118,7 @@ define(['jquery', 'underscore', './view', 'json'
          * @returns {*}
          * @private
          */
-        _removeItem: function (e) {
+        _removeItem: function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
@@ -136,7 +136,7 @@ define(['jquery', 'underscore', './view', 'json'
          * @returns {*}
          * @private
          */
-        _renderOverlay: function () {
+        _renderOverlay: function() {
             this.$tagOverlayId.append(this.tagsOverlayTemplate());
             return this;
         },
@@ -147,7 +147,7 @@ define(['jquery', 'underscore', './view', 'json'
          * @returns {*}
          * @private
          */
-        _prepareCollections: function () {
+        _prepareCollections: function() {
             var allTags = $.parseJSON($(this.options.fieldId).val());
             if (!_.isArray(allTags)) {
                 allTags = [];
@@ -162,7 +162,7 @@ define(['jquery', 'underscore', './view', 'json'
          *
          * @private
          */
-        _updateHiddenInputs: function () {
+        _updateHiddenInputs: function() {
             $(this.options.fieldId).val(JSON.stringify(this.getCollection()));
             $(this.options.ownFieldId).val(JSON.stringify(this.getCollection().getFilteredCollection('owner')));
         }

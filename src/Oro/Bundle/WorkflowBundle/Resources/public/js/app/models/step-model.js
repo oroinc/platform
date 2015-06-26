@@ -30,7 +30,7 @@ define(function(require) {
             this.workflow = workflow;
         },
 
-        getAllowedTransitions: function (workflowModel) {
+        getAllowedTransitions: function(workflowModel) {
             if (!workflowModel) {
                 workflowModel = this.workflow;
             }
@@ -44,7 +44,7 @@ define(function(require) {
                 if (_.isArray(allowedTransitionsAttr)) {
                     _.each(
                         allowedTransitionsAttr,
-                        function (transitionName) {
+                        function(transitionName) {
                             this.allowedTransitions.add(workflowModel.getTransitionByName(transitionName));
                         },
                         this
@@ -77,7 +77,7 @@ define(function(require) {
         destroy: function(options) {
             if (this.workflow) {
                 //Need to manually destroy collection elements to trigger all appropriate events
-                var removeTransitions = function (models) {
+                var removeTransitions = function(models) {
                     if (models.length) {
                         for (var i = models.length - 1; i > -1; i--) {
                             models[i].destroy();

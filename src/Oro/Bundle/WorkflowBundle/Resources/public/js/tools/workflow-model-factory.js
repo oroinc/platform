@@ -1,6 +1,6 @@
 /* global define */
 /** @exports WorkflowEditorComponent */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var _ = require('underscore'),
@@ -22,7 +22,7 @@ define(function (require) {
          * @param {Object} options
          * @returns {WorkflowModel}
          */
-        createWorkflowModel: function (options) {
+        createWorkflowModel: function(options) {
             var model = this._createWorkflowModel(options);
             this.addStartingStep(model);
             return model;
@@ -35,7 +35,7 @@ define(function (require) {
          * @returns {WorkflowModel}
          * @private
          */
-        _createWorkflowModel: function (options) {
+        _createWorkflowModel: function(options) {
             var workflowModel, configuration;
 
             configuration = options.entity.configuration;
@@ -64,7 +64,7 @@ define(function (require) {
          * Adds a starting step to workflow model
          * @param {WorkflowModel} model
          */
-        addStartingStep: function (model) {
+        addStartingStep: function(model) {
             model.get('steps').add(this._createStartingStep(model));
         },
 
@@ -75,7 +75,7 @@ define(function (require) {
          * @returns {StepModel}
          * @private
          */
-        _createStartingStep: function (model) {
+        _createStartingStep: function(model) {
             var startStepModel = new StepModel({
                 name: 'step:starting_point',
                 label: __('(Start)'),
@@ -98,7 +98,7 @@ define(function (require) {
          * @returns {Object}
          * @private
          */
-        _mergeName: function (config, name) {
+        _mergeName: function(config, name) {
             config.name = name;
             return config;
         }

@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailEditorView,
@@ -26,13 +26,13 @@ define(function (require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             EmailEditorView.__super__.initialize.apply(this, options);
             this.templatesProvider = options.templatesProvider;
             this.setupCache();
         },
 
-        render: function () {
+        render: function() {
             this.domCache.body.val(this.initBody(this.domCache.body.val()));
             this.addForgedAsterisk();
             this.initFields();
@@ -40,7 +40,7 @@ define(function (require) {
             return this;
         },
 
-        setupCache: function () {
+        setupCache: function() {
             this.domCache = {
                 subject: this.$('[name$="[subject]"]'),
                 body: this.$('[name$="[body]"]'),
@@ -70,7 +70,7 @@ define(function (require) {
             }
         },
 
-        onTemplateChange: function (e) {
+        onTemplateChange: function(e) {
             var templateId = $(e.target).val();
             if (!templateId) {
                 return;
@@ -79,7 +79,7 @@ define(function (require) {
             var confirm = new ApplyTemplateConfirmation({
                 content: __('oro.email.emailtemplate.apply_template_confirmation_content')
             });
-            confirm.on('ok', _.bind(function () {
+            confirm.on('ok', _.bind(function() {
                 mediator.execute('showLoading');
                 this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
                     .always(_.bind(mediator.execute, mediator, 'hideLoading'))
@@ -88,7 +88,7 @@ define(function (require) {
             confirm.open();
         },
 
-        fillForm: function (emailData) {
+        fillForm: function(emailData) {
             if (!this.model.get('parentEmailId') || !this.domCache.subject.val()) {
                 this.domCache.subject.val(emailData.subject);
             }
@@ -131,18 +131,18 @@ define(function (require) {
             }
         },
 
-        showField: function (fieldName) {
+        showField: function(fieldName) {
             var field = fieldName.toLowerCase(),
                 $field = this.$('[data-ftid=oro_email_email_' + field + ']');
             $field.parents('.control-group.taggable-field').show();
             $field.parents('.controls').find('input.select2-input')
                 .unbind('focusout')
                 .on('focusout', _.bind(function(e) {
-                    setTimeout(_.bind(function(){
+                    setTimeout(_.bind(function() {
                         if (!$field.val()) {
                             this.hideField(fieldName);
                         }
-                    },this), 200);
+                    }, this), 200);
                 }, this))
                 .focus();
 
@@ -153,7 +153,7 @@ define(function (require) {
 
         },
 
-        hideField: function (fieldName) {
+        hideField: function(fieldName) {
             var field = fieldName.toLowerCase(),
                 $field = this.$('[data-ftid=oro_email_email_' + field + ']');
             $field.parents('.control-group.taggable-field').hide();
@@ -170,7 +170,7 @@ define(function (require) {
             }, this));
         },
 
-        addForgedAsterisk: function () {
+        addForgedAsterisk: function() {
             var labelTab = this.$('.forged-required').find('label'),
                 emTag = labelTab.find('em');
 

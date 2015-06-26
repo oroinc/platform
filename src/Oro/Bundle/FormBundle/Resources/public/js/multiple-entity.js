@@ -1,7 +1,7 @@
 /* jshint devel:true */
 /*global define*/
 define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
-    ], function (_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
+    ], function(_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -56,7 +56,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             this.render();
         },
 
-        handleRemove: function (item) {
+        handleRemove: function(item) {
             var itemId = item && item.get('id');
             if (!itemId) {
                 return;
@@ -105,36 +105,36 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             return this.options.collection;
         },
 
-        _onCollectionReset: function (items) {
+        _onCollectionReset: function(items) {
             this._resortCollection();
             this.$entitiesContainer.empty();
             items.each(function(item) {
                 this.addEntity(item);
             }, this);
 
-            this.initialCollectionItems = this.getCollection().map(function (model) {
+            this.initialCollectionItems = this.getCollection().map(function(model) {
                 return model.get('id');
             });
             this.addedCollectionItems = [];
             this.removedCollectionItems = [];
         },
 
-        _isInitialCollectionItem: function (itemId) {
-            var isInitial = !!_.find(this.initialCollectionItems, function (id) {
+        _isInitialCollectionItem: function(itemId) {
+            var isInitial = !!_.find(this.initialCollectionItems, function(id) {
                 return String(id) === String(itemId);
             });
             return isInitial;
         },
 
-        _isAddedCollectionItem: function (itemId) {
-            var isAdded = !!_.find(this.addedCollectionItems, function (id) {
+        _isAddedCollectionItem: function(itemId) {
+            var isAdded = !!_.find(this.addedCollectionItems, function(id) {
                 return String(id) === String(itemId);
             });
             return isAdded;
         },
 
-        _isRemovedCollectionItem: function (itemId) {
-            var isRemoved = !!_.find(this.removedCollectionItems, function (id) {
+        _isRemovedCollectionItem: function(itemId) {
+            var isRemoved = !!_.find(this.removedCollectionItems, function(id) {
                 return String(id) === String(itemId);
             });
             return isRemoved;
@@ -192,23 +192,23 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         _getSelectionWidgetUrl: function() {
-            var url = this.options.selectionUrl
-                || routing.generate(this.options.selectionRouteName, this.options.selectionRouteParams),
+            var url = this.options.selectionUrl ||
+                routing.generate(this.options.selectionRouteName, this.options.selectionRouteParams),
                 separator = url.indexOf('?') > -1 ? '&' : '?',
                 added = this.$addedEl.val(),
                 removed = this.$removedEl.val(),
                 defaultEl = this.$defaultEl.val();
 
-            return url + separator
-                + 'added=' + (added || '')
-                + '&removed=' + (removed || '')
-                + '&default=' + (defaultEl || '') ;
+            return url + separator +
+                'added=' + (added || '') +
+                '&removed=' + (removed || '') +
+                '&default=' + (defaultEl || '') ;
         },
 
-        processSelectedEntities: function (added, addedModels, removed) {
+        processSelectedEntities: function(added, addedModels, removed) {
             var self = this;
 
-            _.intersection(added, removed).forEach(function (itemId) {
+            _.intersection(added, removed).forEach(function(itemId) {
                 if (self._isInitialCollectionItem(itemId)) {
                     added = _.without(added, itemId);
                     removed = _.without(removed, itemId);

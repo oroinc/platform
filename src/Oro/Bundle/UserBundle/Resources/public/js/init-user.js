@@ -18,7 +18,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
             messenger.setup();
         }
 
-        $(document).on('click', '#roles-list input', function () {
+        $(document).on('click', '#roles-list input', function() {
             checkRoleInputs();
         });
 
@@ -37,7 +37,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
             $('.status-disabled').toggleClass('hide');
         });
 
-        $(document).on('click', '#view-activity-btn', function (e) {
+        $(document).on('click', '#view-activity-btn', function(e) {
             e.stopImmediatePropagation();
             var $el = $(this),
                 dialog = /** @var oro.DialogWidget */ $el.data('dialog');
@@ -67,10 +67,10 @@ function($, _, __, mediator, messenger, DialogWidget) {
     /* ============================================================
      * from status.js
      * ============================================================ */
-    $(function () {
+    $(function() {
         var dialogBlock;
 
-        $(".update-status a").click(function () {
+        $(".update-status a").click(function() {
             $.get($(this).attr('href'), function(data) {
                 dialogBlock = $(data).dialog({
                     title: __('oro.user.update_status.label'),

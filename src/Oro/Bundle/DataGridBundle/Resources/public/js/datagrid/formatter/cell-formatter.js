@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'backgrid'
-    ], function (_, Backgrid) {
+    ], function(_, Backgrid) {
     'use strict';
 
     /**
@@ -10,7 +10,7 @@ define(['underscore', 'backgrid'
      * @class   orodatagrid.datagrid.formatter.CellFormatter
      * @extends Backgrid.CellFormatter
      */
-    var CellFormatter = function () {};
+    var CellFormatter = function() {};
 
     CellFormatter.prototype = new Backgrid.CellFormatter();
 
@@ -18,7 +18,7 @@ define(['underscore', 'backgrid'
         /**
          * @inheritDoc
          */
-        fromRaw: function (rawData) {
+        fromRaw: function(rawData) {
             if (rawData === null) {
                 return '';
             }

@@ -4,7 +4,7 @@
 define(['jquery', 'underscore', 'backbone', '../constants',
     'text!./templates/widget-min-template.html',
     'text!./templates/widget-max-template.html'
-    ], function ($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
+    ], function($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
     'use strict';
 
     /**
@@ -24,13 +24,13 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             'click .sidebar-widget-close': 'onClickClose'
         },
 
-        initialize: function () {
+        initialize: function() {
             var view = this;
             view.stopListening(view.model, 'change');
             view.listenTo(view.model, 'change', view.render);
         },
 
-        render: function () {
+        render: function() {
             var view     = this,
                 model    = view.model,
                 template = null;
@@ -49,7 +49,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             }
 
             if (model.get('state') !== constants.WIDGET_MINIMIZED && model.get('module')) {
-                requirejs([model.get('module')], function (Widget) {
+                requirejs([model.get('module')], function(Widget) {
                     var $widgetContent = view.$el.find('.sidebar-widget-content');
                     if (!view.contentView) {
                         view.contentView = new Widget.ContentView({
@@ -70,12 +70,12 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             return view;
         },
 
-        setOffset: function (cord) {
+        setOffset: function(cord) {
             var view = this;
             view.$el.offset(cord);
         },
 
-        onClickToggle: function (e) {
+        onClickToggle: function(e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -83,27 +83,27 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             this.model.save();
         },
 
-        onClickRefresh: function (e) {
+        onClickRefresh: function(e) {
             e.stopPropagation();
             e.preventDefault();
 
             Backbone.trigger('refreshWidget', this.model.cid);
         },
 
-        onClickSettings: function (e) {
+        onClickSettings: function(e) {
             e.stopPropagation();
             e.preventDefault();
 
             Backbone.trigger('setupWidget', this.model.cid);
         },
 
-        onClickRemove: function (e) {
+        onClickRemove: function(e) {
             e.stopPropagation();
             e.preventDefault();
             Backbone.trigger('removeWidget', this.model.cid);
         },
 
-        onClickClose: function (e) {
+        onClickClose: function(e) {
             e.stopPropagation();
             e.preventDefault();
             Backbone.trigger('closeWidget', this.model.cid);

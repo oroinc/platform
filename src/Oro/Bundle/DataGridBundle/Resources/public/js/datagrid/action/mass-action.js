@@ -6,7 +6,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/modal',
     './abstract-action'
-], function (_, messenger, __, Modal, AbstractAction) {
+], function(_, messenger, __, Modal, AbstractAction) {
     'use strict';
 
     var MassAction;
@@ -30,7 +30,7 @@ define([
             empty_selection: 'Please, select items to perform mass action.'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             MassAction.__super__.initialize.apply(this, arguments);
 
             var extended_options = {};
@@ -45,7 +45,7 @@ define([
         /**
          * Ask a confirmation and execute mass action.
          */
-        execute: function () {
+        execute: function() {
             var selectionState = this.datagrid.getSelectionState();
             if (_.isEmpty(selectionState.selectedModels) && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
@@ -60,11 +60,11 @@ define([
          * @returns {Object}
          * @private
          */
-        getActionParameters: function () {
+        getActionParameters: function() {
             var selectionState, collection, idValues, params;
             selectionState = this.datagrid.getSelectionState();
             collection = this.datagrid.collection;
-            idValues = _.map(selectionState.selectedModels, function (model) {
+            idValues = _.map(selectionState.selectedModels, function(model) {
                 return model.get(this.identifierFieldName);
             }, this);
 
@@ -78,7 +78,7 @@ define([
             return params;
         },
 
-        _onAjaxSuccess: function (data, textStatus, jqXHR) {
+        _onAjaxSuccess: function(data, textStatus, jqXHR) {
             this.datagrid.resetSelectionState();
             MassAction.__super__._onAjaxSuccess.apply(this, arguments);
         }

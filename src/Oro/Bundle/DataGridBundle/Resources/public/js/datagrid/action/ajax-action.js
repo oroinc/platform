@@ -1,7 +1,7 @@
 /*global define*/
 define([
     './model-action'
-], function (ModelAction) {
+], function(ModelAction) {
     'use strict';
 
     var AjaxAction;

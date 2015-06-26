@@ -1,9 +1,9 @@
 /*global define*/
-define(['underscore'], function (_) {
+define(['underscore'], function(_) {
     'use strict';
 
     _.mixin({
-        nl2br : function(str){
+        nl2br : function(str) {
             var breakTag = '<br />';
             return String(str).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
         },
@@ -12,8 +12,8 @@ define(['underscore'], function (_) {
             var lastSpace, toLong = str.length > maxLength;
             str = toLong ? str.substr(0, maxLength - 1) : str;
             lastSpace = str.lastIndexOf(' ');
-            str = useWordBoundary && toLong && lastSpace > 0? str.substr(0, lastSpace) : str;
-            return  toLong ? str + '&hellip;' : str;
+            str = useWordBoundary && toLong && lastSpace > 0 ? str.substr(0, lastSpace) : str;
+            return toLong ? str + '&hellip;' : str;
         }
     });
 

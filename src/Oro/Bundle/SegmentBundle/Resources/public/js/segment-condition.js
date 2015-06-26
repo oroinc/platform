@@ -1,7 +1,7 @@
 /*global define, require*/
 /*jslint nomen: true*/
 define(['jquery', 'underscore', './filter/segment-filter', './segment-choice', 'jquery-ui'],
-function ($, _, SegmentFilter) {
+function($, _, SegmentFilter) {
     'use strict';
 
     /**
@@ -15,7 +15,7 @@ function ($, _, SegmentFilter) {
             filterContainerClass: 'active-filter'
         },
 
-        _create: function () {
+        _create: function() {
             var data = this.element.data('value');
 
             this.$segmentChoice = $('<input>').addClass(this.options.segmentChoiceClass);
@@ -29,7 +29,7 @@ function ($, _, SegmentFilter) {
                 this._renderFilter(data.columnName);
             }
 
-            this.$segmentChoice.on('changed', _.bind(function (e, filterId) {
+            this.$segmentChoice.on('changed', _.bind(function(e, filterId) {
                 $(':focus').blur();
                 // reset current value on segment change
                 this.element.data('value', {});
@@ -37,18 +37,18 @@ function ($, _, SegmentFilter) {
                 e.stopPropagation();
             }, this));
 
-            this.$filterContainer.on('change', _.bind(function () {
+            this.$filterContainer.on('change', _.bind(function() {
                 if (this.filter) {
                     this.filter.applyValue();
                 }
             }, this));
         },
 
-        _getCreateOptions: function () {
+        _getCreateOptions: function() {
             return $.extend(true, {}, this.options);
         },
 
-        _renderFilter: function (fieldId) {
+        _renderFilter: function(fieldId) {
             var segmentId = fieldId.split('_')[1],
                 filterId = this._getSegmentFilterId();
 
@@ -74,10 +74,10 @@ function ($, _, SegmentFilter) {
          * @returns {*}
          * @private
          */
-        _getSegmentFilterId: function () {
+        _getSegmentFilterId: function() {
             var filterId = null;
 
-            _.each(this.options.filters, function (filter, id) {
+            _.each(this.options.filters, function(filter, id) {
                 if ('segment' === filter.name) {
                     filterId = id;
                 }
@@ -92,12 +92,12 @@ function ($, _, SegmentFilter) {
          * @param options {Object}
          * @private
          */
-        _createFilter: function (options) {
+        _createFilter: function(options) {
             var filter = new (SegmentFilter.extend(options))();
             this._appendFilter(filter);
         },
 
-        _appendFilter: function (filter) {
+        _appendFilter: function(filter) {
             var value = this.element.data('value');
             this.filter = filter;
 
@@ -112,7 +112,7 @@ function ($, _, SegmentFilter) {
             this._onUpdate();
         },
 
-        _onUpdate: function () {
+        _onUpdate: function() {
             var value;
 
             if (!this.filter.isEmptyValue()) {
@@ -132,7 +132,7 @@ function ($, _, SegmentFilter) {
             this.element.trigger('changed');
         },
 
-        selectSegment: function (data) {
+        selectSegment: function(data) {
             this.$segmentChoice.segmentChoice('setValue', data.columnName);
         }
     });

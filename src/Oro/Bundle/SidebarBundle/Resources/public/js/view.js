@@ -1,7 +1,7 @@
 /*jslint browser: true, nomen: true, vars: true*/
 /*global define*/
 
-define(function (require) {
+define(function(require) {
     'use strict';
 
     require('jquery-ui');
@@ -47,7 +47,7 @@ define(function (require) {
             widgets: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             var view, model, widgets;
             this.options = _.defaults(options || {}, this.options);
 
@@ -87,7 +87,7 @@ define(function (require) {
             return this.model.get('position');
         },
 
-        render: function () {
+        render: function() {
             var view = this;
             var model = view.model;
             var $main = view.options.$main;
@@ -110,11 +110,11 @@ define(function (require) {
             return view;
         },
 
-        renderIcons: function () {
+        renderIcons: function() {
             var view = this;
             var $content = view.$el.find('.sidebar-content');
 
-            this.getWidgets().each(function (widget) {
+            this.getWidgets().each(function(widget) {
                 var iconView = view.iconViews[widget.cid];
                 if (!iconView) {
                     return;
@@ -129,11 +129,11 @@ define(function (require) {
                 delay:       WIDGET_SORT_DELAY,
                 revert:      true,
                 tolerance:   'pointer',
-                start: function (event, ui) {
+                start: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
                 },
-                stop: function (event, ui) {
+                stop: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStop(cid);
 
@@ -144,17 +144,17 @@ define(function (require) {
             return view;
         },
 
-        renderWidgets: function () {
+        renderWidgets: function() {
             var view = this;
             var $content = view.$el.find('.sidebar-content');
 
-            this.getWidgets().each(function (widget) {
+            this.getWidgets().each(function(widget) {
                 var widgetView = view.widgetViews[widget.cid];
                 if (!widgetView) {
                     return;
                 }
                 if (widget.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                    widget.set({ state: constants.WIDGET_MAXIMIZED }, { silent: true });
+                    widget.set({state: constants.WIDGET_MAXIMIZED}, {silent: true});
                 }
                 widgetView.render().delegateEvents();
                 $content.append(widgetView.$el);
@@ -166,11 +166,11 @@ define(function (require) {
                 delay:       WIDGET_SORT_DELAY,
                 revert:      true,
                 tolerance:   'pointer',
-                start: function (event, ui) {
+                start: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
                 },
-                stop: function (event, ui) {
+                stop: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStop(cid);
 
@@ -181,37 +181,37 @@ define(function (require) {
             return view;
         },
 
-        onIconDragStart: function (cid) {
+        onIconDragStart: function(cid) {
             var widget = this.getWidgets().get(cid);
             if (widget) {
                 widget.isDragged = true;
             }
         },
 
-        onIconDragStop: function (cid) {
+        onIconDragStop: function(cid) {
             var widget = this.getWidgets().get(cid);
             if (widget) {
                 widget.isDragged = false;
             }
         },
 
-        reorderWidgets: function () {
+        reorderWidgets: function() {
             var view = this;
             var $content = view.$el.find('.sidebar-content');
 
-            var ids = $content.sortable('toArray', { attribute: 'data-cid' });
+            var ids = $content.sortable('toArray', {attribute: 'data-cid'});
             var widgetOrder = _.object(ids, _.range(ids.length));
 
-            this.getWidgets().each(function (widget) {
+            this.getWidgets().each(function(widget) {
                 var order = widgetOrder[widget.cid];
-                widget.set({ position: order }, { silent: true });
+                widget.set({position: order}, {silent: true});
                 widget.save();
             });
 
             this.getWidgets().sort();
         },
 
-        onClickAdd: function (e) {
+        onClickAdd: function(e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -222,7 +222,7 @@ define(function (require) {
             widgetAddView.open();
         },
 
-        onClickToggle: function (e) {
+        onClickToggle: function(e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -230,10 +230,10 @@ define(function (require) {
             this.model.save();
         },
 
-        onWidgetsReset: function () {
+        onWidgetsReset: function() {
             var view = this;
 
-            this.getWidgets().each(function (widget) {
+            this.getWidgets().each(function(widget) {
                 view.widgetViews[widget.cid] = new WidgetContainerView({
                     model: widget
                 });
@@ -244,7 +244,7 @@ define(function (require) {
             });
         },
 
-        onWidgetAdded: function (widget) {
+        onWidgetAdded: function(widget) {
             this.widgetViews[widget.cid] = new WidgetContainerView({
                 model: widget
             });
@@ -254,7 +254,7 @@ define(function (require) {
             });
         },
 
-        onWidgetRemoved: function (widget) {
+        onWidgetRemoved: function(widget) {
             var cid = widget.cid;
 
             var widgetView = this.widgetViews[cid];
@@ -280,7 +280,7 @@ define(function (require) {
             }
         },
 
-        onShowWidgetHover: function (cid, cord) {
+        onShowWidgetHover: function(cid, cord) {
             var view = this;
 
             var widget = this.getWidgets().get(cid);
@@ -292,7 +292,7 @@ define(function (require) {
             view.hideAllWidgetHovers();
 
             widget.snapshotState();
-            widget.set({ 'state': constants.WIDGET_MAXIMIZED_HOVER }, {silent: true});
+            widget.set({'state': constants.WIDGET_MAXIMIZED_HOVER}, {silent: true});
             widget.save();
 
             if (!view.hoverViews.hasOwnProperty(cid)) {
@@ -306,7 +306,7 @@ define(function (require) {
             view.hoverViews[cid].setOffset({top: cord.top});
         },
 
-        onRefreshWidget: function (cid) {
+        onRefreshWidget: function(cid) {
             var widget = this.getWidgets().get(cid);
             if (!widget) {
                 return;
@@ -324,7 +324,7 @@ define(function (require) {
             }
         },
 
-        hideWidgetHover: function (cid) {
+        hideWidgetHover: function(cid) {
             var hoverView = this.hoverViews[cid];
             if (hoverView) {
                 hoverView.model.restoreState();
@@ -334,15 +334,15 @@ define(function (require) {
             }
         },
 
-        hideAllWidgetHovers: function () {
+        hideAllWidgetHovers: function() {
             var view = this;
 
-            this.getWidgets().each(function (widget) {
+            this.getWidgets().each(function(widget) {
                 view.hideWidgetHover(widget.cid);
             });
         },
 
-        onRemoveWidget: function (cid) {
+        onRemoveWidget: function(cid) {
             var widget = this.getWidgets().get(cid);
             if (!widget) {
                 return;
@@ -352,19 +352,19 @@ define(function (require) {
                 content: __('oro.sidebar.widget.remove.confirm.message')
             });
 
-            modal.on('ok', function () {
+            modal.on('ok', function() {
                 widget.destroy();
                 modal.off();
             });
 
-            modal.on('cancel', function () {
+            modal.on('cancel', function() {
                 modal.off();
             });
 
             modal.open();
         },
 
-        onCloseWidget: function (cid) {
+        onCloseWidget: function(cid) {
             var view = this;
 
             var widget = this.getWidgets().get(cid);
@@ -375,7 +375,7 @@ define(function (require) {
             view.hideWidgetHover(cid);
         },
 
-        onSetupWidget: function (cid) {
+        onSetupWidget: function(cid) {
             var widget = this.getWidgets().get(cid);
             if (!widget) {
                 return;

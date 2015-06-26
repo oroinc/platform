@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'backbone', 'routing'
-    ], function (_, Backbone, routing) {
+    ], function(_, Backbone, routing) {
     'use strict';
 
     /**
@@ -40,13 +40,13 @@ define(['underscore', 'backbone', 'routing'
             options: null
         },
 
-        initialize: function () {
+        initialize: function() {
             this.urlRoot = routing.generate(this.route);
             this._updateCalendarUidAttribute();
             this.on('change:calendarAlias change:calendar', this._updateCalendarUidAttribute, this);
         },
 
-        save: function (key, val, options) {
+        save: function(key, val, options) {
             var attrs;
 
             // Handle both `"key", value` and `{key: value}` -style arguments.
@@ -69,11 +69,11 @@ define(['underscore', 'backbone', 'routing'
             Backbone.Model.prototype.save.call(this, attrs, options);
         },
 
-        toJSON: function (options) {
+        toJSON: function(options) {
             return _.omit(Backbone.Model.prototype.toJSON.call(this, options), ['options']);
         },
 
-        _updateCalendarUidAttribute: function () {
+        _updateCalendarUidAttribute: function() {
             var calendarAlias = this.get('calendarAlias'),
                 calendarId = this.get('calendar'),
                 calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;

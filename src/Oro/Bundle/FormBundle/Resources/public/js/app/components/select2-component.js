@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var Select2Component,
@@ -19,7 +19,7 @@ define(function (require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var config = options.configs;
             this.perPage = _.result(config, 'per_page') || this.perPage;
             this.url = _.result(options, 'url') || '';
@@ -31,12 +31,12 @@ define(function (require) {
             }
         },
 
-        preConfig: function (config) {
+        preConfig: function(config) {
             var that = this;
             if (this.url) {
                 config.ajax = {
                     url: this.url,
-                    data: function (query, page) {
+                    data: function(query, page) {
                         return {
                             page: page,
                             per_page: that.perPage,
@@ -44,7 +44,7 @@ define(function (require) {
                             query: that.makeQuery(query, config)
                         };
                     },
-                    results: function (data, page) {
+                    results: function(data, page) {
                         return data;
                     }
                 };
@@ -52,16 +52,16 @@ define(function (require) {
             return config;
         },
 
-        setConfig: function (config) {
+        setConfig: function(config) {
             var that = this;
             // configure AJAX object if it exists
             if (config.ajax !== undefined) {
                 config.minimumInputLength = 0;
                 config.initSelection = _.result(config, 'initSelection') || _.bind(initSelection, config);
-                if (that.excluded){
-                    config.ajax.results = _.wrap(config.ajax.results, function (func, data, page) {
+                if (that.excluded) {
+                    config.ajax.results = _.wrap(config.ajax.results, function(func, data, page) {
                         var response = func.call(this, data, page);
-                        response.results = _.filter(response.results, function (item) {
+                        response.results = _.filter(response.results, function(item) {
                             return !item.hasOwnProperty('id') || _.indexOf(that.excluded, item.id) < 0;
                         });
                         return response;
@@ -73,13 +73,13 @@ define(function (require) {
                 if (config.minimumResultsForSearch === undefined) {
                     config.minimumResultsForSearch = 7;
                 }
-                config.sortResults = function (results, container, query) {
+                config.sortResults = function(results, container, query) {
                     if (!query.term || query.term.length < 1) {
                         return results;
                     }
                     var expression = tools.safeRegExp(query.term, 'im');
 
-                    var sortIteratorDelegate = function (first, second) {
+                    var sortIteratorDelegate = function(first, second) {
                         var inFirst = first.text.search(expression);
                         var inSecond = second.text.search(expression);
 
@@ -101,7 +101,7 @@ define(function (require) {
                 config.formatSelection = formatFabric(config, config.selection_template || false);
             }
             _.defaults(config, {
-                escapeMarkup: function (m) { return m; },
+                escapeMarkup: function(m) { return m; },
                 dropdownAutoWidth: true,
                 openOnEnter: null
             });
@@ -109,7 +109,7 @@ define(function (require) {
             return config;
         },
 
-        makeQuery: function (query, configs) {
+        makeQuery: function(query, configs) {
             return query;
         }
     });
@@ -132,8 +132,8 @@ define(function (require) {
             var select2Obj = element.data('select2');
             var select2AjaxOptions = select2Obj.opts.ajax;
             var searchData = select2AjaxOptions.data(id, 1, true);
-            var url = (typeof select2AjaxOptions.url === 'function')
-                ? select2AjaxOptions.url.call(select2Obj, id, 1)
+            var url = (typeof select2AjaxOptions.url === 'function') ?
+                select2AjaxOptions.url.call(select2Obj, id, 1)
                 : select2AjaxOptions.url;
 
             searchData.search_by_id = true;
@@ -166,7 +166,7 @@ define(function (require) {
         // elementData must have name
         var elementData = _.filter(
             selectedData,
-            function (item) {
+            function(item) {
                 return item !== undefined && item.name !== undefined && item.name !== null;
             }
         );
@@ -217,12 +217,12 @@ define(function (require) {
             jsTemplate = _.template(jsTemplate);
         }
 
-        return function (object, container, query) {
+        return function(object, container, query) {
             if ($.isEmptyObject(object)) {
                 return undefined;
             }
             var result = '',
-                highlight = function (str) {
+                highlight = function(str) {
                     return object.children ? str : highlightSelection(str, query);
                 };
             if (object._html !== undefined) {

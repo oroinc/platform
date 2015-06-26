@@ -6,7 +6,7 @@ define([
     'oroui/js/mediator',
     'routing',
     './../base/page-region-view'
-], function ($, _, mediator, routing, PageRegionView) {
+], function($, _, mediator, routing, PageRegionView) {
     'use strict';
 
     var DebugToolbarView;
@@ -26,7 +26,7 @@ define([
          * @param {Object} xhr
          * @override
          */
-        onPageUpdate: function (data, actionArgs, xhr) {
+        onPageUpdate: function(data, actionArgs, xhr) {
             if (!xhr) {
                 this.$el.empty();
                 mediator.trigger('layout:adjustHeight');
@@ -40,10 +40,10 @@ define([
          *
          * @param {Object} xhr
          */
-        updateToolbar: function (xhr) {
+        updateToolbar: function(xhr) {
             var url, token;
             token = xhr.getResponseHeader('x-debug-token');
-            url = routing.generate('_wdt', { token: token });
+            url = routing.generate('_wdt', {token: token});
             $.get(url, _.bind(this.render, this, token, url));
         },
 
@@ -54,7 +54,7 @@ define([
          * @param {string} url
          * @param {string} data html content
          */
-        render: function (token, url, data) {
+        render: function(token, url, data) {
             var id;
 
             if (!data) {

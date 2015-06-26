@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var _, $, defaults;
@@ -12,7 +12,7 @@ define(function (require) {
         showItems: ['column', 'label', 'function', 'sorting', 'action']
     };
 
-    return function (options) {
+    return function(options) {
         var $form, $fields, $functions, $label;
 
         options = $.extend({}, defaults, options);
@@ -29,7 +29,7 @@ define(function (require) {
         }
 
         $fields
-            .on('change', function (e) {
+            .on('change', function(e) {
                 if (e.added) {
                     // update label input on field change
                     $label.val(e.added.text).trigger('change');

@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailTemplateCollection,
@@ -26,7 +26,7 @@ define(function (require) {
          * @param includeNonEntity {bool}
          * @param includeSystemTemplates {bool}
          */
-        initialize: function (route, routeId, includeNonEntity, includeSystemTemplates) {
+        initialize: function(route, routeId, includeNonEntity, includeSystemTemplates) {
             this.route = route;
             this.routeId = routeId;
             this.includeNonEntity = includeNonEntity;
@@ -41,7 +41,7 @@ define(function (require) {
          *
          * @param id {String}
          */
-        setEntityId: function (id) {
+        setEntityId: function(id) {
             var routeParams = {};
             routeParams[this.routeId] = id;
             routeParams['includeNonEntity'] = this.includeNonEntity ? '1' : '0';

@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var _ = require('underscore'),
         FlowchartJsPlubmBaseView = require('../jsplumb/base-view'),
@@ -39,7 +39,7 @@ define(function (require) {
 
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.connections = [];
             var optionKeysToCopy = ['areaView', 'stepCollection', 'stepCollectionView', 'transitionOverlayView'];
             if (optionKeysToCopy.length !== _.intersection(optionKeysToCopy, _.keys(options)).length) {
@@ -53,7 +53,7 @@ define(function (require) {
             FlowchartViewerTransitionView.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             this.updateStepTransitions();
             if (!this.isConnected) {
                 this.isConnected = true;
@@ -62,8 +62,8 @@ define(function (require) {
             return this;
         },
 
-        connect: function () {
-            var debouncedUpdate = _.debounce(_.bind(function () {
+        connect: function() {
+            var debouncedUpdate = _.debounce(_.bind(function() {
                 if (!this.disposed) {
                     this.updateStepTransitions();
                 }
@@ -74,11 +74,11 @@ define(function (require) {
             this.listenTo(this.stepCollection, 'remove', debouncedUpdate);
         },
 
-        findElByStep: function (step) {
+        findElByStep: function(step) {
             return this.stepCollectionView.getItemView(step).el;
         },
 
-        findConnectionByStartStep: function (startStep) {
+        findConnectionByStartStep: function(startStep) {
             var i, connection;
             for (i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
@@ -88,7 +88,7 @@ define(function (require) {
             }
         },
 
-        updateStepTransitions: function () {
+        updateStepTransitions: function() {
             var i, startStep, connection,
                 startSteps = this.model.getStartingSteps(),
                 endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
@@ -105,7 +105,7 @@ define(function (require) {
             this.removeStaleConnections();
         },
 
-        addStaleMark: function () {
+        addStaleMark: function() {
             var i, connection;
             for (i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
@@ -113,7 +113,7 @@ define(function (require) {
             }
         },
 
-        removeStaleConnections: function () {
+        removeStaleConnections: function() {
             var i, connection;
             for (i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
@@ -128,7 +128,7 @@ define(function (require) {
             }
         },
 
-        createConnection: function (startStep, endStep) {
+        createConnection: function(startStep, endStep) {
             var jsplumbConnection,
                 overlayView,
                 transitionModel = this.model,
@@ -146,7 +146,7 @@ define(function (require) {
                     hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
                     overlays: [
                         ['Custom', {
-                            create: _.bind(function () {
+                            create: _.bind(function() {
                                 overlayView = new this.transitionOverlayView({
                                     model: transitionModel,
                                     areaView: areaView,
@@ -168,7 +168,7 @@ define(function (require) {
             });
         },
 
-        cleanup: function () {
+        cleanup: function() {
             this.addStaleMark();
             this.removeStaleConnections();
             this.stopListening();

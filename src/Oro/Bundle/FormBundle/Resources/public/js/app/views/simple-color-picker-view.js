@@ -1,7 +1,7 @@
 /*jslint nomen: true*/
 /*global define*/
 define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
-    ], function (_, BaseSimpleColorPickerView) {
+    ], function(_, BaseSimpleColorPickerView) {
     'use strict';
 
     var SimpleColorPickerView = BaseSimpleColorPickerView.extend({
@@ -9,14 +9,14 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
          * @constructor
          * @param {object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             SimpleColorPickerView.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        _processOptions: function (options) {
+        _processOptions: function(options) {
             var selectedVal = this.$el.val(),
                 selectedIndex = null,
                 customIndex = null;
@@ -24,7 +24,7 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
             SimpleColorPickerView.__super__._processOptions.call(this, options);
 
             // set custom color
-            _.each(options.data, function (value, index) {
+            _.each(options.data, function(value, index) {
                 if (value.class) {
                     if (value.class === 'custom-color') {
                         customIndex = index;
@@ -41,7 +41,7 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         /**
          * @inheritDoc
          */
-        _getSimpleColorPickerOptions: function (options) {
+        _getSimpleColorPickerOptions: function(options) {
             options = SimpleColorPickerView.__super__._getSimpleColorPickerOptions.call(this, options);
             return _.defaults(_.omit(options, ['custom_color']), {
                 emptyColor: '#FFFFFF'
@@ -51,14 +51,14 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         /**
          * @inheritDoc
          */
-        _getPickerOptions: function (options) {
+        _getPickerOptions: function(options) {
             return SimpleColorPickerView.__super__._getPickerOptions.call(this, options.custom_color);
         },
 
         /**
          * @inheritDoc
          */
-        _getPicker: function () {
+        _getPicker: function() {
             return this.$parent.find('span.custom-color');
         }
     });

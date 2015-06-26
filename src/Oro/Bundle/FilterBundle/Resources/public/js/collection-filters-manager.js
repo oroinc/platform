@@ -3,7 +3,7 @@
 define([
     'underscore',
     './filters-manager'
-], function (_, FiltersManager) {
+], function(_, FiltersManager) {
     'use strict';
 
     var CollectionFiltersManager;
@@ -24,7 +24,7 @@ define([
          * @param {Object} [options.filters]
          * @param {String} [options.addButtonHint]
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.collection = options.collection;
 
             this.listenTo(this.collection, {
@@ -36,7 +36,7 @@ define([
             CollectionFiltersManager.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             CollectionFiltersManager.__super__.render.apply(this, arguments);
             this._onUpdateCollectionState(this.collection);
             return this;
@@ -48,7 +48,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterUpdated: function (filter) {
+        _onFilterUpdated: function(filter) {
             if (this.ignoreFiltersUpdateEvents) {
                 return;
             }
@@ -63,7 +63,7 @@ define([
          *
          * @protected
          */
-        _beforeCollectionFetch: function (collection) {
+        _beforeCollectionFetch: function(collection) {
             collection.state.filters = this._createState();
         },
 
@@ -72,7 +72,7 @@ define([
          *
          * @param {oro.PageableCollection} collection
          */
-        _onUpdateCollectionState: function (collection) {
+        _onUpdateCollectionState: function(collection) {
             this.ignoreFiltersUpdateEvents = true;
             this._applyState(collection.state.filters || {});
             this.ignoreFiltersUpdateEvents = false;
@@ -83,7 +83,7 @@ define([
          *
          * @protected
          */
-        _onCollectionReset: function (collection) {
+        _onCollectionReset: function(collection) {
             var hasRecords, hasFiltersState;
             hasRecords = collection.state.totalRecords > 0;
             hasFiltersState = !_.isEmpty(collection.state.filters);
@@ -100,9 +100,9 @@ define([
          * @return {Object}
          * @protected
          */
-        _createState: function () {
+        _createState: function() {
             var state = {};
-            _.each(this.filters, function (filter, name) {
+            _.each(this.filters, function(filter, name) {
                 var shortName = '__' + name;
                 if (filter.enabled) {
                     if (!filter.isEmpty()) {
@@ -125,11 +125,11 @@ define([
          * @protected
          * @return {*}
          */
-        _applyState: function (state) {
+        _applyState: function(state) {
             var toEnable  = [],
                 toDisable = [];
 
-            _.each(this.filters, function (filter, name) {
+            _.each(this.filters, function(filter, name) {
                 var shortName = '__' + name,
                     filterState;
                 if (_.has(state, name)) {

@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var BasePlugin = require('./base/plugin');
@@ -23,7 +23,7 @@ define(function (require) {
          * @param {function(new:BasePlugin)} Constructor Plugin constructor
          * @returns {Object}
          */
-        getInstance: function (Constructor) {
+        getInstance: function(Constructor) {
             var i, instance;
             for (i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
@@ -40,7 +40,7 @@ define(function (require) {
          * @param {function(new:BasePlugin)} Constructor Plugin constructor
          * @param {Object=} options
          */
-        create: function (Constructor, options) {
+        create: function(Constructor, options) {
             if (!(Constructor.prototype instanceof BasePlugin)) {
                 throw new Error('Constructor must be a child of BasePlugin');
             }
@@ -59,7 +59,7 @@ define(function (require) {
          * @param {function(new:BasePlugin)} Constructor Plugin constructor
          * @param {Object} options
          */
-        updateOptions: function (Constructor, options) {
+        updateOptions: function(Constructor, options) {
             this.remove(Constructor);
             this.create(Constructor, options);
         },
@@ -69,7 +69,7 @@ define(function (require) {
          *
          * @param {function(new:BasePlugin)} Constructor Plugin constructor
          */
-        remove: function (Constructor) {
+        remove: function(Constructor) {
             var instance = this.getInstance(Constructor);
             if (instance === null) {
                 throw new Error('Plugin is not instantiated yet');
@@ -86,7 +86,7 @@ define(function (require) {
          *
          * @param {Function|Array} Constructor Plugin constructor or array of constructors
          */
-        enable: function (Constructor) {
+        enable: function(Constructor) {
             if (_.isArray(Constructor)) {
                 _.each(Constructor, _.bind(this.enable, this));
                 return;
@@ -108,7 +108,7 @@ define(function (require) {
          *
          * @param {Function|Array} Constructor Plugin constructor or array of constructors
          */
-        disable: function (Constructor) {
+        disable: function(Constructor) {
             if (_.isArray(Constructor)) {
                 _.each(Constructor, _.bind(this.disable, this));
                 return;
@@ -126,7 +126,7 @@ define(function (require) {
         /**
          * Disables all connected plugins
          */
-        disableAll: function () {
+        disableAll: function() {
             var instance, i;
             for (i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
@@ -136,7 +136,7 @@ define(function (require) {
             }
         },
 
-        dispose: function () {
+        dispose: function() {
             var instance, i;
             for (i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];

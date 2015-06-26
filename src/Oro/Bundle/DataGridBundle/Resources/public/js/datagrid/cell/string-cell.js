@@ -3,7 +3,7 @@
 define([
     'backgrid',
     'orodatagrid/js/datagrid/formatter/cell-formatter'
-], function (Backgrid, CellFormatter) {
+], function(Backgrid, CellFormatter) {
     'use strict';
 
     var StringCell;
@@ -24,7 +24,7 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function (e) {
+        enterEditMode: function(e) {
             if (this.column.get("editable")) {
                 e.stopPropagation();
             }

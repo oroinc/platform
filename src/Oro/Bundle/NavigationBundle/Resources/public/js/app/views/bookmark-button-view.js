@@ -3,7 +3,7 @@
 define([
     'oroui/js/mediator',
     'oroui/js/app/views/base/page-region-view'
-], function (mediator, PageRegionView) {
+], function(mediator, PageRegionView) {
     'use strict';
 
     var BookmarkButtonView, document;
@@ -31,7 +31,7 @@ define([
             'reset collection': 'updateState'
         },
 
-        initialize: function(options){
+        initialize: function(options) {
             if (!options.navigationElementType) {
                 throw new Error('"navigationItemElementType" is required option for bookmark button');
             }
@@ -39,7 +39,7 @@ define([
             this.navigationElementType = options.navigationElementType;
         },
 
-        render: function () {
+        render: function() {
             var data, titleSerialized, titleShort;
 
             this.updateState();
@@ -68,13 +68,13 @@ define([
             return this;
         },
 
-        updateState: function () {
+        updateState: function() {
             var model;
             model = this.collection.getCurrentModel();
             this.$el.toggleClass('gold-icon', model != null);
         },
 
-        onToggle: function () {
+        onToggle: function() {
             var model, attrs, Model;
             model = this.collection.getCurrentModel();
             if (model) {
@@ -87,7 +87,7 @@ define([
             }
         },
 
-        getItemAttrs: function () {
+        getItemAttrs: function() {
             var attrs, title;
             title = this.$el.data('title');
             attrs = {

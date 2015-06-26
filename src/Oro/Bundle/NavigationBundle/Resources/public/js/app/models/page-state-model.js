@@ -2,7 +2,7 @@
 define([
     'oroui/js/app/models/base/model',
     'routing'
-], function (BaseModel, routing) {
+], function(BaseModel, routing) {
     'use strict';
 
     var PageStateModel;
@@ -17,7 +17,7 @@ define([
             }
         },
 
-        url: function (method) {
+        url: function(method) {
             var args = ['oro_api_post_pagestate'];
             if (this.id) {
                 args = ['oro_api_put_pagestate', {id: this.id}];

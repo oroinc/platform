@@ -20,7 +20,7 @@ function(_, Translator, module) {
      *
      * @param {string} id
      */
-    Translator.add = function (id) {
+    Translator.add = function(id) {
         dict[id] = 1;
         add.apply(Translator, arguments);
     };
@@ -32,7 +32,7 @@ function(_, Translator, module) {
      * @param {string} id
      * @returns {string}
      */
-    Translator.get = function (id) {
+    Translator.get = function(id) {
         var string = get.apply(Translator, arguments);
         var hasTranslation = checkTranslation(id);
 
@@ -62,7 +62,7 @@ function(_, Translator, module) {
      * @param {Object} data
      * @returns {Object} Translator
      */
-    Translator.fromJSON = function (data) {
+    Translator.fromJSON = function(data) {
         if (typeof data === "string") {
             data = JSON.parse(data);
         }
@@ -81,7 +81,7 @@ function(_, Translator, module) {
             return true;
         }
         var domains = Translator.defaultDomains,
-            checker = function (domain) {
+            checker = function(domain) {
                 return dict.hasOwnProperty(domain ? domain + ':' + id : id);
             };
         domains = _.union([undefined], _.isArray(domains) ? domains : [domains]);

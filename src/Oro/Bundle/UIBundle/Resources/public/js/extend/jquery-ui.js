@@ -1,10 +1,10 @@
 /*global define*/
 /*jslint nomen:true, browser:true*/
-define(['jquery', 'jquery-ui'], function ($) {
+define(['jquery', 'jquery-ui'], function($) {
     'use strict';
 
     /* datepicker extend:start */
-    (function () {
+    (function() {
 
         var original = {
             _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
@@ -21,7 +21,7 @@ define(['jquery', 'jquery-ui'], function ($) {
             var events = ['scroll', 'resize'],
                 ns = 'datepicker-' + uuid;
 
-            events = $.map(events, function (eventName) {
+            events = $.map(events, function(eventName) {
                 return eventName + '.' + ns;
             });
 
@@ -43,7 +43,7 @@ define(['jquery', 'jquery-ui'], function ($) {
             }
 
             isFixed = false;
-            $input.parents().each(function () {
+            $input.parents().each(function() {
                 isFixed |= $(this).css("position") === "fixed";
                 return !isFixed;
             });
@@ -54,7 +54,7 @@ define(['jquery', 'jquery-ui'], function ($) {
 
             dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
 
-            if( $input.hasClass(dateDialogClassName) !== dialogIsBelow) {
+            if ($input.hasClass(dateDialogClassName) !== dialogIsBelow) {
                 $input.trigger('datepicker:dialogReposition', dialogIsBelow ? 'below' : 'above');
                 $input.toggleClass(dateDialogClassName, dialogIsBelow);
             }
@@ -72,7 +72,7 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @override
          * @private
          */
-        $.datepicker.constructor.prototype._showDatepicker = function (elem) {
+        $.datepicker.constructor.prototype._showDatepicker = function(elem) {
             var events, input;
 
             _showDatepicker.apply(this, arguments);
@@ -80,7 +80,7 @@ define(['jquery', 'jquery-ui'], function ($) {
             input = elem.target || elem;
             events = getEvents(input.id);
 
-            $(input).removeClass(dateDialogClassName).parents().add(window).each(function () {
+            $(input).removeClass(dateDialogClassName).parents().add(window).each(function() {
                 $(this).on(events, $.proxy(updatePos, input));
                 // @TODO develop other approach than hide on scroll
                 // because on mobile devices it's impossible to open calendar without scrolling
@@ -101,7 +101,7 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @override
          * @private
          */
-        $.datepicker.constructor.prototype._hideDatepicker = function (elem) {
+        $.datepicker.constructor.prototype._hideDatepicker = function(elem) {
             var events, input = elem;
 
             if (!elem) {
@@ -112,14 +112,14 @@ define(['jquery', 'jquery-ui'], function ($) {
             }
             events = getEvents(input.id);
 
-            $(input).parents().add(window).each(function () {
+            $(input).parents().add(window).each(function() {
                 $(this).off(events);
             });
 
             _hideDatepicker.apply(this, arguments);
         };
 
-        $.datepicker.constructor.prototype._destroyDatepicker = function () {
+        $.datepicker.constructor.prototype._destroyDatepicker = function() {
             if (!this._curInst) {
                 return;
             }

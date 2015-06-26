@@ -3,7 +3,7 @@
 define([
     'oroui/js/app/models/base/collection',
     './note-model'
-], function (BaseCollection, NoteModel) {
+], function(BaseCollection, NoteModel) {
     'use strict';
 
     var NotesCollection;
@@ -13,15 +13,15 @@ define([
         baseUrl: '',
         sorting: 'DESC',
 
-        url: function () {
+        url: function() {
             return this.baseUrl + '?sorting=' + this.sorting;
         },
 
-        getSorting: function () {
+        getSorting: function() {
             return this.sorting;
         },
 
-        setSorting: function (mode) {
+        setSorting: function(mode) {
             this.sorting = mode;
         }
     });

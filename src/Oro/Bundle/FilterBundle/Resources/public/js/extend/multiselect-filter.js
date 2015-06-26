@@ -4,7 +4,7 @@ define([
     'jquery',
     'jquery-ui',
     'jquery.multiselect.filter'
-], function ($) {
+], function($) {
     'use strict';
 
     /**
@@ -23,7 +23,7 @@ define([
             var header = (this.header = instance.menu.find('.ui-multiselect-header').addClass('ui-multiselect-hasfilter'));
 
             // wrapper elem
-            var wrapper = (this.wrapper = $('<div class="ui-multiselect-filter">' + (opts.label.length ? opts.label : '') + '<input placeholder="'+opts.placeholder+'" type="search"' + (/\d/.test(opts.width) ? 'style="width:'+opts.width+'px"' : '') + ' /></div>').prependTo(this.header));
+            var wrapper = (this.wrapper = $('<div class="ui-multiselect-filter">' + (opts.label.length ? opts.label : '') + '<input placeholder="' + opts.placeholder + '" type="search"' + (/\d/.test(opts.width) ? 'style="width:' + opts.width + 'px"' : '') + ' /></div>').prependTo(this.header));
 
             // reference to the actual inputs
             this.inputs = instance.menu.find('input[type="checkbox"], input[type="radio"]');
@@ -32,7 +32,7 @@ define([
             this.input = wrapper.find('input').bind({
                 keydown: function(e) {
                     // prevent the enter key from submitting the form / closing the widget
-                    if(e.which === 13) {
+                    if (e.which === 13) {
                         e.preventDefault();
                     }
                 },
@@ -66,13 +66,13 @@ define([
 
                 // select option tags
                 this.element.find('option').filter(function() {
-                    if(!this.disabled && $.inArray(this.value, values) > -1) {
+                    if (!this.disabled && $.inArray(this.value, values) > -1) {
                         _self._toggleState('selected', flag).call(this);
                     }
                 });
 
                 // trigger the change event on the select
-                if($inputs.length) {
+                if ($inputs.length) {
                     this.element.trigger('change');
                 }
             };
@@ -84,12 +84,12 @@ define([
             }, this));
 
             // automatically reset the widget on close?
-            if(this.options.autoReset) {
+            if (this.options.autoReset) {
                 doc.bind('multiselectclose' + this.eventNamespace, $.proxy(this._reset, this));
             }
         },
 
-        _destroy: function () {
+        _destroy: function() {
             $(document).off(this.eventNamespace);
             this._super();
         }

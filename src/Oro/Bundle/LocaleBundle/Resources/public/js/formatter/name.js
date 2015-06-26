@@ -1,6 +1,6 @@
 /*global define*/
 define(['../locale-settings'
-    ], function (localeSettings) {
+    ], function(localeSettings) {
     'use strict';
 
     /**
@@ -26,13 +26,13 @@ define(['../locale-settings'
          * @param {string} locale
          * @returns {string}
          */
-        format: function (person, locale) {
+        format: function(person, locale) {
             if (!locale) {
                 locale = localeSettings.getLocale();
             }
 
             var format = this.getNameFormat(locale);
-            var formatted = format.replace(/%(\w+)%/g, function (pattern, key) {
+            var formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
                 var lowerCaseKey = key.toLowerCase();
                 var value = '';
                 if (person.hasOwnProperty(lowerCaseKey)) {
@@ -53,7 +53,7 @@ define(['../locale-settings'
          * @param {string} locale
          * @returns {string}
          */
-        getNameFormat: function (locale) {
+        getNameFormat: function(locale) {
             if (!this.formatCache.hasOwnProperty(locale)) {
                 var localeFallback = localeSettings.getLocaleFallback(locale);
 

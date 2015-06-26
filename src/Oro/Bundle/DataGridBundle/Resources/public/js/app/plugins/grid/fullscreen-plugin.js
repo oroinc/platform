@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var FullScreenPlugin,
         _ = require('underscore'),
@@ -8,7 +8,7 @@ define(function (require) {
         FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
 
     FullScreenPlugin = BasePlugin.extend({
-        enable: function () {
+        enable: function() {
             this.listenTo(this.main, 'shown', this.updateLayout, this);
             this.listenTo(this.main, 'rendered', this.updateLayout, this);
             this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
@@ -16,7 +16,7 @@ define(function (require) {
             FullScreenPlugin.__super__.enable.call(this);
         },
 
-        disable: function () {
+        disable: function() {
             clearTimeout(this.updateLayoutTimeoutId);
             this.setLayout('default');
             FullScreenPlugin.__super__.disable.call(this);
@@ -26,7 +26,7 @@ define(function (require) {
          * Returns css expression for fullscreen layout
          * @returns {string}
          */
-        getCssHeightCalcExpression: function () {
+        getCssHeightCalcExpression: function() {
             var documentHeight = $(document).height(),
                 availableHeight = mediator.execute('layout:getAvailableHeight',
                     this.main.$grid.parents('.grid-scrollable-container:first'));
@@ -36,7 +36,7 @@ define(function (require) {
         /**
          * Chooses layout on resize or during creation
          */
-        updateLayout: function () {
+        updateLayout: function() {
             var layout;
             if (!this.main.rendered || !this.main.$grid.parents('body').length || !this.main.$el.is(':visible')) {
                 // not ready to apply layout
@@ -57,7 +57,7 @@ define(function (require) {
         /**
          * Sets layout and perform all required operations
          */
-        setLayout: function (newLayout) {
+        setLayout: function(newLayout) {
             if (newLayout === this.main.layout) {
                 if (newLayout === 'fullscreen') {
                     this.main.$grid.parents('.grid-scrollable-container').css({

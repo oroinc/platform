@@ -7,7 +7,7 @@ define([
     'oroui/js/mediator',
     'oroui/js/messenger',
     'orotranslation/js/translator'
-], function (_, Chaplin, sync, mediator, messenger, __) {
+], function(_, Chaplin, sync, mediator, messenger, __) {
     'use strict';
 
     /**
@@ -130,7 +130,7 @@ define([
      * @return []
      */
     function prepareTags(tags) {
-        tags = _.reject(JSON.parse(tags), function (tag) {
+        tags = _.reject(JSON.parse(tags), function(tag) {
             return (tag.username || null) === currentUser;
         });
         return _.pluck(tags, 'tagname');
@@ -144,7 +144,7 @@ define([
      */
     function refreshHandler(path, callbacks) {
         if (path === current.path) {
-            _.each(callbacks, function (callback) {
+            _.each(callbacks, function(callback) {
                 callback(path);
             });
         }
@@ -161,7 +161,7 @@ define([
 
         pages = [current].concat(_.values(pagesCache));
 
-        _.each(pages, function (page) {
+        _.each(pages, function(page) {
             var handler, items, path, callbacks;
 
             callbacks = [];
@@ -169,7 +169,7 @@ define([
             path = page.path;
 
             // collect callbacks for outdated contents
-            _.each(items, function (options) {
+            _.each(items, function(options) {
                 if (_.intersection(options.tags, tags).length) {
                     callbacks.push(options.callback || defaultCallback);
                 }
@@ -182,7 +182,7 @@ define([
             callbacks = _.uniq(callbacks);
             if (path === current.path) {
                 // current page is outdated - execute all callbacks
-                _.each(callbacks, function (callback) {
+                _.each(callbacks, function(callback) {
                     callback(path);
                 });
             } else {
@@ -200,7 +200,7 @@ define([
     }
 
     // handles page request
-    mediator.on('page:request', function (args) {
+    mediator.on('page:request', function(args) {
         var path, query;
         path = args.route.path != null ? args.route.path : current.path;
         query = args.route.query != null ? args.route.query : current.query;
@@ -211,7 +211,7 @@ define([
     });
 
     // handles page update
-    mediator.on('page:update', function (page, args) {
+    mediator.on('page:update', function(page, args) {
         var options;
         current.page = page;
         options = args.options;
@@ -248,7 +248,7 @@ define([
          * @param {string} query
          * @param {string} userName
          */
-        init: function (path, query, userName) {
+        init: function(path, query, userName) {
             changeUrl(path, query);
             currentUser = userName;
         },
@@ -260,7 +260,7 @@ define([
          * @param {function(string)=} callback is optional,
          *      handler which will be executed on content by the tags gets outdated
          */
-        tagContent: function (tags, callback) {
+        tagContent: function(tags, callback) {
             var obj = {
                 tags: _.isArray(tags) ? tags : [tags]
             };
@@ -269,7 +269,7 @@ define([
             }
 
             current.tags.push(obj);
-            mediator.trigger('content-manager:content-tagged', { current: current.tags, added: obj });
+            mediator.trigger('content-manager:content-tagged', {current: current.tags, added: obj});
         },
 
         /**
@@ -277,7 +277,7 @@ define([
          *
          * @param {string=} path part of URL
          */
-        remove: function (path) {
+        remove: function(path) {
             if (_.isUndefined(path)) {
                 path = current.path;
             } else {
@@ -294,7 +294,7 @@ define([
         /**
          * Add current page to permanent cache
          */
-        add: function () {
+        add: function() {
             var path;
             if (current.path[0] !== '/') {
                 current.path = '/' + current.path;
@@ -309,7 +309,7 @@ define([
          * @param {string=} path part of URL
          * @return {Object|boolean}
          */
-        get: function (path) {
+        get: function(path) {
             path = _.isUndefined(path) ? current.path : fetchPath(path);
             return pagesCache[path] || undefined;
         },
@@ -321,7 +321,7 @@ define([
          * @param {*} value
          * @param {string=} hash
          */
-        saveState: function (key, value, hash) {
+        saveState: function(key, value, hash) {
             if (value !== null) {
                 current.state[key] = value;
             } else {
@@ -343,7 +343,7 @@ define([
          * @param {string} url
          * @param {Object} options
          */
-        changeUrl: function (url, options) {
+        changeUrl: function(url, options) {
             var route, _ref;
             options = options || {};
             _ref = url.split('?');
@@ -359,7 +359,7 @@ define([
          * @param {string} param
          * @param {string} value
          */
-        changeUrlParam: function (param, value) {
+        changeUrlParam: function(param, value) {
             var route, query;
 
             query = Chaplin.utils.queryParams.parse(current.query);
@@ -389,7 +389,7 @@ define([
          * @param {string} key
          * @return {*}
          */
-        fetchState: function (key) {
+        fetchState: function(key) {
             return current.state[key];
         },
 
@@ -399,7 +399,7 @@ define([
          * @param {string} key
          * @param {string} hash
          */
-        checkState: function (key, hash) {
+        checkState: function(key, hash) {
             var query;
             query = Chaplin.utils.queryParams.parse(current.query);
             return query[key] == hash;
@@ -413,7 +413,7 @@ define([
          * @param {string=} refPath
          * @returns {boolean}
          */
-        compareUrl: function (url, refPath) {
+        compareUrl: function(url, refPath) {
             if (refPath == null) {
                 refPath = current.path;
             }
@@ -426,7 +426,7 @@ define([
          *
          * @returns {script}
          */
-        currentUrl: function () {
+        currentUrl: function() {
             var url;
             url = mediator.execute('combineRouteUrl', current);
             return url;
@@ -435,8 +435,8 @@ define([
         /**
          * Prevents storing current page in cache
          */
-        cacheIgnore: function () {
-            mediator.once('page:beforeChange', function (oldRoute) {
+        cacheIgnore: function() {
+            mediator.once('page:beforeChange', function(oldRoute) {
                 contentManager.remove(oldRoute.path);
             });
         }

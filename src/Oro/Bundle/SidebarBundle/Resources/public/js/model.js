@@ -1,6 +1,6 @@
 /*global define*/
 define(['backbone', 'routing', './constants'
-    ], function (Backbone, routing, constants) {
+    ], function(Backbone, routing, constants) {
     'use strict';
 
     /**
@@ -17,7 +17,7 @@ define(['backbone', 'routing', './constants'
         /**
          * Toggles state of sidebar between minimized and maximized
          */
-        toggleState: function () {
+        toggleState: function() {
             switch (this.get('state')) {
             case constants.SIDEBAR_MINIMIZED:
                 this.set('state', constants.SIDEBAR_MAXIMIZED);

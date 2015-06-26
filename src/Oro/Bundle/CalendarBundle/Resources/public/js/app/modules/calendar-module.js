@@ -1,7 +1,7 @@
 /*global require*/
 require([
     'oroui/js/app/controllers/base/controller'
-], function (BaseController) {
+], function(BaseController) {
     'use strict';
 
     /**
@@ -10,7 +10,7 @@ require([
     BaseController.loadBeforeAction([
         'jquery',
         'jquery.validate'
-    ], function ($) {
+    ], function($) {
         $.validator.loadMethod('orocalendar/js/validator/dateearlierthan');
     });
 });

@@ -3,7 +3,7 @@
 define([
     'underscore',
     'backgrid'
-], function (_, Backgrid) {
+], function(_, Backgrid) {
     'use strict';
 
     var SelectCell;
@@ -19,10 +19,10 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (this.choices) {
                 this.optionValues = [];
-                _.each(this.choices, function (value, key) {
+                _.each(this.choices, function(value, key) {
                     this.optionValues.push([value, key]);
                 }, this);
             }
@@ -32,7 +32,7 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function (e) {
+        enterEditMode: function(e) {
             if (this.column.get("editable")) {
                 e.stopPropagation();
             }

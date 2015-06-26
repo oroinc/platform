@@ -7,7 +7,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oroui/js/messenger'],
-function (Backbone, _, routing, __, mediator, messenger) {
+function(Backbone, _, routing, __, mediator, messenger) {
     var $ = Backbone.$;
 
     /**
@@ -36,7 +36,7 @@ function (Backbone, _, routing, __, mediator, messenger) {
         /**
          * Constructor
          */
-        initialize: function () {
+        initialize: function() {
             if (this.el.tagName !== 'INPUT') {
                 throw new TypeError('Configuration field el should be set');
             }
@@ -49,7 +49,7 @@ function (Backbone, _, routing, __, mediator, messenger) {
          *
          * @param {jQuery.Event} e
          */
-        clickHandler: function (e) {
+        clickHandler: function(e) {
             e.preventDefault();
 
             var $el = $(e.currentTarget),
@@ -80,18 +80,18 @@ function (Backbone, _, routing, __, mediator, messenger) {
          *
          * @param {Object} actionMediator
          */
-        performAction: function (actionMediator) {
+        performAction: function(actionMediator) {
             if (actionMediator.action == 'download' || actionMediator.action == 'update') {
                 mediator.execute('showLoading');
 
-                var url = routing.generate(this.route, { code: actionMediator.code });
-                $.getJSON(url, _.bind(function (response) {
+                var url = routing.generate(this.route, {code: actionMediator.code});
+                $.getJSON(url, _.bind(function(response) {
                         if (true === response.success) {
                             this.markAsUpToDate(actionMediator);
                             this.postAction(actionMediator);
                         }
                     }, this))
-                    .always(_.bind(function (response, status) {
+                    .always(_.bind(function(response, status) {
                         var message;
 
                         mediator.execute('hideLoading');
@@ -101,8 +101,8 @@ function (Backbone, _, routing, __, mediator, messenger) {
                             message  = _.isUndefined(response.message) ? __('unknown') : __(response.message);
                             message  = __('Could not download translations, error: ') + message;
                         } else {
-                            message = actionMediator.action == 'download'
-                                ? __('Download finished.')
+                            message = actionMediator.action == 'download' ?
+                                __('Download finished.')
                                 : __('Update finished.');
                         }
 
@@ -119,7 +119,7 @@ function (Backbone, _, routing, __, mediator, messenger) {
          *
          * @param {Object} actionMediator
          */
-        postAction: function (actionMediator) {
+        postAction: function(actionMediator) {
             var $newButton,
                 action = actionMediator.action,
                 code = actionMediator.code,

@@ -1,7 +1,7 @@
 /*global define*/
 define([
     './string-cell'
-], function (StringCell) {
+], function(StringCell) {
     'use strict';
 
     var HtmlCell;
@@ -18,7 +18,7 @@ define([
          * Render a text string in a table cell. The text is converted from the
          * model's raw value for this cell's column.
          */
-        render: function () {
+        render: function() {
             this.$el.empty().html(this.formatter.fromRaw(this.model.get(this.column.get("name"))));
             return this;
         }

@@ -69,7 +69,7 @@ define(function(require) {
         update: function() {
             var isChanged = this.setChartSize();
 
-            if(isChanged) {
+            if (isChanged) {
                 this.draw();
                 this.fixSize();
             }
@@ -111,9 +111,9 @@ define(function(require) {
 
             $labels.each(function(index, element) {
                 var height = $(element).height();
-                if(height > labelMaxHeight) {
+                if (height > labelMaxHeight) {
                     labelMaxHeight = height;
-                } else if(height < labelMinHeight) {
+                } else if (height < labelMinHeight) {
                     labelMinHeight = height;
                 }
             });

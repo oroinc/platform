@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('jquery');
@@ -14,7 +14,7 @@ define(function (require) {
         options: {
             entity: null,
             data: {},
-            dataFilter: function (entityName, entityFields) {
+            dataFilter: function(entityName, entityFields) {
                 return entityFields;
             },
             select2: {
@@ -31,9 +31,9 @@ define(function (require) {
             fieldsLoaderSelector: ''
         },
 
-        _create: function () {
+        _create: function() {
             this._on({
-                change: function (e) {
+                change: function(e) {
                     if (e.added) {
                         this.element.trigger('changed', e.added.id);
                     }
@@ -44,7 +44,7 @@ define(function (require) {
             this._bindFieldsLoader();
         },
 
-        _init: function () {
+        _init: function() {
             var instance, select2Options,
                 self = this;
 
@@ -52,7 +52,7 @@ define(function (require) {
             this.updateData(this.options.entity, this.options.data);
 
             select2Options = $.extend({
-                initSelection: function (element, callback) {
+                initSelection: function(element, callback) {
                     var id, chain, opts, match;
                     instance = element.data('select2');
                     opts = instance.opts;
@@ -61,22 +61,22 @@ define(function (require) {
                     chain = self.util.pathToEntityChain(id, true);
                     instance.pagePath = chain[chain.length - 1].basePath;
                     opts.query({
-                        matcher: function (term, text, el) {
+                        matcher: function(term, text, el) {
                             var is_match = id === opts.id(el);
                             if (is_match) {
                                 match = el;
                             }
                             return is_match;
                         },
-                        callback: !$.isFunction(callback) ? $.noop : function () {
+                        callback: !$.isFunction(callback) ? $.noop : function() {
                             callback(match);
                         }
                     });
                 },
-                id: function (result) {
+                id: function(result) {
                     return result.id !== undefined ? result.id : result.pagePath;
                 },
-                data: function () {
+                data: function() {
                     var pagePath, results;
                     pagePath = (instance && instance.pagePath) || '';
                     results = self._select2Data(pagePath);
@@ -86,14 +86,14 @@ define(function (require) {
                         results: results
                     };
                 },
-                formatBreadcrumbItem: function (item) {
+                formatBreadcrumbItem: function(item) {
                     var label;
                     label = item.field ? item.field.label : item.entity.label;
                     return label;
                 },
-                breadcrumbs: function (pagePath) {
+                breadcrumbs: function(pagePath) {
                     var chain = self.util.pathToEntityChain(pagePath, true);
-                    $.each(chain, function (i, item) {
+                    $.each(chain, function(i, item) {
                         item.pagePath = item.basePath;
                     });
                     return chain;
@@ -104,7 +104,7 @@ define(function (require) {
             instance = this.element.data('select2');
         },
 
-        _setOption: function (key, value) {
+        _setOption: function(key, value) {
             if ($.isPlainObject(value)) {
                 $.extend(this.options[key], value);
             } else {
@@ -113,29 +113,29 @@ define(function (require) {
             return this;
         },
 
-        _getCreateOptions: function () {
+        _getCreateOptions: function() {
             return $.extend(true, {}, this.options);
         },
 
-        _processSelect2Options: function () {
+        _processSelect2Options: function() {
             var template,
                 options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
-                options.formatSelection = $.proxy(function (item) {
+                options.formatSelection = $.proxy(function(item) {
                     return this.formatChoice(item.id, template);
                 }, this);
             }
         },
 
-        _bindFieldsLoader: function () {
+        _bindFieldsLoader: function() {
             if (!this.options.fieldsLoaderSelector) {
                 return;
             }
             this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
             this._on(this.$fieldsLoader, {
-                fieldsloaderupdate: function (e, data) {
+                fieldsloaderupdate: function(e, data) {
                     this.setValue('');
                     this.updateData($(e.target).val(), data);
                 }
@@ -143,7 +143,7 @@ define(function (require) {
             this.updateData(this.$fieldsLoader.val(), this.$fieldsLoader.data('fields'));
         },
 
-        updateData: function (entity, data) {
+        updateData: function(entity, data) {
             data = data || {};
             this.options.entity = entity;
             this.options.data = data;
@@ -155,11 +155,11 @@ define(function (require) {
             this.util.init(entity, data);
         },
 
-        setValue: function (value) {
+        setValue: function(value) {
             this.element.select2('val', value, true);
         },
 
-        formatChoice: function (value, template) {
+        formatChoice: function(value, template) {
             var data;
             if (value) {
                 try {
@@ -169,11 +169,11 @@ define(function (require) {
             return data ? template(data) : value;
         },
 
-        splitFieldId: function (fieldId) {
+        splitFieldId: function(fieldId) {
             return this.util.pathToEntityChain(fieldId);
         },
 
-        getApplicableConditions: function (fieldId) {
+        getApplicableConditions: function(fieldId) {
             return this.util.getApplicableConditions(fieldId);
         },
 
@@ -183,7 +183,7 @@ define(function (require) {
          * @returns {Array}
          * @private
          */
-        _select2Data: function (path) {
+        _select2Data: function(path) {
             var fields = [], relations = [], results = [],
                 chain, entityName, entityFields,
                 entityData = this.options.data,
@@ -205,7 +205,7 @@ define(function (require) {
                 entityFields = Util.filterFields(entityFields, this.options.exclude);
             }
 
-            $.each(entityFields, function () {
+            $.each(entityFields, function() {
                 var field = this, item, chainItem;
                 chainItem = {field: field};
                 item = {

@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var GuestsPlugin,
         _ = require('underscore'),
@@ -6,7 +6,7 @@ define(function (require) {
         GuestNotifierView = require('orocalendar/js/app/views/guest-notifier-view');
 
     GuestsPlugin = BasePlugin.extend({
-        enable: function () {
+        enable: function() {
             this.listenTo(this.main, 'event:added', this.onEventAdded);
             this.listenTo(this.main, 'event:changed', this.onEventChanged);
             this.listenTo(this.main, 'event:deleted', this.onEventDeleted);
@@ -22,12 +22,12 @@ define(function (require) {
          * @param eventModel
          * @returns {boolean}
          */
-        hasParentEvent: function (eventModel) {
+        hasParentEvent: function(eventModel) {
             var result = false,
                 parentEventId = eventModel.get('parentEventId'),
                 alias = eventModel.get('calendarAlias');
             if (parentEventId) {
-                result = Boolean(this.main.getConnectionCollection().find(function (c) {
+                result = Boolean(this.main.getConnectionCollection().find(function(c) {
                     return c.get('calendarAlias') === alias &&
                         this.collection.get(c.get('calendarUid') + '_' + parentEventId);
                 }, this));
@@ -41,7 +41,7 @@ define(function (require) {
          * @param parentEventModel
          * @returns {boolean}
          */
-        hasLoadedGuestEvents: function (parentEventModel) {
+        hasLoadedGuestEvents: function(parentEventModel) {
             var result = false,
                 guests = parentEventModel.get('invitedUsers');
             guests = _.isNull(guests) ? [] : guests;
@@ -49,7 +49,7 @@ define(function (require) {
                 guests = _.union(guests, parentEventModel.previous('invitedUsers'));
             }
             if (!_.isEmpty(guests)) {
-                result = Boolean(this.main.getConnectionCollection().find(function (connection) {
+                result = Boolean(this.main.getConnectionCollection().find(function(connection) {
                     return -1 !== guests.indexOf(connection.get('userId'));
                 }, this));
             }
@@ -62,7 +62,7 @@ define(function (require) {
          * @param parentEventModel
          * @returns {Array.<EventModel>}
          */
-        findGuestEventModels: function (parentEventModel) {
+        findGuestEventModels: function(parentEventModel) {
             return this.main.collection.where({
                 parentEventId: '' + parentEventModel.originalId
             });
@@ -73,7 +73,7 @@ define(function (require) {
          *
          * @param eventModel
          */
-        onEventAdded: function (eventModel) {
+        onEventAdded: function(eventModel) {
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
             if (this.hasLoadedGuestEvents(eventModel)) {
                 this.main.updateEvents();
@@ -85,7 +85,7 @@ define(function (require) {
          *
          * @param eventModel
          */
-        onEventChanged: function (eventModel) {
+        onEventChanged: function(eventModel) {
             var guestEventModels, i, updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
             if (this.hasLoadedGuestEvents(eventModel)) {
@@ -108,7 +108,7 @@ define(function (require) {
          *
          * @param eventModel
          */
-        onEventDeleted: function (eventModel) {
+        onEventDeleted: function(eventModel) {
             var guestEventModels, i;
             if (this.hasLoadedGuestEvents(eventModel)) {
                 // remove guests
@@ -128,33 +128,33 @@ define(function (require) {
          * @param {Array.<$.promise>} promises script will wait execution of all promises before save
          * @param {object} attrs to be set on event model
          */
-        onEventBeforeSave: function (eventModel, promises, attrs) {
+        onEventBeforeSave: function(eventModel, promises, attrs) {
             if (this.hasLoadedGuestEvents(eventModel)) {
                 var cleanUp,
                     deferredConfirmation = $.Deferred();
                 promises.push(deferredConfirmation);
 
                 if (!this.modal) {
-                    cleanUp = _.bind(function () {
+                    cleanUp = _.bind(function() {
                         this.modal.dispose();
                         delete this.modal;
                     }, this);
 
                     this.modal = GuestNotifierView.createConfirmNotificationDialog();
 
-                    this.modal.on('ok', _.bind(function () {
+                    this.modal.on('ok', _.bind(function() {
                         attrs.notifyInvitedUsers = true;
                         deferredConfirmation.resolve();
                         _.defer(cleanUp);
                     }, this));
 
-                    this.modal.on('cancel', _.bind(function () {
+                    this.modal.on('cancel', _.bind(function() {
                         attrs.notifyInvitedUsers = false;
                         deferredConfirmation.resolve();
                         _.defer(cleanUp);
                     }, this));
 
-                    this.modal.on('close', _.bind(function () {
+                    this.modal.on('close', _.bind(function() {
                         deferredConfirmation.reject();
                         _.defer(cleanUp);
                     }, this));

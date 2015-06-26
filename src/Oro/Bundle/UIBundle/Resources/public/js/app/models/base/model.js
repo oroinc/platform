@@ -1,7 +1,7 @@
 /*global define*/
 define([
     'chaplin'
-], function (Chaplin) {
+], function(Chaplin) {
     'use strict';
 
     var BaseModel;

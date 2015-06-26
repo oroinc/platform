@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var CommentComponent,
@@ -18,7 +18,7 @@ define(function (require) {
 
     CommentComponent = BaseComponent.extend({
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
 
             this.collection = new CommentCollection(
@@ -39,7 +39,7 @@ define(function (require) {
             this.collection.once('sync', this.onCollectionSynced, this);
         },
 
-        onCollectionSynced: function () {
+        onCollectionSynced: function() {
             this.commentsView = new CommentsView({
                 el: this.options._sourceElement,
                 collection: this.collection,
@@ -55,7 +55,7 @@ define(function (require) {
             this._resolveDeferredInit();
         },
 
-        createDialog: function (title, model) {
+        createDialog: function(title, model) {
             var dialogWidget, loadingMaskView;
             dialogWidget = new DialogWidget({
                 title: title,
@@ -85,7 +85,7 @@ define(function (require) {
             return dialogWidget;
         },
 
-        onCommentAdd: function () {
+        onCommentAdd: function() {
             var dialogWidget, model;
             if (!this.options.canCreate) {
                 return;
@@ -96,14 +96,14 @@ define(function (require) {
             // init dialog
             dialogWidget = this.createDialog(__('oro.comment.dialog.add_comment.title'), model);
 
-            model.once('sync', function () {
+            model.once('sync', function() {
                 dialogWidget.remove();
                 // add item to collection after it is stored on server
                 this.collection.add(model);
             }, this);
         },
 
-        onCommentEdit: function (model) {
+        onCommentEdit: function(model) {
             var dialogWidget;
 
             if (!model.get('editable')) {
@@ -113,12 +113,12 @@ define(function (require) {
             // init dialog
             dialogWidget = this.createDialog(__('oro.comment.dialog.edit_comment.title'), model);
 
-            dialogWidget.listenTo(model, 'sync', _.bind(function () {
+            dialogWidget.listenTo(model, 'sync', _.bind(function() {
                 dialogWidget.remove();
             }, this));
         },
 
-        onCommentRemove: function (model) {
+        onCommentRemove: function(model) {
             if (!model.get('removable')) {
                 return;
             }
@@ -127,8 +127,8 @@ define(function (require) {
                 content: __('oro.comment.deleteConfirmation')
             });
 
-            confirm.on('ok', _.bind(function () {
-                model.destroy({error: function () {
+            confirm.on('ok', _.bind(function() {
+                model.destroy({error: function() {
                     mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
                 }});
             }, this));
@@ -136,11 +136,11 @@ define(function (require) {
             confirm.open();
         },
 
-        onLoadMore: function () {
+        onLoadMore: function() {
             this.collection.loadMore();
         },
 
-        _initFormView: function (parentView, model) {
+        _initFormView: function(parentView, model) {
             var formView;
             formView = new CommentFromView({
                 template: this.formTemplate,
@@ -151,7 +151,7 @@ define(function (require) {
             this.listenTo(formView, 'submit', this.onFormSubmit, this);
         },
 
-        onFormSubmit: function (formView) {
+        onFormSubmit: function(formView) {
             var model, options;
 
             model = formView.model;
@@ -163,7 +163,6 @@ define(function (require) {
             model.save(null, options);
         }
     });
-
 
     return CommentComponent;
 });

@@ -5,7 +5,7 @@ define([
     'backgrid',
     './row',
     '../pageable-collection'
-], function (_, Backgrid, Row, PageableCollection) {
+], function(_, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -30,7 +30,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = options || {};
 
             if (!opts.row) {
@@ -49,11 +49,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.rows, function (row) {
+            _.each(this.rows, function(row) {
                 row.dispose();
             });
             delete this.rows;
@@ -64,7 +64,7 @@ define([
         /**
          * @inheritDoc
          */
-        refresh: function () {
+        refresh: function() {
             this._stopListeningToRowsEvents(this.rows);
             Body.__super__.refresh.apply(this, arguments);
             this._listenToRowsEvents(this.rows);
@@ -74,7 +74,7 @@ define([
         /**
          * @inheritDoc
          */
-        insertRow: function (model, collection, options) {
+        insertRow: function(model, collection, options) {
             Body.__super__.insertRow.apply(this, arguments);
             var index = collection.indexOf(model);
             if (index < this.rows.length) {
@@ -85,7 +85,7 @@ define([
         /**
          * @inheritDoc
          */
-        removeRow: function (model, collection, options) {
+        removeRow: function(model, collection, options) {
             if (options && !_.isUndefined(options.index)) {
                 this._stopListeningToOneRowEvents(this.rows[options.index]);
             }
@@ -98,8 +98,8 @@ define([
          * @param {Array} rows
          * @private
          */
-        _listenToRowsEvents: function (rows) {
-            _.each(rows, function (row) {
+        _listenToRowsEvents: function(rows) {
+            _.each(rows, function(row) {
                 this._listenToOneRowEvents(row);
             }, this);
         },
@@ -110,8 +110,8 @@ define([
          * @param {Array} rows
          * @private
          */
-        _stopListeningToRowsEvents: function (rows) {
-            _.each(rows, function (row) {
+        _stopListeningToRowsEvents: function(rows) {
+            _.each(rows, function(row) {
                 this._stopListeningToOneRowEvents(row);
             }, this);
         },
@@ -122,8 +122,8 @@ define([
          * @param {Backgrid.Row} row
          * @private
          */
-        _listenToOneRowEvents: function (row) {
-            this.listenTo(row, 'clicked', function (row, e) {
+        _listenToOneRowEvents: function(row) {
+            this.listenTo(row, 'clicked', function(row, e) {
                 this.trigger('rowClicked', row, e);
             });
         },
@@ -134,14 +134,14 @@ define([
          * @param {Backgrid.Row} row
          * @private
          */
-        _stopListeningToOneRowEvents: function (row) {
+        _stopListeningToOneRowEvents: function(row) {
             this.stopListening(row);
         },
 
         /**
          * @inheritDoc
          */
-        render: function () {
+        render: function() {
             Body.__super__.render.apply(this, arguments);
             if (this.rowClassName) {
                 this.$('> *').addClass(this.rowClassName);
@@ -153,7 +153,7 @@ define([
          * @param {string} column
          * @param {null|"ascending"|"descending"} direction
          */
-        sort: function (column, direction) {
+        sort: function(column, direction) {
             if (!_.contains(["ascending", "descending", null], direction)) {
                 throw new RangeError('direction must be one of "ascending", "descending" or `null`');
             }
@@ -177,7 +177,7 @@ define([
             if (order) {
                 extractorDelegate = column.sortValue();
             } else {
-                extractorDelegate = function (model) {
+                extractorDelegate = function(model) {
                     return model.cid.replace('c', '') * 1;
                 };
             }
@@ -193,7 +193,7 @@ define([
                     collection.fullCollection.sort();
                     collection.trigger("backgrid:sorted", column, direction, collection);
                 } else {
-                    collection.fetch({reset: true, success: function () {
+                    collection.fetch({reset: true, success: function() {
                         collection.trigger("backgrid:sorted", column, direction, collection);
                     }});
                 }

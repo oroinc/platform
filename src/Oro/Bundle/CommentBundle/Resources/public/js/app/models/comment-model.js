@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var CommentModel,
@@ -30,14 +30,14 @@ define(function (require) {
             removable: true
         },
 
-        initialize: function (attrs, options) {
+        initialize: function(attrs, options) {
             CommentModel.__super__.initialize.apply(this, arguments);
             this.on('request', this.beginSync);
             this.on('sync', this.finishSync);
             this.on('error', this.unsync);
         },
 
-        url: function () {
+        url: function() {
             var url, parameters;
             if (this.isNew()) {
                 if (!this.get('relationClass') || !this.get('relationId')) {
@@ -58,24 +58,24 @@ define(function (require) {
             return url;
         },
 
-        removeAttachment: function () {
+        removeAttachment: function() {
             var model = this,
                 url = routing.generate(this.routeRemoveAttachment, {id: model.id});
             return $.ajax({
                 url: url,
                 type: 'POST',
-                success: function () {
+                success: function() {
                     model.set('attachmentURL', null);
                     model.set('attachmentFileName', null);
                     model.set('attachmentSize', null);
                 },
-                error: function (jqxhr) {
+                error: function(jqxhr) {
                     model.trigger('error', model, jqxhr);
                 }
             });
         },
 
-        serialize: function () {
+        serialize: function() {
             var data = CommentModel.__super__.serialize.call(this);
             data.isNew = this.isNew();
             data.hasActions = data.removable || data.editable;
@@ -90,7 +90,7 @@ define(function (require) {
             return data;
         },
 
-        getShortMessage: function () {
+        getShortMessage: function() {
             var shortMessage = this.getMessage(),
                 lineBreak = shortMessage.indexOf('<br />');
             if (lineBreak > 0) {
@@ -100,7 +100,7 @@ define(function (require) {
             return shortMessage;
         },
 
-        getMessage: function () {
+        getMessage: function() {
             var message = this.get('message');
             message = _.nl2br(_.escape(message));
             return message;

@@ -1,6 +1,6 @@
 /*global define*/
 define(['jquery', 'oroui/js/mediator', 'routing', 'oro/buttons-widget'
-    ], function ($, mediator, routing, ButtonsWidget) {
+    ], function($, mediator, routing, ButtonsWidget) {
     'use strict';
 
     /**
@@ -18,7 +18,7 @@ define(['jquery', 'oroui/js/mediator', 'routing', 'oro/buttons-widget'
         var formId = form.prop('id');
 
         // On form submit response check for errors
-        mediator.once('page:update', function () {
+        mediator.once('page:update', function() {
             var hasErrors = $('.alert-error, .validation-error').length > 0;
             if (!hasErrors) {
                 var idRegexp = /update\/(\d+).*/;
@@ -34,7 +34,7 @@ define(['jquery', 'oroui/js/mediator', 'routing', 'oro/buttons-widget'
                         'url': routing.generate('oro_workflow_widget_buttons', {
                             'entityId': elementIdMatch[1],
                             'entityClass': saveBtn.data('entity-class')
-                    })
+                        })
                     });
                     transitionsWidget.on('renderComplete', function(el) {
                         // Try to execute required transition

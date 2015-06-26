@@ -2,7 +2,7 @@
 /*jslint nomen: true*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/map-filter-module-name',
     'oroentity/js/field-choice', 'jquery-ui'
-    ], function ($, _, __, mapFilterModuleName) {
+    ], function($, _, __, mapFilterModuleName) {
     'use strict';
 
     /**
@@ -17,7 +17,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             hierarchy: []
         },
 
-        _create: function () {
+        _create: function() {
             var data = this.element.data('value');
 
             // @TODO this 'none' filter probably in not in use any more, to delete
@@ -39,7 +39,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             }
 
             this._on(this.$fieldChoice, {
-                changed: function (e, fieldId) {
+                changed: function(e, fieldId) {
                     $(':focus').blur();
                     // reset current value on field change
                     this.element.data('value', {});
@@ -49,7 +49,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             });
 
             this._on(this.$filterContainer, {
-                change: function () {
+                change: function() {
                     if (this.filter) {
                         this.filter.applyValue();
                     }
@@ -57,18 +57,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             });
         },
 
-        _destroy: function () {
+        _destroy: function() {
             if (this.filter) {
                 this.filter.dispose();
                 delete this.filter;
             }
         },
 
-        _getCreateOptions: function () {
+        _getCreateOptions: function() {
             return $.extend(true, {}, this.options);
         },
 
-        _renderFilter: function (fieldId) {
+        _renderFilter: function(fieldId) {
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
                 filterId = this._getApplicableFilterId(conditions),
                 filter = this.options.filters[filterId];
@@ -98,7 +98,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this._createFilter(filter, fieldId);
         },
 
-        _getApplicableFilterId: function (conditions) {
+        _getApplicableFilterId: function(conditions) {
             var filterId = null,
                 matchedBy = null,
                 self = this;
@@ -108,7 +108,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 return conditions.filter;
             }
 
-            _.each(this.options.filters, function (filter, id) {
+            _.each(this.options.filters, function(filter, id) {
                 var matched;
 
                 if (!_.isEmpty(filter.applicable)) {
@@ -133,10 +133,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return filterId;
         },
 
-        _matchApplicable: function (applicable, criteria) {
+        _matchApplicable: function(applicable, criteria) {
             var hierarchy = this.options.hierarchy[criteria.entity];
-            return _.find(applicable, function (item) {
-                return _.every(item, function (value, key) {
+            return _.find(applicable, function(item) {
+                return _.every(item, function(value, key) {
                     if (key == 'entity' && hierarchy.length) {
                         return _.indexOf(hierarchy, criteria[key]);
                     }
@@ -145,7 +145,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             });
         },
 
-        _createFilter: function (filterOptions, fieldId) {
+        _createFilter: function(filterOptions, fieldId) {
 
             var moduleName = mapFilterModuleName(filterOptions.type),
                 requires = [moduleName];
@@ -155,11 +155,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             }
 
             // show loading message, if loading takes more than 100ms
-            var showLoadingTimeout = setTimeout(_.bind(function () {
+            var showLoadingTimeout = setTimeout(_.bind(function() {
                 this.$filterContainer.html("<span class=\"loading-indicator\">" + __("Loading...") + "</span>")
             }, this), 100);
 
-            require(requires, _.bind(function (Filter, optionResolver) {
+            require(requires, _.bind(function(Filter, optionResolver) {
                 function appendFilter() {
                     clearTimeout(showLoadingTimeout);
                     var filter = new (Filter.extend(filterOptions))();
@@ -174,7 +174,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             }, this));
         },
 
-        _appendFilter: function (filter) {
+        _appendFilter: function(filter) {
             var value = this.element.data('value');
             this.filter = filter;
 
@@ -189,7 +189,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this._onUpdate();
         },
 
-        _onUpdate: function () {
+        _onUpdate: function() {
             var value;
 
             if (this.filter && !this.filter.isEmptyValue()) {
@@ -205,7 +205,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this.element.trigger('changed');
         },
 
-        _getFilterCriterion: function () {
+        _getFilterCriterion: function() {
             var data = this.filter.getValue();
 
             if (this.filter.filterParams) {
@@ -218,7 +218,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             };
         },
 
-        selectField: function (name) {
+        selectField: function(name) {
             this.$fieldChoice.fieldChoice('setValue', name);
         }
     });

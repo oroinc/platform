@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailVariableComponent,
@@ -16,14 +16,14 @@ define(function (require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var attributes;
 
             _.defaults(options, {model: {}, view: {}});
 
             // create model
             attributes = options.model.attributes;
-            attributes = attributes ? JSON.parse(attributes): {};
+            attributes = attributes ? JSON.parse(attributes) : {};
             this.model = new EmailVariableModel(attributes);
             this.model.setEntity(options.model.entityName, options.model.entityLabel);
 
@@ -39,7 +39,7 @@ define(function (require) {
             this.view.render();
         },
 
-        onEntityChange: function (e) {
+        onEntityChange: function(e) {
             var view = this.view,
                 $el = $(e.currentTarget),
                 entityName = $el.val(),
@@ -54,7 +54,7 @@ define(function (require) {
                     okText: __('Yes'),
                     content: __('oro.email.emailtemplate.change_entity_confirmation')
                 });
-                this.confirm.on('ok', function () {
+                this.confirm.on('ok', function() {
                     view.clear();
                 });
                 this.confirm.open();
@@ -62,7 +62,7 @@ define(function (require) {
             this.model.setEntity(entityName, entityLabel);
         },
 
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }

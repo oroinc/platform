@@ -6,13 +6,13 @@ define([
     '../views/bookmark-button-view',
     'oroui/js/app/views/base/collection-view',
     '../views/bookmark-item-view'
-], function (_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
+], function(_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
     'use strict';
 
     var FavoriteComponent;
 
     FavoriteComponent = BaseBookmarkComponent.extend({
-        _createSubViews: function () {
+        _createSubViews: function() {
             this._createButtonView();
             this._createTabView();
         },
@@ -22,7 +22,7 @@ define([
          *
          * @protected
          */
-        _createButtonView: function () {
+        _createButtonView: function() {
             var options, collection;
 
             options = this._options.buttonOptions || {};
@@ -41,7 +41,7 @@ define([
          *
          * @protected
          */
-        _createTabView: function () {
+        _createTabView: function() {
             var options, collection, TabItemView;
 
             options = this._options.tabOptions || {};
@@ -59,7 +59,7 @@ define([
             this.tabs = new CollectionView(options);
         },
 
-        actualizeAttributes: function (model) {
+        actualizeAttributes: function(model) {
             model.set('type', 'favorite');
             model.set('position', this.collection.length);
 

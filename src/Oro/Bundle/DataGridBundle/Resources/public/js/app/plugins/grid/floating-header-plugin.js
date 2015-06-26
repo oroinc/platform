@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var FloatingHeaderPlugin,
         $ = require('jquery'),
@@ -10,7 +10,7 @@ define(function (require) {
         tools = require('oroui/js/tools');
 
     FloatingHeaderPlugin = BasePlugin.extend({
-        initialize: function (grid) {
+        initialize: function(grid) {
             this.grid = grid;
             this.grid.on('shown', _.bind(this.onGridShown, this));
 
@@ -19,13 +19,13 @@ define(function (require) {
             this.fixHeaderCellWidth = _.bind(this.fixHeaderCellWidth, this);
         },
 
-        onGridShown: function () {
+        onGridShown: function() {
             if (this.enabled && !this.connected) {
                 this.enable();
             }
         },
 
-        enable: function () {
+        enable: function() {
             if (!this.grid.rendered) {
                 // not ready to apply floatingHeader
                 FloatingHeaderPlugin.__super__.enable.call(this);
@@ -36,7 +36,7 @@ define(function (require) {
             this.rescrollCb = this.enableOtherScroll();
             this.headerHeight = this.domCache.theadTr.height();
             this.fixHeaderCellWidth();
-            this.$grid.on('click.float-thead', 'thead:first .dropdown', _.bind(function () {
+            this.$grid.on('click.float-thead', 'thead:first .dropdown', _.bind(function() {
                 this.setFloatTheadMode(this.scrollVisible ? 'relative' : 'default');
             }, this));
             this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
@@ -49,7 +49,7 @@ define(function (require) {
             FloatingHeaderPlugin.__super__.enable.call(this);
         },
 
-        disable: function () {
+        disable: function() {
             this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
 
@@ -63,7 +63,7 @@ define(function (require) {
             FloatingHeaderPlugin.__super__.disable.call(this);
         },
 
-        setupCache: function () {
+        setupCache: function() {
             this.$grid = this.grid.$grid;
             this.$el = this.grid.$el;
             this.documentHeight = $(document).height();
@@ -81,7 +81,7 @@ define(function (require) {
             };
         },
 
-        fixHeaderCellWidth: function () {
+        fixHeaderCellWidth: function() {
             this.setupCache();
             var headerCells = this.domCache.headerCells,
                 firstRowCells = this.domCache.firstRowCells,
@@ -107,12 +107,12 @@ define(function (require) {
             }
 
             // save widths
-            headerCells.each(function (i, headerCell) {
+            headerCells.each(function(i, headerCell) {
                 widths.push(headerCell.offsetWidth);
             });
 
             // FF sometimes gives wrong values, need to check
-            sumWidth = _.reduce(widths, function (a, b) {return a + b});
+            sumWidth = _.reduce(widths, function(a, b) {return a + b});
             if (sumWidth > totalWidth) {
                 widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001
             }
@@ -124,7 +124,7 @@ define(function (require) {
             }
 
             // set exact sizes to header cells and cells in first row
-            headerCells.each(function (i, headerCell) {
+            headerCells.each(function(i, headerCell) {
                 var cellWidth = widths[i] - widthDecrement;
                 headerCell.style.width = cellWidth + 'px';
                 headerCell.style.minWidth = cellWidth + 'px';
@@ -152,7 +152,7 @@ define(function (require) {
         /**
          * Selects floating header mode
          */
-        selectMode: function () {
+        selectMode: function() {
             // get gridRect
             var tableRect = this.domCache.gridContainer[0].getBoundingClientRect(),
                 visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]),
@@ -173,7 +173,7 @@ define(function (require) {
         /**
          * Setups floating header mode
          */
-        setFloatTheadMode: function (mode, visibleRect, tableRect) {
+        setFloatTheadMode: function(mode, visibleRect, tableRect) {
             var theadRect, sizingThead;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
@@ -252,7 +252,7 @@ define(function (require) {
         /**
          * Enables other scroll functionality
          */
-        enableOtherScroll: function () {
+        enableOtherScroll: function() {
             var self = this,
                 scrollContainer = this.domCache.gridScrollableContainer,
                 otherScroll = this.domCache.otherScroll,
@@ -268,7 +268,7 @@ define(function (require) {
                 return _.noop;
             }
 
-            scrollStateModel.on('change:headerHeight', function (model, val) {
+            scrollStateModel.on('change:headerHeight', function(model, val) {
                 heightDec = val + 1; // compensate border
                 otherScroll.css({
                     width: scrollBarWidth,
@@ -277,7 +277,7 @@ define(function (require) {
                 scrollStateModel.trigger('change:scrollHeight', scrollStateModel, scrollContainer[0].scrollHeight);
                 scrollStateModel.trigger('change:clientHeight', scrollStateModel, scrollContainer[0].clientHeight);
             }, this);
-            scrollStateModel.on('change:visible', function (model, val) {
+            scrollStateModel.on('change:visible', function(model, val) {
                 scrollContainer.css({
                     width: 'calc(100% + ' + (val ? scrollBarWidth : 0) + 'px)'
                 });
@@ -286,22 +286,22 @@ define(function (require) {
                 });
                 this.fixHeaderCellWidth();
             }, this);
-            scrollStateModel.on('change:clientHeight', function (model, val) {
+            scrollStateModel.on('change:clientHeight', function(model, val) {
                 otherScroll.css({
                     height: val - heightDec
                 });
             }, this);
-            scrollStateModel.on('change:clientWidth', function (model, val) {
+            scrollStateModel.on('change:clientWidth', function(model, val) {
                 otherScroll.css({
                     marginLeft: val - scrollBarWidth
                 });
             }, this);
-            scrollStateModel.on('change:scrollHeight', function (model, val) {
+            scrollStateModel.on('change:scrollHeight', function(model, val) {
                 otherScrollInner.css({
                     height: val - heightDec
                 });
             });
-            scrollStateModel.on('change:scrollTop', function (model, val) {
+            scrollStateModel.on('change:scrollTop', function(model, val) {
                 if (otherScroll[0].scrollTop !== val) {
                     otherScroll[0].scrollTop = val;
                 }
@@ -341,7 +341,7 @@ define(function (require) {
         /**
          * Disables other scroll functionality
          */
-        disableOtherScroll: function () {
+        disableOtherScroll: function() {
             this.domCache.gridScrollableContainer.off('scroll', this.rescrollCb);
             this.domCache.otherScroll.off('scroll');
             this.domCache.otherScroll.css({display: 'none'});
@@ -354,7 +354,7 @@ define(function (require) {
         /**
          * Checks and performs required actions
          */
-        checkLayout: function () {
+        checkLayout: function() {
             var scrollContainerRect, scrollLeft;
             if (this.currentFloatTheadMode === 'default') {
                 if (this.grid.layout === 'fullscreen' &&
@@ -395,7 +395,7 @@ define(function (require) {
          * @param el
          * @returns {{top: number, left: Number, bottom: Number, right: Number}}
          */
-        getVisibleRect: function (el) {
+        getVisibleRect: function(el) {
             var current = el,
                 tableRect = current.getBoundingClientRect(),
                 midRect = tableRect,

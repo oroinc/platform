@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tools'
-    ], function (_, Backbone, BackbonePageableCollection, tools) {
+    ], function(_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
     var PageableCollection, stateShortKeys;
@@ -92,7 +92,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @param models
          * @param options
          */
-        initialize: function (models, options) {
+        initialize: function(models, options) {
             options = options || {};
 
             // copy initialState from the prototype to own property
@@ -100,7 +100,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             _.defaults(this.initialState, this.state);
             if (options.initialState) {
                 if (options.initialState.sorters) {
-                    _.each(options.initialState.sorters, function (direction, field) {
+                    _.each(options.initialState.sorters, function(direction, field) {
                         options.initialState.sorters[field] = this.getSortDirectionKey(direction);
                     }, this);
                 }
@@ -111,7 +111,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             this.state = tools.deepClone(this.state);
             if (options.state) {
                 if (options.state.sorters) {
-                    _.each(options.state.sorters, function (direction, field) {
+                    _.each(options.state.sorters, function(direction, field) {
                         options.state.sorters[field] = this.getSortDirectionKey(direction);
                     }, this);
                 }
@@ -190,7 +190,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @param {Object} state
          * @return {Object}
          */
-        processAdditionalParams: function (state) {
+        processAdditionalParams: function(state) {
             var state = tools.deepClone(state);
             state.parameters = state.parameters || {};
 
@@ -371,7 +371,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         /**
          * @inheritDoc
          */
-        _checkState: function (state) {
+        _checkState: function(state) {
             var mode = this.mode;
             var links = this.links;
             var totalRecords = state.totalRecords;
@@ -421,11 +421,10 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 } else if (totalPages > 0) {
                     if (firstPage === 0 && (currentPage < firstPage || currentPage >= totalPages)) {
                         throw new RangeError("`currentPage` must be firstPage <= currentPage < totalPages if 0-based. Got " + currentPage + '.');
-                    }
-                    else if (firstPage === 1 && (currentPage < firstPage || currentPage > totalPages)) {
+                    } else if (firstPage === 1 && (currentPage < firstPage || currentPage > totalPages)) {
                         throw new RangeError("`currentPage` must be firstPage <= currentPage <= totalPages if 1-based. Got " + currentPage + '.');
                     }
-                } else if (currentPage !== firstPage ) {
+                } else if (currentPage !== firstPage) {
                     throw new RangeError("`currentPage` must be " + firstPage + ". Got " + currentPage + '.');
                 }
             }
@@ -454,7 +453,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          *
          * @returns {Array}
          */
-        getFetchData: function () {
+        getFetchData: function() {
             var data = {};
 
             // extract params from a grid collection url
@@ -478,7 +477,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         /**
          * Fetch collection data
          */
-        fetch: function (options) {
+        fetch: function(options) {
             this.trigger('beforeFetch', this, options);
             var BBColProto = Backbone.Collection.prototype;
 
@@ -514,7 +513,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
                 var self = this;
                 var success = options.success;
-                options.success = function (col, resp, opts) {
+                options.success = function(col, resp, opts) {
 
                     // make sure the caller's intent is obeyed
                     opts = opts || {};
@@ -524,7 +523,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                     var models = col.models;
                     var currentPage = state.currentPage;
 
-                if (mode == "client") resetQuickly(fullCollection, models, opts);
+                    if (mode == "client") resetQuickly(fullCollection, models, opts);
                     else if (links[currentPage]) { // refetching a page
                         var pageSize = state.pageSize;
                         var pageStart = (state.firstPage === 0 ?
@@ -538,8 +537,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                             _.extend({silent: true, sort: false}, opts));
                         if (fullCollection.comparator) fullCollection.sort();
                         fullCollection.trigger("reset", fullCollection, opts);
-                    }
-                    else { // fetching new page
+                    } else { // fetching new page
                         fullCollection.add(models, _.extend({at: fullCollection.length,
                             silent: true}, opts));
                         fullCollection.trigger("reset", fullCollection, opts);
@@ -629,7 +627,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @param {Object} options
          * @return {*}
          */
-        setSorting: function (sortKey, order, options) {
+        setSorting: function(sortKey, order, options) {
             var state = this.state;
 
             state.sorters = state.sorters || {};
@@ -669,13 +667,11 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                 if (full) {
                     if (fullCollection) fullCollection.comparator = comparator;
                     delComp = true;
-                }
-                else {
+                } else {
                     this.comparator = comparator;
                     delFullComp = true;
                 }
-            }
-            else if (side == "server" && !full) {
+            } else if (side == "server" && !full) {
                 this.comparator = comparator;
             }
 
@@ -706,7 +702,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @param {boolean=} purge If true, clears value from initial state
          * @returns {string|null}
          */
-        stateHashValue: function (purge) {
+        stateHashValue: function(purge) {
             var hash;
 
             hash = this._encodeStateData(this.state);
@@ -724,7 +720,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @returns {string}
          * @protected
          */
-        _encodeStateData: function (state) {
+        _encodeStateData: function(state) {
             var stateData = {urlParams: this.urlParams};
             stateData = _.extend(stateData, state);
             return PageableCollection.encodeStateData(stateData);
@@ -735,7 +731,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          *
          * @returns {string}
          */
-        stateHashKey: function () {
+        stateHashKey: function() {
             return PageableCollection.stateHashKey(this.inputName);
         }
     });
@@ -747,7 +743,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
      * @param {string} inputName
      * @returns {string}
      */
-    PageableCollection.stateHashKey = function (inputName) {
+    PageableCollection.stateHashKey = function(inputName) {
         return 'grid[' + inputName + ']';
     };
 
@@ -758,7 +754,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
      * @param {Object} stateObject
      * @return {string}
      */
-    PageableCollection.encodeStateData = function (stateObject) {
+    PageableCollection.encodeStateData = function(stateObject) {
         var data;
         data = _.pick(stateObject, _.keys(stateShortKeys));
         data = tools.invertKeys(data, stateShortKeys);
@@ -772,7 +768,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
      * @param {string} stateString
      * @return {Object}
      */
-    PageableCollection.decodeStateData = function (stateString) {
+    PageableCollection.decodeStateData = function(stateString) {
         var data = tools.unpackFromQueryString(stateString);
         data = tools.invertKeys(data, _.invert(stateShortKeys));
         return data;

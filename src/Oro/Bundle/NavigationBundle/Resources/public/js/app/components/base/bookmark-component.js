@@ -6,7 +6,7 @@ define([
     'oroui/js/mediator',
     'oroui/js/app/components/base/component',
     'oroui/js/error'
-], function ($, _, mediator, BaseComponent, error) {
+], function($, _, mediator, BaseComponent, error) {
     'use strict';
 
     var BaseBookmarkComponent;
@@ -23,7 +23,7 @@ define([
             'toRemove collection': 'toRemove'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             var data, extraOptions, $dataEl;
 
             $dataEl = $(options.dataSource);
@@ -40,14 +40,14 @@ define([
             this._createSubViews();
         },
 
-        _createSubViews: function () {
+        _createSubViews: function() {
             // should be implemented in descendants
         },
 
-        toRemove: function (model) {
+        toRemove: function(model) {
             model.destroy({
                 wait: true,
-                error: function (model, xhr) {
+                error: function(model, xhr) {
                     if (xhr.status === 404 && !mediator.execute('retrieveOption', 'debug')) {
                         // Suppress error if it's 404 response and not debug mode
                         model.unset('id').destroy();
@@ -58,14 +58,14 @@ define([
             });
         },
 
-        toAdd: function (model) {
+        toAdd: function(model) {
             var collection;
             collection = this.collection;
             this.actualizeAttributes(model);
             model.save(null, {
-                success: function () {
+                success: function() {
                     var item;
-                    item = collection.find(function (item) {
+                    item = collection.find(function(item) {
                         return item.get('url') === model.get('url');
                     });
                     if (item) {
@@ -77,7 +77,7 @@ define([
             });
         },
 
-        actualizeAttributes: function (model) {
+        actualizeAttributes: function(model) {
             // should be implemented in descendants
         }
     });

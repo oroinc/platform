@@ -3,7 +3,7 @@
 define([
     'jquery',
     'jquery-ui'
-], function ($) {
+], function($) {
     'use strict';
 
     function setValue($elem, value) {
@@ -25,10 +25,10 @@ define([
             saveButton: '.save-button',
             cancelButton: '.cancel-button',
             collection: null,
-            setter: function ($el, name, value) {
+            setter: function($el, name, value) {
                 return value;
             },
-            getter: function ($el, name, value) {
+            getter: function($el, name, value) {
                 return value;
             },
             changed: false
@@ -39,11 +39,11 @@ define([
          *
          * @returns {boolean}
          */
-        hasChanges: function () {
+        hasChanges: function() {
             return this.changed;
         },
 
-        _create: function () {
+        _create: function() {
             // turn off global validation on submit form
             this.element.attr('data-validation-ignore', '');
             this.errors = $({});
@@ -65,7 +65,7 @@ define([
             this.options.collection.on('remove', $.proxy(this._onRemoveModel, this));
         },
 
-        reset: function (model) {
+        reset: function(model) {
             var elementsMap, attrs,
                 self = this;
             this._hideErrors();
@@ -74,7 +74,7 @@ define([
             if (model) {
                 elementsMap = this._elementsMap();
                 attrs = model.toJSON();
-                $.each(attrs, function (name, value) {
+                $.each(attrs, function(name, value) {
                     var $elem = elementsMap[name];
                     if ($elem) {
                         value = self.options.setter($elem, name, value);
@@ -82,7 +82,7 @@ define([
                     }
                 });
             } else {
-                this._elements().each(function () {
+                this._elements().each(function() {
                     setValue($(this), '');
                 });
             }
@@ -90,7 +90,7 @@ define([
             this.changed = false;
         },
 
-        _onSaveItem: function (e) {
+        _onSaveItem: function(e) {
             var attrs, model;
             e.preventDefault();
             if (!this._validate()) {
@@ -108,22 +108,22 @@ define([
             this.reset();
         },
 
-        _onEditModel: function (model) {
+        _onEditModel: function(model) {
             this.reset(model);
         },
 
-        _onRemoveModel: function (model) {
+        _onRemoveModel: function(model) {
             if (this.model === model) {
                 this.reset();
             }
         },
 
-        _onCancel: function (e) {
+        _onCancel: function(e) {
             e.preventDefault();
             this.reset();
         },
 
-        _validate: function (elem) {
+        _validate: function(elem) {
             var validator = this._getValidator(),
                 result = true;
             if (validator) {
@@ -131,7 +131,7 @@ define([
                 if (elem) {
                     result = validator.element(elem);
                 } else {
-                    $.each(this._elements(), function () {
+                    $.each(this._elements(), function() {
                         result = validator.element(this) && result;
                     });
                     this.validated = true;
@@ -142,17 +142,17 @@ define([
             return result;
         },
 
-        _hideErrors: function () {
+        _hideErrors: function() {
             var validator = this._getValidator();
             if (validator) {
-                this._elements().each(function () {
+                this._elements().each(function() {
                     validator.settings.unhighlight(this);
                 });
                 this.errors.hide();
             }
         },
 
-        _getValidator: function () {
+        _getValidator: function() {
             var validator;
             if (this.form.data('validator')) {
                 validator = this.form.validate();
@@ -160,19 +160,19 @@ define([
             return validator;
         },
 
-        _elements: function () {
+        _elements: function() {
             return this.element.find('input, select, textarea')
                 .not(':submit, :reset, :image');
         },
 
-        _onElementChange: function (e) {
+        _onElementChange: function(e) {
             this.changed = true;
             if (this.validated) {
                 this._validate(e.target);
             }
         },
 
-        _onClick: function (e) {
+        _onClick: function(e) {
             var $target = $(e.target);
             if ($target.is(this.options.addButton) || $target.is(this.options.saveButton)) {
                 this._onSaveItem(e);
@@ -181,37 +181,37 @@ define([
             }
         },
 
-        _collectAttrs: function () {
+        _collectAttrs: function() {
             var arrts = {},
                 self = this;
 
-            $.each(this._elementsMap(), function (name, $elem) {
+            $.each(this._elementsMap(), function(name, $elem) {
                 arrts[name] = self.options.getter($elem, name, $elem.val());
             });
 
             return arrts;
         },
 
-        _elementsMap: function () {
+        _elementsMap: function() {
             var mapped,
                 elementsMap = {},
                 $container = this.element,
                 pattern = this.options.namePattern;
 
             // collect elements using map
-            $.each(this.options.mapping, function (attrName, elemName) {
+            $.each(this.options.mapping, function(attrName, elemName) {
                 var $elem = $container.find('[name="' + elemName + '"]');
                 if ($elem.length) {
                     elementsMap[attrName] = $elem;
                 }
             });
 
-            mapped = $.map(elementsMap, function ($elem) {
+            mapped = $.map(elementsMap, function($elem) {
                 return $elem[0];
             });
 
             // collect elements using name pattern
-            $.each(this._elements().not(mapped), function () {
+            $.each(this._elements().not(mapped), function() {
                 var name = this.name && (this.name.match(pattern) || [])[1];
                 if (name && !elementsMap[name]) {
                     elementsMap[name] = $(this);
@@ -220,7 +220,7 @@ define([
             return elementsMap;
         },
 
-        _updateActions: function () {
+        _updateActions: function() {
             this.element.find(this.options.addButton)[this.model ? 'hide' : 'show']();
             this.element.find(this.options.saveButton)[this.model ? 'show' : 'hide']();
         }

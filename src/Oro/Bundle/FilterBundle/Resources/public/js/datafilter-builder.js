@@ -8,18 +8,18 @@ define([
     'oroui/js/mediator',
     './map-filter-module-name',
     './collection-filters-manager'
-], function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
+], function($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
     var methods = {
         /**
          * Reads data from container, collects required modules and runs filters builder
          */
-        initBuilder: function () {
+        initBuilder: function() {
             var modules;
             _.defaults(this.metadata, {filters: {}});
             modules = methods.collectModules.call(this);
-            tools.loadModules(modules, function (modules) {
+            tools.loadModules(modules, function(modules) {
                 this.modules = modules;
                 methods.build.call(this);
             }, this);
@@ -28,16 +28,16 @@ define([
         /**
          * Collects required modules
          */
-        collectModules: function () {
+        collectModules: function() {
             var modules = {};
-            _.each(this.metadata.filters || {}, function (filter) {
+            _.each(this.metadata.filters || {}, function(filter) {
                 var type = filter.type;
                 modules[type] = mapFilterModuleName(type);
             });
             return modules;
         },
 
-        build: function () {
+        build: function() {
             var options, filtersList;
             if (!this.collection || !this.modules) {
                 return;
@@ -61,11 +61,11 @@ define([
          *
          * @returns {Object}
          */
-        combineOptions: function () {
+        combineOptions: function() {
             var filters = {},
                 modules = this.modules,
                 collection = this.collection;
-            _.each(this.metadata.filters, function (options) {
+            _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
                     // @TODO pass collection only for specific filters
                     if (options.type === 'selectrow') {
@@ -91,7 +91,7 @@ define([
          * @param {Object} [options.data] data for grid's collection
          * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function (deferred, options) {
+        init: function(deferred, options) {
             var self;
             self = {
                 deferred: deferred,
@@ -104,10 +104,10 @@ define([
 
             methods.initBuilder.call(self);
 
-            options.gridPromise.done(function (grid) {
+            options.gridPromise.done(function(grid) {
                 self.collection = grid.collection;
                 methods.build.call(self);
-            }).fail(function () {
+            }).fail(function() {
                 deferred.reject();
             });
         }

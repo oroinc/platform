@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*jshint devel:true*/
 /*global define, console*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var CalendarView,
@@ -114,7 +114,7 @@ define(function (require) {
          */
         layout: undefined,
 
-        initialize: function (options) {
+        initialize: function(options) {
             if (!options) {
                 options = {};
             }
@@ -141,7 +141,7 @@ define(function (require) {
             this.pluginManager.enable(GuestsPlugin);
         },
 
-        onWindowResize: function () {
+        onWindowResize: function() {
             this.setTimeline();
             this.updateLayout();
         },
@@ -149,7 +149,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.layout === 'fullscreen') {
                 // fullscreen layout has side effects, need to clean up
                 this.setLayout('default');
@@ -165,7 +165,7 @@ define(function (require) {
             CalendarView.__super__.dispose.call(this);
         },
 
-        getEventView: function (eventModel) {
+        getEventView: function(eventModel) {
             if (!this.eventView) {
                 var connectionModel = this.getConnectionCollection().findWhere(
                         {calendarUid: eventModel.get('calendarUid')}
@@ -187,7 +187,7 @@ define(function (require) {
             return this.eventView;
         },
 
-        handleEventViewRemove: function () {
+        handleEventViewRemove: function() {
             this.eventView = null;
         },
 
@@ -196,7 +196,7 @@ define(function (require) {
          *
          * @returns {Element}
          */
-        getLoadingMask: function () {
+        getLoadingMask: function() {
             if (!this.loadingMask) {
                 this.loadingMask = new LoadingMask({
                     container: this.getCalendarElement()
@@ -205,41 +205,41 @@ define(function (require) {
             return this.loadingMask;
         },
 
-        getCollection: function () {
+        getCollection: function() {
             return this.collection;
         },
 
-        getConnectionCollection: function () {
+        getConnectionCollection: function() {
             return this.options.connectionsOptions.collection;
         },
 
-        getCalendarElement: function () {
+        getCalendarElement: function() {
             if (!this.fullCalendar) {
                 this.fullCalendar = this.$el.find(this.selectors.calendar);
             }
             return this.fullCalendar;
         },
 
-        handleEventViewAdd: function (eventModel) {
+        handleEventViewAdd: function(eventModel) {
             this.collection.add(eventModel);
         },
 
-        visibleDefaultCalendar: function (eventModel) {
+        visibleDefaultCalendar: function(eventModel) {
 
         },
 
-        addEventToCalendar: function (eventModel) {
+        addEventToCalendar: function(eventModel) {
             var fcEvent = this.createViewModel(eventModel);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
-        getCalendarEvents: function (calendarUid) {
-            return this.getCalendarElement().fullCalendar('clientEvents', function (fcEvent) {
+        getCalendarEvents: function(calendarUid) {
+            return this.getCalendarElement().fullCalendar('clientEvents', function(fcEvent) {
                 return fcEvent.calendarUid === calendarUid;
             });
         },
 
-        onEventAdded: function (eventModel) {
+        onEventAdded: function(eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
 
             eventModel.set('editable', connectionModel.get('canEditEvent'), {silent: true});
@@ -256,7 +256,7 @@ define(function (require) {
             }
         },
 
-        onEventChanged: function (eventModel) {
+        onEventChanged: function(eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
                 calendarElement = this.getCalendarElement(),
                 fcEvent;
@@ -278,17 +278,17 @@ define(function (require) {
             calendarElement.fullCalendar('rerenderEvents');
         },
 
-        onEventDeleted: function (eventModel) {
+        onEventDeleted: function(eventModel) {
             this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
             this.trigger('event:deleted', eventModel);
         },
 
-        onConnectionAdded: function () {
+        onConnectionAdded: function() {
             this.updateEvents();
             this.updateLayout();
         },
 
-        onConnectionChanged: function (connectionModel) {
+        onConnectionChanged: function(connectionModel) {
             if (connectionModel.reloadEventsRequest !== null) {
                 if (connectionModel.reloadEventsRequest === true) {
                     this.updateEvents();
@@ -306,7 +306,7 @@ define(function (require) {
             }
         },
 
-        onConnectionDeleted: function () {
+        onConnectionDeleted: function() {
             this.updateEvents();
             this.updateLayout();
         },
@@ -315,7 +315,7 @@ define(function (require) {
          * @param attrs object with properties to set on model before dialog creation
          *              dates must be in utc
          */
-        showAddEventDialog: function (attrs) {
+        showAddEventDialog: function(attrs) {
             var eventModel;
 
             // need to be able to accept native moments here
@@ -344,8 +344,7 @@ define(function (require) {
             }
         },
 
-
-        onFcSelect: function (start, end) {
+        onFcSelect: function(start, end) {
             var attrs = {
                 allDay: start.time().as('ms') === 0 && end.time().as('ms') === 0,
                 start: start.clone().tz(this.options.timezone, true),
@@ -354,7 +353,7 @@ define(function (require) {
             this.showAddEventDialog(attrs);
         },
 
-        onFcEventClick: function (fcEvent) {
+        onFcEventClick: function(fcEvent) {
             if (!this.eventView) {
                 try {
                     var eventModel = this.collection.get(fcEvent.id);
@@ -365,11 +364,11 @@ define(function (require) {
             }
         },
 
-        onFcEventResize: function (fcEvent, newDuration, undo) {
+        onFcEventResize: function(fcEvent, newDuration, undo) {
             this.saveFcEvent(fcEvent, undo);
         },
 
-        onFcEventDragStart: function (fcEvent) {
+        onFcEventDragStart: function(fcEvent) {
             fcEvent._beforeDragState = {
                 allDay: fcEvent.allDay,
                 start: fcEvent.start.clone(),
@@ -377,7 +376,7 @@ define(function (require) {
             }
         },
 
-        onFcEventDrop: function (fcEvent, dateDiff, undo, jsEvent) {
+        onFcEventDrop: function(fcEvent, dateDiff, undo, jsEvent) {
             var realDuration,
                 currentView = this.getCalendarElement().fullCalendar('getView'),
                 oldState = fcEvent._beforeDragState,
@@ -417,7 +416,7 @@ define(function (require) {
             this.saveFcEvent(fcEvent);
         },
 
-        saveFcEvent: function (fcEvent) {
+        saveFcEvent: function(fcEvent) {
             var promises = [], eventModel, attrs;
             attrs = {
                 allDay: fcEvent.allDay,
@@ -439,14 +438,14 @@ define(function (require) {
                 .done(_.bind(this._saveFcEvent, this, eventModel, attrs));
         },
 
-        _saveFcEvent: function (eventModel, attrs) {
+        _saveFcEvent: function(eventModel, attrs) {
             this.showSavingMask();
             try {
                 eventModel.save(
                     attrs,
                     {
                         success: _.bind(this._hideMask, this),
-                        error: _.bind(function (model, response) {
+                        error: _.bind(function(model, response) {
                             this.showSaveEventError(response.responseJSON || {});
                             this._hideMask();
                         }, this),
@@ -458,14 +457,14 @@ define(function (require) {
             }
         },
 
-        updateEvents: function () {
+        updateEvents: function() {
             try {
                 this.showLoadingMask();
                 // load events from a server
                 this.collection.fetch({
                     reset: true,
                     success: _.bind(this.updateEventsWithoutReload, this),
-                    error: _.bind(function (collection, response) {
+                    error: _.bind(function(collection, response) {
                         this.showLoadEventsError(response.responseJSON || {});
                         this._hideMask();
                     }, this)
@@ -475,21 +474,21 @@ define(function (require) {
             }
         },
 
-        updateEventsWithoutReload: function () {
+        updateEventsWithoutReload: function() {
             var oldEnableEventLoading = this.enableEventLoading;
             this.enableEventLoading = false;
             this.getCalendarElement().fullCalendar('refetchEvents');
             this.enableEventLoading = oldEnableEventLoading;
         },
 
-        loadEvents: function (start, end, timezone, callback) {
-            var onEventsLoad = _.bind(function () {
+        loadEvents: function(start, end, timezone, callback) {
+            var onEventsLoad = _.bind(function() {
                 var fcEvents;
 
                 if (this.enableEventLoading || _.size(this.eventsLoaded) === 0) {
                     // data is loaded, need to update eventsLoaded
                     this.eventsLoaded = {};
-                    this.options.connectionsOptions.collection.each(function (connectionModel) {
+                    this.options.connectionsOptions.collection.each(function(connectionModel) {
                         if (connectionModel.get('visible')) {
                             this.eventsLoaded[connectionModel.get('calendarUid')] = true;
                         }
@@ -497,7 +496,7 @@ define(function (require) {
                 }
 
                 // prepare them for full calendar
-                fcEvents = _.map(this.filterEvents(this.collection.models), function (eventModel) {
+                fcEvents = _.map(this.filterEvents(this.collection.models), function(eventModel) {
                     return this.createViewModel(eventModel);
                 }, this);
 
@@ -515,7 +514,7 @@ define(function (require) {
                     this.collection.fetch({
                         reset: true,
                         success: onEventsLoad,
-                        error: _.bind(function (collection, response) {
+                        error: _.bind(function(collection, response) {
                             callback({});
                             this.showLoadEventsError(response.responseJSON || {});
                         }, this)
@@ -536,16 +535,16 @@ define(function (require) {
          * @param {Array} events
          * @returns {Array}
          */
-        filterEvents: function (events) {
+        filterEvents: function(events) {
             var visibleConnectionIds = [];
             // collect visible connections
-            this.options.connectionsOptions.collection.each(function (connectionModel) {
+            this.options.connectionsOptions.collection.each(function(connectionModel) {
                 if (connectionModel.get('visible')) {
                     visibleConnectionIds.push(connectionModel.get('calendarUid'));
                 }
             }, this);
             // filter visible events
-            events = _.filter(events, function (event) {
+            events = _.filter(events, function(event) {
                 return -1 !== _.indexOf(visibleConnectionIds, event.get('calendarUid'));
             });
 
@@ -557,7 +556,7 @@ define(function (require) {
          *
          * @param {Object} eventModel
          */
-        createViewModel: function (eventModel) {
+        createViewModel: function(eventModel) {
             var fcEvent = _.pick(
                     eventModel.attributes,
                     ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
@@ -585,42 +584,42 @@ define(function (require) {
             return fcEvent;
         },
 
-        showSavingMask: function () {
+        showSavingMask: function() {
             this.getLoadingMask().show(__('Saving...'));
         },
 
-        showLoadingMask: function () {
+        showLoadingMask: function() {
             this.getLoadingMask().show(__('Loading...'));
         },
 
-        _hideMask: function () {
+        _hideMask: function() {
             if (this.loadingMask) {
                 this.loadingMask.hide();
             }
         },
 
-        showLoadEventsError: function (err) {
+        showLoadEventsError: function(err) {
             this._showError(__('Sorry, calendar events were not loaded correctly'), err);
         },
 
-        showSaveEventError: function (err) {
+        showSaveEventError: function(err) {
             this._showError(__('Sorry, calendar event was not saved correctly'), err);
         },
 
-        showMiscError: function (err) {
+        showMiscError: function(err) {
             this._showError(__('Sorry, unexpected error was occurred'), err);
         },
 
-        showUpdateError: function (err) {
+        showUpdateError: function(err) {
             this._showError(__('Sorry, the calendar updating was failed'), err);
         },
 
-        _showError: function (message, err) {
+        _showError: function(message, err) {
             this._hideMask();
             messenger.showErrorMessage(message, err);
         },
 
-        initCalendarContainer: function () {
+        initCalendarContainer: function() {
             // init events container
             var eventsContainer = this.$el.find(this.options.eventsOptions.containerSelector);
             if (eventsContainer.length === 0) {
@@ -630,7 +629,7 @@ define(function (require) {
             eventsContainer.append($(this.eventsTemplate()));
         },
 
-        initializeFullCalendar: function () {
+        initializeFullCalendar: function() {
             var options, keys, self, scrollTime, fullCalendar,
                 calendarElement = this.getCalendarElement();
             // prepare options for jQuery FullCalendar control
@@ -643,7 +642,7 @@ define(function (require) {
                 eventDragStart: _.bind(this.onFcEventDragStart, this),
                 eventDrop: _.bind(this.onFcEventDrop, this),
                 eventResize: _.bind(this.onFcEventResize, this),
-                loading: _.bind(function (show) {
+                loading: _.bind(function(show) {
                     if (show) {
                         this.showLoadingMask();
                     } else {
@@ -682,8 +681,8 @@ define(function (require) {
             var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
             // prepare FullCalendar specific date/time formats
             var isDateFormatStartedWithDay = dateFormat[0] === 'D';
-            var weekFormat = isDateFormatStartedWithDay
-                ? 'D MMMM YYYY'
+            var weekFormat = isDateFormatStartedWithDay ?
+                'D MMMM YYYY'
                 : 'MMMM D YYYY';
 
             options.titleFormat = {
@@ -703,13 +702,13 @@ define(function (require) {
             options.axisFormat = timeFormat;
 
             self = this;
-            options.eventAfterAllRender = function () {
+            options.eventAfterAllRender = function() {
                 _.delay(_.bind(self.setTimeline, self));
                 clearInterval(self.timelineUpdateIntervalId);
-                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
+                self.timelineUpdateIntervalId = setInterval(function() { self.setTimeline(); }, 60 * 1000);
             };
 
-            options.eventAfterRender = _.bind(function (fcEvent, $el) {
+            options.eventAfterRender = _.bind(function(fcEvent, $el) {
                 var event = this.collection.get(fcEvent.id);
                 eventDecorator.decorate(event, $el);
             }, this);
@@ -725,7 +724,7 @@ define(function (require) {
             this.enableEventLoading = true;
         },
 
-        initializeConnectionsView: function () {
+        initializeConnectionsView: function() {
             var connectionsContainer, connectionsTemplate;
             // init connections container
             connectionsContainer = this.$el.find(this.options.connectionsOptions.containerSelector);
@@ -750,11 +749,11 @@ define(function (require) {
             this.listenTo(this.connectionsView, 'connectionRemove', this.onConnectionDeleted);
         },
 
-        loadConnectionColors: function () {
+        loadConnectionColors: function() {
             var lastBackgroundColor = null;
-            this.getConnectionCollection().each(_.bind(function (connection) {
+            this.getConnectionCollection().each(_.bind(function(connection) {
                 var obj = connection.toJSON();
-                this.colorManager.applyColors(obj, function () {
+                this.colorManager.applyColors(obj, function() {
                     return lastBackgroundColor;
                 });
                 this.colorManager.setCalendarColors(obj.calendarUid, obj.backgroundColor);
@@ -764,7 +763,7 @@ define(function (require) {
             }, this));
         },
 
-        render: function () {
+        render: function() {
             // init views
             this.initCalendarContainer();
             if (_.isUndefined(this.options.connectionsOptions.containerTemplateSelector)) {
@@ -778,7 +777,7 @@ define(function (require) {
             return this;
         },
 
-        setTimeline: function () {
+        setTimeline: function() {
             var todayElement, timeGrid, timelineElement, percentOfDay, curSeconds, timelineTop, dayCol,
                 calendarElement = this.getCalendarElement(),
                 currentView = calendarElement.fullCalendar('getView'),
@@ -837,7 +836,7 @@ define(function (require) {
             }
         },
 
-        getAvailableHeight: function () {
+        getAvailableHeight: function() {
             var $fcView = this.getCalendarElement().find('.fc-view:first');
             return mediator.execute('layout:getAvailableHeight', $fcView)
         },
@@ -845,7 +844,7 @@ define(function (require) {
         /**
          * Chooses layout on resize or during creation
          */
-        updateLayout: function () {
+        updateLayout: function() {
             if (this.options.eventsOptions.aspectRatio) {
                 this.setLayout('default');
                 // do nothing
@@ -863,7 +862,7 @@ define(function (require) {
         /**
          * Sets layout and perform all required operations
          */
-        setLayout: function (newLayout) {
+        setLayout: function(newLayout) {
             if (newLayout === this.layout) {
                 if (newLayout === 'fullscreen') {
                     this.getCalendarElement().fullCalendar('option', 'contentHeight', this.getAvailableHeight());

@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var JqueryWidgetComponent,
@@ -15,7 +15,7 @@ define(function (require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var $elem, widgetOptions;
 
             widgetOptions = _.omit(options, ['_sourceElement', 'widgetModule', 'widgetName']);

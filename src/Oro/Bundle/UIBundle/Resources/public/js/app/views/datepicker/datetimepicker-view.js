@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var DateTimePickerView,
@@ -19,7 +19,7 @@ define(function (require) {
          * @final
          * @protected
          */
-        _super: function () {
+        _super: function() {
             return DateTimePickerView.__super__;
         }
     }));

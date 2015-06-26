@@ -3,7 +3,7 @@
 define([
     'underscore',
     'backgrid'
-], function (_, Backgrid) {
+], function(_, Backgrid) {
     "use strict";
 
     var HeaderCell;
@@ -37,7 +37,7 @@ define([
          *
          * Add listening "reset" event of collection to able catch situation when header cell should update it's sort state.
          */
-        initialize: function () {
+        initialize: function() {
             this.allowNoSorting = this.collection.multipleSorting;
             HeaderCell.__super__.initialize.apply(this, arguments);
             this._initCellDirection(this.collection);
@@ -47,7 +47,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -60,7 +60,7 @@ define([
          *
          * @private
          */
-        _resetCellDirection: function () {},
+        _resetCellDirection: function() {},
 
         /**
          * Inits cell direction when collections loads first time.
@@ -68,7 +68,7 @@ define([
          * @param collection
          * @private
          */
-        _initCellDirection: function (collection) {
+        _initCellDirection: function(collection) {
             var state, direction, columnName;
             if (collection === this.collection) {
                 state = collection.state;
@@ -92,7 +92,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             this.$el.empty();
 
             this.$el.append(this.template({
@@ -121,25 +121,24 @@ define([
          *
          * @param {Event} e
          */
-        onClick: function (e) {
+        onClick: function(e) {
             e.preventDefault();
 
             var column = this.column;
             var collection = this.collection;
             var event = "backgrid:sort";
 
-            var cycleSort = _.bind(function (header, col) {
+            var cycleSort = _.bind(function(header, col) {
                 if (column.get("direction") === "ascending") {
                     collection.trigger(event, col, "descending");
                 } else if (this.allowNoSorting && column.get("direction") === "descending") {
                     collection.trigger(event, col, null);
-                }
-                else {
+                } else {
                     collection.trigger(event, col, "ascending");
                 }
             }, this);
 
-            var toggleSort = function (header, col) {
+            var toggleSort = function(header, col) {
                 if (column.get("direction") === "ascending") {
                     collection.trigger(event, col, "descending");
                 } else {

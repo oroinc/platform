@@ -4,7 +4,7 @@ define([
     'underscore',
     './choice-filter',
     'orofilter/js/formatter/number-formatter'
-], function (_, ChoiceFilter, NumberFormatter) {
+], function(_, ChoiceFilter, NumberFormatter) {
     'use strict';
 
     var NumberFilter;
@@ -29,7 +29,7 @@ define([
          * @param {*} [options.formatter] Object with methods fromRaw and toRaw or
          *      a string name of formatter (e.g. "integer", "decimal")
          */
-        initialize: function (options) {
+        initialize: function(options) {
             // init formatter options if it was not initialized so far
             if (_.isUndefined(this.formatterOptions)) {
                 this.formatterOptions = {};
@@ -41,7 +41,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -52,7 +52,7 @@ define([
         /**
          * @inheritDoc
          */
-        _formatRawValue: function (value) {
+        _formatRawValue: function(value) {
             if (value.value === '') {
                 value.value = undefined;
             } else {
@@ -64,7 +64,7 @@ define([
         /**
          * @inheritDoc
          */
-        _formatDisplayValue: function (value) {
+        _formatDisplayValue: function(value) {
             if (value.value && _.isString(value.value)) {
                 value.value = parseFloat(value.value);
             }

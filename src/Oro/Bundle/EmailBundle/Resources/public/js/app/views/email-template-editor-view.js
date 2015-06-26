@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailTemplateEditorView,
@@ -22,7 +22,7 @@ define(function (require) {
             'change input[name*=type]': '_onTypeChange'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             EmailTemplateEditorView.__super__.initialize.apply(this, arguments);
 
             this.options = _.defaults(options || {}, this.options);
@@ -30,11 +30,11 @@ define(function (require) {
             this.render();
         },
 
-        render: function () {
+        render: function() {
             this.initLayout().then(_.bind(this.afterLayoutInit, this));
         },
 
-        afterLayoutInit: function () {
+        afterLayoutInit: function() {
             this.options.hasWysiwyg = this.$('textarea[name*="content"]:first').data('wysiwygEnabled') == true;
             if (this.options.hasWysiwyg) {
                 this.options.isWysiwygEnabled = this.$(this.options.typeSwitcher).filter(':checked').val() === 'html';
@@ -48,14 +48,14 @@ define(function (require) {
             }
         },
 
-        _onVariableClick: function (field, value) {
+        _onVariableClick: function(field, value) {
             var fieldId = field.data('id');
             if (this.options.isWysiwygEnabled && !_.isUndefined(fieldId)) {
-                this.getComponentManager().forEachComponent(function (component) {
-                    if (!_.isUndefined(component.view)
-                        && !_.isUndefined(component.view.tinymceConnected)
-                        && component.view.tinymceConnected === true
-                        && component.view.el.id === fieldId
+                this.getComponentManager().forEachComponent(function(component) {
+                    if (!_.isUndefined(component.view) &&
+                        !_.isUndefined(component.view.tinymceConnected) &&
+                        component.view.tinymceConnected === true &&
+                        component.view.el.id === fieldId
                     ) {
                         component.view.tinymceInstance.execCommand('mceInsertContent', false, value);
                     }
@@ -63,17 +63,17 @@ define(function (require) {
             }
         },
 
-        _onEditorBlur: function () {
+        _onEditorBlur: function() {
             if (this.options.hasWysiwyg && this.options.isWysiwygEnabled) {
-                this.getComponentManager().forEachComponent(function (component) {
-                    if (!_.isUndefined(component.view)
-                        && !_.isUndefined(component.view.tinymceConnected)
-                        && component.view.tinymceConnected === true
+                this.getComponentManager().forEachComponent(function(component) {
+                    if (!_.isUndefined(component.view) &&
+                        !_.isUndefined(component.view.tinymceConnected) &&
+                        component.view.tinymceConnected === true
                     ) {
                         $(component.view.tinymceInstance.getBody()).on(
                             'blur',
                             _.bind(
-                                function (e) {
+                                function(e) {
                                     this.options.emailVariableView.view._updateElementsMetaData(e);
                                 },
                                 this
@@ -84,7 +84,7 @@ define(function (require) {
             }
         },
 
-        _onTypeChange: function (e) {
+        _onTypeChange: function(e) {
             if (this.options.hasWysiwyg) {
                 var type = $(e.target).val();
                 if (type === 'txt') {
@@ -97,9 +97,9 @@ define(function (require) {
             }
         },
 
-        _switchWysiwygEditor: function (enabled) {
+        _switchWysiwygEditor: function(enabled) {
             this.options.isWysiwygEnabled = enabled;
-            this.getComponentManager().forEachComponent(function (component) {
+            this.getComponentManager().forEachComponent(function(component) {
                 if (!_.isUndefined(component.view) && !_.isUndefined(component.view.tinymceConnected)) {
                     component.view.setEnabled(enabled);
                 }

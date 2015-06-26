@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailTreadView,
@@ -32,10 +32,10 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['actionPanelSelector']));
             EmailTreadView.__super__.initialize.apply(this, arguments);
-            this.listenTo(mediator, 'widget:doRefresh:email-thread', function () {
+            this.listenTo(mediator, 'widget:doRefresh:email-thread', function() {
                 if (options.isBaseView) {
                     mediator.trigger('widget:doRefresh:email-thread-context');
                 }
@@ -45,7 +45,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.$actionPanel) {
                 this.$actionPanel.find(this.selectors.toggleAll).remove();
                 delete this.$actionPanel;
@@ -56,7 +56,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        render: function () {
+        render: function() {
             if (this.actionPanelSelector) {
                 // add toggleAll action element
                 this.$actionPanel = $(this.actionPanelSelector);
@@ -77,16 +77,16 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        onToggleAllClick: function (e) {
+        onToggleAllClick: function(e) {
             this.loadEmails().done(_.bind(this.toggleAllEmails, this));
         },
 
         /**
          * Expands or collapses all emails
          */
-        toggleAllEmails: function () {
+        toggleAllEmails: function() {
             var show = this._hasHiddenEmails();
-            _.each(this.subviews, function (emailItemView) {
+            _.each(this.subviews, function(emailItemView) {
                 emailItemView.toggle(show);
             });
         },
@@ -96,7 +96,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        onLoadMoreClick: function (e) {
+        onLoadMoreClick: function(e) {
             if (this.$(this.selectors.loadMore).hasClass('process')) {
                 return;
             }
@@ -108,7 +108,7 @@ define(function (require) {
          *
          * @returns {Promise}
          */
-        loadEmails: function () {
+        loadEmails: function() {
             var url, ids, promise;
             ids = this.$(this.selectors.loadMore).addClass('process').data('emailsItems');
             if (ids) {
@@ -127,7 +127,7 @@ define(function (require) {
          *
          * @param {string} content
          */
-        onDoneLoadEmails: function (content) {
+        onDoneLoadEmails: function(content) {
             if (this.disposed) {
                 return;
             }
@@ -139,7 +139,7 @@ define(function (require) {
         /**
          * Handles emails loading error
          */
-        onFailLoadEmails: function () {
+        onFailLoadEmails: function() {
             if (this.disposed) {
                 return;
             }
@@ -152,7 +152,7 @@ define(function (require) {
          *
          * @param {Array<jQuery.Element>} $elems
          */
-        initEmailItemViews: function ($elems) {
+        initEmailItemViews: function($elems) {
             _.each($elems, this._initEmailItemView, this);
         },
 
@@ -162,7 +162,7 @@ define(function (require) {
          * @param {HTMLElement} elem
          * @protected
          */
-        _initEmailItemView: function (elem) {
+        _initEmailItemView: function(elem) {
             var emailItemView;
             emailItemView = new EmailItemView({
                 autoRender: true,
@@ -178,8 +178,8 @@ define(function (require) {
         /**
          * Invokes refresh method for all emails
          */
-        refreshEmails: function () {
-            _.each(this.subviews, function (emailItemView) {
+        refreshEmails: function() {
+            _.each(this.subviews, function(emailItemView) {
                 emailItemView.refresh();
             });
         },
@@ -187,7 +187,7 @@ define(function (require) {
         /**
          * Update toggle all action element
          */
-        updateToggleAllAction: function () {
+        updateToggleAllAction: function() {
             var hasMultipleEmails, hasHiddenEmails, $toggleAllAction, translationPrefix;
 
             hasMultipleEmails = this.$(this.selectors.emailItem).length > 1;
@@ -207,7 +207,7 @@ define(function (require) {
          * @returns {boolean}
          * @protected
          */
-        _hasHiddenEmails: function () {
+        _hasHiddenEmails: function() {
             var hasCollapsedEmails, hasEmailsToLoad;
             hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
             hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
@@ -219,7 +219,7 @@ define(function (require) {
          *
          * @param {number} diff
          */
-        onCommentCountChange: function (diff) {
+        onCommentCountChange: function(diff) {
             this.trigger('commentCountChanged', diff);
         }
     });

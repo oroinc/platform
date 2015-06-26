@@ -1,13 +1,13 @@
 /* global define */
 define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'],
-function ($, _, widgetManager, routing) {
+function($, _, widgetManager, routing) {
     'use strict';
 
     /**
      * @export  oroform/js/create-select-type-handler
      * @class   oroform.createSelectTypeHandler
      */
-    return function (
+    return function(
         btnContainer,
         viewContainer,
         currentModeEl,
@@ -19,7 +19,7 @@ function ($, _, widgetManager, routing) {
         templateMode,
         templateRouteParameters
     ) {
-        var setAltLabel = function (el, mode) {
+        var setAltLabel = function(el, mode) {
             var $labelHolder = el.find('span');
             var altLabel = $labelHolder.data('alt-label-' + mode);
             var regularLabel = $labelHolder.data('label');
@@ -33,7 +33,7 @@ function ($, _, widgetManager, routing) {
             }
         };
 
-        var setCurrentMode = function (mode) {
+        var setCurrentMode = function(mode) {
             var $btnContainer = $(btnContainer);
             setAltLabel($btnContainer.find('.entity-select-btn'), mode);
             setAltLabel($btnContainer.find('.entity-create-btn'), mode);
@@ -91,14 +91,14 @@ function ($, _, widgetManager, routing) {
             }
         });
 
-        var drawViewWidget = function (viewWidget, routeParameters) {
+        var drawViewWidget = function(viewWidget, routeParameters) {
             widgetManager.getWidgetInstanceByAlias(viewWidget['widget_alias'], function(w) {
                 w.setUrl(routing.generate(viewWidget['route_name'], routeParameters));
                 w.render();
             });
         };
 
-        var loadViewWidgets = function (model) {
+        var loadViewWidgets = function(model) {
             var getRouteParameters = function(map, model) {
                 var parameters = {};
                 for (var routeParamName in map) if (map.hasOwnProperty(routeParamName)) {
@@ -118,7 +118,7 @@ function ($, _, widgetManager, routing) {
         };
 
         // On grid row select render widgets and change current mode to view
-        widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function (widget) {
+        widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
             widget.on('grid-row-select', function(data) {
                 var selectedId = data.model.get(gridModelId);
                 if (selectedId != $(existingEl).val()) {
@@ -135,7 +135,7 @@ function ($, _, widgetManager, routing) {
 
         var setMode = function(mode) {
             setCurrentMode(mode);
-            switch(mode) {
+            switch (mode) {
                 case 'view':
                     var allRouteParameters = getCurrentRouteParameters();
                     for (var i = 0; i < viewWidgets.length; i++) {
@@ -154,8 +154,8 @@ function ($, _, widgetManager, routing) {
         // update mode
         var currentMode = getCurrentMode();
         var currentRouteParameters = getCurrentRouteParameters();
-        if (templateMode != currentMode
-            || currentMode == 'view' && !_.isEqual(templateRouteParameters, currentRouteParameters)
+        if (templateMode != currentMode ||
+            currentMode == 'view' && !_.isEqual(templateRouteParameters, currentRouteParameters)
         ) {
             setMode(currentMode);
         }

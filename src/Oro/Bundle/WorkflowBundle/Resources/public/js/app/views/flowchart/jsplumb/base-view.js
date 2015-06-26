@@ -1,14 +1,14 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var BaseView = require('oroui/js/app/views/base/view'),
         FlowchartJsPlubmBaseView;
 
     FlowchartJsPlubmBaseView = BaseView.extend({
-        id: function () {
+        id: function() {
             return 'jsplumb-' + this.cid;
         },
 
-        render: function () {
+        render: function() {
             FlowchartJsPlubmBaseView.__super__.render.apply(this, arguments);
 
             if (!this.isConnected) {
@@ -18,15 +18,15 @@ define(function (require) {
             return this;
         },
 
-        connect: function () {
+        connect: function() {
             // fill with stuff what should be done once element is rendered
         },
 
-        cleanup: function () {
+        cleanup: function() {
             // empty
         },
 
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }

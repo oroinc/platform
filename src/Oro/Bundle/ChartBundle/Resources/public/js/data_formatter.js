@@ -1,6 +1,6 @@
 /*global define*/
 define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
-    function (numberFormatter, dateTimeFormatter) {
+    function(numberFormatter, dateTimeFormatter) {
         'use strict';
 
         /**
@@ -95,7 +95,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @param {string} format
              * @return {boolean}
              */
-            isValueNumerical: function(format){
+            isValueNumerical: function(format) {
                 switch (format) {
                     case 'integer':
                     case 'smallint':

@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var ActivityListComponent,
@@ -47,13 +47,13 @@ define(function (require) {
             'toView collection': 'onViewActivity'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
             this.processOptions();
 
             if (!_.isEmpty(this.options.modules)) {
                 this._deferredInit();
-                tools.loadModules(this.options.modules, function (modules) {
+                tools.loadModules(this.options.modules, function(modules) {
                     _.extend(this.options.activityListOptions, modules);
                     this._init();
                     this._resolveDeferredInit();
@@ -63,7 +63,7 @@ define(function (require) {
             }
         },
 
-        processOptions: function () {
+        processOptions: function() {
             var defaults, activityListData;
             defaults = $.extend(true, {}, this.defaults);
             _.defaults(this.options, defaults);
@@ -86,7 +86,7 @@ define(function (require) {
             this.options.activityListOptions.doNotFetch = this.options.doNotFetch;
         },
 
-        _init: function () {
+        _init: function() {
             var activityOptions, collection;
             activityOptions = this.options.activityListOptions;
 
@@ -123,7 +123,7 @@ define(function (require) {
          *
          * @returns {{dateRange: (*|Object), activityType: (*|Object)}}
          */
-        getFilterState: function () {
+        getFilterState: function() {
             return {
                 dateRange: this.dateRangeFilter.getValue(),
                 activityType: this.activityTypeFilter.getValue()
@@ -133,7 +133,7 @@ define(function (require) {
         /**
          * Triggered when filter state is changed
          */
-        onFilterStateChange: function () {
+        onFilterStateChange: function() {
             this.collection.setFilter(this.getFilterState());
             this.collection.setPage(1);
             this.listView._reload();
@@ -144,7 +144,7 @@ define(function (require) {
          *
          * @param {ActivityModel} model
          */
-        onViewActivity: function (model) {
+        onViewActivity: function(model) {
             this.initComments(model);
         },
 
@@ -153,7 +153,7 @@ define(function (require) {
          *
          * @param {ActivityModel} model
          */
-        initComments: function (model) {
+        initComments: function(model) {
             var itemView, commentOptions,
                 activityClass = model.getRelatedActivityClass(),
                 configuration = this.options.activityListOptions.configuration[activityClass];
@@ -180,7 +180,7 @@ define(function (require) {
          *
          * @param $el
          */
-        renderFilters: function ($el) {
+        renderFilters: function($el) {
             var activityClass, activityOptions, activityTypeChoices, DateRangeFilterWithMeta;
 
             /*
@@ -219,23 +219,23 @@ define(function (require) {
             $el.find('.date-range-filter').append(this.dateRangeFilter.$el);
         },
 
-        registerWidget: function () {
+        registerWidget: function() {
             var listView = this.listView;
-            mediator.execute('widgets:getByIdAsync', this.options.widgetId, _.bind(function (widget) {
-                widget.getAction('refresh', 'top', function (action) {
+            mediator.execute('widgets:getByIdAsync', this.options.widgetId, _.bind(function(widget) {
+                widget.getAction('refresh', 'top', function(action) {
                     action.on('click', _.bind(listView.refresh, listView));
                 });
 
                 /**
                  * pager actions
                  */
-                widget.getAction('goto_previous', 'top', function (action) {
+                widget.getAction('goto_previous', 'top', function(action) {
                     action.on('click', _.bind(listView.goto_previous, listView));
                 });
-                widget.getAction('goto_page', 'top', function (action) {
+                widget.getAction('goto_page', 'top', function(action) {
                     action.on('change', _.bind(listView.goto_page, {e: this, list: listView}));
                 });
-                widget.getAction('goto_next', 'top', function (action) {
+                widget.getAction('goto_next', 'top', function(action) {
                     action.on('click', _.bind(listView.goto_next, listView));
                 });
 

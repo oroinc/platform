@@ -3,7 +3,7 @@
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget',
     'oroui/js/app/views/loading-mask-view', 'orocalendar/js/form-validation', 'oroui/js/delete-confirmation',
     'oroform/js/formatter/field'
-], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
+], function(_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -37,7 +37,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             {fieldName: 'invitedUsers', emptyValue: '', selector: 'input[name$="[invitedUsers]"]'}
         ],
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(_.pick(options || {}, _.keys(this.options)), this.options);
             this.viewTemplate = _.template($(options.viewTemplateSelector).html());
             this.template = _.template($(options.formTemplateSelector).html());
@@ -46,24 +46,24 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             this.listenTo(this.model, 'destroy', this.onModelDelete);
         },
 
-        remove: function () {
+        remove: function() {
             this.trigger('remove');
             this._hideMask();
             Backbone.View.prototype.remove.apply(this, arguments);
         },
 
-        onModelSave: function () {
+        onModelSave: function() {
             this.trigger('addEvent', this.model);
             this.eventDialog.remove();
             this.remove();
         },
 
-        onModelDelete: function () {
+        onModelDelete: function() {
             this.eventDialog.remove();
             this.remove();
         },
 
-        render: function () {
+        render: function() {
             var widgetOptions = this.options.widgetOptions || {},
                 defaultOptions = {
                     title: this.model.isNew() ? __('Add New Event') : __('View Event'),
@@ -78,23 +78,23 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     }),
                     submitHandler: _.bind(this.saveModel, this)
                 },
-                onDelete = _.bind(function (e) {
+                onDelete = _.bind(function(e) {
                     var $el = $(e.currentTarget),
                         deleteUrl = $el.data('url'),
                         confirm = new DeleteConfirmation({
                             content: $el.data('message')
                         });
                     e.preventDefault();
-                    confirm.on('ok', _.bind(function () {
+                    confirm.on('ok', _.bind(function() {
                         this.deleteModel(deleteUrl);
                     }, this));
                     confirm.open();
                 }, this),
-                onEdit = _.bind(function (e) {
+                onEdit = _.bind(function(e) {
                     this.eventDialog.setTitle(__('Edit Event'));
                     this.eventDialog.setContent(this.getEventForm());
                     // subscribe to 'delete event' event
-                    this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
+                    this.eventDialog.getAction('delete', 'adopted', function(deleteAction) {
                         deleteAction.on('click', onDelete);
                     });
                 }, this);
@@ -115,11 +115,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             this.eventDialog.render();
 
             // subscribe to 'delete event' event
-            this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
+            this.eventDialog.getAction('delete', 'adopted', function(deleteAction) {
                 deleteAction.on('click', onDelete);
             });
             // subscribe to 'switch to edit' event
-            this.eventDialog.getAction('edit', 'adopted', function (editAction) {
+            this.eventDialog.getAction('edit', 'adopted', function(editAction) {
                 editAction.on('click', onEdit);
             });
 
@@ -131,7 +131,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             return this;
         },
 
-        saveModel: function () {
+        saveModel: function() {
             var errors;
             this.model.set(this.getEventFormData());
             if (this.model.isValid()) {
@@ -145,14 +145,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     this.showError(err);
                 }
             } else {
-                errors = _.map(this.model.validationError, function (message) {
+                errors = _.map(this.model.validationError, function(message) {
                     return __(message);
                 });
                 this.showError({errors: errors});
             }
         },
 
-        deleteModel: function (deleteUrl) {
+        deleteModel: function(deleteUrl) {
             this.showDeletingMask();
             try {
                 var options = {
@@ -168,42 +168,42 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
         },
 
-        showSavingMask: function () {
+        showSavingMask: function() {
             this._showMask(__('Saving...'));
         },
 
-        showDeletingMask: function () {
+        showDeletingMask: function() {
             this._showMask(__('Deleting...'));
         },
 
-        showLoadingMask: function () {
+        showLoadingMask: function() {
             this._showMask(__('Loading...'));
         },
 
-        _showMask: function (message) {
+        _showMask: function(message) {
             if (this.loadingMask) {
                 this.loadingMask.show(message);
             }
         },
 
-        _hideMask: function () {
+        _hideMask: function() {
             if (this.loadingMask) {
                 this.loadingMask.hide();
             }
         },
 
-        _handleResponseError: function (model, response) {
+        _handleResponseError: function(model, response) {
             this.showError(response.responseJSON || {});
         },
 
-        showError: function (err) {
+        showError: function(err) {
             this._hideMask();
             if (this.eventDialog) {
                 FormValidation.handleErrors(this.eventDialog.$el.parent(), err);
             }
         },
 
-        fillForm: function (form, modelData) {
+        fillForm: function(form, modelData) {
             var self = this;
             form = $(form);
 
@@ -219,7 +219,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 });
             }
 
-            _.each(inputs, function (input) {
+            _.each(inputs, function(input) {
                 input = $(input);
                 var name = input.attr('name'),
                     matches = [],
@@ -245,7 +245,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
                 // hide loading mask if child events users should be updated
                 if (name.indexOf('[invitedUsers]') !== -1 && !_.isEmpty(modelData.invitedUsers)) {
-                    input.on('select2-data-loaded', function () {
+                    input.on('select2-data-loaded', function() {
                         self._hideMask();
                     });
                 }
@@ -254,16 +254,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             return form;
         },
 
-        buildForm: function (form, modelData) {
+        buildForm: function(form, modelData) {
             var self = this;
             form = $(form);
-            _.each(modelData, function (value, key) {
+            _.each(modelData, function(value, key) {
                 if (typeof value === 'object') {
                     var container = form.find('.' + key + '-collection');
                     if (container) {
                         var prototype = container.data('prototype');
                         if (prototype) {
-                            _.each(value, function (collectionValue, collectionKey) {
+                            _.each(value, function(collectionValue, collectionKey) {
                                 container.append(prototype.replace(/__name__/g, collectionKey));
                             });
                         }
@@ -274,13 +274,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             });
         },
 
-        getEventView: function () {
+        getEventView: function() {
             return this.viewTemplate(_.extend(this.model.toJSON(), {
                 formatter: fieldFormatter
             }));
         },
 
-        getEventForm: function () {
+        getEventForm: function() {
             var modelData = this.model.toJSON(),
                 templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData),
                 form = this.fillForm(this.template(templateData), modelData),
@@ -293,7 +293,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
             this._toggleCalendarUidByInvitedUsers(form);
 
-            form.find(this.selectors.calendarUid).on('change', _.bind(function (e) {
+            form.find(this.selectors.calendarUid).on('change', _.bind(function(e) {
                 var $emptyColor = form.find('.empty-color'),
                     $selector = $(e.currentTarget),
                     tagName = $selector.prop('tagName').toUpperCase(),
@@ -307,22 +307,22 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     this._showUserCalendarOnlyFields(form, false);
                 }
             }, this));
-            form.find(this.selectors.invitedUsers).on('change', _.bind(function (e) {
+            form.find(this.selectors.invitedUsers).on('change', _.bind(function(e) {
                 this._toggleCalendarUidByInvitedUsers(form);
             }, this));
 
             return form;
         },
 
-        getEventFormData: function () {
+        getEventFormData: function() {
             var fieldNameRegex = /\[(\w+)\]/g,
                 data = {},
                 formData = this.eventDialog.form.serializeArray();
             formData = formData.concat(this.eventDialog.form.find('input[type=checkbox]:not(:checked)')
-                .map(function () {
+                .map(function() {
                     return {"name": this.name, "value": false};
                 }).get());
-            _.each(formData, function (dataItem) {
+            _.each(formData, function(dataItem) {
                 var matches = [], match;
                 while ((match = fieldNameRegex.exec(dataItem.name)) !== null) {
                     matches.push(match[1]);
@@ -337,7 +337,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 if (data.calendarUid) {
                     _.extend(data, this.parseCalendarUid(data.calendarUid));
                     if (data.calendarAlias !== 'user') {
-                        _.each(this.userCalendarOnlyFields, function (item) {
+                        _.each(this.userCalendarOnlyFields, function(item) {
                             if (item.fieldName) {
                                 data[item.fieldName] = item.emptyValue;
                             }
@@ -348,7 +348,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
 
             if (data.hasOwnProperty('invitedUsers')) {
-                data.invitedUsers = _.map(data.invitedUsers ? data.invitedUsers.split(',') : [], function (item) {
+                data.invitedUsers = _.map(data.invitedUsers ? data.invitedUsers.split(',') : [], function(item) {
                     return parseInt(item);
                 });
             }
@@ -356,15 +356,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             return data;
         },
 
-        parseCalendarUid: function (calendarUid) {
+        parseCalendarUid: function(calendarUid) {
             return {
                 calendarAlias: calendarUid.substr(0, calendarUid.lastIndexOf('_')),
                 calendar: parseInt(calendarUid.substr(calendarUid.lastIndexOf('_') + 1))
             };
         },
 
-        _showUserCalendarOnlyFields: function (form, visible) {
-            _.each(this.userCalendarOnlyFields, function (item) {
+        _showUserCalendarOnlyFields: function(form, visible) {
+            _.each(this.userCalendarOnlyFields, function(item) {
                 if (item.selector) {
                     if (_.isUndefined(visible) || visible) {
                         form.find(item.selector).closest('.control-group').show();
@@ -375,7 +375,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             });
         },
 
-        _toggleCalendarUidByInvitedUsers: function (form) {
+        _toggleCalendarUidByInvitedUsers: function(form) {
             var $calendarUid = form.find(this.selectors.calendarUid);
             if (!$calendarUid.length) {
                 return;
@@ -403,7 +403,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
         },
 
-        setValueByPath: function (obj, value, path) {
+        setValueByPath: function(obj, value, path) {
             var parent = obj, i;
 
             for (i = 0; i < path.length - 1; i++) {
@@ -416,7 +416,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             parent[path[path.length - 1]] = value;
         },
 
-        getValueByPath: function (obj, path) {
+        getValueByPath: function(obj, path) {
             var current = obj, i;
 
             for (i = 0; i < path.length; i++) {
@@ -429,15 +429,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             return current;
         },
 
-        getEventFormTemplateData: function (isNew) {
+        getEventFormTemplateData: function(isNew) {
             var templateType = '',
                 calendars = [],
                 ownCalendar = null,
-                isOwnCalendar = function (item) {
+                isOwnCalendar = function(item) {
                     return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
                 };
 
-            this.options.connections.each(function (item) {
+            this.options.connections.each(function(item) {
                 var calendar;
                 if (item.get('canAddEvent')) {
                     calendar = {uid: item.get('calendarUid'), name: item.get('calendarName')};

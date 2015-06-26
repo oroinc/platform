@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var JobQueueView,
@@ -21,7 +21,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['intervalUpdate']));
             this.intervalId = setInterval(_.bind(this.checkStatus, this), this.intervalUpdate);
             JobQueueView.__super__.initialize.apply(this, arguments);
@@ -30,7 +30,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -46,7 +46,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        changeDemonState: function (e) {
+        changeDemonState: function(e) {
             var $link, $loader;
             e.preventDefault();
 
@@ -55,7 +55,7 @@ define(function (require) {
 
             $loader.show();
 
-            $.getJSON($link.attr('href'), _.bind(function (data) {
+            $.getJSON($link.attr('href'), _.bind(function(data) {
                 if (data.error) {
                     alert(data.message);
                 } else {
@@ -78,7 +78,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        toggleStateTrace: function (e) {
+        toggleStateTrace: function(e) {
             var $link, $traces;
             e.preventDefault();
 
@@ -98,7 +98,7 @@ define(function (require) {
         /**
          * Checks state of the daemon
          */
-        checkStatus: function () {
+        checkStatus: function() {
             var $statusLink = this.getActionElement('status'),
                 $loader = $statusLink.closest('div').find('img');
             if (!$statusLink.length) {
@@ -107,7 +107,7 @@ define(function (require) {
 
             $loader.show();
 
-            $.get($statusLink.attr('href'), _.bind(function (data) {
+            $.get($statusLink.attr('href'), _.bind(function(data) {
                 data = parseInt(data, 10);
 
                 $statusLink
@@ -131,7 +131,7 @@ define(function (require) {
          * @param {string} action
          * @returns {jQuery.Element}
          */
-        getActionElement: function (action) {
+        getActionElement: function(action) {
             return this.$('[data-action-name="' + action + '-daemon"]');
         },
 
@@ -140,7 +140,7 @@ define(function (require) {
          *
          * @param {boolean} run
          */
-        updateButtons: function (run) {
+        updateButtons: function(run) {
             this.getActionElement('run').toggle(run);
             this.getActionElement('stop').toggle(!run);
         }

@@ -2,7 +2,7 @@
 /*global define*/
 define([
     './abstract-action'
-], function (AbstractAction) {
+], function(AbstractAction) {
     'use strict';
 
     var RefreshCollectionAction;
@@ -25,7 +25,7 @@ define([
          * @param {oro.PageableCollection} options.collection Collection
          * @throws {TypeError} If collection is undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = options || {};
 
             if (!opts.datagrid) {
@@ -39,7 +39,7 @@ define([
         /**
          * Execute refresh collection
          */
-        execute: function () {
+        execute: function() {
             this.datagrid.setAdditionalParameter('refresh', true);
             this.collection.fetch({reset: true});
             this.datagrid.removeAdditionalParameter('refresh');

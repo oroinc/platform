@@ -8,7 +8,7 @@ define([
     '../route-model',
     './collection',
     'oroui/js/mediator'
-], function (_, __, Chaplin, BaseModel, RouteModel, BaseCollection, mediator) {
+], function(_, __, Chaplin, BaseModel, RouteModel, BaseCollection, mediator) {
     'use strict';
     /**
      * RoutingCollection is an abstraction of collection which uses Oro routing system.
@@ -86,7 +86,7 @@ define([
          *
          * @member {Object}
          */
-        routeDefaults: function () {
+        routeDefaults: function() {
             return /** @lends RouteCollection.routeDefaults */{
                 /**
                  * Route name this collection belongs to
@@ -123,7 +123,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (models, options) {
+        initialize: function(models, options) {
             if (!options) {
                 options = {};
             }
@@ -151,7 +151,7 @@ define([
          * @param parameters {Object}
          * @protected
          */
-        _createState: function (parameters) {
+        _createState: function(parameters) {
             return new BaseModel(_.extend(
                 {},
                 this._mergeAllPropertyVersions('stateDefaults'),
@@ -165,7 +165,7 @@ define([
          * @param parameters {Object}
          * @protected
          */
-        _createRoute: function (parameters) {
+        _createRoute: function(parameters) {
             return new RouteModel(_.extend(
                 {},
                 this._mergeAllPropertyVersions('routeDefaults'),
@@ -181,7 +181,7 @@ define([
          * @returns {Object}
          * @protected
          */
-        _mergeAllPropertyVersions: function (attrName) {
+        _mergeAllPropertyVersions: function(attrName) {
             var attrVersion,
                 result = {},
                 attrVersions = Chaplin.utils.getAllPropertyVersions(this, attrName);
@@ -200,7 +200,7 @@ define([
          *
          * @returns {Object}
          */
-        getRouteParameters: function () {
+        getRouteParameters: function() {
             return this._route.serialize();
         },
 
@@ -209,21 +209,21 @@ define([
          *
          * @returns {Object}
          */
-        getState: function () {
+        getState: function() {
             return this._state.serialize();
         },
 
         /**
          * @inheritDoc
          */
-        url: function () {
+        url: function() {
             return this._route.getUrl();
         },
 
         /**
          * @inheritDoc
          */
-        sync: function (type, self, options) {
+        sync: function(type, self, options) {
             this.beginSync();
             this._lastUrl = options.url || this.url();
             this.once('sync error', this.finishSync, this);
@@ -233,7 +233,7 @@ define([
         /**
          * @inheritDoc
          */
-        parse: function (response) {
+        parse: function(response) {
             return response.data;
         },
 
@@ -241,7 +241,7 @@ define([
          * Fetches collection if url is changed.
          * Callback for state and route changes.
          */
-        checkUrlChange: function () {
+        checkUrlChange: function() {
             var newUrl = this.url();
             if (newUrl !== this._lastUrl) {
                 this.fetch();
@@ -251,7 +251,7 @@ define([
         /**
          * @inheritDoc
          */
-        serializeExtraData: function () {
+        serializeExtraData: function() {
             return {
                 route: this._route.serialize(),
                 state: this._state.serialize(),
@@ -264,7 +264,7 @@ define([
          * It will show error messages for all HTTP error codes except 400.
          * @protected
          */
-        _onErrorResponse: function (collection, jqxhr) {
+        _onErrorResponse: function(collection, jqxhr) {
             this.finishSync();
             if (jqxhr.status === 403) {
                 mediator.execute('showFlashMessage', 'error', __('oro.ui.forbidden_error'));
@@ -279,7 +279,7 @@ define([
          *
          * @protected
          */
-        _onAdd: function () {
+        _onAdd: function() {
 
         },
 
@@ -288,14 +288,14 @@ define([
          *
          * @protected
          */
-        _onRemove: function () {
+        _onRemove: function() {
 
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             this._route.dispose();
             this._state.dispose();
             RoutingCollection.__super__.dispose.apply(this, arguments);

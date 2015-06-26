@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', './number'
-    ], function (_, numberValidator) {
+    ], function(_, numberValidator) {
     'use strict';
 
     var defaultParam = {
@@ -14,10 +14,10 @@ define(['underscore', './number'
      */
     return [
         'Length',
-        function (value, element, param) {
+        function(value, element, param) {
             return this.optional(element) || numberValidator[1].call(this, value.length, element, param);
         },
-        function (param, element) {
+        function(param, element) {
             var value = this.elementValue(element),
                 placeholders = {};
             param = _.extend({}, defaultParam, param);

@@ -7,7 +7,7 @@ define([
     'routing',
     'oroui/js/tools',
     'oroui/js/modal'
-], function (_, __, $, routing, tools, Modal) {
+], function(_, __, $, routing, tools, Modal) {
     'use strict';
 
     var defaults = {
@@ -25,7 +25,7 @@ define([
              * @param {Object} xhr
              * @param {Object} settings
              */
-            handle: function (event, xhr, settings) {
+            handle: function(event, xhr, settings) {
                 // enforce handling in case when called manually from user handler
                 var force = settings.enforce || false;
 
@@ -43,7 +43,7 @@ define([
              *
              * @param {Object} xhr
              */
-            modalHandler: function (xhr) {
+            modalHandler: function(xhr) {
                 var modal, message, responseObject, errorType;
 
                 message = defaults.message;
@@ -66,7 +66,7 @@ define([
              * Redirects to login
              * @private
              */
-            _processRedirect: function () {
+            _processRedirect: function() {
                 var hashUrl = '';
                 // @TODO add extra parameter for redirect after login
                 /*if (Navigation.isEnabled()) {

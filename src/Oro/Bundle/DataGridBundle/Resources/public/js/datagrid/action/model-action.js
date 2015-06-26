@@ -3,7 +3,7 @@
 define([
     'underscore',
     './abstract-action'
-], function (_, AbstractAction) {
+], function(_, AbstractAction) {
     'use strict';
 
     var ModelAction, location;
@@ -36,7 +36,7 @@ define([
          * @param {Backbone.Model} options.model Optional parameter
          * @throws {TypeError} If model is undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = options || {};
 
             if (!opts.model) {
@@ -61,7 +61,7 @@ define([
          * @return {String}
          * @throws {TypeError} If route is undefined
          */
-        getLink: function () {
+        getLink: function() {
             var result, backUrl;
             if (!this.link) {
                 throw new TypeError("'link' is required");
@@ -91,7 +91,7 @@ define([
          * @return {string}
          * @protected
          */
-        addUrlParameter: function (url, parameterName, parameterValue) {
+        addUrlParameter: function(url, parameterName, parameterValue) {
             var urlHash, sourceUrl, cl, urlParts, newQueryString, parameters, parameterParts, i,
                 replaceDuplicates = true;
             if (url.indexOf('#') > 0) {
@@ -108,7 +108,7 @@ define([
 
             if (urlParts.length > 1) {
                 parameters = urlParts[1].split("&");
-                for (i = 0; (i < parameters.length); i += 1) {
+                for (i = 0; ( i < parameters.length); i += 1) {
                     parameterParts = parameters[i].split("=");
                     if (!(replaceDuplicates && parameterParts[0] === parameterName)) {
                         if (newQueryString === "") {

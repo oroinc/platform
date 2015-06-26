@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
+define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     'use strict';
 
     var SERVICE_AREA = 60, // extra area for some kind of sidebars, etc.
@@ -83,7 +83,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var $sections = this.$sections;
             var isChanged = false;
 
-            $sections.each(function () {
+            $sections.each(function() {
                 if (context._updateSection($(this))) {
                     isChanged = true;
                 }
@@ -111,7 +111,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var hasBlocks = true;
             var isChanged = false;
 
-            $cells.each(function () {
+            $cells.each(function() {
                 var $cell = $(this);
                 if (context._updateCell($cell)) {
                     isChanged = true;
@@ -161,7 +161,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
         _getSections: function() {
             var $parent;
 
-            if(this.element.hasClass(this.options.sectionClassName)) {
+            if (this.element.hasClass(this.options.sectionClassName)) {
                 $parent = this.element.parent();
             } else {
                 $parent = this.element;

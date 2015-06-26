@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'backbone', 'routing', 'moment'
-    ], function (_, Backbone, routing, moment) {
+    ], function(_, Backbone, routing, moment) {
     'use strict';
 
     var EventModel;
@@ -35,13 +35,13 @@ define(['underscore', 'backbone', 'routing', 'moment'
             calendarUid: null // calculated automatically, equals to calendarAlias + calendarId
         },
 
-        initialize: function () {
+        initialize: function() {
             this.urlRoot = routing.generate(this.route);
             this._updateComputableAttributes();
             this.on('change:id change:calendarAlias change:calendar', this._updateComputableAttributes, this);
         },
 
-        url: function () {
+        url: function() {
             var url,
                 id = this.id;
 
@@ -52,7 +52,7 @@ define(['underscore', 'backbone', 'routing', 'moment'
             return url;
         },
 
-        save: function (key, val, options) {
+        save: function(key, val, options) {
             var attrs, modelData;
 
             // Handle both `"key", value` and `{key: value}` -style arguments.
@@ -80,7 +80,7 @@ define(['underscore', 'backbone', 'routing', 'moment'
             Backbone.Model.prototype.save.call(this, attrs, options);
         },
 
-        _updateComputableAttributes: function () {
+        _updateComputableAttributes: function() {
             var calendarAlias = this.get('calendarAlias'),
                 calendarId = this.get('calendar'),
                 calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
@@ -93,7 +93,7 @@ define(['underscore', 'backbone', 'routing', 'moment'
             }
         },
 
-        validate: function (attrs) {
+        validate: function(attrs) {
             var errors = [];
 
             if (moment(attrs.end).diff(attrs.start) < 0) {
@@ -103,7 +103,7 @@ define(['underscore', 'backbone', 'routing', 'moment'
             return errors.length ? errors : null;
         },
 
-        getInvitationStatus: function () {
+        getInvitationStatus: function() {
             var invitationStatus = this.get('invitationStatus'),
                 invitedUsers = this.get('invitedUsers');
             if (!invitationStatus && invitedUsers && invitedUsers.length) {

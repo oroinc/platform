@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WysiwygEditorView,
@@ -31,14 +31,14 @@ define(function (require) {
             'set-focus': 'setFocus'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
             this.options = _.omit(options, ['enabled']);
             WysiwygEditorView.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             var loadingMaskContainer,
                 self = this;
             if (this.tinymceConnected) {
@@ -79,13 +79,13 @@ define(function (require) {
                     options.readonly = true;
                 }
                 this.$el.tinymce(_.extend({
-                    init_instance_callback: function (editor) {
+                    init_instance_callback: function(editor) {
                         /**
                          * fix of https://magecore.atlassian.net/browse/BAP-7130
                          * "WYSWING editor does not work with IE"
                          * Please check if it's still required after tinyMCE update
                          */
-                        setTimeout(function () {
+                        setTimeout(function() {
                             var focusedElement = $(':focus');
                             editor.focus();
                             focusedElement.focus();
@@ -93,7 +93,7 @@ define(function (require) {
 
                         self.removeSubview('loadingMask');
                         self.tinymceInstance = editor;
-                        _.defer(function () {
+                        _.defer(function() {
                             /**
                              * fixes jumping dialog on refresh page
                              * (promise should be resolved in a separate process)
@@ -111,7 +111,7 @@ define(function (require) {
             this.trigger('resize');
         },
 
-        setEnabled: function (enabled) {
+        setEnabled: function(enabled) {
             if (this.enabled === enabled) {
                 return;
             }
@@ -119,17 +119,17 @@ define(function (require) {
             this.render();
         },
 
-        setFocus: function (e) {
+        setFocus: function(e) {
             if (this.enabled) {
                 this.tinymceInstance.focus();
             }
         },
 
-        getHeight: function () {
+        getHeight: function() {
             return this.$el.parent().height();
         },
 
-        setHeight: function (newHeight) {
+        setHeight: function(newHeight) {
             if (this.tinymceConnected) {
                 this.$el.parent().find('iframe').height(newHeight - this.TINYMCE_UI_HEIGHT);
             } else {
@@ -137,7 +137,7 @@ define(function (require) {
             }
         },
 
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }

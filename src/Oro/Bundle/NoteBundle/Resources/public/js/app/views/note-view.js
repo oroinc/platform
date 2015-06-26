@@ -7,7 +7,7 @@ define([
     'routing',
     'orolocale/js/formatter/datetime',
     'autolinker'
-], function ($, _, BaseView, routing, dateTimeFormatter, autolinker) {
+], function($, _, BaseView, routing, dateTimeFormatter, autolinker) {
     'use strict';
 
     var NoteView;
@@ -31,7 +31,7 @@ define([
             'change model': '_onModelChanged'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.collapsed = false;
 
@@ -40,7 +40,7 @@ define([
             }
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data = NoteView.__super__.getTemplateData.call(this);
 
             data.collapsed = this.collapsed;
@@ -66,15 +66,15 @@ define([
             return data;
         },
 
-        onEdit: function () {
+        onEdit: function() {
             this.model.collection.trigger('toEdit', this.model);
         },
 
-        onDelete: function () {
+        onDelete: function() {
             this.model.collection.trigger('toDelete', this.model);
         },
 
-        onToggle: function (e) {
+        onToggle: function(e) {
             e.preventDefault();
             this.toggle();
         },
@@ -84,7 +84,7 @@ define([
          *
          * @param {boolean=} collapse
          */
-        toggle: function (collapse) {
+        toggle: function(collapse) {
             if (_.isUndefined(collapse)) {
                 collapse = !this.isCollapsed();
             }
@@ -92,11 +92,11 @@ define([
             this.$('.collapse').toggleClass('in', !collapse);
         },
 
-        isCollapsed: function () {
+        isCollapsed: function() {
             return this.$('.accordion-toggle').hasClass('collapsed');
         },
 
-        _onModelChanged: function () {
+        _onModelChanged: function() {
             this.collapsed = this.isCollapsed();
             this.render();
         }

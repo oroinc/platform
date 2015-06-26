@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var AttributeFormOptionEditView,
@@ -29,7 +29,7 @@ define(function (require) {
             workflow: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-edit-template').html();
             this.template = _.template(template);

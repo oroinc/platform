@@ -3,7 +3,7 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/modal'
-], function (_, __, Modal) {
+], function(_, __, Modal) {
     'use strict';
 
     var ViewNameModal = Modal.extend({

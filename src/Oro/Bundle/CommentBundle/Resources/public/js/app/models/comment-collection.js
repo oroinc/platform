@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var CommentCollection,
@@ -21,7 +21,7 @@ define(function (require) {
 
         comparator: 'createdAt',
 
-        create: function () {
+        create: function() {
             return new CommentModel({
                 relationId: this._route.get('relationId'),
                 relationClass: this._route.get('relationClass')

@@ -1,7 +1,7 @@
 /*jslint vars: true, nomen: true, browser: true*/
 /* jshint browser: true */
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var DataGridComponent, helpers,
@@ -19,10 +19,10 @@ define(function (require) {
         FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
 
     helpers = {
-        cellType: function (type) {
+        cellType: function(type) {
             return type + 'Cell';
         },
-        actionType: function (type) {
+        actionType: function(type) {
             return type + 'Action';
         }
     };
@@ -43,7 +43,7 @@ define(function (require) {
     }
 
     DataGridComponent = BaseComponent.extend({
-        initialize: function (options) {
+        initialize: function(options) {
             var promises, self;
             if (!options.enableFilters) {
                 options.builders = _.reject(options.builders, function(module) {
@@ -63,13 +63,13 @@ define(function (require) {
             promises = [this.built.promise()];
 
             // run related builders
-            _.each(options.builders, function (module) {
+            _.each(options.builders, function(module) {
                 var built = $.Deferred();
                 promises.push(built.promise());
                 require([module], _.partial(runBuilder, built, options));
             });
 
-            $.when.apply($, promises).always(function () {
+            $.when.apply($, promises).always(function() {
                 self.subComponents = _.compact(arguments);
                 self._resolveDeferredInit();
                 self.$el.show();
@@ -82,7 +82,7 @@ define(function (require) {
          *
          * @param options
          */
-        processOptions: function (options) {
+        processOptions: function(options) {
             if (typeof options.inputName === 'undefined') {
                 throw new Error('Option inputName has to be specified');
             }
@@ -99,7 +99,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initDataGrid: function (options) {
+        initDataGrid: function(options) {
             this.$el = $('<div>');
             $(options.el).append(this.$el);
             this.gridName = options.gridName;
@@ -124,21 +124,21 @@ define(function (require) {
         /**
          * Collects required modules
          */
-        collectModules: function () {
+        collectModules: function() {
             var modules = this.modules,
                 metadata = this.metadata;
             // cells
-            _.each(metadata.columns, function (column) {
+            _.each(metadata.columns, function(column) {
                 var type = column.type;
                 modules[helpers.cellType(type)] = mapCellModuleName(type);
             });
             // row actions
-            _.each(_.values(metadata.rowActions), function (action) {
+            _.each(_.values(metadata.rowActions), function(action) {
                 var type = action.frontend_type;
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
             // mass actions
-            _.each(_.values(metadata.massActions), function (action) {
+            _.each(_.values(metadata.massActions), function(action) {
                 var type = action.frontend_type;
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
@@ -147,7 +147,7 @@ define(function (require) {
         /**
          * Build grid
          */
-        build: function () {
+        build: function() {
             var options, collectionOptions, collection, collectionName, grid;
 
             collectionName = this.gridName;
@@ -184,7 +184,7 @@ define(function (require) {
          *
          * @returns {Object}
          */
-        combineCollectionOptions: function () {
+        combineCollectionOptions: function() {
             var options = _.extend({
                 inputName: this.inputName,
                 parse: true,
@@ -203,7 +203,7 @@ define(function (require) {
          *
          * @returns {Object}
          */
-        combineGridOptions: function () {
+        combineGridOptions: function() {
             var columns,
                 rowActions = {},
                 massActions = {},
@@ -215,7 +215,7 @@ define(function (require) {
                 plugins = [];
 
             // columns
-            columns = _.map(metadata.columns, function (cell) {
+            columns = _.map(metadata.columns, function(cell) {
                 var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'],
                     cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys))),
                     extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type'))),
@@ -228,12 +228,12 @@ define(function (require) {
             });
 
             // row actions
-            _.each(metadata.rowActions, function (options, action) {
+            _.each(metadata.rowActions, function(options, action) {
                 rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
             // mass actions
-            _.each(metadata.massActions, function (options, action) {
+            _.each(metadata.massActions, function(options, action) {
                 massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
@@ -261,7 +261,7 @@ define(function (require) {
             };
         },
 
-        fixStates: function (options) {
+        fixStates: function(options) {
             if (options.metadata) {
                 this.fixState(options.metadata.state);
                 this.fixState(options.metadata.initialState);
@@ -278,10 +278,10 @@ define(function (require) {
             }
         },
 
-        dispose: function () {
+        dispose: function() {
             // disposes registered sub-components
             if (this.subComponents) {
-                _.each(this.subComponents, function (component) {
+                _.each(this.subComponents, function(component) {
                     if (component && typeof component.dispose === 'function') {
                         component.dispose();
                     }

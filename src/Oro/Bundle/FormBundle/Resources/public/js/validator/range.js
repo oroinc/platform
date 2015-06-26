@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number'
-    ], function (_, __, numberFormatter) {
+    ], function(_, __, numberFormatter) {
     'use strict';
 
     var defaultParam = {
@@ -14,14 +14,14 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
      */
     return [
         'Range',
-        function (value, element, param) {
+        function(value, element, param) {
             value = numberFormatter.unformat(value);
             return this.optional(element) ||
                 !(isNaN(value) ||
                     (param.min !== null && value < Number(param.min)) ||
                     (param.max !== null && value > Number(param.max)));
         },
-        function (param, element) {
+        function(param, element) {
             var message,
                 placeholders = {},
                 value = this.elementValue(element),

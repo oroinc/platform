@@ -1,5 +1,5 @@
 /* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var TransitionRowView,
@@ -25,7 +25,7 @@ define(function (require) {
             'change model': 'render'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-row-template').html();
             this.template = _.template(template);

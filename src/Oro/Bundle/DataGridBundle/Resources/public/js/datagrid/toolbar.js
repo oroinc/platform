@@ -7,7 +7,7 @@ define([
     './pagination-input',
     './page-size',
     './actions-panel'
-], function (_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
+], function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
     'use strict';
 
     var $, Toolbar;
@@ -44,7 +44,7 @@ define([
          * @param {Array} options.actions List of actions
          * @throws {TypeError} If "collection" is undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             options = options || {};
 
             if (!options.collection) {
@@ -84,7 +84,7 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             this.subviews.pagination.enable();
             this.subviews.pageSize.enable();
             this.subviews.actionsPanel.enable();
@@ -97,7 +97,7 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             this.subviews.pagination.disable();
             this.subviews.pageSize.disable();
             this.subviews.actionsPanel.disable();
@@ -110,7 +110,7 @@ define([
          *
          * @return {*}
          */
-        hide: function () {
+        hide: function() {
             this.$el.hide();
             return this;
         },
@@ -118,7 +118,7 @@ define([
         /**
          * Render toolbar with pager and other views
          */
-        render: function () {
+        render: function() {
             var $pagination;
             this.$el.empty();
             this.$el.append(this.template());

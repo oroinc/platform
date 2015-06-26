@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', './abstract-formatter'
-    ], function (_, AbstractFormatter) {
+    ], function(_, AbstractFormatter) {
     'use strict';
 
     /**
@@ -11,7 +11,7 @@ define(['underscore', './abstract-formatter'
      * @extends orofilter.formatter.AbstractFormatter
      * @throws {RangeError} If decimals < 0 or > 20.
      */
-    var NumberFormatter = function (options) {
+    var NumberFormatter = function(options) {
         options = options ? _.clone(options) : {};
         _.extend(this, this.defaults, options);
 
@@ -55,7 +55,7 @@ define(['underscore', './abstract-formatter'
          * @param {number} number
          * @return {string}
          */
-        fromRaw: function (number) {
+        fromRaw: function(number) {
             if (isNaN(number) || number === null) return '';
 
             number = number.toFixed(~~this.decimals);
@@ -77,7 +77,7 @@ define(['underscore', './abstract-formatter'
          * @return {number|undefined} Undefined if the string cannot be converted to
          * a number.
          */
-        toRaw: function (formattedData) {
+        toRaw: function(formattedData) {
             var rawData = '';
 
             var thousands = formattedData.trim().split(this.orderSeparator);

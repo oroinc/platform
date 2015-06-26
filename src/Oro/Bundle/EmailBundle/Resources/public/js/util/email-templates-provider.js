@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('jquery'),
@@ -8,17 +8,17 @@ define(function (require) {
         __ = require('orotranslation/js/translator');
 
     return {
-        create: function (templateId, relatedEntityId) {
+        create: function(templateId, relatedEntityId) {
             var url = routing.generate(
                 'oro_api_get_emailtemplate_compiled',
                 {'id': templateId, 'entityId': relatedEntityId}
             );
 
             return $.ajax(url, {dataType: 'json'}).then(
-                function( data, textStatus, jqXHR ) {
+                function(data, textStatus, jqXHR) {
                     return data;
                 },
-                function ( jqXHR, textStatus, errorThrown) {
+                function(jqXHR, textStatus, errorThrown) {
                     messenger.showErrorMessage(__('oro.email.emailtemplate.load_failed'));
                     return errorThrown;
                 }

@@ -1,20 +1,20 @@
 /* global define */
 define(['routing', 'oro/dialog-widget', 'oroui/js/widget-manager', 'orotranslation/js/translator', 'jquery.select2'],
-function (routing, DialogWidget, widgetManager, __) {
+function(routing, DialogWidget, widgetManager, __) {
     'use strict';
 
     /**
      * @export  oroform/js/select-create-inline-type-handler
      * @class   oroform.selectCreateInlineTypeHandler
      */
-    return function (container,
+    return function(container,
         selectorEl,
         label,
         urlParts,
         existingEntityGridId,
         createEnabled
     ) {
-        var handleGridSelect = function (e) {
+        var handleGridSelect = function(e) {
             e.preventDefault();
 
             var routeName = urlParts.grid.route,
@@ -22,7 +22,7 @@ function (routing, DialogWidget, widgetManager, __) {
 
             var additionalRequestParams = selectorEl.data('select2_query_additional_params');
             if (additionalRequestParams) {
-                routeParams = $.extend({}, routeParams, additionalRequestParams )
+                routeParams = $.extend({}, routeParams, additionalRequestParams)
             }
 
             var entitySelectDialog = new DialogWidget({
@@ -35,21 +35,21 @@ function (routing, DialogWidget, widgetManager, __) {
                     allowMaximize: true,
                     width: 1280,
                     height: 650,
-                    close: function () {
+                    close: function() {
                         selectorEl.off('.' + entitySelectDialog._wid);
                     }
                 }
             });
 
-            entitySelectDialog.on('grid-row-select', function (data) {
+            entitySelectDialog.on('grid-row-select', function(data) {
                 entitySelectDialog._showLoading();
                 var loadingStarted = false,
-                    onSelect = function () {
+                    onSelect = function() {
                         entitySelectDialog.remove();
                         selectorEl.select2('focus');
                         selectorEl.off('select2-data-loaded.' + entitySelectDialog._wid, onSelect);
                     },
-                    onDataRequest = function () {
+                    onDataRequest = function() {
                         loadingStarted = true;
                         selectorEl.off('select2-data-request.' + entitySelectDialog._wid, onDataRequest);
                         selectorEl.on('select2-data-loaded.' + entitySelectDialog._wid, onSelect);
@@ -67,7 +67,7 @@ function (routing, DialogWidget, widgetManager, __) {
             entitySelectDialog.render();
         };
 
-        var handleCreate = function (e) {
+        var handleCreate = function(e) {
             e.preventDefault();
 
             var routeName = urlParts.create.route,
@@ -75,7 +75,7 @@ function (routing, DialogWidget, widgetManager, __) {
 
             var additionalRequestParams = selectorEl.data('select2_query_additional_params');
             if (additionalRequestParams) {
-                routeParams = $.extend({}, routeParams, additionalRequestParams )
+                routeParams = $.extend({}, routeParams, additionalRequestParams)
             }
 
             var entityCreateDialog = new DialogWidget({
@@ -91,7 +91,7 @@ function (routing, DialogWidget, widgetManager, __) {
                 }
             });
 
-            var processSelectedEntities = function (id) {
+            var processSelectedEntities = function(id) {
                 selectorEl.select2('val', id, true);
                 entityCreateDialog.remove();
                 selectorEl.select2('focus');
@@ -107,16 +107,16 @@ function (routing, DialogWidget, widgetManager, __) {
         }
 
         return {
-            getUrlParts: function () {
+            getUrlParts: function() {
                 return urlParts;
             },
-            setUrlParts: function (newParts) {
+            setUrlParts: function(newParts) {
                 urlParts = newParts
             },
-            setSelection: function (value) {
+            setSelection: function(value) {
                 selectorEl.select2('val', value);
             },
-            getSelection: function () {
+            getSelection: function() {
                 return selectorEl.select2('val');
             }
         };

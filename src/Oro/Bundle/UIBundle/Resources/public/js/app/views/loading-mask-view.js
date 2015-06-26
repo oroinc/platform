@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var LoadingMaskView,
@@ -44,7 +44,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingHint', 'hideDelay']));
             LoadingMaskView.__super__.initialize.apply(this, arguments);
         },
@@ -52,7 +52,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data = {
                 loadingHint: this.loadingHint
             };
@@ -64,7 +64,7 @@ define(function (require) {
          *
          * @param hint {string=}
          */
-        show: function (hint) {
+        show: function(hint) {
             if (hint && _.isString(hint)) {
                 this.setLoadingHint(hint);
             }
@@ -88,7 +88,7 @@ define(function (require) {
          *
          * @param {boolean=} instant if true loading mask will disappear instantly
          */
-        hide: function (instant) {
+        hide: function(instant) {
             if (instant || this.hideDelay < 0) {
                 // instant hide
                 this._hide();
@@ -103,7 +103,7 @@ define(function (require) {
         /**
          * Hides loading mask
          */
-        _hide: function () {
+        _hide: function() {
             clearTimeout(this.hideTimeoutId);
             delete this.hideTimeoutId;
 
@@ -125,7 +125,7 @@ define(function (require) {
          *
          * @param {boolean=} visible
          */
-        toggle: function (visible) {
+        toggle: function(visible) {
             if (typeof visible === 'undefined') {
                 visible = !this.isShown();
             }
@@ -137,7 +137,7 @@ define(function (require) {
          *
          * @returns {boolean}
          */
-        isShown: function () {
+        isShown: function() {
             return !this.disposed && this.$el.hasClass('shown');
         },
 
@@ -146,7 +146,7 @@ define(function (require) {
          *
          * @param {string} newHint
          */
-        setLoadingHint: function (newHint) {
+        setLoadingHint: function(newHint) {
             var oldHint = this.loadingHint;
             this.loadingHint = newHint;
             this.render();
@@ -156,7 +156,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }

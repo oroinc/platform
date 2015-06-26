@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(function (require) {
+define(function(require) {
     'use strict';
     var SegmentComponent,
         $ = require('jquery'),
@@ -54,10 +54,10 @@ define(function (require) {
             metadata: {}
         },
 
-        initialize: function (options) {
-            require(options.extensions || [], _.bind(function () {
+        initialize: function(options) {
+            require(options.extensions || [], _.bind(function() {
                 var extensions = arguments;
-                _.each(extensions, function (extension) {
+                _.each(extensions, function(extension) {
                     extension.load(this);
                 }, this);
 
@@ -79,7 +79,7 @@ define(function (require) {
             }, this));
         },
 
-        initEntityChangeEvents: function () {
+        initEntityChangeEvents: function() {
             var confirm = new DeleteConfirmation({
                 title: __('Change Entity Confirmation'),
                 okText: __('Yes'),
@@ -87,17 +87,17 @@ define(function (require) {
             });
 
             var self = this;
-            this.$entityChoice.on('change', function (e, extraArgs) {
+            this.$entityChoice.on('change', function(e, extraArgs) {
                 _.extend(e, extraArgs);
 
                 var data = self.load() || [];
-                var requiresConfirm = _.some(data, function (value) {
+                var requiresConfirm = _.some(data, function(value) {
                     return !_.isEmpty(value);
                 });
 
                 var ok = _.partial(_.bind(self._onEntityChangeConfirm, self), e, _.pick(e, 'val', 'removed'));
 
-                var cancel = function () {
+                var cancel = function() {
                     var oldVal = (e.removed && e.removed.id) || null;
                     self.$entityChoice.val(oldVal).change();
                 };
@@ -105,7 +105,7 @@ define(function (require) {
                 if (requiresConfirm) {
                     confirm.on('ok', ok);
                     confirm.on('cancel', cancel);
-                    confirm.once('hidden', function () {
+                    confirm.once('hidden', function() {
                         confirm.off('ok');
                         confirm.off('cancel');
                     });
@@ -115,7 +115,7 @@ define(function (require) {
                 }
             });
 
-            this.once('dispose:before', function () {
+            this.once('dispose:before', function() {
                 confirm.dispose();
             });
 
@@ -125,11 +125,11 @@ define(function (require) {
                 this.$fieldsLoader.fieldsLoader('getFieldsData'));
         },
 
-        _onEntityChangeConfirm: function (e, additionalOptions) {
+        _onEntityChangeConfirm: function(e, additionalOptions) {
             this.$fieldsLoader.val(e.val).trigger('change', additionalOptions);
         },
 
-        onBeforeSubmit: function (e) {
+        onBeforeSubmit: function(e) {
             var unsavedComponents = [], modal;
 
             // please note that event name, looks like method call
@@ -149,7 +149,7 @@ define(function (require) {
                 okText: __('OK')
             });
 
-            modal.open(_.bind(function () {
+            modal.open(_.bind(function() {
                 // let sub-components do cleanup before submit
                 this.trigger('before-submit');
                 this.form.trigger('submit');
@@ -162,7 +162,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -180,7 +180,7 @@ define(function (require) {
          * @param {Function} template
          * @returns {string}
          */
-        formatChoice: function (value, template) {
+        formatChoice: function(value, template) {
             var data;
             if (value) {
                 try {
@@ -195,7 +195,7 @@ define(function (require) {
          *
          * @param {string=} key name of data branch
          */
-        load: function (key) {
+        load: function(key) {
             var data = {},
                 json = this.$storage.val();
             if (json) {
@@ -214,7 +214,7 @@ define(function (require) {
          * @param {Object} value data from certain control
          * @param {string=} key name of data branch
          */
-        save: function (value, key) {
+        save: function(value, key) {
             var data = this.load();
             if (key) {
                 data[key] = value;
@@ -229,7 +229,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        processOptions: function (options) {
+        processOptions: function(options) {
             this.options = {};
             $.extend(true, this.options, this.defaults, options);
 
@@ -258,10 +258,10 @@ define(function (require) {
         /**
          * Initializes EntityFieldsUtil
          */
-        initEntityFieldsUtil: function () {
+        initEntityFieldsUtil: function() {
             this.entityFieldsUtil = new EntityFieldsUtil();
             this.on('fieldsLoaded', this.entityFieldsUtil.init, this.entityFieldsUtil);
-            this.once('dispose:before', function () {
+            this.once('dispose:before', function() {
                 delete this.entityFieldsUtil;
             });
         },
@@ -269,7 +269,7 @@ define(function (require) {
         /**
          * Initializes FieldsLoader on entityChoice element
          */
-        initFieldsLoader: function (loaderOptions) {
+        initFieldsLoader: function(loaderOptions) {
             var self, options, loadingMask, $entityChoice;
 
             self = this;
@@ -299,13 +299,13 @@ define(function (require) {
                 })
                 .on('fieldsloaderstart', _.bind(loadingMask.show, loadingMask))
                 .on('fieldsloadercomplete', _.bind(loadingMask.hide, loadingMask))
-                .on('fieldsloaderupdate', function (e, data) {
+                .on('fieldsloaderupdate', function(e, data) {
                     if (!loaderOptions) {
                         self.$entityChoice.trigger('fieldsloaderupdate', data);
                     }
                     self.trigger(options.loadEvent, $(e.target).val(), data);
                 })
-                .on('fieldsloadercomplete', function () {
+                .on('fieldsloadercomplete', function() {
                     var data = {};
                     self.trigger('resetData', data);
                     self.save(data);
@@ -314,7 +314,7 @@ define(function (require) {
             var fieldsData = !_.isEmpty(options.fieldsData) ? JSON.parse(options.fieldsData) : options.fieldsData;
             $entityChoice.fieldsLoader('setFieldsData', fieldsData);
 
-            this.once('dispose:before', function () {
+            this.once('dispose:before', function() {
                 loadingMask.dispose();
                 delete this.$entityChoice;
             }, this);
@@ -325,7 +325,7 @@ define(function (require) {
         /**
          * Initializes Fields Grouping component
          */
-        initGrouping: function () {
+        initGrouping: function() {
             var self, options, fieldChoiceOptions, confirm,
                 $table, $editor, $fieldChoice, collection, template;
 
@@ -344,22 +344,22 @@ define(function (require) {
             fieldChoiceOptions = _.extend({}, this.options.fieldChoiceOptions, this.options.metadata.grouping, {select2: {}});
             $fieldChoice = $editor.find('[data-purpose=column-selector]');
             $fieldChoice.fieldChoice(fieldChoiceOptions);
-            this.on('fieldsLoaded', function (entity, data) {
+            this.on('fieldsLoaded', function(entity, data) {
                 $fieldChoice.fieldChoice('updateData', entity, data);
             });
 
             // prepare collection for Items Manager
             collection = new BaseCollection(this.load('grouping_columns'), {model: GroupingModel});
-            this.listenTo(collection, 'add remove sort change', function () {
+            this.listenTo(collection, 'add remove sort change', function() {
                 this.save(collection.toJSON(), 'grouping_columns');
             });
 
             // setup confirmation dialog for delete item
             confirm = new DeleteConfirmation({content: ''});
-            confirm.on('ok', function () {
+            confirm.on('ok', function() {
                 collection.remove(this.model);
             });
-            confirm.on('hidden', function () {
+            confirm.on('hidden', function() {
                 delete this.model;
             });
 
@@ -368,13 +368,13 @@ define(function (require) {
                 collection: collection
             }));
 
-            this.on('find-unsaved-components', function (unsavedComponents) {
+            this.on('find-unsaved-components', function(unsavedComponents) {
                 if ($editor.itemsManagerEditor('hasChanges')) {
                     unsavedComponents.push(__('oro.segment.grouping_editor'));
                 }
             });
 
-            this.on('before-submit', function () {
+            this.on('before-submit', function() {
                 $editor.itemsManagerEditor('reset');
             });
 
@@ -383,24 +383,24 @@ define(function (require) {
             $table.itemsManagerTable({
                 collection: collection,
                 itemTemplate: $(options.itemTemplate).html(),
-                itemRender: function (tmpl, data) {
+                itemRender: function(tmpl, data) {
                     data.name = self.formatChoice(data.name, template);
                     return tmpl(data);
                 },
-                deleteHandler: function (model, data) {
+                deleteHandler: function(model, data) {
                     confirm.setContent(data.message);
                     confirm.model = model;
                     confirm.open();
                 }
             });
 
-            this.on('resetData', function (data) {
+            this.on('resetData', function(data) {
                 data.grouping_columns = [];
                 $table.itemsManagerTable('reset');
                 $editor.itemsManagerEditor('reset');
             });
 
-            this.once('dispose:before', function () {
+            this.once('dispose:before', function() {
                 confirm.dispose();
                 collection.dispose();
                 $editor.itemsManagerEditor('destroy');
@@ -411,7 +411,7 @@ define(function (require) {
         /**
          * Initializes Columns component
          */
-        initColumn: function () {
+        initColumn: function() {
             var self, options, metadata, fieldChoiceOptions, confirm,
                 $table, $editor, $fieldChoice, collection, template, sortingLabels;
 
@@ -431,22 +431,22 @@ define(function (require) {
             fieldChoiceOptions = _.extend({}, this.options.columnFieldChoiceOptions, {select2: {}});
             $fieldChoice = $editor.find('[data-purpose=column-selector]');
             $fieldChoice.fieldChoice(fieldChoiceOptions);
-            this.on('fieldsLoaded', function (entity, data) {
+            this.on('fieldsLoaded', function(entity, data) {
                 $fieldChoice.fieldChoice('updateData', entity, data);
             });
 
             // prepare collection for Items Manager
             collection = new BaseCollection(this.load('columns'), {model: ColumnModel});
-            this.listenTo(collection, 'add remove sort change', function () {
+            this.listenTo(collection, 'add remove sort change', function() {
                 this.save(collection.toJSON(), 'columns');
             });
 
             // setup confirmation dialog for delete item
             confirm = new DeleteConfirmation({content: ''});
-            confirm.on('ok', function () {
+            confirm.on('ok', function() {
                 collection.remove(this.model);
             });
-            confirm.on('hidden', function () {
+            confirm.on('hidden', function() {
                 delete this.model;
             });
 
@@ -457,13 +457,13 @@ define(function (require) {
             });
             $editor.itemsManagerEditor($.extend(options.editor, {
                 collection: collection,
-                setter: function ($el, name, value) {
+                setter: function($el, name, value) {
                     if (name === 'func') {
                         value = value.name;
                     }
                     return value;
                 },
-                getter: function ($el, name, value) {
+                getter: function($el, name, value) {
                     if (name === 'func') {
                         value = value && {
                             name: value,
@@ -476,17 +476,17 @@ define(function (require) {
             }));
 
             sortingLabels = {};
-            $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function () {
+            $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function() {
                 sortingLabels[this.value] = $(this).text();
             });
 
-            this.on('find-unsaved-components', function (unsavedComponents) {
+            this.on('find-unsaved-components', function(unsavedComponents) {
                 if ($editor.itemsManagerEditor('hasChanges')) {
                     unsavedComponents.push(__('oro.segment.report_column_editor'));
                 }
             });
 
-            this.on('before-submit', function () {
+            this.on('before-submit', function() {
                 $editor.itemsManagerEditor('reset');
             });
 
@@ -494,7 +494,7 @@ define(function (require) {
             $table.itemsManagerTable({
                 collection: collection,
                 itemTemplate: $(options.itemTemplate).html(),
-                itemRender: function (tmpl, data) {
+                itemRender: function(tmpl, data) {
                     var item, itemFunc,
                         func = data.func;
 
@@ -516,20 +516,20 @@ define(function (require) {
 
                     return tmpl(data);
                 },
-                deleteHandler: function (model, data) {
+                deleteHandler: function(model, data) {
                     confirm.setContent(data.message);
                     confirm.model = model;
                     confirm.open();
                 }
             });
 
-            this.on('resetData', function (data) {
+            this.on('resetData', function(data) {
                 data.columns = [];
                 $table.itemsManagerTable('reset');
                 $editor.itemsManagerEditor('reset');
             });
 
-            this.once('dispose:before', function () {
+            this.once('dispose:before', function() {
                 confirm.dispose();
                 collection.dispose();
                 $editor.itemsManagerEditor('destroy');
@@ -537,7 +537,7 @@ define(function (require) {
             }, this);
         },
 
-        configureFilters: function () {
+        configureFilters: function() {
             var self, options, metadata,
                 $fieldCondition, $segmentCondition,
                 $builder, $criteria;
@@ -576,16 +576,16 @@ define(function (require) {
                 criteriaListSelector: options.criteriaList
             });
             $builder.conditionBuilder('setValue', this.load('filters'));
-            $builder.on('changed', function () {
+            $builder.on('changed', function() {
                 self.save($builder.conditionBuilder('getValue'), 'filters');
             });
 
-            this.on('resetData', function (data) {
+            this.on('resetData', function(data) {
                 data.filters = [];
                 $builder.conditionBuilder('setValue', data.filters);
             });
 
-            this.once('dispose:before', function () {
+            this.once('dispose:before', function() {
                 $builder.conditionBuilder('destroy');
             }, this);
         }

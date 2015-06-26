@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailContextView,
@@ -72,7 +72,7 @@ define(function (require) {
          *
          * @param {string=} value
          */
-        currentTargetClass: function (value) {
+        currentTargetClass: function(value) {
             if (_.isUndefined(value)) {
                 value = this._currentTargetClass;
             } else {

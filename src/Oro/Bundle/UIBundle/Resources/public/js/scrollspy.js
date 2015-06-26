@@ -1,6 +1,6 @@
 /*global define*/
 /*jshint browser: true*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('jquery');
@@ -11,7 +11,7 @@ define(function (require) {
 
     var scrollspy = {};
 
-    scrollspy.init = function ($container) {
+    scrollspy.init = function($container) {
         if (tools.isMobile()) {
             this._replaceWithCollapse($container);
             return;
@@ -24,7 +24,7 @@ define(function (require) {
 
         $('.scrollspy .responsive-section:nth-of-type(1) .scrollspy-title').css('display', 'none');
 
-        $container.find('[data-spy="scroll"]').each(function () {
+        $container.find('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
             $spy.scrollspy($spy.data());
         });
@@ -37,7 +37,7 @@ define(function (require) {
      *
      * @param {jQuery} container
      */
-    scrollspy.makeUnique = function (container) {
+    scrollspy.makeUnique = function(container) {
         var containerId, $scrollSpy;
 
         $scrollSpy = container.find('[data-spy="scroll"]');
@@ -53,7 +53,7 @@ define(function (require) {
             container.attr('id', containerId);
         }
 
-        $scrollSpy.each(function () {
+        $scrollSpy.each(function() {
             var $spy, href, menuSelector, suffix;
 
             suffix = _.uniqueId('-');
@@ -66,7 +66,7 @@ define(function (require) {
             // make target to be container related
             $spy.data('target', '#' + containerId + ' ' + menuSelector);
 
-            container.find(menuSelector  + ' .nav li > a').each(function () {
+            container.find(menuSelector  + ' .nav li > a').each(function() {
                 var $link, $target, target;
                 $link = $(this);
                 target = $link.data('target') || $link.attr('href');
@@ -81,12 +81,12 @@ define(function (require) {
         });
     };
 
-    scrollspy._replaceWithCollapse = function (container) {
-        container.find('[data-spy="scroll"]').each(function () {
+    scrollspy._replaceWithCollapse = function(container) {
+        container.find('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
             $spy.removeAttr('data-spy').addClass('accordion');
 
-            $spy.find('.scrollspy-title').each(function (i) {
+            $spy.find('.scrollspy-title').each(function(i) {
                 var $header = $(this),
                     targetSelector = '#' + $header.next().attr('id') + '+',
                     $target = $(targetSelector);
@@ -106,24 +106,24 @@ define(function (require) {
                 } else {
                     $target.addClass('in').data('toggle', false);
                 }
-                $target.on('focusin', function () {
+                $target.on('focusin', function() {
                     $target.collapse('show');
                 });
             });
         });
     };
 
-    scrollspy.adjust = function () {
+    scrollspy.adjust = function() {
         if (tools.isMobile()) {
             return;
         }
 
-        $('[data-spy="scroll"]').each(function () {
+        $('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
             var spyHeight = $spy.innerHeight();
             var isMultipleRows = $spy.find('.responsive-section').length > 1;
 
-            $spy.find('.responsive-section:last').each(function () {
+            $spy.find('.responsive-section:last').each(function() {
                 var $row = $(this);
                 var titleHeight = $row.find('.scrollspy-title').outerHeight();
                 var rowAdjHeight = isMultipleRows ? titleHeight + spyHeight : spyHeight;
@@ -140,17 +140,17 @@ define(function (require) {
         });
     };
 
-    scrollspy.top = function () {
+    scrollspy.top = function() {
         if (tools.isMobile()) {
             return;
         }
 
-        $('[data-spy="scroll"]').each(function () {
+        $('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
             var targetSelector = $spy.data('target');
             var target = $(targetSelector);
 
-            target.each(function () {
+            target.each(function() {
                 var $target = $(this);
                 var firstItemHref = $target.find('li.active:first a').attr('href');
                 var $firstItem = $(firstItemHref);

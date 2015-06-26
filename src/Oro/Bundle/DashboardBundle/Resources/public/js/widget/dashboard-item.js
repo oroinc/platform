@@ -6,7 +6,7 @@ define([
     'oroui/js/mediator',
     'oro/block-widget',
     'oroui/js/delete-confirmation'
-], function (_, Backbone, __, mediator, BlockWidget, DeleteConfirmation) {
+], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation) {
     'use strict';
 
     var DashboardItemWidget,
@@ -28,7 +28,7 @@ define([
                 event.preventDefault();
                 if (this.state.expanded) {
                     this.collapse();
-                }else{
+                }else {
                     this.expand();
                 }
             },
@@ -127,7 +127,7 @@ define([
             DashboardItemWidget.__super__.initializeWidget.apply(this, arguments);
         },
 
-        _afterLayoutInit: function () {
+        _afterLayoutInit: function() {
             this.$el.removeClass('invisible');
             DashboardItemWidget.__super__._afterLayoutInit.apply(this, arguments);
         },
@@ -146,7 +146,7 @@ define([
             if (this.state.layoutPosition) {
                 this.state.layoutPosition = _.map(
                     this.state.layoutPosition,
-                    function (value) {
+                    function(value) {
                         return parseInt(value);
                     }
                 );
@@ -199,7 +199,7 @@ define([
                 mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
                 var self = this;
                 this.widgetContentContainer.slideUp({
-                    complete: function  () {
+                    complete: function() {
                         self.widget.addClass('collapsed');
                     }
                 });
@@ -238,7 +238,7 @@ define([
 
             }
 
-            if($chart.length > 0) {
+            if ($chart.length > 0) {
                 $chart.trigger("update");
             }
         },
@@ -269,7 +269,7 @@ define([
                 content: __('oro.dashboard.widget.delete_confirmation')
             });
             
-            confirm.on('ok', function () {
+            confirm.on('ok', function() {
                 that.trigger('removeFromDashboard', that.$el, that);
                 mediator.trigger('widget:dashboard:removeFromDashboard:' + that.getWid(), that.$el, that);
             });

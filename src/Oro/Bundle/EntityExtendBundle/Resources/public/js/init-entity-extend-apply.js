@@ -2,10 +2,10 @@
 /*jslint nomen:true, browser:true*/
 /*global require*/
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/mediator', 'routing'
-    ], function ($, _, __, Modal, mediator, routing) {
+    ], function($, _, __, Modal, mediator, routing) {
     'use strict';
-    $(function () {
-        $(document).on('click', '.entity-extend-apply', function (e) {
+    $(function() {
+        $(document).on('click', '.entity-extend-apply', function(e) {
             var el = $(this),
                 message = el.data('message'),
                 title = __('Schema update confirmation'),
@@ -37,17 +37,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
                 modal.$el.find('.modal-footer').html(progress);
                 progress.show();
 
-                $.post(url, function () {
-                    mediator.once('page:beforeChange', function () {
+                $.post(url, function() {
+                    mediator.once('page:beforeChange', function() {
                         modal.close();
                     });
-                    mediator.once('page:afterChange', function () {
+                    mediator.once('page:afterChange', function() {
                         mediator.execute('showFlashMessage', 'success', __('oro.entity_extend.schema_updated'));
                     });
                     mediator.execute('redirectTo', {
                         url: routing.generate('oro_entityconfig_index', {'_enableContentProviders': 'mainMenu'})
                     });
-                }).fail(function () {
+                }).fail(function() {
                     modal.close();
                     mediator.execute('showFlashMessage', 'error', __('oro.entity_extend.schema_update_failed'));
                 });

@@ -1,7 +1,7 @@
 /*jslint nomen: true, vars: true*/
 /*global define, requirejs*/
 
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var Modal = require('oroui/js/modal');
@@ -15,7 +15,7 @@ define(function (require) {
         /** @property {String} */
         className: 'modal oro-modal-normal widget-setup',
 
-        initialize: function (options) {
+        initialize: function(options) {
             var view = this;
             var model = view.model;
 
@@ -24,32 +24,32 @@ define(function (require) {
 
             var moduleId = model.get('module');
 
-            requirejs([moduleId], function (Widget) {
+            requirejs([moduleId], function(Widget) {
                 view.setupView = new Widget.SetupView({
                     model: model
                 });
                 view.setupView.render();
                 view.$el.find('.sidebar-widget-setup').append(view.setupView.$el);
 
-                view.once('ok', function () {
+                view.once('ok', function() {
                     view.setupView.trigger('ok');
                 });
 
-                view.on('ok', function () {
+                view.on('ok', function() {
                     model.save();
                 });
 
-                view.once('cancel', function () {
+                view.once('cancel', function() {
                     view.setupView.trigger('cancel');
                     view.setupView.remove();
                 });
 
-                view.on('cancel', function () {
-                    model.set(JSON.parse(options.snapshot), { silent: true });
+                view.on('cancel', function() {
+                    model.set(JSON.parse(options.snapshot), {silent: true});
                     model.trigger('change');
                 });
 
-                view.setupView.once('close', function () {
+                view.setupView.once('close', function() {
                     view.setupView.remove();
                     view.close();
                 });

@@ -5,7 +5,7 @@ define([
     'oroui/js/mediator',
     'oroui/js/tools',
     './../base/page-region-view'
-], function ($, _, mediator, tools, PageRegionView) {
+], function($, _, mediator, tools, PageRegionView) {
     'use strict';
 
     var PageContentView;
@@ -23,24 +23,24 @@ define([
             '.scrollspy'
         ];
 
-        target = _.find(scrollable, function (item) {
+        target = _.find(scrollable, function(item) {
             var $el = $(item).first(),
                 overflow = $el.css('overflow-y');
             return $el.length && /auto|scroll/.test(overflow) && $el[0].scrollHeight > $el[0].clientHeight;
         });
 
-        if(!_.isUndefined(target)) {
+        if (!_.isUndefined(target)) {
             $(target).attr({
                 'tabindex': 0,
                 'data-scroll-focus': ''
-            }).one('blur', function(){
+            }).one('blur', function() {
                 $(this).removeAttr('data-scroll-focus tabindex');
             }).focus();
         }
     }
 
     PageContentView = PageRegionView.extend({
-        template: function (data) {
+        template: function(data) {
             return data.content;
         },
         pageItems: ['content', 'scripts'],
@@ -49,7 +49,7 @@ define([
             'page:afterChange mediator': 'onPageAfterChange'
         },
 
-        render: function () {
+        render: function() {
             var data;
             PageContentView.__super__.render.call(this);
 
@@ -65,7 +65,7 @@ define([
         /**
          * Handles page:afterChange event
          */
-        onPageAfterChange: function () {
+        onPageAfterChange: function() {
             // should not be applied before layouting (see init-layout.js)
             // that will give issues on extra small screens
             _.defer(_.bind(this.initFocus, this));
@@ -77,13 +77,13 @@ define([
         /**
          * Sets focus on first form field
          */
-        initFocus: function () {
+        initFocus: function() {
             var activeElement = document.activeElement,
                 delay = 200;
 
             this.$('form:first').focusFirstInput();
 
-            if(!tools.isMobile() && activeElement === document.activeElement){
+            if (!tools.isMobile() && activeElement === document.activeElement) {
                 _.delay(focusScrollElement, delay);
             }
         }

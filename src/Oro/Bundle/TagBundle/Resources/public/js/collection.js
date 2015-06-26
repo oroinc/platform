@@ -1,6 +1,6 @@
 /*global define*/
 define(['backbone', './model'
-    ], function (Backbone, TagModel) {
+    ], function(Backbone, TagModel) {
     'use strict';
 
     /**

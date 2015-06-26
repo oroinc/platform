@@ -5,7 +5,7 @@ define([
     'underscore',
     'oroui/js/app/views/base/view',
     'oroui/js/mediator'
-], function ($, _, BaseView, mediator) {
+], function($, _, BaseView, mediator) {
     'use strict';
 
     var BookmarkItemView;
@@ -26,11 +26,11 @@ define([
         /**
          * Change active item after navigation request is completed
          */
-        onPageUpdated: function () {
+        onPageUpdated: function() {
             this.setActiveItem();
         },
 
-        toRemove: function () {
+        toRemove: function() {
             this.model.collection.trigger('toRemove', this.model);
         },
 
@@ -39,17 +39,17 @@ define([
          *
          * @returns {boolean}
          */
-        checkCurrentUrl: function () {
+        checkCurrentUrl: function() {
             var url;
             url = this.model.get('url');
             return mediator.execute('compareUrl', url);
         },
 
-        setActiveItem: function () {
+        setActiveItem: function() {
             this.$el.toggleClass('active', this.checkCurrentUrl());
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data = BookmarkItemView.__super__.getTemplateData.call(this);
             // to support previously saved urls without leading slash
             data.url = (data.url[0] !== '/' ? '/' : '') + data.url;

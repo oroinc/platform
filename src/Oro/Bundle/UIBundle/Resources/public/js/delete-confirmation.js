@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
-    ], function (_, __, Modal) {
+    ], function(_, __, Modal) {
     'use strict';
 
     /**
@@ -20,7 +20,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
         /**
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             options = _.extend({
                 title: __('Delete Confirmation'),
                 okText: __('Yes, Delete'),

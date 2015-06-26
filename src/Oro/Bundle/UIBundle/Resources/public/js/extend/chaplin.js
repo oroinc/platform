@@ -5,7 +5,7 @@ define([
     'underscore',
     'oroui/js/tools',
     'chaplin'
-], function ($, _, tools, Chaplin) {
+], function($, _, tools, Chaplin) {
     'use strict';
 
     var utils, location, original = {};
@@ -40,7 +40,7 @@ define([
         return title;
     };
 
-    Chaplin.View.prototype.dispose = function () {
+    Chaplin.View.prototype.dispose = function() {
         if (this.disposed) {
             return;
         }
@@ -204,7 +204,7 @@ define([
      * In case it's an error page blocks application's navigation and turns on full redirect
      * @override
      */
-    utils.redirectTo = _.wrap(utils.redirectTo, function (func, pathDesc, params, options) {
+    utils.redirectTo = _.wrap(utils.redirectTo, function(func, pathDesc, params, options) {
         if (typeof pathDesc === 'object' && pathDesc.url != null && tools.isErrorPage()) {
             options = params || {};
             options.fullRedirect = true;

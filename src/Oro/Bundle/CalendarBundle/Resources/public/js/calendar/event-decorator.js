@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'orotranslation/js/translator'
-    ], function (_, __) {
+    ], function(_, __) {
     'use strict';
 
     return {
@@ -13,7 +13,7 @@ define(['underscore', 'orotranslation/js/translator'
             acceptedIcon: '<i class="invitation-status icon-ok" title="' + __('Accepted') + '"></i>'
         },
 
-        decorate: function (eventModel, $el) {
+        decorate: function(eventModel, $el) {
             var $body = $el.find('.fc-content'),
                 $timePlace = $el.find('.fc-time'),
                 reminders = eventModel.get('reminders'),

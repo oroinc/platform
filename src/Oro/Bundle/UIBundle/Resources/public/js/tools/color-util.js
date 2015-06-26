@@ -1,5 +1,5 @@
 /*global define*/
-define([], function () {
+define([], function() {
     'use strict';
 
     /**
@@ -13,7 +13,7 @@ define([], function () {
          * @param {string} hex A color in six-digit hexadecimal form.
          * @returns {Object|null}
          */
-        hex2rgb: function (hex) {
+        hex2rgb: function(hex) {
             var result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
                 r: parseInt(result[1], 16),
@@ -28,18 +28,18 @@ define([], function () {
          * @param {Object} rgb An RGB object
          * @returns {string}
          */
-        rgb2hex: function (rgb) {
-            var filter = function (dec) {
+        rgb2hex: function(rgb) {
+            var filter = function(dec) {
                 var hex = dec.toString(16).toUpperCase();
                 return hex.length === 1 ? '0' + hex : hex;
             };
             return '#' + filter(rgb.r) + filter(rgb.g) + filter(rgb.b);
         },
 
-        colorDifference: function (x, y) {
-            return Math.abs(x.r - y.r) * 299
-                    + Math.abs(x.g - y.g) * 587
-                    + Math.abs(x.b - y.b) * 114;
+        colorDifference: function(x, y) {
+            return Math.abs(x.r - y.r) * 299 +
+                    Math.abs(x.g - y.g) * 587 +
+                    Math.abs(x.b - y.b) * 114;
         },
 
         /**
@@ -49,7 +49,7 @@ define([], function () {
          * @returns {string} Calculated sufficient contrast color, black or white.
          *                   If the given color is invalid or cannot be parsed, returns black.
          */
-        getContrastColor: function (hex, blackPreference) {
+        getContrastColor: function(hex, blackPreference) {
             var rgb = this.hex2rgb(hex),
                 white = {
                     r: 255,

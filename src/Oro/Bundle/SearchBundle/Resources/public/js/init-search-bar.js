@@ -6,8 +6,8 @@ require([
     'oroui/js/mediator',
     'orotranslation/js/translator'
 ], function($, _, routing, mediator, __) {
-  'use strict';
-      $(function() {
+    'use strict';
+    $(function() {
           var _searchFlag = false,
               timeout = 700,
               searchBarContainer = $('#search-div'),
@@ -18,7 +18,7 @@ require([
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
 
-          mediator.bind('page:beforeChange', function () {
+          mediator.bind('page:beforeChange', function() {
               searchBarContainer.removeClass('header-search-focused');
               $('#oroplatform-header .search-form .search').val('');
           });
@@ -30,7 +30,7 @@ require([
               return false;
           });
 
-          $('.search-form').submit(function(){
+          $('.search-form').submit(function() {
               var $searchString = $.trim($(this).find('.search').val());
               if ($searchString.length === 0) {
                   return false;
@@ -143,14 +143,14 @@ require([
                       return false;
                   },
                   selectNext = function() {
-                  $this.parent('li').next().find('a').focus();
+                      $this.parent('li').next().find('a').focus();
                       evt.stopPropagation();
                       evt.preventDefault();
 
                       return false;
                   };
 
-              switch(evt.keyCode) {
+              switch (evt.keyCode) {
                   case 13: // Enter key
                   case 32: // Space bar
                       this.click();
@@ -159,8 +159,7 @@ require([
                   case 9: // Tab key
                       if (evt.shiftKey) {
                           selectPrevious();
-                      }
-                      else {
+                      } else {
                           selectNext();
                       }
                       evt.preventDefault();

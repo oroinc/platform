@@ -2,7 +2,7 @@
 define([
     'backbone',
     './model'
-], function (Backbone, GridViewsModel) {
+], function(Backbone, GridViewsModel) {
     'use strict';
 
     var GridViewsCollection;

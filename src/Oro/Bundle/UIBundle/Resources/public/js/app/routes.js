@@ -1,5 +1,5 @@
 /*global define*/
-define(function () {
+define(function() {
     'use strict';
     return [
         ['*pathname', 'page#index']

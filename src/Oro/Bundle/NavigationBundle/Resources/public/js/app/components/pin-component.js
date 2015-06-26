@@ -9,7 +9,7 @@ define([
     '../views/pin-bar-view',
     '../views/pin-dropdown-view',
     '../views/pin-item-view'
-], function (_, mediator, BaseBookmarkComponent, ButtonView, PinBarView, DropdownView, ItemView) {
+], function(_, mediator, BaseBookmarkComponent, ButtonView, PinBarView, DropdownView, ItemView) {
     'use strict';
 
     var PinComponent;
@@ -21,7 +21,7 @@ define([
             'pagestate:change mediator': 'onPageStateChange'
         },
 
-        _createSubViews: function () {
+        _createSubViews: function() {
             this._createButtonView();
             this._createBarView();
             this._createDropdownView();
@@ -32,7 +32,7 @@ define([
          *
          * @protected
          */
-        _createButtonView: function () {
+        _createButtonView: function() {
             var options, collection;
 
             options = this._options.buttonOptions || {};
@@ -51,7 +51,7 @@ define([
          *
          * @protected
          */
-        _createBarView: function () {
+        _createBarView: function() {
             var options, collection, BarItemView;
 
             options = this._options.barOptions || {};
@@ -74,7 +74,7 @@ define([
          *
          * @protected
          */
-        _createDropdownView: function () {
+        _createDropdownView: function() {
             var options, collection, pinBar, DropdownItemView;
 
             options = this._options.dropdownOptions || {};
@@ -88,10 +88,10 @@ define([
                 autoRender: true,
                 collection: collection,
                 itemView: DropdownItemView,
-                filterer: function (item) {
+                filterer: function(item) {
                     return !pinBar.isVisibleItem(item);
                 },
-                position: function () {
+                position: function() {
                     return {
                         left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
                     };
@@ -101,12 +101,12 @@ define([
             this.dropdown = new DropdownView(options);
         },
 
-        actualizeAttributes: function (model) {
+        actualizeAttributes: function(model) {
             model.set('type', 'pinbar');
             model.set('position', 0);
         },
 
-        onAdd: function (model) {
+        onAdd: function(model) {
             mediator.execute({name: 'pageCache:add', silent: true});
             if (model.get('url') !== mediator.execute('currentUrl')) {
                 // if URL was changed on server, applies this changes for current page
@@ -114,7 +114,7 @@ define([
             }
         },
 
-        onRemove: function (model) {
+        onRemove: function(model) {
             var url;
             url = model.get('url');
             mediator.execute({name: 'pageCache:remove', silent: true}, url);
@@ -124,7 +124,7 @@ define([
             }
         },
 
-        onPageStateChange: function () {
+        onPageStateChange: function() {
             var model, url;
             model = this.collection.getCurrentModel();
             if (model) {

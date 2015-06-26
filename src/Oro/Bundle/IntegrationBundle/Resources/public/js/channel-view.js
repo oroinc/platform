@@ -7,7 +7,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oroui/js/delete-confirmation'
-], function ($, Backbone, _, __, mediator, DeleteConfirmation) {
+], function($, Backbone, _, __, mediator, DeleteConfirmation) {
     "use strict";
 
     /**
@@ -35,9 +35,9 @@ define([
         /**
          * @param options Object
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var requiredMissed = this.requiredOptions.filter(function (option) {
+            var requiredMissed = this.requiredOptions.filter(function(option) {
                 return _.isUndefined(options[option]);
             });
             if (requiredMissed.length) {
@@ -56,7 +56,7 @@ define([
         /**
          * Hide transport type select element in case when only one type exists
          */
-        processSelectorState: function () {
+        processSelectorState: function() {
             var $el = $(this.options.transportTypeSelector);
 
             if ($el.find('option').length < 2) {
@@ -68,7 +68,7 @@ define([
          * Check whenever form change and shows confirmation
          * @param {$.Event} e
          */
-        changeHandler: function (e) {
+        changeHandler: function(e) {
             var $el = $(e.currentTarget);
             if ($el.data('cancelled') !== true) {
                 var prevVal = $el.data('current');
@@ -78,10 +78,10 @@ define([
                         okText:  __('Yes'),
                         content: __('oro.integration.submit')
                     });
-                    confirm.on('ok', _.bind(function () {
+                    confirm.on('ok', _.bind(function() {
                         this.processChange($el);
                     }, this));
-                    confirm.on('cancel', _.bind(function () {
+                    confirm.on('cancel', _.bind(function() {
                         $el.data('cancelled', true).val(prevVal).trigger('change');
                         this.memoizeValue($el);
                     }, this));
@@ -99,22 +99,22 @@ define([
          *
          * @param {$.element} $el
          */
-        processChange: function ($el) {
+        processChange: function($el) {
             this.memoizeValue($el);
 
             var $form = $(this.options.formSelector),
                 data = $form.serializeArray(),
                 url = $form.attr('action'),
-                fieldsSet = $el.is(this.options.typeSelector)
-                    ? this.fieldsSets.type
+                fieldsSet = $el.is(this.options.typeSelector) ?
+                    this.fieldsSets.type
                     : this.fieldsSets.transportType;
 
-            data = _.filter(data, function (field) {
+            data = _.filter(data, function(field) {
                 return _.indexOf(fieldsSet, field.name) !== -1;
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            var event = { formEl: $form, data: data, reloadManually: true };
+            var event = {formEl: $form, data: data, reloadManually: true};
             mediator.trigger('integrationFormReload:before', event);
 
             if (event.reloadManually) {
@@ -127,10 +127,10 @@ define([
          *
          * @returns {boolean}
          */
-        isEmpty: function () {
+        isEmpty: function() {
             var fields = $(this.options.typeSelector).parents('form').find('input[type="text"]:not([name$="[name]"])');
 
-            fields = fields.filter(function () {
+            fields = fields.filter(function() {
                 return this.value != '';
             });
 
@@ -142,7 +142,7 @@ define([
          *
          * @param {HTMLSelectElement} el
          */
-        memoizeValue: function (el) {
+        memoizeValue: function(el) {
             var $el = $(el);
             $el.data('current', $el.val());
         }

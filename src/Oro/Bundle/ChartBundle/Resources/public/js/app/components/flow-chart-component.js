@@ -35,7 +35,7 @@ define(function(require) {
          *
          * @protected
          */
-        _prepareData: function () {
+        _prepareData: function() {
             var date = this.date;
             _.each(this.data, function(item) {
                 var params, format;
@@ -56,7 +56,7 @@ define(function(require) {
          *
          * @overrides
          */
-        draw: function () {
+        draw: function() {
             var labelsWidth,
                 $chart = this.$chart,
                 $legend = this.$legend,

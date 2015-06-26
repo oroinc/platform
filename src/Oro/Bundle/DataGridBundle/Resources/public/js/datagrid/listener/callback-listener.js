@@ -3,7 +3,7 @@
 define([
     'underscore',
     './abstract-listener'
-], function (_, AbstractListener) {
+], function(_, AbstractListener) {
     'use strict';
 
     var CallbackListener;
@@ -24,7 +24,7 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!_.has(options, 'processCallback')) {
                 throw new Error('Process callback is not specified');
             }
@@ -41,7 +41,7 @@ define([
          * @param {Backbone.Model} model
          * @protected
          */
-        _processValue: function (value, model) {
+        _processValue: function(value, model) {
             this.processCallback(value, model, this);
         }
     });

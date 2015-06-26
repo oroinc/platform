@@ -6,7 +6,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     './app/views/base/view'
-], function ($, _, __, mediator, BaseView) {
+], function($, _, __, mediator, BaseView) {
     'use strict';
 
     var LoadingMaskView;
@@ -50,7 +50,7 @@ define([
          * @param {Object} options
          * @param {Boolean} [options.liveUpdate] Update position of loading animation on window scroll and resize
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var updateProxy,
                 options = options || {};
 
@@ -75,7 +75,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.loadingElement) {
                 this.loadingElement.data('loading-mask-visible', false);
                 this.loadingElement.removeClass('hide-overlays');
@@ -89,7 +89,7 @@ define([
          *
          * @return {*}
          */
-        show: function () {
+        show: function() {
             this.$el.show();
             if (this.loadingElement) {
                 this.loadingElement.addClass('hide-overlays');
@@ -105,7 +105,7 @@ define([
          * @return {*}
          * @protected
          */
-        updatePos: function () {
+        updatePos: function() {
             if (!this.displayed) {
                 return this;
             }
@@ -147,7 +147,7 @@ define([
          * @return {*}
          * @protected
          */
-        resetPos: function () {
+        resetPos: function() {
             this.$('.loading-wrapper').css('height', '100%');
             return this;
         },
@@ -157,7 +157,7 @@ define([
          *
          * @return {*}
          */
-        hide: function () {
+        hide: function() {
             this.$el.hide();
             if (this.loadingElement) {
                 this.loadingElement.removeClass('hide-overlays');
@@ -172,7 +172,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             this.$el.empty();
             this.$el.append(this.template({
                 loadingHint: this.loadingHint

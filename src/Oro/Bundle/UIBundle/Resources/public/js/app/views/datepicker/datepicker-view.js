@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var DatePickerView,
@@ -43,7 +43,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = {};
             $.extend(true, opts, this.defaults, options);
             $.extend(this, _.pick(opts, ['nativeMode']));
@@ -70,7 +70,7 @@ define(function (require) {
          *
          * @override
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -87,7 +87,7 @@ define(function (require) {
          *
          * @param {string} value
          */
-        setValue: function (value) {
+        setValue: function(value) {
             this.$el.val(value).trigger('change');
         },
 
@@ -96,7 +96,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        createFrontField: function (options) {
+        createFrontField: function(options) {
             this.$frontDateField = $('<input />');
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
@@ -109,7 +109,7 @@ define(function (require) {
          * 
          * @param {Object} options
          */
-        initPickerWidget: function (options) {
+        initPickerWidget: function(options) {
             var widgetOptions = options.datePickerOptions;
             _.extend(widgetOptions, {
                 onSelect: _.bind(this.onSelect, this)
@@ -120,14 +120,14 @@ define(function (require) {
         /**
          * Destroys picker widget
          */
-        destroyPickerWidget: function () {
+        destroyPickerWidget: function() {
             this.$frontDateField.datepicker('destroy');
         },
 
         /**
          * Handles pick date event
          */
-        onSelect: function () {
+        onSelect: function() {
             var form = this.$frontDateField.parents('form');
             if (form.length && form.data('validator')) {
                 form.validate()
@@ -141,14 +141,14 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        updateOrigin: function (e) {
+        updateOrigin: function(e) {
             this.$el.val(this.getBackendFormattedValue());
         },
 
         /**
          * Update front date field value
          */
-        updateFront: function () {
+        updateFront: function() {
             this.$frontDateField.val(this.getFrontendFormattedDate());
         },
 
@@ -157,7 +157,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getBackendFormattedValue: function () {
+        getBackendFormattedValue: function() {
             var value = '',
                 momentInstance = this.getFrontendMoment(),
                 format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
@@ -172,7 +172,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedDate: function () {
+        getFrontendFormattedDate: function() {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
@@ -186,7 +186,7 @@ define(function (require) {
          *
          * @returns {moment}
          */
-        getOriginalMoment: function () {
+        getOriginalMoment: function() {
             var value, format, momentInstance;
             value = this.$el.val();
             format = this.backendFormat;
@@ -201,7 +201,7 @@ define(function (require) {
          *
          * @returns {moment}
          */
-        getFrontendMoment: function () {
+        getFrontendMoment: function() {
             var value, format, momentInstance;
             value = this.$frontDateField.val();
             format = this.getDateFormat();
@@ -216,7 +216,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getDateFormat: function () {
+        getDateFormat: function() {
             return this.nativeMode ? this.nativeDateFormat : datetimeFormatter.getDateFormat();
         }
     });

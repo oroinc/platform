@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
-], function (_, Backbone, mediator, BlockWidget) {
+], function(_, Backbone, mediator, BlockWidget) {
     'use strict';
 
     var $ = Backbone.$;

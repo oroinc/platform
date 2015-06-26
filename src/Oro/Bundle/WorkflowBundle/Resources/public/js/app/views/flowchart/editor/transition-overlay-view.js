@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
     var FlowchartViewerOverlayView = require('../viewer/transition-overlay-view'),
         FlowChartEditorTransitionOverlayView;
@@ -6,7 +6,7 @@ define(function (require) {
     FlowChartEditorTransitionOverlayView = FlowchartViewerOverlayView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/editor/transition.html'),
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.stepFrom = options.stepFrom;
             FlowChartEditorTransitionOverlayView.__super__.initialize.apply(this, arguments);
         },
@@ -18,17 +18,17 @@ define(function (require) {
             'click .workflow-step-delete': 'triggerDeleteTransition'
         },
 
-        triggerDeleteTransition: function (e) {
+        triggerDeleteTransition: function(e) {
             e.preventDefault();
             this.areaView.model.trigger('requestRemoveTransition', this.model);
         },
 
-        triggerEditTransition: function (e) {
+        triggerEditTransition: function(e) {
             e.preventDefault();
             this.areaView.model.trigger('requestEditTransition', this.model, this.stepFrom);
         },
 
-        triggerCloneTransition: function (e) {
+        triggerCloneTransition: function(e) {
             e.preventDefault();
             this.areaView.model.trigger('requestCloneTransition', this.model, this.stepFrom);
         }

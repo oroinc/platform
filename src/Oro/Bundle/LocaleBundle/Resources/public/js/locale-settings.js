@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'orolocale/js/locale-settings/data'
-    ], function (_, settings) {
+    ], function(_, settings) {
     'use strict';
 
     /**
@@ -127,9 +127,9 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                         6: 'Friday',
                         7: 'Saturday'
                     },
-                    abbreviated: { 1: 'Sun', 2: 'Mon', 3: 'Tue', 4: 'Wed', 5: 'Thu', 6: 'Fri', 7: 'Sat' },
-                    short:       { 1: 'Su',  2: 'Mo',  3: 'Tu',  4: 'We',  5: 'Th',  6: 'Fr',  7: 'Sa' },
-                    narrow:      { 1: 'S',   2: 'M',   3: 'T',   4: 'W',   5: 'T',   6: 'F',   7: 'S' }
+                    abbreviated: {1: 'Sun', 2: 'Mon', 3: 'Tue', 4: 'Wed', 5: 'Thu', 6: 'Fri', 7: 'Sat'},
+                    short:       {1: 'Su',  2: 'Mo',  3: 'Tu',  4: 'We',  5: 'Th',  6: 'Fr',  7: 'Sa'},
+                    narrow:      {1: 'S',   2: 'M',   3: 'T',   4: 'W',   5: 'T',   6: 'F',   7: 'S'}
                 },
                 months: {
                     wide: {
@@ -214,7 +214,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
         /**
          * @return {string} name of system tynezone
          */
-        getTimeZone: function () {
+        getTimeZone: function() {
             return this.settings.timezone;
         },
 
@@ -228,7 +228,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          *
          * @returns {number}
          */
-        getTimeZoneShift: function () {
+        getTimeZoneShift: function() {
             return this._timezone_shift;
         },
 
@@ -238,7 +238,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @param tz {string} timezone specification, just like "+08:00"
          * @returns {number} shift in minutes
          */
-        calculateTimeZoneShift: function (tz) {
+        calculateTimeZoneShift: function(tz) {
             var matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
                 sign = Number(matches[1] + '1'),
                 hours = Number(matches[2]),

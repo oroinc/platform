@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'
-    ], function (_, __, numberFormatter, dateTimeFormatter) {
+    ], function(_, __, numberFormatter, dateTimeFormatter) {
     'use strict';
 
     /**
@@ -13,7 +13,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        bool: function (val) {
+        bool: function(val) {
             return val ? __('Yes') : __('No');
         },
 
@@ -21,7 +21,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        string: function (val) {
+        string: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : _.escape(val);
         },
 
@@ -29,7 +29,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        text: function (val) {
+        text: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : _.escape(val).replace(/\n/g, '<br />\n');
         },
 
@@ -37,7 +37,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        integer: function (val) {
+        integer: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : numberFormatter.formatInteger(val);
         },
 
@@ -45,7 +45,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        decimal: function (val) {
+        decimal: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : numberFormatter.formatDecimal(val);
         },
 
@@ -53,7 +53,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        percent: function (val) {
+        percent: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : numberFormatter.formatPercent(val);
         },
 
@@ -61,7 +61,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        currency: function (val) {
+        currency: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : numberFormatter.formatCurrency(val);
         },
 
@@ -69,7 +69,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        date: function (val) {
+        date: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : dateTimeFormatter.formatDate(val);
         },
 
@@ -77,7 +77,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        time: function (val) {
+        time: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : dateTimeFormatter.formatTime(val);
         },
 
@@ -85,7 +85,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        dateTime: function (val) {
+        dateTime: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : dateTimeFormatter.formatDateTime(val);
         },
 
@@ -93,7 +93,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          * @param {*} val
          * @returns {string}
          */
-        color: function (val) {
+        color: function(val) {
             return !val ? __('N/A') : '<i class="color hide-text" title="' +
                 val + '" style="background-color: ' + val + ';">' + val + '</i>';
         }

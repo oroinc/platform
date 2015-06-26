@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery'], function ($) {
+define(['jquery'], function($) {
     'use strict';
 
     $.ajaxSetup({
@@ -7,13 +7,13 @@ define(['jquery'], function ($) {
             'X-CSRF-Header': 1
         }
     });
-    $.expr[':'].parents = function (a, i, m) {
+    $.expr[':'].parents = function(a, i, m) {
         return $(a).parents(m[3]).length < 1;
     };
 
     $.fn.extend({
         // http://stackoverflow.com/questions/4609405/set-focus-after-last-character-in-text-box
-        focusAndSetCaretAtEnd: function () {
+        focusAndSetCaretAtEnd: function() {
             if (!this.length)
                 return;
             var elem = this[0], elemLen = elem.value.length;
@@ -28,8 +28,7 @@ define(['jquery'], function ($) {
                 oSel.moveStart('character', elemLen);
                 oSel.moveEnd('character', 0);
                 oSel.select();
-            }
-            else if (elem.selectionStart || elem.selectionStart == '0') {
+            } else if (elem.selectionStart || elem.selectionStart == '0') {
                 // Firefox/Chrome
                 elem.selectionStart = elemLen;
                 elem.selectionEnd = elemLen;
@@ -40,7 +39,7 @@ define(['jquery'], function ($) {
         /**
          * Sets focus on first form field
          */
-        focusFirstInput: function () {
+        focusFirstInput: function() {
             var $autoFocus,
                 $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
@@ -64,7 +63,7 @@ define(['jquery'], function ($) {
         /**
          * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
          */
-        getBorders: function (el) {
+        getBorders: function(el) {
             var computed = window.getComputedStyle(el || this[0], null);
             function convertBorderToPx(cssValue) {
                 switch (cssValue) {
@@ -99,9 +98,9 @@ define(['jquery'], function ($) {
         getCursorPosition: function() {
             var el = $(this).get(0);
             var pos = 0;
-            if('selectionStart' in el) {
+            if ('selectionStart' in el) {
                 pos = el.selectionStart;
-            } else if('selection' in document) {
+            } else if ('selection' in document) {
                 el.focus();
                 var Sel = document.selection.createRange();
                 var SelLength = document.selection.createRange().text.length;

@@ -8,7 +8,7 @@ define([
     'oroaddress/js/mapservice/googlemaps',
     'oroaddress/js/address/view',
     'oroaddress/js/address/collection'
-], function (
+], function(
     _,
     Backbone,
     __,
@@ -44,7 +44,7 @@ define([
             'class': 'list-box map-box'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.options.collection = this.options.collection || new AddressCollection();
             this.options.collection.url = this._getUrl('addressListUrl');
@@ -80,18 +80,18 @@ define([
             }
         },
 
-        _getUrl: function (optionsKey) {
+        _getUrl: function(optionsKey) {
             if (_.isFunction(this.options[optionsKey])) {
                 return this.options[optionsKey].apply(this, Array.prototype.slice.call(arguments, 1));
             }
             return this.options[optionsKey];
         },
 
-        getCollection: function () {
+        getCollection: function() {
             return this.options.collection;
         },
 
-        onAddressRemove: function () {
+        onAddressRemove: function() {
             if (!this.getCollection().where({active: true}).length) {
                 var primaryAddress = this.getCollection().where({primary: true});
                 if (primaryAddress.length) {
@@ -102,15 +102,15 @@ define([
             }
         },
 
-        _activateFirstAddress: function () {
+        _activateFirstAddress: function() {
             this.getCollection().at(0).set('active', true);
         },
 
-        addAll: function (items) {
+        addAll: function(items) {
             this.$addressesContainer.empty();
-            if(items.length > 0){
+            if (items.length > 0) {
                 this._hideEmptyMessage();
-                items.each(function (item) {
+                items.each(function(item) {
                     this.addAddress(item);
                 }, this);
             } else {
@@ -123,19 +123,19 @@ define([
             }
         },
 
-        _hideEmptyMessage: function(){
+        _hideEmptyMessage: function() {
             this.$noDataContainer.hide();
             this.$mapContainerFrame.show();
             this.$addressesContainer.show();
         },
 
-        _showEmptyMessage: function () {
+        _showEmptyMessage: function() {
             this.$noDataContainer.show();
             this.$mapContainerFrame.hide();
             this.$addressesContainer.hide();
         },
 
-        _activatePreviousAddress: function () {
+        _activatePreviousAddress: function() {
             if (this.activeAddress !== undefined) {
                 var previouslyActive = this.getCollection().where({id: this.activeAddress.get('id')});
                 if (previouslyActive.length) {
@@ -144,7 +144,7 @@ define([
             }
         },
 
-        addAddress: function (address) {
+        addAddress: function(address) {
             if (!this.$el.find('#address-book-' + address.id).length) {
                 var addressView = new AddressView({
                     model: address
@@ -154,15 +154,15 @@ define([
             }
         },
 
-        editAddress: function (addressView, address) {
+        editAddress: function(addressView, address) {
             this._openAddressEditForm(__('Update Address'), this._getUrl('addressUpdateUrl', address));
         },
 
-        createAddress: function () {
+        createAddress: function() {
             this._openAddressEditForm(__('Add Address'), this._getUrl('addressCreateUrl'));
         },
 
-        _openAddressEditForm: function (title, url) {
+        _openAddressEditForm: function(title, url) {
             if (!this.addressEditDialog) {
                 this.addressEditDialog = new DialogWidget({
                     'url': url,
@@ -174,7 +174,7 @@ define([
                         'resizable': false,
                         'width': 475,
                         'autoResize': true,
-                        'close': _.bind(function () {
+                        'close': _.bind(function() {
                             delete this.addressEditDialog;
                         }, this)
                     }
@@ -182,13 +182,13 @@ define([
                 this.addressEditDialog.render();
                 mediator.on(
                     "page:request",
-                    _.bind(function () {
+                    _.bind(function() {
                         if (this.addressEditDialog) {
                             this.addressEditDialog.remove();
                         }
                     }, this)
                 );
-                this.addressEditDialog.on('formSave', _.bind(function () {
+                this.addressEditDialog.on('formSave', _.bind(function() {
                     this.addressEditDialog.remove();
                     messenger.notificationFlashMessage('success', __('Address saved'));
                     this.reloadAddresses();
@@ -196,11 +196,11 @@ define([
             }
         },
 
-        reloadAddresses: function () {
+        reloadAddresses: function() {
             this.getCollection().fetch({reset: true});
         },
 
-        activateAddress: function (address) {
+        activateAddress: function(address) {
             if (!address.get('primary')) {
                 this.activeAddress = address;
             }

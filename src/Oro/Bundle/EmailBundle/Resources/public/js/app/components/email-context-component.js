@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailContextComponent,
@@ -43,7 +43,7 @@ define(function (require) {
          * Bind event handlers on grid widget
          * @protected
          */
-        _bindGridEvent: function () {
+        _bindGridEvent: function() {
             var self = this,
                 gridWidgetName = this.options.gridWidgetName;
             if (!gridWidgetName) {
@@ -61,7 +61,7 @@ define(function (require) {
          * @param {} gridWidget
          * @param {} data
          */
-        onRowSelect: function (gridWidget, data) {
+        onRowSelect: function(gridWidget, data) {
             var id = data.model.get('id'),
                 dialogWidgetName = this.options.dialogWidgetName,
                 contextTargetClass = this.contextView.currentTargetClass();
@@ -74,15 +74,15 @@ define(function (require) {
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                    targets: [{ entity: contextTargetClass, id: id }]
+                    targets: [{entity: contextTargetClass, id: id}]
                 }
-            }).done(function () {
+            }).done(function() {
                 messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
                 mediator.trigger('widget_success:activity_list:item:update');
                 mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
-            }).fail(function (response) {
+            }).fail(function(response) {
                 messenger.showErrorMessage(__('oro.ui.item_add_error'), response.responseJSON || {});
-            }).always(function () {
+            }).always(function() {
                 gridWidget._hideLoading();
                 if (!dialogWidgetName) {
                     return;

@@ -5,7 +5,7 @@ define([
     'chaplin',
     './view',
     'oroui/js/app/views/loading-mask-view',
-], function (_, Chaplin, View, LoadingMaskView) {
+], function(_, Chaplin, View, LoadingMaskView) {
     'use strict';
 
     var BaseCollectionView;
@@ -27,7 +27,7 @@ define([
          */
         showLoadingForce: true,
 
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'loadingContainerSelector',
                 'itemSelector', 'listSelector', 'animationDuration']));
             BaseCollectionView.__super__.initialize.apply(this, arguments);
@@ -45,7 +45,7 @@ define([
          * @param {Chaplin.Model} model
          * @returns {Chaplin.View}
          */
-        getItemView: function (model) {
+        getItemView: function(model) {
             return this.subview("itemView:" + model.cid);
         },
 
@@ -57,7 +57,7 @@ define([
          * @returns {jQuery}
          * @override
          */
-        initLoadingIndicator: function () {
+        initLoadingIndicator: function() {
             var loading, loadingContainer;
             loadingContainer = this._getLoadingContainer();
             if (loadingContainer) {
@@ -76,7 +76,7 @@ define([
          * @returns {HTMLElement|undefined}
          * @protected
          */
-        _getLoadingContainer: function () {
+        _getLoadingContainer: function() {
             var loadingContainer;
             if (this.loadingContainerSelector) {
                 loadingContainer = this.$(this.loadingContainerSelector).get(0);
@@ -93,7 +93,7 @@ define([
          * @returns {jQuery}
          * @override
          */
-        toggleLoadingIndicator: function () {
+        toggleLoadingIndicator: function() {
             var visible;
 
             visible = (this.collection.length === 0 || this.showLoadingForce) && this.collection.isSyncing();

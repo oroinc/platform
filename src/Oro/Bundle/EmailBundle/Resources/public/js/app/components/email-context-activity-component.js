@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var BaseComponent = require('oroui/js/app/components/base/component'),

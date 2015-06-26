@@ -1,6 +1,6 @@
 /*global define*/
 define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
-    ], function (_, __, datetimeFormatter) {
+    ], function(_, __, datetimeFormatter) {
     'use strict';
 
     var defaultParam = {
@@ -12,10 +12,10 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/da
      */
     return [
         'Date',
-        function (value, element) {
+        function(value, element) {
             return this.optional(element) || element.type === 'date' || datetimeFormatter.isDateValid(String(value));
         },
-        function (param, element) {
+        function(param, element) {
             var value = String(this.elementValue(element)),
                 placeholders = {};
             param = _.extend({}, defaultParam, param);

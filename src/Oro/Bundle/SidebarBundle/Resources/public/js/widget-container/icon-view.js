@@ -1,6 +1,6 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var _ = require('underscore'),
@@ -21,13 +21,13 @@ define(function (require) {
             'click': 'onClick'
         },
 
-        initialize: function () {
+        initialize: function() {
             var view = this;
             view.template = _.template(iconTemplate);
             view.listenTo(view.model, 'change', view.render);
         },
 
-        render: function () {
+        render: function() {
             var view  = this,
                 model = view.model;
 
@@ -43,7 +43,7 @@ define(function (require) {
             return view;
         },
 
-        onClick: function (e) {
+        onClick: function(e) {
             e.stopPropagation();
             e.preventDefault();
 

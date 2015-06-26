@@ -5,7 +5,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     './model-action'
-], function (_, __, mediator, ModelAction) {
+], function(_, __, mediator, ModelAction) {
     'use strict';
 
     var NavigateAction;
@@ -33,7 +33,7 @@ define([
          * @param {Object} options
          * @param {Boolean} options.useDirectLauncherLink
          */
-        initialize: function (options) {
+        initialize: function(options) {
             NavigateAction.__super__.initialize.apply(this, arguments);
 
             if (options.useDirectLauncherLink) {
@@ -54,7 +54,7 @@ define([
          * Execute redirect
          *  - extends URL with grid state parameter
          */
-        execute: function () {
+        execute: function() {
             var url, key, value;
             url = this.getLink();
 
@@ -70,8 +70,8 @@ define([
          *
          * @private
          */
-        _preExecuteSubscriber: function (action, options) {
-            mediator.once('page:beforeError', function (xmlHttp, options) {
+        _preExecuteSubscriber: function(action, options) {
+            mediator.once('page:beforeError', function(xmlHttp, options) {
                 var message;
                 if (403 === xmlHttp.status) {
                     options.stopPageProcessing = true;

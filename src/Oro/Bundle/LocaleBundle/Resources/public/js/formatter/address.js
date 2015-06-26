@@ -1,6 +1,6 @@
 /*global define*/
 define(['../locale-settings', './name'
-    ], function (localeSettings, nameFormatter) {
+    ], function(localeSettings, nameFormatter) {
     'use strict';
 
     /**
@@ -21,7 +21,7 @@ define(['../locale-settings', './name'
          * @param {string} newLine
          * @returns {string}
          */
-        format: function (address, country, newLine) {
+        format: function(address, country, newLine) {
             if (!country) {
                 if (localeSettings.isFormatAddressByAddressCountry()) {
                     country = address.country_iso2;
@@ -32,7 +32,7 @@ define(['../locale-settings', './name'
             newLine = newLine || '<br/>';
 
             var format = this.getAddressFormat(country);
-            var formatted = format.replace(/%(\w+)%/g, function (pattern, key) {
+            var formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
                 var lowerCaseKey = key.toLowerCase();
                 var value = '';
                 if ('name' === lowerCaseKey) {
@@ -68,7 +68,7 @@ define(['../locale-settings', './name'
          * @param {string} country ISO2 code
          * @returns {*}
          */
-        getAddressFormat: function (country) {
+        getAddressFormat: function(country) {
             if (!this.formats.hasOwnProperty(country)) {
                 country = localeSettings.getCountry();
             }

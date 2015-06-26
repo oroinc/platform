@@ -7,7 +7,7 @@ define([
     'oroui/js/app/views/base/view',
     'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker',
     'oroui/lib/jquery.datepair-0.4.4/jquery.datepair.min'
-], function ($, _, moment, BaseView) {
+], function($, _, moment, BaseView) {
     'use strict';
 
     var _ONE_DAY = 86400000;
@@ -50,14 +50,14 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['nativeMode']));
             this.options = _.defaults(_.pick(options, _.keys(this.options)), this.options);
             DatepairView.__super__.initialize.apply(this, arguments);
             this.initDatepair();
         },
 
-        initDatepair: function () {
+        initDatepair: function() {
             this.$el.datepair({
                 startClass: this.options.startClass,
                 endClass: this.options.endClass,
@@ -71,7 +71,7 @@ define([
             });
         },
 
-        _parseTime: function (input) {
+        _parseTime: function(input) {
             if (this.nativeMode) {
                 var momentInstance = moment($(input).val(), this.nativeTimeFormat, true);
 
@@ -81,7 +81,7 @@ define([
             }
         },
 
-        _parseDate: function (input) {
+        _parseDate: function(input) {
             if (this.nativeMode) {
                 var momentInstance = moment($(input).val(), this.nativeDateFormat, true);
 
@@ -91,13 +91,13 @@ define([
             }
         },
 
-        _setMinTime: function (input, dateObj) {
+        _setMinTime: function(input, dateObj) {
             if (!this.nativeMode) {
                 $(input).timepicker('option', 'minTime', dateObj);
             }
         },
 
-        _updateTime: function (input, dateObj) {
+        _updateTime: function(input, dateObj) {
             if (this.nativeMode) {
                 var momentInstance = moment(dateObj);
                 $(input).val(momentInstance.format(this.nativeTimeFormat));
@@ -108,7 +108,7 @@ define([
             $(input).trigger('change');
         },
 
-        _updateDate: function (input, dateObj) {
+        _updateDate: function(input, dateObj) {
             if (this.nativeMode) {
                 var momentInstance = moment(dateObj);
                 $(input).val(momentInstance.format(this.nativeDateFormat));
@@ -120,7 +120,7 @@ define([
             $(input).trigger('change');
         },
 
-        handleRangeError: function () {
+        handleRangeError: function() {
             // resets 'start' and 'end' fields to default values on range error
             var startDateInput = this.$('.' + this.options.startClass + '.' + this.options.dateClass),
                 endDateInput = this.$('.' + this.options.endClass + '.' + this.options.dateClass),

@@ -1,7 +1,7 @@
 /*global define*/
 /*jslint nomen:true*/
 define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap', 'cryptojs/sha256'],
-function ($, _, tools) {
+function($, _, tools) {
     'use strict';
 
     var defaults = {
@@ -30,11 +30,11 @@ function ($, _, tools) {
             return actions;
         };
 
-        /**
-         * @export oroui/js/messenger
-         * @name   oro.messenger
-         */
-        return {
+    /**
+     * @export oroui/js/messenger
+     * @name   oro.messenger
+     */
+    return {
             /**
              * Shows notification message
              *
@@ -109,7 +109,7 @@ function ($, _, tools) {
              * @return {Object} collection of methods - actions over message element,
              *      at the moment there's only one method 'close', allows to close the message
              */
-            showErrorMessage: function (message, err) {
+            showErrorMessage: function(message, err) {
                 var msg = message;
                 if (!_.isUndefined(err) && !_.isNull(err)) {
                     if (!_.isUndefined(console)) {
@@ -152,7 +152,7 @@ function ($, _, tools) {
              */
             clear: function(namespace, options) {
                 var opt = _.extend({}, defaults, options || {});
-                $(opt.container).find('[data-messenger-namespace=' + namespace +']').remove();
+                $(opt.container).find('[data-messenger-namespace=' + namespace + ']').remove();
             }
         };
 });

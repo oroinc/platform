@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var DatePickerTabsView,
@@ -16,7 +16,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['data', 'template']));
             DatePickerTabsView.__super__.initialize.apply(this, arguments);
         },
@@ -24,7 +24,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        render: function () {
+        render: function() {
             var data, template, html;
             data = this.getTemplateData();
             template = this.getTemplateFunction();
@@ -36,7 +36,7 @@ define(function (require) {
          * @inheritDoc
          * @returns {*}
          */
-        getTemplateData: function () {
+        getTemplateData: function() {
             return this.data;
         },
 
@@ -45,7 +45,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        onTabSwitch: function (e) {
+        onTabSwitch: function(e) {
             e.preventDefault();
             this.$(e.currentTarget).tab('show');
         },
@@ -55,7 +55,7 @@ define(function (require) {
          *
          * @param {string} tabName
          */
-        show: function (tabName) {
+        show: function(tabName) {
             this.$('[href^="#' + tabName + '-"]').tab('show');
         }
     });

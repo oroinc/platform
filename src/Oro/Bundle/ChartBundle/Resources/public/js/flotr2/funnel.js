@@ -1,7 +1,7 @@
 /*global define*/
 define([
     'jquery', 'underscore', 'flotr2'
-], function ($, _, Flotr) {
+], function($, _, Flotr) {
     'use strict';
 
     Flotr.addType('funnel', {
@@ -22,7 +22,7 @@ define([
         shapes: [],
         stacked: false,
 
-        draw: function (options) {
+        draw: function(options) {
             var shape;
 
             shape = this.calculateShape(options);
@@ -34,7 +34,7 @@ define([
             }
         },
 
-        hit: function (options) {
+        hit: function(options) {
             var s1, s2, s3, i,
                 self   = this,
                 args   = options.args,
@@ -60,7 +60,7 @@ define([
                     s1 = (seg.x1 - x) * (seg.y4 - seg.y1) - (seg.x1 - seg.x1) * (seg.y1 - y);
                     s2 = (seg.x1 - x) * (seg.y4 - seg.y4) - (seg.x4 - seg.x1) * (seg.y4 - y);
                     s3 = (seg.x4 - x) * (seg.y1 - seg.y4) - (seg.x1 - seg.x4) * (seg.y4 - y);
-                    if (s1 === 0 || s2 === 0 || s3 === 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
+                    if (s1 === 0 || s2 === 0 || s3 === 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
                         belongSide = false;
                     }
                 }
@@ -70,7 +70,7 @@ define([
                     s1 = (seg.x3 - x) * (seg.y2 - seg.y3) - (seg.x2 - seg.x3) * (seg.y3 - y);
                     s2 = (seg.x2 - x) * (seg.y3 - seg.y2) - (seg.x2 - seg.x2) * (seg.y2 - y);
                     s3 = (seg.x2 - x) * (seg.y3 - seg.y3) - (seg.x3 - seg.x2) * (seg.y3 - y);
-                    if (s1 === 0 || s2 === 0 || s3 === 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
+                    if (s1 === 0 || s2 === 0 || s3 === 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
                         belongSide = false;
                     }
                 }
@@ -91,7 +91,7 @@ define([
             self.clearHit(options);
         },
 
-        drawHit: function (options, i) {
+        drawHit: function(options, i) {
             var context = options.context,
                 shape = this.shapes[i];
             context.save();
@@ -108,10 +108,10 @@ define([
             context.restore();
         },
 
-        clearHit: function (options) {
+        clearHit: function(options) {
             var context = options.context;
             context.save();
-            _.each(this.shapes, function (shape) {
+            _.each(this.shapes, function(shape) {
                 context.clearRect(
                     shape.x1 - options.lineWidth * 2,
                     shape.y1 - options.lineWidth,
@@ -127,7 +127,7 @@ define([
          * @param shape
          * @param options
          */
-        plot: function (shape, options) {
+        plot: function(shape, options) {
             var context = options.context;
             context.save();
             context.lineJoin    = 'round';
@@ -151,7 +151,7 @@ define([
          * @param options
          * @returns {Object}
          */
-        calculateShape: function (options) {
+        calculateShape: function(options) {
             var shape, leftHeight, width, AD, BC,
                 value = options.data[0],
                 index = options.index,
@@ -275,7 +275,7 @@ define([
          * @param data
          * @param options
          */
-        extendRange: function (series, data, options) {
+        extendRange: function(series, data, options) {
             if (data[0] <= 0) {
                 // normalize min value
                 data[0] = 0.0001;
@@ -298,12 +298,12 @@ define([
          *
          * @returns {number}
          */
-        total: function () {
+        total: function() {
             var sum = this._sum,
                 total = 0;
 
             if (!this._total) {
-                _.each(this.allSeries, function (series) {
+                _.each(this.allSeries, function(series) {
                     if (series.isNozzle) {
                         // nozzle is always === 10% of sum
                         series.data[0] = sum * 0.1;

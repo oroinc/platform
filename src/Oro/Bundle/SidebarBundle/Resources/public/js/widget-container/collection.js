@@ -1,7 +1,7 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
 
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var Backbone = require('backbone');

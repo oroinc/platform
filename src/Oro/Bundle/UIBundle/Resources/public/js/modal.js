@@ -4,7 +4,7 @@ define([
     'backbone',
     'orotranslation/js/translator',
     'backbone-bootstrap-modal'
-], function (_, Backbone, __) {
+], function(_, Backbone, __) {
     'use strict';
 
     var Modal, $;
@@ -28,7 +28,7 @@ define([
         /** @property {String} */
         className: 'modal',
 
-        initialize: function (options) {
+        initialize: function(options) {
             options = options || {};
             _.defaults(options, this.defaults);
 
@@ -38,7 +38,7 @@ define([
             Modal.__super__.initialize.call(this, options);
         },
 
-        onClose: function (event) {
+        onClose: function(event) {
             event.preventDefault();
 
             this.trigger('close');
@@ -53,7 +53,7 @@ define([
          *
          * @param {Function} [cb]     Optional callback that runs only when OK is pressed.
          */
-        open: function (cb) {
+        open: function(cb) {
             if (!this.isRendered) this.render();
             this.delegateEvents();
 
@@ -67,7 +67,7 @@ define([
             }, this.options.modalOptions));
 
             //Focus OK button
-            $el.one('shown', function () {
+            $el.one('shown', function() {
                 if (self.options.focusOk) {
                     $el.find('.btn.ok').focus();
                 }
@@ -89,7 +89,7 @@ define([
             this.$el.css('z-index', elIndex + numModals);
 
             if (this.options.allowCancel) {
-                $backdrop.one('click', function () {
+                $backdrop.one('click', function() {
                     if (self.options.content && self.options.content.trigger) {
                         self.options.content.trigger('cancel', self);
                     }
@@ -97,7 +97,7 @@ define([
                     self.trigger('cancel');
                 });
 
-                $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function (e) {
+                $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function(e) {
                     if (self.options.handleClose) {
                         e.which === 27 && self.trigger('close');
                     } else {
@@ -110,11 +110,11 @@ define([
                 });
             }
 
-            this.once('cancel', function () {
+            this.once('cancel', function() {
                 self.close();
             });
 
-            this.once('close', function () {
+            this.once('close', function() {
                 self.close();
             });
 
@@ -125,7 +125,7 @@ define([
                 self.on('ok', cb);
             }
 
-            this.once('cancel', _.bind(function () {
+            this.once('cancel', _.bind(function() {
                 this.$el.trigger('hidden');
             }, this));
 
@@ -135,7 +135,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -147,7 +147,7 @@ define([
         /**
          * Updates content of modal dialog
          */
-        setContent: function (content) {
+        setContent: function(content) {
             this.options.content = content;
             this.$el.find('.modal-body').html(content);
         },
@@ -158,7 +158,7 @@ define([
          * @returns {string}
          * @protected
          */
-        _eventNamespace: function () {
+        _eventNamespace: function() {
             return '.delegateEvents' + this.cid;
         }
     });

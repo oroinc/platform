@@ -1,5 +1,5 @@
 /*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var EmailEditorComponent,
@@ -26,7 +26,7 @@ define(function (require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options;
             this._deferredInit();
             this.view = new EmailEditorView({
@@ -35,13 +35,13 @@ define(function (require) {
                 templatesProvider: emailTemplatesProvider
             });
             this.view.render();
-            this.view.renderPromise.done(_.bind(function () {
+            this.view.renderPromise.done(_.bind(function() {
                 this._resolveDeferredInit();
                 this.listenTo(this.view.pageComponent('bodyEditor').view, 'resize', this.onResize, this);
             }, this));
         },
 
-        createEditorModelFromComponentOptions: function (options) {
+        createEditorModelFromComponentOptions: function(options) {
             var $el = options._sourceElement;
             return new EmailEditorModel({
                 appendSignature: options.appendSignature,
@@ -60,7 +60,7 @@ define(function (require) {
             });
         },
 
-        onResize: function () {
+        onResize: function() {
             var component = this.view.pageComponent('bodyEditor'),
                 outerHeight = this.view.$el.closest('.ui-widget-content').height(),
                 innerHeight = this.view.$el.height(),
