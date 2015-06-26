@@ -7,10 +7,10 @@ use Doctrine\ORM\EntityManager;
 use Zend\Mail\Storage;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 
 /**
  * Class ImapEmailFlagManager
@@ -21,7 +21,8 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnector;
  */
 class ImapEmailFlagManager implements EmailFlagManagerInterface
 {
-    const UNSEEN = 'UNSEEN';
+    const FLAG_UNSEEN = 'UNSEEN';
+    const FLAG_SEEN = '\Seen';
 
     /** @var ImapConnector */
     protected $connector;
@@ -48,6 +49,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     {
         $repoImapEmail = $this->em->getRepository('OroImapBundle:ImapEmail');
         $uid = $repoImapEmail->getUid($folder->getId(), $email->getId());
+        $this->connector->selectFolder($folder->getFullName());
         $this->connector->setFlags($uid, $flags);
     }
 
@@ -56,7 +58,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
      */
     public function setUnseen(EmailFolder $folder, Email $email)
     {
-        $this->setFlags($folder, $email, [self::UNSEEN]);
+        $this->setFlags($folder, $email, [self::FLAG_UNSEEN]);
     }
 
     /**
@@ -64,6 +66,6 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
      */
     public function setSeen(EmailFolder $folder, Email $email)
     {
-        $this->setFlags($folder, $email, [Storage::FLAG_SEEN]);
+        $this->setFlags($folder, $email, [self::FLAG_SEEN]);
     }
 }

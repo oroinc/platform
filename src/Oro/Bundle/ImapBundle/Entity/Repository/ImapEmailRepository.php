@@ -111,9 +111,9 @@ class ImapEmailRepository extends EntityRepository
         $query = $this->createQueryBuilder('e')
             ->select('e.uid')
             ->innerJoin('e.imapFolder', 'if')
-            ->where('e.email = ?1 AND if.folder = ?2')
-            ->setParameter(1, $email)
-            ->setParameter(2, $folder)
+            ->where('e.email = :email AND if.folder = :folder')
+            ->setParameter('email', $email)
+            ->setParameter('folder', $folder)
             ->getQuery();
 
         return $query->getSingleScalarResult();

@@ -590,3 +590,5 @@ services:
         arguments:
             - @oro_email.email_flag_manager_loader_selector
             - @doctrine.orm.entity_manager
+        calls:
+            - [setLogger, [@logger]]
