@@ -1,0 +1,4 @@
+oro_entity:
+    entity_alias_exclusions:
+        - Oro\Bundle\MigrationBundle\Entity\DataFixture
+        - Oro\Bundle\MigrationBundle\Entity\DataMigration

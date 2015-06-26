@@ -28,7 +28,7 @@ class UserCalendarHandlerTest extends \PHPUnit_Framework_TestCase
     protected $aclHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /** @var  UserCalendarHandler */
     protected $handler;
@@ -63,10 +63,10 @@ class UserCalendarHandlerTest extends \PHPUnit_Framework_TestCase
             $this->treeProvider,
             $this->aclHelper
         );
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->handler->setNameFormatter($this->nameFormatter);
+        $this->handler->setEntityNameResolver($this->entityNameResolver);
         $this->handler->setProperties([
             'avatar',
             'firstName',

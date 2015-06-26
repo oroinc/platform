@@ -12,7 +12,7 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
      */
     protected function createFormatConverter()
     {
-        return new JqueryUiDateTimeFormatConverter($this->formatter);
+        return new JqueryUiDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
     /**
@@ -20,12 +20,12 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
      */
     public function getDateFormatDataProvider()
     {
-        return array(
-            'en default'      => array("M d, yy", null, self::LOCALE_EN),
-            'en custom'       => array("MM d, yy", \IntlDateFormatter::LONG, self::LOCALE_EN),
-            'ru default'      => array("dd.mm.yy", null, self::LOCALE_RU),
-            'ru custom'       => array("d MM yy г.", \IntlDateFormatter::LONG, self::LOCALE_RU),
-        );
+        return [
+            'en default' => ["M d, yy", null, self::LOCALE_EN],
+            'en custom' => ["MM d, yy", \IntlDateFormatter::LONG, self::LOCALE_EN],
+            'ru default' => ["dd.mm.yy", null, self::LOCALE_RU],
+            'ru custom' => ["d MM yy г.", \IntlDateFormatter::LONG, self::LOCALE_RU],
+        ];
     }
 
     /**
@@ -33,12 +33,23 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
      */
     public function getTimeFormatDataProvider()
     {
-        return array(
-            'en default'      => array("h:mm TT", null, self::LOCALE_EN),
-            'en custom'       => array("h:mm:ss TT", \IntlDateFormatter::MEDIUM, self::LOCALE_EN),
-            'ru default'      => array("H:mm", null, self::LOCALE_RU),
-            'ru custom'       => array("H:mm:ss", \IntlDateFormatter::MEDIUM, self::LOCALE_RU),
-        );
+        return [
+            'en default' => ["h:mm TT", null, self::LOCALE_EN],
+            'en custom' => ["h:mm:ss TT", \IntlDateFormatter::MEDIUM, self::LOCALE_EN],
+            'ru default' => ["H:mm", null, self::LOCALE_RU],
+            'ru custom' => ["H:mm:ss", \IntlDateFormatter::MEDIUM, self::LOCALE_RU],
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDateFormatDayProvider()
+    {
+        return [
+            'en default' => ["M d", self::LOCALE_EN],
+            'ru default' => ["d.M", self::LOCALE_RU],
+        ];
     }
 
     /**
@@ -46,21 +57,21 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
      */
     public function getDateTimeFormatDataProvider()
     {
-        return array(
-            'en default' => array("M d, yy h:mm TT", null, null, self::LOCALE_EN),
-            'en custom'  => array(
+        return [
+            'en default' => ["M d, yy h:mm TT", null, null, self::LOCALE_EN],
+            'en custom' => [
                 "MM d, yy h:mm:ss TT",
                 \IntlDateFormatter::LONG,
                 \IntlDateFormatter::MEDIUM,
                 self::LOCALE_EN
-            ),
-            'ru default' => array("dd.mm.yy H:mm", null, null, self::LOCALE_RU),
-            'ru custom'  => array(
+            ],
+            'ru default' => ["dd.mm.yy H:mm", null, null, self::LOCALE_RU],
+            'ru custom' => [
                 "d MM yy г. H:mm:ss",
                 \IntlDateFormatter::LONG,
                 \IntlDateFormatter::MEDIUM,
                 self::LOCALE_RU
-            ),
-        );
+            ],
+        ];
     }
 }

@@ -42,7 +42,7 @@ class EntitiesController extends Controller
      */
     public function indexAction($entityName)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -83,7 +83,7 @@ class EntitiesController extends Controller
      */
     public function detailedAction($id, $entityName, $fieldName)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -154,7 +154,7 @@ class EntitiesController extends Controller
      */
     public function relationAction($id, $entityName, $fieldName)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -202,7 +202,7 @@ class EntitiesController extends Controller
      */
     public function viewAction($entityName, $id)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -246,7 +246,7 @@ class EntitiesController extends Controller
      */
     public function updateAction(Request $request, $entityName, $id)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -323,7 +323,7 @@ class EntitiesController extends Controller
      */
     public function deleteAction($entityName, $id)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
