@@ -49,11 +49,12 @@ class EmailBodyBuilder
     /**
      * Adds an email attachment
      *
-     * @param string $fileName
-     * @param string $content
-     * @param string $contentType
-     * @param string $contentTransferEncoding
-     * @param null   $contentId
+     * @param string      $fileName
+     * @param string      $content
+     * @param string      $contentType
+     * @param string      $contentTransferEncoding
+     * @param null|string $contentId
+     *
      * @throws \LogicException
      */
     public function addEmailAttachment(

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 
 class EmailBodyLoaded extends Event
@@ -15,7 +16,7 @@ class EmailBodyLoaded extends Event
     /**
      * @param Email $email
      */
-    public function __construct($email)
+    public function __construct(Email $email)
     {
         $this->email = $email;
     }
