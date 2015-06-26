@@ -74,17 +74,7 @@
                     'aCss':   'no-hash schedule-button',
                     'label' : 'oro.integration.button.sync'|trans
                 }) }}
-
-                {% if supports_force_sync %}
-                    {{ UI.clientButton({
-                        'dataUrl': path('oro_integration_schedule', { 'id': entity.id, 'force': true }) ,
-                        'aCss':   'no-hash schedule-button',
-                        'label' : 'oro.integration.button.force_sync'|trans,
-                        'dataAttributes': {
-                            'force': true
-                        }
-                    }) }}
-                {% endif %}
+                {% placeholder oro_integration_force_sync_button with {'entity': entity} %}
             {% endset %}
             {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}
         </div>

@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
@@ -321,21 +322,19 @@ class TypesRegistry
     /**
      * Checks if there is at least one connector that supports force sync.
      *
-     * @param string $integrationType
+     * @param Integration $integration
      *
      * @return boolean
      */
-    public function isForceSyncSupported($integrationType)
+    public function supportsForceSync($integration)
     {
-        $connectors = $this->getRegisteredConnectorsTypes($integrationType);
+        $connectors = $this->getRegisteredConnectorsTypes($integration->getType());
 
         foreach ($connectors as $connector) {
             if ($connector instanceof ForceConnectorInterface) {
                 if ($connector->supportsForceSync()) {
                     return true;
                 }
-            } else {
-                return true;
             }
         }
 
