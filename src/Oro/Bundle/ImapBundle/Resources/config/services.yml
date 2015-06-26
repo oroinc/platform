@@ -55,10 +55,12 @@ services:
         arguments:
             - @doctrine
             - @oro_email.email.entity.builder
+            - @oro_email.email.address.helper
 
     oro_imap.form.type.configuration:
         class: %oro_imap.form.type.configuration.class%
         arguments:
             - @oro_security.encoder.mcrypt
+            - @oro_security.security_facade
         tags:
              - { name: form.type, alias: oro_imap_configuration }

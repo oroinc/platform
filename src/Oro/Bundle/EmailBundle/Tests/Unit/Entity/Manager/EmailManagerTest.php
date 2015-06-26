@@ -32,37 +32,33 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new EmailManager($this->em, $this->emailThreadManager, $this->emailThreadProvider);
     }
 
-    public function testSetEmailSeenNothinChanges()
+    public function testSetEmailSeenNothingChanges()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->once())
+        $emailUser = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+        $emailUser->expects($this->once())
             ->method('isSeen')
             ->will($this->returnValue(true));
-        $email->expects($this->never())
+        $emailUser->expects($this->never())
             ->method('setSeen');
         $this->emailThreadManager->expects($this->never())
             ->method('updateThreadHead');
         $this->em->expects($this->never())
-            ->method('persist');
-        $this->em->expects($this->never())
             ->method('flush');
-        $this->manager->setEmailSeen($email);
+        $this->manager->setEmailUserSeen($emailUser);
     }
 
     public function testSetEmailSeenChanges()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->once())
+        $emailUser = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+        $emailUser->expects($this->once())
             ->method('isSeen')
             ->will($this->returnValue(false));
-        $email->expects($this->once())
+        $emailUser->expects($this->once())
             ->method('setSeen')
             ->with(true);
         $this->em->expects($this->once())
-            ->method('persist');
-        $this->em->expects($this->once())
             ->method('flush');
 
-        $this->manager->setEmailSeen($email);
+        $this->manager->setEmailUserSeen($emailUser);
     }
 }
