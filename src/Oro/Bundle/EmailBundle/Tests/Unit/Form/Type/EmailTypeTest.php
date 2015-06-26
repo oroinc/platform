@@ -47,7 +47,6 @@ class EmailTypeTest extends TypeTestCase
             ->will($this->returnValue(TranslatableEntityType::NAME));
 
         $user = new User();
-        $user->setEmail('John Smith <john@example.com>');
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
@@ -55,11 +54,21 @@ class EmailTypeTest extends TypeTestCase
             ->method('getLoggedUser')
             ->will($this->returnValue($user));
 
+        $relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $relatedEmailsProvider->expects($this->any())
+            ->method('getEmails')
+            ->with($user)
+            ->will($this->returnValue([
+                'john@example.com' => 'John Smith <john@example.com>',
+            ]));
+
         $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
         $genemuChoiceType  = new Select2Type('choice');
         $emailTemplateList = new EmailTemplateSelectType();
         $attachmentsType   = new EmailAttachmentsType();
-        $emailAddressFromType       = new EmailAddressFromType($securityFacade);
+        $emailAddressFromType       = new EmailAddressFromType($securityFacade, $relatedEmailsProvider);
         $emailAddressRecipientsType = new EmailAddressRecipientsType();
 
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')

@@ -50,7 +50,7 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testOnLoadShouldSetNothingIfLimitIsNotPositive()
+    public function testLoadRecentEmailsShouldSetNothingIfLimitIsNotPositive()
     {
         $query = 'query';
         $limit = 0;
@@ -58,12 +58,12 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
         $expectedResults = [];
 
         $event = new EmailRecipientsLoadEvent(null, $query, $limit);
-        $this->emailRecipientsLoadListener->onLoad($event);
+        $this->emailRecipientsLoadListener->loadRecentEmails($event);
         
         $this->assertEquals($expectedResults, $event->getResults());
     }
 
-    public function testOnLoadShouldSetNothingIfNoUserIsLoggedIn()
+    public function testLoadRecentEmailsShouldSetNothingIfNoUserIsLoggedIn()
     {
         $query = 'query';
         $limit = 1;
@@ -75,18 +75,18 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $event = new EmailRecipientsLoadEvent(null, $query, $limit);
-        $this->emailRecipientsLoadListener->onLoad($event);
+        $this->emailRecipientsLoadListener->loadRecentEmails($event);
         
         $this->assertEquals($expectedResults, $event->getResults());
     }
 
-    public function testOnLoadShouldSetNothingIfThereAreNoRecentEmails()
+    public function testLoadRecentEmailsShouldSetNothingIfThereAreNoRecentEmails()
     {
         $query = 'query';
         $limit = 1;
 
         $userEmailAddresses = [
-            'user@example.com',
+            'user@example.com' => 'User <user@example.com>',
         ];
 
         $recentEmailAddresses = [];
@@ -109,7 +109,7 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $emailRecipientRepository->expects($this->once())
             ->method('getEmailsUsedInLast30Days')
-            ->with($this->aclHelper, $userEmailAddresses, [], $query, $limit)
+            ->with($this->aclHelper, array_keys($userEmailAddresses), [], $query, $limit)
             ->will($this->returnValue($recentEmailAddresses));
 
         $this->registry->expects($this->once())
@@ -118,18 +118,18 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailRecipientRepository));
 
         $event = new EmailRecipientsLoadEvent(null, $query, $limit);
-        $this->emailRecipientsLoadListener->onLoad($event);
+        $this->emailRecipientsLoadListener->loadRecentEmails($event);
 
         $this->assertEquals($expectedResults, $event->getResults());
     }
 
-    public function testOnLoadShouldSetRecentEmails()
+    public function testLoadRecentEmailsShouldSetRecentEmails()
     {
         $query = 'query';
         $limit = 1;
 
         $userEmailAddresses = [
-            'user@example.com',
+            'user@example.com' => 'User <user@example.com>',
         ];
 
         $recentEmailAddresses = [
@@ -164,7 +164,7 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $emailRecipientRepository->expects($this->once())
             ->method('getEmailsUsedInLast30Days')
-            ->with($this->aclHelper, $userEmailAddresses, [], $query, $limit)
+            ->with($this->aclHelper, array_keys($userEmailAddresses), [], $query, $limit)
             ->will($this->returnValue($recentEmailAddresses));
 
         $this->registry->expects($this->once())
@@ -173,7 +173,7 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailRecipientRepository));
 
         $event = new EmailRecipientsLoadEvent(null, $query, $limit);
-        $this->emailRecipientsLoadListener->onLoad($event);
+        $this->emailRecipientsLoadListener->loadRecentEmails($event);
 
         $this->assertEquals($expectedResults, $event->getResults());
     }
