@@ -22,6 +22,12 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $queryBuilder;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailFlagManager;
+
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityContext;
+
     protected function setUp()
     {
         $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -39,7 +45,21 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->emailThreadProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->manager = new EmailManager($this->em, $this->emailThreadManager, $this->emailThreadProvider);
+
+        $this->emailFlagManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\EmailFlagManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->manager = new EmailManager($this->em,
+            $this->emailThreadManager,
+            $this->emailThreadProvider,
+            $this->emailFlagManager,
+            $this->securityContext
+        );
     }
 
     /**
