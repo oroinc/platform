@@ -36,10 +36,10 @@ define(function (require) {
             this.domCache.body.val(this.initBody(this.domCache.body.val()));
             this.addForgedAsterisk();
             this.initFields();
-            this.renderPromise = mediator.execute('layout:init', this.$el, this);
+            this.renderPromise = this.initLayout();
             return this;
         },
-        
+
         setupCache: function () {
             this.domCache = {
                 subject: this.$('[name$="[subject]"]'),
@@ -62,12 +62,11 @@ define(function (require) {
                         this.model.get('signature').replace(/(<([^>]+)>)/ig, '') + body.substring(caretPos));
                 }
             } else {
-                var url = routing.generate('oro_user_profile_update');
-                if (this.model.get('isSignatureEditable')) {
-                    mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature', {url: url}));
-                } else {
-                    mediator.execute('showFlashMessage', 'info', __('oro.email.thread.no_signature_no_permission'));
-                }
+                var url = routing.generate('oro_user_profile_update'),
+                    message = this.model.get('isSignatureEditable') ?
+                        __('oro.email.thread.no_signature', {url: url}) :
+                        __('oro.email.thread.no_signature_no_permission');
+                mediator.execute('showFlashMessage', 'info', message);
             }
         },
 
@@ -106,17 +105,18 @@ define(function (require) {
         },
 
         initFields: function() {
-            var select2Config = {
+            var originalSelect2Config = {
                 containerCssClass: 'taggable-email',
                 separator: ';',
                 tags: [],
                 tokenSeparators: [';', ',']
             };
             this.$('input.taggable-field').each(function(key, elem) {
+                var select2Config = _.extend({}, originalSelect2Config);
                 if ($(elem).hasClass('from')) {
                     select2Config.maximumSelectionSize = 1;
                 }
-                $(elem).select2(_.extend({}, select2Config));
+                $(elem).select2(select2Config);
             });
             if (!this.model.get('email').get('bcc').length || !this.model.get('email').get('cc').length) {
                 this.$('[id^=oro_email_email_to]').parents('.controls').find('ul.select2-choices').after(

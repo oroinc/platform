@@ -21,11 +21,11 @@ class FullNameSearchHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     protected function setUp()
     {
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $this->searchHandler = new FullNameSearchHandler(self::TEST_ENTITY_CLASS, $this->testProperties);
@@ -39,12 +39,12 @@ class FullNameSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $entity->name = 'John';
         $entity->email = 'john@example.com';
 
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($entity)
             ->will($this->returnValue($fullName));
 
-        $this->searchHandler->setNameFormatter($this->nameFormatter);
+        $this->searchHandler->setEntityNameResolver($this->entityNameResolver);
         $this->assertEquals(
             array(
                 'name' => 'John',
@@ -57,7 +57,7 @@ class FullNameSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Name formatter must be configured
+     * @expectedExceptionMessage Name resolver must be configured
      */
     public function testConvertItemFails()
     {

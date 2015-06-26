@@ -56,7 +56,7 @@ class ActivityListFilterHelperTest extends \PHPUnit_Framework_TestCase
             ->method('apply');
 
         $routingHelper->expects($this->once())
-            ->method('decodeClassName')
+            ->method('resolveEntityClass')
             ->with('Acme\TestBundle\Entity\TestEntity')
             ->will($this->returnValue('Acme\TestBundle\Entity\TestEntity'));
         $chainProvider->expects($this->once())

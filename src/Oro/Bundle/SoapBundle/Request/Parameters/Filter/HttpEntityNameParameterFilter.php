@@ -22,6 +22,6 @@ class HttpEntityNameParameterFilter implements ParameterFilterInterface
      */
     public function filter($rawValue, $operator)
     {
-        return $this->helper->decodeClassName($rawValue);
+        return $this->helper->resolveEntityClass($rawValue);
     }
 }

@@ -7,7 +7,7 @@ use Psr\Log\LoggerAwareTrait;
 
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
@@ -27,27 +27,27 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
     protected $emailAddressHelper;
 
     /**
-     * @var NameFormatter
+     * @var EntityNameResolver
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
      * @param ContextAccessor    $contextAccessor
      * @param Processor          $emailProcessor
      * @param EmailAddressHelper $emailAddressHelper
-     * @param NameFormatter      $nameFormatter
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
         EmailAddressHelper $emailAddressHelper,
-        NameFormatter $nameFormatter
+        EntityNameResolver $entityNameResolver
     ) {
         parent::__construct($contextAccessor);
 
-        $this->emailProcessor = $emailProcessor;
+        $this->emailProcessor     = $emailProcessor;
         $this->emailAddressHelper = $emailAddressHelper;
-        $this->nameFormatter      = $nameFormatter;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -82,7 +82,7 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
                 $data['name'] = $this->contextAccessor->getValue($context, $data['name']);
 
                 if (is_object($data['name'])) {
-                    $name = $this->nameFormatter->format($data['name']);
+                    $name = $this->entityNameResolver->getName($data['name']);
                 } else {
                     $name = $data['name'];
                 }

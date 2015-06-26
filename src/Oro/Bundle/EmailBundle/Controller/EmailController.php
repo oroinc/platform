@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -16,13 +17,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -36,12 +37,7 @@ class EmailController extends Controller
 {
     /**
      * @Route("/view/{id}", name="oro_email_view", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_email_view",
-     *      type="entity",
-     *      class="OroEmailBundle:Email",
-     *      permission="VIEW"
-     * )
+     * @AclAncestor("oro_email_email_view")
      * @Template
      */
     public function viewAction(Email $entity)
@@ -52,7 +48,13 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-        $this->getEmailManager()->setEmailSeen($entity);
+
+        // TODO Should be refactored in CRM-2482
+        $em = $this->getDoctrine()->getManager();
+        $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
+        if ($emailUser) {
+            $this->getEmailManager()->setEmailUserSeen($emailUser);
+        }
 
         return [
             'entity' => $entity,
@@ -65,7 +67,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
      */
     public function viewThreadAction(Email $entity)
@@ -75,7 +77,6 @@ class EmailController extends Controller
 
     /**
      * @Route("/widget/thread/{id}", name="oro_email_thread_widget", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
      * @Template("OroEmailBundle:Email/widget:thread.html.twig")
      */
     public function threadWidgetAction(Email $entity)
@@ -84,6 +85,9 @@ class EmailController extends Controller
             $this->get('doctrine')->getManager(),
             $entity
         );
+        $emails = array_filter($emails, function ($email) {
+            return $this->get('security.context')->isGranted('VIEW', $email);
+        });
         $this->loadEmailBody($emails);
 
         return [
@@ -98,7 +102,6 @@ class EmailController extends Controller
 
     /**
      * @Route("/view-items", name="oro_email_items_view")
-     * @AclAncestor("oro_email_view")
      * @Template
      */
     public function itemsAction()
@@ -110,8 +113,12 @@ class EmailController extends Controller
         }
         $this->loadEmailBody($emails);
 
+        $items = array_filter($emails, function ($email) {
+            return $this->get('security.context')->isGranted('VIEW', $email);
+        });
+
         return [
-            'items' => $emails,
+            'items' => $items,
             'target' => $this->getTargetEntity(),
             'hasGrantReattach' => $this->isAttachmentCreationGranted(),
             'routeParameters' => $this->getTargetEntityConfig()
@@ -120,7 +127,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/view-group/{id}", name="oro_email_view_group", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      * @Template
      */
     public function viewGroupAction(Email $email)
@@ -146,24 +153,23 @@ class EmailController extends Controller
      *      name="oro_email_activity_view"
      * )
      *
-     * @AclAncestor("oro_email_view")
      * @Template
      */
     public function activityAction($entityClass, $entityId)
     {
+        $entity = $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId);
+        if (!$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
+            throw new AccessDeniedException();
+        }
+
         return [
-            'entity' => $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId)
+            'entity' => $entity
         ];
     }
 
     /**
      * @Route("/create")
-     * @Acl(
-     *      id="oro_email_create",
-     *      type="entity",
-     *      class="OroEmailBundle:Email",
-     *      permission="CREATE"
-     * )
+     * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
     public function createAction()
@@ -174,7 +180,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/reply/{id}", name="oro_email_email_reply", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_create")
+     * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
     public function replyAction(Email $email)
@@ -185,7 +191,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/forward/{id}", name="oro_email_email_forward", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_create")
+     * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
     public function forwardAction(Email $email)
@@ -198,7 +204,7 @@ class EmailController extends Controller
      * Get the given email body content
      *
      * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function bodyAction(EmailBody $entity)
     {
@@ -209,7 +215,7 @@ class EmailController extends Controller
      * Get a response for download the given email attachment
      *
      * @Route("/attachment/{id}", name="oro_email_attachment", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function attachmentAction(EmailAttachment $entity)
     {
@@ -231,12 +237,7 @@ class EmailController extends Controller
      * Link attachment to entity
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_email_update",
-     *      type="entity",
-     *      class="OroEmailBundle:Email",
-     *      permission="EDIT"
-     * )
+     * @AclAncestor("oro_email_email_edit")
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
@@ -257,7 +258,6 @@ class EmailController extends Controller
     /**
      * @Route("/widget", name="oro_email_widget_emails")
      * @Template
-     * @AclAncestor("oro_email_view")
      *
      * @param Request $request
      * @return array
@@ -272,7 +272,6 @@ class EmailController extends Controller
     /**
      * @Route("/base-widget", name="oro_email_widget_base_emails")
      * @Template
-     * @AclAncestor("oro_email_view")
      *
      * @param Request $request
      * @return array
@@ -286,7 +285,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/user-emails", name="oro_email_user_emails")
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      * @Template
      */
     public function userEmailsAction()
@@ -296,9 +295,11 @@ class EmailController extends Controller
 
     /**
      * @Route("/context/{id}", name="oro_email_context", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
      * @Template("OroEmailBundle:Email:context.html.twig")
+     * @AclAncestor("oro_email_email_view")
+     *
      * @param Email $emailEntity
+     *
      * @return array
      */
     public function contextAction(Email $emailEntity)
@@ -319,7 +320,6 @@ class EmailController extends Controller
 
     /**
      * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
-     * @AclAncestor("oro_email_view")
      * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
      * @param string $entityClass
      * @param string $activityId
@@ -425,11 +425,12 @@ class EmailController extends Controller
      */
     protected function getTargetEntityConfig($encode = true)
     {
+        /** @var EntityRoutingHelper $entityRoutingHelper */
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $targetEntityClass = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
         $targetEntityId = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
         if ($encode) {
-            $targetEntityClass = $entityRoutingHelper->encodeClassName($targetEntityClass);
+            $targetEntityClass = $entityRoutingHelper->getUrlSafeClassName($targetEntityClass);
         }
         if (null === $targetEntityClass || null === $targetEntityId) {
             return [];

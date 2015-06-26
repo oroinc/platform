@@ -52,10 +52,10 @@ abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
      *
      * @return Login
      */
-    public function login($userName = null, $password = null)
+    public function login($userName = null, $password = null, $args = [])
     {
         /** @var Login $login */
-        $login = new Login($this, array());
+        $login = new Login($this, $args);
         $login->setUsername(($userName) ? $userName : PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->setPassword(($password) ? $password : PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS)
             ->submit();

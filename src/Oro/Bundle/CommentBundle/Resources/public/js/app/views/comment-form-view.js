@@ -40,7 +40,7 @@ define(function (require) {
 
             this.$('form')
                 .validate();
-            mediator.execute('layout:init', this.$('form'), this);
+            this.initLayout();
             this.bindData();
 
             return this;

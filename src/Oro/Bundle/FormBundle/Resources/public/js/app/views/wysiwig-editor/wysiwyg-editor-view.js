@@ -21,9 +21,9 @@ define(function (require) {
 
         defaults: {
             enabled: true,
-            plugins: ['textcolor', 'code'],
+            plugins: ['textcolor', 'code', 'bdesk_photo'],
             menubar : false,
-            toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code'],
+            toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar : false
         },
 

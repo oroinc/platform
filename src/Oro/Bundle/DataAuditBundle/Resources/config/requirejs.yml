@@ -1,0 +1,4 @@
+config:
+    paths:
+        'orodataaudit/js/data-audit-condition': 'bundles/orodataaudit/js/data-audit-condition.js'
+        'orodataaudit/js/app/components/segment-component-extension': 'bundles/orodataaudit/js/app/components/segment-component-extension.js'

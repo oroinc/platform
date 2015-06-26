@@ -18,6 +18,8 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  */
 class EmailAttachment
 {
+    const CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\EmailAttachment';
+
     /**
      * @var integer
      *

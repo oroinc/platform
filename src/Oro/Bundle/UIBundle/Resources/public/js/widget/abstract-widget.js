@@ -735,6 +735,13 @@ define(function (require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        getLayoutElement: function () {
+            return this.widget;
+        },
+
+        /**
          * Show widget content
          *
          * @private
@@ -746,7 +753,7 @@ define(function (require) {
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
             this.renderDeferred = $.Deferred();
-            mediator.execute('layout:init', this.widget, this)
+            this.initLayout()
                 .done(_.bind(function () {
                     if (this.disposed) {
                         return;

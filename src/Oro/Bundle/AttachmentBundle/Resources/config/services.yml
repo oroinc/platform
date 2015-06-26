@@ -24,6 +24,10 @@ parameters:
     oro_attachment.provider.attachment.class:             Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
     oro_attachment.config.class:                          Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
+    oro_attachment.formatter.image_encoded.class:         Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
+    oro_attachment.formatter.image_link.class:            Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
+    oro_attachment.formatter.image_src.class:             Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
@@ -140,3 +144,26 @@ services:
         arguments:
             - @oro_entity_config.provider.attachment
             - @oro_entity_config.provider.entity
+
+    oro_attachment.formatter.image_encoded:
+        class: %oro_attachment.formatter.image_encoded.class%
+        arguments:
+          - @oro_attachment.manager
+          - @file_locator
+        tags:
+          - { name: oro_formatter, formatter: image_encoded }
+
+    oro_attachment.formatter.image_link:
+        class: %oro_attachment.formatter.image_link.class%
+        arguments:
+          - @oro_attachment.manager
+          - @translator
+        tags:
+          - { name: oro_formatter, formatter: image_link }
+
+    oro_attachment.formatter.image_src:
+        class: %oro_attachment.formatter.image_src.class%
+        arguments:
+          - @oro_attachment.manager
+        tags:
+          - { name: oro_formatter, formatter: image_src }
