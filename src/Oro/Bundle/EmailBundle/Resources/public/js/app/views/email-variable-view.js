@@ -270,14 +270,7 @@ define(function (require) {
             }
 
             if (field) {
-                value = field.val();
-                if('selectionStart' in field[0]) {
-                    start = field[0].selectionStart;
-                    end = field[0].selectionEnd;
-                    field.val(value.substring(0, start) + variable + value.substring(end));
-                } else {
-                    field.val(value + variable);
-                }
+                field.insertAtCursor(variable).focus();
                 mediator.trigger('email-variable-view:click-variable', field, variable);
             }
         },
