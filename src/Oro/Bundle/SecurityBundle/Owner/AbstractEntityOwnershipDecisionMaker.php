@@ -160,8 +160,8 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
         $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
         if (empty($userOrganizationIds)
-            || ($organizationId && !in_array($organizationId, $userOrganizationIds, true)))
-        {
+            || ($organizationId && !in_array($organizationId, $userOrganizationIds, true))
+        ) {
             return false;
         }
 
