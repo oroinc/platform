@@ -21,7 +21,8 @@ use Oro\Bundle\EmailBundle\Entity\Email;
  */
 class ImapEmailFlagManager implements EmailFlagManagerInterface
 {
-    const UNSEEN = 'UNSEEN';
+    const FLAG_UNSEEN = 'UNSEEN';
+    const FLAG_SEEN = '\Seen';
 
     /** @var ImapConnector */
     protected $connector;
@@ -67,7 +68,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
      */
     public function setFlagUnseen(EmailFolder $folder, Email $email)
     {
-        $this->setFlags($folder, $email, [self::UNSEEN]);
+        $this->setFlags($folder, $email, [self::FLAG_UNSEEN]);
     }
 
     /**
@@ -80,7 +81,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
      */
     public function setFlagSeen(EmailFolder $folder, Email $email)
     {
-        $this->setFlags($folder, $email, [Storage::FLAG_SEEN]);
+        $this->setFlags($folder, $email, [self::FLAG_SEEN]);
     }
 
     /**
