@@ -7,7 +7,7 @@ parameters:
     oro_imap.storage.gmail.class:                    Oro\Bundle\ImapBundle\Mail\Storage\GmailImap
     oro_imap.storage.other.class:                    Oro\Bundle\ImapBundle\Mail\Storage\Imap
     oro_imap.email_body_loader.class:                Oro\Bundle\ImapBundle\Provider\ImapEmailBodyLoader
-    oro_imap.email_flag_manager_loader.class:                Oro\Bundle\ImapBundle\Provider\ImapEmailFlagManagerLoader
+    oro_imap.email_flag_manager_loader.class:        Oro\Bundle\ImapBundle\Provider\ImapEmailFlagManagerLoader
     oro_imap.email_synchronizer.class:               Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer
     oro_imap.email_sync_processor_factory.class:     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory
 

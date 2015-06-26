@@ -47,12 +47,7 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
     }
 
     /**
-     * Select ImapEmailFlagManager
-     *
-     * @param EmailFolder   $folder
-     * @param EntityManager $em
-     *
-     * @return ImapEmailFlagManager
+     * {@inheritdoc}
      */
     public function select(EmailFolder $folder, OroEntityManager $em)
     {

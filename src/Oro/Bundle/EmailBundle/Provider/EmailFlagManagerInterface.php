@@ -12,6 +12,8 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 interface EmailFlagManagerInterface
 {
     /**
+     * Set flags for message by EmailFolder and  Email
+     *
      * @param EmailFolder $folder
      * @param Email $email
      * @param $flags
@@ -21,17 +23,22 @@ interface EmailFlagManagerInterface
     public function setFlags(EmailFolder $folder, Email $email, $flags);
 
     /**
+     * Set flag UNSEEN for message by EmailFolder and Email
+     *
      * @param EmailFolder $folder
      * @param Email $email
      *
      * @return void
      */
-    public function setFlagUnseen(EmailFolder $folder, Email $email);
+    public function setUnseen(EmailFolder $folder, Email $email);
 
     /**
+     * Set flag SEEN for message by EmailFolder and Email
+     *
      * @param EmailFolder $folder
      * @param Email $email
+     *
      * @return void
      */
-    public function setFlagSeen(EmailFolder $folder, Email $email);
+    public function setSeen(EmailFolder $folder, Email $email);
 }

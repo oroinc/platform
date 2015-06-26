@@ -43,63 +43,29 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     }
 
     /**
-     * Set flags for message by EmailFolder and  Email
-     *
-     * @param EmailFolder $folder
-     * @param Email       $email
-     * @param array       $flags
-     *
-     * @return void
+     * (@inherit)
      */
     public function setFlags(EmailFolder $folder, Email $email, $flags)
     {
-        $uid = $this->getUid($folder->getId(), $email->getId());
+        $repoImapEmail = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $uid = $repoImapEmail->getUid($folder->getId(), $email->getId());
         $this->connector->selectFolder($folder->getFullName());
         $this->connector->setFlags($uid, $flags);
     }
 
     /**
-     * Set flag UNSEEN for message by EmailFolder and Email
-     *
-     * @param EmailFolder $folder
-     * @param Email $email
-     *
-     * @return void
+     * (@inherit)
      */
-    public function setFlagUnseen(EmailFolder $folder, Email $email)
+    public function setUnseen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [self::FLAG_UNSEEN]);
     }
 
     /**
-     * Set flag SEEN for message by EmailFolder and Email
-     *
-     * @param EmailFolder $folder
-     * @param Email $email
-     *
-     * @return void
+     * (@inherit)
      */
-    public function setFlagSeen(EmailFolder $folder, Email $email)
+    public function setSeen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [self::FLAG_SEEN]);
-    }
-
-    /**
-     * @param integer $folder - id of Folder
-     * @param integer $email  - id of Email
-     * @return integer|false
-     */
-    protected function getUid($folder, $email)
-    {
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
-        $query = $repo->createQueryBuilder('e')
-            ->select('e.uid')
-            ->innerJoin('e.imapFolder', 'if')
-            ->where('e.email = ?1 AND if.folder = ?2')
-            ->setParameter(1, $email)
-            ->setParameter(2, $folder)
-            ->getQuery();
-
-        return $query->getSingleScalarResult();
     }
 }
