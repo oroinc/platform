@@ -10,10 +10,11 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application as ConsoleApplication;
 
 use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
+use Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-abstract class AbstractCommand extends ContainerAwareCommand
+abstract class CacheCommand extends ContainerAwareCommand
 {
     /** @var string|null */
     protected $cacheDir;
@@ -64,6 +65,7 @@ abstract class AbstractCommand extends ContainerAwareCommand
         $cacheDir = $dumper->getCacheDir();
         if (empty($this->cacheDir) || $this->cacheDir === $cacheDir) {
             $dumper->dump();
+            $this->setClassAliases($cacheDir, true);
         } else {
             $dumper->setCacheDir($this->cacheDir);
             try {
@@ -73,6 +75,7 @@ abstract class AbstractCommand extends ContainerAwareCommand
                 $dumper->setCacheDir($cacheDir);
                 throw $e;
             }
+            $this->setClassAliases($this->cacheDir, true);
         }
     }
 
@@ -135,13 +138,51 @@ abstract class AbstractCommand extends ContainerAwareCommand
 
         $output->writeln('Generate Doctrine proxy classes for extended entities');
 
-        /** @var EntityProcessor $processor */
-        $processor = $this->getContainer()->get('oro_entity_extend.extend.entity_processor');
+        /** @var EntityProxyGenerator $proxyGenerator */
+        $proxyGenerator = $this->getContainer()->get('oro_entity_extend.extend.entity_proxy_generator');
 
-        if (empty($this->cacheDir)) {
-            $processor->generateProxies();
+        $cacheDir = $proxyGenerator->getCacheDir();
+        if (empty($this->cacheDir) || $this->cacheDir === $cacheDir) {
+            $proxyGenerator->generateProxies();
         } else {
-            $processor->generateProxies($this->cacheDir);
+            $proxyGenerator->setCacheDir($this->cacheDir);
+            try {
+                $proxyGenerator->generateProxies();
+                $proxyGenerator->setCacheDir($cacheDir);
+            } catch (\Exception $e) {
+                $proxyGenerator->setCacheDir($cacheDir);
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Sets class aliases for extended entities.
+     *
+     * @param string $cacheDir The cache directory
+     *
+     * @throws \ReflectionException
+     */
+    protected function setClassAliases($cacheDir)
+    {
+        $aliases = ExtendClassLoadingUtils::getAliases($cacheDir);
+        foreach ($aliases as $className => $alias) {
+            if (class_exists($className)) {
+                if (class_exists($alias, false)) {
+                    throw new \ReflectionException(
+                        sprintf(
+                            'The alias "%1$s" for the class "%2$s" cannot be registered '
+                            . 'because the class "%1$s" is already loaded. '
+                            . 'This may happen if this class or a derived class '
+                            . 'is used in EntityConfigDumperExtension or EntityGeneratorExtension.',
+                            $alias,
+                            $className
+                        )
+                    );
+                }
+
+                class_alias($className, $alias);
+            }
         }
     }
 }

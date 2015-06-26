@@ -6,17 +6,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CacheWarmupCommand extends AbstractCommand
+class CacheWarmupCommand extends CacheCommand
 {
-    const NAME = 'oro:entity-extend:cache:warmup';
-
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName(self::NAME)
+            ->setName('oro:entity-extend:cache:warmup')
             ->setDescription('Warms up extended entity cache.')
             ->addOption(
                 'cache-dir',

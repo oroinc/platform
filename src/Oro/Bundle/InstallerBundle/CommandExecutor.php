@@ -263,19 +263,21 @@ class CommandExecutor
     /**
      * Check whether specified command is running now
      *
-     * @param string $commandName
+     * @param string $command  The command name or prefix
+     * @param bool   $isPrefix Determines whether $command is a command name or prefix
+     *
      * @return bool
      */
-    public static function isCommandRunning($commandName)
+    public static function isCommandRunning($command, $isPrefix = false)
     {
-        if (self::isCurrentCommand($commandName)) {
+        if (self::isCurrentCommand($command, $isPrefix)) {
             return true;
         }
 
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
         } else {
-            $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $commandName);
+            $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $command);
         }
 
         $process = new Process($cmd);
@@ -288,11 +290,25 @@ class CommandExecutor
     /**
      * Check if this process executes specified command
      *
-     * @param string $commandName
+     * @param string $command  The command name or prefix
+     * @param bool   $isPrefix Determines whether $command is a command name or prefix
+     *
      * @return bool
      */
-    public static function isCurrentCommand($commandName)
+    public static function isCurrentCommand($command, $isPrefix = false)
     {
-        return php_sapi_name() == 'cli' && isset($_SERVER['argv']) && in_array($commandName, $_SERVER['argv']);
+        if (isset($_SERVER['argv']) && php_sapi_name() === 'cli') {
+            if (!$isPrefix) {
+                return in_array($command, $_SERVER['argv'], true);
+            } else {
+                foreach ($_SERVER['argv'] as $arg) {
+                    if (is_string($arg) && strpos($arg, $command) === 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

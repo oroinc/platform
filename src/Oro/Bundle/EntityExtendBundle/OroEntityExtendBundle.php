@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\ProcessBuilder;
@@ -14,18 +13,15 @@ use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityMetadataBuilderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
-use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
-use Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand;
-use Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class OroEntityExtendBundle extends Bundle
 {
     const CACHE_GENERATION_TIMEOUT = 300;
-    const CACHE_CHECKOUT_INTERVAL  = 1;
-    const CACHE_CHECKOUT_ATTEMPTS  = 120;
+    const CACHE_CHECKOUT_INTERVAL = 1;
+    const CACHE_CHECKOUT_ATTEMPTS = 120;
 
     /** @var KernelInterface */
     private $kernel;
@@ -75,34 +71,34 @@ class OroEntityExtendBundle extends Bundle
 
     private function ensureInitialized()
     {
-        ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
-        $this->ensureCacheInitialized();
-        $this->ensureAliasesSet();
+        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
+            ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
+            if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))) {
+                $this->initializeCache();
+            }
+            $this->ensureAliasesSet();
+        }
     }
 
-    private function ensureCacheInitialized()
+    private function initializeCache()
     {
-        $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
-        if (file_exists($aliasesPath) || CommandExecutor::isCurrentCommand(CacheWarmupCommand::NAME)) {
-            return;
-        }
-
         // We have to warm up the extend entities cache in separate process
         // to allow this process continue executing.
         // The problem is we need initialized DI contained for warming up this cache,
         // but in this moment we are exactly doing this for the current process.
-        $attempts = 0;
         $pb = ProcessBuilder::create()
             ->setTimeout(self::CACHE_GENERATION_TIMEOUT)
             ->add(CommandExecutor::getPhpExecutable())
             ->add($this->kernel->getRootDir() . '/console')
-            ->add(CacheWarmupCommand::NAME)
+            ->add('oro:entity-extend:cache:warmup')
             ->add('--env')
             ->add($this->kernel->getEnvironment())
             ->add('--cache-dir')
             ->add($this->cacheDir);
+
+        $attempts = 0;
         do {
-            if (!CommandExecutor::isCommandRunning(CacheWarmupCommand::NAME)) {
+            if (!CommandExecutor::isCommandRunning('oro:entity-extend:cache:warmup')) {
                 // if cache was generated there is no need to generate it again
                 if ($attempts > 0) {
                     return;
@@ -120,7 +116,7 @@ class OroEntityExtendBundle extends Bundle
 
     private function ensureAliasesSet()
     {
-        if (!CommandExecutor::isCurrentCommand(UpdateConfigCommand::NAME)) {
+        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')) {
             ExtendClassLoadingUtils::setAliases($this->cacheDir);
         }
     }
