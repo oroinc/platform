@@ -54,7 +54,8 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new EmailManager($this->em,
+        $this->manager = new EmailManager(
+            $this->em,
             $this->emailThreadManager,
             $this->emailThreadProvider,
             $this->emailFlagManager,

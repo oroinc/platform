@@ -15,7 +15,7 @@ parameters:
     oro_email.email.model.builder.class:          Oro\Bundle\EmailBundle\Builder\EmailModelBuilder
     oro_email.email.entity.batch_processor.class: Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor
     oro_email.email_body_loader_selector.class:   Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector
-    oro_email.email_flag_manager_loader_selector.class:   Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
+    oro_email.email_flag_manager_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
     oro_email.manager.email.api.class:            Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
@@ -27,7 +27,7 @@ parameters:
     oro_email.known_email_address_checker_factory.class: Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory
     oro_email.twig.extension.email.class:         Oro\Bundle\EmailBundle\Twig\EmailExtension
     oro_email.email.manager.class:                Oro\Bundle\EmailBundle\Entity\Manager\EmailManager
-    oro_email.email.flag.manager.class:                Oro\Bundle\EmailBundle\Manager\EmailFlagManager
+    oro_email.email.flag.manager.class:           Oro\Bundle\EmailBundle\Manager\EmailFlagManager
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
@@ -586,7 +586,7 @@ services:
             - @oro_activity.manager
 
     oro_email.email.flag.manager:
-            class: %oro_email.email.flag.manager.class%
-            arguments:
-                - @oro_email.email_flag_manager_loader_selector
-                - @doctrine.orm.entity_manager
+        class: %oro_email.email.flag.manager.class%
+        arguments:
+            - @oro_email.email_flag_manager_loader_selector
+            - @doctrine.orm.entity_manager

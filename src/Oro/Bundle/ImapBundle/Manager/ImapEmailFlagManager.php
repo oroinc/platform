@@ -4,13 +4,13 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Zend\Mail\Storage;
 
-use Oro\Bundle\ImapBundle\Connector\ImapConnector;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 
 /**
  * Class ImapEmailFlagManager
@@ -42,13 +42,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     }
 
     /**
-     * Set flags for message by EmailFolder and  Email
-     *
-     * @param EmailFolder $folder
-     * @param Email       $email
-     * @param array       $flags
-     *
-     * @return void
+     * (@inherit)
      */
     public function setFlags(EmailFolder $folder, Email $email, $flags)
     {
@@ -57,12 +51,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     }
 
     /**
-     * Set flag UNSEEN for message by EmailFolder and Email
-     *
-     * @param EmailFolder $folder
-     * @param Email $email
-     *
-     * @return void
+     * (@inherit)
      */
     public function setFlagUnseen(EmailFolder $folder, Email $email)
     {
@@ -70,12 +59,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     }
 
     /**
-     * Set flag SEEN for message by EmailFolder and Email
-     *
-     * @param EmailFolder $folder
-     * @param Email $email
-     *
-     * @return void
+     * (@inherit)
      */
     public function setFlagSeen(EmailFolder $folder, Email $email)
     {

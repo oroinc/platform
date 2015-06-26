@@ -22,7 +22,7 @@ interface EmailFlagManagerLoaderInterface
     public function supports(EmailOrigin $origin);
 
     /**
-     * Loads email body for the given email
+     * Loads email flag manager
      *
      * @param EmailFolder      $folder
      * @param OroEntityManager $em

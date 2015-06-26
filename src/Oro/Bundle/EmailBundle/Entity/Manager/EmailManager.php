@@ -4,12 +4,17 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Core\SecurityContext;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
-use Symfony\Component\Security\Core\SecurityContext;
 
+/**
+ * Class EmailManager
+ * @package Oro\Bundle\EmailBundle\Entity\Manager
+ */
 class EmailManager
 {
     /**

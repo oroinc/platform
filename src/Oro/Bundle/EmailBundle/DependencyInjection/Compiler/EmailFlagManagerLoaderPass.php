@@ -23,7 +23,7 @@ class EmailFlagManagerLoaderPass implements CompilerPassInterface
         $selectorDef = $container->getDefinition(self::SERVICE_KEY);
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
         foreach ($taggedServices as $loaderServiceId => $tagAttributes) {
-            $selectorDef->addMethodCall('addLoader', array(new Reference($loaderServiceId)));
+            $selectorDef->addMethodCall('addLoader', [new Reference($loaderServiceId)]);
         }
     }
 }
