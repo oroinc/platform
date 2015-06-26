@@ -46,7 +46,7 @@ class EmailFlagManager
         $emailFlagManager = $this->selectEmailFlagManager($emailUser);
 
         if ($emailFlagManager instanceof EmailFlagManagerInterface) {
-            $emailFlagManager->setFlagUnseen($emailUser->getFolder(), $emailUser->getEmail());
+            $emailFlagManager->setUnseen($emailUser->getFolder(), $emailUser->getEmail());
         }
     }
 
@@ -62,7 +62,7 @@ class EmailFlagManager
         $emailFlagManager = $this->selectEmailFlagManager($emailUser);
 
         if ($emailFlagManager instanceof EmailFlagManagerInterface) {
-            $emailFlagManager->setFlagSeen($emailUser->getFolder(), $emailUser->getEmail());
+            $emailFlagManager->setSeen($emailUser->getFolder(), $emailUser->getEmail());
         }
     }
 

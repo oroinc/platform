@@ -30,7 +30,7 @@ interface EmailFlagManagerInterface
      *
      * @return void
      */
-    public function setFlagUnseen(EmailFolder $folder, Email $email);
+    public function setUnseen(EmailFolder $folder, Email $email);
 
     /**
      * Set flag SEEN for message by EmailFolder and Email
@@ -40,5 +40,5 @@ interface EmailFlagManagerInterface
      *
      * @return void
      */
-    public function setFlagSeen(EmailFolder $folder, Email $email);
+    public function setSeen(EmailFolder $folder, Email $email);
 }

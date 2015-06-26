@@ -54,7 +54,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     /**
      * (@inherit)
      */
-    public function setFlagUnseen(EmailFolder $folder, Email $email)
+    public function setUnseen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [self::UNSEEN]);
     }
@@ -62,7 +62,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     /**
      * (@inherit)
      */
-    public function setFlagSeen(EmailFolder $folder, Email $email)
+    public function setSeen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [Storage::FLAG_SEEN]);
     }
