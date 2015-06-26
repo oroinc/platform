@@ -68,6 +68,11 @@ parameters:
     oro_security.listener.console_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
+    oro_security.form.type.share.class:                        Oro\Bundle\SecurityBundle\Form\Type\ShareType
+    oro_security.form.handler.share.class:                     Oro\Bundle\SecurityBundle\Form\Handler\ShareHandler
+    oro_security.form.factory.class:                           Oro\Bundle\SecurityBundle\Form\Model\Factory
+
+    oro_security.placeholder.filter.class:                     Oro\Bundle\SecurityBundle\Placeholder\PlaceholderFilter
 
 services:
     oro_security.security_facade:
@@ -558,3 +563,42 @@ services:
     # managed by platform entities.
     security.acl.dbal.schema_listener:
         synthetic: true
+
+    oro_security.widget_provider.actions:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_share_button
+            - oro_share_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity}
+
+    oro_security.form.type.share:
+        class: %oro_security.form.type.share.class%
+        tags:
+            - { name: form.type, alias: oro_share }
+
+    oro_security.form.share:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - 'oro_share_form'
+            - 'oro_share'
+
+    oro_security.form.handler.share:
+        class: %oro_security.form.handler.share.class%
+        scope: request
+        arguments:
+            - @oro_security.form.share
+            - @request
+            - @security.acl.provider
+            - @doctrine.orm.entity_manager
+
+    oro_security.form.factory:
+        class: %oro_security.form.factory.class%
+
+    oro_security.placeholder.filter:
+        class: %oro_security.placeholder.filter.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_entity_config.provider.security

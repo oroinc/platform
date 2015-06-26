@@ -42,4 +42,18 @@ class UserRepository extends EntityRepository
 
         return $qb->getQuery()->getOneOrNullResult();
     }
+
+    /**
+     * @param array $usernames
+     * 
+     * @return array
+     */
+    public function findUsersByUsernames(array $usernames)
+    {
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('u');
+        $queryBuilder->where($queryBuilder->expr()->in('u.username', $usernames));
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

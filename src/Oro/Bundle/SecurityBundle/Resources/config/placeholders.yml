@@ -14,3 +14,9 @@ items:
         applicable: @oro_user.placeholder.filter->isUserApplicable()
     organization_name:
         template: OroSecurityBundle:Organization:current_name.html.twig
+    oro_share_link:
+        template: OroSecurityBundle:Share:addLink.html.twig
+        applicable: @oro_security.placeholder.filter->isShareEnabled($entity$)
+    oro_share_button:
+        template: OroSecurityBundle:Share:addButton.html.twig
+        applicable: @oro_security.placeholder.filter->isShareEnabled($entity$)

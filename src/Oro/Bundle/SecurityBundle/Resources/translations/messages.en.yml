@@ -23,3 +23,6 @@ oro:
             division: Division
             business_unit: Business Unit
             user: User
+        action:
+            share: Share record
+            shared: Record shared
