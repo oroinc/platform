@@ -4,8 +4,6 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
-use Zend\Mail\Storage;
-
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
