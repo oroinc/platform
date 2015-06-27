@@ -132,6 +132,8 @@ class ExtendConfigDumper
                 // and other bundles can produce more changes depending on already made, it's a bit hacky,
                 // but it's a service operation so called inevitable evil
                 $extendProvider->flush();
+                // the clearing of an entity manager gives a performance gain of 4 times
+                $extendProvider->getConfigManager()->getEntityManager()->clear();
 
                 $this->updateStateValues($extendConfig);
             }
