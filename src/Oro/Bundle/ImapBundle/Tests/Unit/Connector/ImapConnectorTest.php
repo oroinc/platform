@@ -142,4 +142,23 @@ class ImapConnectorTest extends \PHPUnit_Framework_TestCase
         $result = $this->connector->getItem(123);
         $this->assertTrue($msg === $result);
     }
+
+    public function testSetFlags()
+    {
+        $uid = 123;
+        $id = 12345;
+        $flags = [];
+
+        $this->storage->expects($this->once())
+            ->method('getNumberByUniqueId')
+            ->with($this->equalTo($uid))
+            ->will($this->returnValue($id));
+
+        $this->storage->expects($this->once())
+            ->method('setFlags')
+            ->with($id,$flags);
+
+        $response = $this->connector->setFlags($uid, $flags);
+        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Connector\ImapConnector',$response);
+    }
 }
