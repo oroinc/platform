@@ -6,7 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Oro\Bundle\TrackingBundle\Tools\VisitEventAssociationDumperExtension;
 
@@ -123,7 +122,11 @@ class VisitEventAssociationDumperExtensionTest extends \PHPUnit_Framework_TestCa
         $this->associationBuilder
             ->expects($this->once())
             ->method('createManyToOneAssociation')
-            ->with(TrackingVisitEvent::ENTITY_NAME, $data[0], VisitEventAssociationExtension::ASSOCIATION_KIND);
+            ->with(
+                'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
+                $data[0],
+                VisitEventAssociationExtension::ASSOCIATION_KIND
+            );
 
         $this->extension->preUpdate();
     }
@@ -156,7 +159,7 @@ class VisitEventAssociationDumperExtensionTest extends \PHPUnit_Framework_TestCa
         $extendProvider
             ->expects($this->any())
             ->method('hasConfig')
-            ->with(TrackingVisitEvent::ENTITY_NAME)
+            ->with('Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent')
             ->will($this->returnValue(true));
 
         $this->configManager

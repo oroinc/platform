@@ -153,6 +153,7 @@ oro:
         importance.label:         Importance
         internal_date.label:      Internal date
         message_id.label:         Message Id
+        multi_message_id.label:   Multi Message Id
         received_at.label:        Received at
         recipients.label:         Recipients
         send_email:               Send email
