@@ -105,7 +105,7 @@ datagrid:
             view_thread_link:
                 type: url
                 route: oro_email_thread_view
-                params: { id: id }
+                params: { id: email.id }
             toggle_seen_link:
                 type: url
                 route: oro_email_toggle_seen
