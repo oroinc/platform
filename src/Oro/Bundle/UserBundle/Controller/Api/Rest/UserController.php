@@ -17,10 +17,13 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Entity\User;
+
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 /**
@@ -63,7 +66,7 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function cgetAction()
     {
-        $page = (int) $this->getRequest()->get('page', 1);
+        $page  = (int) $this->getRequest()->get('page', 1);
         $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters(__FUNCTION__));
@@ -168,13 +171,57 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function getRolesAction($id)
     {
-        $entity = $this->getManager()->getRepository()->findOneBy(array('id' => (int) $id));
+        $entity = $this->getManager()->getRepository()->findOneBy(['id' => (int) $id]);
 
         if (!$entity) {
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
         return $this->handleView($this->view($entity->getRoles(), Codes::HTTP_OK));
+    }
+
+
+    /**
+     * Get user permissions
+     *
+     * @param int $id User id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @ApiDoc(
+     *      description="Get user permissions",
+     *      resource=true,
+     *      requirements={
+     *          {"name"="id", "dataType"="integer"},
+     *      }
+     * )
+     * @QueryParam(
+     *      name="entities",
+     *      requirements=".+",
+     *      nullable=true,
+     *      description="The entity class name. One or several classes names separated by comma.
+     * Defaults to all classes."
+     *)
+     * @AclAncestor("oro_user_permission_view")
+     */
+    public function getPermissionsAction($id)
+    {
+        /** @var User $user */
+        $user = $this->getManager()->getRepository()->findOneBy(['id' => (int) $id]);
+
+        if (!$user) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
+
+        $filter   = new StringToArrayParameterFilter();
+        $entities = $filter->filter($this->getRequest()->get('entities'), null);
+        if (!$entities) {
+            $entities = [];
+        }
+
+        $manager = $this->get('oro_user.permission_manager.api');
+        $result  = $manager->getData($user, $entities);
+
+        return $this->handleView($this->view($result, Codes::HTTP_OK));
     }
 
     /**
@@ -244,30 +291,30 @@ class UserController extends RestController implements ClassResourceInterface
     {
         switch ($field) {
             case 'roles':
-                $result = array();
+                $result = [];
                 /** @var Role $role */
                 foreach ($value as $index => $role) {
-                    $result[$index] = array(
-                        'id' => $role->getId(),
-                        'role' => $role->getRole(),
+                    $result[$index] = [
+                        'id'    => $role->getId(),
+                        'role'  => $role->getRole(),
                         'label' => $role->getLabel(),
-                    );
+                    ];
                 }
                 $value = $result;
                 break;
             case 'groups':
-                $result = array();
+                $result = [];
                 /** @var Group $group */
                 foreach ($value as $index => $group) {
-                    $result[$index] = array(
-                        'id' => $group->getId(),
+                    $result[$index] = [
+                        'id'   => $group->getId(),
                         'name' => $group->getName()
-                    );
+                    ];
                 }
                 $value = $result;
                 break;
             case 'emails':
-                $result = array();
+                $result = [];
                 /** @var Email $email */
                 foreach ($value as $email) {
                     $result[] = $email->getEmail();
@@ -275,22 +322,22 @@ class UserController extends RestController implements ClassResourceInterface
                 $value = $result;
                 break;
             case 'businessUnits':
-                $result = array();
+                $result = [];
                 /** @var BusinessUnit $businessUnit */
                 foreach ($value as $index => $businessUnit) {
-                    $result[$index] = array(
-                        'id' => $businessUnit->getId(),
+                    $result[$index] = [
+                        'id'   => $businessUnit->getId(),
                         'name' => $businessUnit->getName()
-                    );
+                    ];
                 }
                 $value = $result;
                 break;
             case 'owner':
                 if ($value) {
-                    $value = array(
-                        'id' => $value->getId(),
+                    $value = [
+                        'id'   => $value->getId(),
                         'name' => $value->getName()
-                    );
+                    ];
                 }
                 break;
             default:
