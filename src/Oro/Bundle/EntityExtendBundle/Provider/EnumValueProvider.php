@@ -26,9 +26,17 @@ class EnumValueProvider
      * @param string $enumCode
      * @return array
      */
-    public function getEnumChoices($enumCode)
+    public function getEnumChoicesByCode($enumCode)
     {
-        $enumClass = ExtendHelper::buildEnumValueClassName($enumCode);
+        return $this->getEnumChoices(ExtendHelper::buildEnumValueClassName($enumCode));
+    }
+
+    /**
+     * @param string $enumClass = ExtendHelper::buildEnumValueClassName($enumCode);
+     * @return array
+     */
+    public function getEnumChoices($enumClass)
+    {
         /** @var EnumValueRepository $repository */
         $repository = $this->doctrineHelper->getEntityRepository($enumClass);
         $values = $repository->getValues();

@@ -2,16 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
-
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
@@ -22,18 +18,18 @@ class EnumFilterType extends AbstractChoiceType
     const NAME = 'oro_enum_filter';
 
     /**
-     * @var ManagerRegistry
+     * @var EnumValueProvider
      */
-    protected $doctrine;
+    protected $valueProvider;
 
     /**
      * @param TranslatorInterface $translator
-     * @param ManagerRegistry     $doctrine
+     * @param EnumValueProvider $valueProvider
      */
-    public function __construct(TranslatorInterface $translator, ManagerRegistry $doctrine)
+    public function __construct(TranslatorInterface $translator, EnumValueProvider $valueProvider)
     {
         parent::__construct($translator);
-        $this->doctrine = $doctrine;
+        $this->valueProvider = $valueProvider;
     }
 
     /**
@@ -55,10 +51,24 @@ class EnumFilterType extends AbstractChoiceType
         );
         $resolver->setNormalizers(
             [
-                'class'         => function (Options $options, $value) {
-                    return $value !== null
-                        ? $value
-                        : ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                'class' => function (Options $options, $value) {
+                    if (!empty($value)) {
+                        $class = $value;
+                    } else {
+                        $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                    }
+
+                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                        throw new InvalidOptionsException(
+                            sprintf(
+                                '"%s" must be a child of "%s"',
+                                $class,
+                                'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                            )
+                        );
+                    }
+
+                    return $class;
                 },
                 // this normalizer allows to add/override field_options options outside
                 'field_options' => function (Options $options, $value) use (&$defaultFieldOptions) {
@@ -103,14 +113,7 @@ class EnumFilterType extends AbstractChoiceType
         }
 
         if (!empty($enumValueClassName)) {
-            /** @var EnumValueRepository $repo */
-            $repo = $this->doctrine->getRepository($enumValueClassName);
-            /** @var AbstractEnumValue[] $values */
-            $values = $repo->getValues();
-
-            foreach ($values as $value) {
-                $choices[$value->getId()] = $value->getName();
-            }
+            $choices = array_merge($choices, $this->valueProvider->getEnumChoices($enumValueClassName));
         }
 
         return $choices;
