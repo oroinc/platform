@@ -99,6 +99,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $startDate = clone $endDate;
             $startDate = $startDate->modify('-1 month');
 
+            // set seen flags from previously synchronized emails
             $this->checkFlags($imapFolder, $startDate, $endDate);
 
             $this->em->flush($folder);
@@ -118,29 +119,16 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkFlags(ImapEmailfolder $imapFolder, $startDate, $endDate)
     {
-        $emails = $this->manager->getUnseenEmails($startDate, $endDate);
+        $uids = $this->manager->getUnseenEmailUIDs($startDate, $endDate);
 
-        foreach ($emails as $email) {
-            echo $email->getId()->getUid();
-        }
+        $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
 
-/*        if ($uids) {
-            var_dump($uids);
-            $qb = $this->em->createQueryBuilder();
+        $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
+        $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
 
-            $emailUserIds = $qb->select('email_users.id')
-                ->from('OroImapBundle:ImapEmail', 'ie')
-                ->leftJoin('ie.email', 'email')
-                ->leftJoin('email.emailUsers', 'email_users')
-                ->andWhere('ie.imapFolder = :imap_folder')
-                ->andWhere($qb->expr()->in('ie.uid', ':uids'))
-                ->setParameter('imap_folder', $imapFolder)
-                ->setParameter('uids', $uids)
-                ->getQuery()->getArrayResult();
-
-            var_dump($emailUserIds);
-            exit;
-        }*/
+        $emailUserRepository->setEmailUsersSeen($ids, false);
+        $emailUserRepository->setEmailUsersSeen($invertedIds, true);
     }
 
     /**

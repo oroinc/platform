@@ -117,11 +117,16 @@ class ImapConnector
         return $result;
     }
 
-    public function findIds($query = null)
+    /**
+     * @param null $query
+     *
+     * @return mixed
+     */
+    public function findUIDs($query = null)
     {
         $this->ensureConnected();
 
-        return $this->imap->search([$query]);
+        return $this->imap->uidSearch([$query]);
     }
 
     /**

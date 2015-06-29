@@ -124,7 +124,7 @@ class ImapEmailManager
      *
      * @return ImapEmailIterator
      */
-    public function getUnseenEmails($startDate, $endDate)
+    public function getUnseenEmailUIDs($startDate, $endDate)
     {
         $query = sprintf(
             'UNSEEN SINCE "%s" BEFORE "%s"',
@@ -132,10 +132,7 @@ class ImapEmailManager
             $endDate->format('d-M-Y')
         );
 
-        return new ImapMessageIterator(
-            $this->connector->findIds($query),
-            $this
-        );
+        return $this->connector->findUIDs($query);
     }
 
     /**
