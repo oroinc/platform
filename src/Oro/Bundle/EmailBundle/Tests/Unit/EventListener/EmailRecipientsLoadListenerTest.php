@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Event\EmailRecipientsLoadEvent;
 use Oro\Bundle\EmailBundle\EventListener\EmailRecipientsLoadListener;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -187,5 +188,53 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
         $this->emailRecipientsLoadListener->loadRecentEmails($event);
 
         $this->assertEquals($expectedResults, $event->getResults());
+    }
+
+    public function testLoadContextEmailsShouldNotAddStuffInContextIfLimitIsNotPositive()
+    {
+        $query = 'query';
+        $limit = 0;
+
+        $this->emailRecipientsHelper->expects($this->never())
+            ->method('addEmailsToContext');
+
+        $event = new EmailRecipientsLoadEvent(null, $query, $limit);
+        $this->emailRecipientsLoadListener->loadContextEmails($event);
+    }
+
+    public function testLoadContextEmailsShouldNotAddStuffInContextIfRelatedActivityIsNull()
+    {
+        $query = 'query';
+        $limit = 1;
+
+        $this->emailRecipientsHelper->expects($this->never())
+            ->method('addEmailsToContext');
+
+        $event = new EmailRecipientsLoadEvent(null, $query, $limit);
+        $this->emailRecipientsLoadListener->loadContextEmails($event);
+    }
+
+    public function testLoadContextEmailsShouldAddStuffInContext()
+    {
+        $query = 'query';
+        $limit = 1;
+
+        $emails = [
+            'mail@example.com' => 'Mail <mail@example.com>',
+        ];
+
+        $relatedEntity = new Email();
+        $event = new EmailRecipientsLoadEvent($relatedEntity, $query, $limit);
+
+        $this->relatedEmailsProvider->expects($this->once())
+            ->method('getEmails')
+            ->with($relatedEntity, 2)
+            ->will($this->returnValue($emails));
+
+        $this->emailRecipientsHelper->expects($this->once())
+            ->method('addEmailsToContext')
+            ->with($event, $emails);
+
+        $this->emailRecipientsLoadListener->loadContextEmails($event);
     }
 }
