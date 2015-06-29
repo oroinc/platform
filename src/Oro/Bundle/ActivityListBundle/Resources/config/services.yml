@@ -25,6 +25,8 @@ parameters:
     oro_activity_list.filter.activity_list.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
     oro_activity_list.filter.datagrid_helper.class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
 
+    oro_activity_list.listener.email_recipients_load.listener.class: Oro\Bundle\ActivityListBundle\EventListener\EmailRecipientsLoadListener
+
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
@@ -158,3 +160,13 @@ services:
             - @oro_query_designer.grid.datagrid_configuration_builder
             - @oro_activity_list.datagrid.builder.link
             - @event_dispatcher
+
+    oro_activity_list.listener.email_recipients_load.listener:
+        class: %oro_activity_list.listener.email_recipients_load.listener.class%
+        arguments:
+            - @doctrine
+            - @oro_activity.manager
+            - @oro_email.related_emails.provider
+            - @translator
+        tags:
+            - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: onLoad }
