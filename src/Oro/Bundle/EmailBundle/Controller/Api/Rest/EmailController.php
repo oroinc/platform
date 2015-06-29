@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -172,8 +173,10 @@ class EmailController extends RestController
         $query = $request->query->get('query');
         if ($request->query->get('search_by_id', false)) {
             $results = [
-                'id'   => $query,
-                'text' => $query,
+                [
+                    'id'   => $query,
+                    'text' => $query,
+                ],
             ];
         } else {
             $limit = $request->query->get('per_page', 100);

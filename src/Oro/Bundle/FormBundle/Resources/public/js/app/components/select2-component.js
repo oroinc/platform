@@ -49,6 +49,21 @@ define(function (require) {
                     }
                 };
             }
+
+            if (!config.hasOwnProperty('createSearchChoice')
+                && config.hasOwnProperty('ajax')
+                && config.hasOwnProperty('tags')
+            ) {
+                config.createSearchChoice = function (term, data) {
+                    if (!dataHasText(data, term)) {
+                        return {
+                            id: term,
+                            text: term
+                        };
+                    }
+                };
+            }
+
             return config;
         },
 
@@ -239,6 +254,16 @@ define(function (require) {
             }
             return result;
         };
+    }
+
+    function dataHasText(data, text) {
+        return _.some(data, function (row) {
+            if (!row.hasOwnProperty('children')) {
+                return row.text.localeCompare(text) === 0;
+            }
+
+            return dataHasText(row.children, text);
+        });
     }
 
     return Select2Component;
