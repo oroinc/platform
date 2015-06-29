@@ -111,10 +111,6 @@ define(function (require) {
 
         makeQuery: function (query, configs) {
             return query;
-        },
-
-        dispose: function () {
-
         }
     });
 

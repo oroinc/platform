@@ -29,6 +29,10 @@ define(function (require) {
             this.undelegateEvents();
             this.$el.select2(this.select2Config).trigger('select2-init');
             this.delegateEvents();
+        },
+
+        dispose: function () {
+            this.$el.select2('close').select2('destroy');
         }
     });
 

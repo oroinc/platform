@@ -16,6 +16,7 @@
 //   2005.07.21 - Release 1.0
 //
 //   2015.06.04 - Fix isodatetime() when today.getUTCDate() !== today.getDate()
+//   2015.06.24 - Add serverTimeOffset to fix difference between server and client time
 //
 
 /*
@@ -293,8 +294,8 @@ function encode64(input) {
 // Reserved but may be freely used provided this colophon is 
 // included in full.
 //
-function isodatetime() {
-    var today = new Date();
+function isodatetime(serverTimeOffset) {
+    var today = new Date((new Date()).getTime() + serverTimeOffset);
     var year  = today.getYear();
     if (year < 2000)    // Y2K Fix, Isaac Powell
     year = year + 1900; // http://onyx.idbsu.edu/~ipowell
@@ -313,22 +314,22 @@ function isodatetime() {
     if (minute != minuteUTC && minuteUTC < 30 && diff < 0) { hourdifference--; }
     if (minute != minuteUTC && minuteUTC > 30 && diff > 0) { hourdifference--; }
     if (minute != minuteUTC) {
-    minutedifference = ":30";
+        minutedifference = ":30";
     }
     else {
-    minutedifference = ":00";
+        minutedifference = ":00";
     }
     if (hourdifference < 10) { 
-    timezone = "0" + hourdifference + minutedifference;
+        timezone = "0" + hourdifference + minutedifference;
     }
     else {
-    timezone = "" + hourdifference + minutedifference;
+        timezone = "" + hourdifference + minutedifference;
     }
     if (diff < 0) {
-    timezone = "-" + timezone;
+        timezone = "-" + timezone;
     }
     else {
-    timezone = "+" + timezone;
+        timezone = "+" + timezone;
     }
     if (month <= 9) month = "0" + month;
     if (day <= 9) day = "0" + day;
@@ -355,13 +356,13 @@ function isodatetime() {
 //    as: base64(sha1(Nonce . Created . Password))
 //
 
-function wsse(Password) {
-    var PasswordDigest, Nonce, Created;
+function wsse(Password, serverTimeOffset) {
+    var PasswordDigest, Nonce;
     var r = new Array;
-    
-    Nonce = b64_sha1(isodatetime() + 'There is more than words');
+    var Created = isodatetime(serverTimeOffset);
+
+    Nonce = b64_sha1(Created + 'There is more than words');
     nonceEncoded = encode64(Nonce);
-    Created = isodatetime();
     PasswordDigest = b64_sha1(Nonce + Created + Password);
 
     r[0] = nonceEncoded;
@@ -370,8 +371,8 @@ function wsse(Password) {
     return r;
 }
 
-function wsseHeader(Username, Password) {
-    var w = wsse(Password);
+function wsseHeader(Username, Password, serverTimeOffset) {
+    var w = wsse(Password, serverTimeOffset);
     var header = 'UsernameToken Username="' + Username + '", PasswordDigest="' + w[2] + '", Created="' + w[1] + '", Nonce="' + w[0] + '"';
     return header;
 }
