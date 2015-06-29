@@ -70,6 +70,9 @@ class EmailApi
     /** @var string */
     protected $refs;
 
+    /** @var \DateTime */
+    protected $changedStatusAt;
+
     /**
      * @param EmailEntity|null $entity
      */
@@ -350,6 +353,30 @@ class EmailApi
     public function getReceivedAt()
     {
         return $this->receivedAt;
+    }
+
+    /**
+     * Set email changed status date
+     *
+     * @param \DateTime $changedStatusAt
+     *
+     * @return self
+     */
+    public function setChangedStatusAt($changedStatusAt)
+    {
+        $this->changedStatusAt = $changedStatusAt;
+
+        return $this;
+    }
+
+    /**
+     * Get email changed status date
+     *
+     * @return \DateTime
+     */
+    public function getChangedStatusAt()
+    {
+        return $this->changedStatusAt;
     }
 
     /**

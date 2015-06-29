@@ -105,11 +105,11 @@ datagrid:
             view_thread_link:
                 type: url
                 route: oro_email_thread_view
-                params: { id: email.id }
+                params: { id: id }
             toggle_seen_link:
                 type: url
                 route: oro_email_toggle_seen
-                params: { id: email.id }
+                params: { id: id }
             row_class_name:
                 type: callback
                 className: 'email-row-is-readed'
@@ -126,7 +126,7 @@ datagrid:
                 type: ajax
                 label: oro.email.datagrid.emails.action.mark_as_read
                 link:  toggle_seen_link
-                icon: plus
+                icon: check
                 defaultMessages:
                     success: oro.email.action.success_mark_read
                     error: oro.email.action.error
@@ -139,6 +139,20 @@ datagrid:
                     success: oro.email.action.success_mark_unread
                     error: oro.email.action.error
         action_configuration: @oro_email.helper.datagrid.emails->getActionConfigurationClosure
+        mass_actions:
+            emailmarkread:
+                type: emailmarkread
+                entity_name: %oro_email.email_user.entity.class%
+                data_identifier: eu.id
+                label: oro.email.datagrid.emails.action.mark_as_read
+                icon: check
+            emailmarkunread:
+                type: emailmarkunread
+                entity_name: %oro_email.email_user.entity.class%
+                data_identifier: eu.id
+                label: oro.email.datagrid.emails.action.mark_as_unread
+                icon: minus
+
     dashboard-recent-emails-grid:
         source:
             type: orm
