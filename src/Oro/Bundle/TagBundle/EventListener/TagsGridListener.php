@@ -10,9 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 class TagsGridListener
 {
     const GRID_EXTEND_ENTITY_PATH = '[extended_entity_name]';
-    const GRID_LEFT_JOIN_PATH     = '[source][query][join][left]';
     const GRID_FROM_PATH          = '[source][query][from]';
-    const GRID_SELECT_PATH        = '[source][query][select]';
     const GRID_FILTERS_PATH       = '[filters][columns]';
     const GRID_NAME_PATH          = 'name';
     const COLUMN_NAME             = 'tagname';
@@ -44,54 +42,14 @@ class TagsGridListener
             return;
         }
 
-        $fromParts = $config->offsetGetByPath(self::GRID_FROM_PATH, []);
-        $alias     = false;
-
-        foreach ($fromParts as $fromPart) {
-            if ($this->entityClassResolver->getEntityClass($fromPart['table']) == $entityClassName) {
-                $alias = $fromPart['alias'];
-                break;
-            }
-        }
-
-        if ($alias === false) {
-            // add entity if it not exists in from clause
-            $alias       = 'o';
-            $fromParts[] = ['table' => $entityClassName, 'alias' => $alias];
-            $config->offsetSetByPath(self::GRID_FROM_PATH, $fromParts);
-        }
-
-        $config->offsetAddToArrayByPath(
-            self::GRID_LEFT_JOIN_PATH,
-            [
-                [
-                    'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
-                    'alias'         => 'tagging',
-                    'conditionType' => 'WITH',
-                    'condition'     => sprintf(
-                        "(tagging.entityName = '%s' and tagging.recordId = %s.id)",
-                        $entityClassName,
-                        $alias
-                    )
-                ],
-                ['join' => 'tagging.tag', 'alias' => 'tag']
-            ]
-        );
-
-        $config->offsetAddToArrayByPath(self::GRID_SELECT_PATH, ['COUNT(tag.id) as tagsCount']);
-
         $filters[self::COLUMN_NAME] = [
-            'type'         => 'entity',
-            'label'        => 'oro.tag.entity_plural_label',
-            'data_name'    => 'tag.id',
-            'enabled'      => false,
-            'translatable' => true,
-            'options'      => [
-                'field_type'    => 'oro_tag_entity_tags_selector',
+            'type'      => 'tag',
+            'label'     => 'oro.tag.entity_plural_label',
+            'data_name' => 'tag.id',
+            'enabled'   => false,
+            'options'   => [
                 'field_options' => [
-                    'entity_class'         => $entityClassName,
-                    'multiple'             => true,
-                    'translatable_options' => true
+                    'entity_class' => $entityClassName,
                 ]
             ]
         ];

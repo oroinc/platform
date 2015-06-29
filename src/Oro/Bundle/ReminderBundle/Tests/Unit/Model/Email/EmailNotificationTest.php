@@ -32,7 +32,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -49,8 +49,8 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->nameFormatter = $this
-            ->getMockBuilder('\Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -155,9 +155,9 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSenderName()
     {
-        $this->nameFormatter
+        $this->entityNameResolver
             ->expects($this->once())
-            ->method('format')
+            ->method('getName')
             ->with($this->sender)
             ->will($this->returnValue(self::SENDER_NAME));
         $name = $this->createNotification(true, false, true, true)->getSenderName();
@@ -225,7 +225,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $notification = new EmailNotification(
             $this->em,
             $this->provider,
-            $this->nameFormatter
+            $this->entityNameResolver
         );
 
         if ($hasReminder) {

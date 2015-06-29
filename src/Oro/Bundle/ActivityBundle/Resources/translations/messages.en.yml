@@ -6,4 +6,4 @@ oro:
             activities_tab.label: Activities
 
         sections:
-            activities:       Record Activities
+            activities:       Activity

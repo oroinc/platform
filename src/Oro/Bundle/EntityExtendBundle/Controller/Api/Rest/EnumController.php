@@ -38,7 +38,7 @@ class EnumController extends FOSRestController
      */
     public function getAction($entityName)
     {
-        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         /** @var EntityManager $em */
         $em       = $this->get('doctrine')->getManagerForClass($entityName);

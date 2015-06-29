@@ -42,6 +42,8 @@ services:
 
     oro_email.form.type.emailtemplate_translation:
         class: %oro_email.form.type.emailtemplate_translation.class%
+        arguments:
+            - @oro_config.user
         tags:
             - { name: form.type, alias: oro_email_emailtemplate_translatation }
 

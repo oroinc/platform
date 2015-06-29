@@ -65,7 +65,6 @@ parameters:
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
-    oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
     oro_email.listener.datagrid.context.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\ContextGridListener
 
     # Email Action for workflows
@@ -82,6 +81,8 @@ parameters:
 
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
+    oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
+    oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
 services:
     oro_email.entity.cache.warmer:
@@ -152,7 +153,7 @@ services:
         arguments:
             - @oro_entity.routing_helper
             - @oro_email.email.address.helper
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @security.context
             - @oro_email.email.address.manager
             - @doctrine.orm.entity_manager
@@ -186,6 +187,7 @@ services:
         arguments:
             - @oro_email.email.address.manager
             - @oro_email.email.owner.provider
+            - @event_dispatcher
 
     oro_email.listener.entity_listener:
         class: %oro_email.listener.entity_listener.class%
@@ -203,6 +205,10 @@ services:
         arguments:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @oro_entity_config.config_manager
+            - @oro_security.security_facade
+            - @router
 
     oro_email.direct_mailer:
         class: %oro_email.direct_mailer.class%
@@ -298,7 +304,7 @@ services:
         arguments:
             - @translator
             - @oro_security.security_facade
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @oro_config.user
         lazy: true
         tags:
@@ -330,7 +336,7 @@ services:
         class: %oro_email.datagrid_query_factory.class%
         arguments:
             - @oro_email.email.owner.provider.storage
-            - @oro_locale.dql.formatter.name
+            - @oro_entity.entity_name_resolver
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
@@ -357,6 +363,7 @@ services:
             - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
+            - @oro_security.security_facade.link
             - @event_dispatcher
 
     oro_email.workflow.action.send_email:
@@ -365,7 +372,7 @@ services:
             - @oro_workflow.context_accessor
             - @oro_email.mailer.processor
             - @oro_email.email.address.helper
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
         calls:
             - [setLogger, [@logger]]
         tags:
@@ -377,7 +384,7 @@ services:
             - @oro_workflow.context_accessor
             - @oro_email.mailer.processor
             - @oro_email.email.address.helper
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @oro_email.email_renderer
             - @doctrine.orm.entity_manager
             - @validator
@@ -409,13 +416,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
 
-    oro_email.listener.datagrid.user_emails.main:
-        class: %oro_email.listener.datagrid.user_emails.main.class%
-        arguments:
-            - @oro_email.helper.datagrid.emails
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
-
     oro_email.listener.datagrid.recent_emails.inbox:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
@@ -428,6 +428,7 @@ services:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
             - @oro_email.helper.datagrid.emails
+            - @oro_email.datagrid_query_factory
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
 
@@ -490,7 +491,7 @@ services:
         arguments:
            - @oro_entity.doctrine_helper
            - @oro_entity_config.link.entity_manager
-           - @oro_email.link.formatter.name
+           - @oro_entity.entity_name_resolver
            - @router
            - @oro_entity_config.config_manager
            - @oro_email.email.thread.provider
@@ -570,3 +571,26 @@ services:
 
     oro_email.email_body_type_transformer:
         class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailBodyTypeApiTransformer
+
+    oro_email.acl.voter.email_voter:
+        class: %oro_email.acl.voter.email_voter.class%
+        arguments:
+            - @service_container
+        tags:
+            - { name: security.voter }
+
+    oro_email.entity_alias_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
+        public: false
+        arguments:
+            - @oro_email.email.address.manager
+        tags:
+            - { name: oro_entity.alias_provider }
+
+    oro_email.manager.email_activity.api:
+        class: %oro_email.manager.email_activity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager

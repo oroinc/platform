@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Cache\ClearableCache;
+
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
@@ -9,7 +11,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -69,6 +70,26 @@ class ExtendConfigDumper
     }
 
     /**
+     * Gets the cache directory
+     *
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+
+    /**
+     * Sets the cache directory
+     *
+     * @param string $cacheDir
+     */
+    public function setCacheDir($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
+    }
+
+    /**
      * @param AbstractEntityConfigDumperExtension $extension
      * @param int                                 $priority
      */
@@ -111,6 +132,8 @@ class ExtendConfigDumper
                 // and other bundles can produce more changes depending on already made, it's a bit hacky,
                 // but it's a service operation so called inevitable evil
                 $extendProvider->flush();
+                // the clearing of an entity manager gives a performance gain of 4 times
+                $extendProvider->getConfigManager()->getEntityManager()->clear();
 
                 $this->updateStateValues($extendConfig);
             }
@@ -142,7 +165,19 @@ class ExtendConfigDumper
             }
         }
 
-        $this->entityGenerator->generate($schemas);
+        $cacheDir = $this->entityGenerator->getCacheDir();
+        if ($cacheDir === $this->cacheDir) {
+            $this->entityGenerator->generate($schemas);
+        } else {
+            $this->entityGenerator->setCacheDir($this->cacheDir);
+            try {
+                $this->entityGenerator->generate($schemas);
+                $this->entityGenerator->setCacheDir($cacheDir);
+            } catch (\Exception $e) {
+                $this->entityGenerator->setCacheDir($cacheDir);
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -167,9 +202,10 @@ class ExtendConfigDumper
             $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         }
 
-        /** @var ExtendClassMetadataFactory $metadataFactory */
-        $metadataFactory = $this->em->getMetadataFactory();
-        $metadataFactory->clearCache();
+        $metadataCacheDriver = $this->em->getMetadataFactory()->getCacheDriver();
+        if ($metadataCacheDriver instanceof ClearableCache) {
+            $metadataCacheDriver->deleteAll();
+        }
     }
 
     /**

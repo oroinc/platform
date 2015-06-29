@@ -2,24 +2,30 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Symfony\Component\Form\FormView;
+
+use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 
 class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var EmailTemplateTranslationType
-     */
+    /** @var EmailTemplateTranslationType */
     protected $type;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
 
     protected function setUp()
     {
-        $this->type = new EmailTemplateTranslationType(array());
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->type = new EmailTemplateTranslationType($this->configManager);
     }
 
     protected function tearDown()
     {
         unset($this->type);
+        unset($this->configManager);
     }
 
     public function testSetDefaultOptions()

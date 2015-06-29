@@ -2,46 +2,47 @@
 
 namespace Oro\Bundle\DistributionBundle\Routing;
 
-use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
+
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+
+use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 
 class OroExposeLoader extends AbstractLoader
 {
-    const OPTION_EXPOSE = 'expose';
+    /**
+     * @param KernelInterface               $kernel
+     * @param RouteOptionsResolverInterface $routeOptionsResolver
+     */
+    public function __construct(
+        KernelInterface $kernel,
+        RouteOptionsResolverInterface $routeOptionsResolver
+    ) {
+        parent::__construct(
+            $kernel,
+            $routeOptionsResolver,
+            ['Resources/config/oro/routing.yml'],
+            'oro_expose'
+        );
+    }
 
     /**
      * {@inheritdoc}
      */
     public function load($file, $type = null)
     {
-        $routes = new RouteCollection();
+        $routes = parent::load($file, $type);
 
-        foreach ($this->kernel->getBundles() as $bundle) {
-            try {
-                $path = $this->locator->locate('Resources/config/oro/routing.yml', $bundle->getPath());
-            } catch (\InvalidArgumentException $e) {
-                continue;
-            }
-
-            $collection = parent::load($path, $type);
-
-            /** @var Route $route */
-            foreach ($collection->getIterator() as $routeName => $route) {
-                if ($route->hasOption(self::OPTION_EXPOSE) && $route->getOption(self::OPTION_EXPOSE)) {
-                    $routes->add($routeName, $route);
-                }
+        $toRemove = [];
+        /** @var Route $route */
+        foreach ($routes->all() as $name => $route) {
+            if (!$route->getOption('expose')) {
+                $toRemove[] = $name;
             }
         }
+        $routes->remove($toRemove);
 
         return $this->dispatchEvent(RouteCollectionEvent::EXPOSE, $routes);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($resource, $type = null)
-    {
-        return 'oro_expose' === $type;
     }
 }

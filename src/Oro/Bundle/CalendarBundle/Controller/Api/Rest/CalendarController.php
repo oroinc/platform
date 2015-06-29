@@ -57,7 +57,7 @@ class CalendarController extends FOSRestController
         );
 
         if (!$result['calendarName']) {
-            $result['calendarName'] = $this->get('oro_locale.formatter.name')->format($calendar->getOwner());
+            $result['calendarName'] = $this->get('oro_entity.entity_name_resolver')->getName($calendar->getOwner());
         }
 
         return new Response(json_encode($result), Codes::HTTP_OK);
