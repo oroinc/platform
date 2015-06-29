@@ -2,23 +2,18 @@
 
 namespace Oro\Bundle\TranslationBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Handler\Context;
-
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
 
 /**
  * @RouteResource("translation")
@@ -44,42 +39,51 @@ class TranslationController extends FOSRestController
      * @QueryParam(
      *      name="domain",
      *      requirements=".+",
-     *      nullable=false,
-     *      description="The translation domain."
+     *      nullable=true,
+     *      description="The translation domain. Defaults to 'messages'."
      * )
      * @QueryParam(
      *      name="locale",
-     *      requirements="^[a-z]{2}$",
+     *      requirements=".+",
      *      nullable=true,
-     *      description="The preferred locale for translation. Default for all locales."
+     *      description="The translation locale."
      * )
      * @ApiDoc(
-     *      description="Get all translation",
+     *      description="Get translations",
      *      resource=true
      * )
-     * @AclAncestor("oro_translation_view")
+     *
      * @return Response
      */
     public function cgetAction()
     {
         $page   = (int)$this->getRequest()->get('page', 1);
         $limit  = (int)$this->getRequest()->get('limit', RestGetController::ITEMS_PER_PAGE);
-        $domain = $this->getRequest()->get('domain');
+        $domain = $this->getRequest()->get('domain', 'messages');
 
-        $result = $this->get('translator.default')->getTranslations([$domain]);
+        $result = $this->get('translator')->getTranslations([$domain]);
 
-        $totalCount = 0;
-        $data = [$domain => []];
+        $data = [];
         if (isset($result[$domain]) && is_array($result[$domain])) {
-            $data = [$domain => array_slice($result[$domain], ($page - 1) * $limit, $limit)];
-            $totalCount = count($result[$domain]);
+            $slice = array_slice(
+                $result[$domain],
+                $page > 0 ? ($page - 1) * $limit : 0,
+                $limit
+            );
+            foreach ($slice as $key => $val) {
+                $data[] = ['key' => $key, 'value' => $val];
+            }
         }
 
-        $view = $this->view($data, Codes::HTTP_OK);
+        $view     = $this->view($data, Codes::HTTP_OK);
         $response = parent::handleView($view);
-        $values = [
-            'totalCount' => function () use ($totalCount) {
-                return $totalCount;
+
+        $responseContext = [
+            'result'     => $data,
+            'totalCount' => function () use ($result, $domain) {
+                return isset($result[$domain]) && is_array($result[$domain])
+                    ? count($result[$domain])
+                    : 0;
             },
         ];
 
@@ -89,8 +93,8 @@ class TranslationController extends FOSRestController
                 $this,
                 $this->get('request'),
                 $response,
-                RestApiReadInterface::ACTION_LIST,
-                $values
+                RestGetController::ACTION_LIST,
+                $responseContext
             )
         );
 
