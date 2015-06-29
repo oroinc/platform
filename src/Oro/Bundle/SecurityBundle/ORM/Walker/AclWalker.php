@@ -16,7 +16,10 @@ use Doctrine\ORM\Query\AST\WhereClause;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\ComparisonExpression;
+use Doctrine\ORM\Query\AST\NullComparisonExpression;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclBiCondition;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclNullCondition;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -26,6 +29,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStatement;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinClause;
 
 /**
  * Class AclWalker
@@ -39,6 +43,9 @@ class AclWalker extends TreeWalkerAdapter
 
     const EXPECTED_TYPE = 12;
 
+    /** @var   */
+    protected $whereShareCondition;
+
     /**
      * @inheritdoc
      */
@@ -46,6 +53,16 @@ class AclWalker extends TreeWalkerAdapter
     {
         /** @var Query $query */
         $query = $this->_getQuery();
+
+        if ($query->hasHint(self::ORO_ACL_JOIN)) {
+            /** @var AclJoinStorage $joinStorage */
+            $joinStorage = $query->getHint(self::ORO_ACL_JOIN);
+
+            if (!$joinStorage->isEmpty()) {
+                $this->addJoins($AST, $joinStorage);
+            }
+        }
+
         if ($query->hasHint(self::ORO_ACL_CONDITION)) {
             /** @var AclConditionStorage $aclCondition */
             $aclCondition = $query->getHint(self::ORO_ACL_CONDITION);
@@ -53,15 +70,6 @@ class AclWalker extends TreeWalkerAdapter
             if (!$aclCondition->isEmpty()) {
                 $this->addRequestConditions($AST, $aclCondition);
                 $this->processSubRequests($AST, $aclCondition);
-            }
-        }
-
-        if ($query->hasHint(self::ORO_ACL_JOIN)) {
-            /** @var AclJoinStorage $joinStorage */
-            $joinStorage = $query->getHint(self::ORO_ACL_JOIN);
-
-            if (!$joinStorage->isEmpty()) {
-                $this->addJoinRequest($AST, $joinStorage);
             }
         }
 
@@ -227,6 +235,10 @@ class AclWalker extends TreeWalkerAdapter
             if ($whereCondition instanceof AclCondition) {
                 $this->addConditionFactors($aclConditionalFactors, $whereCondition);
             }
+        }
+
+        if (!empty($aclConditionalFactors)) {
+            $aclConditionalFactors = $this->addShareFactor($aclConditionalFactors);
         }
 
         if (!empty($aclConditionalFactors)) {
@@ -433,12 +445,111 @@ class AclWalker extends TreeWalkerAdapter
      * @param SelectStatement $AST
      * @param AclJoinStorage $joinStorage
      */
-    protected function addJoinRequest($AST, $joinStorage)
+    protected function addJoins($AST, $joinStorage)
     {
         $joinStatements = $joinStorage->getJoinStatements();
         /** @var AclJoinStatement $joinStatement */
         foreach ($joinStatements as $joinStatement) {
-            //TODO: in AEIV-81
+            //Implement Join logic here
+            switch ($joinStatement->getMethod()) {
+                case AclJoinStatement::ACL_SHARE_STATEMENT:
+                    $this->addShareJoin($AST, $joinStatement);
+                    break;
+            }
         }
+    }
+
+    protected function addShareJoin(SelectStatement $AST, AclJoinStatement $joinStatement)
+    {
+        /** @var AclJoinClause $joinClause */
+        $joinClause = $joinStatement->getJoinClause();
+
+        $conditionalFactors = [];
+        foreach ($joinStatement->getJoinConditions() as $condition) {
+            switch (true) {
+                case $condition instanceof AclBiCondition:
+                    $pathExpression = new PathExpression(
+                        self::EXPECTED_TYPE,
+                        $condition->getEntityAliasLeft(),
+                        $condition->getEntityFieldLeft()
+                    );
+                    $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+                    $leftExpression = new ArithmeticExpression();
+                    $leftExpression->simpleArithmeticExpression = $pathExpression;
+                    $rightExpression = new ArithmeticExpression();
+                    $pathExpression = new PathExpression(
+                        self::EXPECTED_TYPE,
+                        $condition->getEntityAliasRight(),
+                        $condition->getEntityFieldRight()
+                    );
+                    $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+                    $rightExpression->simpleArithmeticExpression = $pathExpression;
+                    $resultCondition      = new ConditionalPrimary();
+                    $resultCondition->simpleConditionalExpression =
+                        new ComparisonExpression($leftExpression, '=', $rightExpression);
+                    $conditionalFactors[] = $resultCondition;
+                    break;
+
+                case $condition instanceof AclCondition:
+                    $pathExpression       = new PathExpression(
+                        self::EXPECTED_TYPE,
+                        $condition->getEntityAlias(),
+                        $condition->getEntityField()
+                    );
+                    $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+                    $leftExpression                              = new ArithmeticExpression();
+                    $leftExpression->simpleArithmeticExpression  = $pathExpression;
+                    $rightExpression                             = new ArithmeticExpression();
+                    $rightExpression->simpleArithmeticExpression =
+                        new Literal(Literal::NUMERIC, (int)$condition->getValue());
+                    $resultCondition      = new ConditionalPrimary();
+                    $resultCondition->simpleConditionalExpression =
+                         new ComparisonExpression($leftExpression, '=', $rightExpression);
+                    $conditionalFactors[] = $resultCondition;
+                    break;
+            }
+
+        }
+
+        $join = new Join(
+            Join::JOIN_TYPE_LEFT,
+            new Query\AST\RangeVariableDeclaration(
+                $joinClause->getAbstractSchemaName(),
+                $joinClause->getAliasIdentificationVariable(),
+                false
+            )
+        );
+        $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
+
+        if (!empty($AST->fromClause->identificationVariableDeclarations[0])) {
+            $AST->fromClause->identificationVariableDeclarations[0]->joins[] = $join;
+            foreach ($joinStatement->getWhereConditions() as $whereCondition) {
+                if ($whereCondition instanceof AclNullCondition) {
+                    $this->whereShareCondition = $whereCondition;
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array $aclConditionalFactors
+     *
+     * @return array
+     */
+    protected function addShareFactor(array $aclConditionalFactors)
+    {
+        $pathExpression = new PathExpression(
+            self::EXPECTED_TYPE,
+            $this->whereShareCondition->getEntityAlias(),
+            $this->whereShareCondition->getEntityField()
+        );
+        $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+        $shareCondition = new NullComparisonExpression($pathExpression);
+        $shareCondition->not = true;
+        $orgCondition = new ConditionalPrimary();
+        $ownershipCondition = new ConditionalTerm($aclConditionalFactors);
+        $orgCondition->conditionalExpression = [$ownershipCondition, $shareCondition];
+        return [$orgCondition];
     }
 }

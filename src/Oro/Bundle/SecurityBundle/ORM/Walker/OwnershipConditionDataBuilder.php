@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
+use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\PathExpression;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclBiCondition;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclNullCondition;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinClause;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -23,6 +28,12 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
  */
 class OwnershipConditionDataBuilder
 {
+    const ACL_ENTRIES_SCHEMA_NAME = 'Oro\Bundle\SecurityBundle\Entities\AclEntries';
+    const ACL_ENTRIES_ALIAS = 'acl_entries';
+    const ACL_ENTRIES_SHARE_RECORD = 'record_id';
+    const ACL_ENTRIES_CLASS_ID = 'class_id';
+    const ACL_ENTRIES_SECURITY_ID = 'security_identity_id';
+
     /** @var ServiceLink */
     protected $securityContextLink;
 
@@ -393,8 +404,36 @@ class OwnershipConditionDataBuilder
         return $this->treeProvider->getTree();
     }
 
-    public function getAclJoinData($entityName, $entityAlias, $permission)
+    /**
+     * @param string $entityName
+     * @param string $entityAlias
+     * @param string $permission
+     *
+     * @return array
+     */
+    public function getAclShareData($entityName, $entityAlias, $permission)
     {
-        //TODO: AEIV-81
+        $joinClause = new AclJoinClause(
+            self::ACL_ENTRIES_SCHEMA_NAME,
+            self::ACL_ENTRIES_ALIAS,
+            null,
+            null,
+            Join::JOIN_TYPE_LEFT
+        );
+        $whereConditions[] = new AclNullCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_SHARE_RECORD, true);
+        $joinConditions[] = new AclBiCondition(
+            $entityAlias,
+            'id',
+            self::ACL_ENTRIES_ALIAS,
+            self::ACL_ENTRIES_SHARE_RECORD
+        );
+        //Stub, @TODO: AEIV-74
+        $sid = 9;
+        //Stub, @TODO: AEIV-74
+        $cid = 9;
+        $joinConditions[] = new AclCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_SECURITY_ID, $sid);
+        $joinConditions[] = new AclCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_CLASS_ID, $cid);
+
+        return [$joinClause, $joinConditions, $whereConditions];
     }
 }

@@ -142,13 +142,15 @@ class AclHelper
             }
 
             if (!$joinStorage->isEmpty()) {
-                $query->setHint(
-                    Query::HINT_CUSTOM_TREE_WALKERS,
-                    array_merge(
-                        $query->getHints(),
-                        array(self::ORO_ACL_WALKER)
-                    )
-                );
+                $hints = $query->getHints();
+                if (!empty($hints[Query::HINT_CUSTOM_TREE_WALKERS])) {
+                    $customHints = !in_array(self::ORO_ACL_WALKER, $hints[Query::HINT_CUSTOM_TREE_WALKERS])
+                        ? array_merge($hints[Query::HINT_CUSTOM_TREE_WALKERS], array(self::ORO_ACL_WALKER))
+                        : $hints[Query::HINT_CUSTOM_TREE_WALKERS];
+                } else {
+                    $customHints = array(self::ORO_ACL_WALKER);
+                }
+                $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $customHints);
                 $query->setHint(AclWalker::ORO_ACL_JOIN, $joinStorage);
             }
         }
@@ -255,14 +257,13 @@ class AclHelper
             );
             if ($condition) {
                 $whereConditions[] = $condition;
-            }
-
-            $joinStatement = $this->processRangeVariableDeclarationShare(
-                $identificationVariableDeclaration->rangeVariableDeclaration,
-                $permission
-            );
-            if ($joinStatement) {
-                $joinStatements[] = $joinStatement;
+                $joinStatement = $this->processRangeVariableDeclarationShare(
+                    $identificationVariableDeclaration->rangeVariableDeclaration,
+                    $permission
+                );
+                if ($joinStatement) {
+                    $joinStatements[] = $joinStatement;
+                }
             }
 
             // check joins
@@ -471,12 +472,12 @@ class AclHelper
     }
 
     /**
-     * Process where and join statement
+     * Process where and join statements
      *
      * @param RangeVariableDeclaration $rangeVariableDeclaration
      * @param string                   $permission
      *
-     * @return null|AclJoinStatement
+     * @return AclJoinStatement|null
      */
     protected function processRangeVariableDeclarationShare(
         RangeVariableDeclaration $rangeVariableDeclaration,
@@ -486,11 +487,11 @@ class AclHelper
         $entityName = $rangeVariableDeclaration->abstractSchemaName;
         $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
 
-        $resultData = $this->builder->getAclJoinData($entityName, $entityAlias, $permission);
+        $resultData = $this->builder->getAclShareData($entityName, $entityAlias, $permission);
 
         if (!empty($resultData)) {
-            list($join, $aclCondition) = $resultData;
-            return new AclJoinStatement($join, $aclCondition);
+            list($join, $joinConditions, $whereConditions) = $resultData;
+            return new AclJoinStatement($join, $whereConditions, $joinConditions);
         }
 
         return null;
