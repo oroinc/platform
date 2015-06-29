@@ -8,9 +8,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Event\EmailRecipientsLoadEvent;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailRecipientsLoadListener
 {
@@ -29,25 +30,31 @@ class EmailRecipientsLoadListener
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var EmailRecipientsHelper */
+    protected $emailRecipientsHelper;
+
     /**
      * @param SecurityFacade $securityFacade
      * @param AclHelper $aclHelper
      * @param RelatedEmailsProvider $relatedEmailsProvider
      * @param Registry $registry
      * @param TranslatorInterface $translator
+     * @param EmailRecipientsHelper $emailRecipientsHelper
      */
     public function __construct(
         SecurityFacade $securityFacade,
         AclHelper $aclHelper,
         RelatedEmailsProvider $relatedEmailsProvider,
         Registry $registry,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        EmailRecipientsHelper $emailRecipientsHelper
     ) {
         $this->securityFacade = $securityFacade;
         $this->aclHelper = $aclHelper;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
         $this->registry = $registry;
         $this->translator = $translator;
+        $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
 
     /**
@@ -74,7 +81,7 @@ class EmailRecipientsLoadListener
             [
                 [
                     'text'     => $this->translator->trans('oro.email.autocomplete.recently_used'),
-                    'children' => $this->createResultFromEmails($recentlyUsedEmails),
+                    'children' => $this->emailRecipientsHelper->createResultFromEmails($recentlyUsedEmails),
                 ],
             ]
         ));
@@ -85,68 +92,13 @@ class EmailRecipientsLoadListener
      */
     public function loadContextEmails(EmailRecipientsLoadEvent $event)
     {
-        $query = $event->getQuery();
         $limit = $event->getRemainingLimit();
-
         if (!$limit || !$event->getRelatedEntity()) {
             return;
         }
 
         $emails = $this->relatedEmailsProvider->getEmails($event->getRelatedEntity(), 2);
-
-        $excludedEmails = $event->getEmails();
-        $filteredEmails = array_filter($emails, function ($email) use ($query, $excludedEmails) {
-            return !in_array($email, $excludedEmails) && stripos($email, $query) !== false;
-        });
-        if (!$filteredEmails) {
-            return;
-        }
-
-        $id = $this->translator->trans('oro.email.autocomplete.contexts');
-        $resultsId = null;
-        $results = $event->getResults();
-        foreach ($results as $recordId => $record) {
-            if ($record['text'] === $id) {
-                $resultsId = $recordId;
-
-                break;
-            }
-        }
-
-        $children = $this->createResultFromEmails(array_splice($filteredEmails, 0, $limit));
-        if ($resultsId !== null) {
-            $results[$resultsId]['children'] = array_merge($results[$resultsId]['children'], $children);
-        } else {
-            $results = array_merge(
-                $results,
-                [
-                    [
-                        'text'     => $id,
-                        'children' => $children,
-                    ],
-                ]
-            );
-        }
-
-        $event->setResults($results);
-    }
-
-    /**
-     * @param array $emails
-     *
-     * @return array
-     */
-    protected function createResultFromEmails(array $emails)
-    {
-        $result = [];
-        foreach ($emails as $email => $name) {
-            $result[] = [
-                'id'   => $email,
-                'text' => $name,
-            ];
-        }
-
-        return $result;
+        $this->emailRecipientsHelper->addEmailsToContext($event, $emails);
     }
 
     /**

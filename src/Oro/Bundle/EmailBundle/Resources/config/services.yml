@@ -47,6 +47,7 @@ parameters:
     oro_email.activity_list.provider.class: Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider
     oro_email.related_emails.provider.class: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider
     oro_email.email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider
+    oro_email.provider.email_recipients.helper.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper
 
     # Cache keys
     oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'
@@ -513,6 +514,11 @@ services:
         arguments:
             - @event_dispatcher
 
+    oro_email.provider.email_recipients.helper:
+        class: %oro_email.provider.email_recipients.helper.class%
+        arguments:
+            - @translator
+
     oro_email.listener.email_recipients_load.listener:
         class: %oro_email.listener.email_recipients_load.listener.class%
         arguments:
@@ -521,6 +527,7 @@ services:
             - @oro_email.related_emails.provider
             - @doctrine
             - @translator
+            - @oro_email.provider.email_recipients.helper
         tags:
             - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: loadRecentEmails }
             - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: loadContextEmails }

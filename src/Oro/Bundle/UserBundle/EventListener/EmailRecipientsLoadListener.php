@@ -7,8 +7,9 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Event\EmailRecipientsLoadEvent;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class EmailRecipientsLoadListener
 {
@@ -21,16 +22,25 @@ class EmailRecipientsLoadListener
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var EmailRecipientsHelper */
+    protected $emailRecipientsHelper;
+
     /**
      * @param Registry $registry
      * @param AclHelper $aclHelper
      * @param TranslatorInterface $translator
+     * @param EmailRecipientsHelper $emailRecipientsHelper
      */
-    public function __construct(Registry $registry, AclHelper $aclHelper, TranslatorInterface $translator)
-    {
+    public function __construct(
+        Registry $registry,
+        AclHelper $aclHelper,
+        TranslatorInterface $translator,
+        EmailRecipientsHelper $emailRecipientsHelper
+    ) {
         $this->registry = $registry;
         $this->aclHelper = $aclHelper;
         $this->translator = $translator;
+        $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
 
     /**
@@ -55,28 +65,10 @@ class EmailRecipientsLoadListener
             [
                 [
                     'text'     => $this->translator->trans('oro.user.entity_plural_label'),
-                    'children' => $this->createResultFromEmails($userEmails),
+                    'children' => $this->emailRecipientsHelper->createResultFromEmails($userEmails),
                 ],
             ]
         ));
-    }
-
-    /**
-     * @param array $emails
-     *
-     * @return array
-     */
-    protected function createResultFromEmails(array $emails)
-    {
-        $result = [];
-        foreach ($emails as $email => $name) {
-            $result[] = [
-                'id'   => $email,
-                'text' => $name,
-            ];
-        }
-
-        return $result;
     }
 
     /**
