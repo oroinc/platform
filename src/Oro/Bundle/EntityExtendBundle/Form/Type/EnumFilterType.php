@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -102,13 +103,10 @@ class EnumFilterType extends AbstractChoiceType
         }
 
         if (!empty($enumValueClassName)) {
-            /** @var EntityRepository $repo */
+            /** @var EnumValueRepository $repo */
             $repo = $this->doctrine->getRepository($enumValueClassName);
             /** @var AbstractEnumValue[] $values */
-            $values = $repo->createQueryBuilder('o')
-                ->orderBy('o.priority')
-                ->getQuery()
-                ->getResult();
+            $values = $repo->getValues();
 
             foreach ($values as $value) {
                 $choices[$value->getId()] = $value->getName();

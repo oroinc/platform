@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -46,5 +48,40 @@ class EnumValueRepository extends EntityRepository
         $enumValueClassName = $this->getClassName();
 
         return new $enumValueClassName($id, $name, $priority, $default);
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getValuesQueryBuilder()
+    {
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.priority', Criteria::ASC);
+    }
+
+    /**
+     * @return AbstractEnumValue[]
+     */
+    public function getValues()
+    {
+        return $this->getValuesQueryBuilder()->getQuery()->getResult();
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getDefaultValuesQueryBuilder()
+    {
+        return $this->getValuesQueryBuilder()
+            ->andWhere('e.default = :default')
+            ->setParameter('default', true);
+    }
+
+    /**
+     * @return AbstractEnumValue[]
+     */
+    public function getDefaultValues()
+    {
+        return $this->getDefaultValuesQueryBuilder()->getQuery()->getResult();
     }
 }
