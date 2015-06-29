@@ -10,6 +10,7 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
     protected $registry;
     protected $aclHelper;
     protected $translator;
+    protected $emailRecipientsHelper;
 
     protected $emailRecipientsLoadListener;
 
@@ -30,10 +31,15 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
                 return $id;
             }));
 
+        $this->emailRecipientsHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailRecipientsLoadListener = new EmailRecipientsLoadListener(
             $this->registry,
             $this->aclHelper,
-            $this->translator
+            $this->translator,
+            $this->emailRecipientsHelper
         );
     }
 
@@ -109,6 +115,11 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with('OroUserBundle:User')
             ->will($this->returnValue($userRepository));
+
+        $this->emailRecipientsHelper->expects($this->once())
+            ->method('createResultFromEmails')
+            ->with($userEmails)
+            ->will($this->returnValue($expectedResults[0]['children']));
 
         $event = new EmailRecipientsLoadEvent(null, $query, $limit);
         $this->emailRecipientsLoadListener->onLoad($event);
