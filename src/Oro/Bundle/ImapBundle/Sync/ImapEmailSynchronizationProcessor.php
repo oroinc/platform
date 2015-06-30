@@ -69,8 +69,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $this->initEnv($origin);
 
-        // iterate through all folders and do a synchronization of emails for each one
-        $imapFolders = $this->syncFolders($origin);
+        // iterate through all folders enabled for sync and do a synchronization of emails for each one
+        $imapFolders = $this->getSyncEnabledImapFolders($origin);
         foreach ($imapFolders as $imapFolder) {
             $folder = $imapFolder->getFolder();
 
@@ -233,6 +233,27 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * Gets the list of IMAP folders enabled for sync
+     * The outdated folders are ignored
+     *
+     * @param EmailOrigin $origin
+     *
+     * @return ImapEmailFolder[]
+     */
+    protected function getSyncEnabledImapFolders(EmailOrigin $origin)
+    {
+        $this->logger->notice('Get folders enabled for sync...');
+
+        /** @var ImapEmailFolderRepository $repo */
+        $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE);
+
+        $this->logger->notice(sprintf('Got %d folder(s).', count($imapFolders)));
+
+        return $imapFolders;
+    }
+
+    /**
      * Gets all folders from IMAP server
      *
      * @return Folder[]
@@ -285,7 +306,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function syncEmails(ImapEmailFolder $imapFolder, SearchQuery $searchQuery)
     {
         $folder             = $imapFolder->getFolder();
-        $folderType         = $folder->getType();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
 
         $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
@@ -327,15 +347,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 );
                 $totalInvalid += $invalid;
                 $invalid = 0;
-            }
-
-            if (!$this->isApplicableEmail(
-                $email,
-                $folderType,
-                (int) $this->currentUser->getId(),
-                $this->currentOrganization
-            )) {
-                continue;
             }
 
             if ($email->getSentAt() > $lastSynchronizedAt) {
