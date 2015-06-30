@@ -7,6 +7,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
 {
@@ -15,9 +16,35 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var Mcrypt */
     protected $encryptor;
 
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
     protected function setUp()
     {
         $this->encryptor = new Mcrypt('someKey');
+
+        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->setMethods(['getOrganization'])
+            ->getMock();
+
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+
+        $user->expects($this->any())
+            ->method('getOrganization')
+            ->willReturn($organization);
+
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacade->expects($this->any())
+            ->method('getLoggerUser')
+            ->willReturn($user);
+
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganization')
+            ->willReturn($organization);
+
         parent::setUp();
     }
 
@@ -37,7 +64,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindValidData($formData, $expectedViewData, $expectedModelData)
     {
-        $type = new ConfigurationType($this->encryptor);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
         $form = $this->factory->create($type);
         if ($expectedViewData) {
             $form->submit($formData);
@@ -72,13 +99,13 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'port'     => '123',
                     'ssl'      => 'ssl',
                     'user'     => 'someUser',
-                    'password' => self::TEST_PASSWORD
+                    'password' => self::TEST_PASSWORD,
                 ),
                 array(
-                    'host' => 'someHost',
-                    'port' => '123',
-                    'ssl'  => 'ssl',
-                    'user' => 'someUser',
+                    'host'     => 'someHost',
+                    'port'     => '123',
+                    'ssl'      => 'ssl',
+                    'user'     => 'someUser',
                 ),
                 array(
                     'host'     => 'someHost',
@@ -107,7 +134,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindEmptyPassword()
     {
-        $type = new ConfigurationType($this->encryptor);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();
@@ -133,7 +160,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testCreatingNewConfiguration()
     {
-        $type = new ConfigurationType($this->encryptor);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();
@@ -162,7 +189,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmitEmptyForm()
     {
-        $type = new ConfigurationType($this->encryptor);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();

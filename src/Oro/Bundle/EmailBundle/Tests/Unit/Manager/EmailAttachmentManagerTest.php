@@ -8,17 +8,14 @@ use Doctrine\ORM\EntityManager;
 
 use Gaufrette\Filesystem;
 
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;

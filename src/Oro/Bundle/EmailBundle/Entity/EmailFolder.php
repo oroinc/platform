@@ -68,14 +68,6 @@ class EmailFolder
     protected $origin;
 
     /**
-     * @var ArrayCollection
-     *
-     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist"}, orphanRemoval=true)
-     * @JMS\Exclude
-     */
-    protected $emails;
-
-    /**
      * @var \DateTime
      *
      * @ORM\Column(name="synchronized", type="datetime", nullable=true)
@@ -89,10 +81,13 @@ class EmailFolder
      */
     protected $outdatedAt;
 
-    public function __construct()
-    {
-        $this->emails = new ArrayCollection();
-    }
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder",
+     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    protected $emailUsers;
 
     /**
      * Get id
@@ -196,46 +191,6 @@ class EmailFolder
     public function setOrigin(EmailOrigin $origin)
     {
         $this->origin = $origin;
-
-        return $this;
-    }
-
-    /**
-     * Get emails
-     *
-     * @return Email[]
-     */
-    public function getEmails()
-    {
-        return $this->emails;
-    }
-
-    /**
-     * Add email
-     *
-     * @param Email $email
-     *
-     * @return EmailFolder
-     */
-    public function addEmail(Email $email)
-    {
-        if (!$this->emails->contains($email)) {
-            $this->emails->add($email);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Email $email
-     *
-     * @return EmailFolder
-     */
-    public function removeEmail(Email $email)
-    {
-        if ($this->emails->contains($email)) {
-            $this->emails->removeElement($email);
-        }
 
         return $this;
     }
