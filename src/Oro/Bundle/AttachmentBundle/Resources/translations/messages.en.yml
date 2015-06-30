@@ -50,11 +50,12 @@ oro:
                 update:          Update
                 delete:          Delete
 
+        formatter:
+            image_link:
+                default: N/A
+
     entity_extend:
         form:
             data_type:
                 file:  File
                 image: Image
-    formatter:
-        image_link:
-            default: N/A
