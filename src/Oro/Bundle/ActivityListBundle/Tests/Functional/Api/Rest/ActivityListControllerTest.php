@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional\Api\Rest;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -38,17 +39,33 @@ class ActivityListControllerTest extends WebTestCase
     {
         /** @var TestActivity $activity */
         $activity = $this->getReference('test_activity_1');
-        $id       = $activity->getId();
+        $activityId       = $activity->getId();
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $activityListId = $em->getRepository(ActivityList::ENTITY_NAME)
+            ->createQueryBuilder('list')
+            ->select('list.id')
+            ->where('list.relatedActivityClass = :relatedActivityClass')
+            ->andWhere('list.relatedActivityId = :relatedActivityId')
+            ->setParameter('relatedActivityClass', 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity')
+            ->setParameter('relatedActivityId', $activityId)
+            ->getQuery()
+            ->getSingleScalarResult();
+
         $this->client->request(
             'GET',
             $this->getUrl(
                 'oro_api_get_activitylist_activity_list_item',
-                ['entityId' => $id]
+                ['entityId' => $activityListId]
             )
         );
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertArrayIntersectEquals(
-            ['id' => $id, 'subject' => $activity->getMessage(), 'description' => $activity->getDescription()],
+            [
+                'id' => $activityListId,
+                'relatedActivityId' => $activityId,
+                'subject' => $activity->getMessage(),
+                'description' => $activity->getDescription()
+            ],
             $result
         );
     }

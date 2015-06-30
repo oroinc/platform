@@ -19,7 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class TestActivity extends ExtendTestActivity
+class TestActivity extends ExtendTestActivity implements TestFrameworkEntityInterface
 {
     /**
      * @var integer
