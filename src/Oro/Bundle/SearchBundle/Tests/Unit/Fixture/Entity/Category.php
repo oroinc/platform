@@ -5,12 +5,12 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Oro\Bundle\DataBundle\Entity\Manufacturer
+ * Oro\Bundle\DataBundle\Entity\Category
  *
  * @ORM\Table()
  * @ORM\Entity()
  */
-class Manufacturer
+class Category
 {
     /**
      * @var integer $id
@@ -29,7 +29,7 @@ class Manufacturer
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="Product", mappedBy="manufacturer")
+     * @ORM\MayToMany(targetEntity="Product", mappedBy="categories")
      */
     private $products;
 
@@ -49,7 +49,7 @@ class Manufacturer
      * Set name
      *
      * @param  string       $name
-     * @return Manufacturer
+     * @return Category
      */
     public function setName($name)
     {
@@ -79,7 +79,7 @@ class Manufacturer
      * Add product
      *
      * @param  Product $product
-     * @return Manufacturer
+     * @return Category
      */
     public function addProduct(Product $product)
     {
