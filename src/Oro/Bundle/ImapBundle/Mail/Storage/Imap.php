@@ -224,6 +224,35 @@ class Imap extends \Zend\Mail\Storage\Imap
     }
 
     /**
+     * Searches UIDS by the given criteria
+     *
+     * @param array $criteria
+     *
+     * @return mixed
+     */
+    public function uidSearch(array $criteria)
+    {
+        if (empty($criteria)) {
+            throw new \Zend\Mail\Storage\Exception\RuntimeException('The search criteria must not be empty.');
+        }
+
+        $response = $this->protocol->requestAndResponse('UID SEARCH', $criteria);
+        foreach ($response as $ids) {
+            if ($ids[0] === 'SEARCH') {
+                array_shift($ids);
+
+                return $ids;
+            }
+        }
+
+        if (!is_array($response)) {
+            throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot search messages.');
+        }
+
+        return $response;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function selectFolder($globalName)

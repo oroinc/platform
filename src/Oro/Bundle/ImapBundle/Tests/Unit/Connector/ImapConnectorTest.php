@@ -70,8 +70,8 @@ class ImapConnectorTest extends \PHPUnit_Framework_TestCase
     {
         $this->storage->expects($this->at(0))
             ->method('search')
-            ->with($this->equalTo(array('some query')))
-            ->will($this->returnValue(array('1', '2')));
+            ->with($this->equalTo(['some query']))
+            ->will($this->returnValue(['1', '2']));
         $this->storage->expects($this->never())
             ->method('getMessage')
             ->will($this->returnValue(new \stdClass()));
@@ -84,8 +84,8 @@ class ImapConnectorTest extends \PHPUnit_Framework_TestCase
     {
         $this->storage->expects($this->at(0))
             ->method('search')
-            ->with($this->equalTo(array('some query')))
-            ->will($this->returnValue(array('1', '2')));
+            ->with($this->equalTo(['some query']))
+            ->will($this->returnValue(['1', '2']));
         $this->storage->expects($this->exactly(2))
             ->method('getMessage')
             ->will($this->returnValue(new \stdClass()));
@@ -93,7 +93,18 @@ class ImapConnectorTest extends \PHPUnit_Framework_TestCase
         $result = $this->connector->findItems($this->connector->getSearchQueryBuilder()->get());
         $this->assertCount(2, $result);
         foreach ($result as $r) {
+            // idle iteration is necessary here
         }
+    }
+
+    public function testFindUIDs()
+    {
+        $this->storage->expects($this->at(0))
+            ->method('uidSearch')
+            ->with(['some query'])
+            ->willReturn(['1', '2']);
+        $result = $this->connector->findUIDs('some query');
+        $this->assertEquals(['1', '2'], $result);
     }
 
     public function testFindFolders()
