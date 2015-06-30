@@ -70,6 +70,7 @@ Workflow activated: Workflow activated
 Workflow deactivated: Workflow deactivated
 There are no transitions yet.: There are no transitions yet.
 Reset workflow data: Reset workflow data
+Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:

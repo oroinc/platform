@@ -2,12 +2,12 @@ define(function (require) {
     'use strict';
 
     var _ = require('underscore'),
-        FlowchartJsPlubmBaseView = require('../jsplumb/base-view'),
+        FlowchartJsPlumbBaseView = require('../jsplumb/base-view'),
         FlowchartViewerTransitionView;
 
-    FlowchartViewerTransitionView = FlowchartJsPlubmBaseView.extend({
+    FlowchartViewerTransitionView = FlowchartJsPlumbBaseView.extend({
         /**
-         * @type {FlowchartJsPlubmAreaView}
+         * @type {FlowchartJsPlumbAreaView}
          */
         areaView: null,
 
@@ -135,14 +135,16 @@ define(function (require) {
                         ['Custom', {
                             id: 'overlay',
                             create: _.bind(function (connection) {
-                                var overlayView;
+                                var overlayView,
+                                    overlay = connection.getOverlay('overlay');
                                 connection.overlayView = overlayView = new this.transitionOverlayView({
                                     model: transitionModel,
+                                    overlay: overlay,
                                     areaView: areaView,
                                     stepFrom: startStep
                                 });
                                 overlayView.render();
-                                connection.getOverlay('overlay').cssClass = _.result(overlayView, 'className');
+                                overlay.cssClass = _.result(overlayView, 'className');
                                 return overlayView.$el;
                             }, this),
                             location: 0.5

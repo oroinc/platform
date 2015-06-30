@@ -9,6 +9,7 @@ define(function (require) {
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
+        autoRender: true,
         /**
          * @type {Constructor.<FlowchartJsPlumbOverlayView>}
          */

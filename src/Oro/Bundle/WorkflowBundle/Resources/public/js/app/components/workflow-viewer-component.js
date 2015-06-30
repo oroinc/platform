@@ -8,6 +8,8 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         workflowModelFactory = require('../../tools/workflow-model-factory'),
         FlowchartViewerWorkflowView = require('../views/flowchart/viewer/workflow-view'),
+        FlowchartControlView = require('../views/flowchart/viewer/flowchart-control-view'),
+        FlowchartStateModel = require('../models/flowchart-state-model'),
         flowchartTools = require('oroworkflow/js/tools/flowchart-tools');
 
     /**
@@ -25,6 +27,8 @@ define(function (require) {
             var flowchartOptions = _.pick(options, ['connectionOptions', 'chartOptions']);
             WorkflowViewerComponent.__super__.initialize.apply(this, arguments);
             this.model = workflowModelFactory.createWorkflowModel(options);
+            this.flowchartState = new FlowchartStateModel();
+            this.FlowchartWorkflowView = FlowchartViewerWorkflowView;
             this.initViews(options._sourceElement, flowchartOptions);
         },
 
@@ -39,11 +43,16 @@ define(function (require) {
             flowchartTools.checkPositions(this.model);
             flowchartOptions = _.extend(flowchartOptions, {
                 el: $el.find('.workflow-flowchart'),
-                model: this.model
+                model: this.model,
+                flowchartState: this.flowchartState
             });
-            this.flowchartView = new FlowchartViewerWorkflowView(flowchartOptions);
-            this.flowchartView.render();
+            this.flowchartView = new this.FlowchartWorkflowView(flowchartOptions);
+            this.flowchartControlView = new FlowchartControlView({
+                el: $el.find('.workflow-flowchart-controls'),
+                model: this.flowchartState
+            });
         }
+
     });
 
     return WorkflowViewerComponent;
