@@ -111,7 +111,7 @@ class Message extends \Zend\Mail\Storage\Message
 
     /**
      * @param Part $multiPart
-     * @return array
+     * @return Attachment[]
      */
     protected function getMultiPartAttachments(Part $multiPart)
     {
@@ -131,7 +131,14 @@ class Message extends \Zend\Mail\Storage\Message
     }
 
     /**
+     * The 'Content-Disposition' may be missed, because it is introduced only in RFC 2183.
+     * Param 'name' of 'Content-type' may be missed too.
+     *
+     * So, it's assumed that any part that has 'Content-Disposition' OR param ";name=" in the Content-Type
+     * is an attachment.
+     *
      * @param Part $part
+     *
      * @return null|Attachment
      */
     protected function getPartAttachment(Part $part)
@@ -141,11 +148,6 @@ class Message extends \Zend\Mail\Storage\Message
             $name               = $contentType->getParameter('name');
             $contentDisposition = $this->getPartContentDisposition($part);
             if ($name !== null || $contentDisposition !== null) {
-                // The Content-Disposition may be missed, because it is introduced only in RFC 2183
-                // In this case it is assumed that any part which has ";name="
-                // in the Content-Type is an attachment
-                // param name of Content-type also may be missed
-                // then we will use Content-Disposition header to detect part as attachment
                 return new Attachment($part);
             }
         }

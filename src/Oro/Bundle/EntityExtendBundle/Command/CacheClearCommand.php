@@ -2,39 +2,34 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-
-class CacheClearCommand extends ContainerAwareCommand
+class CacheClearCommand extends CacheCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     public function configure()
     {
         $this
             ->setName('oro:entity-extend:cache:clear')
-            ->setDescription('Clears the extended entity cache.')
+            ->setDescription('Clears extended entity cache.')
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Clear the extended entity cache');
+        $output->writeln('Clear extended entity cache');
 
-        /** @var ExtendConfigDumper $dumper */
-        $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->clear();
-
-        /** @var EntityProcessor $processor */
-        $processor = $this->getContainer()->get('oro_entity_extend.extend.entity_processor');
+        $this->getExtendConfigDumper()->clear();
 
         if (!$input->getOption('no-warmup')) {
-            $dumper->dump();
-            $processor->generateProxies();
+            $this->warmup($output);
         }
     }
 }

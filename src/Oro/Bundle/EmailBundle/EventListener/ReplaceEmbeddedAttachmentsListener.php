@@ -21,7 +21,7 @@ class ReplaceEmbeddedAttachmentsListener
                 foreach ($attachments as $attachment) {
                     $contentId = $attachment->getEmbeddedContentId();
                     if ($contentId !== null && $this->supportsAttachment($attachment)) {
-                        $replacement                       = sprintf(
+                        $replacement = sprintf(
                             'data:%s;base64,%s',
                             $attachment->getContentType(),
                             $attachment->getContent()->getContent()
@@ -41,6 +41,6 @@ class ReplaceEmbeddedAttachmentsListener
     protected function supportsAttachment(EmailAttachment $attachment)
     {
         return $attachment->getContent()->getContentTransferEncoding() === 'base64'
-        && strpos($attachment->getContentType(), 'image/') === 0;
+               && strpos($attachment->getContentType(), 'image/') === 0;
     }
 }

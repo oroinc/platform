@@ -49,11 +49,12 @@ class EmailBodyBuilder
     /**
      * Adds an email attachment
      *
-     * @param string $fileName
-     * @param string $content
-     * @param string $contentType
-     * @param string $contentTransferEncoding
-     * @param null   $contentId
+     * @param string      $fileName
+     * @param string      $content
+     * @param string      $contentType
+     * @param string      $contentTransferEncoding
+     * @param null|string $embeddedContentId
+     *
      * @throws \LogicException
      */
     public function addEmailAttachment(
@@ -61,7 +62,7 @@ class EmailBodyBuilder
         $content,
         $contentType,
         $contentTransferEncoding,
-        $contentId = null
+        $embeddedContentId = null
     ) {
         if ($this->emailBody === null) {
             throw new \LogicException('Call setEmailBody first.');
@@ -79,7 +80,7 @@ class EmailBodyBuilder
             ->setFileName($fileName)
             ->setContentType($contentType)
             ->setContent($emailAttachmentContent)
-            ->setEmbeddedContentId($contentId);
+            ->setEmbeddedContentId($embeddedContentId);
 
         $this->emailBody->addAttachment($emailAttachment);
     }
