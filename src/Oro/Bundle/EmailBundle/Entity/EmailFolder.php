@@ -58,14 +58,14 @@ class EmailFolder
      */
     protected $type;
 
-    /**
+    /**sync
      * @var bool
      *
-     * @ORM\Column(name="id_checked", type="boolean", options={"default"=false})
+     * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
      * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
-    protected $checked = false;
+    protected $syncEnabled = false;
 
     /**
      * @var EmailFolder $folder
@@ -212,9 +212,9 @@ class EmailFolder
      *
      * @return bool
      */
-    public function isChecked()
+    public function isSyncEnabled()
     {
-        return $this->checked;
+        return $this->syncEnabled;
     }
 
     /**
@@ -224,9 +224,9 @@ class EmailFolder
      *
      * @return $this
      */
-    public function setChecked($checked)
+    public function setSyncEnabled($checked)
     {
-        $this->checked = (bool)$checked;
+        $this->syncEnabled = (bool)$checked;
 
         return $this;
     }
