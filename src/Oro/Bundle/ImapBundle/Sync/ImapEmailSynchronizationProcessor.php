@@ -143,6 +143,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * TODO: remove in feature CRM-3260
+     *
      * Performs synchronization of folders
      *
      * @param EmailOrigin $origin
@@ -671,7 +673,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if (!in_array($email->getId()->getUid(), $existingUids)) {
                 $result[] = $email->getMessageId();
             }
-
         }
 
         return $result;
