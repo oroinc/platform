@@ -3,14 +3,15 @@
 namespace Oro\Bundle\UserBundle\Entity\Manager;
 
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
@@ -22,14 +23,18 @@ class UserPermissionApiEntityManager extends ApiEntityManager
     /** @var AclExtensionSelector */
     protected $aclSelector;
 
-    /** @var TokenInterface|null */
+    /** @var UsernamePasswordOrganizationToken|null */
     protected $tempToken;
+
+    /** @var  Organization */
+    protected $organization;
 
     public function __construct(SecurityContext $securityContext, AclExtensionSelector $aclSelector)
     {
         $this->aclSelector     = $aclSelector;
         $this->securityContext = $securityContext;
         $this->tempToken       = $securityContext->getToken();
+        $this->organization    = $this->tempToken->getOrganizationContext();
     }
 
     /**
@@ -68,7 +73,9 @@ class UserPermissionApiEntityManager extends ApiEntityManager
             ];
             foreach ($permissions as $permission) {
                 $entity                           = 'entity:' . $class->getClassName();
-                $data['permissions'][$permission] = $this->securityContext->isGranted($permission, $entity);
+                if ($this->securityContext->isGranted($permission, $entity)) {
+                    $data['permissions'][] = $permission;
+                }
             }
             $result[] = $data;
         }
@@ -83,18 +90,20 @@ class UserPermissionApiEntityManager extends ApiEntityManager
      *
      * @param User $user
      *
-     * @throws \Exception
+     * @throws AccessDeniedException
      */
     protected function setTokenForUser(User $user)
     {
-        if ($user->getOrganization() === null) {
-            throw new \Exception('User should have active organization assigned.');
+        // Check if current user has access to $user in the same organization
+        if (!$user->hasOrganization($this->organization)) {
+            throw new AccessDeniedException();
         }
+
         $token = new UsernamePasswordOrganizationToken(
             $user,
             $user->getUsername(),
             'main',
-            $user->getOrganization(),
+            $this->organization,
             $user->getRoles()
         );
         $this->securityContext->setToken($token);
