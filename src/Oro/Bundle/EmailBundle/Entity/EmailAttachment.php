@@ -79,7 +79,7 @@ class EmailAttachment
     /**
      * @var string
      *
-     * @ORM\Column(name="embedded_content_id", type="string", length=255)
+     * @ORM\Column(name="embedded_content_id", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
