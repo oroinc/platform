@@ -127,7 +127,7 @@ class EntityNameResolver
             if (empty($this->providers)) {
                 $this->sorted = [];
             } else {
-                ksort($this->providers);
+                krsort($this->providers);
                 $this->sorted = call_user_func_array('array_merge', $this->providers);
             }
         }
