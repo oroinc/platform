@@ -1,0 +1,13 @@
+oro:
+    testframework:
+        testactivitytarget:
+            entity_label:         Test Activity Target
+            entity_plural_label:  Test Activity Targets
+            id.label: Id
+        testactivity:
+            entity_label: Test Activity
+            entity_plural_label: Test Activities
+            description.label: Description
+            id.label: Id
+            message.label: Message
+            organization.label: Organization
