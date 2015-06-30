@@ -57,7 +57,6 @@ class EmailApiType extends AbstractType
             ->add('createdAt', 'oro_datetime', ['required' => false])
             ->add('sentAt', 'oro_datetime', ['required' => false])
             ->add('receivedAt', 'oro_datetime', ['required' => false])
-            ->add('changedStatusAt', 'oro_datetime', ['required' => false])
             ->add('internalDate', 'oro_datetime', ['required' => false])
             ->add(
                 'importance',

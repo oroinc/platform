@@ -25,8 +25,7 @@ class EmailControllerTest extends WebTestCase
         'importance' => 'low',
         'body'       => 'Test body',
         'bodyType'   => 'text',
-        'receivedAt' => '2015-06-19 12:17:51',
-        'changedStatusAt' => '2015-06-19 12:17:51'
+        'receivedAt' => '2015-06-19 12:17:51'
     ];
 
     protected function setUp()
@@ -159,7 +158,6 @@ class EmailControllerTest extends WebTestCase
             [
                 'seen'    => 1,
                 'receivedAt' => '2015-06-19 12:17:51',
-                'changedStatusAt' => '2015-06-19 12:17:51',
                 'folders' => $folders
             ]
         );
