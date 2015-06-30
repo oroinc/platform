@@ -222,7 +222,7 @@ services:
         arguments:
             - @oro_entity.entity_alias_resolver
         tags:
-            - { name: kernel.cache_warmer, priority: 30 }
+            - { name: kernel.cache_warmer }
 
     oro_entity.entity_alias_resolver:
         class: %oro_entity.entity_alias_resolver.class%
