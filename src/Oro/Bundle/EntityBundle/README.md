@@ -79,8 +79,8 @@ You can use entity aliases with the help of [EntityAliasResolver](./ORM/EntityAl
 In most cases aliases are generated automatically.
 The generation rules are the following:
 - For all Oro entities (basically, all classes starting with "Oro") the lowercase short class name is used, e.g. `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` = `calendarevent`.
-- For non-Oro (3-rd party) entities, the bundle name is prepended to the short class name if it does not already start with the bundle name, e.g. `Acme\Bundle\DemoBundle\Entity\MyEntity` = `demomyentity`.
-- For "enums" the enum code is used as the entity alias.
+- For non-Oro (3-rd party) entities, the bundle name is prepended to the short class name if it does not already start with the bundle name, e.g. `Acme\Bundle\DemoBundle\Entity\MyEntity` = `demomyentity`, `Acme\Bundle\DemoBundle\Entity\DemoEntity` = `demoentity`.
+- For "enums" the enum code is used as the entity alias, but the underscore (_) character is removed.
 - For custom entities the lower case short class name is used prepended with "extend" key word.
 - Hidden entities are ignored.
 
