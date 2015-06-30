@@ -25,11 +25,11 @@ class ControllersTest extends WebTestCase
                 'oro_activity_list_widget_activities',
                 [
                     'entityClass' => 'Oro_Bundle_TestFrameworkBundle_Entity_TestActivityTarget',
-                    'entityId' => $this->getReference('test_activity_target_1')->getId()
+                    'entityId'    => $this->getReference('test_activity_target_1')->getId()
                 ]
             )
         );
-        $result = $this->client->getResponse();
+        $result  = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
         /** @var TestActivity $activity1 */

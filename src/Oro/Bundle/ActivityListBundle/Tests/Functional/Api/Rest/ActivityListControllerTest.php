@@ -25,7 +25,7 @@ class ActivityListControllerTest extends WebTestCase
                 'oro_activity_list_api_get_list',
                 [
                     'entityClass' => 'Oro_Bundle_TestFrameworkBundle_Entity_TestActivityTarget',
-                    'entityId' => $this->getReference('test_activity_target_1')->getId()
+                    'entityId'    => $this->getReference('test_activity_target_1')->getId()
                 ]
             )
         );
@@ -38,7 +38,7 @@ class ActivityListControllerTest extends WebTestCase
     {
         /** @var TestActivity $activity */
         $activity = $this->getReference('test_activity_1');
-        $id = $activity->getId();
+        $id       = $activity->getId();
         $this->client->request(
             'GET',
             $this->getUrl(

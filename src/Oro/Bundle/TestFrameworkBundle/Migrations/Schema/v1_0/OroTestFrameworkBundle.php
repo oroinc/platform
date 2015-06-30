@@ -10,7 +10,6 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterface
-
 {
     /** @var ActivityExtension */
     protected $activityExtension;

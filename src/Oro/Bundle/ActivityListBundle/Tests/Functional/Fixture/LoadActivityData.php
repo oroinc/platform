@@ -16,8 +16,8 @@ class LoadActivityData extends AbstractFixture
     public function load(ObjectManager $manager)
     {
         $testActivityTarget = new TestActivityTarget();
-        $testActivity1 = new TestActivity();
-        $testActivity2 = new TestActivity();
+        $testActivity1      = new TestActivity();
+        $testActivity2      = new TestActivity();
         $testActivity1
             ->setMessage('activity_test1')
             ->setDescription('activity_test1 description')

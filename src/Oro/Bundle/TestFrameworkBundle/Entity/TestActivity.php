@@ -8,7 +8,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
-
 /**
  * @ORM\Table(name="test_activity")
  * @ORM\Entity
