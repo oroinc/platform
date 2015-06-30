@@ -8,7 +8,6 @@ use CG\Generator\PhpClass;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
 use Oro\Bundle\TrackingBundle\Tools\IdentifierVisitGeneratorExtension;
 
@@ -49,13 +48,13 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    'class' => TrackingVisit::ENTITY_NAME,
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
                     'relation' => 'test',
                     'relationData' => [
                         [
                             'field_id' => new FieldConfigId(
                                 'extend',
-                                TrackingVisit::ENTITY_NAME,
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
                                 ExtendHelper::buildAssociationName(
                                     'Test\TargetEntity',
                                     IdentifierEventExtension::ASSOCIATION_KIND
@@ -70,13 +69,13 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'class' => TrackingVisit::ENTITY_NAME,
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
                     'relation' => 'test',
                     'relationData' => [
                         [
                             'field_id' => new FieldConfigId(
                                 'extend',
-                                TrackingVisit::ENTITY_NAME,
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
                                 'testField',
                                 'manyToOne'
                             ),
@@ -88,13 +87,13 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'class' => TrackingVisit::ENTITY_NAME,
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
                     'relation' => 'test',
                     'relationData' => [
                         [
                             'field_id' => new FieldConfigId(
                                 'extend',
-                                TrackingVisit::ENTITY_NAME,
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
                                 ExtendHelper::buildAssociationName(
                                     'Test\TargetEntity',
                                     IdentifierEventExtension::ASSOCIATION_KIND
@@ -108,7 +107,7 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 false
             ],
             [
-                ['class' => TrackingVisit::ENTITY_NAME],
+                ['class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit'],
                 false
             ],
             [
