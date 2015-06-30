@@ -23,23 +23,6 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->cmf = new ExtendClassMetadataFactory($driver, $metadata);
     }
 
-    public function testClearCache()
-    {
-        $this->assertNull($this->cmf->getCacheDriver());
-
-        $cache = new ArrayCache();
-        $this->cmf->setCacheDriver($cache);
-        $this->assertSame($cache, $this->cmf->getCacheDriver());
-
-        $this->cmf->clearCache();
-
-        $this->assertAttributeSame(
-            ['DoctrineNamespaceCacheKey[]' => 2],
-            'data',
-            $this->cmf->getCacheDriver()
-        );
-    }
-
     public function testSetMetadataFor()
     {
         $cache = new ArrayCache();
