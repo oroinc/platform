@@ -7,6 +7,7 @@ use Oro\Bundle\UserBundle\EventListener\EmailRecipientsLoadListener;
 
 class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
 {
+    protected $nameFormatter;
     protected $registry;
     protected $aclHelper;
     protected $translator;
@@ -16,6 +17,10 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
             ->getMock();
@@ -39,7 +44,8 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
             $this->registry,
             $this->aclHelper,
             $this->translator,
-            $this->emailRecipientsHelper
+            $this->emailRecipientsHelper,
+            $this->nameFormatter
         );
     }
 
@@ -60,15 +66,21 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
     {
         $query = 'query';
         $limit = 1;
+        $fullNameQueryPart = 'u.firstName';
 
         $expectedResults = [];
+
+        $this->nameFormatter->expects($this->once())
+            ->method('getFormattedNameDQL')
+            ->with('u', 'Oro\Bundle\UserBundle\Entity\User')
+            ->will($this->returnValue($fullNameQueryPart));
 
         $userRepository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $userRepository->expects($this->once())
             ->method('getEmails')
-            ->with($this->aclHelper, [], $query, $limit)
+            ->with($this->aclHelper, $fullNameQueryPart, [], $query, $limit)
             ->will($this->returnValue([]));
 
         $this->registry->expects($this->once())
@@ -87,6 +99,8 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
         $query = 'query';
         $limit = 1;
 
+        $fullNameQueryPart = 'u.firstName';
+
         $userEmails = [
             'user@example.com' => 'User <user@example.com>',
         ];
@@ -103,12 +117,17 @@ class EmailRecipientsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
+        $this->nameFormatter->expects($this->once())
+            ->method('getFormattedNameDQL')
+            ->with('u', 'Oro\Bundle\UserBundle\Entity\User')
+            ->will($this->returnValue($fullNameQueryPart));
+
         $userRepository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $userRepository->expects($this->once())
             ->method('getEmails')
-            ->with($this->aclHelper, [], $query, $limit)
+            ->with($this->aclHelper, $fullNameQueryPart, [], $query, $limit)
             ->will($this->returnValue($userEmails));
 
         $this->registry->expects($this->once())
