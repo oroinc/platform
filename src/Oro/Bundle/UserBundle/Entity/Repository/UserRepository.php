@@ -44,7 +44,7 @@ class UserRepository extends EntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-   /**
+    /**
      * @param AclHelper $aclHelper
      * @param string $fullNameQueryPart
      * @param array $excludedEmails

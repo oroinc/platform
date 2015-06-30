@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
@@ -31,6 +32,9 @@ class RelatedEmailsProvider
 
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
+
+    /** @var PropertyAccessor*/
+    protected $propertyAccessor;
 
     /**
      * @param Registry $registry
@@ -78,25 +82,7 @@ class RelatedEmailsProvider
 
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-        foreach ($metadata->fieldNames as $fieldName) {
-            if (false !== stripos($fieldName, 'email')) {
-                $attributes[] = new EmailAttribute($fieldName);
-                continue;
-            }
-
-            if (!$this->entityConfigProvider->hasConfig($className, $fieldName)) {
-                continue;
-            }
-
-            $fieldConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
-            if (!$fieldConfig->has('contact_information')) {
-                continue;
-            }
-
-            if ($fieldConfig->get('contact_information') === 'email') {
-                $attributes[] = new EmailAttribute($fieldName);
-            }
-        }
+        $attributes = array_merge($attributes, $this->getFieldAttributes($metadata));
 
         foreach ($metadata->associationMappings as $name => $assoc) {
             if (in_array('Oro\Bundle\EmailBundle\Entity\EmailInterface', class_implements($assoc['targetEntity']))) {
@@ -118,8 +104,23 @@ class RelatedEmailsProvider
             }
         }
 
+        $emails = array_merge($emails, $this->createEmailsFromAttributes($attributes, $object));
+
+        return $emails;
+    }
+
+    /**
+     * @param EmailAttribute[] $attributes
+     * @param object $object
+     *
+     * @return array
+     */
+    protected function createEmailsFromAttributes(array $attributes, $object)
+    {
+        $emails = [];
+
         foreach ($attributes as $attribute) {
-            $value = $propertyAccessor->getValue($object, $attribute->getName());
+            $value = $this->getPropertyAccessor()->getValue($object, $attribute->getName());
             if (!$value instanceof \Traversable) {
                 $value = [$value];
             }
@@ -137,6 +138,37 @@ class RelatedEmailsProvider
     }
 
     /**
+     * @param ClassMetadata $metadata
+     *
+     * @return EmailAttribute[]
+     */
+    protected function getFieldAttributes(ClassMetadata $metadata)
+    {
+        $attributes = [];
+        foreach ($metadata->fieldNames as $fieldName) {
+            if (false !== stripos($fieldName, 'email')) {
+                $attributes[] = new EmailAttribute($fieldName);
+                continue;
+            }
+
+            if (!$this->entityConfigProvider->hasConfig($metadata->name, $fieldName)) {
+                continue;
+            }
+
+            $fieldConfig = $this->entityConfigProvider->getConfig($metadata->name, $fieldName);
+            if (!$fieldConfig->has('contact_information')) {
+                continue;
+            }
+
+            if ($fieldConfig->get('contact_information') === 'email') {
+                $attributes[] = new EmailAttribute($fieldName);
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
      * @param object|null $owner
      * @param string $email
      *
@@ -151,6 +183,18 @@ class RelatedEmailsProvider
         $ownerName = $this->nameFormatter->format($owner);
 
         return $this->emailAddressHelper->buildFullEmailAddress($email, $ownerName);
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 
     /**
