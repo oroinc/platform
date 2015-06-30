@@ -34,8 +34,11 @@ class EmailAddressFromType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $choices = $this->createChoices();
+
         $resolver->setDefaults([
-            'choices' => $this->createChoices(),
+            'choices'   => $choices,
+            'read_only' => count($choices) === 1,
         ]);
     }
 
