@@ -28,25 +28,26 @@ define(function (require) {
      * @class WorkflowEditorComponent
      * @augments WorkflowViewerComponent
      */
-    WorkflowEditorComponent = WorkflowViewerComponent.extend(
-        /** @lends WorkflowEditorComponent.prototype */{
+    WorkflowEditorComponent = WorkflowViewerComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
 
-        initViews: function () {
+        /**
+         * @inheritDoc
+         */
+        initViews: function ($el, flowchartOptions) {
             flowchartTools.checkPositions(this.model);
 
             this.workflowManagementView = new WorkflowManagementView({
-                el: this._sourceElement,
+                el: $el,
                 stepsEl: '.workflow-definition-steps-list-container',
                 model: this.model
             });
-
             this.workflowManagementView.render();
 
-            this.flowchartView = new FlowchartEditorWorkflowView({
-                el: this._sourceElement.find('.workflow-flowchart'),
+            flowchartOptions = _.extend(flowchartOptions, {
+                el: $el.find('.workflow-flowchart'),
                 model: this.model
             });
-
+            this.flowchartView = new FlowchartEditorWorkflowView(flowchartOptions);
             this.flowchartView.render();
         },
 

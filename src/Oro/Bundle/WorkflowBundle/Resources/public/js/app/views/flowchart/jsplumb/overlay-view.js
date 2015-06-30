@@ -1,5 +1,6 @@
 define(function (require) {
     'use strict';
+
     var FlowchartJsPlubmOverlayView,
         BaseView = require('oroui/js/app/views/base/view'),
         FlowchartJsPlubmAreaView = require('./area-view');
@@ -7,6 +8,10 @@ define(function (require) {
     FlowchartJsPlubmOverlayView = BaseView.extend({
         listen: {
             'change model': 'render'
+        },
+
+        className: function () {
+            return 'jsplumb-overlay';
         },
 
         initialize: function (options) {

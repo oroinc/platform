@@ -1,10 +1,17 @@
 define(function (require) {
     'use strict';
+
     var FlowchartViewerOverlayView = require('../viewer/transition-overlay-view'),
         FlowChartEditorTransitionOverlayView;
 
     FlowChartEditorTransitionOverlayView = FlowchartViewerOverlayView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/editor/transition.html'),
+
+        className: function () {
+            var classNames = [FlowChartEditorTransitionOverlayView.__super__.className.call(this)];
+            classNames.push('dropdown');
+            return classNames.join(' ');
+        },
 
         initialize: function (options) {
             this.stepFrom = options.stepFrom;

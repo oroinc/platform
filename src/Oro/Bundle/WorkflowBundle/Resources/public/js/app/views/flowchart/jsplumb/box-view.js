@@ -1,5 +1,6 @@
 define(function (require) {
     'use strict';
+
     var FlowchartJsPlubmBaseView = require('./base-view'),
         FlowchartJsPlubmAreaView = require('./area-view'),
         FlowchartJsPlubmBoxView;
@@ -7,7 +8,9 @@ define(function (require) {
     FlowchartJsPlubmBoxView = FlowchartJsPlubmBaseView.extend({
         areaView: null,
 
-        className: 'jsplumb-box',
+        className: function () {
+            return 'jsplumb-box';
+        },
 
         isConnected: false,
 
