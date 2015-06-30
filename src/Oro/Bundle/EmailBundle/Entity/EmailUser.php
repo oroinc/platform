@@ -122,15 +122,6 @@ class EmailUser
     protected $email;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="changed_status_at", type="datetime")
-     * @Soap\ComplexType("dateTime")
-     * @JMS\Type("DateTime")
-     */
-    protected $changedStatusAt;
-
-    /**
      * Get id
      *
      * @return integer
@@ -287,30 +278,6 @@ class EmailUser
     public function setEmail(Email $email)
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * Get date/time when status was changed
-     *
-     * @return \DateTime
-     */
-    public function getChangedStatusAt()
-    {
-        return $this->changedStatusAt;
-    }
-
-    /**
-     * Set date/time when status was changed
-     *
-     * @param \DateTime $changedStatusAt
-     *
-     * @return $this
-     */
-    public function setChangedStatusAt($changedStatusAt)
-    {
-        $this->changedStatusAt = $changedStatusAt;
 
         return $this;
     }

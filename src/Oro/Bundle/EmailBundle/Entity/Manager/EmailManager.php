@@ -77,7 +77,6 @@ class EmailManager
         if ($entity->isSeen() !== $value) {
             $this->emailFlagManager->changeStatusSeen($entity, $value);
             $entity->setSeen($value);
-            $entity->setChangedStatusAt(new \DateTime('now', new \DateTimeZone('UTC')));
             if ($flush) {
                 $this->em->flush();
             }
