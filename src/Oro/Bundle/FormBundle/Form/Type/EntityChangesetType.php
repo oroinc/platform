@@ -33,7 +33,7 @@ class EntityChangesetType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(['class']);
-        $resolver->setDefaults(['mapped' => false]);
+        $resolver->setDefaults(['data_class' => null, 'mapped' => false]);
     }
 
     /**
