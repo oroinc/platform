@@ -58,7 +58,7 @@ class EmailFolder
      */
     protected $type;
 
-    /**sync
+    /**
      * @var bool
      *
      * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
