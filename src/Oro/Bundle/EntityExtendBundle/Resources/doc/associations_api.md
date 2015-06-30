@@ -6,7 +6,7 @@ In this section we'll demonstrate how you can create an API for managing associa
 Introduction to Association Manager
 ------------------------------------
 
-The [AssociationManager](../../Entity/Manager/AssociationManager.php) is designed to provide necessary functions for fetching all information that is needed for managing associations between entities.
+The [AssociationManager](../../Entity/Manager/AssociationManager.php) is designed to provide necessary functions for fetching all information that is needed for managing [associations](./associations.md) between entities.
 
 Here is a brief description of its methods:
 

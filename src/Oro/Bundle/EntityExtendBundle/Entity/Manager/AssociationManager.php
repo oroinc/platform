@@ -141,6 +141,35 @@ class AssociationManager
      * Returns a query builder that could be used for fetching the list of entities
      * associated with $associationOwnerClass entities found by $filters and $joins
      *
+     * The resulting query would be something like this:
+     * <code>
+     * SELECT entity.entityId AS id, entity.entityClass AS entity, entity.entityTitle AS title FROM (
+     *      SELECT [DISTINCT]
+     *          e.id AS id,
+     *          target.id AS entityId,
+     *          {first_target_entity_class} AS entityClass,
+     *          {first_target_title} AS entityTitle
+     *      FROM {associationOwnerClass} AS e
+     *          INNER JOIN e.{first_target_field_name} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      SELECT [DISTINCT]
+     *          e.id AS id,
+     *          target.id AS entityId,
+     *          {second_target_entity_class} AS entityClass,
+     *          {second_target_title} AS entityTitle
+     *      FROM {associationOwnerClass} AS e
+     *          INNER JOIN e.{second_target_field_name} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      ... select statements for other targets
+     * ) entity
+     * ORDER BY {orderBy}
+     * LIMIT {limit} OFFSET {(page - 1) * limit}
+     * </code>
+     *
      * @param string      $associationOwnerClass The FQCN of the entity that is the owning side of the association
      * @param mixed|null  $filters               Criteria is used to filter entities which are association owners
      *                                           e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
@@ -230,8 +259,38 @@ class AssociationManager
     }
 
     /**
-     * Returns a query builder that could be used for fetching the list of entities
-     * associated with $associationTargetClass entities found by $filters and $joins
+     * Returns a query builder that could be used for fetching the list of owner side entities
+     * the specified $associationTargetClass associated with.
+     * The $filters and $joins could be used to filter entities
+     *
+     * The resulting query would be something like this:
+     * <code>
+     * SELECT entity.entityId AS id, entity.entityClass AS entity, entity.entityTitle AS title FROM (
+     *      SELECT [DISTINCT]
+     *          target.id AS id,
+     *          e.id AS entityId,
+     *          {first_owner_entity_class} AS entityClass,
+     *          {first_owner_title} AS entityTitle
+     *      FROM {first_owner_entity_class} AS e
+     *          INNER JOIN e.{target_field_name_for_first_owner} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      SELECT [DISTINCT]
+     *          target.id AS id,
+     *          e.id AS entityId,
+     *          {second_owner_entity_class} AS entityClass,
+     *          {second_owner_title} AS entityTitle
+     *      FROM {second_owner_entity_class} AS e
+     *          INNER JOIN e.{target_field_name_for_second_owner} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      ... select statements for other owners
+     * ) entity
+     * ORDER BY {orderBy}
+     * LIMIT {limit} OFFSET {(page - 1) * limit}
+     * </code>
      *
      * @param string      $associationTargetClass The FQCN of the entity that is the target side of the association
      * @param mixed|null  $filters                Criteria is used to filter entities which are association owners
