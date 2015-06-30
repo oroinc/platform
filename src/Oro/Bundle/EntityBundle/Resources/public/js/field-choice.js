@@ -14,6 +14,9 @@ define(function (require) {
         options: {
             entity: null,
             data: {},
+            dataFilter: function (entityName, entityFields) {
+                return entityFields;
+            },
             select2: {
                 pageableResults: true,
                 dropdownAutoWidth: true
@@ -190,9 +193,13 @@ define(function (require) {
             }
 
             chain = this.util.pathToEntityChain(path, true);
+            if (!chain.length) {
+                return results;
+            }
+
             entityName = chain[chain.length - 1].entity.name;
             entityData = entityData[entityName];
-            entityFields = entityData.fields;
+            entityFields = this.options.dataFilter.call(this, entityName, entityData.fields);
 
             if (!_.isEmpty(this.options.exclude)) {
                 entityFields = Util.filterFields(entityFields, this.options.exclude);
