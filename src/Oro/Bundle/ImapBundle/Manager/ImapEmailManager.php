@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
 use Zend\Mail\Headers;
 use Zend\Mail\Header\HeaderInterface;
 use Zend\Mail\Header\AbstractAddressList;
