@@ -7,7 +7,7 @@ use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
- * An Email Origin which cam be used for emails sent by BAP
+ * An Email Origin which can be used for emails sent by BAP
  *
  * @ORM\Entity
  */
