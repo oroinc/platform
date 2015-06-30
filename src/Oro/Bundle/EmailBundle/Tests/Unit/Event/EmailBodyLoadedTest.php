@@ -8,9 +8,11 @@ class EmailBodyLoadedTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()
     {
-        $email              = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Email')
+        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()->getMock();
+
         $emailBodySyncAfter = new EmailBodyLoaded($email);
+
         $this->assertEquals($emailBodySyncAfter->getEmail(), $email);
     }
 }
