@@ -18,7 +18,6 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
         $organization = new Organization();
         $folder = new EmailFolder();
         $receivedAt = new \DateTime('now');
-        $changedStatusAt = new \DateTime('now');
 
         $emailUser->setEmail($email);
         $emailUser->setOrganization($organization);
@@ -26,7 +25,6 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
         $emailUser->setSeen(true);
         $emailUser->setOwner($owner);
         $emailUser->setReceivedAt($receivedAt);
-        $emailUser->setChangedStatusAt($changedStatusAt);
 
         $this->assertEquals($email, $emailUser->getEmail());
         $this->assertEquals($organization, $emailUser->getOrganization());
@@ -34,7 +32,6 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $emailUser->isSeen());
         $this->assertEquals($owner, $emailUser->getOwner());
         $this->assertEquals($receivedAt, $emailUser->getReceivedAt());
-        $this->assertEquals($changedStatusAt, $emailUser->getChangedStatusAt());
         $this->assertNull($emailUser->getCreatedAt());
     }
 

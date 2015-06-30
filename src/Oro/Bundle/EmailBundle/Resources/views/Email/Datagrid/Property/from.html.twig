@@ -11,7 +11,7 @@
 {% if fromEmailAddress.owner is null -%}
     {{ value }}
 {%- else -%}
-    {{ EA.email_address_link(fromEmailAddress, value) }}
+    {{ EA.email_address_link(fromEmailAddress, fromEmailAddress.owner) }}
 {% endif %}
 {% if isNew == 1 %}
     </strong>

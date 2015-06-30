@@ -187,6 +187,24 @@ class ImapConnector
     }
 
     /**
+     * Set flags for massage in origin
+     *
+     * @param string $uid   - The UID of a message
+     * @param array  $flags - array of flags
+     *
+     * @return $this;
+     */
+    public function setFlags($uid, $flags)
+    {
+        $this->ensureConnected();
+
+        $id = $this->imap->getNumberByUniqueId($uid);
+        $this->imap->setFlags($id, $flags);
+
+        return $this;
+    }
+
+    /**
      * Makes sure that there is active connection to IMAP server
      */
     protected function ensureConnected()
