@@ -110,11 +110,23 @@ class ImapConnector
         if (empty($searchString)) {
             $result = new ImapMessageIterator($this->imap);
         } else {
-            $ids    = $this->imap->search(array($searchString));
+            $ids    = $this->imap->search([$searchString]);
             $result = new ImapMessageIterator($this->imap, $ids);
         }
 
         return $result;
+    }
+
+    /**
+     * @param null $query
+     *
+     * @return mixed
+     */
+    public function findUIDs($query = null)
+    {
+        $this->ensureConnected();
+
+        return $this->imap->uidSearch([$query]);
     }
 
     /**
