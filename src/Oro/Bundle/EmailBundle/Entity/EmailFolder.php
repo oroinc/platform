@@ -220,13 +220,13 @@ class EmailFolder
     /**
      * Set folder checked for sync
      *
-     * @param boolean $checked
+     * @param boolean $syncEnabled
      *
      * @return $this
      */
-    public function setSyncEnabled($checked)
+    public function setSyncEnabled($syncEnabled)
     {
-        $this->syncEnabled = (bool)$checked;
+        $this->syncEnabled = (bool)$syncEnabled;
 
         return $this;
     }
