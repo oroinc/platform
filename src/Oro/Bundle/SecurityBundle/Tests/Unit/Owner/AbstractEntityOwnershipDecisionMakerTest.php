@@ -7,12 +7,13 @@ use Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDecisionMakerTest
 {
@@ -20,6 +21,11 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
      * @var AbstractEntityOwnershipDecisionMaker
      */
     protected $decisionMaker;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     protected function setUp()
     {
@@ -48,16 +54,42 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
+        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [
+                            'oro_security.ownership_tree_provider',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $treeProvider,
+                        ],
+                        [
+                            'oro_security.owner.metadata_provider.chain',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->metadataProvider,
+                        ],
+                        [
+                            'oro_security.acl.object_id_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new ObjectIdAccessor(),
+                        ],
+                        [
+                            'oro_security.owner.entity_owner_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new EntityOwnerAccessor($this->metadataProvider),
+                        ],
+                    ]
+                )
+            );
+
         $this->decisionMaker = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker')
-            ->setConstructorArgs([
-                $treeProvider,
-                new ObjectIdAccessor(),
-                new EntityOwnerAccessor($this->metadataProvider),
-                $this->metadataProvider
-            ])
+            ->setMethods(['getContainer'])
             ->getMockForAbstractClass();
 
+        $this->decisionMaker->expects($this->any())->method('getContainer')->willReturn($this->container);
     }
 
     public function testIsGlobalLevelEntity()

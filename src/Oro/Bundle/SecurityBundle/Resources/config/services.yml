@@ -189,18 +189,18 @@ services:
     oro_security.owner.decision_maker.abstract:
         class: %oro_security.owner.decision_maker.abstract.class%
         abstract: true
-        arguments:
-            - @oro_security.ownership_tree_provider
-            - @oro_security.acl.object_id_accessor
-            - @oro_security.owner.entity_owner_accessor
-            - @oro_security.owner.ownership_metadata_provider
+        calls:
+            - [ setContainer, [ @service_container ] ]
 
     oro_security.owner.decision_maker:
         public: false
         parent: oro_security.owner.decision_maker.abstract
         class: %oro_security.owner.decision_maker.class%
-        calls:
-            - [ setSecurityFacade, [ @oro_security.security_facade ] ]
+        arguments:
+            - @oro_security.ownership_tree_provider
+            - @oro_security.acl.object_id_accessor
+            - @oro_security.owner.entity_owner_accessor
+            - @oro_security.owner.ownership_metadata_provider
         tags:
            - { name: oro_security.owner.ownership_decision_maker }
 
@@ -470,6 +470,8 @@ services:
             - @doctrine
             - @security.context
             - @oro_user.manager
+        calls:
+            - [setContainer, [@service_container]]
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 

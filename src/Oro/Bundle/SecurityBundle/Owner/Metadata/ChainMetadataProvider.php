@@ -19,11 +19,18 @@ class ChainMetadataProvider implements MetadataProviderInterface
     protected $supportedProvider;
 
     /**
-     * @param MetadataProviderInterface[] $providers
+     * @var MetadataProviderInterface
      */
-    public function __construct(array $providers = [])
+    protected $defaultProvider;
+
+    /**
+     * @param MetadataProviderInterface[] $providers
+     * @param MetadataProviderInterface $defaultProvider
+     */
+    public function __construct(array $providers = [], MetadataProviderInterface $defaultProvider = null)
     {
         $this->providers = new ArrayCollection($providers);
+        $this->defaultProvider = $defaultProvider;
     }
 
     /**
@@ -43,6 +50,10 @@ class ChainMetadataProvider implements MetadataProviderInterface
      */
     public function supports()
     {
+        if ($this->defaultProvider) {
+            return true;
+        }
+
         foreach ($this->providers as $provider) {
             if ($provider->supports()) {
                 return true;
@@ -94,8 +105,6 @@ class ChainMetadataProvider implements MetadataProviderInterface
 
     /**
      * @return MetadataProviderInterface
-     *
-     * @throws NoSupportsMetadataProviderException
      */
     protected function getSupportedProvider()
     {
@@ -109,6 +118,10 @@ class ChainMetadataProvider implements MetadataProviderInterface
 
                 return $this->supportedProvider;
             }
+        }
+
+        if ($this->defaultProvider) {
+            return $this->defaultProvider;
         }
 
         throw new NoSupportsMetadataProviderException('Found no supports provider in chain');
