@@ -64,12 +64,16 @@ class EmailTypeTest extends TypeTestCase
                 'john@example.com' => 'John Smith <john@example.com>',
             ]));
 
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
         $genemuChoiceType  = new Select2Type('choice');
         $emailTemplateList = new EmailTemplateSelectType();
         $attachmentsType   = new EmailAttachmentsType();
         $emailAddressFromType       = new EmailAddressFromType($securityFacade, $relatedEmailsProvider);
-        $emailAddressRecipientsType = new EmailAddressRecipientsType();
+        $emailAddressRecipientsType = new EmailAddressRecipientsType($configManager);
 
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

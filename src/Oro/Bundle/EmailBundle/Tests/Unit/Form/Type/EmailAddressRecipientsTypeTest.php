@@ -40,7 +40,11 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
 
     protected function getExtensions()
     {
-        $emailAddressRecipients = new EmailAddressRecipientsType();
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $emailAddressRecipients = new EmailAddressRecipientsType($configManager);
         $select2Hidden = new Select2Type('hidden');
 
         return [
