@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
                 'signature' => ['value' => ''],
                 'append_signature' => ['value' => true],
                 'use_threads_in_emails' => ['value' => true],
+                'minimum_input_length' => ['value' => 2],
             ]
         );
 

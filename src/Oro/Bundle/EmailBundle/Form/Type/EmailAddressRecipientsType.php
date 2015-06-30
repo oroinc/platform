@@ -8,10 +8,22 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EmailAddressRecipientsType extends AbstractType
 {
     const NAME = 'oro_email_email_address_recipients';
+
+    /** @var ConfigManager */
+    protected $cm;
+
+    /**
+     * @param ConfigManager $cm
+     */
+    public function __construct(ConfigManager $cm)
+    {
+        $this->cm = $cm;
+    }
 
     /**
      * {@inheritdoc}
@@ -50,7 +62,7 @@ class EmailAddressRecipientsType extends AbstractType
                 'allowClear'         => true,
                 'multiple'           => true,
                 'route_name'         => 'oro_api_get_email_recipient_autocomplete',
-                'minimumInputLength' => 1,
+                'minimumInputLength' => $this->cm->get('oro_email.minimum_input_length'),
                 'per_page'           => 100,
                 'containerCssClass'  => 'taggable-email',
                 'tags'               => [],

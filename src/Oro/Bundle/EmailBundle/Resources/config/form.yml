@@ -164,5 +164,7 @@ services:
 
     oro_email.form.type.email_address_recipients:
         class: %oro_email.form.type.email_address_recipients.class%
+        arguments:
+            - @oro_config.global
         tags:
             - { name: form.type, alias: oro_email_email_address_recipients }

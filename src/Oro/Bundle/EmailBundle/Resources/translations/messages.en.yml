@@ -48,6 +48,11 @@ oro:
                         auto.label: Auto
                         manual.label: Manual
 
+            email_autocomplete_configuration:
+                label: Autocomplete
+                minimum_input_length:
+                    label: Minumum number of characters for autocomplete
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
