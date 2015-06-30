@@ -1,5 +1,5 @@
-/*jslint browser:true, nomen:true*/
-/*global define, alert*/
+/* jslint browser:true, nomen:true */
+/* global define */
 define(function (require) {
     'use strict';
 
@@ -12,6 +12,12 @@ define(function (require) {
         listen: {
             'component:parentResize': 'onParentResize'
         },
+
+        initialize: function (options) {
+            this.editorComponentName = options.editorComponentName;
+            NoteView.__super__.initialize.apply(this, arguments);
+        },
+
         render: function () {
             this._deferredRender();
             this.initLayout().done(_.bind(function () {
@@ -21,12 +27,11 @@ define(function (require) {
         },
 
         onParentResize: function () {
-            var editor = this.getComponentManager().get('oro_note_form_message');
-            if (editor) {
-                editor.view.setHeight(this.$el.closest('.ui-widget-content').innerHeight());
-            } else {
+            var editor = this.pageComponent(this.editorComponentName);
+            if (!editor) {
                 throw new Error('Could not find message editor');
             }
+            editor.view.setHeight(this.$el.closest('.ui-widget-content').innerHeight());
         }
     });
 

@@ -21,7 +21,10 @@
     {% else %}
         <div class="form-container" {{ UI.renderPageComponentAttributes({
             'module': 'oroui/js/app/components/view-component',
-            'options': {'view': 'oronote/js/app/views/note-dialog-view'},
+            'options': {
+                'view': 'oronote/js/app/views/note-dialog-view',
+                'editorComponentName': form.message.vars.attr['data-ftid']
+            },
             'layout': 'separate'
         }) }}>
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
