@@ -93,10 +93,10 @@ class SendEmail extends AbstractSendEmail
         }
         $emailModel->setType($type);
 
-        $email = $this->emailProcessor->process($emailModel);
+        $emailUser = $this->emailProcessor->process($emailModel);
 
         if (array_key_exists('attribute', $this->options)) {
-            $this->contextAccessor->setValue($context, $this->options['attribute'], $email);
+            $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
         }
     }
 }

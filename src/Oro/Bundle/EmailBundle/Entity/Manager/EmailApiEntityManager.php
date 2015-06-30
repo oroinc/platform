@@ -198,8 +198,8 @@ class EmailApiEntityManager extends ApiEntityManager
             $result['body']     = null;
             $result['bodyType'] = null;
         } else {
-            $result['body']     = $result['emailBody'][0]['body'];
-            $result['bodyType'] = $result['emailBody'][0]['bodyType'];
+            $result['body']     = $result['emailBody']['body'];
+            $result['bodyType'] = $result['emailBody']['bodyType'];
         }
         unset($result['emailBody']);
     }

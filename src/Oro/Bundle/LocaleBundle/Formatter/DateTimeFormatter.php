@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateTimeFormatter
@@ -9,17 +11,20 @@ class DateTimeFormatter
     const DEFAULT_DATE_TYPE = \IntlDateFormatter::MEDIUM;
     const DEFAULT_TIME_TYPE = \IntlDateFormatter::SHORT;
 
-    /**
-     * @var LocaleSettings
-     */
+    /** @var LocaleSettings */
     protected $localeSettings;
+
+    /** @var Translator */
+    private $translator;
 
     /**
      * @param LocaleSettings $localeSettings
+     * @param Translator $translator
      */
-    public function __construct(LocaleSettings $localeSettings)
+    public function __construct(LocaleSettings $localeSettings, Translator $translator)
     {
         $this->localeSettings = $localeSettings;
+        $this->translator = $translator;
     }
 
     /**
@@ -73,17 +78,9 @@ class DateTimeFormatter
      */
     public function formatDay($date, $dateType = null, $locale = null, $timeZone = null)
     {
-        $formatter = new \IntlDateFormatter(
-            $this->localeSettings->getLanguage(),
-            \IntlDateFormatter::MEDIUM,
-            \IntlDateFormatter::NONE,
-            $timeZone,
-            \IntlDateFormatter::GREGORIAN
-        );
-        $pattern = $formatter->getPattern();
-        $pattern = preg_replace(['/y/', "/'.*'/", '/\./', '/,/'], '', $pattern);
+        $pattern = $this->translator->trans('oro.locale.date_format.day', [], null, $locale);
 
-        return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, trim($pattern));
+        return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
 
     /**
