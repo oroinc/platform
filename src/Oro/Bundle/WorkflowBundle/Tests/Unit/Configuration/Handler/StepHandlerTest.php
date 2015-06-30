@@ -90,6 +90,7 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                             'is_final' => false,
                             'entity_acl' => array('attribute' => array('delete' => false)),
                             'allowed_transitions' => array('regular_transition'),
+                            'position' => [1,100],
                         ),
                         array(
                             'name' => 'second_step',
@@ -130,6 +131,7 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                             'allowed_transitions' => array('regular_transition', 'unknown_transition'),
                             'unknown_first' => 'first_value',
                             'unknown_second' => 'second_value',
+                            'position' => [1, 100]
                         ),
                         array(
                             'name' => 'second_step',
