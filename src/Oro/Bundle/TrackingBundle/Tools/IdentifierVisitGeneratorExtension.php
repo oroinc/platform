@@ -4,7 +4,6 @@ namespace Oro\Bundle\TrackingBundle\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
 
 class IdentifierVisitGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
@@ -15,7 +14,7 @@ class IdentifierVisitGeneratorExtension extends AbstractAssociationEntityGenerat
     public function supports(array $schema)
     {
         return
-            $schema['class'] === TrackingVisit::ENTITY_NAME
+            $schema['class'] === 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit'
             && parent::supports($schema);
     }
 

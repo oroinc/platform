@@ -8,7 +8,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider;
 
@@ -48,9 +47,13 @@ class VisitEventAssociationDumperExtension extends AbstractEntityConfigDumperExt
     {
         if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
             $targetEntities = $this->getTargetEntities();
+            if (empty($targetEntities)) {
+                return false;
+            }
 
-            return !empty($targetEntities)
-            && $this->configManager->getProvider('extend')->hasConfig(TrackingVisitEvent::ENTITY_NAME);
+            return $this->configManager
+                ->getProvider('extend')
+                ->hasConfig('Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent');
         }
 
         return false;
@@ -64,7 +67,7 @@ class VisitEventAssociationDumperExtension extends AbstractEntityConfigDumperExt
         $targetEntities = $this->getTargetEntities();
         foreach ($targetEntities as $targetEntity) {
             $this->associationBuilder->createManyToOneAssociation(
-                TrackingVisitEvent::ENTITY_NAME,
+                'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
                 $targetEntity,
                 VisitEventAssociationExtension::ASSOCIATION_KIND
             );
