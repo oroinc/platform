@@ -5,6 +5,12 @@ namespace Oro\Bundle\LocaleBundle\Converter;
 interface DateTimeFormatConverterInterface
 {
     /**
+     * @param string|null $locale
+     * @return string
+     */
+    public function getDayFormat($locale = null);
+
+    /**
      * @param int|string|null $dateFormat \IntlDateFormatter format constant it's string name
      * @param string|null $locale
      * @return string

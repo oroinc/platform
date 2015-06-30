@@ -46,6 +46,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             format: {
                 datetime: {
                     moment: {
+                        day: 'MM-DD',
                         date: 'YYYY-MM-DD',
                         time: 'HH:mms',
                         datetime: 'YYYY-MM-DD HH:mm',

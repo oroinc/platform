@@ -1,0 +1,15 @@
+{% set dataAuditConditionOptions = {
+    fieldChoice: {
+        select2: {
+            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
+        },
+        fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_get_audit_fields',
+    },
+} %}
+
+<li class="option" data-criteria="condition-data-audit"
+    data-module="orodataaudit/js/data-audit-condition"
+    data-widget="dataAuditCondition"
+    data-options="{{ dataAuditConditionOptions|json_encode }}">
+    {{ 'oro.dataaudit.condition_builder.criteria.data_audit'|trans }}
+</li>
