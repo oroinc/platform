@@ -26,7 +26,7 @@ define([
         /**
          * @inheritDoc
          */
-        template: _.template('<input name="<%- this.model.cid + \'_\' + this.cid %>" type="radio" value="<%- value %>" <%= selected ? checked : "" %>><%- text %>', null, {variable: null}),
+        template: _.template('<input name="<%- this.model.cid + \'_\' + this.cid %>" type="radio" value="<%- value %>" <%= selected ? "checked" : "" %>><%- text %>', null, {variable: null}),
 
         /**
          * @param {Object} event
