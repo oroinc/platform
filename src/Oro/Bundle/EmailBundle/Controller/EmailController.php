@@ -370,7 +370,7 @@ class EmailController extends Controller
             if ((bool)$status) {
                 $this->getEmailManager()->setSeenStatus($email);
             } else {
-                $this->getEmailManager()->setUneenStatus($email);
+                $this->getEmailManager()->setUnseenStatus($email);
             }
         }
 
