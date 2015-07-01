@@ -137,7 +137,8 @@ Configurable entities can use attachments for adding additional files to records
 
 To turn attachments for entity, administrator should turn attachments in UI for current entity configuration.
 
-Additional, admin can set array with allowed nine types and maximun attached file size. If mime types was not set, for validation will be taken mime types from `Upload settings` block mime types of system configuraton.
+Additional, admin can set array with allowed mine types and maximum attached file size. 
+If mime types was not set, the mime types from `Upload settings` (system configuration) will be used for validation.
 
 After the schema was updated, for current entity will be available button `Add attachment`.
 
