@@ -21,6 +21,10 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailFolder
 {
+    const SYNC_ENABLED_TRUE = 1;
+    const SYNC_ENABLED_FALSE = 0;
+    const SYNC_ENABLED_IGNORE = -1;
+
     /**
      * @var integer
      *
@@ -61,11 +65,11 @@ class EmailFolder
     /**
      * @var bool
      *
-     * @ORM\Column(name="id_checked", type="boolean", options={"default"=false})
+     * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
      * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
-    protected $checked = false;
+    protected $syncEnabled = false;
 
     /**
      * @var EmailFolder $folder
@@ -212,21 +216,21 @@ class EmailFolder
      *
      * @return bool
      */
-    public function isChecked()
+    public function isSyncEnabled()
     {
-        return $this->checked;
+        return $this->syncEnabled;
     }
 
     /**
      * Set folder checked for sync
      *
-     * @param boolean $checked
+     * @param boolean $syncEnabled
      *
      * @return $this
      */
-    public function setChecked($checked)
+    public function setSyncEnabled($syncEnabled)
     {
-        $this->checked = (bool)$checked;
+        $this->syncEnabled = (bool)$syncEnabled;
 
         return $this;
     }

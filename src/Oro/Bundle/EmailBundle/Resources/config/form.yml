@@ -17,6 +17,8 @@ parameters:
     oro_email.form.type.contexts_select.class:            Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType
     oro_email.form.type.email_link_to_scope.class:        Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
+    oro_email.form.type.email_folder.class:               Oro\Bundle\EmailBundle\Form\Type\EmailFolderType
+    oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
 
 services:
     oro_email.form.subscriber.emailtemplate:
@@ -151,3 +153,13 @@ services:
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%
+
+    oro_email.form.type.email_folder:
+        class: %oro_email.form.type.email_folder.class%
+        tags:
+            - { name: form.type, alias: oro_email_email_folder }
+
+    oro_email.form.type.email_folder_tree:
+        class: %oro_email.form.type.email_folder_tree.class%
+        tags:
+            - { name: form.type, alias: oro_email_email_folder_tree }

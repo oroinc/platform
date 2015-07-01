@@ -26,7 +26,7 @@ class OroEmailBundle implements Migration
     {
         $emailFolderTable = $schema->getTable('oro_email_folder');
 
-        $emailFolderTable->addColumn('id_checked', 'boolean', ['default' => false]);
+        $emailFolderTable->addColumn('sync_enabled', 'boolean', ['default' => false]);
         $emailFolderTable->addColumn('parent_folder_id', 'integer', ['notnull' => false]);
         $emailFolderTable->addForeignKeyConstraint(
             $emailFolderTable,

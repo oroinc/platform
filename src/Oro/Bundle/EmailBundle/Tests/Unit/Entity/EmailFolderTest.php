@@ -75,8 +75,8 @@ class EmailFolderTest extends \PHPUnit_Framework_TestCase
             ['fullName', 'test'],
             ['name', 'test'],
             ['origin', $origin],
-            ['checked', true],
-            ['checked', false],
+            ['syncEnabled', true],
+            ['syncEnabled', false],
             ['parentFolder', $parentFolder],
             ['synchronizedAt', $synchronizedAt],
         ];
