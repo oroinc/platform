@@ -194,6 +194,34 @@
     </script>
 {% endblock %}
 
+{% block oro_email_email_folder_row %}
+    {{ form_widget(form.syncEnabled) }} <label>{{ value.name }}</label>
+    {% if value.subFolders %}
+        <div style="margin-left: 20px">
+            {{ form_widget(form.subFolders) }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_widget %}
+    <input id="check-all" type="checkbox"/><label>All</label>
+    <div id="folder-list" style="margin-left: 20px">
+        {{ form_rest(form) }}
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery'], function($) {
+            var $folderList = $('#folder-list');
+            var $checkAll = $('#check-all');
+            $checkAll.click(function() {
+                var checked = this.checked;
+                $folderList.find(':checkbox').each(function() {
+                    this.checked = checked;
+                });
+            });
+        });
+    </script>
+{% endblock %}
 {#
     Renders tab `li` tag for bootstrap tab panels
     paramters:
