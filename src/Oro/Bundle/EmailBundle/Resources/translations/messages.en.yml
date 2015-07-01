@@ -99,6 +99,8 @@ oro:
             compose: Compose
             shortcut_compose_email.label: Compose email
             shortcut_compose_email.description: Compose email
+            mark_read.label: Mark read
+            mark_unread.label: Mark unread
 
         datagrid:
             emailtemplate:

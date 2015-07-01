@@ -96,6 +96,18 @@ class EmailManager
     }
 
     /**
+     * @param Email $entity
+     */
+    public function setUnseenStatus(Email $entity)
+    {
+        $emailUser = $this->getCurrentEmailUser($entity);
+
+        if ($emailUser) {
+            $this->setEmailUserSeen($emailUser, false, true);
+        }
+    }
+
+    /**
      * Toggle user email seen
      *
      * @param EmailUser $entity

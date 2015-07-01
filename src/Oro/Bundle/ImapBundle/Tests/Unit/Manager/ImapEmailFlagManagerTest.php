@@ -47,7 +47,7 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
         $this->repoImapEmail->expects($this->once())
             ->method('getUid')
             ->will($this->returnValue(1))
-            ->with($folderId,$emailId);
+            ->with($folderId, $emailId);
 
         $this->em->expects($this->once())
             ->method('getRepository')->willReturn($this->repoImapEmail);
@@ -80,7 +80,7 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
         $this->repoImapEmail->expects($this->once())
             ->method('getUid')
             ->will($this->returnValue(1))
-            ->with($folderId,$emailId);
+            ->with($folderId, $emailId);
 
         $this->em->expects($this->once())
             ->method('getRepository')->willReturn($this->repoImapEmail);
@@ -113,7 +113,7 @@ class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
         $this->repoImapEmail->expects($this->once())
             ->method('getUid')
             ->will($this->returnValue(1))
-            ->with($folderId,$emailId);
+            ->with($folderId, $emailId);
 
         $this->em->expects($this->once())
             ->method('getRepository')->willReturn($this->repoImapEmail);

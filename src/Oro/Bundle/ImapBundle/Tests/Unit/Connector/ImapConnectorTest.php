@@ -80,6 +80,9 @@ class ImapConnectorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     */
     public function testFindItemsWithSearchQueryGetMessages()
     {
         $this->storage->expects($this->at(0))
@@ -167,9 +170,9 @@ class ImapConnectorTest extends \PHPUnit_Framework_TestCase
 
         $this->storage->expects($this->once())
             ->method('setFlags')
-            ->with($id,$flags);
+            ->with($id, $flags);
 
         $response = $this->connector->setFlags($uid, $flags);
-        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Connector\ImapConnector',$response);
+        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Connector\ImapConnector', $response);
     }
 }

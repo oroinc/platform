@@ -25,8 +25,8 @@ use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * Class EmailController
@@ -34,6 +34,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
  * @package Oro\Bundle\EmailBundle\Controller
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailController extends Controller
 {
@@ -341,21 +342,48 @@ class EmailController extends Controller
      * @Route("/toggle_seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
      *
-     * @param EmailUser $emailUserEntity
+     * @param EmailUser $emailUser
      *
-     * @return array
+     * @return JsonResponse
      */
-    public function toggleSeenAction(EmailUser $emailUserEntity)
+    public function toggleSeenAction(EmailUser $emailUser)
     {
-        if ($emailUserEntity) {
-            $this->getEmailManager()->toggleEmailUserSeen($emailUserEntity);
+        if ($emailUser) {
+            $this->getEmailManager()->toggleEmailUserSeen($emailUser);
         }
     
-        return new JsonResponse(['successful' => (bool)$emailUserEntity]);
+        return new JsonResponse(['successful' => (bool)$emailUser]);
+    }
+
+    /**
+     * @Route("/mark_seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
+     * @AclAncestor("oro_email_email_user_edit")
+     *
+     * @param Email $email
+     * @param string $status
+     *
+     * @return JsonResponse
+     */
+    public function markSeenAction(Email $email, $status)
+    {
+        if ($email) {
+            if ((bool)$status) {
+                $this->getEmailManager()->setSeenStatus($email);
+            } else {
+                $this->getEmailManager()->setUneenStatus($email);
+            }
+        }
+
+        return new JsonResponse(['successful' => (bool)$email]);
     }
 
     /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
+     *
+     * @param string $gridName
+     * @param string $actionName
+     *
+     * @return JsonResponse
      */
     public function markMassAction($gridName, $actionName)
     {

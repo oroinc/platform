@@ -2,10 +2,19 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Protocol;
 
+/**
+ * Class Imap
+ * Add PEEK capability to Zend Imap Protocol
+ *
+ * @package Oro\Bundle\ImapBundle\Mail\Protocol
+ */
 class Imap extends \Zend\Mail\Protocol\Imap
 {
     /**
      * {@inheridoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function fetch($items, $from, $to = null)
     {
@@ -63,7 +72,8 @@ class Imap extends \Zend\Mail\Protocol\Imap
             // if we want only one message we can ignore everything else and just return
             if ($to === null && !is_array($from) && $tokens[0] == $from) {
                 // we still need to read all liness
-                while (!$this->readLine($tokens, $tag));
+                while (!$this->readLine($tokens, $tag)) {
+                }
                 return $data;
             }
             $result[$tokens[0]] = $data;
