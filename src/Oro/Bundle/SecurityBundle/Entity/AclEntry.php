@@ -118,7 +118,7 @@ class AclEntry
      *
      * @var int
      *
-     * @ORM\Column(name="record_id", type="integer", options={"unsigned"=true})
+     * @ORM\Column(name="record_id", type="bigint", options={"unsigned"=true}, nullable=true)
      */
     protected $recordId;
 
