@@ -74,7 +74,6 @@ class UpdateSchemaCommand extends ContainerAwareCommand
                         count($sqls)
                     )
                 );
-                $output->writeln(implode(';' . PHP_EOL, $sqls) . ';');
             }
         }
 

@@ -14,7 +14,7 @@ class ControllersTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\ActivityListBundle\Tests\Functional\Fixture\LoadActivityData'], true);
+        $this->loadFixtures(['Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData']);
     }
 
     public function testWidget()
