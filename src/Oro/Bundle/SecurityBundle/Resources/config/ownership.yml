@@ -57,7 +57,7 @@ services:
         public: false
         class: %oro_security.owner.ownership_metadata_provider.cache.warmer.class%
         arguments:
-            - @oro_security.owner.ownership_metadata_provider
+            - @oro_security.owner.metadata_provider.chain
         tags:
             - { name: kernel.cache_warmer }
 
@@ -65,7 +65,7 @@ services:
         public: false
         class: %oro_security.owner.ownership_metadata_provider.cache.clearer.class%
         arguments:
-            - @oro_security.owner.ownership_metadata_provider
+            - @oro_security.owner.metadata_provider.chain
         tags:
             - { name: kernel.cache_clearer }
 

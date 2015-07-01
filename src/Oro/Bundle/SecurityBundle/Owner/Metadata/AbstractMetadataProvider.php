@@ -20,11 +20,6 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     private $configProvider;
 
     /**
-     * @var ConfigProvider
-     */
-    private $cache;
-
-    /**
      * @var EntityClassResolver
      */
     private $entityClassResolver;
@@ -77,23 +72,11 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     }
 
     /**
-     * @return CacheProvider
-     */
-    protected function getCache()
-    {
-        if ($this->container) {
-            $this->cache = $this->getContainer()->get('oro_security.owner.ownership_metadata_provider.cache');
-        }
-
-        return $this->cache;
-    }
-
-    /**
      * @return EntityClassResolver
      */
     protected function getEntityClassResolver()
     {
-        if ($this->container) {
+        if (!$this->entityClassResolver) {
             $this->entityClassResolver = $this->getContainer()->get('oro_entity.orm.entity_class_resolver');
         }
 
@@ -131,6 +114,11 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     abstract protected function getNoOwnershipMetadata();
 
     /**
+     * @return CacheProvider
+     */
+    abstract protected function getCache();
+
+    /**
      * {@inheritDoc}
      */
     public function getMetadata($className)
@@ -146,11 +134,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     }
 
     /**
-     * Warms up the cache
-     *
-     * If the class name is specified this method warms up cache for this class only
-     *
-     * @param string|null $className
+     * {@inheritdoc}
      */
     public function warmUpCache($className = null)
     {
@@ -165,11 +149,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     }
 
     /**
-     * Clears the ownership metadata cache
-     *
-     * If the class name is not specified this method clears all cached data
-     *
-     * @param string|null $className
+     * {@inheritdoc}
      */
     public function clearCache($className = null)
     {

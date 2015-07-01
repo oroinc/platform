@@ -24,11 +24,9 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     protected $configProvider;
 
     /**
-     * @deprecated since 1.8, use getCache method instead
-     *
-     * @var ConfigProvider
+     * @var CacheProvider
      */
-    protected $cache;
+    private $cache;
 
     /**
      * @var string
@@ -56,7 +54,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      * @param EntityClassResolver $entityClassResolver
      * @param CacheProvider|null  $cache
      *
-     * @deprecated since 1.8. $configProvider, $entityClassResolver, $cache will be removed
+     * @deprecated since 1.8. $configProvider, $entityClassResolver will be removed
      *      use getConfigProvider, getCache, getEntityClassResolver methods instead
      */
     public function __construct(
@@ -219,7 +217,8 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
                         OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT,
                         OwnershipMetadata::OWNER_TYPE_USER,
                         OwnershipMetadata::OWNER_TYPE_ORGANIZATION
-                    ]
+                    ],
+                    true
                 );
 
                 if ($checkOwnerType) {
@@ -229,5 +228,17 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
         }
 
         return $accessLevel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCache()
+    {
+        if (!$this->cache) {
+            $this->cache = $this->getContainer()->get('oro_security.owner.ownership_metadata_provider.cache');
+        }
+
+        return $this->cache;
     }
 }

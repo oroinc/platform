@@ -67,7 +67,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     {
         return isset($this->metadata[$className])
             ? $this->metadata[$className]
-            : new OwnershipMetadata();
+            : parent::getMetadata($className);
     }
 
     /**

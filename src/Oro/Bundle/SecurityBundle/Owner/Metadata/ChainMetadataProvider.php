@@ -134,4 +134,32 @@ class ChainMetadataProvider implements MetadataProviderInterface
 
         throw new NoSupportsMetadataProviderException('Found no supports provider in chain');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clearCache($className = null)
+    {
+        foreach ($this->providers as $provider) {
+            $provider->clearCache($className);
+        }
+
+        if ($this->defaultProvider) {
+            $this->defaultProvider->clearCache($className);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUpCache($className = null)
+    {
+        foreach ($this->providers as $provider) {
+            $provider->warmUpCache($className);
+        }
+
+        if ($this->defaultProvider) {
+            $this->defaultProvider->warmUpCache($className);
+        }
+    }
 }
