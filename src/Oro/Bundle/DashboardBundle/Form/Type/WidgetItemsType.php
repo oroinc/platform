@@ -32,7 +32,7 @@ class WidgetItemsType extends AbstractType
         $builder->addEventSubscriber($this->itemsSubscriber);
 
         $builder->add('items', 'collection', [
-            'type' => 'orocrm_magento_metric',
+            'type' => 'oro_type_widget_item',
         ]);
     }
 
