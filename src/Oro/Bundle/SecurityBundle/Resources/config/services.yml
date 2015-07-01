@@ -23,6 +23,8 @@ parameters:
 
     oro_security.type.oro_acl_access_level_selector.class:     Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType
     oro_security.type.oro_acl_label.class:                     Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType
+    oro_security.type.oro_acl_collection.class:                Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType
+    oro_security.type.oro_acl_privilege.class:                 Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType
 
     oro_security.entity_security_metadata_provider.class:      Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider
     oro_security.action_metadata_provider.class:               Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider
@@ -75,7 +77,6 @@ services:
             - @logger
         tags:
             - { name: monolog.logger, channel: security }
-        lazy: true
 
     security.context.link:
         tags:
@@ -92,7 +93,6 @@ services:
             - @oro_security.acl.extension_selector
             - @?security.acl.dbal.provider
             - @oro_security.acl.ace_provider
-        lazy: true
 
     oro_security.acl.privilege_repository:
         class: %oro_security.acl.privilege_repository.class%
@@ -213,6 +213,16 @@ services:
         class: %oro_security.type.oro_acl_label.class%
         tags:
             - { name: form.type, alias: oro_acl_label }
+
+    oro_security.form.type.oro_acl_collection:
+        class: %oro_security.type.oro_acl_collection.class%
+        tags:
+            - { name: form.type, alias: oro_acl_collection }
+
+    oro_security.form.type.oro_acl_privilege:
+        class: %oro_security.type.oro_acl_privilege.class%
+        tags:
+            - { name: form.type, alias: oro_acl_privilege }
 
     oro_security.entity_security_metadata_provider:
         public: false

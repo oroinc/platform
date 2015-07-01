@@ -352,7 +352,6 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
-
         if (0 === $this->removeServiceBits($mask)) {
             return AccessLevel::NONE_LEVEL;
         }
@@ -370,7 +369,7 @@ class EntityAclExtension extends AbstractAclExtension
             }
         }
 
-        return $this->metadataProvider->getMaxAccessLevel($result, $object);
+        return $this->metadataProvider->getMaxAccessLevel($result, $this->getObjectClassName($object));
     }
 
     /**
@@ -519,7 +518,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function fixMaxAccessLevel($accessLevel, $object)
     {
-        return $this->metadataProvider->getMaxAccessLevel($accessLevel, $object);
+        return $this->metadataProvider->getMaxAccessLevel($accessLevel, $this->getObjectClassName($object));
     }
 
     /**
