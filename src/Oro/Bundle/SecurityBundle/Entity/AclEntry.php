@@ -113,6 +113,16 @@ class AclEntry
     protected $auditFailure;
 
     /**
+     * The field is added in purpose to gain better performance. In other word, denormalization is added.
+     * This field duplicates acl_object_identities.object_identifier field.
+     *
+     * @var int
+     *
+     * @ORM\Column(name="record_id", type="integer", options={"unsigned"=true})
+     */
+    protected $recordId;
+
+    /**
      * Gets id
      *
      * @return int
@@ -350,5 +360,28 @@ class AclEntry
     public function getAuditFailure()
     {
         return $this->auditFailure;
+    }
+
+    /**
+     * Sets recordId
+     *
+     * @param int $recordId
+     * @return self
+     */
+    public function setRecordId($recordId)
+    {
+        $this->recordId = $recordId;
+
+        return $this;
+    }
+
+    /**
+     * Gets recordId
+     *
+     * @return int
+     */
+    public function getRecordId()
+    {
+        return $this->recordId;
     }
 }

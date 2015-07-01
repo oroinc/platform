@@ -17,6 +17,7 @@ class AclEntryTest extends \PHPUnit_Framework_TestCase
     const GRANTING_STRATEGY = 'all';
     const AUDIT_SUCCESS     = false;
     const AUDIT_FAILURE     = true;
+    const RECORD_ID         = 5;
 
     /**
      * @var AclEntry
@@ -72,5 +73,8 @@ class AclEntryTest extends \PHPUnit_Framework_TestCase
 
         $this->entity->setAuditFailure(self::AUDIT_FAILURE);
         $this->assertEquals(self::AUDIT_FAILURE, $this->entity->getAuditFailure());
+
+        $this->entity->setRecordId(self::RECORD_ID);
+        $this->assertEquals(self::RECORD_ID, $this->entity->getRecordId());
     }
 }
