@@ -3,9 +3,8 @@
 define([
     'underscore',
     'backgrid',
-    'orodatagrid/js/datagrid/editor/select-cell-editor',
     'orodatagrid/js/datagrid/editor/select-cell-radio-editor'
-], function (_, Backgrid, SelectCellEditor, SelectCellRadioEditor) {
+], function (_, Backgrid, SelectCellRadioEditor) {
     'use strict';
 
     var SelectCell;
@@ -18,11 +17,6 @@ define([
      * @extends Backgrid.SelectCell
      */
     SelectCell = Backgrid.SelectCell.extend({
-        /**
-         * @inheritDoc
-         */
-        editor: SelectCellEditor,
-
         /**
          * @inheritDoc
          */

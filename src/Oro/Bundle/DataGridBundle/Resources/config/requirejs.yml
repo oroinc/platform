@@ -40,7 +40,6 @@ config:
         'orodatagrid/js/datagrid/formatter/cell-formatter': 'bundles/orodatagrid/js/datagrid/formatter/cell-formatter.js'
         'orodatagrid/js/datagrid/formatter/datetime-formatter': 'bundles/orodatagrid/js/datagrid/formatter/datetime-formatter.js'
         'orodatagrid/js/datagrid/formatter/number-formatter': 'bundles/orodatagrid/js/datagrid/formatter/number-formatter.js'
-        'orodatagrid/js/datagrid/editor/select-cell-editor': 'bundles/orodatagrid/js/datagrid/editor/select-cell-editor.js'
         'orodatagrid/js/datagrid/editor/select-cell-radio-editor': 'bundles/orodatagrid/js/datagrid/editor/select-cell-radio-editor.js'
         'orodatagrid/js/datagrid/grid': 'bundles/orodatagrid/js/datagrid/grid.js'
         'orodatagrid/js/datagrid/header-cell/header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/header-cell.js'

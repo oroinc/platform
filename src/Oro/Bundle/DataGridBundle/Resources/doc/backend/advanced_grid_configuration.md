@@ -78,7 +78,7 @@ datagrid:
             id: ~  # Identifier property must be passed to frontend
 ```
 
-When this done we have to create form fields that wil contain assigned/removed user ids and process it on backend
+When this done we have to create form fields that will contain assigned/removed user ids and process it on backend
 For example fields are:
 ``` twig
     form_widget(form.appendUsers, {'id': 'groupAppendUsers'}),
@@ -100,6 +100,60 @@ datagrid:
                 selectors:
                     included: '#groupAppendUsers'  # field selectors
                     excluded: '#groupRemoveUsers'
+```
+
+#### Problem:
+Let's take previous problem, but in additional we need to fill some form field dependent on grid state.
+For example "_grid should show users for group that currently editing and user should be able to select some parameter from dropwown for users in this group_"
+#### Solution:
+For solving this problem we have to create form field that will contain changeset of edited user fields and process it on backend
+For example fields are:
+``` twig
+    form_widget(form.changeset, {'id': 'changeset'}),
+```
+
+Next step: modify query. We'll add additional field `enabled` that user will be able to change.
+``` yml
+datagrid:
+    acme-demo-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - u.id
+                    - u.username
+                    - CASE WHEN u.enabled = true THEN 'enabled' ELSE 'disabled' END as enabled
+                from:
+                    { table: AcmeDemoBundle:User, alias:u }
+            bind_parameters:
+                - groupId
+        options:
+            entityHint: user
+        properties:
+            id: ~
+        columns:
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                editable: true
+                choices:
+                   enabled: Active
+                   disabled: Inactive
+```
+
+Last step: need to set "cellSelection" option, it will add behavior of selecting rows on frontend:
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # previous configuration
+        options:
+            cellSelection:
+                dataField: id
+                columns:
+                    - enabled
+                changeset: '#changeset'
 ```
 
 #### Problem:
