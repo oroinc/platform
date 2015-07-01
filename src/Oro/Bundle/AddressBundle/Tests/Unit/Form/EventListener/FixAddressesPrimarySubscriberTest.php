@@ -4,9 +4,10 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
-use Symfony\Component\Form\FormEvents;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
+
+use Symfony\Component\Form\FormEvents;
 
 class FixAddressesPrimarySubscriberTest extends \PHPUnit_Framework_TestCase
 {

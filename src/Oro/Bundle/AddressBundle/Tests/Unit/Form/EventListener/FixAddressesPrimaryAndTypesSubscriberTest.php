@@ -3,10 +3,11 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber;
-use Symfony\Component\Form\FormEvents;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
+
+use Symfony\Component\Form\FormEvents;
 
 class FixAddressesPrimaryAndTypesSubscriberTest extends \PHPUnit_Framework_TestCase
 {

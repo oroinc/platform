@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
+use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 
 /**
  * When address is created/updated from single form, it will ensure the rules of one primary address uniqueness
@@ -25,6 +25,9 @@ class FixAddressesPrimarySubscriber implements EventSubscriberInterface
      */
     protected $addressAccess;
 
+    /**
+     * @param string $addressesProperty Address property path like "owner.addresses"
+     */
     public function __construct($addressesProperty)
     {
         $this->addressesAccess = PropertyAccess::createPropertyAccessor();
