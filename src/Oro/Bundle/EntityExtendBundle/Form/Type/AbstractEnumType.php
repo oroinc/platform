@@ -74,12 +74,15 @@ abstract class AbstractEnumType extends AbstractType
             [
                 'class' => function (Options $options, $value) {
                     if (!empty($value)) {
-                        $class = $value;
-                    } else {
-                        $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                        return $value;
                     }
 
-                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                    if (empty($options['enum_code'])) {
+                        throw new InvalidOptionsException('Either "class" or "enum_code must" option must be set.');
+                    }
+
+                    $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
                         throw new InvalidOptionsException(
                             sprintf(
                                 '"%s" must be a child of "%s"',
@@ -92,9 +95,14 @@ abstract class AbstractEnumType extends AbstractType
                     return $class;
                 },
                 'multiple' => function (Options $options, $value) {
-                    return $value !== null
-                        ? $value
-                        : $this->configManager->getProvider('enum')->getConfig($options['class'])->is('multiple');
+                    if ($value === null) {
+                        $value = $this->configManager
+                            ->getProvider('enum')
+                            ->getConfig($options['class'])
+                            ->is('multiple');
+                    }
+
+                    return $value;
                 }
             ]
         );

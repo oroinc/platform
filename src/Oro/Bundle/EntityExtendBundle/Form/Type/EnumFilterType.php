@@ -53,12 +53,15 @@ class EnumFilterType extends AbstractChoiceType
             [
                 'class' => function (Options $options, $value) {
                     if (!empty($value)) {
-                        $class = $value;
-                    } else {
-                        $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                        return $value;
                     }
 
-                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                    if (empty($options['enum_code'])) {
+                        throw new InvalidOptionsException('Either "class" or "enum_code must" option must be set.');
+                    }
+
+                    $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
                         throw new InvalidOptionsException(
                             sprintf(
                                 '"%s" must be a child of "%s"',
@@ -72,9 +75,11 @@ class EnumFilterType extends AbstractChoiceType
                 },
                 // this normalizer allows to add/override field_options options outside
                 'field_options' => function (Options $options, $value) use (&$defaultFieldOptions) {
-                    $value['choices'] = $options['class'] !== null
-                        ? $this->getChoices($options['class'], $options['null_value'])
-                        : [];
+                    if ($options['class'] !== null) {
+                        $value['choices'] = $this->getChoices($options['class'], $options['null_value']);
+                    } else {
+                        $value['choices'] = [];
+                    }
 
                     return array_merge($defaultFieldOptions, $value);
                 }
@@ -107,7 +112,6 @@ class EnumFilterType extends AbstractChoiceType
     protected function getChoices($enumValueClassName, $nullValue)
     {
         $choices = [];
-
         if (!empty($nullValue)) {
             $choices[$nullValue] = $this->translator->trans('oro.entity_extend.datagrid.enum.filter.empty');
         }
