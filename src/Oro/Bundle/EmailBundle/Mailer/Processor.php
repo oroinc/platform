@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -22,7 +22,7 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -69,13 +69,13 @@ class Processor
     protected $origins = [];
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param \Swift_Mailer $mailer
-     * @param EmailAddressHelper $emailAddressHelper
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param EmailOwnerProvider $emailOwnerProvider
-     * @param EmailActivityManager $emailActivityManager
-     * @param ServiceLink $serviceLink
+     * @param DoctrineHelper           $doctrineHelper
+     * @param \Swift_Mailer            $mailer
+     * @param EmailAddressHelper       $emailAddressHelper
+     * @param EmailEntityBuilder       $emailEntityBuilder
+     * @param EmailOwnerProvider       $emailOwnerProvider
+     * @param EmailActivityManager     $emailActivityManager
+     * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
@@ -94,8 +94,8 @@ class Processor
         $this->emailEntityBuilder   = $emailEntityBuilder;
         $this->emailOwnerProvider   = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
-        $this->securityFacade = $serviceLink->getService();
-        $this->eventDispatcher = $eventDispatcher;
+        $this->securityFacade       = $serviceLink->getService();
+        $this->eventDispatcher      = $eventDispatcher;
     }
 
     /**
@@ -192,11 +192,17 @@ class Processor
             $guesser = ExtensionGuesser::getInstance();
             $body    = $message->getBody();
             $body    = preg_replace_callback(
-                '/<img(.*)src(.*)=(.*)"(.*)"/U',
+                '/<img(.*)src(\s*)=(\s*)["\'](.*)["\']/U',
                 function ($matches) use ($message, $guesser, $model) {
-                    foreach ($matches as $match) {
-                        if (strpos($match, 'data:image') === 0) {
-                            list($mime, $content) = explode(';', $match);
+                    if (count($matches) === 5) {
+                        // 1st match contains any data between '<img' and 'src' parts (e.g. 'width=100')
+                        $imgConfig = $matches[1];
+
+                        // 4th match contains src attribute value
+                        $srcData = $matches[4];
+
+                        if (strpos($srcData, 'data:image') === 0) {
+                            list($mime, $content) = explode(';', $srcData);
                             list($encoding, $file) = explode(',', $content);
                             $mime            = str_replace('data:', '', $mime);
                             $fileName        = sprintf('%s.%s', uniqid(), $guesser->guess($mime));
@@ -212,17 +218,19 @@ class Processor
                             $attachmentContent = new EmailAttachmentContent();
                             $attachmentContent->setContent($file);
                             $attachmentContent->setContentTransferEncoding($encoding);
-                            $emailAttachment = new \Oro\Bundle\EmailBundle\Entity\EmailAttachment();
+
+                            $emailAttachment = new EmailAttachment();
                             $emailAttachment->setEmbeddedContentId($swiftAttachment->getId());
                             $emailAttachment->setFileName($fileName);
                             $emailAttachment->setContentType($mime);
                             $attachmentContent->setEmailAttachment($emailAttachment);
                             $emailAttachment->setContent($attachmentContent);
-                            $attachment = new EmailAttachment();
-                            $attachment->setEmailAttachment($emailAttachment);
-                            $model->addAttachment($attachment);
 
-                            return sprintf('<img src="%s"', $id);
+                            $emailAttachmentModel = new EmailAttachmentModel();
+                            $emailAttachmentModel->setEmailAttachment($emailAttachment);
+                            $model->addAttachment($emailAttachmentModel);
+
+                            return sprintf('<img%ssrc="%s"', $imgConfig, $id);
                         }
                     }
                 },
@@ -238,9 +246,9 @@ class Processor
      */
     protected function addAttachments(\Swift_Message $message, EmailModel $model)
     {
-        /** @var AttachmentModel $attachmentModel */
-        foreach ($model->getAttachments() as $attachmentModel) {
-            $attachment      = $attachmentModel->getEmailAttachment();
+        /** @var EmailAttachmentModel $emailAttachmentModel */
+        foreach ($model->getAttachments() as $emailAttachmentModel) {
+            $attachment      = $emailAttachmentModel->getEmailAttachment();
             $swiftAttachment = new \Swift_Attachment(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
@@ -259,9 +267,9 @@ class Processor
      */
     protected function persistAttachments(EmailModel $model, Email $email)
     {
-        /** @var AttachmentModel $attachmentModel */
-        foreach ($model->getAttachments() as $attachmentModel) {
-            $attachment = $attachmentModel->getEmailAttachment();
+        /** @var EmailAttachmentModel $emailAttachmentModel */
+        foreach ($model->getAttachments() as $emailAttachmentModel) {
+            $attachment = $emailAttachmentModel->getEmailAttachment();
 
             if (!$attachment->getId()) {
                 $this->getEntityManager()->persist($attachment);
@@ -287,7 +295,7 @@ class Processor
      */
     public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
-        $originKey = $originName . $email;
+        $originKey    = $originName . $email;
         $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
             ? $this->securityFacade->getOrganization()
             : null;
@@ -322,7 +330,7 @@ class Processor
     }
 
     /**
-     * @param User $emailOwner
+     * @param User                  $emailOwner
      * @param OrganizationInterface $organization
      *
      * @return InternalEmailOrigin
@@ -332,7 +340,7 @@ class Processor
         $organization = $organization
             ? $organization
             : $emailOwner->getOrganization();
-        $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
+        $originName   = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
 
         $outboxFolder = new EmailFolder();
         $outboxFolder

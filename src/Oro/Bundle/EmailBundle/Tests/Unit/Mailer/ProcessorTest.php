@@ -285,7 +285,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($this->em));
         $this->em->expects($this->once())->method('flush');
 
-        $emailUser->expects($this->any())
+        $email->expects($this->any())
             ->method('getEmailBody')
             ->willReturn($body);
 
@@ -325,9 +325,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'cc' => ['Cc <cc@test.com>'],
                     'bcc' => ['Bcc <bcc@test.com>'],
                     'subject' => 'subject',
-                    'body' => 'body <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9n'
-                            .'AAAAA1BMVEX///+nxBvIAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB98GEAgrL'
-                            .'yNXN+0AAAAmaVRYdENvbW1lbnQAAAAAAENyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjleRfWwAAAAxJREFUCN'
+                    'body' => 'body <img width=100 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAAB'
+                            .'IeJ9nAAAAA1BMVEX///+nxBvIAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB98GEA'
+                            .'grLyNXN+0AAAAmaVRYdENvbW1lbnQAAAAAAENyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjleRfWwAAAAxJREFUCN'
                             .'djYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==" height="100"/>',
                     'type' => 'html'
                 ],
@@ -337,7 +337,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'cc' => ['cc@test.com' => 'Cc'],
                     'bcc' => ['bcc@test.com' => 'Bcc'],
                     'subject' => 'subject',
-                    'body' => 'body <img src="%s" height="100"/>',
+                    'body' => 'body <img width=100 src="%s" height="100"/>',
                     'type' => 'text/html'
                 ],
                 true
