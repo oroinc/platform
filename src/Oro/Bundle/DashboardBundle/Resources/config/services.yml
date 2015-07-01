@@ -27,6 +27,8 @@ parameters:
     oro_dashboard.form.type.widget_widget_title.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
     oro_dashboard.form.type.widget_previous_date_rang.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType
     oro_dashboard.form.type.widget_items_choice.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType
+    oro_dashboard.form.type.widget_items.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsType
+    oro_dashboard.event_listener.widget_items_form_subscriber.class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
 
 services:
     oro_datagrid.datagrid.name_strategy:
@@ -145,6 +147,19 @@ services:
         class: %oro_dashboard.form.type.widget_items_choice.class%
         tags:
             - { name: form.type, alias: "oro_type_widget_items_choice" }
+
+    oro_dashboard.form.type.widget_items:
+        class: %oro_dashboard.form.type.widget_items.class%
+        arguments:
+            - @oro_dashboard.event_listener.widget_items_form_subscriber
+        tags:
+            - { name: form.type, alias: oro_type_widget_items }
+
+    oro_dashboard.event_listener.widget_items_form_subscriber:
+        class: %oro_dashboard.event_listener.widget_items_form_subscriber.class%
+        arguments:
+            - @oro_dashboard.widget_configs
+            - @translator
 
     oro_dashboard.widget_config_value.provider:
         class: %oro_dashboard.widget_config_value.provider.class%
