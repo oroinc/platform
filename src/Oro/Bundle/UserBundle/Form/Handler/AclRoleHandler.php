@@ -42,6 +42,13 @@ class AclRoleHandler
     protected $managerRegistry;
 
     /**
+     * @var ObjectManager
+     *
+     * @deprecated since 1.8
+     */
+    protected $manager;
+
+    /**
      * @var AclManager
      */
     protected $aclManager;
@@ -98,6 +105,16 @@ class AclRoleHandler
     }
 
     /**
+     * @param ObjectManager $manager
+     *
+     * @deprecated since 1.8
+     */
+    public function setEntityManager(ObjectManager $manager)
+    {
+        $this->manager = $manager;
+    }
+
+    /**
      * @param Request $request
      */
     public function setRequest(Request $request)
@@ -115,7 +132,9 @@ class AclRoleHandler
             $this->extensionFilters[$extensionKey] = [];
         }
 
-        $this->extensionFilters[$extensionKey][] = $allowedGroup;
+        if (!in_array($allowedGroup, $this->extensionFilters[$extensionKey])) {
+            $this->extensionFilters[$extensionKey][] = $allowedGroup;
+        }
     }
 
     /**
@@ -277,7 +296,7 @@ class AclRoleHandler
     /**
      * "Success" form handler
      *
-     * @param AbstractRole   $entity
+     * @param AbstractRole $entity
      * @param User[] $appendUsers
      * @param User[] $removeUsers
      */
@@ -294,7 +313,7 @@ class AclRoleHandler
     /**
      * Append users to role
      *
-     * @param AbstractRole   $role
+     * @param AbstractRole $role
      * @param User[] $users
      */
     protected function appendUsers(AbstractRole $role, array $users)
@@ -311,7 +330,7 @@ class AclRoleHandler
     /**
      * Remove users from role
      *
-     * @param AbstractRole   $role
+     * @param AbstractRole $role
      * @param User[] $users
      */
     protected function removeUsers(AbstractRole $role, array $users)

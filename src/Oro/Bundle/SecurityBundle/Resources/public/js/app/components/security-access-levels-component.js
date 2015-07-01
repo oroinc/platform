@@ -6,50 +6,62 @@ define(function (require) {
     var SecurityAccessLevelsComponent,
         BaseComponent = require('oroui/js/app/components/base/component'),
         routing = require('routing'),
+        _ = require('underscore'),
         $ = require('jquery');
 
     SecurityAccessLevelsComponent = BaseComponent.extend({
-        accessLevelLinkSelector : '.access_level_value a',
-        selectDivSelector : '.access_level_value_choice',
-        linkDivSelector : 'access_level_value_link',
+        element : null,
 
-        accessLevelRoute : 'oro_security_access_levels',
+        options : {
+            accessLevelLinkSelector : '.access_level_value a',
+            selectDivSelector : '.access_level_value_choice',
+            linkDivSelector : 'access_level_value_link',
+            accessLevelRoute : 'oro_security_access_levels',
+            objectIdentityAttribute : 'data-identity',
+            selectorNameAttribute : 'data-selector-name',
+            selectorIdAttribute : 'data-selector-id',
+            valueAttribute : 'data-value'
+        },
 
-        objectIdentityAttribute : 'data-identity',
-        selectorNameAttribute : 'data-selector-name',
-        selectorIdAttribute : 'data-selector-id',
-        valueAttribute : 'data-value',
+        selectTemplate : _.template(
+            '<select name="<%= name %>" id="<%= id %>" class="<%= className %>">' +
+                '<% $.each(options, function (value, text) { %>' +
+                    '<option value="<%= value %>"' +
+                        '<% if (value == selectedOption) { %> selected="selected"<% } %>' +
+                    '><%= text %></option>' +
+                '<% }) %>' +
+            '</select>'
+        ),
 
         initialize: function (options) {
+             _.extend(this.options, options);
+
+            this.element = options._sourceElement;
+
             var self = this;
-            options._sourceElement.on('click', self.accessLevelLinkSelector, function () {
+            this.element.on('click', self.options.accessLevelLinkSelector, function () {
                 var link = $(this);
-                var parentDiv = link.parent().parent();
-                var selectDiv = parentDiv.find(self.selectDivSelector);
-                var linkDiv = parentDiv.find(self.linkDivSelector);
+                var parentDiv = link.parents('.access_level_value').first();
+                var selectDiv = parentDiv.find(self.options.selectDivSelector);
+                var linkDiv = parentDiv.find(self.options.linkDivSelector);
                 link.hide();
-                var oid = parentDiv.attr(self.objectIdentityAttribute);
+                var oid = parentDiv.attr(self.options.objectIdentityAttribute);
                 oid = oid.replace(/\\/g, '_');
                 $.ajax({
-                    url: routing.generate(self.accessLevelRoute, {oid: oid}),
+                    url: routing.generate(self.options.accessLevelRoute, {oid: oid}),
                     success: function (data) {
-                        var selector = $('<select>');
-                        selector.attr('name', parentDiv.attr(self.selectorNameAttribute));
-                        selector.attr('id', parentDiv.attr(self.selectorIdAttribute));
-                        selector.attr('class', 'security-permission');
-                        $.each(data, function (value, text) {
-                            if (value !== 'template_name') {
-                                var option = $('<option>').attr('value', value).text(text);
-                                if (parentDiv.attr(self.valueAttribute) == value) {
-                                    option.attr('selected', 'selected');
-                                }
-                                selector.append(option);
-                            }
-                        });
+                        var selector = $(self.selectTemplate({
+                            name : parentDiv.attr(self.options.selectorNameAttribute),
+                            id : parentDiv.attr(self.options.selectorIdAttribute),
+                            className : 'security-permission',
+                            options : _.omit(data, 'template_name'),
+                            selectedOption : parentDiv.attr(self.options.valueAttribute)
+                        }));
+
                         selectDiv.append(selector);
                         selectDiv.show();
                         linkDiv.remove();
-                        $('select').uniform('update');
+                        selector.uniform('update');
                     },
                     error: function () {
                         link.show();
@@ -58,6 +70,21 @@ define(function (require) {
 
                 return false;
             });
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.element) {
+                this.element.off();
+            }
+
+            SecurityAccessLevelsComponent.__super__.dispose.call(this);
         }
     });
 
