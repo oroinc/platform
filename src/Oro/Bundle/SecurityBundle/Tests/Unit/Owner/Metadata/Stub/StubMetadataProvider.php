@@ -29,7 +29,7 @@ class StubMetadataProvider extends AbstractMetadataProvider
      */
     protected function getOwnershipMetadata(ConfigInterface $config)
     {
-        return $this->noOwnershipMetadata;
+        return $this->getNoOwnershipMetadata();
     }
 
     /**

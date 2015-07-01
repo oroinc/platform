@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
@@ -27,6 +30,16 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
      */
     private $decisionMaker;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
+     */
+    protected $securityFacade;
+
     protected function setUp()
     {
         $this->tree = new OwnerTree();
@@ -45,6 +58,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProvider */
         $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -53,12 +67,57 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [
+                            'oro_security.ownership_tree_provider',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $treeProvider,
+                        ],
+                        [
+                            'oro_security.owner.metadata_provider.chain',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->metadataProvider,
+                        ],
+                        [
+                            'oro_security.security_facade',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->securityFacade,
+                        ],
+                        [
+                            'oro_security.acl.object_id_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new ObjectIdAccessor(),
+                        ],
+                        [
+                            'oro_security.owner.entity_owner_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new EntityOwnerAccessor($this->metadataProvider),
+                        ],
+                    ]
+                )
+            );
+
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProvider,
             new ObjectIdAccessor(),
             new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
+        $this->decisionMaker->setContainer($this->container);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->decisionMaker, $this->container, $this->securityFacade);
     }
 
     public function testIsOrganization()
@@ -554,14 +613,16 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     /**
      * @dataProvider supportsDataProvider
      *
-     * @param SecurityFacade|null $securityFacade
+     * @param mixed $user
      * @param bool $expectedResult
      */
-    public function testSupports($securityFacade, $expectedResult)
+    public function testSupports($user, $expectedResult)
     {
-        if ($securityFacade) {
-            $this->decisionMaker->setSecurityFacade($securityFacade);
-        }
+        $this->securityFacade
+            ->expects($this->once())
+            ->method('getLoggedUser')
+            ->willReturn($user);
+
         $this->assertEquals($expectedResult, $this->decisionMaker->supports());
     }
 
@@ -570,31 +631,17 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
      */
     public function supportsDataProvider()
     {
-        $securityFacadeWithoutUser = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityFacadeWithoutUser->expects($this->once())
-            ->method('getLoggedUser')
-            ->willReturn(new \stdClass());
-
-        $securityFacadeWithUser = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityFacadeWithUser->expects($this->once())
-            ->method('getLoggedUser')
-            ->willReturn(new User());
-
         return [
             'without security facade' => [
-                'securityFacade' => null,
+                'user' => null,
                 'expectedResult' => false,
             ],
             'security facade with incorrect user class' => [
-                'securityFacade' => $securityFacadeWithoutUser,
+                'user' => new \stdClass(),
                 'expectedResult' => false,
             ],
             'security facade with user class' => [
-                'securityFacade' => $securityFacadeWithUser,
+                'user' => new User(),
                 'expectedResult' => true,
             ],
         ];

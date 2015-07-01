@@ -2,27 +2,63 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker implements
     OwnershipDecisionMakerInterface
 {
     /**
-     * @var SecurityFacade
+     * @deprecated since 1.8, use getTreeProvider method instead
+     *
+     * @var OwnerTreeProvider
      */
-    protected $securityFacade;
+    protected $treeProvider;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @deprecated since 1.8, use getObjectIdAccessor method instead
      *
-     * @return $this
+     * @var ObjectIdAccessor
      */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
-    {
-        $this->securityFacade = $securityFacade;
-        return $this;
+    protected $objectIdAccessor;
+
+    /**
+     * @deprecated since 1.8, use getEntityOwnerAccessor method instead
+     *
+     * @var EntityOwnerAccessor
+     */
+    protected $entityOwnerAccessor;
+
+    /**
+     * @deprecated since 1.8, use getMetadataProvider method instead
+     *
+     * @var OwnershipMetadataProvider
+     */
+    protected $metadataProvider;
+
+    /**
+     * Constructor
+     *
+     * @param OwnerTreeProvider         $treeProvider
+     * @param ObjectIdAccessor          $objectIdAccessor
+     * @param EntityOwnerAccessor       $entityOwnerAccessor
+     * @param OwnershipMetadataProvider $metadataProvider
+     *
+     * @deprecated since 1.8,
+     *      use getTreeProvider, getObjectIdAccessor, getEntityOwnerAccessor, getMetadataProvider method instead
+     */
+    public function __construct(
+        OwnerTreeProvider $treeProvider,
+        ObjectIdAccessor $objectIdAccessor,
+        EntityOwnerAccessor $entityOwnerAccessor,
+        OwnershipMetadataProvider $metadataProvider
+    ) {
+        $this->treeProvider = $treeProvider;
+        $this->objectIdAccessor = $objectIdAccessor;
+        $this->entityOwnerAccessor = $entityOwnerAccessor;
+        $this->metadataProvider = $metadataProvider;
     }
 
     /**
@@ -86,6 +122,6 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      */
     public function supports()
     {
-        return $this->securityFacade && $this->securityFacade->getLoggedUser() instanceof User;
+        return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
     }
 }

@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -45,7 +47,28 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['delete', 'deleteAll', 'fetch', 'save'])
             ->getMockForAbstractClass();
 
-        $this->provider = new StubMetadataProvider([], $this->configProvider, null, $this->cache);
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [
+                            'oro_entity_config.provider.ownership',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->configProvider,
+                        ],
+                        [
+                            'oro_security.owner.ownership_metadata_provider.cache',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->cache,
+                        ],
+                    ]
+                )
+            );
+
+        $this->provider = new StubMetadataProvider([]);
+        $this->provider->setContainer($container);
 
         $this->config = new Config(new EntityConfigId('ownership', self::SOME_CLASS));
     }

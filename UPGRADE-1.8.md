@@ -40,6 +40,7 @@ UPGRADE FROM 1.7 to 1.8
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
 - IMPORTANT: if you use the service method links in your `entity_config.yml` they should be replaced with the direct service method call. For example `my_service_method_link` should be replaced with `@my_service->method`.
 - Removed the method `initConfig` of the class `Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer`.
+- `Oro\Bundle\ConfigBundle\Config\UserScopeManager` is no longer depends on `security.context`. It is retreived from `service.container` directly inside
 
 ####ImportExportBundle
  - `Oro\Bundle\ImportExportBundle\Context\ContextInterface` added $incrementBy integer parameter for methods: incrementReadCount, incrementAddCount, incrementUpdateCount, incrementReplaceCount, incrementDeleteCount, incrementErrorEntriesCount
@@ -116,3 +117,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
     * fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
     * `fixMaxAccessLevel` deprecated, use `MetadataProviderInterface::getMaxAccessLevel` instead
+- Class methods and constructors deprecated, please inject `@service_container` and appropriate methods instead
+    * `Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener` defined using `oro_security.listener.console_context_listener` service
+    * `Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker` defined using `oro_security.owner.decision_maker` service
+    * `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` defined using `oro_security.owner.ownership_metadata_provider` service
