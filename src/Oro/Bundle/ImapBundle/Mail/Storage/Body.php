@@ -39,7 +39,7 @@ class Body
     /**
      * Gets a header in specified format
      *
-     * @param  string $name The name of header, matches case-insensitive, but camel-case is replaced with dashes
+     * @param  string $name   The name of header, matches case-insensitive, but camel-case is replaced with dashes
      * @param  string $format change The type of return value to 'string' or 'array'
      * @return Headers
      */
@@ -58,7 +58,7 @@ class Body
     public function getContent($format = Body::FORMAT_TEXT)
     {
         $contentProcessor = new ContentProcessor();
-        $content = null;
+        $content          = null;
         switch ($format) {
             case Body::FORMAT_HTML:
                 $content = $contentProcessor->processHtml($this->part);
