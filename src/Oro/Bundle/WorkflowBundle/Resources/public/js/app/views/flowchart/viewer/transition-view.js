@@ -84,7 +84,10 @@ define(function (require) {
 
         updateStepTransitions: function () {
             var i, startStep, connection,
-                startSteps = this.model.getStartingSteps(),
+                name = this.model.get('name'),
+                startSteps = this.stepCollection.filter(function (item) {
+                    return item.get('allowed_transitions').indexOf(name) !== -1;
+                }),
                 endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
             this.addStaleMark();
             for (i = 0; i < startSteps.length; i++) {

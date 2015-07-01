@@ -10,6 +10,8 @@ define(function (require) {
 
     FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
         autoRender: true,
+        noWrap: true,
+        container: '.workflow-flowchart',
         /**
          * @type {Constructor.<FlowchartJsPlumbOverlayView>}
          */

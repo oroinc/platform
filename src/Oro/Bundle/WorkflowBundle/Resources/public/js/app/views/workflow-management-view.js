@@ -20,6 +20,8 @@ define(function (require) {
         events: {
             'click .add-step-btn': 'addNewStep',
             'click .add-transition-btn': 'addNewTransition',
+            'click .undo-btn': 'onUndo',
+            'click .redo-btn': 'onRedo',
             'submit': 'onSubmit',
             'click [type=submit]': 'setSubmitActor'
         },
@@ -43,7 +45,7 @@ define(function (require) {
 
             this.$entitySelectEl = this.$('[name$="[related_entity]"]');
             this.initEntityFieldsLoader();
-
+            this.historyManager = options.historyManager;
             this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
         },
 
@@ -180,6 +182,14 @@ define(function (require) {
 
         valid: function () {
             return this.$el.valid();
+        },
+
+        onUndo: function () {
+            this.historyManager.undo();
+        },
+
+        onRedo: function () {
+            this.historyManager.redo();
         }
     });
 

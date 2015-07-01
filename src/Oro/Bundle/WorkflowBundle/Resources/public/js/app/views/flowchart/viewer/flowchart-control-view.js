@@ -6,6 +6,8 @@ define(function (require) {
 
     FlowchartControlView = BaseView.extend({
         autoRender: true,
+        noWrap: true,
+        container: '.workflow-flowchart-controls',
         template: require('tpl!oroworkflow/templates/flowchart/controls.html'),
         events: {
             'change [name="toggle-transition-labels"]': function (e) {

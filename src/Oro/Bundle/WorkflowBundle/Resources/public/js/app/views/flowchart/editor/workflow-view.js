@@ -12,6 +12,9 @@ define(function (require) {
 
     FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
 
+        autoRender: true,
+        noWrap: true,
+        container: '.workflow-flowchart',
         isConnected: false,
 
         transitionOverlayView: FlowChartEditorTransitionOverlayView,
@@ -45,12 +48,15 @@ define(function (require) {
         },
 
         onBeforeConnectionDrop: function (data) {
-            var transitionModel, startingSteps, suspendedStep,
+            var transitionModel, transitionName, startingSteps, suspendedStep,
                 stepFrom = this.findStepModelByElement(data.connection.source),
                 stepTo = this.findStepModelByElement(data.connection.target);
             if (data.connection.suspendedElement && !stepTo.get('_is_start')) {
                 transitionModel = data.connection.overlayView.model;
-                startingSteps = transitionModel.getStartingSteps();
+                transitionName = transitionModel.get('name');
+                startingSteps = this.stepCollection.filter(function (item) {
+                    return item.get('allowed_transitions').indexOf(transitionName) !== -1;
+                });
                 if (stepTo.get('name') !== transitionModel.get('step_to')) {
                     // stepTo changed
                     transitionModel.set({

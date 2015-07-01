@@ -37,6 +37,7 @@ define(function(require) {
         positionIncrementPx: 35,
 
         initialize: function() {
+            var steps, transitions;
             if (this.get('steps') === null) {
                 this.set('steps', new StepCollection());
             }
@@ -49,15 +50,25 @@ define(function(require) {
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
-
-            _.each(this.get('steps').models, this.setWorkflow, this);
-            _.each(this.get('transitions').models, this.setWorkflow, this);
-            this.listenTo(this.get('steps'), 'add', this.setWorkflow);
-            this.listenTo(this.get('transitions'), 'add', this.setWorkflow);
+            steps = this.get('steps');
+            transitions = this.get('transitions');
+            this.setWorkflowToCollection(steps);
+            this.setWorkflowToCollection(transitions);
+            this.listenTo(steps, 'add', this.setWorkflow);
+            this.listenTo(transitions, 'add', this.setWorkflow);
+            this.listenTo(steps, 'reset', this.setWorkflowToCollection);
+            this.listenTo(transitions, 'reset', this.setWorkflowToCollection);
         },
 
         setWorkflow: function (item) {
             item.setWorkflow(this);
+        },
+
+        setWorkflowToCollection: function (collection) {
+            var that = this;
+            collection.each( function (item) {
+                item.setWorkflow(that);
+            });
         },
 
         cloneTransitionDefinition: function(definition) {

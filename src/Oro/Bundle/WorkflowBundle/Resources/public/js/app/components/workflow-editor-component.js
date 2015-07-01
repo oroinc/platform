@@ -5,6 +5,7 @@ define(function (require) {
 
     var WorkflowEditorComponent,
         WorkflowViewerComponent = require('./workflow-viewer-component'),
+        WorkflowHistoryComponent = require('./workflow-history-component'),
         FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
         flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
         mediator = require('oroui/js/mediator'),
@@ -34,11 +35,13 @@ define(function (require) {
          * @inheritDoc
          */
         initViews: function ($el, flowchartOptions) {
-
             this.workflowManagementView = new WorkflowManagementView({
                 el: $el,
                 stepsEl: '.workflow-definition-steps-list-container',
-                model: this.model
+                model: this.model,
+                historyManager: new WorkflowHistoryComponent({
+                    workflow: this.model
+                })
             });
             this.workflowManagementView.render();
             this.FlowchartWorkflowView = FlowchartEditorWorkflowView;

@@ -42,13 +42,11 @@ define(function (require) {
         initViews: function ($el, flowchartOptions) {
             flowchartTools.checkPositions(this.model);
             flowchartOptions = _.extend(flowchartOptions, {
-                el: $el.find('.workflow-flowchart'),
                 model: this.model,
                 flowchartState: this.flowchartState
             });
             this.flowchartView = new this.FlowchartWorkflowView(flowchartOptions);
             this.flowchartControlView = new FlowchartControlView({
-                el: $el.find('.workflow-flowchart-controls'),
                 model: this.flowchartState
             });
         }
