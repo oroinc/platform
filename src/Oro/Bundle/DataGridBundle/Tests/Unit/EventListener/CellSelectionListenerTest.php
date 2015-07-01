@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\EventListener\SelectCellListener;
+use Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener;
 
 class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
     protected $datasource;
 
     /**
-     * @var SelectCellListener
+     * @var CellSelectionListener
      */
     protected $listener;
 
@@ -37,7 +37,7 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new SelectCellListener();
+        $this->listener = new CellSelectionListener();
     }
 
     protected function tearDown()
@@ -80,22 +80,22 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
             'applicable config' => [
                 'config' => [
                     'options' => [
-                        'selectCell' => [
+                        'cellSelection' => [
                             'dataField' => 'id',
-                            'fields' => ['first', 'second'],
+                            'columns' => ['first', 'second'],
                             'changeset' => 'changeset'
                         ]
                     ]
                 ],
                 'expectedConfig' => [
                     'options' => [
-                        'selectCell' => [
+                        'cellSelection' => [
                             'dataField' => 'id',
-                            'fields' => ['first', 'second'],
+                            'columns' => ['first', 'second'],
                             'changeset' => 'changeset'
                         ],
                         'requireJSModules' => [
-                            'orodatagrid/js/datagrid/listener/select-cell-form-listener'
+                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
                         ],
                     ],
                 ],
@@ -111,9 +111,9 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
             'append frontend module' => [
                 'config' => [
                     'options' => [
-                        'selectCell' => [
+                        'cellSelection' => [
                             'dataField' => 'id',
-                            'fields' => ['first', 'second'],
+                            'columns' => ['first', 'second'],
                             'changeset' => 'changeset'
                         ],
                         'requireJSModules' => [
@@ -123,14 +123,14 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedConfig' => [
                     'options' => [
-                        'selectCell' => [
+                        'cellSelection' => [
                             'dataField' => 'id',
-                            'fields' => ['first', 'second'],
+                            'columns' => ['first', 'second'],
                             'changeset' => 'changeset'
                         ],
                         'requireJSModules' => [
                             'some-module',
-                            'orodatagrid/js/datagrid/listener/select-cell-form-listener'
+                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
                         ],
                     ],
                 ]
@@ -138,25 +138,25 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
             'frontend module exist' => [
                 'config' => [
                     'options' => [
-                        'selectCell' => [
+                        'cellSelection' => [
                             'dataField' => 'id',
-                            'fields' => ['first', 'second'],
+                            'columns' => ['first', 'second'],
                             'changeset' => 'changeset'
                         ],
                         'requireJSModules' => [
-                            'orodatagrid/js/datagrid/listener/select-cell-form-listener'
+                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
                         ],
                     ],
                 ],
                 'expectedConfig' => [
                     'options' => [
-                        'selectCell' => [
+                        'cellSelection' => [
                             'dataField' => 'id',
-                            'fields' => ['first', 'second'],
+                            'columns' => ['first', 'second'],
                             'changeset' => 'changeset'
                         ],
                         'requireJSModules' => [
-                            'orodatagrid/js/datagrid/listener/select-cell-form-listener'
+                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
                         ],
                     ],
                 ]
@@ -187,13 +187,13 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\DataGridBundle\Exception\LogicException
-     * @expectedExceptionMessage SelectCell options fields, changeset are required
+     * @expectedExceptionMessage cellSelection options `columns`, `changeset` are required
      */
     public function testOnBuildAfterException()
     {
         $config = DatagridConfiguration::create([
             'options' => [
-                'selectCell' => [
+                'cellSelection' => [
                     'dataField' => 'id'
                 ]
             ]
