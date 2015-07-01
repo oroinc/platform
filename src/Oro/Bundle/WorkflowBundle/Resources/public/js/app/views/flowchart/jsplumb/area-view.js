@@ -1,12 +1,11 @@
 define(function (require) {
     'use strict';
-    var $ = require('jquery'),
-        _ = require('underscore'),
+    var _ = require('underscore'),
         jsPlumb = require('jsplumb'),
-        FlowchartJsPlubmBaseView = require('./base-view'),
-        FlowchartJsPlubmAreaView;
+        FlowchartJsPlumbBaseView = require('./base-view'),
+        FlowchartJsPlumbAreaView;
 
-    FlowchartJsPlubmAreaView = FlowchartJsPlubmBaseView.extend({
+    FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
 
         jsPlumbInstance: null,
 
@@ -56,7 +55,8 @@ define(function (require) {
                 _.result(this, 'defaultsChartOptions'),
                 options.chartOptions || {}
             );
-            FlowchartJsPlubmAreaView.__super__.initialize.apply(this, arguments);
+            this.flowchartState = options.flowchartState;
+            FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
         },
 
         render: function () {
@@ -76,5 +76,5 @@ define(function (require) {
         }
     });
 
-    return FlowchartJsPlubmAreaView;
+    return FlowchartJsPlumbAreaView;
 });

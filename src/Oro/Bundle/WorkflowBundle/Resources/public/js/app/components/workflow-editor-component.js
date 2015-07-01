@@ -34,7 +34,6 @@ define(function (require) {
          * @inheritDoc
          */
         initViews: function ($el, flowchartOptions) {
-            flowchartTools.checkPositions(this.model);
 
             this.workflowManagementView = new WorkflowManagementView({
                 el: $el,
@@ -42,13 +41,8 @@ define(function (require) {
                 model: this.model
             });
             this.workflowManagementView.render();
-
-            flowchartOptions = _.extend(flowchartOptions, {
-                el: $el.find('.workflow-flowchart'),
-                model: this.model
-            });
-            this.flowchartView = new FlowchartEditorWorkflowView(flowchartOptions);
-            this.flowchartView.render();
+            this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
+            WorkflowEditorComponent.__super__.initViews.apply(this, arguments);
         },
 
         /**
