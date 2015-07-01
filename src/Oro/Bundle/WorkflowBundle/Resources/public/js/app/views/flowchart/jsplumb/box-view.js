@@ -1,11 +1,11 @@
 define(function (require) {
     'use strict';
 
-    var FlowchartJsPlubmBaseView = require('./base-view'),
-        FlowchartJsPlubmAreaView = require('./area-view'),
-        FlowchartJsPlubmBoxView;
+    var FlowchartJsPlumbBaseView = require('./base-view'),
+        FlowchartJsPlumbAreaView = require('./area-view'),
+        FlowchartJsPlumbBoxView;
 
-    FlowchartJsPlubmBoxView = FlowchartJsPlubmBaseView.extend({
+    FlowchartJsPlumbBoxView = FlowchartJsPlumbBaseView.extend({
         areaView: null,
 
         className: function () {
@@ -19,11 +19,11 @@ define(function (require) {
         },
 
         initialize: function (options) {
-            if (!(options.areaView instanceof FlowchartJsPlubmAreaView)) {
+            if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {
                 throw new Error('areaView options is required and must be a JsplumbAreaView');
             }
             this.areaView = options.areaView;
-            FlowchartJsPlubmBoxView.__super__.initialize.apply(this, arguments);
+            FlowchartJsPlumbBoxView.__super__.initialize.apply(this, arguments);
 
             // append $el to the area view
             this.areaView.$el.append(this.$el);
@@ -47,5 +47,5 @@ define(function (require) {
         }
     });
 
-    return FlowchartJsPlubmBoxView;
+    return FlowchartJsPlumbBoxView;
 });

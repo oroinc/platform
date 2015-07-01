@@ -1,14 +1,14 @@
 define(function (require) {
     'use strict';
 
-    var FlowchartJsPlubmBoxView = require('../jsplumb/box-view'),
+    var FlowchartJsPlumbBoxView = require('../jsplumb/box-view'),
         $ = require('jquery'),
         _ = require('underscore'),
         mediator = require('oroui/js/mediator'),
         __ = require('orotranslation/js/translator'),
         FlowchartViewerStepView;
 
-    FlowchartViewerStepView = FlowchartJsPlubmBoxView.extend({
+    FlowchartViewerStepView = FlowchartJsPlumbBoxView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/viewer/step.html'),
 
         className: function () {

@@ -6,16 +6,11 @@ define(function (require) {
 
     FlowchartControlView = BaseView.extend({
         autoRender: true,
+        template: require('tpl!oroworkflow/templates/flowchart/controls.html'),
         events: {
             'change [name="toggle-transition-labels"]': function (e) {
                 this.model.set('transitionLabelsVisible', !!_.result(e.currentTarget, 'checked'));
             }
-        },
-        render: function () {
-            var transitionLabelsVisible = this.model.get('transitionLabelsVisible');
-            this.undelegateEvents();
-            this.$el.find('[name="toggle-transition-labels"]').prop('checked', transitionLabelsVisible);
-            this.delegateEvents();
         }
     });
 

@@ -126,6 +126,7 @@ define(function (require) {
             var jsplumbConnection,
                 transitionModel = this.model,
                 areaView = this.areaView,
+                overlayIsVisible = areaView.flowchartState.get('transitionLabelsVisible'),
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep),
                 connectionOptions = _.defaults({
@@ -147,6 +148,7 @@ define(function (require) {
                                 overlay.cssClass = _.result(overlayView, 'className');
                                 return overlayView.$el;
                             }, this),
+                            visible: overlayIsVisible,
                             location: 0.5
                         }]
                     ]
