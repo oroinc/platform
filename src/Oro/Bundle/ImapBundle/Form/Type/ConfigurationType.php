@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -22,10 +23,14 @@ class ConfigurationType extends AbstractType
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    public function __construct(Mcrypt $encryptor, SecurityFacade $securityFacade)
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    public function __construct(Mcrypt $encryptor, SecurityFacade $securityFacade, TranslatorInterface $translator)
     {
         $this->encryptor = $encryptor;
         $this->securityFacade = $securityFacade;
+        $this->translator = $translator;
     }
 
     /**
@@ -33,6 +38,7 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->addFolderTreeListener($builder);
         // pre-populate password, imap origin change
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
@@ -72,6 +78,29 @@ class ConfigurationType extends AbstractType
             ->add('check_connection', new CheckButtonType());
     }
 
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addFolderTreeListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) {
+                /** @var ImapEmailOrigin $data */
+                $data = $event->getData();
+
+                if ($data !== null && !$data->getFolders()->isEmpty()) {
+                    $event->getForm()->add('rootFolders', 'oro_email_email_folder_tree', [
+                        'label' => $this->translator->trans('oro.email.folders.label'),
+                    ]);
+                }
+            }
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
     protected function addPrepopulatePasswordEventListener(FormBuilderInterface $builder)
     {
         $encryptor = $this->encryptor;
