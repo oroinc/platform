@@ -210,7 +210,7 @@
     </div>
 
     <script type="text/javascript">
-        require(['jquery', function($) {
+        require(['jquery'], function($) {
             var $folderList = $('#folder-list');
             var $checkAll = $('#check-all');
             $checkAll.click(function() {
@@ -219,7 +219,7 @@
                     this.checked = checked;
                 });
             });
-        }]);
+        });
     </script>
 {% endblock %}
 {#
