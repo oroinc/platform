@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -198,5 +199,35 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
             $organizationFieldName,
             $organizationColumnName
         );
+    }
+
+    /**
+     * Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
+     * if object have owner type OWNER_TYPE_BUSINESS_UNIT, OWNER_TYPE_USER or OWNER_TYPE_ORGANIZATION
+     *
+     * {@inheritDoc}
+     */
+    public function getMaxAccessLevel($accessLevel, $object = null)
+    {
+        if ($object && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
+            $metadata = $this->getMetadata($object);
+
+            if ($metadata->hasOwner()) {
+                $checkOwnerType = in_array(
+                    $metadata->getOwnerType(),
+                    [
+                        OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT,
+                        OwnershipMetadata::OWNER_TYPE_USER,
+                        OwnershipMetadata::OWNER_TYPE_ORGANIZATION
+                    ]
+                );
+
+                if ($checkOwnerType) {
+                    $accessLevel = AccessLevel::GLOBAL_LEVEL;
+                }
+            }
+        }
+
+        return $accessLevel;
     }
 }

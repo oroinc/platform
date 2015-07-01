@@ -39,4 +39,12 @@ interface MetadataProviderInterface
      * @return string
      */
     public function getSystemLevelClass();
+
+    /**
+     * @param int        $accessLevel Current object access level
+     * @param mixed|null $object      Object for test
+     *
+     * @return int
+     */
+    public function getMaxAccessLevel($accessLevel, $object = null);
 }

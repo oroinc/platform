@@ -71,4 +71,12 @@ class StubMetadataProvider extends AbstractMetadataProvider
     {
         return 'systemLevelClass';
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMaxAccessLevel($accessLevel, $object = null)
+    {
+        return $accessLevel;
+    }
 }
