@@ -107,7 +107,7 @@ oro_entity:
         short: ~
 ```
 
-Note that it is possible to specify the fallback format for the entity that will be used when the given format is not supported.
+Note that it is possible to specify the fallback format for the entity that will be used when the given format is not implemented by any providers.
 
 **Entity name providers**
 
@@ -168,10 +168,10 @@ Entity name providers are registered in the DI container by `oro_entity.name_pro
         arguments:
             - @doctrine
         tags:
-            - { name: oro_entity.name_provider, priority: 100 }
+            - { name: oro_entity.name_provider, priority: -100 }
 ```
 
-The priority can be specified to move the provider up or down the providers chain.
+The priority can be specified to move the provider up or down the providers chain. The bigger the priority number is, the earlier the provider will be executed. The priority value is optional and defaults to 0.
 
 ## Aliases ##
 
@@ -218,19 +218,7 @@ oro_entity:
 There can be situations when you need more complicated rules for creating entity aliases that can not be simply configured via `entity.yml` file.
 In this case you'll need to create an entity alias provider.
 
-For this you need to register a new provider service in the DI container using the `oro_entity.alias_provider` tag:
-
-```yml
-    oro_email.entity_alias_provider:
-        class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
-        public: false
-        arguments:
-            - @oro_email.email.address.manager
-        tags:
-            - { name: oro_entity.alias_provider }
-```
-
-And implement the [EntityAliasProviderInterface](./Provider/EntityAliasProviderInterface.php) interface in your provider class:
+For this you need to implement the [EntityAliasProviderInterface](./Provider/EntityAliasProviderInterface.php) interface in your provider class:
 
 ```php
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
@@ -263,6 +251,20 @@ class EmailEntityAliasProvider implements EntityAliasProviderInterface
     }
 }
 ```
+
+And register your provider service in the DI container using the `oro_entity.alias_provider` tag:
+
+```yml
+    oro_email.entity_alias_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
+        public: false
+        arguments:
+            - @oro_email.email.address.manager
+        tags:
+            - { name: oro_entity.alias_provider, priority: 100 }
+```
+
+Please, note that you can specify the priority for the alias provider. The bigger the priority number is, the earlier the provider will be executed. The priority value is optional and defaults to 0.
 
 **Viewing existing entity aliases**
 
