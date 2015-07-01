@@ -570,3 +570,5 @@ services:
         class: %oro_email.email.folder.manager.class%
         arguments:
             - @oro_email.email_folder_loader_selector
+        calls:
+            - [setLogger, [@logger]]

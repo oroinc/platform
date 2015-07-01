@@ -9,7 +9,6 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
-use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 
 class ImapEmailFolderLoader implements EmailFolderLoaderInterface
 {
@@ -42,8 +41,7 @@ class ImapEmailFolderLoader implements EmailFolderLoaderInterface
     }
 
     /**
-     * @param EmailOrigin $origin
-     * @return Folder[]
+     * {@inheritdoc}
      */
     public function loadEmailFolders(EmailOrigin $origin)
     {

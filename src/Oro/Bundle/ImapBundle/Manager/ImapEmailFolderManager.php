@@ -11,8 +11,6 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
  *
  * @package Oro\Bundle\ImapBundle\Manager
  *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImapEmailFolderManager
 {

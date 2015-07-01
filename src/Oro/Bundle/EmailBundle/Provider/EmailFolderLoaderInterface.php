@@ -20,7 +20,7 @@ interface EmailFolderLoaderInterface
      *
      * @param EmailOrigin $email
      *
-     * @return EmailFolder
+     * @return array
      */
     public function loadEmailFolders(EmailOrigin $email);
 }
