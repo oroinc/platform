@@ -149,6 +149,22 @@ abstract class EmailOrigin
     }
 
     /**
+     * @param array $folders
+     *
+     * @return $this
+     */
+    public function setFolders(array $folders)
+    {
+        $this->folders->clear();
+
+        foreach ($folders as $folder) {
+            $this->addFolder($folder);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add folder
      *
      * @param  EmailFolder $folder

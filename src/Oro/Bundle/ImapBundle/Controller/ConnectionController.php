@@ -43,7 +43,8 @@ class ConnectionController extends Controller
                 $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
                 $connector->getCapability();
 
-                $responseCode = Codes::HTTP_NO_CONTENT;
+                $this->get('oro_email.email.folder.manager')->getEmailFolders($origin);
+                $this->createForm('')
             } catch (\Exception $e) {
                 $this->get('logger')
                     ->critical('Unable to connect to IMAP server: ' . $e->getMessage(), ['exception' => $e]);
