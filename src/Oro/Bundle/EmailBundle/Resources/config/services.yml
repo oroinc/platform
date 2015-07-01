@@ -81,6 +81,9 @@ parameters:
     oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
     oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
+    # Email DataGrid
+    oro_email.datagrid.folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\FolderFilterProvider
+
 services:
     oro_email.entity.cache.warmer:
         class: %oro_email.entity.cache.warmer.class%
@@ -561,3 +564,9 @@ services:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+
+    oro_email.datagrid.folder.provider:
+        class: %oro_email.datagrid.folder.provider.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @security.context
