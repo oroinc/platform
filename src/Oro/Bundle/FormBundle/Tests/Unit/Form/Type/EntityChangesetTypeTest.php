@@ -95,18 +95,6 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
     {
         return [
             [
-                'defaultData' => null,
-                'viewData' => null,
-                'submittedData' => json_encode(null),
-                'expected'  => new ArrayCollection()
-            ],
-            [
-                'defaultData' => null,
-                'viewData' => null,
-                'submittedData' => json_encode([]),
-                'expected'  => new ArrayCollection()
-            ],
-            [
                 'defaultData' => new ArrayCollection([
                     '1' => ['entity' => $this->createDataObject(1), 'data' => ['test' => '123', 'test2' => 'val']],
                     '2' => ['entity' => $this->createDataObject(2), 'data' => ['test' => '12']]
@@ -125,16 +113,6 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
                 ]),
             ]
         ];
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
-    public function testReverseTransformException()
-    {
-        $form = $this->factory->create($this->type, null, ['class' => '\stdClass']);
-        $form->submit(json_encode('test'));
     }
 
     /**
