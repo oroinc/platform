@@ -77,6 +77,15 @@ class EmailAttachment
     protected $file;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="embedded_content_id", type="string", length=255, nullable=true)
+     * @Soap\ComplexType("string")
+     * @JMS\Type("string")
+     */
+    protected $embeddedContentId;
+
+    /**
      * Get id
      *
      * @return integer
@@ -212,6 +221,25 @@ class EmailAttachment
     public function getExtension()
     {
         return pathinfo($this->fileName, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmbeddedContentId()
+    {
+        return $this->embeddedContentId;
+    }
+
+    /**
+     * @param string $embeddedContentId
+     * @return $this
+     */
+    public function setEmbeddedContentId($embeddedContentId)
+    {
+        $this->embeddedContentId = $embeddedContentId;
+
+        return $this;
     }
 
     /**
