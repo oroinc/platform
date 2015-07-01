@@ -4,6 +4,12 @@
 {% set name = app.user|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name }}) %}
 
+{# grid params #}
+{% set params = {'userId': app.user.id} %}
+{% set gridName = 'user-email-grid' %}
+
+{% set pageTitle = 'oro.email.entity_plural_label'|trans %}
+
 {% block navButtons %}
     {% if resource_granted('oro_email_email_create') %}
         <div class="btn-group">
@@ -13,12 +19,29 @@
             }}
         </div>
     {% endif %}
+        <div class="btn-group">
+            <a type="button"
+               class="btn sync-btn icons-holder-text no-hash"
+               href="{{ path('oro_email_user_sync_emails') }}">
+                <i class="icon-refresh hide-text">{{ 'oro.email.sync.label'|trans }}</i>{{ 'oro.email.sync.label'|trans }}
+            </a>
+            <script type="text/javascript">
+                require(['jquery', 'oroui/js/mediator'],
+                    function($, mediator) {
+                        $('.sync-btn').on('click', function(e) {
+                            $(this).html('<i class="icon-refresh hide-text">{{ 'oro.email.sync.processing'|trans }}</i>{{ 'oro.email.sync.processing'|trans }}')
+                            $(this).disable();
+                            e.preventDefault();
+                            $.getJSON(this.href, function(data) {
+                                $(this).html('<i class="icon-refresh hide-text">{{ 'oro.email.sync.label'|trans }}</i>{{ 'oro.email.sync.label'|trans }}');
+                                mediator.trigger('datagrid:doReset:{{ gridName }}');
+                                //$(this).enable();
+                            });
+                        });
+                    });
+            </script>
+        </div>
 {% endblock %}
-
-{% set pageTitle = 'oro.email.entity_plural_label'|trans %}
-{% set gridName = 'user-email-grid' %}
-{# grid params #}
-{% set params = {'userId': app.user.id} %}
 
 {% block breadcrumb %}
     {% set breadcrumbs = [

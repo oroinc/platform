@@ -294,6 +294,21 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/user-sync-emails", name="oro_email_user_sync_emails")
+     * @AclAncestor("oro_email_email_view")
+     */
+    public function syncUserBox()
+    {
+        $this->get('oro_email.email_synchronization_manager')
+            ->syncOrigins(
+                $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
+                    $this->get('oro_security.security_facade')->getLoggedUserId()
+                )
+            );
+        return new JsonResponse('ok');
+    }
+
+    /**
      * @Route("/context/{id}", name="oro_email_context", requirements={"id"="\d+"})
      * @Template("OroEmailBundle:Email:context.html.twig")
      * @AclAncestor("oro_email_email_view")
