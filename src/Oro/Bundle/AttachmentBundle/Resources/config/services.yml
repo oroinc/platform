@@ -38,7 +38,6 @@ services:
           - %oro_attachment.files%
           - @oro_entity_extend.association_manager
 
-
     oro_attachment.manager.api:
         class: %oro_attachment.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract

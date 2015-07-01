@@ -64,16 +64,16 @@ class FormatterManager
      */
     public function guessFormatters(FieldConfigId $configId)
     {
-        $fieldType = $configId->getFieldType();
-        $filters = [];
+        $fieldType        = $configId->getFieldType();
+        $formatters       = [];
         $defaultFormatter = null;
-        $found = false;
+        $found            = false;
 
         foreach ($this->formatters as $formatterName => $formatter) {
             $isSupport = in_array($fieldType, $formatter->getSupportedTypes());
             if ($isSupport) {
-                $found = true;
-                $filters[] = $formatterName;
+                $found        = true;
+                $formatters[] = $formatterName;
                 if ($formatter->isDefaultFormatter()) {
                     $defaultFormatter = $formatterName;
                 }
@@ -82,7 +82,7 @@ class FormatterManager
 
         if ($found) {
             return [
-                'formatters' => $filters,
+                'formatters'        => $formatters,
                 'default_formatter' => $defaultFormatter
             ];
         }
