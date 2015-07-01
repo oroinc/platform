@@ -129,11 +129,23 @@ abstract class EmailOrigin
     /**
      * Get email folders
      *
-     * @return EmailFolder[]
+     * @return ArrayCollection|EmailFolder[]
      */
     public function getFolders()
     {
         return $this->folders;
+    }
+
+    /**
+     * Get root folders list
+     *
+     * @return ArrayCollection|EmailFolder
+     */
+    public function getRootFolders()
+    {
+        return $this->folders->filter(function(EmailFolder $folder) {
+            return $folder->getParentFolder() === null;
+        });
     }
 
     /**
