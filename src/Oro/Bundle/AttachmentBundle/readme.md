@@ -145,15 +145,15 @@ After the schema was updated, for current entity will be available button `Add a
 
 User can use 3 formatters for image type fields.
 
-`image_encoded` will return img tag with embedded image content in src attribute. Additional parameters
+`image_encoded` returns img tag with embedded image content in src attribute. Additional parameters:
 
-- `alt` - custom alt attribute for img tag. By default will be used original file name
+- `alt` - custom alt attribute for img tag. By default - original file name.
 
 - `height` - custom height attribute for img tag. Has no default value.
 
 - `width`- custom width attribute for img tag. Has no default value.
 
-`image_link` will return link to the resized image (e.g. <a href='http://test.com/path/to/image.jpg'>image name</a>) 
+`image_link` returns link to the resized image (e.g. <a href='http://test.com/path/to/image.jpg'>image name</a>). Additional parameters:
 
 - `title` - custom image text value. By default - original file name.
 
@@ -161,7 +161,7 @@ User can use 3 formatters for image type fields.
 
 - `width`- custom image width. By default - 100 px.
 
-`image_src` will return url to the resized image (e.g. http://test.com/path/to/image.jpg) 
+`image_src` returns url to the resized image (e.g. http://test.com/path/to/image.jpg). Additional parameters:
 
 - `height` - custom image height. By default - 100 px.
 
