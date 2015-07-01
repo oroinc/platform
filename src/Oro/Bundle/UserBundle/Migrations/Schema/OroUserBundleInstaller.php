@@ -8,11 +8,9 @@ use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_2\OroUserBundle as UserAvatars;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_3\OroUserBundle as UserEmailActivities;
@@ -21,6 +19,9 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as Em
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -42,7 +43,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_15';
     }
 
     /**
@@ -78,7 +79,6 @@ class OroUserBundleInstaller implements
         $this->createOroUserAccessRoleTable($schema);
         $this->createOroUserAccessGroupTable($schema);
         $this->createOroUserBusinessUnitTable($schema);
-        $this->createOroUserEmailOriginTable($schema);
         $this->createOroAccessGroupTable($schema);
         $this->createOroUserAccessGroupRoleTable($schema);
         $this->createOroAccessRoleTable($schema);
@@ -92,7 +92,6 @@ class OroUserBundleInstaller implements
         $this->addOroUserAccessRoleForeignKeys($schema);
         $this->addOroUserAccessGroupForeignKeys($schema);
         $this->addOroUserBusinessUnitForeignKeys($schema);
-        $this->addOroUserEmailOriginForeignKeys($schema);
         $this->addOroAccessGroupForeignKeys($schema);
         $this->addOroUserAccessGroupRoleForeignKeys($schema);
         $this->addOroUserStatusForeignKeys($schema);
@@ -109,6 +108,10 @@ class OroUserBundleInstaller implements
         PasswordChanged::addPasswordChangedColumn($schema);
 
         $this->addOroAccessGroupIndexes($schema);
+
+        EmailOrigin::addOwnerAndOrganizationColumns($schema);
+        SetOwnerForEmail::addOwnerToOroEmail($schema);
+        RemoveOldSchema::execute($schema);
     }
 
     /**
@@ -234,21 +237,6 @@ class OroUserBundleInstaller implements
         $table->addIndex(['user_id'], 'IDX_B190CE8FA76ED395', []);
         $table->addIndex(['business_unit_id'], 'IDX_B190CE8FA58ECB40', []);
         $table->setPrimaryKey(['user_id', 'business_unit_id']);
-    }
-
-    /**
-     * Create oro_user_email_origin table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroUserEmailOriginTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_user_email_origin');
-        $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('origin_id', 'integer', []);
-        $table->addIndex(['user_id'], 'IDX_CB3E838BA76ED395', []);
-        $table->addIndex(['origin_id'], 'IDX_CB3E838B56A273CC', []);
-        $table->setPrimaryKey(['user_id', 'origin_id']);
     }
 
     /**
@@ -446,28 +434,6 @@ class OroUserBundleInstaller implements
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_business_unit'),
             ['business_unit_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE']
-        );
-    }
-
-    /**
-     * Add oro_user_email_origin foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroUserEmailOriginForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_user_email_origin');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE']
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email_origin'),
-            ['origin_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
         );

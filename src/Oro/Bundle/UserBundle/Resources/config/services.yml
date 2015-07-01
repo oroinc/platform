@@ -211,10 +211,10 @@ services:
     oro_user.mailer.processor:
         class: %oro_user.mailer.processor.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
             - @oro_config.global
             - @oro_email.email_renderer
-            - @oro_user.manager
+            - @oro_email.email_holder_helper
             - @oro_email.direct_mailer
 
     oro_user.placeholder.filter:

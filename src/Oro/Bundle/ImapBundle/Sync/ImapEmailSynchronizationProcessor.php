@@ -67,6 +67,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         // make sure that the entity builder is empty
         $this->emailEntityBuilder->clear();
 
+        $this->initEnv($origin);
+
         // iterate through all folders and do a synchronization of emails for each one
         $imapFolders = $this->syncFolders($origin);
         foreach ($imapFolders as $imapFolder) {
@@ -104,20 +106,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDoNotCleanableEntityClasses()
-    {
-        return array_merge(
-            parent::getDoNotCleanableEntityClasses(),
-            [
-                'Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin',
-                'Oro\Bundle\ImapBundle\Entity\ImapEmailFolder'
-            ]
-        );
     }
 
     /**
@@ -299,7 +287,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $folder             = $imapFolder->getFolder();
         $folderType         = $folder->getType();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
-        $userId             = $this->getUserId($folder->getOrigin());
 
         $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
         $this->logger->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
@@ -342,7 +329,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $invalid = 0;
             }
 
-            if (!$this->isApplicableEmail($email, $folderType, $userId)) {
+            if (!$this->isApplicableEmail(
+                $email,
+                $folderType,
+                (int) $this->currentUser->getId(),
+                $this->currentOrganization
+            )) {
                 continue;
             }
 
@@ -353,13 +345,23 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $count++;
             $batch[] = $email;
             if ($count === self::DB_BATCH_SIZE) {
-                $this->saveEmails($batch, $imapFolder);
+                $this->saveEmails(
+                    $batch,
+                    $imapFolder,
+                    $this->currentUser,
+                    $this->currentOrganization
+                );
                 $count = 0;
                 $batch = [];
             }
         }
         if ($count > 0) {
-            $this->saveEmails($batch, $imapFolder);
+            $this->saveEmails(
+                $batch,
+                $imapFolder,
+                $this->currentUser,
+                $this->currentOrganization
+            );
         }
 
         $totalInvalid += $invalid;
@@ -378,8 +380,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
      */
-    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
-    {
+    protected function saveEmails(
+        array $emails,
+        ImapEmailFolder $imapFolder
+    ) {
         $this->emailEntityBuilder->removeEmails();
 
         $folder        = $imapFolder->getFolder();
@@ -424,9 +428,15 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
                 try {
-                    $imapEmail       = $this->createImapEmail(
+                    $imapEmail = $this->createImapEmail(
                         $email->getId()->getUid(),
-                        $this->addEmail($email, $folder, $email->hasFlag("\\Seen")),
+                        $this->addEmailUser(
+                            $email,
+                            $folder,
+                            $email->hasFlag("\\Seen"),
+                            $this->currentUser,
+                            $this->currentOrganization
+                        )->getEmail(),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;
@@ -553,8 +563,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
-        $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
-        $imapEmail->getEmail()->addFolder($newImapFolder->getFolder());
+        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        if ($emailUser != null) {
+            $emailUser->setFolder($newImapFolder->getFolder());
+        }
         $imapEmail->setImapFolder($newImapFolder);
         $imapEmail->setUid($newUid);
     }
@@ -574,7 +586,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $imapEmail->getImapFolder()->getFolder()->getFullName()
             )
         );
-        $imapEmail->getEmail()->removeFolder($imapEmail->getImapFolder()->getFolder());
+
+        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        if ($emailUser != null) {
+            $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+        }
         $this->em->remove($imapEmail);
     }
 

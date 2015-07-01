@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 
@@ -10,13 +11,13 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInterface
+class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /** @var EntityManager */
     protected $em;
@@ -27,12 +28,24 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
+    /** @var Processor */
+    protected $mailerProcessor;
+
     /**
      * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
+        $this->mailerProcessor = $container->get('oro_email.mailer.processor');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return ['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData'];
     }
 
     /**
@@ -90,13 +103,11 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     protected function createEmail($subject, $messageId, $from, $to, $cc = null, $bcc = null)
     {
-        $origin = $this->em
-            ->getRepository('OroEmailBundle:InternalEmailOrigin')
-            ->findOneBy(['internalName' => InternalEmailOrigin::BAP]);
+        $origin = $this->mailerProcessor->getEmailOrigin($this->getReference('simple_user')->getEmail());
         $folder = $origin->getFolder(FolderType::SENT);
         $date   = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        $email = $this->emailEntityBuilder->email(
+        $emailUser = $this->emailEntityBuilder->emailUser(
             $subject,
             $from,
             $to,
@@ -107,10 +118,10 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
             $cc,
             $bcc
         );
-        $email->addFolder($folder);
-        $email->setMessageId($messageId);
+        $emailUser->setFolder($folder);
+        $emailUser->getEmail()->setMessageId($messageId);
 
-        return $email;
+        return $emailUser->getEmail();
     }
 
     /**
