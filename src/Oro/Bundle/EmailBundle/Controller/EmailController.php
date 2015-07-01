@@ -69,7 +69,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        $this->getEmailManager()->setSeenStatus($entity);
+        $this->getEmailManager()->setSeenStatus($entity, true);
         
         return ['entity' => $entity];
     }
@@ -368,9 +368,9 @@ class EmailController extends Controller
     {
         if ($email) {
             if ((bool)$status) {
-                $this->getEmailManager()->setSeenStatus($email);
+                $this->getEmailManager()->setSeenStatus($email, true);
             } else {
-                $this->getEmailManager()->setUnseenStatus($email);
+                $this->getEmailManager()->setUnseenStatus($email, true);
             }
         }
 

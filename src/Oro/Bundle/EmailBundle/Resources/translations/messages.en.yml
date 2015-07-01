@@ -4,7 +4,7 @@ oro:
             title:       Recent Emails
             inbox:       Inbox
             sent:        Sent
-            new:         New Emails
+            unread:      Unread Emails
             view_all:    View All
             description: This widget allows you to see most recent additions to your inbox and outbox
 
@@ -131,7 +131,7 @@ oro:
                     inbox: Inbox
                     sent: Sent Mail
             filters:
-                new: New Mail
+                new: Unread emails
             mark:
                 success_message: "{0} No entities were marked|{1} One entity was marked|]1,Inf[ %count% entities were marked"
 
@@ -191,7 +191,10 @@ oro:
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
-        new.label:                New
+        status:
+            label:                Status
+            unread.label:         Unread
+            read.label:           Read
 
         entity_config:
             email:

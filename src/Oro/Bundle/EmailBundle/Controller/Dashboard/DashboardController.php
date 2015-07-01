@@ -20,32 +20,31 @@ class DashboardController extends Controller
     public function recentEmailsAction($widget, $activeTab, $contentType)
     {
         $loggedUser = $this->getUser();
-        $loggedUserId     = $loggedUser->getId();
-        $renderMethod     = ($contentType === 'tab') ? 'render' : 'renderView';
+        $loggedUserId = $loggedUser->getId();
+        $renderMethod = ($contentType === 'tab') ? 'render' : 'renderView';
         $activeTabContent = $this->$renderMethod(
             'OroEmailBundle:Dashboard:recentEmailsGrid.html.twig',
             [
                 'loggedUserId' => $loggedUserId,
-                'gridName'     => sprintf('dashboard-recent-emails-%s-grid', $activeTab)
+                'gridName' => sprintf('dashboard-recent-emails-%s-grid', $activeTab)
             ]
         );
 
         if ($contentType === 'tab') {
             return $activeTabContent;
         } else {
-            $currentOrganization = $this->container->get('security.context')->getToken()->getOrganizationContext();
-
-            $unreadInboxMailList = $this
-                ->getDoctrine()
+            $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
+            $unreadMailList = $this
+                ->get('doctrine')
                 ->getRepository('OroEmailBundle:EmailUser')
-                ->getEmailUserList($loggedUser, $currentOrganization, [FolderType::INBOX, FolderType::OTHER], 0);
+                ->getEmailUserList($loggedUser, $currentOrganization, [], 0);
 
             $params = array_merge(
                 [
                     'loggedUserId'     => $loggedUserId,
                     'activeTab'        => $activeTab,
                     'activeTabContent' => $activeTabContent,
-                    'unreadInboxMailCount' => count($unreadInboxMailList)
+                    'unreadMailCount' => count($unreadMailList)
                 ],
                 $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
             );

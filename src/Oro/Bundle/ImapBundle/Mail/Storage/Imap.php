@@ -52,6 +52,8 @@ class Imap extends \Zend\Mail\Storage\Imap
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function __construct($params)
     {

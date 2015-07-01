@@ -1,12 +1,14 @@
 {% extends 'OroDashboardBundle:Dashboard:tabbedWidget.html.twig' %}
 {% import 'OroEmailBundle::macros.html.twig' as Email %}
 
-{% if unreadInboxMailCount > 0 %}
-    {% set unreadInboxMailCount %}
-        <div class="email-mail-count-circle">{{ unreadInboxMailCount }}</div>
+{% if unreadMailCount > 6 %}
+    {% set unreadMailCount %}
+        <div class="email-mail-count-circle">6+</div>
     {% endset %}
 {% else %}
-    {% set unreadInboxMailCount = '' %}
+    {% set unreadMailCount %}
+        <div class="email-mail-count-circle">{{ unreadMailCount }}</div>
+    {% endset %}
 {% endif %}
 
 {% block content %}
@@ -16,8 +18,7 @@
             {'widget': widgetName, 'activeTab': 'inbox', 'contentType': 'tab'}
         ),
         'name': 'inbox',
-        'label': 'oro.dashboard.recent_emails.inbox'|trans,
-        'afterHtml': unreadInboxMailCount
+        'label': 'oro.dashboard.recent_emails.inbox'|trans
     },
     {
         'url': path(
@@ -32,8 +33,9 @@
             'oro_email_dashboard_recent_emails',
             {'widget': widgetName, 'activeTab': 'new', 'contentType': 'tab'}
         ),
-        'name': 'new',
-        'label': 'oro.dashboard.recent_emails.new'|trans
+        'name': 'unread',
+        'label': 'oro.dashboard.recent_emails.unread'|trans,
+        'afterHtml': unreadMailCount
     }] %}
 
     {{ parent() }}

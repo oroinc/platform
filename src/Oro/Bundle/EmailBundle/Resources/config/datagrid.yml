@@ -90,7 +90,15 @@ datagrid:
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
                 folder:  { type: string,   data_name: f.type, label: oro.email.folders.label }
-                is_new:  { type: boolean,  data_name: is_new, label: oro.email.new.label }
+                is_new:
+                    label: oro.email.status.label
+                    type: choice
+                    options:
+                        field_options:
+                            choices:
+                                false: oro.email.status.unread.label
+                                true: oro.email.status.read.label
+                    data_name: eu.seen
         views_list : @oro_email.emailseen.datagrid_view_list
 
     activity-email-grid:
@@ -257,7 +265,6 @@ datagrid:
             query:
                 where:
                     and:
-                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
                         - eu.seen = 0
         columns:
             receivedAt:

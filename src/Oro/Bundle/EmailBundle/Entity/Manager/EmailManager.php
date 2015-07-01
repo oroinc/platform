@@ -85,25 +85,31 @@ class EmailManager
 
     /**
      * @param Email $entity
+     * @param bool $checkThread Set statuses for threaded emails
      */
-    public function setSeenStatus(Email $entity)
+    public function setSeenStatus(Email $entity, $checkThread = false)
     {
-        $emailUser = $this->getCurrentEmailUser($entity);
-
-        if ($emailUser) {
-            $this->setEmailUserSeen($emailUser, true, true);
+        $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
+        foreach ($emails as $email) {
+            $emailUser = $this->getCurrentEmailUser($email);
+            if ($emailUser) {
+                $this->setEmailUserSeen($emailUser, true, true);
+            }
         }
     }
 
     /**
      * @param Email $entity
+     * @param bool $checkThread Set statuses for threaded emails
      */
-    public function setUnseenStatus(Email $entity)
+    public function setUnseenStatus(Email $entity, $checkThread = false)
     {
-        $emailUser = $this->getCurrentEmailUser($entity);
-
-        if ($emailUser) {
-            $this->setEmailUserSeen($emailUser, false, true);
+        $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
+        foreach ($emails as $email) {
+            $emailUser = $this->getCurrentEmailUser($email);
+            if ($emailUser) {
+                $this->setEmailUserSeen($emailUser, false, true);
+            }
         }
     }
 
@@ -176,5 +182,26 @@ class EmailManager
             ->findByEmailAndOwner($entity, $user);
 
         return $emailUser;
+    }
+
+    /**
+     * Prepare emails to set status. If need get all from thread
+     *
+     * @param Email $entity
+     * @param bool $checkThread Get threaded emails
+     *
+     * @return Email[]
+     */
+    protected function prepareFlaggedEmailEntities(Email $entity, $checkThread)
+    {
+        $thread = $entity->getThread();
+        $emails = [$entity];
+        if ($checkThread && $thread) {
+            $emails = $thread->getEmails();
+
+            return $emails->toArray();
+        }
+
+        return $emails;
     }
 }
