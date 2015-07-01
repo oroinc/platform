@@ -139,11 +139,11 @@ abstract class EmailOrigin
     /**
      * Get root folders list
      *
-     * @return ArrayCollection|EmailFolder
+     * @return ArrayCollection|EmailFolder[]
      */
     public function getRootFolders()
     {
-        return $this->folders->filter(function(EmailFolder $folder) {
+        return $this->folders->filter(function (EmailFolder $folder) {
             return $folder->getParentFolder() === null;
         });
     }

@@ -85,7 +85,7 @@ class ConfigurationType extends AbstractType
     {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function(FormEvent $event) {
+            function (FormEvent $event) {
                 /** @var ImapEmailOrigin $data */
                 $data = $event->getData();
 
