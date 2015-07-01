@@ -20,7 +20,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
-    /** @var Translator| */
+    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
     protected function setUp()
