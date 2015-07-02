@@ -123,3 +123,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker` defined using `oro_security.owner.decision_maker` service
     * `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` defined using `oro_security.owner.ownership_metadata_provider` service
 - ACL parameter `group_name` is now used to separate permissions in application scopes 
+- `Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheClearer` and `Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheWarmer` constructor was changed
+    * from implementation `public function __construct(OwnershipMetadataProvider $provider)` to interface `public function __construct(MetadataProviderInterface $provider)`
+    * `oro_security.owner.ownership_metadata_provider.cache.warmer` and `oro_security.owner.ownership_metadata_provider.cache.clearer` services rely on `oro_security.owner.metadata_provider.chain` now
