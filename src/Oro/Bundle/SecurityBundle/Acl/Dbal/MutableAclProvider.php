@@ -14,6 +14,9 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\OrganizationSecurityIdentity;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
+
 /**
  * This class extends the standard Symfony MutableAclProvider.
  *
@@ -197,6 +200,13 @@ class MutableAclProvider extends BaseMutableAclProvider
             $oldIdentifier = $oldName;
             $newIdentifier = $sid->getRole();
             $username = false;
+        } elseif ($sid instanceof OrganizationSecurityIdentity || $sid instanceof BusinessUnitSecurityIdentity) {
+            if ($sid->getId() === $oldName) {
+                throw new \InvalidArgumentException('There are no changes.');
+            }
+            $oldIdentifier = $sid->getClass() . '-' . $oldName;
+            $newIdentifier = $sid->getClass() . '-' . $sid->getId();
+            $username = false;
         } else {
             throw new \InvalidArgumentException(
                 '$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.'
@@ -239,5 +249,69 @@ class MutableAclProvider extends BaseMutableAclProvider
         $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
 
         return $delete;
+    }
+
+    /**
+     * Constructs the SQL for inserting a security identity.
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            $identifier = $sid->getClass().'-'.$sid->getUsername();
+            $username = true;
+        } elseif ($sid instanceof RoleSecurityIdentity) {
+            $identifier = $sid->getRole();
+            $username = false;
+        } elseif ($sid instanceof OrganizationSecurityIdentity || $sid instanceof BusinessUnitSecurityIdentity) {
+            $identifier = $sid->getClass() . '-' . $sid->getId();
+            $username = false;
+        } else {
+            throw new \InvalidArgumentException('$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.');
+        }
+
+        return sprintf(
+            'INSERT INTO %s (identifier, username) VALUES (%s, %s)',
+            $this->options['sid_table_name'],
+            $this->connection->quote($identifier),
+            $this->connection->getDatabasePlatform()->convertBooleans($username)
+        );
+    }
+
+    /**
+     * Constructs the SQL for selecting the primary key of a security identity.
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            $identifier = $sid->getClass().'-'.$sid->getUsername();
+            $username = true;
+        } elseif ($sid instanceof RoleSecurityIdentity) {
+            $identifier = $sid->getRole();
+            $username = false;
+        }  elseif ($sid instanceof OrganizationSecurityIdentity || $sid instanceof BusinessUnitSecurityIdentity) {
+            $identifier = $sid->getClass() . '-' . $sid->getId();
+            $username = false;
+        } else {
+            throw new \InvalidArgumentException('$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.');
+        }
+
+        return sprintf(
+            'SELECT id FROM %s WHERE identifier = %s AND username = %s',
+            $this->options['sid_table_name'],
+            $this->connection->quote($identifier),
+            $this->connection->getDatabasePlatform()->convertBooleans($username)
+        );
     }
 }

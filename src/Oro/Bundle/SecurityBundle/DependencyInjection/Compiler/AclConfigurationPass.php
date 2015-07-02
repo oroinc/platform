@@ -14,12 +14,14 @@ class AclConfigurationPass implements CompilerPassInterface
     const NEW_ACL_PERMISSION_GRANTING_STRATEGY = 'oro_security.acl.permission_granting_strategy';
     const NEW_ACL_PERMISSION_MAP = 'oro_security.acl.permission_map';
     const NEW_ACL_OBJECT_ID_STRATEGY = 'oro_security.acl.object_identity_retrieval_strategy';
+    const NEW_ACL_SECURITY_ID_STRATEGY_CLASS = 'oro_security.acl.security_identity_retrieval_strategy.class';
 
     const DEFAULT_ACL_VOTER = 'security.acl.voter.basic_permissions';
     const DEFAULT_ACL_VOTER_LINK = 'oro_security.acl.voter_link';
     const DEFAULT_ACL_PROVIDER = 'security.acl.dbal.provider';
     const DEFAULT_ACL_DBAL_PROVIDER_CLASS = 'security.acl.dbal.provider.class';
     const DEFAULT_ACL_CACHE = 'security.acl.cache.doctrine';
+    const DEFAULT_ACL_SECURITY_ID_STRATEGY_CLASS = 'security.acl.security_identity_retrieval_strategy.class';
 
     const ACL_EXTENSION_SELECTOR = 'oro_security.acl.extension_selector';
     const ACL_EXTENSION_TAG = 'oro_security.acl.extension';
@@ -157,6 +159,13 @@ class AclConfigurationPass implements CompilerPassInterface
                 $newProviderDef = $container->getDefinition(self::NEW_ACL_PROVIDER);
                 $newProviderDef->addMethodCall('setBaseAclProvider', array($voterDef->getArgument(0)));
                 $voterDef->replaceArgument(0, new Reference(self::NEW_ACL_PROVIDER));
+            }
+            // substitute ACL Security Identity Retrieval Strategy
+            if ($container->hasParameter(self::NEW_ACL_SECURITY_ID_STRATEGY_CLASS)) {
+                $container->setParameter(
+                    self::DEFAULT_ACL_SECURITY_ID_STRATEGY_CLASS,
+                    $container->getParameter(self::NEW_ACL_SECURITY_ID_STRATEGY_CLASS)
+                );
             }
             // substitute ACL Object Identity Retrieval Strategy
             if ($container->hasDefinition(self::NEW_ACL_OBJECT_ID_STRATEGY)) {
