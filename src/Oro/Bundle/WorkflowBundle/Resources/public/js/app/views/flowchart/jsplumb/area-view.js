@@ -1,11 +1,19 @@
 define(function (require) {
     'use strict';
-    var _ = require('underscore'),
+    var FlowchartJsPlumbAreaView,
+        $ = require('jquery'),
+        _ = require('underscore'),
         jsPlumb = require('jsplumb'),
-        FlowchartJsPlumbBaseView = require('./base-view'),
-        FlowchartJsPlumbAreaView;
+        JPManager = require('../../../../tools/jsplumb-manager'),
+        FlowchartJsPlumbBaseView = require('./base-view');
+    require('../../../../tools/jsplumb-smartline');
 
     FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
+
+        /**
+         * @type {JsPlumbManager}
+         */
+        jsPlumbManager: null,
 
         jsPlumbInstance: null,
 
@@ -59,6 +67,10 @@ define(function (require) {
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
         },
 
+        events: {
+            'mouseup': 'recalculateConnections'
+        },
+
         render: function () {
             // do nothing except connect()
             if (!this.isConnected) {
@@ -73,6 +85,14 @@ define(function (require) {
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
+            this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
+            this.jsPlumbManager.organizeBlocks();
+            // wait a bit while flowchart renders
+            _.delay(_.bind(this.recalculateConnections, this), 100);
+        },
+
+        recalculateConnections: function () {
+            this.jsPlumbManager.recalculateConnections();
         }
     });
 

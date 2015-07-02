@@ -132,9 +132,14 @@ define(function (require) {
                 overlayIsVisible = areaView.flowchartState.get('transitionLabelsVisible'),
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep),
+                anchors = this.areaView.jsPlumbManager.getAnchors(startEl, endEl),
                 connectionOptions = _.defaults({
                     source: startEl,
                     target: endEl,
+                    connector: [ "Smartline", { cornerRadius: 5 } ],
+                    paintStyle: _.result(this, 'connectorStyle'),
+                    hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
+                    anchors: anchors,
                     overlays: [
                         ['Custom', {
                             id: 'overlay',
@@ -158,6 +163,7 @@ define(function (require) {
                 }, this.defaultConnectionOptions);
 
             jsplumbConnection = this.areaView.jsPlumbInstance.connect(connectionOptions);
+            jsplumbConnection.overlayView = overlayView;
             this.connections.push({
                 startStep: startStep,
                 endStep: endStep,

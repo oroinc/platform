@@ -15,7 +15,8 @@ define(function (require) {
         isConnected: false,
 
         listen: {
-            'change model': 'render'
+            'change model': 'render',
+            'change:position model': 'refreshPosition'
         },
 
         initialize: function (options) {
@@ -34,11 +35,21 @@ define(function (require) {
             // all other changes should be done by jsPlumb
             // or jsPlumb.redraw must be called
             if (this.model.get('position')) {
+                this.refreshPosition();
+            } else {
+                this.model.set('position', this.areaView.jsPlumbManager.getPositionForNew());
+            }
+        },
+
+        refreshPosition: function () {
+            var instance = this.areaView.jsPlumbInstance;
+            instance.batch(_.bind(function () {
                 this.$el.css({
                     top: this.model.get('position')[1],
                     left: this.model.get('position')[0]
                 });
-            }
+            }, this));
+            this.areaView.jsPlumbInstance.repaintEverything();
         },
 
         cleanup: function () {
