@@ -28,9 +28,9 @@ parameters:
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
-
-
-    oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
+    oro_email.email.folder.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailFolderManager
+    oro_email.email_folder_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFolderLoaderSelector
+    oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
     # Email template API
     oro_email.manager.emailtemplate.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -564,6 +564,17 @@ services:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+
+    oro_email.email_folder_loader_selector:
+        public: false
+        class: %oro_email.email_folder_loader_selector.class%
+
+    oro_email.email.folder.manager:
+        class: %oro_email.email.folder.manager.class%
+        arguments:
+            - @oro_email.email_folder_loader_selector
+        calls:
+            - [setLogger, [@logger]]
 
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
