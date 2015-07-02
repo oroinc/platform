@@ -156,28 +156,18 @@ class ActivityListFilter extends EntityFilter
             )
         );
 
-        $activityQb = $em
-            ->getRepository('OroActivityListBundle:ActivityList')
+        $activityListRepository = $em->getRepository('OroActivityListBundle:ActivityList');
+
+        $activityQb = $activityListRepository
             ->createQueryBuilder($this->activityListAlias)
             ->select('1')
             ->setMaxResults(1);
 
         $availableActivityAssociations = $this->activityManager->getActivityAssociations($data['entityClassName']);
-        $availableClasses = array_map(function ($assoc) {
-            return $assoc['className'];
-        }, $availableActivityAssociations);
 
-        $chosenActivities = $data['activityType']['value'];
-        if (count($chosenActivities) === 1 && empty($chosenActivities[0])) {
-            $chosenActivities = $this->activityListChainProvider->getSupportedActivities();
-        }
-        $chosenClasses = array_map(function ($className) {
-            return $this->entityRoutingHelper->decodeClassName($className);
-        }, $chosenActivities);
-
-        $unavailableChoices = array_diff($chosenClasses, $availableClasses);
-
-        if ($unavailableChoices) {
+        if (!$availableActivityAssociations
+            && !$activityListRepository->getRecordsCountForTargetClass($data['entityClassName'])
+        ) {
             $activityQb->andWhere('1 = 0');
 
             return $activityQb;
