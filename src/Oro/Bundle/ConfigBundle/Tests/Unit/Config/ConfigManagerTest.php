@@ -259,16 +259,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->willReturn(null);
-        $this->userScopeManager->expects($this->never())
-            ->method('getScopedEntityName');
+            ->willReturn(['value' => '']);
 
-        $this->globalScopeManager->expects($this->once())
-            ->method('getSettingValue')
-            ->willReturn(null);
+        $this->globalScopeManager->expects($this->never())
+            ->method('getSettingValue');
         $this->globalScopeManager->expects($this->never())
             ->method('getScopedEntityName');
 
-        $this->assertEquals(false, $this->manager->get($parameterName));
+        $this->assertEquals(['value' => null], $this->manager->get($parameterName));
     }
 }
