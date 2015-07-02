@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
-
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -18,11 +18,6 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
      * @var ConfigProvider
      */
     private $configProvider;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $cache;
 
     /**
      * @var EntityClassResolver
@@ -77,23 +72,11 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     }
 
     /**
-     * @return CacheProvider
-     */
-    protected function getCache()
-    {
-        if ($this->container) {
-            $this->cache = $this->getContainer()->get('oro_security.owner.ownership_metadata_provider.cache');
-        }
-
-        return $this->cache;
-    }
-
-    /**
      * @return EntityClassResolver
      */
     protected function getEntityClassResolver()
     {
-        if ($this->container) {
+        if (!$this->entityClassResolver) {
             $this->entityClassResolver = $this->getContainer()->get('oro_entity.orm.entity_class_resolver');
         }
 
@@ -131,6 +114,11 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     abstract protected function getNoOwnershipMetadata();
 
     /**
+     * @return CacheProvider
+     */
+    abstract protected function getCache();
+
+    /**
      * {@inheritDoc}
      */
     public function getMetadata($className)
@@ -146,16 +134,12 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     }
 
     /**
-     * Warms up the cache
-     *
-     * If the class name is specified this method warms up cache for this class only
-     *
-     * @param string|null $className
+     * {@inheritdoc}
      */
     public function warmUpCache($className = null)
     {
         if ($className === null) {
-            $configs = $this->getConfigProvider()->getConfigs();
+            $configs = $this->getOwnershipConfigs();
             foreach ($configs as $config) {
                 $this->ensureMetadataLoaded($config->getId()->getClassName());
             }
@@ -165,11 +149,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     }
 
     /**
-     * Clears the ownership metadata cache
-     *
-     * If the class name is not specified this method clears all cached data
-     *
-     * @param string|null $className
+     * {@inheritdoc}
      */
     public function clearCache($className = null)
     {
@@ -180,6 +160,14 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
                 $this->getCache()->deleteAll();
             }
         }
+    }
+
+    /**
+     * @return ConfigInterface[]
+     */
+    protected function getOwnershipConfigs()
+    {
+        return $this->getConfigProvider()->getConfigs();
     }
 
     /**

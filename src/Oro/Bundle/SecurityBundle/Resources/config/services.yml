@@ -132,8 +132,8 @@ services:
             - @oro_security.acl.object_id_accessor
             - @oro_entity.orm.entity_class_resolver
             - @oro_security.entity_security_metadata_provider
-            - @oro_security.owner.ownership_metadata_provider
-            - @oro_security.owner.decision_maker
+            - @oro_security.owner.metadata_provider.chain
+            - @oro_security.owner.ownership_decision_maker.chain
         tags:
             - { name: oro_security.acl.extension, priority: 20 }
 

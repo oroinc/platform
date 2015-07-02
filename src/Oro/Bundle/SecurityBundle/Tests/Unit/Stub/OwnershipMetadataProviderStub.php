@@ -67,7 +67,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     {
         return isset($this->metadata[$className])
             ? $this->metadata[$className]
-            : new OwnershipMetadata();
+            : parent::getMetadata($className);
     }
 
     /**
@@ -77,5 +77,13 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     public function setMetadata($className, OwnershipMetadata $metadata)
     {
         $this->metadata[$className] = $metadata;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMaxAccessLevel($accessLevel, $className = null)
+    {
+        return $accessLevel;
     }
 }

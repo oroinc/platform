@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata\Stub\StubMetadataProvider;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
     protected $cache;
 
     /**
-     * @var StubMetadataProvider
+     * @var OwnershipMetadataProviderStub
      */
     protected $provider;
 
@@ -67,7 +67,7 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->provider = new StubMetadataProvider([]);
+        $this->provider = new OwnershipMetadataProviderStub($this);
         $this->provider->setContainer($container);
 
         $this->config = new Config(new EntityConfigId('ownership', self::SOME_CLASS));

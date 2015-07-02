@@ -47,4 +47,22 @@ interface MetadataProviderInterface
      * @return int
      */
     public function getMaxAccessLevel($accessLevel, $className = null);
+
+    /**
+     * Clears the ownership metadata cache
+     *
+     * If the class name is not specified this method clears all cached data
+     *
+     * @param string|null $className
+     */
+    public function clearCache($className = null);
+
+    /**
+     * Warms up the cache
+     *
+     * If the class name is specified this method warms up cache for this class only
+     *
+     * @param string|null $className
+     */
+    public function warmUpCache($className = null);
 }
