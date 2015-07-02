@@ -41,12 +41,12 @@ interface MetadataProviderInterface
     public function getSystemLevelClass();
 
     /**
-     * @param int        $accessLevel Current object access level
-     * @param mixed|null $object      Object for test
+     * @param int    $accessLevel Current object access level
+     * @param string $className   Class name to test
      *
      * @return int
      */
-    public function getMaxAccessLevel($accessLevel, $object = null);
+    public function getMaxAccessLevel($accessLevel, $className = null);
 
     /**
      * Clears the ownership metadata cache

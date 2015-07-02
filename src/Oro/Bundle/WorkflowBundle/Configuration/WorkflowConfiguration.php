@@ -123,6 +123,10 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('scalar')
                         ->end()
                     ->end()
+                    ->arrayNode('position')
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
                 ->end()
             ->end();
 

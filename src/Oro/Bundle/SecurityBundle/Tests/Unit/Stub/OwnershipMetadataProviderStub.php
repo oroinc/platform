@@ -78,4 +78,12 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     {
         $this->metadata[$className] = $metadata;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMaxAccessLevel($accessLevel, $className = null)
+    {
+        return $accessLevel;
+    }
 }

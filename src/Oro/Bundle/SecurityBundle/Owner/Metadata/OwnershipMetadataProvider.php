@@ -205,10 +205,10 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      *
      * {@inheritDoc}
      */
-    public function getMaxAccessLevel($accessLevel, $object = null)
+    public function getMaxAccessLevel($accessLevel, $className = null)
     {
-        if ($object && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
-            $metadata = $this->getMetadata($object);
+        if ($className && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
+            $metadata = $this->getMetadata($className);
 
             if ($metadata->hasOwner()) {
                 $checkOwnerType = in_array(
