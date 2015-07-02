@@ -4,6 +4,12 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 
+/**
+ * Class Imap
+ * @package Oro\Bundle\ImapBundle\Mail\Storage
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Imap extends \Zend\Mail\Storage\Imap
 {
     const BODY_HEADER      = 'BODY[HEADER]';
