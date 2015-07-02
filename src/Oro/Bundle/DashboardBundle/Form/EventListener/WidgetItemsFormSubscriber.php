@@ -55,7 +55,7 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
             $data[$id] = [
                 'id'    => $id,
                 'label' => $this->translator->trans($item['label']),
-                'show'  => $oldItem ? $oldItem['show'] : ($originalData ? false : true),
+                'show'  => $oldItem ? $oldItem['show'] : !$originalData,
                 'order' => $oldItem ? $oldItem['order'] : $order,
             ];
 
