@@ -75,7 +75,7 @@ class EmailManager
     public function setEmailUserSeen(EmailUser $entity, $value = true, $flush = false)
     {
         if ($entity->isSeen() !== $value) {
-            $this->emailFlagManager->changeStatusSeen($entity, $value);
+//            $this->emailFlagManager->changeStatusSeen($entity, $value);
             $entity->setSeen($value);
             if ($flush) {
                 $this->em->flush();
