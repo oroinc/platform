@@ -47,6 +47,12 @@ class EmailActivitySearchController extends RestGetController
      *      description="Number of items per page. Defaults to 10."
      * )
      * @QueryParam(
+     *     name="search",
+     *     requirements=".+",
+     *     nullable=true,
+     *     description="The search string."
+     * )
+     * @QueryParam(
      *      name="from",
      *      requirements=".+",
      *      nullable=true,
@@ -73,7 +79,9 @@ class EmailActivitySearchController extends RestGetController
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        $filters = [];
+        $filters = [
+            'search' => $this->getRequest()->get('search')
+        ];
         $from    = $this->getRequest()->get('from', null);
         if ($from) {
             $filter          = new StringToArrayParameterFilter();

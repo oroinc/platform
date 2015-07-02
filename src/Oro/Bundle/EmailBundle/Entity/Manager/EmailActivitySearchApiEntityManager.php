@@ -19,7 +19,6 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
-        $criteria = array_merge($criteria, ['search' => null]);
         $searchQuery = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
 
         if (isset($criteria['email'])) {
