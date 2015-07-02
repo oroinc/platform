@@ -14,7 +14,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 class IterableResult extends BufferedQueryResultIterator implements IterableResultInterface
 {
     /**
-     * @var QueryBuilder
+     * @var QueryBuilder|Query
      */
     private $source;
 
@@ -28,9 +28,9 @@ class IterableResult extends BufferedQueryResultIterator implements IterableResu
     /**
      * Constructor
      *
-     * @param QueryBuilder $source
+     * @param QueryBuilder|Query $source
      */
-    public function __construct(QueryBuilder $source)
+    public function __construct($source)
     {
         parent::__construct($source);
         $this->source = $source;

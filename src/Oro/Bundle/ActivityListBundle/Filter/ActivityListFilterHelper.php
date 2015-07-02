@@ -45,12 +45,21 @@ class ActivityListFilterHelper
     /**
      * @param QueryBuilder $qb
      * @param array        $filterData
+     * @param string       $rangeField
+     * @param string       $activityListAlias
      */
-    public function addFiltersToQuery(QueryBuilder $qb, $filterData)
-    {
+    public function addFiltersToQuery(
+        QueryBuilder $qb,
+        $filterData,
+        $rangeField = 'updatedAt',
+        $activityListAlias = 'activity'
+    ) {
         $dataSourceAdapter = new OrmFilterDatasourceAdapter($qb);
         if (isset($filterData['dateRange'])) {
-            $this->dateTimeRangeFilter->init('updatedAt', ['data_name' => 'activity.updatedAt']);
+            $this->dateTimeRangeFilter->init(
+                $rangeField,
+                ['data_name' => sprintf('%s.%s', $activityListAlias, $rangeField)]
+            );
             $datetimeForm = $this->dateTimeRangeFilter->getForm();
             if (!$datetimeForm->isSubmitted()) {
                 $datetimeForm->submit($filterData['dateRange']);
@@ -62,7 +71,7 @@ class ActivityListFilterHelper
 
             $filterData['activityType']['value'] = array_map(
                 function ($activityClass) use ($routingHelper) {
-                    return $routingHelper->decodeClassName($activityClass);
+                    return $routingHelper->resolveEntityClass($activityClass);
                 },
                 $filterData['activityType']['value']
             );
@@ -70,7 +79,7 @@ class ActivityListFilterHelper
             $this->choiceFilter->init(
                 'relatedActivityClass',
                 [
-                    'data_name' => 'activity.relatedActivityClass',
+                    'data_name' => sprintf('%s.relatedActivityClass', $activityListAlias),
                     'options'   => [
                         'field_options' => [
                             'multiple' => true,

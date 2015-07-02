@@ -183,7 +183,7 @@ services:
         arguments:
             - @oro_locale.formatter.address
             - @oro_locale.formatter.date_time
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
             - @oro_locale.formatter.number
         tags:
             - { name: kernel.event_listener, event: oro.entity_merge.before_value_render, method: beforeValueRender }

@@ -9,8 +9,6 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
 class SecurityController extends Controller
 {
     /**
@@ -49,7 +47,7 @@ class SecurityController extends Controller
         return array(
             'last_username' => $lastUsername,
             'csrf_token'    => $csrfToken,
-            'error'         => $error,
+            'error'         => $error
         );
     }
 

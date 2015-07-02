@@ -45,20 +45,6 @@ class EmailFolderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($origin === $entity->getOrigin());
     }
 
-    public function testEmailGetterAndSetter()
-    {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-
-        $entity = new EmailFolder();
-        $entity->addEmail($email);
-
-        $emails = $entity->getEmails();
-
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $emails);
-        $this->assertCount(1, $emails);
-        $this->assertTrue($email === $emails[0]);
-    }
-
     public function testOutdatedAt()
     {
         $entity = new EmailFolder();

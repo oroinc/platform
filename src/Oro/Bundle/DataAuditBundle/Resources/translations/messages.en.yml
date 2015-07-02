@@ -28,3 +28,7 @@ oro:
             field:
                 items:
                     auditable: Auditable
+
+        condition_builder:
+            criteria:
+                data_audit: Data audit

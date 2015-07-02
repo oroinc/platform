@@ -14,7 +14,7 @@ parameters:
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
     oro_dashboard.provider.widget_configuration_form_provider.class:  Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider
     oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
-    oro_dashboard.datetime.hepler.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
+    oro_dashboard.datetime.helper.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
     oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
 
     oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
@@ -104,8 +104,8 @@ services:
             - @form.factory
             - @oro_form.validator.constraint_factory
 
-    oro_dashboard.datetime.hepler:
-        class: %oro_dashboard.datetime.hepler.class%
+    oro_dashboard.datetime.helper:
+        class: %oro_dashboard.datetime.helper.class%
         arguments:
             - @oro_locale.settings
             - @doctrine

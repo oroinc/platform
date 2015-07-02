@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Twig;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UserBundle\Twig\OroUserExtension;
 use Oro\Bundle\UserBundle\Model\Gender;

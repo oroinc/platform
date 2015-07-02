@@ -1,0 +1,14 @@
+oro_entity:
+    entity_aliases:
+        Oro\Bundle\IntegrationBundle\Entity\Channel:
+            alias:        integrationchannel
+            plural_alias: integrationchannels
+        Oro\Bundle\IntegrationBundle\Entity\FieldsChanges:
+            alias:        integrationfieldschanges
+            plural_alias: integrationfieldschanges
+        Oro\Bundle\IntegrationBundle\Entity\Status:
+            alias:        integrationstatus
+            plural_alias: integrationstatuses
+        Oro\Bundle\IntegrationBundle\Entity\Transport:
+            alias:        integrationtransport
+            plural_alias: integrationtransports

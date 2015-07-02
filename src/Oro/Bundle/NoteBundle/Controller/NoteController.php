@@ -49,7 +49,7 @@ class NoteController extends Controller
      */
     public function getAction($entityClass, $entityId)
     {
-        $entityClass = $this->getEntityRoutingHelper()->decodeClassName($entityClass);
+        $entityClass = $this->getEntityRoutingHelper()->resolveEntityClass($entityClass);
 
         $sorting = strtoupper($this->getRequest()->get('sorting', 'DESC'));
 

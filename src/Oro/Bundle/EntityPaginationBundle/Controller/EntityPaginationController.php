@@ -78,7 +78,7 @@ class EntityPaginationController extends Controller
 
         $params = $this->getRequest()->query->all();
 
-        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
         $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
         $message = null;
 

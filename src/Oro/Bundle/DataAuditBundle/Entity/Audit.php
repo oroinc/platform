@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
@@ -81,12 +83,18 @@ class Audit extends AbstractLogEntry
     protected $version;
 
     /**
-     * @var string $data
+     * Redefined parent property to remove the column from db
      *
-     * @ORM\Column(type="array", nullable=true)
-     * @Soap\ComplexType("Oro\Bundle\DataAuditBundle\Entity\AuditData[]", nillable=true)
+     * @var array|null
      */
     protected $data;
+
+    /**
+     * @var AuditField[]|Collection
+     *
+     * @ORM\OneToMany(targetEntity="AuditField", mappedBy="audit", cascade={"persist"})
+     */
+    protected $fields;
 
     /**
      * @var string $username
@@ -112,6 +120,14 @@ class Audit extends AbstractLogEntry
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->fields = new ArrayCollection();
+    }
 
     /**
      * Set user
@@ -190,5 +206,108 @@ class Audit extends AbstractLogEntry
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * Get fields
+     *
+     * @return AuditField[]|Collection
+     */
+    public function getFields()
+    {
+        if ($this->fields === null) {
+            $this->fields = new ArrayCollection();
+        }
+
+        return $this->fields;
+    }
+
+    /**
+     * Get field
+     *
+     * @param string $field
+     *
+     * @return AuditField|false
+     */
+    public function getField($field)
+    {
+        return $this->fields->filter(function (AuditField $auditField) use ($field) {
+            return $auditField->getField() === $field;
+        })->first();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        $data = [];
+        foreach ($this->getFields() as $field) {
+            $newValue = $field->getNewValue();
+            $oldValue = $field->getOldValue();
+            if (in_array($field->getDataType(), ['date', 'datetime'])) {
+                $newValue = [
+                    'value' => $newValue,
+                    'type'  => $field->getDataType(),
+                ];
+
+                $oldValue = [
+                    'value' => $oldValue,
+                    'type'  => $field->getDataType(),
+                ];
+            }
+
+            $data[$field->getField()] = [
+                'old' => $oldValue,
+                'new' => $newValue,
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated Use method createField instead
+     */
+    public function setData($data)
+    {
+        parent::setData($data);
+    }
+
+    /**
+     * @deprecated This method is for internal use only. Use method getData or getFields instead
+     *
+     * @return array|null
+     */
+    public function getDeprecatedData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Create field
+     *
+     * @param string $field
+     * @param string $dataType
+     * @param mixed $newValue
+     * @param mixed $oldValue
+     * @return Audit
+     */
+    public function createField($field, $dataType, $newValue, $oldValue)
+    {
+        if ($this->fields === null) {
+            $this->fields = new ArrayCollection();
+        }
+
+        if ($existingField = $this->getField($field)) {
+            $this->fields->removeElement($existingField);
+        }
+
+        $auditField = new AuditField($this, $field, $dataType, $newValue, $oldValue);
+        $this->fields->add($auditField);
+
+        return $this;
     }
 }

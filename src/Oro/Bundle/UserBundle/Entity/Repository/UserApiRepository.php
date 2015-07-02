@@ -3,8 +3,10 @@
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
 
 class UserApiRepository extends EntityRepository
 {
@@ -14,7 +16,7 @@ class UserApiRepository extends EntityRepository
      * @param User         $user
      * @param Organization $organization
      *
-     * @return Organization
+     * @return UserApi
      */
     public function getApi(User $user, Organization $organization)
     {
