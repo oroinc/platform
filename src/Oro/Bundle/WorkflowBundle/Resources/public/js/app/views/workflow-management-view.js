@@ -43,7 +43,6 @@ define(function (require) {
 
             this.$entitySelectEl = this.$('[name$="[related_entity]"]');
             this.initEntityFieldsLoader();
-
             this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
         },
 

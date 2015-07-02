@@ -43,13 +43,6 @@ define(function(require) {
             return null;
         },
 
-        getStartingSteps: function () {
-            var name = this.get('name');
-            return this.workflow.get('steps').filter(function (item) {
-                return item.get('allowed_transitions').indexOf(name) !== -1;
-            });
-        },
-
         destroy: function (options) {
             var transitionDefinition = this.getTransitionDefinition();
             if (transitionDefinition) {

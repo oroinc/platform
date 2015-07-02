@@ -39,8 +39,9 @@ define(function (require) {
             this.$listElBody.append(rowView.render().$el);
         },
 
-        addAllItems: function(items) {
-            _.each(items, this.addItem, this);
+        addAllItems: function(collection) {
+            this.resetView();
+            collection.each(_.bind(this.addItem, this));
         },
 
         getCollection: function() {
@@ -61,9 +62,7 @@ define(function (require) {
 
         render: function() {
             this.getCollection().sort();
-            this.resetView();
-            this.addAllItems(this.getCollection().models);
-
+            this.addAllItems(this.getCollection());
             return this;
         }
     });

@@ -5,7 +5,7 @@ define(function(require) {
     var WorkflowModel,
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
-        BaseModel = require('oroui/js/app/models/base/model'),
+        StatefulModel = require('oroui/js/app/models/base/stateful-model'),
         helper = require('oroworkflow/js/tools/workflow-helper'),
         StepCollection = require('./step-collection'),
         TransitionCollection = require('./transition-collection'),
@@ -17,7 +17,7 @@ define(function(require) {
         AttributeModel = require('./attribute-model'),
         EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
-    WorkflowModel = BaseModel.extend({
+    WorkflowModel = StatefulModel.extend({
         defaults: {
             name: '',
             label: '',
@@ -37,6 +37,7 @@ define(function(require) {
         positionIncrementPx: 35,
 
         initialize: function() {
+            var steps, transitions;
             if (this.get('steps') === null) {
                 this.set('steps', new StepCollection());
             }
@@ -49,15 +50,25 @@ define(function(require) {
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
-
-            _.each(this.get('steps').models, this.setWorkflow, this);
-            _.each(this.get('transitions').models, this.setWorkflow, this);
-            this.listenTo(this.get('steps'), 'add', this.setWorkflow);
-            this.listenTo(this.get('transitions'), 'add', this.setWorkflow);
+            steps = this.get('steps');
+            transitions = this.get('transitions');
+            this.setWorkflowToCollection(steps);
+            this.setWorkflowToCollection(transitions);
+            this.listenTo(steps, 'add', this.setWorkflow);
+            this.listenTo(transitions, 'add', this.setWorkflow);
+            this.listenTo(steps, 'reset', this.setWorkflowToCollection);
+            this.listenTo(transitions, 'reset', this.setWorkflowToCollection);
         },
 
         setWorkflow: function (item) {
             item.setWorkflow(this);
+        },
+
+        setWorkflowToCollection: function (collection) {
+            var that = this;
+            collection.each( function (item) {
+                item.setWorkflow(that);
+            });
         },
 
         cloneTransitionDefinition: function(definition) {
@@ -208,6 +219,22 @@ define(function(require) {
 
         _getByName: function(item, name) {
             return _.first(this.get(item).where({'name': name}));
+        },
+
+        getState: function () {
+            return new Backbone.Model({
+                steps: this.get('steps').toJSON(),
+                transitions: this.get('transitions').toJSON()
+            })
+        },
+        setState: function (state) {
+            WorkflowModel.__super__.setState.apply(this,arguments);
+            var steps = state.get('steps'),
+                transitions = state.get('transitions');
+            if (steps && transitions) {
+                this.get('steps').reset(steps);
+                this.get('transitions').reset(transitions);
+            }
         }
     });
 
