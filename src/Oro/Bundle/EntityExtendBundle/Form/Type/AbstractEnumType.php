@@ -78,7 +78,7 @@ abstract class AbstractEnumType extends AbstractType
                     }
 
                     if (empty($options['enum_code'])) {
-                        throw new InvalidOptionsException('Either "class" or "enum_code must" option must be set.');
+                        throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
                     }
 
                     $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);

@@ -55,7 +55,7 @@ UPGRADE FROM 1.7 to 1.8
  - `Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension` by default adds unique suffix to id attribute of each form type
  - `Oro\Bundle\FormBundle\Model\UpdateHandler` triggers events that can be used to modify data and interrupt processing, also this handler has new constructor argument used to inject EventDispatcher
  - `Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType` removed support for `extra_config` and `extra_modules` options, use `component` option instead (the value reflects what js-module will be used as Select2Component)
- - `Oro\Bundle\FormBundle\Form\Type\EnumFilterType` second constructor argument changed from instance of `Doctrine\Common\Persistence\ManagerRegistry` to `Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider` 
+ - `Oro\Bundle\FormBundle\Form\Type\EnumFilterType` second constructor argument was changed from instance of `Doctrine\Common\Persistence\ManagerRegistry` to `Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider` 
 
 ####SyncBundle
 Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. Instead the following websocket configuration is used:

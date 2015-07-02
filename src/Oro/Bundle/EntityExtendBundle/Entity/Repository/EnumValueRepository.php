@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Repository;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
@@ -55,8 +54,10 @@ class EnumValueRepository extends EntityRepository
      */
     public function getValuesQueryBuilder()
     {
-        return $this->createQueryBuilder('e')
-            ->orderBy('e.priority', Criteria::ASC);
+        $qb = $this->createQueryBuilder('e');
+        $qb->orderBy($qb->expr()->asc('e.priority'));
+
+        return $qb;
     }
 
     /**
@@ -72,9 +73,11 @@ class EnumValueRepository extends EntityRepository
      */
     public function getDefaultValuesQueryBuilder()
     {
-        return $this->getValuesQueryBuilder()
-            ->andWhere('e.default = :default')
+        $qb = $this->getValuesQueryBuilder();
+        $qb->andWhere($qb->expr()->eq('e.default', ':default'))
             ->setParameter('default', true);
+
+        return $qb;
     }
 
     /**

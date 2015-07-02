@@ -185,7 +185,7 @@ class EnumFilterTypeTest extends TypeTestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage Either "class" or "enum_code must" option must be set.
+     * @expectedExceptionMessage Either "class" or "enum_code" must option must be set.
      */
     public function testClassNormalizerOptionsException()
     {

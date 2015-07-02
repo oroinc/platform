@@ -57,7 +57,7 @@ class EnumFilterType extends AbstractChoiceType
                     }
 
                     if (empty($options['enum_code'])) {
-                        throw new InvalidOptionsException('Either "class" or "enum_code must" option must be set.');
+                        throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
                     }
 
                     $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
@@ -75,8 +75,12 @@ class EnumFilterType extends AbstractChoiceType
                 },
                 // this normalizer allows to add/override field_options options outside
                 'field_options' => function (Options $options, $value) use (&$defaultFieldOptions) {
-                    if ($options['class'] !== null) {
-                        $value['choices'] = $this->getChoices($options['class'], $options['null_value']);
+                    if (isset($options['class'])) {
+                        $nullValue = null;
+                        if ($options->has('null_value')) {
+                            $nullValue = $options->get('null_value');
+                        }
+                        $value['choices'] = $this->getChoices($options['class'], $nullValue);
                     } else {
                         $value['choices'] = [];
                     }
