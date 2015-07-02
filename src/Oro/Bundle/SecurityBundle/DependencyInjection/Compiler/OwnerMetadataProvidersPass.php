@@ -21,10 +21,16 @@ class OwnerMetadataProvidersPass implements CompilerPassInterface
         }
 
         $chainServiceDefinition = $container->getDefinition(self::CHAIN_SERVICE_ID);
-        $taggedServiceIds = array_keys($container->findTaggedServiceIds(self::TAG_NAME));
+        $taggedServices = $container->findTaggedServiceIds(self::TAG_NAME);
 
-        foreach ($taggedServiceIds as $serviceId) {
-            $chainServiceDefinition->addMethodCall('addProvider', [new Reference($serviceId)]);
+        foreach ($taggedServices as $id => $attributes) {
+            if (empty($attributes[0]['alias'])) {
+                throw new \InvalidArgumentException(
+                    sprintf('Tag %s alias is missing for %s service', self::TAG_NAME, $id)
+                );
+            }
+
+            $chainServiceDefinition->addMethodCall('addProvider', [$attributes[0]['alias'], new Reference($id)]);
         }
     }
 }
