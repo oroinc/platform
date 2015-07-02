@@ -35,7 +35,7 @@ definitions:
                 actions:
                     - @format_string:
                         attribute: $.arguments
-                        string: '--seen %seen% --ids=%id%'
+                        string: '--seen=%seen% --ids=%id%'
                         arguments:
                             id: $id
                             seen: $seen
