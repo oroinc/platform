@@ -237,18 +237,19 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
                 AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
             ];
         }
+
+        $minLevel = AccessLevel::BASIC_LEVEL;
+        $maxLevel = AccessLevel::SYSTEM_LEVEL;
+
         if ($this->isBasicLevelOwned()) {
-            $maxLevel = AccessLevel::GLOBAL_LEVEL;
             $minLevel = AccessLevel::BASIC_LEVEL;
+            $maxLevel = AccessLevel::GLOBAL_LEVEL;
         } elseif ($this->isLocalLevelOwned()) {
-            $maxLevel = AccessLevel::GLOBAL_LEVEL;
             $minLevel = AccessLevel::LOCAL_LEVEL;
-        } elseif ($this->isGlobalLevelOwned()) {
             $maxLevel = AccessLevel::GLOBAL_LEVEL;
+        } elseif ($this->isGlobalLevelOwned()) {
             $minLevel = AccessLevel::GLOBAL_LEVEL;
-        } else {
-            $minLevel = AccessLevel::BASIC_LEVEL;
-            $maxLevel = AccessLevel::SYSTEM_LEVEL;
+            $maxLevel = AccessLevel::GLOBAL_LEVEL;
         }
 
         return AccessLevel::getAccessLevelNames($minLevel, $maxLevel);
