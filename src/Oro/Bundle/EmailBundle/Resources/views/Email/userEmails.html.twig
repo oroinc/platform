@@ -19,28 +19,94 @@
             }}
         </div>
     {% endif %}
-        <div class="btn-group">
-            <a type="button"
-               class="btn sync-btn icons-holder-text no-hash"
-               href="{{ path('oro_email_user_sync_emails') }}">
-                <i class="icon-refresh hide-text">{{ 'oro.email.sync.label'|trans }}</i>{{ 'oro.email.sync.label'|trans }}
-            </a>
-            <script type="text/javascript">
-                require(['jquery', 'oroui/js/mediator'],
-                    function($, mediator) {
-                        $('.sync-btn').on('click', function(e) {
-                            $(this).html('<i class="icon-refresh hide-text">{{ 'oro.email.sync.processing'|trans }}</i>{{ 'oro.email.sync.processing'|trans }}')
-                            $(this).disable();
-                            e.preventDefault();
-                            $.getJSON(this.href, function(data) {
-                                $(this).html('<i class="icon-refresh hide-text">{{ 'oro.email.sync.label'|trans }}</i>{{ 'oro.email.sync.label'|trans }}');
+
+    {%- set actionSync =
+        '<i class="icon-refresh hide-text">' ~
+            'oro.email.action.sync'|trans ~
+        '</i>' ~
+        'oro.email.action.sync'|trans
+    %}
+    {%- set actionProcessing =
+        '<i class="icon-refresh hide-text">' ~
+            'oro.email.action.processing'|trans ~
+        '</i>' ~
+        'oro.email.action.processing'|trans ~
+        '&nbsp;<span style="width:10px;display:inline-block;text-align:left" class="dots">.</span>'
+    %}
+    <div class="btn-group">
+        <a type="button" class="btn sync-btn icons-holder-text no-hash" href="{{ path('oro_email_user_sync_emails') }}">
+            {{ actionSync|raw }}
+        </a>
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/mediator', 'oroui/js/messenger'],
+                function($, mediator, messenger) {
+                    var buttonSyncSelector = 'a[type=button].sync-btn:enabled';
+                    var _sync = function (e) {
+                        e.preventDefault();
+                        var button = $(e.currentTarget);
+                        if (button.attr('disabled')) {
+                            return;
+                        }
+
+                        var loader;
+                        var dotsLoader = function () {
+                            var dots = button.find('span.dots');
+                            if(dots.html() == '....'){
+                                dots.html('.');
+                            }
+                            else{
+                                dots.html(dots.html() + '.');
+                            }
+                        };
+
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'json',
+                            url: e.currentTarget.href,
+                            beforeSend: function () {
+                                button.html('{{ actionProcessing|raw }}');
+                                button.attr('disabled', 'disabled');
+                                messenger.notificationFlashMessage(
+                                    'info',
+                                    {{ 'Email sync started, please wait...'|trans|json_encode|raw }}
+                                );
+
+                                loader = setInterval(function() { dotsLoader() }, 500);
+                            },
+                            success: function () {
+                                clearInterval(loader);
+
+                                button.html('{{ actionSync|raw }}');
+                                button.removeAttr('disabled');
                                 mediator.trigger('datagrid:doReset:{{ gridName }}');
-                                //$(this).enable();
-                            });
-                        });
+
+                                messenger.notificationFlashMessage(
+                                    'success',
+                                    {{ 'Email sync completed.'|trans|json_encode|raw }}
+                                );
+                            },
+                            error: function () {
+                                clearInterval(loader);
+
+                                button.html('{{ actionSync|raw }}');
+                                button.removeAttr('disabled');
+
+                                messenger.notificationFlashMessage(
+                                    'error',
+                                    {{ 'Email sync failed.'|trans|json_encode|raw }}
+                                );
+
+                            }
+                        })
+                    };
+
+                    $(buttonSyncSelector).on('click.syncEmails', _sync);
+                    mediator.once('page:beforeChange', function () {
+                        $(buttonSyncSelector).off('click.syncEmails', _sync);
                     });
-            </script>
-        </div>
+                });
+        </script>
+    </div>
 {% endblock %}
 
 {% block breadcrumb %}

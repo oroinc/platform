@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
 
+use FOS\RestBundle\Util\Codes;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -305,7 +306,8 @@ class EmailController extends Controller
                     $this->get('oro_security.security_facade')->getLoggedUserId()
                 )
             );
-        return new JsonResponse('ok');
+
+        return new JsonResponse([], Codes::HTTP_OK);
     }
 
     /**

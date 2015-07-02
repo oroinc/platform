@@ -204,9 +204,10 @@ oro:
             owner.label:              Owner
             received_at.label:        Received At
             seen.label:               Seen
-        sync:
-          label: Sync emails
-          processing: Processing
+
+        action:
+            sync: Sync emails
+            processing: Processing
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
