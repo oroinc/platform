@@ -31,11 +31,6 @@ class EmailManager
     protected $em;
 
     /**
-     * @var EmailFlagManager
-     */
-    protected $emailFlagManager;
-
-    /**
      * @var SecurityContext
      */
     protected $securityContext;
@@ -46,20 +41,17 @@ class EmailManager
      * @param EntityManager       $em                  - Entity Manager
      * @param EmailThreadManager  $emailThreadManager  - Email Thread Manager
      * @param EmailThreadProvider $emailThreadProvider - Email Thread Provider
-     * @param EmailFlagManager    $emailFlagManager    - Email Flag Manager
      * @param SecurityContext     $securityContext     - Security Context
      */
     public function __construct(
         EntityManager $em,
         EmailThreadManager $emailThreadManager,
         EmailThreadProvider $emailThreadProvider,
-        EmailFlagManager $emailFlagManager,
         SecurityContext $securityContext
     ) {
         $this->em = $em;
         $this->emailThreadManager = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
-        $this->emailFlagManager = $emailFlagManager;
         $this->securityContext = $securityContext;
     }
 
@@ -75,7 +67,6 @@ class EmailManager
     public function setEmailUserSeen(EmailUser $entity, $value = true, $flush = false)
     {
         if ($entity->isSeen() !== $value) {
-//            $this->emailFlagManager->changeStatusSeen($entity, $value);
             $entity->setSeen($value);
             if ($flush) {
                 $this->em->flush();

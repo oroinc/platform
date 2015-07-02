@@ -489,7 +489,6 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.email.thread.manager
             - @oro_email.email.thread.provider
-            - @oro_email.email.flag.manager
             - @security.context
 
     oro_email.twig.extension.email:
