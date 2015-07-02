@@ -11,7 +11,7 @@ define(function(require) {
             states: null,
             index: -1
         },
-        initialize: function (options) {
+        initialize: function () {
             this.set('states', new WorkflowHistoryStateCollection());
             this.set('index', -1);
         },
@@ -27,7 +27,7 @@ define(function(require) {
             states.add(state);
             this.set('index', states.length - 1);
         },
-        popState: function () {
+        getCurrentState: function () {
             return this.get('states').at(this.get('index'));
         },
         back: function () {

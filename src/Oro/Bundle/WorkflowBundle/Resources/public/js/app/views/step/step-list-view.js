@@ -63,7 +63,6 @@ define(function (require) {
             this.getCollection().sort();
             this.resetView();
             this.addAllItems(this.getCollection());
-
             return this;
         }
     });

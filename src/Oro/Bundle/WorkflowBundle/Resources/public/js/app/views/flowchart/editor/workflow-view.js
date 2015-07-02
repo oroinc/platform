@@ -13,8 +13,6 @@ define(function (require) {
     FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
 
         autoRender: true,
-        noWrap: true,
-        container: '.workflow-flowchart',
         isConnected: false,
 
         transitionOverlayView: FlowChartEditorTransitionOverlayView,

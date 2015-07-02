@@ -1,5 +1,5 @@
 /* global define */
-/** @exports WorkflowViewerComponent */
+/** @exports WorkflowHistoryComponent */
 define(function (require) {
     'use strict';
 
@@ -25,11 +25,13 @@ define(function (require) {
             var onWorkflowChange = _.debounce(_.bind(this.onWorkflowChange, this), 50);
             this.workflow = options.workflow;
             this.history = new WorkflowHistoryModel();
-            new WorkflowHistoryView({
-                model: this.history
+            this.workflowHistoryView = new WorkflowHistoryView({
+                model: this.history,
+                el: options._sourceElement
             });
             this.listenTo(options.workflow.get('steps'), 'change add remove', onWorkflowChange);
             this.listenTo(options.workflow.get('transitions'), 'change add remove', onWorkflowChange);
+            this.listenTo(this.history, 'change:index', this.updateWorkflow);
         },
 
         onWorkflowChange: function () {
@@ -40,17 +42,8 @@ define(function (require) {
             this.history.pushState(state);
         },
 
-        undo: function () {
-            if (this.history.back() === true) {
-                this.updateWorkflow(this.history.popState());
-            }
-        },
-        redo: function () {
-            if (this.history.forward() === true) {
-                this.updateWorkflow(this.history.popState());
-            }
-        },
         updateWorkflow: function (state) {
+            var state = this.history.getCurrentState();
             this.workflow.get('steps').reset(state.get('steps'));
             this.workflow.get('transitions').reset(state.get('transitions'));
         }

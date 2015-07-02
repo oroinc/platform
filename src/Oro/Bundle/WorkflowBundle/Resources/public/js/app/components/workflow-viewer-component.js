@@ -43,11 +43,13 @@ define(function (require) {
             flowchartTools.checkPositions(this.model);
             flowchartOptions = _.extend(flowchartOptions, {
                 model: this.model,
+                el: $el.find('.workflow-flowchart'),
                 flowchartState: this.flowchartState
             });
             this.flowchartView = new this.FlowchartWorkflowView(flowchartOptions);
             this.flowchartControlView = new FlowchartControlView({
-                model: this.flowchartState
+                model: this.flowchartState,
+                el: $el.find('.workflow-flowchart-controls')
             });
         }
 
