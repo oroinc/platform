@@ -147,6 +147,10 @@ class WidgetConfigs
 
         $items = isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [];
 
+        $applyVisible = $this->shouldVisibleItemsBeChecked($widgetConfig);
+        $visibleItems = $widgetOptions->get('subWidgets') ?: [];
+        $items = $this->filterWidgets($items, $applyVisible, $visibleItems);
+
         foreach ($items as $itemName => $config) {
             $items[$itemName]['value'] = $this->resolver->resolve(
                 [$config['data_provider']],
@@ -155,6 +159,20 @@ class WidgetConfigs
         }
 
         return $items;
+    }
+
+    /**
+     * @param array $widgetConfig
+     *
+     * @return boolean
+     */
+    private function shouldVisibleItemsBeChecked(array $widgetConfig = [])
+    {
+        if (!isset($widgetConfig['configuration'], $widgetConfig['configuration']['subWidgets'])) {
+            return false;
+        }
+
+        return $widgetConfig['configuration']['subWidgets']['type'] === 'oro_type_widget_items_choice';
     }
 
     /**
