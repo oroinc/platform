@@ -16,7 +16,7 @@ parameters:
     oro_email.email_body_loader_selector.class:   Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
     oro_email.manager.email.api.class:            Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager
-    oro_email.manager.email_search.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailSearchApiEntityManager
+    oro_email.manager.email_activity_search.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
     oro_email.entity.cache.clearer.class:         Oro\Bundle\EmailBundle\Cache\EntityCacheClearer
     oro_email.direct_mailer.class:                Oro\Bundle\EmailBundle\Mailer\DirectMailer
@@ -560,10 +560,6 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
 
-    oro_email.manager.activity_search.api:
-        class: %oro_email.manager.email_search.api.class%
-        parent: oro_soap.manager.entity_manager.abstract
-        arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @oro_search.index
+    oro_email.manager.email_activity_search.api:
+        class: %oro_email.manager.email_activity_search.api.class%
+        parent: oro_activity.manager.activity_search.api

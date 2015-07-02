@@ -11,22 +11,26 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailSearchApiEntityManager;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
-
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 /**
  * @RouteResource("email_search_relation")
  * @NamePrefix("oro_api_")
  */
-class EmailSearchController extends RestGetController
+class EmailActivitySearchController extends RestGetController
 {
-    const ACTIVITY_EMAILS = 'emails';
+    /**
+     * The type of the emails activity entity.
+     *
+     * @see Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivitySearchController::cgetAction
+     */
+    const EMAILS_ACTIVITY_TYPE = 'emails';
 
     /**
-     * Searches entities associated with the specified type of an activity entity.
+     * Searches entities associated with the emails activity type.
      *
      * @Get("/activities/emails/relations/search", name="")
      *
@@ -46,17 +50,17 @@ class EmailSearchController extends RestGetController
      *      name="from",
      *      requirements=".+",
      *      nullable=true,
-     *      description="The entity alias. One or several aliases separated by comma. Defaults to all entities"
+     *      description="The entity alias. One or several aliases separated by comma. Defaults to all entities."
      * )
      * @QueryParam(
      *      name="email",
      *      requirements=".+",
      *      nullable=true,
-     *      description="An email address. Defaults to all emails"
+     *      description="An email address. Defaults to all emails."
      * )
      *
      * @ApiDoc(
-     *      description="Searches entities associated with the specified type of an activity entity",
+     *      description="Searches entities associated with the emails activity type.",
      *      resource=true
      * )
      * @return Response
@@ -64,7 +68,7 @@ class EmailSearchController extends RestGetController
     public function cgetAction()
     {
         $manager = $this->getManager();
-        $manager->setClass($manager->resolveEntityClass(self::ACTIVITY_EMAILS, true));
+        $manager->setClass($manager->resolveEntityClass(self::EMAILS_ACTIVITY_TYPE, true));
 
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
@@ -80,23 +84,22 @@ class EmailSearchController extends RestGetController
         if ($email) {
             /** @var EmailAddressHelper $emailAddressHelper */
             $emailAddressHelper = $this->container->get('oro_email.email.address.helper');
-            $pureEmailAddress = $emailAddressHelper->extractPureEmailAddress($email);
+            $pureEmailAddress   = $emailAddressHelper->extractPureEmailAddress($email);
             if ($pureEmailAddress) {
                 $filters['email'] = $pureEmailAddress;
             }
         }
 
-        //$filters
         return $this->handleGetListRequest($page, $limit, $filters);
     }
 
     /**
      * Gets the API entity manager
      *
-     * @return EmailSearchApiEntityManager
+     * @return EmailActivitySearchApiEntityManager
      */
     public function getManager()
     {
-        return $this->container->get('oro_email.manager.activity_search.api');
+        return $this->container->get('oro_email.manager.email_activity_search.api');
     }
 }
