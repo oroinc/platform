@@ -4,6 +4,9 @@ namespace Oro\Bundle\SoapBundle\Request\Parameters\Filter;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
+/**
+ * @deprecated since 1.9. Use EntityClassParameterFilter instead
+ */
 class HttpEntityNameParameterFilter implements ParameterFilterInterface
 {
     /** @var EntityRoutingHelper */
