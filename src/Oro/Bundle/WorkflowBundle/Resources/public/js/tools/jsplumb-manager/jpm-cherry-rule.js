@@ -25,7 +25,7 @@ define(function (require) {
                     if(this.items[0].x > this.items[1].x) {
                         this.items.reverse();
                     }
-                    if(this.items[0].calculateTree() < this.items[1].calculateTree()) {
+                    if(this.items[0].getAllChildrenCount() < this.items[1].getAllChildrenCount()) {
                         changed = true;
                         context.swap(this.items[0], this.items[1]);
                         this.items.reverse();

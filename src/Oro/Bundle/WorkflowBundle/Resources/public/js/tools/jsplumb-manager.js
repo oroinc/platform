@@ -51,8 +51,8 @@ define(function (require) {
             'left': [0, 0.5, -1, 0],
             'right': [1, 0.5, 1, 0]
         },
-        JsPlumbManager = function (jsplumb, workflow) {
-            this.jp = jsplumb;
+        JsPlumbManager = function (jsPlumbInstance, workflow) {
+            this.jsPlumbInstance = jsPlumbInstance;
             this.workflow = workflow;
             this.loopback = {};
             this.loopbackAnchorPreset = [
@@ -75,15 +75,10 @@ define(function (require) {
                     return !item.get('position');
                 }),
                 matrix = new Matrix({
-                    workflow: this.workflow,
-                    xPadding: this.xPadding,
-                    yPadding: this.xPadding,
-                    xIncrement: this.xIncrement,
-                    yIncrement: this.yIncrement
+                    workflow: this.workflow
                 });
 
-            var cells = [],
-                rules = [
+            var ruleTypes = [
                     HideStartRule,
                     CascadeRule,
                     PyramidRule,
@@ -91,14 +86,10 @@ define(function (require) {
                     CherryRule
                 ],
                 transforms = [];
-            matrix.forEachCell(function(item){
-                cells.push(item);
-            });
-
-            _.each(cells, function (item) {
-                _.find(rules, function (type) {
-                    var rule = new type(matrix);
-                    if (rule.match(item)) {
+            matrix.forEachCell(function (cell) {
+                _.find(ruleTypes, function (RuleType) {
+                    var rule = new RuleType(matrix);
+                    if (rule.match(cell)) {
                         transforms.push(rule);
                         return true;
                     }
@@ -112,7 +103,12 @@ define(function (require) {
                 rule.apply();
 
             });
-            matrix.align().show();
+            matrix.align().forEachCell( _.bind(function(cell){
+                cell.step.set('position', [
+                    this.xIncrement * cell.x + this.xPadding,
+                    this.yIncrement * cell.y + this.yPadding
+                ]);
+            }, this));
         },
 
         getPositionForNew: function () {
@@ -167,7 +163,7 @@ define(function (require) {
             var that = this,
                 segs = conn.connector.getAbsSegments(conn),
                 collection = [];
-            _.each(that.jp.getConnections(), function (c) {
+            _.each(that.jsPlumbInstance.getConnections(), function (c) {
                 if(c !== conn && _.isArray(c.endpoints) && c.endpoints.length === 2) {
                     _.each(c.connector.getAbsSegments(c), function (s1) {
                         _.each(segs, function (s2) {
@@ -202,7 +198,7 @@ define(function (require) {
             var that = this;
             that.loopback = {};
             that.anchors = {};
-             _.each(that.jp.getConnections(), function (conn) {
+             _.each(that.jsPlumbInstance.getConnections(), function (conn) {
                 var anchors, se, te;
                 if(_.isArray(conn.endpoints) && conn.endpoints.length === 2) {
                     se = conn.endpoints[0];
@@ -214,7 +210,7 @@ define(function (require) {
                 }
             });
             console.groupCollapsed('Intersections');
-            _.each(that.jp.getConnections(), function (conn) {
+            _.each(that.jsPlumbInstance.getConnections(), function (conn) {
                 var is = that.getIntersections(conn),
                     msg = 'Connection "' + conn.overlayView.model.get('label') + '" has ' + (is.length ? is.length : 'not.');
                 if(is.length) {

@@ -4,7 +4,7 @@ define(function (require) {
         Rule = require('./jpm-base-rule'),
         PyramidRule = Rule.extend({
             name: 'Pyramid',
-            prio: 20,
+            priority: 20,
             match: function(cell) {
                 var a, b, c, temp, children = _.filter(cell.children, function(child) {
                     return child.y == cell.y + 1 || child.y == cell.y + 2;
@@ -12,7 +12,6 @@ define(function (require) {
                 children.sort(function(a, b) {
                     return a.x - b.x;
                 });
-
 
                 if(children.length == 3) {
                     this.items = [];

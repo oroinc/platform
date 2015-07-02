@@ -1,7 +1,6 @@
 define(function (require) {
     'use strict';
-    var _ = require('underscore'),
-        Rule = require('./jpm-base-rule'),
+    var Rule = require('./jpm-base-rule'),
         HideStartRule = Rule.extend({
             name: 'HideStart',
             match: function (cell) {

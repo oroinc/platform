@@ -1,11 +1,10 @@
 config:
     shim:
-        'jsplumb.smartline':
+        'bundles/oroworkflow/js/tools/jsplumb-smartline.js':
             deps:
               - 'jsplumb'
     paths:
         'jsplumb':                                                  'bundles/components/jsplumb/dom.jsPlumb.js'
-        'jsplumb.smartline':                                        'bundles/oroworkflow/js/tools/jsplumb-smartline.js'
         'oroworkflow/js/transition-handler':                        'bundles/oroworkflow/js/transition-handler.js'
         'oroworkflow/js/save-and-transit-handler':                  'bundles/oroworkflow/js/save-and-transit-handler.js'
         'oroworkflow/js/transition-executor':                       'bundles/oroworkflow/js/transition-executor.js'

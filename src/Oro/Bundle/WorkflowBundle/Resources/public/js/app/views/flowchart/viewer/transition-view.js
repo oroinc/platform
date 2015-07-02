@@ -136,7 +136,7 @@ define(function (require) {
                 areaView = this.areaView,
                 endEl = this.findElByStep(endStep),
                 startEl = this.findElByStep(startStep),
-                anchors = this.areaView.jpm.getAnchors(startEl, endEl),
+                anchors = this.areaView.jsPlumbManager.getAnchors(startEl, endEl),
                 parameters = {
                     source: startEl,
                     target: endEl,

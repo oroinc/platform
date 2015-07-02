@@ -1,7 +1,5 @@
 define(['jsplumb', 'underscore'], function (_jp, _) {
     "use strict";
-    var root = this;
-
     var Smartline = function (params) {
         this.type = "Smartline";
         params = params || {};

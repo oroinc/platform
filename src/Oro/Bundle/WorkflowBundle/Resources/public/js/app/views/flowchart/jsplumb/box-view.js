@@ -33,7 +33,7 @@ define(function (require) {
             if (this.model.get('position')) {
                 this.refreshPosition();
             } else {
-                this.model.set('position', this.areaView.jpm.getPositionForNew());
+                this.model.set('position', this.areaView.jsPlumbManager.getPositionForNew());
             }
         },
 

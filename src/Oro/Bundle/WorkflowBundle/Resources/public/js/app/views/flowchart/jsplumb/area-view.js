@@ -1,19 +1,19 @@
 define(function (require) {
     'use strict';
-    var $ = require('jquery'),
+    var FlowchartJsPlubmAreaView,
+        $ = require('jquery'),
         _ = require('underscore'),
         jsPlumb = require('jsplumb'),
-        Smartline = require('jsplumb.smartline'),
         JPManager = require('../../../../tools/jsplumb-manager'),
-        FlowchartJsPlubmBaseView = require('./base-view'),
-        FlowchartJsPlubmAreaView;
+        FlowchartJsPlubmBaseView = require('./base-view');
+    require('../../../../tools/jsplumb-smartline');
 
     FlowchartJsPlubmAreaView = FlowchartJsPlubmBaseView.extend({
 
         /**
          * @type {JsPlumbManager}
          */
-        jpm: null,
+        jsPlumbManager: null,
 
         jsPlumbInstance: null,
 
@@ -49,15 +49,14 @@ define(function (require) {
             var options = $.extend(true, {}, _.result(this, 'defaults'));
             options.Container = this.id();
             this.jsPlumbInstance = jsPlumb.getInstance(options);
-            this.jpm = new JPManager(this.jsPlumbInstance, this.model);
-            this.jpm.organizeBlocks();
-            this.recalculateConnections();
+            this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
+            this.jsPlumbManager.organizeBlocks();
+            // wait a bit while flowchart renders
+            _.delay(_.bind(this.recalculateConnections, this), 100);
         },
 
         recalculateConnections: function () {
-            _.delay(function (jpm) {
-                jpm.recalculateConnections();
-            }, 100, this.jpm);
+            this.jsPlumbManager.recalculateConnections();
         }
     });
 
