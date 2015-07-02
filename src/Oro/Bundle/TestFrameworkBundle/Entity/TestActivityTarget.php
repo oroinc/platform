@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivityTarget;
 /**
  * @ORM\Table(name="test_activity_target")
  * @ORM\Entity
- * @Config(defaultValues={"entity"={}})
+ * @Config
  */
 class TestActivityTarget extends ExtendTestActivityTarget implements TestFrameworkEntityInterface
 {
