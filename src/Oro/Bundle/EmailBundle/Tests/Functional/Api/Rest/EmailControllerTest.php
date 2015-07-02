@@ -51,13 +51,13 @@ class EmailControllerTest extends WebTestCase
         $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId']);
-        $this->assertCount(10, $this->getJsonResponseContent($this->client->getResponse(), 200));
+        $this->assertCount(9, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
         $this->assertCount(2, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
-        $this->assertCount(10, $this->getJsonResponseContent($this->client->getResponse(), 200));
+        $this->assertCount(8, $this->getJsonResponseContent($this->client->getResponse(), 200));
     }
 
     public function testGet()
