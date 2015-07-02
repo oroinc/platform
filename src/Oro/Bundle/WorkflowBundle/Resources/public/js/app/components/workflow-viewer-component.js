@@ -9,8 +9,7 @@ define(function (require) {
         workflowModelFactory = require('../../tools/workflow-model-factory'),
         FlowchartViewerWorkflowView = require('../views/flowchart/viewer/workflow-view'),
         FlowchartControlView = require('../views/flowchart/viewer/flowchart-control-view'),
-        FlowchartStateModel = require('../models/flowchart-state-model'),
-        flowchartTools = require('oroworkflow/js/tools/flowchart-tools');
+        FlowchartStateModel = require('../models/flowchart-state-model');
 
     /**
      * Builds workflow editor UI.
@@ -40,7 +39,6 @@ define(function (require) {
          *  contain connectionOptions and chartOptions properties
          */
         initViews: function ($el, flowchartOptions) {
-            flowchartTools.checkPositions(this.model);
             flowchartOptions = _.extend(flowchartOptions, {
                 model: this.model,
                 el: $el.find('.workflow-flowchart'),

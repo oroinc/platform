@@ -61,10 +61,10 @@ define(function (require) {
                 [[1, 0.5, 1, 0],[0.5, 0, 0, -1]],
                 [[0.5, 1, 0, 1],[0, 0.5, -1, 0]]
             ];
-            this.xPadding = 60;
+            this.xPadding = 80;
             this.yPadding = 15;
-            this.xIncrement = 240;
-            this.yIncrement = 130;
+            this.xIncrement = 200;
+            this.yIncrement = 100;
             this.stepForNew = 10;
         };
 

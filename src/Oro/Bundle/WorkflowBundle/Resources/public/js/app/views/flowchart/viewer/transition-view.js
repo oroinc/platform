@@ -127,6 +127,7 @@ define(function (require) {
 
         createConnection: function (startStep, endStep) {
             var jsplumbConnection,
+                overlayView,
                 transitionModel = this.model,
                 areaView = this.areaView,
                 overlayIsVisible = areaView.flowchartState.get('transitionLabelsVisible'),
@@ -144,8 +145,7 @@ define(function (require) {
                         ['Custom', {
                             id: 'overlay',
                             create: _.bind(function (connection) {
-                                var overlayView,
-                                    overlay = connection.getOverlay('overlay');
+                                var overlay = connection.getOverlay('overlay');
                                 connection.overlayView = overlayView = new this.transitionOverlayView({
                                     model: transitionModel,
                                     overlay: overlay,
