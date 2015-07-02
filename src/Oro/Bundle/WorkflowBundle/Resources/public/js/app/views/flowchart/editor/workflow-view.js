@@ -52,7 +52,7 @@ define(function (require) {
             if (data.connection.suspendedElement && !stepTo.get('_is_start')) {
                 transitionModel = data.connection.overlayView.model;
                 transitionName = transitionModel.get('name');
-                startingSteps = this.stepCollection.filter(function (item) {
+                startingSteps = this.model.get('steps').filter(function (item) {
                     return item.get('allowed_transitions').indexOf(transitionName) !== -1;
                 });
                 if (stepTo.get('name') !== transitionModel.get('step_to')) {

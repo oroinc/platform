@@ -40,6 +40,7 @@ define(function (require) {
         },
 
         addAllItems: function(collection) {
+            this.resetView();
             collection.each(_.bind(this.addItem, this));
         },
 
@@ -61,7 +62,6 @@ define(function (require) {
 
         render: function() {
             this.getCollection().sort();
-            this.resetView();
             this.addAllItems(this.getCollection());
             return this;
         }

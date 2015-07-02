@@ -5,8 +5,8 @@ define(function (require) {
 
     var WorkflowHistoryComponent,
         BaseComponent = require('oroui/js/app/components/base/component'),
+        StatefulModel = require('oroui/js/app/models/base/stateful-model'),
         WorkflowHistoryView = require('../views/workflow-history-view'),
-        WorkflowHistoryStateModel = require('../models/workflow-history-state-model'),
         WorkflowHistoryModel = require('../models/workflow-history-model');
 
     /**
@@ -23,6 +23,9 @@ define(function (require) {
          */
         initialize: function (options) {
             var onWorkflowChange = _.debounce(_.bind(this.onWorkflowChange, this), 50);
+            if (options.workflow instanceof StatefulModel === false) {
+                throw new Error('State object should be instance of Backbone.Model');
+            }
             this.workflow = options.workflow;
             this.history = new WorkflowHistoryModel();
             this.workflowHistoryView = new WorkflowHistoryView({
@@ -35,17 +38,12 @@ define(function (require) {
         },
 
         onWorkflowChange: function () {
-            var state = new WorkflowHistoryStateModel({
-                steps: this.workflow.get('steps').toJSON(),
-                transitions: this.workflow.get('transitions').toJSON()
-            });
-            this.history.pushState(state);
+            this.history.pushState(this.workflow.getState());
         },
 
-        updateWorkflow: function (state) {
+        updateWorkflow: function () {
             var state = this.history.getCurrentState();
-            this.workflow.get('steps').reset(state.get('steps'));
-            this.workflow.get('transitions').reset(state.get('transitions'));
+            this.workflow.setState(state);
         }
 
     });

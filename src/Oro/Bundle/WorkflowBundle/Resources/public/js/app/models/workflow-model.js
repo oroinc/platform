@@ -5,7 +5,7 @@ define(function(require) {
     var WorkflowModel,
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
-        BaseModel = require('oroui/js/app/models/base/model'),
+        StatefulModel = require('oroui/js/app/models/base/stateful-model'),
         helper = require('oroworkflow/js/tools/workflow-helper'),
         StepCollection = require('./step-collection'),
         TransitionCollection = require('./transition-collection'),
@@ -17,7 +17,7 @@ define(function(require) {
         AttributeModel = require('./attribute-model'),
         EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
-    WorkflowModel = BaseModel.extend({
+    WorkflowModel = StatefulModel.extend({
         defaults: {
             name: '',
             label: '',
@@ -219,6 +219,22 @@ define(function(require) {
 
         _getByName: function(item, name) {
             return _.first(this.get(item).where({'name': name}));
+        },
+
+        getState: function () {
+            return new Backbone.Model({
+                steps: this.get('steps').toJSON(),
+                transitions: this.get('transitions').toJSON()
+            })
+        },
+        setState: function (state) {
+            WorkflowModel.__super__.setState.apply(this,arguments);
+            var steps = state.get('steps'),
+                transitions = state.get('transitions');
+            if (steps && transitions) {
+                this.get('steps').reset(steps);
+                this.get('transitions').reset(transitions);
+            }
         }
     });
 
