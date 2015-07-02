@@ -2,8 +2,9 @@
 /*global define*/
 define([
     'underscore',
-    'backgrid'
-], function (_, Backgrid) {
+    'backgrid',
+    'orodatagrid/js/datagrid/editor/select-cell-radio-editor'
+], function (_, Backgrid, SelectCellRadioEditor) {
     'use strict';
 
     var SelectCell;
@@ -20,6 +21,10 @@ define([
          * @inheritDoc
          */
         initialize: function (options) {
+            if (this.expanded && !this.multiple) {
+                this.editor = SelectCellRadioEditor
+            }
+
             if (this.choices) {
                 this.optionValues = [];
                 _.each(this.choices, function (value, key) {
