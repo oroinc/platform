@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
+use Zend\Mail\Header\GenericHeader;
+use Zend\Mail\Headers;
+
 use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Oro\Bundle\ImapBundle\Mail\Storage\Value;
@@ -118,10 +121,10 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('Content-Disposition', false),
-                        array('Content-Type', true)
-                    )
+                    [
+                        ['Content-Disposition', false],
+                        ['Content-Type', true]
+                    ]
                 )
             );
 
@@ -184,10 +187,10 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('Content-Type', $contentType !== null),
-                        array('Content-Transfer-Encoding', $contentTransferEncoding !== null),
-                    )
+                    [
+                        ['Content-Type', $contentType !== null],
+                        ['Content-Transfer-Encoding', $contentTransferEncoding !== null],
+                    ]
                 )
             );
 
@@ -200,10 +203,10 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             ->method('getHeader')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('Content-Type', null, $contentTypeHeader),
-                        array('Content-Transfer-Encoding', null, $contentTransferEncodingHeader),
-                    )
+                    [
+                        ['Content-Type', null, $contentTypeHeader],
+                        ['Content-Transfer-Encoding', null, $contentTransferEncodingHeader],
+                    ]
                 )
             );
         $this->part->expects($this->once())
@@ -216,81 +219,149 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($decodedValue, $result->getDecodedContent());
     }
 
+    /**
+     * @dataProvider getEmbeddedContentIdProvider
+     * @param $rawHeaders
+     * @param $expected
+     */
+    public function testGetEmbeddedContentId($rawHeaders, $expected)
+    {
+        $headers = Headers::fromString(implode(PHP_EOL, $rawHeaders), PHP_EOL);
+
+        $contentIdHeader = null;
+        $contentDispositionHeader = null;
+        if (isset($rawHeaders['Content-ID'])) {
+            $contentIdHeader = GenericHeader::fromString($rawHeaders['Content-ID']);
+        }
+        if (isset($rawHeaders['Content-Disposition'])) {
+            $contentDispositionHeader = GenericHeader::fromString($rawHeaders['Content-Disposition']);
+        }
+
+        $this->part
+            ->expects($this->any())
+            ->method('getHeader')
+            ->willReturnMap(
+                [
+                    ['Content-ID', null, $contentIdHeader],
+                    ['Content-Disposition', null, $contentDispositionHeader]
+                ]
+            );
+
+        $this->part
+            ->expects($this->any())
+            ->method('getHeaders')
+            ->willReturn($headers);
+
+        $this->assertEquals($expected, $this->attachment->getEmbeddedContentId());
+    }
+
+    public static function getEmbeddedContentIdProvider()
+    {
+        return [
+            'embedded content_id from Content-ID Header' => [
+                'raw_headers' => [
+                    'Content-ID' => sprintf('Content-ID: <%s>', 'test_content_id')
+                ],
+                'content_id' => 'test_content_id'
+            ],
+            'embedded content_id from Content-ID Header having Content-Disposition inline header' => [
+                'raw_headers' => [
+                    'Content-ID' => sprintf('Content-ID: <%s>', 'test_content_id'),
+                    'Content-Disposition' => 'Content-Disposition: inline'
+                ],
+                'content_id' => 'test_content_id'
+            ],
+            'embedded content_id will be null[no Content-ID]' => [
+                'raw_headers' => [
+                    'Content-Type' => 'Content-Type: image/png; name="test.png"'
+                ],
+                'content_id' => null
+            ],
+            'embedded content_id will be null[no Content-Disposition not inline]' => [
+                'raw_headers' => [
+                    'Content-ID' => sprintf('Content-ID: <%s>', 'test_content_id'),
+                    'Content-Disposition' => 'Content-Disposition: attachment'
+                ],
+                'content_id' => null
+            ],
+        ];
+    }
+
     public static function getContentProvider()
     {
-        return array(
-            '7bit' => array(
+        return [
+            '7bit' => [
                 '7Bit',
                 'SomeContentType',
                 'ISO-8859-1',
                 'A value',
                 new Content('A value', 'SomeContentType', '7Bit', 'ISO-8859-1'),
                 'A value'
-            ),
-            '8bit' => array(
+            ],
+            '8bit' => [
                 '8Bit',
                 'SomeContentType',
                 'ISO-8859-1',
                 'A value',
                 new Content('A value', 'SomeContentType', '8Bit', 'ISO-8859-1'),
                 'A value'
-            ),
-            'binary' => array(
+            ],
+            'binary' => [
                 'Binary',
                 'SomeContentType',
                 'ISO-8859-1',
                 'A value',
                 new Content('A value', 'SomeContentType', 'Binary', 'ISO-8859-1'),
                 'A value'
-            ),
-            'base64' => array(
+            ],
+            'base64' => [
                 'Base64',
                 'SomeContentType',
                 'ISO-8859-1',
                 base64_encode('A value'),
                 new Content(base64_encode('A value'), 'SomeContentType', 'Base64', 'ISO-8859-1'),
                 'A value'
-            ),
-            'quoted-printable' => array(
+            ],
+            'quoted-printable' => [
                 'Quoted-Printable',
                 'SomeContentType',
                 'ISO-8859-1',
                 quoted_printable_encode('A value='), // = symbol is added to test the 'quoted printable' decoding
                 new Content(quoted_printable_encode('A value='), 'SomeContentType', 'Quoted-Printable', 'ISO-8859-1'),
                 'A value='
-            ),
-            'Unknown' => array(
+            ],
+            'Unknown' => [
                 'Unknown',
                 'SomeContentType',
                 'ISO-8859-1',
                 'A value',
                 new Content('A value', 'SomeContentType', 'Unknown', 'ISO-8859-1'),
                 'A value'
-            ),
-            'no charset' => array(
+            ],
+            'no charset' => [
                 '8Bit',
                 'SomeContentType',
                 null,
                 'A value',
                 new Content('A value', 'SomeContentType', '8Bit', 'ASCII'),
                 'A value'
-            ),
-            'no Content-Type' => array(
+            ],
+            'no Content-Type' => [
                 '8Bit',
                 null,
                 null,
                 'A value',
                 new Content('A value', 'text/plain', '8Bit', 'ASCII'),
                 'A value'
-            ),
-            'no Content-Transfer-Encoding' => array(
+            ],
+            'no Content-Transfer-Encoding' => [
                 null,
                 'SomeContentType',
                 'ISO-8859-1',
                 'A value',
                 new Content('A value', 'SomeContentType', 'BINARY', 'ISO-8859-1'),
                 'A value'
-            ),
-        );
+            ],
+        ];
     }
 }
