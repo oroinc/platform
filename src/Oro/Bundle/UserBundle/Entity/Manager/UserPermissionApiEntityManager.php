@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-
+use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UserPermissionApiEntityManager extends ApiEntityManager
 {
@@ -23,97 +26,114 @@ class UserPermissionApiEntityManager extends ApiEntityManager
     /** @var AclExtensionSelector */
     protected $aclSelector;
 
-    /** @var UsernamePasswordOrganizationToken|null */
-    protected $tempToken;
-
-    /** @var  Organization */
-    protected $organization;
-
-    public function __construct(SecurityContext $securityContext, AclExtensionSelector $aclSelector)
-    {
+    /**
+     * @param string               $class
+     * @param ObjectManager        $om
+     * @param SecurityContext      $securityContext
+     * @param AclExtensionSelector $aclSelector
+     */
+    public function __construct(
+        $class,
+        ObjectManager $om,
+        SecurityContext $securityContext,
+        AclExtensionSelector $aclSelector
+    ) {
+        parent::__construct($class, $om);
         $this->aclSelector     = $aclSelector;
         $this->securityContext = $securityContext;
-        $this->tempToken       = $securityContext->getToken();
-        $this->organization    = $this->tempToken->getOrganizationContext();
     }
 
     /**
-     * Gets permissions for user $user
+     * Gets permissions of the given user
      *
-     * @param User  $user
-     * @param array $entities
+     * @param User          $user
+     * @param Criteria|null $filters
      *
      * @return array
-     *
-     * @throws InvalidDomainObjectException
      */
-    public function getData(User $user, array $entities = [])
+    public function getUserPermissions(User $user, Criteria $filters = null)
     {
-        foreach ($entities as $key => $entity) {
-            $entity[$key] = $this->resolveEntityClass($entity);
+        $entityAclExtension = $this->aclSelector->select($user);
+
+        $resources = array_map(
+            function (AclClassInfo $class) use ($entityAclExtension) {
+                return [
+                    'type'     => $entityAclExtension->getExtensionKey(),
+                    'resource' => $class->getClassName()
+                ];
+            },
+            $entityAclExtension->getClasses()
+        );
+        if ($filters) {
+            $collection = new ArrayCollection($resources);
+            $resources = $collection->matching($filters)->toArray();
         }
 
-        $extension   = $this->aclSelector->select($user);
-        $classes     = $extension->getClasses();
-        $permissions = $extension->getPermissions();
-
-        if (!empty($entities)) {
-            /** @var AclClassInfo[] $classes */
-            $classes = array_filter($classes, function (AclClassInfo $class) use ($entities) {
-                return in_array($class->getClassName(), $entities);
-            });
-        }
-
-        $this->setTokenForUser($user);
         $result = [];
-        foreach ($classes as $class) {
-            $data = [
-                'entity'      => $class->getClassName(),
-                'permissions' => []
-            ];
-            foreach ($permissions as $permission) {
-                $entity                           = 'entity:' . $class->getClassName();
-                if ($this->securityContext->isGranted($permission, $entity)) {
-                    $data['permissions'][] = $permission;
-                }
-            }
-            $result[] = $data;
-        }
+        $originalToken = $this->impersonateUser($user);
+        try {
+            foreach ($resources as $resource) {
+                $oid = new ObjectIdentity($resource['type'], $resource['resource']);
 
-        $this->resetToken();
+                $permissions = [];
+                foreach ($entityAclExtension->getAllowedPermissions($oid) as $permission) {
+                    if ($this->securityContext->isGranted($permission, $oid)) {
+                        $permissions[] = $permission;
+                    }
+                }
+
+                $result[] = array_merge($resource, ['permissions' => $permissions]);
+            }
+
+            $this->undoImpersonation($originalToken);
+        } catch (\Exception $e) {
+            $this->undoImpersonation($originalToken);
+            throw $e;
+        }
 
         return $result;
     }
 
     /**
-     * Sets token for user $user
+     * Switches the security context to the given user
      *
      * @param User $user
      *
+     * @return TokenInterface|null The previous security token
+     *
+     * @throws \UnexpectedValueException
      * @throws AccessDeniedException
      */
-    protected function setTokenForUser(User $user)
+    protected function impersonateUser(User $user)
     {
-        // Check if current user has access to $user in the same organization
-        if (!$user->hasOrganization($this->organization)) {
+        $currentToken = $this->securityContext->getToken();
+        if (!$currentToken instanceof OrganizationContextTokenInterface) {
+            throw new \UnexpectedValueException('The current security token must be aware of the organization.');
+        }
+
+        $organization = $currentToken->getOrganizationContext();
+
+        // check if new user has access to the current organization
+        if (!$user->hasOrganization($organization)) {
             throw new AccessDeniedException();
         }
 
-        $token = new UsernamePasswordOrganizationToken(
-            $user,
-            $user->getUsername(),
-            'main',
-            $this->organization,
-            $user->getRoles()
+        $this->securityContext->setToken(
+            new ImpersonationToken($user, $organization, $user->getRoles())
         );
-        $this->securityContext->setToken($token);
+
+        return $currentToken;
     }
 
     /**
-     * Resets token for current authorized user
+     * Switches the security context to the previous security token
+     *
+     * @param TokenInterface|null $originalToken
      */
-    protected function resetToken()
+    protected function undoImpersonation(TokenInterface $originalToken = null)
     {
-        $this->securityContext->setToken($this->tempToken);
+        if ($originalToken) {
+            $this->securityContext->setToken($originalToken);
+        }
     }
 }

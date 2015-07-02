@@ -17,12 +17,10 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Email;
-use Oro\Bundle\UserBundle\Entity\User;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
@@ -171,57 +169,13 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function getRolesAction($id)
     {
-        $entity = $this->getManager()->getRepository()->findOneBy(['id' => (int) $id]);
+        $entity = $this->getManager()->find($id);
 
         if (!$entity) {
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
         return $this->handleView($this->view($entity->getRoles(), Codes::HTTP_OK));
-    }
-
-
-    /**
-     * Get user permissions
-     *
-     * @param int $id User id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @ApiDoc(
-     *      description="Get user permissions",
-     *      resource=true,
-     *      requirements={
-     *          {"name"="id", "dataType"="integer"},
-     *      }
-     * )
-     * @QueryParam(
-     *      name="entities",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The entity class name. One or several classes names separated by comma.
-     * Defaults to all classes."
-     *)
-     * @AclAncestor("oro_user_permission_view")
-     */
-    public function getPermissionsAction($id)
-    {
-        /** @var User $user */
-        $user = $this->getManager()->getRepository()->findOneBy(['id' => (int) $id]);
-
-        if (!$user) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
-        $filter   = new StringToArrayParameterFilter();
-        $entities = $filter->filter($this->getRequest()->get('entities'), null);
-        if (!$entities) {
-            $entities = [];
-        }
-
-        $manager = $this->get('oro_user.permission_manager.api');
-        $result  = $manager->getData($user, $entities);
-
-        return $this->handleView($this->view($result, Codes::HTTP_OK));
     }
 
     /**

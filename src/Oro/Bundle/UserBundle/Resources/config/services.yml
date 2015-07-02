@@ -50,6 +50,8 @@ services:
         class: %oro_user.permission.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
+            - %oro_user.entity.class%
+            - @doctrine.orm.entity_manager
             - @security.context
             - @oro_security.acl.extension_selector
 

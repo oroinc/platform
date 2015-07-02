@@ -65,7 +65,7 @@ class RestPermissionsTest extends WebTestCase
                 'entities' => implode(
                     ',',
                     [
-                        'Oro\Bundle\UserBundle\Entity\User',
+                        'user',
                         'Oro\Bundle\OrganizationBundle\Entity\Organization'
                     ]
                 )
