@@ -47,7 +47,10 @@ class EmailUserRepository extends EntityRepository
         }
 
         if ($isSeen !== null) {
-            $qb->andWhere($qb->expr()->eq('eu.seen', $isSeen));
+            $qb->add(
+                'where',
+                $qb->expr()->andX($qb->expr()->eq('eu.seen', ':seen'))
+            )->setParameters(['seen' => (bool)$isSeen]);
         }
 
         return $qb->getQuery()->getResult();
@@ -136,7 +139,7 @@ class EmailUserRepository extends EntityRepository
         $queryBuilder->join('eu.email', 'e');
         $queryBuilder->join('e.thread', 't');
         $this->applyOwnerFilter($queryBuilder, $user);
-        $this->applyHeadFilter($queryBuilder, 0);
+        $this->applyHeadFilter($queryBuilder, false);
         $queryBuilder->andWhere($queryBuilder->expr()->in('t.id', $threadIds));
 
         return $queryBuilder;
@@ -184,10 +187,13 @@ class EmailUserRepository extends EntityRepository
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param int $isHead
+     * @param bool $isHead
      */
-    protected function applyHeadFilter(QueryBuilder $queryBuilder, $isHead = 1)
+    protected function applyHeadFilter(QueryBuilder $queryBuilder, $isHead = true)
     {
-        $queryBuilder->andWhere($queryBuilder->expr()->eq('e.head', $isHead));
+        $queryBuilder->add(
+            'where',
+            $queryBuilder->expr()->andX($queryBuilder->expr()->eq('e.head', ':head'))
+        )->setParameters(['head' => (bool)$isHead]);
     }
 }
