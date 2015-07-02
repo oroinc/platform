@@ -32,20 +32,39 @@ definitions:
                     @and:
                         - @not_empty: [$folder.origin]
                         - @equal: [$folder.origin.active, true]
+                        - @equal: [$seen, false]
                 actions:
                     - @format_string:
                         attribute: $.arguments
-                        string: '--seen=%seen% --ids=%id%'
+                        string: '--ids=%id%'
                         arguments:
                             id: $id
-                            seen: $seen
                     - @create_entity:
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
                         flush: true
                         arguments:
                             - 'oro:email:flag-sync'
-                            - [$.arguments]
+                            - ['--seen=false', $.arguments]
+            - @tree:
+                conditions:
+                    @and:
+                        - @not_empty: [$folder.origin]
+                        - @equal: [$folder.origin.active, true]
+                        - @equal: [$seen, true]
+                actions:
+                    - @format_string:
+                        attribute: $.arguments
+                        string: '--ids=%id%'
+                        arguments:
+                            id: $id
+                    - @create_entity:
+                        class: JMS\JobQueueBundle\Entity\Job
+                        attribute: $.syncJob
+                        flush: true
+                        arguments:
+                            - 'oro:email:flag-sync'
+                            - ['--seen=true', $.arguments]
 
 triggers:
     sync_email_body_after_email_synchronize:

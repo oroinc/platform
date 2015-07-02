@@ -28,7 +28,7 @@ class EmailFlagSyncCommand extends ContainerAwareCommand
                 self::SEEN,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'The seen status 1 or 0.'
+                'The seen status true or false.'
             )
             ->addOption(
                 self::IDS,
@@ -48,7 +48,7 @@ class EmailFlagSyncCommand extends ContainerAwareCommand
         /** @var EmailFlagManager $emailFlagManager */
         $emailFlagManager = $this->getContainer()->get('oro_email.email.flag.manager');
 
-        $seenStatus = $input->getOption('seen') === '1' ? 1 : 0;
+        $seenStatus = $input->getOption('seen') === 'true';
         $emailUserIds = $input->getOption('ids');
         foreach ($emailUserIds as $emailUserId) {
             $emailUser = $this->getContainer()->get('doctrine')
