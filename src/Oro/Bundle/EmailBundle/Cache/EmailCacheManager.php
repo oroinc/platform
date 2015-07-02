@@ -41,8 +41,8 @@ class EmailCacheManager implements LoggerAwareInterface
         EntityManager $em,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->selector        = $selector;
-        $this->em              = $em;
+        $this->selector = $selector;
+        $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
     }
 
