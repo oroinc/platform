@@ -13,7 +13,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /** @var LoggedUserVariablesProvider */
     protected $provider;
@@ -34,7 +34,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -45,7 +45,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new LoggedUserVariablesProvider(
             $translator,
             $this->securityFacade,
-            $this->nameFormatter,
+            $this->entityNameResolver,
             $this->configManager
         );
     }
@@ -186,8 +186,8 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getLoggedUser')
             ->will($this->returnValue($user));
 
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($this->identicalTo($user))
             ->will($this->returnValue('FullName'));
 

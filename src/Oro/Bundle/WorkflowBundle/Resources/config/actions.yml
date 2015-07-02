@@ -146,7 +146,7 @@ services:
         class: %oro_workflow.action.format_name.class%
         arguments:
             - @oro_workflow.context_accessor
-            - @oro_locale.formatter.name
+            - @oro_entity.entity_name_resolver
         tags:
             - { name: oro_workflow.action, alias: format_name }
 

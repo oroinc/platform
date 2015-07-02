@@ -35,7 +35,7 @@ class AttachmentController extends Controller
      */
     public function widgetAction($entityClass, $entityId)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         return [
             'entityId'    => $entityId,
             'entityField' => ExtendHelper::buildAssociationName($entityClass),

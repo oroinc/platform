@@ -1,4 +1,6 @@
 oro.locale:
+    date_format:
+        day: "MMM d"
     address_format:
         region_name_type:
             parish: "parish"
@@ -39,3 +41,6 @@ oro.locale:
                     miles_per_hour: 'Miles per hour'
                     kilometers_per_hour: 'Kilometers per hour'
                     meters_per_second: 'Meters per second'
+    formatter:
+        datetime:
+            default: N/A

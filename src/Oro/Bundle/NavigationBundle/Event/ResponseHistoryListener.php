@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -19,6 +18,7 @@ use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ResponseHistoryListener
 {
@@ -154,7 +154,7 @@ class ResponseHistoryListener
             && $request->getMethod() == 'GET'
             && (!$request->isXmlHttpRequest()
                 || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
-            && ($user instanceof UserInterface);
+            && ($user instanceof User);
 
         if ($result) {
             $route  = $request->get('_route');

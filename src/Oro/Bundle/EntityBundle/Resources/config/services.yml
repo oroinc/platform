@@ -28,6 +28,13 @@ parameters:
 
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
     oro_entity.entity_context_provider.class:                Oro\Bundle\EntityBundle\Provider\EntityContextProvider
+    oro_entity.entity_alias_resolver.class:                  Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
+    oro_entity.entity_alias_config_bag.class:                Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag
+    oro_entity.entity_alias_provider.class:                  Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
+    oro_entity.entity_class_name_helper.class:               Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
+    oro_entity.entity_name_resolver.class:                   Oro\Bundle\EntityBundle\Provider\EntityNameResolver
+    oro_entity.entity_name_provider.default.class:           Oro\Bundle\EntityBundle\Provider\EntityNameProvider
+
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
@@ -180,12 +187,14 @@ services:
         arguments:
             - @oro_entity.entity_identifier_accessor
             - @oro_entity.routing_helper
+            - @oro_entity.entity_name_resolver
         tags:
             - { name: twig.extension }
 
     oro_entity.routing_helper:
         class: %oro_entity.routing_helper.class%
         arguments:
+            - @oro_entity.entity_class_name_helper
             - @oro_entity.doctrine_helper
             - @router
 
@@ -207,3 +216,51 @@ services:
             - @oro_entity.routing_helper
             - @oro_entity.entity_provider
             - @oro_entity_config.provider.entity
+
+    oro_entity.entity_alias.cache.warmer:
+        class: Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer
+        arguments:
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_entity.entity_alias_resolver:
+        class: %oro_entity.entity_alias_resolver.class%
+        arguments:
+            - @doctrine
+            - %kernel.debug%
+        lazy: true
+
+    oro_entity.entity_alias_config_bag:
+        class: %oro_entity.entity_alias_config_bag.class%
+        public: false
+        arguments:
+            - %oro_entity.entity_aliases%
+            - %oro_entity.entity_alias_exclusions%
+
+    oro_entity.entity_alias_provider:
+        class: %oro_entity.entity_alias_provider.class%
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_config_bag
+        tags:
+            - { name: oro_entity.alias_provider, priority: 100 }
+
+    oro_entity.entity_class_name_helper:
+        class: %oro_entity.entity_class_name_helper.class%
+        arguments:
+            - @oro_entity.entity_alias_resolver
+
+    oro_entity.entity_name_resolver:
+        class: %oro_entity.entity_name_resolver.class%
+        arguments:
+            - %oro_entity.entity_name_format.default%
+            - %oro_entity.entity_name_formats%
+
+    oro_entity.entity_name_provider.default:
+        class: %oro_entity.entity_name_provider.default.class%
+        public: false
+        arguments:
+            - @doctrine
+        tags:
+            - { name: oro_entity.name_provider, priority: 100 }
