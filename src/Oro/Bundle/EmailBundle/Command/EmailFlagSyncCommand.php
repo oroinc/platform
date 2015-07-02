@@ -67,6 +67,10 @@ class EmailFlagSyncCommand extends ContainerAwareCommand
                     $output->writeln('<info>' . $warn . '</info>');
                     $logger->warning($warn);
                 }
+            } else {
+                $warn = sprintf('Not found email user - %s', $emailUser->getId());
+                $output->writeln('<info>' . $warn . '</info>');
+                $logger->warning($warn);
             }
         }
     }
