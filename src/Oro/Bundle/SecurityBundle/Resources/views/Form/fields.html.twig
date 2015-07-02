@@ -8,8 +8,8 @@
         <div class="access_level_value_link">
             <a href="javascript:void(0);">
                 {% set label = level_label is not defined or level_label is empty ?
-                    'oro.security.access-level.NONE' :
-                    'oro.security.access-level.' ~ level_label
+                    translation_prefix ~ 'NONE' :
+                    translation_prefix ~ level_label
                 %}
                 {{ label|trans({}, translation_domain) }}
             </a>

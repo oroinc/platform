@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+
 /**
  * This class represents the entity ownership metadata
  */
@@ -222,6 +224,34 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     public function getGlobalOwnerFieldName()
     {
         return $this->organizationFieldName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessLevelNames()
+    {
+        if (!$this->hasOwner()) {
+            return [
+                AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
+                AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
+            ];
+        }
+        if ($this->isBasicLevelOwned()) {
+            $maxLevel = AccessLevel::GLOBAL_LEVEL;
+            $minLevel = AccessLevel::BASIC_LEVEL;
+        } elseif ($this->isLocalLevelOwned()) {
+            $maxLevel = AccessLevel::GLOBAL_LEVEL;
+            $minLevel = AccessLevel::LOCAL_LEVEL;
+        } elseif ($this->isGlobalLevelOwned()) {
+            $maxLevel = AccessLevel::GLOBAL_LEVEL;
+            $minLevel = AccessLevel::GLOBAL_LEVEL;
+        } else {
+            $minLevel = AccessLevel::BASIC_LEVEL;
+            $maxLevel = AccessLevel::SYSTEM_LEVEL;
+        }
+
+        return AccessLevel::getAccessLevelNames($minLevel, $maxLevel);
     }
 
     /**

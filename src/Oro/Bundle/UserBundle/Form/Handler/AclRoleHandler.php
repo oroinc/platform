@@ -209,8 +209,7 @@ class AclRoleHandler
      */
     protected function setRolePrivileges(AbstractRole $role)
     {
-        /** @var ArrayCollection $privileges */
-        $privileges = $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
+        $privileges = $this->getRolePrivileges($role);
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $sortedPrivileges = $this->filterPrivileges($privileges, $config['types']);
@@ -231,6 +230,15 @@ class AclRoleHandler
 
             $this->form->get($fieldName)->setData($sortedPrivileges);
         }
+    }
+
+    /**
+     * @param AbstractRole $role
+     * @return ArrayCollection|AclPrivilege[]
+     */
+    protected function getRolePrivileges(AbstractRole $role)
+    {
+        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
     }
 
     /**

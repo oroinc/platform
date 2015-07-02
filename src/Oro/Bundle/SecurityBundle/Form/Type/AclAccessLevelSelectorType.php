@@ -35,6 +35,7 @@ class AclAccessLevelSelectorType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => AccessLevel::getAccessLevelNames(),
+            'translation_prefix' => 'oro.security.access-level.',
         ));
     }
 
@@ -49,5 +50,7 @@ class AclAccessLevelSelectorType extends AbstractType
             $view->vars['identity'] = $parentData->getIdentity()->getId();
             $view->vars['level_label'] = AccessLevel::getAccessLevelName($form->getData());
         }
+
+        $view->vars['translation_prefix'] = $options['translation_prefix'];
     }
 }

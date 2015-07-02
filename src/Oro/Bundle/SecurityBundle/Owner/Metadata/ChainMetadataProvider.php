@@ -24,6 +24,11 @@ class ChainMetadataProvider implements MetadataProviderInterface
     protected $defaultProvider;
 
     /**
+     * @var MetadataProviderInterface
+     */
+    protected $emulatedProvider;
+
+    /**
      * @param MetadataProviderInterface[] $providers
      * @param MetadataProviderInterface $defaultProvider
      */
@@ -112,10 +117,27 @@ class ChainMetadataProvider implements MetadataProviderInterface
     }
 
     /**
+     * @param MetadataProviderInterface $provider
+     */
+    public function startProviderEmulation(MetadataProviderInterface $provider)
+    {
+        $this->emulatedProvider = $provider;
+    }
+
+    public function stopProviderEmulation()
+    {
+        $this->emulatedProvider = null;
+    }
+
+    /**
      * @return MetadataProviderInterface
      */
     protected function getSupportedProvider()
     {
+        if ($this->emulatedProvider) {
+            return $this->emulatedProvider;
+        }
+
         if ($this->supportedProvider) {
             return $this->supportedProvider;
         }
