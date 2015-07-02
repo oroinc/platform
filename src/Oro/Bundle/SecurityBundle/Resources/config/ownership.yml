@@ -49,7 +49,7 @@ services:
     oro_security.owner.ownership_config_subscriber:
         class: %oro_security.owner.ownership_config_subscriber.class%
         arguments:
-            - @oro_security.owner.ownership_metadata_provider
+            - @oro_security.owner.metadata_provider.chain
         tags:
             - { name: kernel.event_subscriber }
 

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
-
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -139,7 +139,7 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     public function warmUpCache($className = null)
     {
         if ($className === null) {
-            $configs = $this->getConfigProvider()->getConfigs();
+            $configs = $this->getOwnershipConfigs();
             foreach ($configs as $config) {
                 $this->ensureMetadataLoaded($config->getId()->getClassName());
             }
@@ -160,6 +160,14 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
                 $this->getCache()->deleteAll();
             }
         }
+    }
+
+    /**
+     * @return ConfigInterface[]
+     */
+    protected function getOwnershipConfigs()
+    {
+        return $this->getConfigProvider()->getConfigs();
     }
 
     /**
