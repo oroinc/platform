@@ -9,18 +9,28 @@ use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 interface DictionaryValueListProviderInterface
 {
     /**
-     * Gets query builder for getting dictionary item values for the given dictionary class
+     * Gets a query builder for getting dictionary item values for a given dictionary class
      *
-     * @param string $className
+     * @param string $className The FQCN of a dictionary entity
      *
-     * @return QueryBuilder|SqlQueryBuilder|null  QueryBuilder or SqlQueryBuilder if the provider can get value list
-     *                                            NULL if the provider can not get the value list for this dictionary
+     * @return QueryBuilder|SqlQueryBuilder|null QueryBuilder or SqlQueryBuilder if the provider can get values
+     *                                           NULL if the provider cannot process the given entity
      */
     public function getValueListQueryBuilder($className);
+
     /**
-     * Gets list of supported dictionary entity classes
+     * Returns the configuration of the entity serializer for a given dictionary class
      *
-     * @return array
+     * @param string $className The FQCN of a dictionary entity
+     *
+     * @return array|null
+     */
+    public function getSerializationConfig($className);
+
+    /**
+     * Gets a list of entity classes supported by this provider
+     *
+     * @return string[]
      */
     public function getSupportedEntityClasses();
 }

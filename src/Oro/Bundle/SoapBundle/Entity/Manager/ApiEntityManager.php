@@ -310,7 +310,7 @@ class ApiEntityManager
     }
 
     /**
-     * Returns the configuration of the entity serializer is used for process GET reruests
+     * Returns the configuration of the entity serializer is used for process GET requests
      *
      * @return array|null
      */
