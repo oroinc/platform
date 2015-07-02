@@ -82,7 +82,7 @@ parameters:
     oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
     # Email DataGrid
-    oro_email.datagrid.folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\FolderFilterProvider
+    oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
 
 services:
     oro_email.entity.cache.warmer:
@@ -565,8 +565,8 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
 
-    oro_email.datagrid.folder.provider:
-        class: %oro_email.datagrid.folder.provider.class%
+    oro_email.datagrid.origin_folder.provider:
+        class: %oro_email.datagrid.origin_folder.provider.class%
         arguments:
             - @doctrine.orm.entity_manager
             - @security.context

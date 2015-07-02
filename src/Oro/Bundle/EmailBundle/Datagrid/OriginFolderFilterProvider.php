@@ -6,11 +6,11 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
-class FolderFilterProvider
+class OriginFolderFilterProvider
 {
-    const EMAIL_FOLDER = 'OroEmailBundle:EmailFolder';
+    const EMAIL_FOLDER = 'OroEmailBundle:EmailOrigin';
 
     /**
      * @var SecurityContext
@@ -41,17 +41,20 @@ class FolderFilterProvider
     public function getListTypeChoices()
     {
         $user = $this->securityContext->getToken()->getUser();
-        $query = $this->em->getRepository(self::EMAIL_FOLDER)->createQueryBuilder('f')
-            ->leftJoin('f.origin', 'o')
-            ->where('o.owner = :owner_id')
-        ->setParameter('owner_id', $user->getId());
-        $folders = $query->getQuery()->getResult();
+        $origins = $this->em->getRepository(self::EMAIL_FOLDER)->findBy(['owner'=>$user->getId()]);
         $results = [];
         /**
-         * @var EmailFolder $folder
+         * @var EmailOrigin $origin
          */
-        foreach ($folders as $folder) {
-            $results[$folder->getId()]= $folder->getFullName();
+        foreach ($origins as $origin) {
+            $folders = $origin->getFolders();
+
+            if (count($folders)>0) {
+                $results[$origin->getUserLogin()]= [];
+                foreach ($folders as $folder) {
+                    $results[$origin->getUserLogin()][$folder->getId()] = $folder->getFullName();
+                }
+            }
         }
 
         return $results;

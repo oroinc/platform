@@ -1,0 +1,11 @@
+parameters:
+    oro_email_filter.filter_origin_folder.class:  Oro\Bundle\EmailBundle\Filter\ChoiceOriginFolderFilter
+
+services:
+    oro_email_filter.filter_origin_folder:
+        class: %oro_email_filter.filter_origin_folder.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: originfolder }

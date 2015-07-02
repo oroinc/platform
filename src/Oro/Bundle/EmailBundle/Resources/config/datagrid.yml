@@ -89,12 +89,12 @@ datagrid:
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
                 folder:
-                    type:               choice
+                    type:               originfolder
                     data_name:          f.id
                     label: oro.email.folders.label
                     options:
                         field_options:
-                            choices:    @oro_email.datagrid.folder.provider->getListTypeChoices
+                            choices:    @oro_email.datagrid.origin_folder.provider->getListTypeChoices
                             multiple:   true
         views_list : @oro_email.emailfolder.datagrid_view_list
 

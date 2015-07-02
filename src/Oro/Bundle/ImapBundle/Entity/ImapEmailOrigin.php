@@ -176,4 +176,14 @@ class ImapEmailOrigin extends EmailOrigin
     {
         return sprintf('%s (%s)', $this->user, $this->host);
     }
+
+    /**
+     * Gets the user's login email
+     *
+     * @return string
+     */
+    public function getUserLogin()
+    {
+        return $this->user;
+    }
 }
