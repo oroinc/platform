@@ -193,7 +193,7 @@ class EnumFilterTypeTest extends TypeTestCase
         $this->type->setDefaultOptions($resolver);
         $resolver->resolve([
             'enum_code'     => null,
-            'class'         => '',
+            'class'         => null,
             'null_value'    => ':empty:'
         ]);
     }

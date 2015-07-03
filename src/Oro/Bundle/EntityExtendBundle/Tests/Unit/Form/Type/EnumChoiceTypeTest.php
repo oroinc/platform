@@ -101,7 +101,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $this->type->setDefaultOptions($resolver);
         $resolver->resolve([
             'enum_code' => null,
-            'class' => ''
+            'class' => null
         ]);
     }
 
