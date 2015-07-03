@@ -20,6 +20,16 @@ define([
         templateSelector: '#multiselect-origin-folder-template',
 
         /**
+         * Select widget options
+         *
+         * @property
+         */
+        widgetOptions: {
+            multiple: true,
+            classes: 'select-filter-widget multiselect-filter-widget multiselect-origin-folder'
+        },
+
+        /**
         * Initialize.
         *
         * @param {Object} options
