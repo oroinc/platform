@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface
+abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, OwnerTreeProviderInterface
 {
     const CACHE_KEY = 'data';
 
@@ -153,9 +154,9 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface
             }
 
             $result = $conn->isConnected() && (bool)array_intersect(
-                    [$tableName],
-                    $em->getConnection()->getSchemaManager()->listTableNames()
-                );
+                [$tableName],
+                $em->getConnection()->getSchemaManager()->listTableNames()
+            );
         } catch (\PDOException $e) {
         }
 
