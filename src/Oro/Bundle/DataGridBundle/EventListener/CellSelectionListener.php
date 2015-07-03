@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
 /**
  * Event listener applied to all grids with "cellSelection" option. If this option is specified this listener will add:
- *  - js module "orodatagrid/js/datagrid/listener/cell-selection-listener" to handle selection behavior on frontend.
+ *  - js module "orodatagrid/js/datagrid/listener/change-editable-cell-listener" to handle changes behavior on frontend.
  *
  * Example of grid configuration:
  *
@@ -33,15 +33,15 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
  *       options:
  *           cellSelection:
  *               dataField: id
- *               columns:
+ *               columnName:
  *                   - enabled
- *               changeset: '#changeset'
+ *               selector: '#changeset'
  */
 class CellSelectionListener
 {
     const CELL_SELECTION_OPTION_PATH            = '[options][cellSelection]';
     const REQUIREJS_MODULES_MODULES_OPTION_PATH = '[options][requireJSModules]';
-    const CELL_SELECTION_JS_MODULE              = 'orodatagrid/js/datagrid/listener/cell-selection-listener';
+    const CELL_SELECTION_JS_MODULE              = 'orodatagrid/js/datagrid/listener/change-editable-cell-listener';
 
     /**
      * Required options for selectCell js module
@@ -49,8 +49,8 @@ class CellSelectionListener
      */
     protected $requiredOptions = [
         'dataField',
-        'columns',
-        'changeset'
+        'columnName',
+        'selector'
     ];
 
     /**

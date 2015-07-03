@@ -78,7 +78,7 @@ datagrid:
             id: ~  # Identifier property must be passed to frontend
 ```
 
-When this done we have to create form fields that wil contain assigned/removed user ids and process it on backend
+When this done we have to create form fields that will contain assigned/removed user ids and process it on backend
 For example fields are:
 ``` twig
     form_widget(form.appendUsers, {'id': 'groupAppendUsers'}),

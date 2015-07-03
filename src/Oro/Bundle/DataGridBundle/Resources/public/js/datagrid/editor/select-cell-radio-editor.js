@@ -7,32 +7,32 @@ define([
 
     var SelectCellRadioEditor;
 
+    /**
+     * @export  orodatagrid/js/datagrid/editor/select-cell-radio-editor
+     * @class   orodatagrid.datagrid.editor.SelectCellRadioEditor
+     * @extends Backgrid.SelectCellEditor
+     */
     SelectCellRadioEditor = Backgrid.SelectCellEditor.extend({
         /**
          * @inheritDoc
          */
-        tagName: "div",
+        tagName: 'ul',
+
+        /** @property */
+        className: 'icons-ul',
 
         /**
          * @inheritDoc
          */
-        events: {
-            "change": "save",
-            "blur": "close",
-            "keydown": "close",
-            "click": "onClick"
-        },
+        template: _.template('<li><input id="<%- this.model.cid + \'_\' + this.cid + \'_\' + value %>" name="<%- this.model.cid + \'_\' + this.cid %>" type="radio" value="<%- value %>" <%= selected ? "checked" : "" %>><label for="<%- this.model.cid + \'_\' + this.cid + \'_\' + value %>"><%- text %></label></li>', null, {variable: null}),
 
         /**
          * @inheritDoc
          */
-        template: _.template('<input name="<%- this.model.cid + \'_\' + this.cid %>" type="radio" value="<%- value %>" <%= selected ? "checked" : "" %>><%- text %>', null, {variable: null}),
-
-        /**
-         * @param {Object} event
-         */
-        onClick: function (event) {
-            event.stopPropagation();
+        save: function () {
+            var model = this.model;
+            var column = this.column;
+            model.set(column.get("name"), this.formatter.toRaw(this.$el.find(':checked').val(), model));
         }
     });
 

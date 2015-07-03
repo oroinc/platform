@@ -32,6 +32,10 @@ define([
                 }, this);
             }
             SelectCell.__super__.initialize.apply(this, arguments);
+
+            this.listenTo(this.model, 'change:' + this.column.get('name'), function () {
+                this.enterEditMode();
+            });
         },
 
         /**
@@ -40,11 +44,20 @@ define([
         render: function () {
             var render = SelectCell.__super__.render.apply(this, arguments);
 
-            if (this.column.get('editable')) {
-                this.enterEditMode();
-            }
+            this.enterEditMode();
 
             return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enterEditMode: function () {
+            if (this.column.get('editable')) {
+                SelectCell.__super__.enterEditMode.apply(this, arguments);
+
+                this.$el.find('select').uniform();
+            }
         },
 
         /**
