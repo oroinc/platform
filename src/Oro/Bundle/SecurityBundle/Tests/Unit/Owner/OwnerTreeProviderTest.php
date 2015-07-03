@@ -3,11 +3,15 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,21 +30,76 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $cache;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
+     */
+    protected $securityFacade;
+
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($this->em);
+
         $this->cache = $this->getMockForAbstractClass('Doctrine\Common\Cache\CacheProvider');
+        $this->cache->expects($this->any())->method('fetch')->will($this->returnValue(false));
+        $this->cache->expects($this->any())->method('save');
 
-        $this->cache->expects($this->any())
-            ->method('fetch')
-            ->will($this->returnValue(false));
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->cache->expects($this->any())
-            ->method('save');
+        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [
+                            'oro_security.ownership_tree_provider.cache',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->cache,
+                        ],
+                        [
+                            'oro_security.owner.ownership_metadata_provider',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new OwnershipMetadataProviderStub(
+                                $this,
+                                [
+                                    'user' => 'Oro\Bundle\UserBundle\Entity\User',
+                                    'business_unit' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
+                                ]
+                            ),
+                        ],
+                        [
+                            'doctrine',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $managerRegistry,
+                        ],
+                        [
+                            'oro_security.security_facade',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->securityFacade,
+                        ],
+                    ]
+                )
+            );
 
         $this->treeProvider = new OwnerTreeProvider($this->em, $this->cache);
+        $this->treeProvider->setContainer($this->container);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->cache, $this->container, $this->treeProvider, $this->em);
     }
 
     public function testGetTree()
@@ -56,17 +115,11 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())
             ->method('getRepository')
             ->will(
-                $this->returnCallback(
-                    function ($repoName) use ($userRepo, $buRepo) {
-                        if ($repoName == 'Oro\Bundle\UserBundle\Entity\User') {
-                            return $userRepo;
-                        }
-                        if ($repoName == 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit') {
-                            return $buRepo;
-                        }
-
-                        return null;
-                    }
+                $this->returnValueMap(
+                    [
+                        ['Oro\Bundle\UserBundle\Entity\User', $userRepo],
+                        ['Oro\Bundle\OrganizationBundle\Entity\BusinessUnit', $buRepo],
+                    ]
                 )
             );
 
@@ -106,7 +159,7 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($schemaManager));
         $schemaManager->expects($this->any())
             ->method('listTableNames')
-            ->will($this->returnValue(array('test')));
+            ->will($this->returnValue(['test']));
 
         $this->treeProvider->warmUpCache();
         $tree = $this->treeProvider->getTree();
@@ -114,6 +167,10 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([1], $tree->getUserOrganizationIds(1));
     }
 
+    /**
+     * @param object $object
+     * @param mixed $value
+     */
     protected function setId($object, $value)
     {
         $reflection = new \ReflectionClass($object);
@@ -165,7 +222,32 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
         return [
             [$user1, $user2, $user3],
-            [$mainBu, $bu2, $childBu]
+            [$mainBu, $bu2, $childBu],
+        ];
+    }
+
+    /**
+     * @param object $user
+     * @param bool $expected
+     *
+     * @dataProvider supportsDataProvider
+     */
+    public function testSupports($user, $expected)
+    {
+        $this->securityFacade->expects($this->once())->method('getLoggedUser')->willReturn($user);
+
+        $this->assertEquals($expected, $this->treeProvider->supports());
+    }
+
+    /**
+     * @return array
+     */
+    public function supportsDataProvider()
+    {
+        return [
+            [null, false],
+            [new \stdClass(), false],
+            [new User(), true],
         ];
     }
 }

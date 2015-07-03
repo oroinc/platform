@@ -18,6 +18,11 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
      */
     protected $defaultProvider;
 
+    public function __construct()
+    {
+        $this->providers = new ArrayCollection();
+    }
+
     /**
      * @param OwnerTreeProviderInterface $provider
      */
@@ -36,11 +41,6 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     public function setDefaultProvider($defaultProvider)
     {
         $this->defaultProvider = $defaultProvider;
-    }
-
-    public function __construct()
-    {
-        $this->providers = new ArrayCollection();
     }
 
     /**
