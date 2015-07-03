@@ -55,7 +55,7 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetValueListQueryBuilder()
+    public function testSupports()
     {
         $className = 'Test\Enum';
 
@@ -76,28 +76,10 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->willReturn($extendConfig);
 
-        $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with($className)
-            ->willReturn($repo);
-        $repo->expects($this->once())
-            ->method('createQueryBuilder')
-            ->with('e')
-            ->willReturn($qb);
-
-        $this->assertSame(
-            $qb,
-            $this->enumValueListProvider->getValueListQueryBuilder($className)
-        );
+        $this->assertTrue($this->enumValueListProvider->supports($className));
     }
 
-    public function testGetValueListQueryBuilderForNotConfigurableEntity()
+    public function testSupportsForNotConfigurableEntity()
     {
         $className = 'Test\NotConfigurableEntity';
 
@@ -106,12 +88,10 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->willReturn(false);
 
-        $this->assertNull(
-            $this->enumValueListProvider->getValueListQueryBuilder($className)
-        );
+        $this->assertFalse($this->enumValueListProvider->supports($className));
     }
 
-    public function testGetValueListQueryBuilderForNewEnum()
+    public function testSupportsForNewEnum()
     {
         $className = 'Test\NewEnum';
 
@@ -132,12 +112,10 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->willReturn($extendConfig);
 
-        $this->assertNull(
-            $this->enumValueListProvider->getValueListQueryBuilder($className)
-        );
+        $this->assertFalse($this->enumValueListProvider->supports($className));
     }
 
-    public function testGetValueListQueryBuilderForDeletedEnum()
+    public function testSupportsForDeletedEnum()
     {
         $className = 'Test\DeletedEnum';
 
@@ -159,12 +137,10 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->willReturn($extendConfig);
 
-        $this->assertNull(
-            $this->enumValueListProvider->getValueListQueryBuilder($className)
-        );
+        $this->assertFalse($this->enumValueListProvider->supports($className));
     }
 
-    public function testGetValueListQueryBuilderForNotEnum()
+    public function testSupportsForNotEnum()
     {
         $className = 'Test\NotEnum';
 
@@ -184,7 +160,30 @@ class EnumValueListProviderTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->willReturn($extendConfig);
 
-        $this->assertNull(
+        $this->assertFalse($this->enumValueListProvider->supports($className));
+    }
+
+    public function testGetValueListQueryBuilder()
+    {
+        $className = 'Test\Enum';
+
+        $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->with($className)
+            ->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($qb);
+
+        $this->assertSame(
+            $qb,
             $this->enumValueListProvider->getValueListQueryBuilder($className)
         );
     }

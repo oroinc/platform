@@ -34,17 +34,25 @@ class EnumValueListProvider implements DictionaryValueListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getValueListQueryBuilder($className)
+    public function supports($className)
     {
         $extendConfigProvider = $this->configManager->getProvider('extend');
         if (!$extendConfigProvider->hasConfig($className)) {
-            return null;
+            return false;
         }
         $extendConfig = $extendConfigProvider->getConfig($className);
         if (!$this->isEnum($extendConfig)) {
-            return null;
+            return false;
         }
 
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValueListQueryBuilder($className)
+    {
         /** @var EntityManager $em */
         $em = $this->doctrine->getManagerForClass($className);
         $qb = $em->getRepository($className)->createQueryBuilder('e');
