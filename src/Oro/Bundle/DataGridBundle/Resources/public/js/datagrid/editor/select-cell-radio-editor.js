@@ -19,7 +19,7 @@ define([
         tagName: 'ul',
 
         /** @property */
-        className: 'icons-ul',
+        className: 'radio-ul',
 
         /**
          * @inheritDoc
