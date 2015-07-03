@@ -6,11 +6,12 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+
+abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, OwnerTreeProviderInterface
 {
     const CACHE_KEY = 'data';
 
@@ -65,7 +66,7 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface
     }
 
     /**
-     * Clear the owner tree cache
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -73,7 +74,7 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface
     }
 
     /**
-     * Warmup owner tree cache
+     * {@inheritdoc}
      */
     public function warmUpCache()
     {
@@ -81,10 +82,7 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface
     }
 
     /**
-     * Get ACL tree
-     *
-     * @return OwnerTree
-     * @throws \Exception
+     * {@inheritdoc}
      */
     public function getTree()
     {

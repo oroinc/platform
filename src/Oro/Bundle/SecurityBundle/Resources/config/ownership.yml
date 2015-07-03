@@ -1,9 +1,7 @@
 parameters:
     oro_security.entity.owners:
         organization: "OroOrganizationBundle:Organization"
-        business_unit: "OroOrganizationBundle:BusinessUnit"ДА там пожно потерятся
-[16:12:00] Roman Sergeevich: ладно давай я 10 мин пожебажу, если ничего не выйдет напишу
-
+        business_unit: "OroOrganizationBundle:BusinessUnit"
         user: "OroUserBundle:User"
 
     oro_security.owner.entity_owner_accessor.class:                       Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor

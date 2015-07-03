@@ -93,23 +93,23 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider implements OwnerTreePr
 
         foreach ($businessUnits as $businessUnit) {
             if ($businessUnit->getOrganization()) {
-                $tree->addBusinessUnit($businessUnit->getId(), $businessUnit->getOrganization()->getId());
+                $tree->addLocalEntity($businessUnit->getId(), $businessUnit->getOrganization()->getId());
                 if ($businessUnit->getOwner()) {
-                    $tree->addBusinessUnitRelation($businessUnit->getId(), $businessUnit->getOwner()->getId());
+                    $tree->addDeepEntity($businessUnit->getId(), $businessUnit->getOwner()->getId());
                 }
             }
         }
 
         foreach ($users as $user) {
             $owner = $user->getOwner();
-            $tree->addUser($user->getId(), $owner ? $owner->getId() : null);
+            $tree->addBasicEntity($user->getId(), $owner ? $owner->getId() : null);
             foreach ($user->getOrganizations() as $organization) {
                 $organizationId = $organization->getId();
-                $tree->addUserOrganization($user->getId(), $organizationId);
+                $tree->addGlobalEntity($user->getId(), $organizationId);
                 foreach ($user->getBusinessUnits() as $businessUnit) {
                     $buOrganizationId = $businessUnit->getOrganization()->getId();
                     if ($organizationId == $buOrganizationId) {
-                        $tree->addUserBusinessUnit($user->getId(), $organizationId, $businessUnit->getId());
+                        $tree->addLocalEntityToBasic($user->getId(), $organizationId, $businessUnit->getId());
                     }
                 }
             }

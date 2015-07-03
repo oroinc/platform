@@ -398,7 +398,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_security.ownership_tree_provider.cache
         tags:
-            - { name: oro_security.ownership.tree_provider, alias: default }
+            - { name: oro_security.ownership.tree_provider }
 
     oro_security.link.ownership_tree_provider:
         tags:
