@@ -23,7 +23,7 @@ class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterfa
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
