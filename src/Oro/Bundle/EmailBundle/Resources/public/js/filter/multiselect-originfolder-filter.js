@@ -11,13 +11,6 @@ define([
 
     var MultiSelectOriginFolder;
 
-    /**
-     * Choice filter: filter type as option + filter value as string
-     *
-     * @export  oro/filter/choice-filter
-     * @class   oro.filter.ChoiceFilter
-     * @extends oro.filter.TextFilter
-     */
     MultiSelectOriginFolder = MultiSelect.extend({
         /**
          * Template selector for filter criteria
