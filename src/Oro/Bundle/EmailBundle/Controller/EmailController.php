@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
 
+use FOS\RestBundle\Util\Codes;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -291,6 +293,21 @@ class EmailController extends Controller
     public function userEmailsAction()
     {
         return [];
+    }
+
+    /**
+     * @Route("/user-sync-emails", name="oro_email_user_sync_emails")
+     * @AclAncestor("oro_email_email_view")
+     */
+    public function userEmailsSyncAction()
+    {
+        $this->get('oro_email.email_synchronization_manager')->syncOrigins(
+            $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
+                $this->get('oro_security.security_facade')->getLoggedUserId()
+            )
+        );
+
+        return new JsonResponse([], Codes::HTTP_OK);
     }
 
     /**
