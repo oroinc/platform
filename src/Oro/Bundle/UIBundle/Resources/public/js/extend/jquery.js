@@ -13,6 +13,18 @@ define(['jquery'], function ($) {
 
     $.fn.extend({
         /**
+         * Sets cursor to end of input
+         */
+        setCursorToEnd: function(str) {
+            return this.each(function() {
+                var el = this;
+                if ('selectionStart' in el) {
+                    el.selectionEnd = el.selectionStart = el.value.length;
+                }
+            });
+        },
+
+        /**
          * Sets focus on first form field
          */
         focusFirstInput: function () {
@@ -20,7 +32,7 @@ define(['jquery'], function ($) {
                 $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
             $autoFocus = $input.filter('[autofocus]');
-            ($autoFocus.length ? $autoFocus : $input).first().focus();
+            ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
         },
 
         focus: (function(orig) {
@@ -67,7 +79,7 @@ define(['jquery'], function ($) {
         },
 
         /**
-         * Inserts string in <textarea> or <input> at the cursor position and set cursor after inserted data
+         * Inserts string in <textarea> or <input> at the cursor position and sets cursor after inserted data
          *
          * @returns {number}
          */

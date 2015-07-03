@@ -258,10 +258,7 @@ define(function (require) {
          * @param {Event} e
          */
         _handleVariableClick: function (e) {
-            var value,
-                start,
-                end,
-                field = this.fields.filter(document.activeElement),
+            var field = this.fields.filter(document.activeElement),
                 variable = $(e.currentTarget).html();
 
             e.preventDefault();
