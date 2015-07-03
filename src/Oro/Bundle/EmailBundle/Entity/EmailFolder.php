@@ -256,6 +256,8 @@ class EmailFolder
     {
         $this->subFolders->add($folder);
 
+        $folder->setParentFolder($this);
+
         return $this;
     }
 

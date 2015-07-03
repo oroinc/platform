@@ -54,10 +54,8 @@ class ImapEmailFolderLoader implements EmailFolderLoaderInterface
             $this->encryptor->decryptData($origin->getPassword())
         );
 
-        /** @var ImapEmailFolderManager $manager */
-        $manager = new ImapEmailFolderManager($this->connectorFactory->createImapConnector($config));
-        /** @var array $folders */
-        $folders = $manager->getFolders(null, true);
+        $connector = $this->connectorFactory->createImapConnector($config);
+        $folders = $connector->findFolders(null, true);
 
         return $folders;
     }

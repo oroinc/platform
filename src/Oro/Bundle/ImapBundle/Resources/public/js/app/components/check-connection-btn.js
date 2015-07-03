@@ -49,10 +49,12 @@ function ($, _, routing, __, mediator, messenger) {
 
                 mediator.execute('showLoading');
                 $.post(url, data)
-                    .done(function () {
-                        messenger.notificationFlashMessage('success', __('oro.imap.connection.success'), {
+                    .done(function (response) {
+/*                        messenger.notificationFlashMessage('success', __('oro.imap.connection.success'), {
                             container: $el.parent()
-                        });
+                        });*/
+
+                        $el.parent().parent().append(response);
                     })
                     .error(function () {
                         messenger.notificationFlashMessage('error', __('oro.imap.connection.error'), {

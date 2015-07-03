@@ -44,7 +44,6 @@ class EmailFolderManager implements LoggerAwareInterface
         try {
             $loader = $this->selector->select($origin);
             $folders = $loader->loadEmailFolders($origin);
-            $origin->setFolders($folders);
         } catch (\RuntimeException $loadEx) {
             $this->logger->notice(
                 sprintf('Load email folder failed. Email id: %d. Error: %s', $origin->getId(), $loadEx->getMessage()),
