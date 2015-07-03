@@ -30,7 +30,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     protected function getSerializationConfig()
     {
-        $this->dictionaryProvider->getSerializationConfig($this->class);;
+        $this->dictionaryProvider->getSerializationConfig($this->class);
     }
 
     /**

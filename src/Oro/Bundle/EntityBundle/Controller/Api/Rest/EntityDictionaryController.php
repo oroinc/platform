@@ -14,7 +14,7 @@ use Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 
 /**
- * @RouteResource("dictionary")
+ * @RouteResource("dictionary_value")
  * @NamePrefix("oro_api_")
  */
 class EntityDictionaryController extends RestGetController
