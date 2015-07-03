@@ -151,9 +151,9 @@ datagrid:
         options:
             cellSelection:
                 dataField: id
-                columns:
+                columnName:
                     - enabled
-                changeset: '#changeset'
+                selector: '#changeset'
 ```
 
 #### Problem:
