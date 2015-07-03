@@ -31,7 +31,7 @@
             'oro.email.action.processing'|trans ~
         '</i>' ~
         'oro.email.action.processing'|trans ~
-        '&nbsp;<span style="width:10px;display:inline-block;text-align:left" class="dots">.</span>'
+        '&nbsp;<span class="dots">.</span>'
     %}
     <div class="btn-group">
         <a type="button" class="btn sync-btn icons-holder-text no-hash" href="javascript: void(0);">
@@ -50,10 +50,9 @@
                         var loader;
                         var dotsLoader = function () {
                             var dots = button.find('span.dots');
-                            if(dots.html() == '....'){
+                            if(dots.html() == '....') {
                                 dots.html('.');
-                            }
-                            else{
+                            } else {
                                 dots.html(dots.html() + '.');
                             }
                         };
@@ -65,6 +64,7 @@
                             beforeSend: function () {
                                 button.html('{{ actionProcessing|raw }}');
                                 button.attr('disabled', 'disabled');
+
                                 messenger.notificationFlashMessage(
                                     'info',
                                     {{ 'oro.email.action.message.processing'|trans|json_encode|raw }}
@@ -77,6 +77,7 @@
 
                                 button.html('{{ actionSync|raw }}');
                                 button.removeAttr('disabled');
+
                                 mediator.trigger('datagrid:doReset:{{ gridName }}');
 
                                 messenger.notificationFlashMessage(
@@ -94,7 +95,6 @@
                                     'error',
                                     {{ 'oro.email.action.message.error'|trans|json_encode|raw }}
                                 );
-
                             }
                         })
                     };
@@ -109,8 +109,8 @@
 {% endblock %}
 
 {% block breadcrumb %}
-    {% set breadcrumbs = [
-        {'label': 'oro.email.menu.user_emails'|trans }
-    ] %}
+    {% set breadcrumbs = [{
+        'label': 'oro.email.menu.user_emails'|trans
+    }] %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
