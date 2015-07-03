@@ -112,9 +112,9 @@ define(function (require) {
         },
 
         getPositionForNew: function () {
-            var val = 0,
-                exist = [],
-                step = this.stepForNew;
+            var step = this.stepForNew,
+                val = step,
+                exist = [];
             this.workflow.get('steps').each(function (item) {
                 var pos = item.get('position');
                 if(pos && pos[0] == pos[1] && pos[0] % step == 0) {
