@@ -51,15 +51,40 @@ define([
         /**
          * @inheritDoc
          */
-        _processValue: function (id, model) {
+        _onModelEdited: function (e, model) {
+            var changes = model.changed;
+            var columns = this.columnName;
+
+            _.each(changes, function (value, column) {
+                if (_.indexOf(columns, column) === -1) {
+                    delete changes[column];
+                }
+            });
+
+            if (_.isEmpty(changes)) {
+                return;
+            }
+
+            var id = model.get(this.dataField);
+
+            if (!_.isUndefined(id)) {
+                this._processValue(id, changes);
+            }
+        },
+
+        /**
+         * Process value
+         *
+         * @param {*}      id      Value of model property with name of this.dataField
+         * @param {Object} changes
+         */
+        _processValue: function (id, changes) {
             var changeset = this.get('changeset');
             if (!_.has(changeset, id)) {
                 changeset[id] = {};
             }
 
-            _.each(model.changedAttributes(this.columnName), function (column) {
-                changeset[id][column] = model.get(column);
-            });
+            changeset[id] = _.extend(changeset[id], changes);
 
             this.set('changeset', changeset);
 
