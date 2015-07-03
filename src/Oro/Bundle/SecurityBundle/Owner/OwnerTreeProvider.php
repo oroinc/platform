@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * Class OwnerTreeProvider
  * @package Oro\Bundle\SecurityBundle\Owner
  */
-class OwnerTreeProvider extends AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
+class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
     /**
      * @deprecated 1.8:2.1 use AbstractOwnerTreeProvider::CACHE_KEY instead
@@ -30,7 +30,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider implements OwnerTreePr
     /**
      * @var CacheProvider
      */
-    protected $cache;
+    private $cache;
 
     /**
      * @var OwnershipMetadataProvider

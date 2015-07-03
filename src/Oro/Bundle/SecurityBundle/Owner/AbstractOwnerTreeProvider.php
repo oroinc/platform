@@ -150,10 +150,8 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
                 $em->getConnection()->connect();
             }
 
-            $result = $conn->isConnected() && (bool)array_intersect(
-                    [$tableName],
-                    $em->getConnection()->getSchemaManager()->listTableNames()
-                );
+            $result = $conn->isConnected()
+                && (bool)array_intersect([$tableName], $em->getConnection()->getSchemaManager()->listTableNames());
         } catch (\PDOException $e) {
         }
 
