@@ -11,9 +11,8 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EmailAddressParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
 /**
@@ -23,14 +22,7 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter
 class EmailActivitySearchController extends RestGetController
 {
     /**
-     * The type of the emails activity entity.
-     *
-     * @see Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivitySearchController::cgetAction
-     */
-    const EMAILS_ACTIVITY_TYPE = 'emails';
-
-    /**
-     * Searches entities associated with the emails activity type.
+     * Searches entities associated with the email activity.
      *
      * @Get("/activities/emails/relations/search", name="")
      *
@@ -62,20 +54,18 @@ class EmailActivitySearchController extends RestGetController
      *      name="email",
      *      requirements=".+",
      *      nullable=true,
-     *      description="An email address. Defaults to all emails."
+     *      description="An email address."
      * )
      *
      * @ApiDoc(
-     *      description="Searches entities associated with the emails activity type.",
+     *      description="Searches entities associated with the email activity.",
      *      resource=true
      * )
+     *
      * @return Response
      */
     public function cgetAction()
     {
-        $manager = $this->getManager();
-        $manager->setClass($manager->resolveEntityClass(self::EMAILS_ACTIVITY_TYPE, true));
-
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
@@ -90,21 +80,17 @@ class EmailActivitySearchController extends RestGetController
 
         $email = $this->getRequest()->get('email', null);
         if ($email) {
-            /** @var EmailAddressHelper $emailAddressHelper */
-            $emailAddressHelper = $this->container->get('oro_email.email.address.helper');
-            $pureEmailAddress   = $emailAddressHelper->extractPureEmailAddress($email);
-            if ($pureEmailAddress) {
-                $filters['email'] = $pureEmailAddress;
-            }
+            $filter           = new EmailAddressParameterFilter(
+                $this->container->get('oro_email.email.address.helper')
+            );
+            $filters['email'] = $filter->filter($email, null);
         }
 
         return $this->handleGetListRequest($page, $limit, $filters);
     }
 
     /**
-     * Gets the API entity manager
-     *
-     * @return EmailActivitySearchApiEntityManager
+     * {@inheritdoc}
      */
     public function getManager()
     {

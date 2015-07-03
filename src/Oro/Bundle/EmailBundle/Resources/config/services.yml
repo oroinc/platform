@@ -594,7 +594,12 @@ services:
 
     oro_email.manager.email_activity_search.api:
         class: %oro_email.manager.email_activity_search.api.class%
-        parent: oro_activity.manager.activity_search.api
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @oro_search.index
 
     oro_email.email.flag.manager:
         class: %oro_email.email.flag.manager.class%

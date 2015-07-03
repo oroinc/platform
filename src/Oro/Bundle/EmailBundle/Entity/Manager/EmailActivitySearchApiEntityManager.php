@@ -2,17 +2,30 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\ORM\Query;
+use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
 {
     /**
-     * The target field that we use for searching activities
+     * @param string          $class
+     * @param ObjectManager   $om
+     * @param ActivityManager $activityManager
+     * @param SearchIndexer   $searchIndexer
      */
-    const SEARCH_EMAIL_TARGET_FIELD = 'email';
+    public function __construct(
+        $class,
+        ObjectManager $om,
+        ActivityManager $activityManager,
+        SearchIndexer $searchIndexer
+    ) {
+        parent::__construct($om, $activityManager, $searchIndexer);
+        $this->setClass($class);
+    }
 
     /**
      * {@inheritdoc}
@@ -21,13 +34,14 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
     {
         $searchQuery = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
 
-        if (isset($criteria['email'])) {
+        if (!empty($criteria['email'])) {
             $searchQuery->andWhere(
-                self::SEARCH_EMAIL_TARGET_FIELD,
+                'email',
                 SearchQuery::OPERATOR_CONTAINS,
                 $criteria['email']
             );
         }
+
         return $searchQuery;
     }
 }

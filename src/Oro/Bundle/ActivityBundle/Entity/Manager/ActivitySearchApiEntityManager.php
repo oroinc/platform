@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Query;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
@@ -43,16 +42,6 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
             $limit,
             $this->getSearchAliases(isset($criteria['from']) ? $criteria['from'] : [])
         );
-    }
-
-    /**
-     * Returns the list of fields responsible to store activity associations for the given activity entity type
-     *
-     * @return array
-     */
-    public function getAssociations()
-    {
-        return $this->activityManager->getActivityTargets($this->class);
     }
 
     /**

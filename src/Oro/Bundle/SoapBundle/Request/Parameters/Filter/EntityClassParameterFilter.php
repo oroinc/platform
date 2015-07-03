@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Request\Parameters\Filter;
 
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
-class EntityClassParameterFilter
+class EntityClassParameterFilter implements ParameterFilterInterface
 {
     /** @var EntityClassNameHelper */
     protected $helper;
