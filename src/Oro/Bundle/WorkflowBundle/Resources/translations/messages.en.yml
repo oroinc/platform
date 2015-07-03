@@ -146,6 +146,7 @@ oro:
 
         transition:
             start: "Start %workflow%"
+            entity_not_found: Entity not found
 
         workflowdefinition:
             entity_label:                 Workflow
