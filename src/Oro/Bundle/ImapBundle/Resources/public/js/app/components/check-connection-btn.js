@@ -54,7 +54,8 @@ function ($, _, routing, __, mediator, messenger) {
                             container: $el.parent()
                         });*/
 
-                        $el.parent().parent().append(response);
+                        $el.parent().parent().parent().find('div.control-group').slice(6).remove();
+                        $el.parent().parent().parent().append(response);
                     })
                     .error(function () {
                         messenger.notificationFlashMessage('error', __('oro.imap.connection.error'), {

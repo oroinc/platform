@@ -238,7 +238,7 @@ class EmailFolder
     /**
      * Get sub folders
      *
-     * @return EmailFolder[]
+     * @return EmailFolder[]|ArrayCollection
      */
     public function getSubFolders()
     {

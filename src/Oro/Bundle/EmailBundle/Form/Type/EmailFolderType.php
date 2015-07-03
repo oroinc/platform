@@ -25,6 +25,7 @@ class EmailFolderType extends AbstractType
     {
         $builder
             ->add('syncEnabled', 'checkbox')
+            ->add('fullName', 'hidden')
             ->add('subFolders', 'collection', [
                 'type' => 'oro_email_email_folder',
             ]);

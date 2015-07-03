@@ -37,6 +37,8 @@ services:
             - %oro_user.entity.class%
             - @doctrine
             - @security.encoder_factory
+            - @oro_imap.connector.factory
+            - @oro_security.encoder.mcrypt
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%

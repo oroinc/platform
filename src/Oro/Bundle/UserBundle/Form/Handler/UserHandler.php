@@ -111,11 +111,11 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
 
-            if ($this->form->isValid()) {
+            //if ($this->form->isValid()) {
                 $this->onSuccess($user);
 
                 return true;
-            }
+            //}
         }
 
         return false;

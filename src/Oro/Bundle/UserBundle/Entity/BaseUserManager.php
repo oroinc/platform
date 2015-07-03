@@ -8,6 +8,11 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -16,6 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 use Oro\Bundle\UserBundle\Entity\UserInterface as OroUserInterface;
+use Zend\Mail\Storage\Folder;
 
 class BaseUserManager implements UserProviderInterface
 {
@@ -35,17 +41,33 @@ class BaseUserManager implements UserProviderInterface
     protected $encoderFactory;
 
     /**
+     * @var ImapEmailManager
+     */
+    protected $manager;
+
+    protected $processedFolders = [];
+
+    /**
      * Constructor
      *
      * @param string $class Entity name
      * @param ManagerRegistry $registry
      * @param EncoderFactoryInterface $encoderFactory
+     * @param ImapConnectorFactory $connectorFactory
+     * @param Mcrypt $mcrypt
      */
-    public function __construct($class, ManagerRegistry $registry, EncoderFactoryInterface $encoderFactory)
-    {
+    public function __construct(
+        $class,
+        ManagerRegistry $registry,
+        EncoderFactoryInterface $encoderFactory,
+        ImapConnectorFactory $connectorFactory,
+        MCrypt $mcrypt
+    ) {
         $this->class = $class;
         $this->registry = $registry;
         $this->encoderFactory = $encoderFactory;
+        $this->connectorFactory = $connectorFactory;
+        $this->mcrypt = $mcrypt;
     }
 
     /**
@@ -70,12 +92,168 @@ class BaseUserManager implements UserProviderInterface
     {
         $this->assertRoles($user);
         $this->updatePassword($user);
+
+        /** @var User $user */
+        if ($user->getImapConfiguration() && $user->getImapConfiguration()->getRootFolders()) {
+            $checkedFolders = $_REQUEST['oro_user_user_form']['imapConfiguration']['rootFolders'];
+            $em = $this->registry->getManager();
+
+            $origin = $user->getImapConfiguration();
+            if (!$origin->getId()) {
+                $em->persist($origin);
+                $em->flush();
+            }
+
+            $config = new ImapConfig(
+                $origin->getHost(),
+                $origin->getPort(),
+                $origin->getSsl(),
+                $origin->getUser(),
+                $this->mcrypt->decryptData($origin->getPassword())
+            );
+
+            $this->manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
+            $folders = $this->syncFolders($origin);
+            foreach ($folders as $folder) {
+                if ($this->hasFolder($folder->getFullName(), $checkedFolders)) {
+                    $folder->setSyncEnabled(true);
+                }
+
+                if (!$folder->getId()) {
+                    $em->persist($folder);
+                }
+            }
+
+            $em->flush();
+        }
+
         $this->getStorageManager()->persist($user);
 
         if ($flush) {
             $this->getStorageManager()->flush();
         }
     }
+
+    /**
+     * @param string $fullName
+     * @param EmailFolder $folder
+     *
+     * @return bool
+     */
+    protected function hasFolder($fullName, $checkedFolders)
+    {
+        foreach ($checkedFolders as $checkedFolder) {
+            if ($checkedFolder['fullName'] === $fullName) {
+                if ($checkedFolder['syncEnabled']) {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Folder[] $srcFolders
+     *
+     * @return EmailFolder[]
+     */
+    protected function processFolders(array $srcFolders, $origin)
+    {
+        $folders = [];
+        foreach ($srcFolders as $srcFolder) {
+            $folder = null;
+            $folderFullName = $srcFolder->getGlobalName();
+            $uidValidity = $this->getUidValidity($srcFolder);
+
+            if ($uidValidity !== null) {
+                $folder = $this->createFolder($srcFolder, $folderFullName, $origin);
+                if ($folder === null) {
+                    continue;
+                }
+                $folders[] = $folder;
+            }
+
+            $childSrcFolders = [];
+            foreach ($srcFolder as $childSrcFolder) {
+                $childSrcFolders[] = $childSrcFolder;
+            }
+
+            $childFolders = $this->processFolders($childSrcFolders, $origin);
+            if (isset($folder)) {
+                foreach ($childFolders as $childFolder) {
+                    $folder->addSubFolder($childFolder);
+                }
+            } else {
+                $folders = array_merge($folders, $childFolders);
+            }
+        }
+
+        return $folders;
+    }
+
+    /**
+     * Performs synchronization of folders
+     *
+     * @return EmailFolder[] The list of folders for which emails need to be synchronized
+     */
+    protected function syncFolders($origin)
+    {
+        //$existingImapFolders = $this->getExistingImapFolders($origin); // todo implement
+        $srcFolders = $this->manager->getFolders(null, true);
+
+        $this->processedFolders = [];
+
+        return $this->processFolders($srcFolders, $origin);
+    }
+
+    protected function createFolder(Folder $srcFolder, $fullName, $origin)
+    {
+        if (in_array($fullName, $this->processedFolders)) {
+            return null;
+        }
+        $em = $this->registry->getManager();
+        $repo = $em->getRepository('OroEmailBundle:EmailFolder');
+        $folder = $repo->findOneBy(['fullName' => $fullName/*, 'origin' => $origin*/]);
+
+        if ($folder) {
+            $this->processedFolders[] = $folder->getFullName();
+            return $folder;
+        }
+
+        $folder = new EmailFolder();
+        $folder
+            ->setFullName($fullName)
+            ->setOrigin($origin)
+            ->setName($srcFolder->getLocalName())
+            ->setType($srcFolder->guessFolderType());
+
+        $this->processedFolders[] = $fullName;
+
+        return $folder;
+    }
+
+    /**
+     * Gets UIDVALIDITY of the given folder
+     *
+     * @param Folder $folder
+     *
+     * @return int|null
+     */
+    protected function getUidValidity(Folder $folder)
+    {
+        try {
+            $this->manager->selectFolder($folder->getGlobalName());
+
+            return $this->manager->getUidValidity();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+
 
     /**
      * Updates a user password if a plain password is set

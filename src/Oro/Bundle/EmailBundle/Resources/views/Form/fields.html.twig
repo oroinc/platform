@@ -195,7 +195,8 @@
 {% endblock %}
 
 {% block oro_email_email_folder_row %}
-    {{ form_widget(form.syncEnabled) }} <label>{{ value.name }}</label>
+    {{ form_widget(form.syncEnabled) }}<label style="margin-right: 5px">{{ value.name }}</label>
+    {{ form_widget(form.fullName) }}
     {% if value.subFolders %}
         <div style="margin-left: 20px">
             {{ form_widget(form.subFolders) }}
@@ -204,7 +205,7 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
-    <input id="check-all" type="checkbox"/><label>All</label>
+    <input id="check-all" type="checkbox" style="margin: 0"/><label style="margin-right: 5px">All</label>
     <div id="folder-list" style="margin-left: 20px">
         {{ form_rest(form) }}
     </div>
@@ -218,6 +219,10 @@
                 $folderList.find(':checkbox').each(function() {
                     this.checked = checked;
                 });
+            });
+
+            $folderList.find(':checkbox').each(function() {
+                $(this).css('margin', 0);
             });
         });
     </script>

@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImapBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
 
+use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\UserBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +41,7 @@ class ConnectionController extends Controller
         $form->submit($this->getRequest());
         $origin = $form->getData();
 
-        if ($form->isValid() && null !== $origin) {
+        if (/*$form->isValid() && */null !== $origin) {
             $config = new ImapConfig(
                 $origin->getHost(),
                 $origin->getPort(),
@@ -55,11 +57,15 @@ class ConnectionController extends Controller
                 $connector->getCapability();
 
                 $folders = $this->syncFolders();
-                $emailFolderForm = $this->createForm('oro_email_email_folder_tree');
-                $emailFolderForm->setData($folders);
+                $origin->setFolders($folders);
+                $user = new User();
+                $user->setImapConfiguration($origin);
+
+                $userForm = $this->get('oro_user.form.user');
+                $userForm->setData($user);
 
                 return $this->render('OroImapBundle:Connection:check.html.twig', [
-                    'form' => $emailFolderForm->createView(),
+                    'form' => $userForm->createView(),
                 ]);
             } catch (\Exception $e) {
                 $this->get('logger')

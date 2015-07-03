@@ -136,6 +136,20 @@ abstract class EmailOrigin
         return $this->folders;
     }
 
+    public function addRootFolder(EmailFolder $folder)
+    {
+        return $this->addFolder($folder);
+    }
+
+    public function removeRootFolder(EmailFolder $folder)
+    {
+        if ($this->folders->contains($folder)) {
+            $this->folders->remove($folder);
+        }
+
+        return $this;
+    }
+
     /**
      * Get root folders list
      *
