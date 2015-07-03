@@ -9,7 +9,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 use Oro\Bundle\EntityBundle\Exception\EntityExceptionInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class RelatedEntityTransformer implements DataTransformerInterface
@@ -17,25 +17,25 @@ class RelatedEntityTransformer implements DataTransformerInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
 
     /** @var SecurityFacade */
     protected $securityFacade;
 
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param SecurityFacade      $securityFacade
+     * @param DoctrineHelper        $doctrineHelper
+     * @param EntityClassNameHelper $entityClassNameHelper
+     * @param SecurityFacade        $securityFacade
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityAliasResolver $entityAliasResolver,
+        EntityClassNameHelper $entityClassNameHelper,
         SecurityFacade $securityFacade
     ) {
-        $this->doctrineHelper      = $doctrineHelper;
-        $this->entityAliasResolver = $entityAliasResolver;
-        $this->securityFacade      = $securityFacade;
+        $this->doctrineHelper        = $doctrineHelper;
+        $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->securityFacade        = $securityFacade;
     }
 
     /**
@@ -87,11 +87,8 @@ class RelatedEntityTransformer implements DataTransformerInterface
      */
     protected function getEntity($entityName, $id)
     {
-        if (false === strpos($entityName, '\\')) {
-            $entityName = $this->entityAliasResolver->getClassByAlias($entityName);
-        }
-
-        $entity = $this->doctrineHelper->getEntityRepository($entityName)->find($id);
+        $entityName = $this->entityClassNameHelper->resolveEntityClass($entityName);
+        $entity     = $this->doctrineHelper->getEntityRepository($entityName)->find($id);
 
         return $entity && $this->securityFacade->isGranted('VIEW', $entity)
             ? $entity

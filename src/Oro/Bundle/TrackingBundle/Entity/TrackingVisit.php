@@ -24,8 +24,6 @@ use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisit;
  */
 class TrackingVisit extends ExtendTrackingVisit
 {
-    const ENTITY_NAME = 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit';
-
     /**
      * @var integer
      *

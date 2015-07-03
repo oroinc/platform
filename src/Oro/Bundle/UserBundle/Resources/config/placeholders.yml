@@ -7,6 +7,7 @@ placeholders:
 items:
     menu_user:
         template: OroUserBundle:Menu:menuProfile.html.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
 
     oro_user_password_change_button:
         template: OroUserBundle:User:passwordChangeButton.html.twig

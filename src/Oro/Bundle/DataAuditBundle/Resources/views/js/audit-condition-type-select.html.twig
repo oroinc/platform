@@ -1,0 +1,24 @@
+<script type="text-template" id="template-audit-condition-type-select">
+    <span class="active-filter">
+        <div>
+            <div class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selected === "changed" ? changedLabel : changedToValueLabel %></a>
+                <ul class="dropdown-menu">
+                    <li <%= (selected === "changed") ? 'class="active"' : '' %>>
+                        <a class="choice-value" href="#" data-value="changed"><%= changedLabel %></a>
+                    </li>
+                    <li <%= (selected === "changed_to_value") ? 'class="active"' : '' %>>
+                        <a class="choice-value" href="#" data-value="changed_to_value"><%= changedToValueLabel %></a>
+                    </li>
+                </ul>
+
+                <select style="display: none;">
+                    <option <%= (selected === "changed") ? "selected" : "" %> value="changed"><%= changedLabel %></option>
+                    <option <%= (selected === "changed_to_value") ? "selected" : "" %> value="changed_to_value"><%= changedToValueLabel %></option>
+                </select>
+                <span class="active-filter">
+                </span>
+            </div>
+        </div>
+    </span>
+</script>

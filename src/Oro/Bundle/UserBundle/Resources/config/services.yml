@@ -1,6 +1,8 @@
 parameters:
+    oro_user.manager.base.class:                  Oro\Bundle\UserBundle\Entity\BaseUserManager
     oro_user.manager.class:                       Oro\Bundle\UserBundle\Entity\UserManager
     oro_user.manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_user.permission.manager.api.class:        Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager
     oro_user.status.manager.class:                Oro\Bundle\UserBundle\Entity\Manager\StatusManager
     oro_user.entity.class:                        Oro\Bundle\UserBundle\Entity\User
     oro_user.group.entity.class:                  Oro\Bundle\UserBundle\Entity\Group
@@ -31,8 +33,11 @@ parameters:
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
 services:
     oro_user.manager:
-        class:                        %oro_user.manager.class%
-        arguments:                    [%oro_user.entity.class%, "@doctrine.orm.entity_manager", "@security.encoder_factory"]
+        class: %oro_user.manager.class%
+        arguments:
+            - %oro_user.entity.class%
+            - @doctrine
+            - @security.encoder_factory
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%
@@ -40,6 +45,15 @@ services:
         arguments:
             - %oro_user.entity.class%
             - @doctrine.orm.entity_manager
+
+    oro_user.permission_manager.api:
+        class: %oro_user.permission.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_user.entity.class%
+            - @doctrine.orm.entity_manager
+            - @security.context
+            - @oro_security.acl.extension_selector
 
     oro_user.security.provider:
         class:                        %oro_user.security.provider.class%
@@ -69,6 +83,7 @@ services:
         arguments:                    ["@oro_security.link.sid_manager"]
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: prePersist }
 
     oro_user.twig.user_extension:
         class:                        %oro_user.twig.user_extension.class%
@@ -114,7 +129,7 @@ services:
             - @oro_security.ownership_tree_provider
             - @?security.acl.voter.basic_permissions
         calls:
-            - [ setNameFormatter, [@oro_locale.formatter.name] ]
+            - [ setEntityNameResolver, [@oro_entity.entity_name_resolver] ]
 
     oro_user.autocomplete.user.search_acl_handler:
         parent: oro_user.autocomplete.user.search_acl_handler.abstract
@@ -206,14 +221,16 @@ services:
     oro_user.mailer.processor:
         class: %oro_user.mailer.processor.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
             - @oro_config.global
             - @oro_email.email_renderer
-            - @oro_user.manager
+            - @oro_email.email_holder_helper
             - @oro_email.direct_mailer
 
     oro_user.placeholder.filter:
         class: %oro_user.placeholder.filter.class%
+        arguments:
+            - @oro_security.security_facade
 
     oro_user.password_change.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract

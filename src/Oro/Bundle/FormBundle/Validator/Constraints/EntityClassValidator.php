@@ -7,26 +7,26 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class EntityClassValidator extends ConstraintValidator
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
 
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityAliasResolver $entityAliasResolver
+     * @param DoctrineHelper        $doctrineHelper
+     * @param EntityClassNameHelper $entityClassNameHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityAliasResolver $entityAliasResolver
+        EntityClassNameHelper $entityClassNameHelper
     ) {
-        $this->doctrineHelper      = $doctrineHelper;
-        $this->entityAliasResolver = $entityAliasResolver;
+        $this->doctrineHelper        = $doctrineHelper;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
@@ -52,12 +52,10 @@ class EntityClassValidator extends ConstraintValidator
      */
     protected function isValidEntityClass($entityName)
     {
-        if (false === strpos($entityName, '\\')) {
-            try {
-                $entityName = $this->entityAliasResolver->getClassByAlias($entityName);
-            } catch (EntityAliasNotFoundException $e) {
-                return false;
-            }
+        try {
+            $entityName = $this->entityClassNameHelper->resolveEntityClass($entityName);
+        } catch (EntityAliasNotFoundException $e) {
+            return false;
         }
 
         return $this->doctrineHelper->isManageableEntity($entityName);

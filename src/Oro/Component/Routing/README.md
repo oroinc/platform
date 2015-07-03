@@ -159,7 +159,7 @@ class MyRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(Route $route, RouteCollectionAccessor $routeCollectionAccessor)
+    public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
         // Add your logic here
     }

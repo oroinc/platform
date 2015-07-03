@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
-use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
+use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
 
 class ChangePasswordTypeTest extends FormIntegrationTestCase
 {
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ChangePasswordSubscriber */
     protected $subscriber;
 
-    /** @var  ChangePasswordType */
+    /** @var ChangePasswordType */
     protected $type;
 
     protected function setUp()
@@ -24,13 +28,24 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
         $this->type = new ChangePasswordType($this->subscriber);
     }
 
+    protected function tearDown()
+    {
+        unset($this->subscriber, $this->type);
+    }
+
     /**
      * Test buildForm
      */
     public function testBuildForm()
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|FormBuilderInterface $builder */
         $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
-        $options = array();
+        $options = [
+            'current_password_label' => 'label',
+            'plain_password_invalid_message' => 'label',
+            'first_options_label' => 'label',
+            'second_options_label' => 'label'
+        ];
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')
@@ -48,10 +63,19 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
      */
     public function testSetDefaultOptions()
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolverInterface $resolver */
         $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with($this->isType('array'));
+            ->with(
+                $this->logicalAnd(
+                    $this->isType('array'),
+                    $this->arrayHasKey('current_password_label'),
+                    $this->arrayHasKey('plain_password_invalid_message'),
+                    $this->arrayHasKey('first_options_label'),
+                    $this->arrayHasKey('second_options_label')
+                )
+            );
         $this->type->setDefaultOptions($resolver);
     }
 

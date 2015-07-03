@@ -25,7 +25,7 @@ Consider there is a form type that should have a field with support of autocompl
 ```php
 class ProductType extends AbstractType
 {
-/**
+    /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -38,7 +38,7 @@ class ProductType extends AbstractType
 
                 // Default values
                 'configs' => array(
-                    'extra_config'            => 'autocomplete',
+                    'component'               => 'autocomplete',
                     'placeholder'             => 'Choose a value...',
                     'allowClear'              => true,
                     'minimumInputLength'      => 1,
@@ -124,27 +124,48 @@ This option can be ommited if option "autocomplete_alias" provided.
 List of properties that will be used in view to convert json object to string that will be displayed in select options
 (optional if "autocomplete_alias" option is provided).
 
-**configs.extra_config**
+**configs.component**
 
-This option specifies the block name in twig template that will be used to add extra configuration to select2 jQuery plugin.
-Make sure that block with name "oro_combobox_dataconfig_%extra_config%" exists. There are two predefined values that can be used:
-"autocomplete" (block name "oro_combobox_dataconfig_autocomplete") and "grid" (block name "oro_combobox_dataconfig_grid").
+This option specifies the Select2Component that will be used for configuring Select2 jQuery plugin.
+Make sure that the component with the name `oro/select2-%component%-component` is defined in `requirejs.yml`.
+For example, `config.component` with value `autocomplete` refers to the module `oro/select2-autocomplete-component` and
+the path to this module name is specified in `Resources/config/requirejs.yml`
 
-If you need to extend select2 logic you can add a block in twig template with name of your "extra_config" and do all customization there.
+```yml
+config:
+    paths:
+        'oro/select2-autocomplete-component': 'bundles/oroform/js/app/components/select2-autocomplete-component.js'
+```
 
-**configs.extra_modules**
+There are several predefined values that can be used:
+ - `autocomplete` (module name `oro/select2-autocomplete-component`)
+ - `grid` (module name `oro/select2-grid-component`)
+ - `relation` (module name `oro/select2-relation-component`)
 
-By default `underscore.js` and `jQuery` are available in extra configuration block. If you need some additional JavaScript modules you can use `configs.extra_modules` options. This option should be an associative array of modules you need. The key is a module alias, the value is a module path. For example:
-``` php
-public function setDefaultOptions(OptionsResolverInterface $resolver)
-{
-    $resolver->setDefaults([
-        ...
-        'configs' => [
-            ...
-            'extra_modules' => ['SomeModule' => 'oro/some-module']
-        ]
-    ]);
+If you need to extend select2 configuration, you can define your own component name (e.g. `my-autocomplete`),
+create the component (extending from some Select2Component):
+
+```javascript
+define(function (require) {
+    'use strict';
+    var Select2MyAutocompleteComponent,
+        Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+    Select2MyAutocompleteComponent = Select2AutocompleteComponent.extend({
+        makeQuery: function (query, configs) {
+            return query + ';' + configs.entity_id;
+        }
+    });
+    return Select2MyAutocompleteComponent;
+});
+
+```
+
+And declare this module name in requirejs configuration:
+
+```yml
+config:
+    paths:
+        'oro/select2-my-autocomplete-component': 'bundles/mybundle/js/app/components/select2-my-autocomplete-component.js'
 ```
 
 **configs.selection_template_twig**

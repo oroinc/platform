@@ -20,6 +20,9 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ActivityManager
 {
     /** @var DoctrineHelper */
@@ -268,28 +271,33 @@ class ActivityManager
      * associated with the given activity
      *
      * @param string      $activityClassName The FQCN of the activity entity
-     * @param mixed|null  $filters           Criteria is used to filter activity entities
+     * @param mixed       $filters           Criteria is used to filter activity entities
      *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
      * @param array|null  $joins             Additional associations required to filter activity entities
-     * @param int         $limit             The maximum number of items per page
-     * @param int         $page              The page number
+     * @param int|null    $limit             The maximum number of items per page
+     * @param int|null    $page              The page number
      * @param string|null $orderBy           The ordering expression for the result
      *
-     * @return SqlQueryBuilder
+     * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
     public function getActivityTargetsQueryBuilder(
         $activityClassName,
         $filters,
-        $joins,
+        $joins = null,
         $limit = null,
         $page = null,
         $orderBy = null
     ) {
+        $targets = $this->getActivityTargets($activityClassName);
+        if (empty($targets)) {
+            return null;
+        }
+
         return $this->associationManager->getMultiAssociationsQueryBuilder(
             $activityClassName,
             $filters,
             $joins,
-            $this->getActivityTargets($activityClassName),
+            $targets,
             $limit,
             $page,
             $orderBy
@@ -321,28 +329,33 @@ class ActivityManager
      * associated with the given target entity
      *
      * @param string      $targetClassName The FQCN of the activity entity
-     * @param mixed|null  $filters         Criteria is used to filter activity entities
+     * @param mixed       $filters         Criteria is used to filter activity entities
      *                                     e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
      * @param array|null  $joins           Additional associations required to filter activity entities
-     * @param int         $limit           The maximum number of items per page
-     * @param int         $page            The page number
+     * @param int|null    $limit           The maximum number of items per page
+     * @param int|null    $page            The page number
      * @param string|null $orderBy         The ordering expression for the result
      *
-     * @return SqlQueryBuilder
+     * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
     public function getActivitiesQueryBuilder(
         $targetClassName,
         $filters,
-        $joins,
+        $joins = null,
         $limit = null,
         $page = null,
         $orderBy = null
     ) {
+        $activities = $this->getActivities($targetClassName);
+        if (empty($activities)) {
+            return null;
+        }
+
         return $this->associationManager->getMultiAssociationOwnersQueryBuilder(
             $targetClassName,
             $filters,
             $joins,
-            $this->getActivities($targetClassName),
+            $activities,
             $limit,
             $page,
             $orderBy
@@ -360,7 +373,8 @@ class ActivityManager
     {
         $result = [];
 
-        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        $config = $this->activityConfigProvider->getConfig($entityClass);
+        $activityClassNames = $config->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
             if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
                 continue;

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -12,6 +13,7 @@ use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
  * Class ProcessorTest
@@ -47,6 +49,12 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var Processor */
     protected $emailProcessor;
 
+    /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacadeLink;
+
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -72,6 +80,25 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->setMethods(['getLoggedUser', 'getOrganization'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacadeLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->setMethods(['getService'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacadeLink->expects($this->any())
+            ->method('getService')
+            ->will($this->returnValue($this->securityFacade));
+
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganization')
+            ->will($this->returnValue($this->getTestOrganization()));
+
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with('OroEmailBundle:Email')
@@ -84,6 +111,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->emailEntityBuilder,
             $this->emailOwnerProvider,
             $this->emailActivityManager,
+            $this->securityFacadeLink,
             $this->dispatcher
         );
     }
@@ -176,37 +204,13 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      * @dataProvider messageDataProvider
      * @param array $data
      * @param array $expectedMessageData
+     * @param bool  $needConverting
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcess($data, $expectedMessageData)
+    public function testProcess($data, $expectedMessageData, $needConverting = false)
     {
-        $message = $this->getMockBuilder('\Swift_Message')
-            ->setMethods(['setDate', 'setFrom', 'setTo',  'setCc',  'setBcc', 'setSubject', 'setBody'])
-            ->getMockForAbstractClass();
-        $message->expects($this->once())
-            ->method('setDate');
-        $message->expects($this->once())
-            ->method('setFrom')
-            ->with($expectedMessageData['from']);
-        $message->expects($this->once())
-            ->method('setTo')
-            ->with($expectedMessageData['to']);
-        $message->expects($this->once())
-            ->method('setCc')
-            ->with($expectedMessageData['cc']);
-        $message->expects($this->once())
-            ->method('setBcc')
-            ->with($expectedMessageData['bcc']);
-        $message->expects($this->once())
-            ->method('setSubject')
-            ->with($expectedMessageData['subject']);
-        $message->expects($this->once())
-            ->method('setBody')
-            ->with(
-                $expectedMessageData['body'],
-                isset($expectedMessageData['type']) ? $expectedMessageData['type'] : 'text/plain'
-            );
+        $message = new \Swift_Message();
 
         $this->mailer->expects($this->once())
             ->method('createMessage')
@@ -222,7 +226,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
             ->disableOriginalConstructor()
             ->getMock();
-        $origin->expects($this->once())
+        $origin->expects($this->any())
             ->method('getFolder')
             ->with(FolderType::SENT)
             ->will($this->returnValue($folder));
@@ -239,11 +243,19 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:InternalEmailOrigin')
             ->will($this->returnValue($emailOriginRepo));
 
+        $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
+            ->setMethods(['setFolder', 'getEmail'])
+            ->getMock();
+        $emailUser->expects($this->once())
+            ->method('setFolder');
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();
+        $emailUser->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($email);
         $this->emailEntityBuilder->expects($this->once())
-            ->method('email')
+            ->method('emailUser')
             ->with(
                 $data['subject'],
                 $data['from'],
@@ -255,18 +267,13 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                 $data['cc'],
                 $data['bcc']
             )
-            ->will($this->returnValue($email));
+            ->willReturn($emailUser);
 
         $body = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
             ->disableOriginalConstructor()
             ->getMock();
         $this->emailEntityBuilder->expects($this->once())
             ->method('body')
-            ->with(
-                $expectedMessageData['body'],
-                isset($data['type']) && $data['type'] === 'html' ? true : false,
-                true
-            )
             ->will($this->returnValue($body));
 
         $batch = $this->getMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
@@ -278,6 +285,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($this->em));
         $this->em->expects($this->once())->method('flush');
 
+        $email->expects($this->any())
+            ->method('getEmailBody')
+            ->willReturn($body);
+
         if (!empty($data['entityClass']) && !empty($data['entityClass'])) {
             $targetEntity = new TestUser();
             $this->doctrineHelper->expects($this->exactly(0))
@@ -287,11 +298,21 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->emailActivityManager->expects($this->exactly(0))
                 ->method('addAssociation')
                 ->with($this->identicalTo($email), $this->identicalTo($targetEntity));
-        } else {
         }
 
         $model = $this->createEmailModel($data);
-        $this->assertSame($email, $this->emailProcessor->process($model));
+
+        $this->assertSame($emailUser, $this->emailProcessor->process($model));
+        $this->assertEquals($expectedMessageData['from'], [$model->getFrom()]);
+        $this->assertEquals($data['cc'], $model->getCc());
+        $this->assertEquals($data['bcc'], $model->getBcc());
+        $this->assertEquals($expectedMessageData['subject'], $model->getSubject());
+        if ($needConverting) {
+            $id = $model->getAttachments()->first()->getEmailAttachment()->getEmbeddedContentId();
+            $this->assertEquals(sprintf($expectedMessageData['body'], 'cid:' . $id), $message->getBody());
+        } else {
+            $this->assertEquals($expectedMessageData['body'], $model->getBody());
+        };
     }
 
     public function messageDataProvider()
@@ -304,7 +325,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'cc' => ['Cc <cc@test.com>'],
                     'bcc' => ['Bcc <bcc@test.com>'],
                     'subject' => 'subject',
-                    'body' => 'body'
+                    'body' => 'body <img width=100 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAAB'
+                            .'IeJ9nAAAAA1BMVEX///+nxBvIAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB98GEA'
+                            .'grLyNXN+0AAAAmaVRYdENvbW1lbnQAAAAAAENyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjleRfWwAAAAxJREFUCN'
+                            .'djYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==" height="100"/>',
+                    'type' => 'html'
                 ],
                 [
                     'from' => ['from@test.com'],
@@ -312,8 +337,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'cc' => ['cc@test.com' => 'Cc'],
                     'bcc' => ['bcc@test.com' => 'Bcc'],
                     'subject' => 'subject',
-                    'body' => 'body'
-                ]
+                    'body' => 'body <img width=100 src="%s" height="100"/>',
+                    'type' => 'text/html'
+                ],
+                true
             ],
             [
                 [
@@ -345,7 +372,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'body' => 'body'
                 ],
                 [
-                    'from' => ['from@test.com' => 'Test'],
+                    'from' => ['Test <from@test.com>'],
                     'to' => ['to@test.com' => 'To', 'to2@test.com'],
                     'cc' => ['cc3@test.com' => 'Cc3', 'cc4@test.com'],
                     'bcc' => [],
@@ -382,9 +409,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $method = $processor->getMethod('createUserInternalOrigin');
         $method->setAccessible(true);
 
-        $origin = $method->invokeArgs($this->emailProcessor, [$this->getTestUser()]);
+        $origin = $method->invokeArgs($this->emailProcessor, [$this->getTestUser(), $this->getTestOrganization()]);
+        $testOrigin = $this->getTestOrigin();
+        $testOrigin->getOwner()->addEmailOrigin($testOrigin);
 
-        $this->assertEquals($this->getTestOrigin(), $origin);
+        $this->assertEquals($testOrigin, $origin);
     }
 
     public function testProcessOwnerUserWithoutOrigin()
@@ -423,13 +452,21 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->em, 'test_user@test.com')
             ->will($this->returnValue($user));
 
+        $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
+            ->setMethods(['setFolder', 'getEmail'])
+            ->getMock();
+        $emailUser->expects($this->once())
+            ->method('setFolder');
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();
+        $emailUser->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($email);
         $this->emailEntityBuilder->expects($this->once())
-            ->method('email')
+            ->method('emailUser')
             ->with('test', 'Test User <test_user@test.com>', ['test2@test.com'])
-            ->will($this->returnValue($email));
+            ->will($this->returnValue($emailUser));
         $body = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
             ->disableOriginalConstructor()
             ->getMock();
@@ -458,6 +495,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                         $this->emailEntityBuilder,
                         $this->emailOwnerProvider,
                         $this->emailActivityManager,
+                        $this->securityFacadeLink,
                         $this->dispatcher
                     ]
                 )
@@ -492,6 +530,14 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         return $user;
     }
 
+    protected function getTestOrganization()
+    {
+        $organization = new Organization();
+        $organization->setId(1);
+
+        return $organization;
+    }
+
     protected function getTestOrigin()
     {
         $outboxFolder = new EmailFolder();
@@ -503,7 +549,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $origin = new InternalEmailOrigin();
         $origin
             ->setName('BAP_User_1')
-            ->addFolder($outboxFolder);
+            ->addFolder($outboxFolder)
+            ->setOwner($this->getTestUser())
+            ->setOrganization($this->getTestOrganization());
 
         return $origin;
     }

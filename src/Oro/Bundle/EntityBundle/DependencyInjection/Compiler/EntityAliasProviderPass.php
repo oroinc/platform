@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class EntityAliasProviderPass implements CompilerPassInterface
 {
     const RESOLVER_SERVICE = 'oro_entity.entity_alias_resolver';
-    const PROVIDER_TAG_NAME = 'entity.alias_provider';
+    const PROVIDER_TAG_NAME = 'oro_entity.alias_provider';
 
     /**
      * {@inheritdoc}
@@ -32,7 +32,7 @@ class EntityAliasProviderPass implements CompilerPassInterface
         }
 
         // sort by priority and flatten
-        ksort($providers);
+        krsort($providers);
         $providers = call_user_func_array('array_merge', $providers);
 
         // register

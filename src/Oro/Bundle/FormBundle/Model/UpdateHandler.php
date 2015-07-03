@@ -65,8 +65,8 @@ class UpdateHandler
     /**
      * @param object $entity
      * @param FormInterface $form
-     * @param callable $saveAndStayRoute
-     * @param callable $saveAndCloseRoute
+     * @param array|callable $saveAndStayRoute
+     * @param array|callable $saveAndCloseRoute
      * @param string $saveMessage
      * @param null|object $formHandler
      * @param callable|null $resultCallback

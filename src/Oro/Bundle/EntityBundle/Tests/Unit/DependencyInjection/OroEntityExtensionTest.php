@@ -101,5 +101,21 @@ class OroEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             $entityAliasExclusions
         );
+
+        $textRepresentationTypes = $container->getParameter('oro_entity.entity_name_formats');
+        $this->assertEquals(
+            [
+                'long' => [
+                    'fallback' => 'short'
+                ],
+                'short' => [
+                    'fallback' => null
+                ],
+                'html' => [
+                    'fallback' => 'long'
+                ]
+            ],
+            $textRepresentationTypes
+        );
     }
 }

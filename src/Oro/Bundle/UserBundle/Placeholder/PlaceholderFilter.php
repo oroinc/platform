@@ -2,10 +2,24 @@
 
 namespace Oro\Bundle\UserBundle\Placeholder;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class PlaceholderFilter
 {
+    /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    /**
+     * @param SecurityFacade $securityFacade
+     */
+    public function __construct(SecurityFacade $securityFacade)
+    {
+        $this->securityFacade = $securityFacade;
+    }
+
     /**
      * Checks if the object is an instance of a given class.
      *
@@ -14,9 +28,14 @@ class PlaceholderFilter
      */
     public function isPasswordManageEnabled($entity)
     {
-        if ($entity instanceof User && $entity->isEnabled()) {
-            return true;
-        }
-        return false;
+        return $entity instanceof User && $entity->isEnabled();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUserApplicable()
+    {
+        return $this->securityFacade->getLoggedUser() instanceof User;
     }
 }

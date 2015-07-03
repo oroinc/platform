@@ -11,11 +11,11 @@ use FOS\RestBundle\Controller\Annotations\Post;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
 
 /**
  * @RouteResource("activity_relation")
@@ -65,7 +65,7 @@ class ActivityEntityController extends RestController
     }
 
     /**
-     * Adds an association between an activity and an target entity.
+     * Adds an association between an activity and a target entity.
      *
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
@@ -73,7 +73,7 @@ class ActivityEntityController extends RestController
      * @Post("/activities/{activity}/{id}/relations", name="")
      *
      * @ApiDoc(
-     *      description="Adds an association between an activity and an target entity",
+     *      description="Adds an association between an activity and a target entity",
      *      resource=true
      * )
      *
@@ -88,7 +88,7 @@ class ActivityEntityController extends RestController
     }
 
     /**
-     * Deletes an association between an activity and an target entity.
+     * Deletes an association between an activity and a target entity.
      *
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
@@ -98,7 +98,7 @@ class ActivityEntityController extends RestController
      * @Delete("/activities/{activity}/{id}/{entity}/{entityId}", name="")
      *
      * @ApiDoc(
-     *      description="Deletes an association between an activity and an target entity",
+     *      description="Deletes an association between an activity and a target entity",
      *      resource=true
      * )
      *
