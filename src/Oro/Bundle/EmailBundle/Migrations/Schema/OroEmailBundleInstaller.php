@@ -25,7 +25,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_15';
     }
 
     /**
@@ -72,6 +72,8 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle113::addColumnMultiMessageId($schema);
 
-        OroEmailBundle114::addEmailFolderFields($schema);
+        OroEmailBundle114::addEmbeddedContentIdField($schema);
+
+        OroEmailBundle115::addEmailFolderFields($schema);
     }
 }

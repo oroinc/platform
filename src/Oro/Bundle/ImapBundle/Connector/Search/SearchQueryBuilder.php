@@ -25,6 +25,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function from($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('from', $value, $match);
+
         return $this;
     }
 
@@ -39,6 +40,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function to($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('to', $value, $match);
+
         return $this;
     }
 
@@ -53,6 +55,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function cc($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('cc', $value, $match);
+
         return $this;
     }
 
@@ -67,6 +70,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function bcc($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('bcc', $value, $match);
+
         return $this;
     }
 
@@ -81,6 +85,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function participants($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('participants', $value, $match);
+
         return $this;
     }
 
@@ -95,6 +100,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function subject($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('subject', $value, $match);
+
         return $this;
     }
 
@@ -109,6 +115,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function body($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('body', $value, $match);
+
         return $this;
     }
 
@@ -123,6 +130,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function attachment($value, $match = SearchQueryMatch::DEFAULT_MATCH)
     {
         $this->processField('attachment', $value, $match);
+
         return $this;
     }
 
@@ -137,6 +145,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function sent($fromValue = null, $toValue = null)
     {
         $this->processDateField('sent', $fromValue, $toValue);
+
         return $this;
     }
 
@@ -151,6 +160,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     public function received($fromValue = null, $toValue = null)
     {
         $this->processDateField('received', $fromValue, $toValue);
+
         return $this;
     }
 
@@ -164,7 +174,12 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
         }
     }
 
-    private function processField($name, $value, $match)
+    /**
+     * @param $name
+     * @param $value
+     * @param $match
+     */
+    public function processField($name, $value, $match)
     {
         if ($value instanceof \Closure) {
             $exprBuilder = new SearchQueryValueBuilder($this->query->newInstance());

@@ -120,4 +120,51 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
+
+    public function testEmailSeen()
+    {
+        $url = $this->getUrl('oro_email_toggle_seen', ['id' => $this->getReference('emailUser_1')->getId()]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful']);
+    }
+
+    public function testMarkReadMass()
+    {
+        $url = $this->getUrl(
+            'oro_email_mark_massaction',
+            [
+                'gridName' => 'user-email-grid',
+                'actionName' => 'emailmarkread',
+                'user-email-grid[userId]' => $this->getReference('simple_user')->getId(),
+                'inset' => 1,
+                'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
+            ]
+        );
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful'] === true);
+        $this->assertTrue($data['count'] === 1);
+    }
+
+    public function testMarkUnreadMass()
+    {
+        $url = $this->getUrl(
+            'oro_email_mark_massaction',
+            [
+                'gridName' => 'user-email-grid',
+                'actionName' => 'emailmarkunread',
+                'user-email-grid[userId]' => $this->getReference('simple_user')->getId(),
+                'inset' => 1,
+                'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
+            ]
+        );
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful'] === true);
+        $this->assertTrue($data['count'] === 1);
+    }
 }
