@@ -11,7 +11,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
@@ -81,9 +80,7 @@ class ActivitySearchController extends RestGetController
     }
 
     /**
-     * Gets the API entity manager
-     *
-     * @return ActivitySearchApiEntityManager
+     * {@inheritdoc}
      */
     public function getManager()
     {
