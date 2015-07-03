@@ -37,6 +37,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailController extends Controller
 {
