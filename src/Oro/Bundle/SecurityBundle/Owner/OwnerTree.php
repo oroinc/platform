@@ -447,6 +447,8 @@ class OwnerTree implements OwnerTreeInterface
     }
 
     /**
+     * Pay attention that now local level entity is second and global entity is third
+     *
      * {@inheritdoc}
      */
     public function addLocalEntityToBasic($basicLevelEntityId, $localLevelEntityId, $globalLevelEntityId)
