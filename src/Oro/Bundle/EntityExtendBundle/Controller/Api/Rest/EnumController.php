@@ -22,7 +22,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 class EnumController extends FOSRestController
 {
     /**
-     * Get all values of the specified enumeration
+     * Get all values of the specified enumeration.
+     * Deprecated since 1.9. Use /api/rest/{version}/{enum_plural_alias}.{_format} instead.
+     * For example /api/rest/latest/leadsources.json.
      *
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *
@@ -35,6 +37,8 @@ class EnumController extends FOSRestController
      * )
      *
      * @return Response
+     *
+     * @deprecated since 1.9. Use /api/rest/{version}/{enum_plural_alias}.{_format} instead
      */
     public function getAction($entityName)
     {
