@@ -5,6 +5,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 
 class ObjectMapperTest extends \PHPUnit_Framework_TestCase
@@ -43,6 +44,17 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
                         [
                             'name'        => 'name',
                             'target_type' => 'text',
+                        ],
+                        [
+                            'name'            => 'categories',
+                            'relation_type'   => 'one-to-many',
+                            'relation_fields' => [
+                                [
+                                    'name'          => 'name',
+                                    'target_type'   => 'text',
+                                    'target_fields' => ['categoryNames']
+                                ]
+                            ]
                         ]
                     ]
                 ],
@@ -123,6 +135,13 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             ->setManufacturer($manufacturer)
             ->setDescription('description')
             ->setCreateDate(new \DateTime());
+        $categories = ['men', 'women'];
+        foreach ($categories as $categoryName) {
+            $category = new Category();
+            $category->setName($categoryName)
+                ->addProduct($this->product);
+            $this->product->addCategory($category);
+        }
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
@@ -139,6 +158,10 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
         $productName = $this->product->getName();
         $productDescription = $this->product->getDescription();
         $manufacturerName = $this->product->getManufacturer()->getName();
+        $categoryNames = [];
+        foreach ($this->product->getCategories() as $category) {
+            $categoryNames[] = $category->getName();
+        }
         $allTextData = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
 
         $productMapping = [
@@ -164,8 +187,9 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
         $manufacturerMapping = [
             'text' => [
-                'products' => $productName,
-                Indexer::TEXT_ALL_DATA_FIELD => $productName
+                'products'                   => $productName,
+                'categoryNames'              => implode(' ', $categoryNames),
+                Indexer::TEXT_ALL_DATA_FIELD => $productName . ' ' . implode(' ', $categoryNames)
             ]
         ];
         $this->assertEquals($manufacturerMapping, $this->mapper->mapObject($manufacturer));
