@@ -52,7 +52,7 @@ class EnumFilterType extends AbstractChoiceType
         $resolver->setNormalizers(
             [
                 'class' => function (Options $options, $value) {
-                    if (!empty($value)) {
+                    if ($value !== null) {
                         return $value;
                     }
 
