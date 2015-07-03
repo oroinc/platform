@@ -244,7 +244,7 @@ services:
         arguments:
             - @oro_entity.entity_alias_config_bag
         tags:
-            - { name: oro_entity.alias_provider, priority: 100 }
+            - { name: oro_entity.alias_provider, priority: -100 }
 
     oro_entity.entity_class_name_helper:
         class: %oro_entity.entity_class_name_helper.class%
@@ -263,4 +263,4 @@ services:
         arguments:
             - @doctrine
         tags:
-            - { name: oro_entity.name_provider, priority: 100 }
+            - { name: oro_entity.name_provider, priority: -100 }

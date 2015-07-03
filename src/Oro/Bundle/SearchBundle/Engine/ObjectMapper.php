@@ -42,6 +42,34 @@ class ObjectMapper extends AbstractMapper
     }
 
     /**
+     * Gets search aliases for entities
+     *
+     * @param string[] $classNames The list of entity FQCN
+     *
+     * @return array [entity class name => entity search alias, ...]
+     *
+     * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
+     *                                   or has no the search alias
+     */
+    public function getEntityAliases(array $classNames = [])
+    {
+        return $this->mappingProvider->getEntityAliases($classNames);
+    }
+
+    /**
+     * Gets the search alias of a given entity
+     *
+     * @param string $className The FQCN of an entity
+     *
+     * @return string|null The search alias of the entity
+     *                     or NULL if the entity is not registered in a search index or has no the search alias
+     */
+    public function getEntityAlias($className)
+    {
+        return $this->mappingProvider->getEntityAlias($className);
+    }
+
+    /**
      * Get search entities list
      *
      * @param null|string|string[] $modeFilter Filter entities by "mode"

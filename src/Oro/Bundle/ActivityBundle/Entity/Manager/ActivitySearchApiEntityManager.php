@@ -58,17 +58,18 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
     /**
      * Get search aliases for specified entity class(es). By default returns all associated entities.
      *
-     * @param string[] $from
+     * @param string[] $entities
      *
-     * @return array
+     * @return string[]
      */
-    protected function getSearchAliases(array $from)
+    protected function getSearchAliases(array $entities)
     {
-        $entities = empty($from)
-            ? $this->activityManager->getActivityTargets($this->class)
-            : array_flip($from);
-        $aliases  = array_intersect_key($this->searchIndexer->getEntitiesListAliases(), $entities);
+        if (empty($entities)) {
+            $entities = array_flip($this->activityManager->getActivityTargets($this->class));
+        }
 
-        return array_values($aliases);
+        return array_values(
+            $this->searchIndexer->getEntityAliases($entities)
+        );
     }
 }
