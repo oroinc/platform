@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Controller;
 use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
