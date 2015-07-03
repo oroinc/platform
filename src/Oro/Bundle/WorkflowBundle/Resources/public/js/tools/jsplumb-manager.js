@@ -185,25 +185,26 @@ define(function (require) {
             function process (ep, anchor) {
                 // don't manage Perimeter type anchors
                 var i, adjusted,
+                    coords = _.clone(anchor),
                     round = $('#' + ep.elementId).hasClass('start-step'),
-                    edge = getEdge(anchor),
+                    edge = getEdge(coords),
                     key = ep.element.id + '_' + edge;
                 if(key in that.anchors === false) {
                     that.anchors[key] = [];
                 }
                 i = that.anchors[key].length % positions.length;
                 if( edge === 'top' || edge === 'bottom') {
-                    anchor[0] = positions[i];
+                    coords[0] = positions[i];
                 } else {
-                    anchor[1] = positions[i];
+                    coords[1] = positions[i];
                 }
                 if (round) {
-                    adjusted = roundAdjust(edge, anchor[0], anchor[1]);
-                    anchor[0] = adjusted[0];
-                    anchor[1] = adjusted[1]
+                    adjusted = roundAdjust(edge, coords[0], coords[1]);
+                    coords[0] = adjusted[0];
+                    coords[1] = adjusted[1]
                 }
-                that.anchors[key].push(anchor);
-                ep.setAnchor(anchor);
+                that.anchors[key].push(coords);
+                ep.setAnchor(coords);
             }
             function roundAdjust(edge, x, y) {
                 if(x * 2 % 1 === 0 && y * 2 % 1 === 0) {
