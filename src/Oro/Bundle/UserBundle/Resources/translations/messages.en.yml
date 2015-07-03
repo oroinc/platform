@@ -22,6 +22,10 @@ Login page: Login page
 "Business Unit": "Business Unit"
 "User": "User"
 "None": "None"
+"The username or email address \"%username%\" does not exist.": "The username or email address \"%username%\" does not exist."
+"Username or Email": "Username or Email"
+"Return to Login": "Return to Login"
+"Request": "Request"
 
 User account is locked.: User account is locked
 User account is disabled.: User account is disabled
@@ -150,11 +154,6 @@ oro:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
-                forgot_password: Forgot Password
-                no_active_user_message: There is no active user with username or email address "%username%".
-                return_to_login: Return to Login
-                request: Request
-                username_or_email: Username or Email
         action:
             password_management: Manage users' passwords
 
