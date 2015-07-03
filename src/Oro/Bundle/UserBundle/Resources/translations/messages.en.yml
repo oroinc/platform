@@ -22,6 +22,10 @@ Login page: Login page
 "Business Unit": "Business Unit"
 "User": "User"
 "None": "None"
+"The username or email address \"%username%\" does not exist.": "The username or email address \"%username%\" does not exist."
+"Username or Email": "Username or Email"
+"Return to Login": "Return to Login"
+"Request": "Request"
 
 change_password:
     flash:
@@ -129,11 +133,3 @@ oro:
         privileges:
             entity.label: Entity
             action.label: Capabilities
-
-        password:
-            reset:
-                forgot_password: Forgot Password
-                no_active_user_message: There is no active user with username or email address "%username%".
-                return_to_login: Return to Login
-                request: Request
-                username_or_email: Username or Email
