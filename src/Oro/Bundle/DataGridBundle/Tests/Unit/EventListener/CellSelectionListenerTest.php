@@ -82,8 +82,8 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
                     'options' => [
                         'cellSelection' => [
                             'dataField' => 'id',
-                            'columns' => ['first', 'second'],
-                            'changeset' => 'changeset'
+                            'columnName' => ['first', 'second'],
+                            'selector' => 'changeset'
                         ]
                     ]
                 ],
@@ -91,11 +91,11 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
                     'options' => [
                         'cellSelection' => [
                             'dataField' => 'id',
-                            'columns' => ['first', 'second'],
-                            'changeset' => 'changeset'
+                            'columnName' => ['first', 'second'],
+                            'selector' => 'changeset'
                         ],
                         'requireJSModules' => [
-                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
+                            'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
                     ],
                 ],
@@ -113,8 +113,8 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
                     'options' => [
                         'cellSelection' => [
                             'dataField' => 'id',
-                            'columns' => ['first', 'second'],
-                            'changeset' => 'changeset'
+                            'columnName' => ['first', 'second'],
+                            'selector' => 'changeset'
                         ],
                         'requireJSModules' => [
                             'some-module'
@@ -125,12 +125,12 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
                     'options' => [
                         'cellSelection' => [
                             'dataField' => 'id',
-                            'columns' => ['first', 'second'],
-                            'changeset' => 'changeset'
+                            'columnName' => ['first', 'second'],
+                            'selector' => 'changeset'
                         ],
                         'requireJSModules' => [
                             'some-module',
-                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
+                            'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
                     ],
                 ]
@@ -140,11 +140,11 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
                     'options' => [
                         'cellSelection' => [
                             'dataField' => 'id',
-                            'columns' => ['first', 'second'],
-                            'changeset' => 'changeset'
+                            'columnName' => ['first', 'second'],
+                            'selector' => 'changeset'
                         ],
                         'requireJSModules' => [
-                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
+                            'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
                     ],
                 ],
@@ -152,11 +152,11 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
                     'options' => [
                         'cellSelection' => [
                             'dataField' => 'id',
-                            'columns' => ['first', 'second'],
-                            'changeset' => 'changeset'
+                            'columnName' => ['first', 'second'],
+                            'selector' => 'changeset'
                         ],
                         'requireJSModules' => [
-                            'orodatagrid/js/datagrid/listener/cell-selection-listener'
+                            'orodatagrid/js/datagrid/listener/change-editable-cell-listener'
                         ],
                     ],
                 ]
@@ -187,7 +187,7 @@ class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\DataGridBundle\Exception\LogicException
-     * @expectedExceptionMessage cellSelection options `columns`, `changeset` are required
+     * @expectedExceptionMessage cellSelection options `columnName`, `selector` are required
      */
     public function testOnBuildAfterException()
     {
