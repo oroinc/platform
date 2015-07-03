@@ -7,11 +7,19 @@ define([
 
     var SelectCellRadioEditor;
 
+    /**
+     * @export  orodatagrid/js/datagrid/editor/select-cell-radio-editor
+     * @class   orodatagrid.datagrid.editor.SelectCellRadioEditor
+     * @extends Backgrid.SelectCellEditor
+     */
     SelectCellRadioEditor = Backgrid.SelectCellEditor.extend({
         /**
          * @inheritDoc
          */
-        tagName: "ul class='icons-ul'",
+        tagName: 'ul',
+
+        /** @property */
+        className: 'icons-ul',
 
         /**
          * @inheritDoc
