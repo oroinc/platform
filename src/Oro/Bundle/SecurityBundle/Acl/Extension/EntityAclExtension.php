@@ -149,35 +149,18 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getAccessLevelNames($object)
     {
-        $minLevel = AccessLevel::BASIC_LEVEL;
-        $maxLevel = AccessLevel::SYSTEM_LEVEL;
-
         if ($this->getObjectClassName($object) === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             /**
              * In community version root entity should not have GLOBAL(Organization) access level
              */
-            return AccessLevel::getAccessLevelNames($minLevel, $maxLevel, [AccessLevel::GLOBAL_LEVEL]);
+            return AccessLevel::getAccessLevelNames(
+                AccessLevel::BASIC_LEVEL,
+                AccessLevel::SYSTEM_LEVEL,
+                [AccessLevel::GLOBAL_LEVEL]
+            );
         } else {
-            $metadata = $this->getMetadata($object);
-            if (!$metadata->hasOwner()) {
-                return array(
-                    AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
-                    AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
-                );
-            }
-            if ($metadata->isBasicLevelOwned()) {
-                $maxLevel = AccessLevel::GLOBAL_LEVEL;
-                $minLevel = AccessLevel::BASIC_LEVEL;
-            } elseif ($metadata->isLocalLevelOwned()) {
-                $maxLevel = AccessLevel::GLOBAL_LEVEL;
-                $minLevel = AccessLevel::LOCAL_LEVEL;
-            } elseif ($metadata->isGlobalLevelOwned()) {
-                $maxLevel = AccessLevel::GLOBAL_LEVEL;
-                $minLevel = AccessLevel::GLOBAL_LEVEL;
-            }
+            return $this->getMetadata($object)->getAccessLevelNames();
         }
-
-        return AccessLevel::getAccessLevelNames($minLevel, $maxLevel);
     }
 
     /**

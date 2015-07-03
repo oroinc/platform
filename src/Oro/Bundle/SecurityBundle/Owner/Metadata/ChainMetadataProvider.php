@@ -24,6 +24,11 @@ class ChainMetadataProvider implements MetadataProviderInterface
     protected $defaultProvider;
 
     /**
+     * @var MetadataProviderInterface
+     */
+    protected $emulatedProvider;
+
+    /**
      * @param MetadataProviderInterface[] $providers
      * @param MetadataProviderInterface $defaultProvider
      */
@@ -36,13 +41,12 @@ class ChainMetadataProvider implements MetadataProviderInterface
     /**
      * Adds all providers that marked by tag: oro_security.owner.metadata_provider
      *
+     * @param string $alias
      * @param MetadataProviderInterface $provider
      */
-    public function addProvider(MetadataProviderInterface $provider)
+    public function addProvider($alias, MetadataProviderInterface $provider)
     {
-        if (!$this->providers->contains($provider)) {
-            $this->providers->add($provider);
-        }
+        $this->providers->set($alias, $provider);
     }
 
     /**
@@ -112,10 +116,31 @@ class ChainMetadataProvider implements MetadataProviderInterface
     }
 
     /**
+     * @param string $providerAlias
+     */
+    public function startProviderEmulation($providerAlias)
+    {
+        if (!$this->providers->containsKey($providerAlias)) {
+            throw new \InvalidArgumentException(sprintf('Provider with "%s" alias not registered', $providerAlias));
+        }
+
+        $this->emulatedProvider = $this->providers->get($providerAlias);
+    }
+
+    public function stopProviderEmulation()
+    {
+        $this->emulatedProvider = null;
+    }
+
+    /**
      * @return MetadataProviderInterface
      */
     protected function getSupportedProvider()
     {
+        if ($this->emulatedProvider) {
+            return $this->emulatedProvider;
+        }
+
         if ($this->supportedProvider) {
             return $this->supportedProvider;
         }

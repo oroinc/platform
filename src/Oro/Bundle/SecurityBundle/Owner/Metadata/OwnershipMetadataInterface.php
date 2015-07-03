@@ -83,4 +83,11 @@ interface OwnershipMetadataInterface
      * @return string
      */
     public function getGlobalOwnerFieldName();
+
+    /**
+     * Get list of allowed access level names
+     *
+     * @return array
+     */
+    public function getAccessLevelNames();
 }
