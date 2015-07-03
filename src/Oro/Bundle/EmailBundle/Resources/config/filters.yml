@@ -8,4 +8,4 @@ services:
             - @form.factory
             - @oro_filter.filter_utility
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: originfolder }
+            - { name: oro_filter.extension.orm_filter.filter, type: multiselect-originfolder }

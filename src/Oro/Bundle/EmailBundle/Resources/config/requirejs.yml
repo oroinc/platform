@@ -25,4 +25,4 @@ config:
 
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'
 
-        'oro/filter/originfolder-filter': 'bundles/oroemail/js/filter/originfolder-filter.js'
+        'oro/filter/multiselect-originfolder-filter': 'bundles/oroemail/js/filter/multiselect-originfolder-filter.js'

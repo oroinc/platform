@@ -19,7 +19,7 @@ parameters:
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
     oro_email.form.type.email_folder.class:               Oro\Bundle\EmailBundle\Form\Type\EmailFolderType
     oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
-    oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceFilterType
+    oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
 
 services:
     oro_email.form.subscriber.emailtemplate:

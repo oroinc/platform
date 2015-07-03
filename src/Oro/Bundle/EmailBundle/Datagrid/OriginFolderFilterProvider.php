@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
 class OriginFolderFilterProvider
 {
-    const EMAIL_FOLDER = 'OroEmailBundle:EmailOrigin';
+    const EMAIL_ORIGIN = 'OroEmailBundle:EmailOrigin';
 
     /**
      * @var SecurityContext
@@ -41,7 +41,7 @@ class OriginFolderFilterProvider
     public function getListTypeChoices()
     {
         $user = $this->securityContext->getToken()->getUser();
-        $origins = $this->em->getRepository(self::EMAIL_FOLDER)->findBy(['owner'=>$user->getId()]);
+        $origins = $this->em->getRepository(self::EMAIL_ORIGIN)->findBy(['owner'=>$user->getId()]);
         $results = [];
         /**
          * @var EmailOrigin $origin

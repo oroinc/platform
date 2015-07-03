@@ -7,7 +7,7 @@ use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 class ChoiceOriginFolderFilter extends ChoiceFilter
@@ -17,7 +17,7 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
      */
     protected function getFormType()
     {
-        return ChoiceFilterType::NAME;
+        return ChoiceOriginFolderFilterType::NAME;
     }
 
     /**
@@ -29,7 +29,7 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
         $fieldView = $formView->children['value'];
         $choices = $fieldView->vars['choices'];
 
-        $metadata = $this->getMeta();
+        $metadata = $this->getDefaultMetadata();
         $metadata['choices']         = $choices;
         $metadata['populateDefault'] = $formView->vars['populate_default'];
         if (!empty($formView->vars['default_value'])) {
@@ -40,7 +40,7 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
         }
 
         if ($fieldView->vars['multiple']) {
-            $metadata[FilterUtility::TYPE_KEY] = 'originfolder';
+            $metadata[FilterUtility::TYPE_KEY] = 'multiselect-originfolder';
         }
 
         return $metadata;
@@ -49,7 +49,7 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
     /**
      * @return array
      */
-    protected function getMeta()
+    protected function getDefaultMetadata()
     {
         $formView = $this->getForm()->createView();
         $typeView = $formView->children['type'];

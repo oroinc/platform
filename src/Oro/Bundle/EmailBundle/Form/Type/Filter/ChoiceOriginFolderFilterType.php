@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 
-class ChoiceFilterType extends AbstractChoiceType
+class ChoiceOriginFolderFilterType extends AbstractChoiceType
 {
     const TYPE_CONTAINS     = 1;
     const TYPE_NOT_CONTAINS = 2;

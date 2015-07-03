@@ -9,7 +9,7 @@ define([
 ], function ($, _, __, tools, MultiSelect) {
     'use strict';
 
-    var ChoiceOriginFolder;
+    var MultiSelectOriginFolder;
 
     /**
      * Choice filter: filter type as option + filter value as string
@@ -18,13 +18,13 @@ define([
      * @class   oro.filter.ChoiceFilter
      * @extends oro.filter.TextFilter
      */
-    ChoiceOriginFolder = MultiSelect.extend({
+    MultiSelectOriginFolder = MultiSelect.extend({
         /**
          * Template selector for filter criteria
          *
          * @property
          */
-        templateSelector: '#choice-origin-folder-template',
+        templateSelector: '#multiselect-origin-folder-template',
 
         /**
         * Initialize.
@@ -32,7 +32,6 @@ define([
         * @param {Object} options
         */
         initialize: function (options) {
-            debugger;
             if (_.isUndefined(this.choices)) {
                 this.choices = [];
             }
@@ -48,7 +47,6 @@ define([
          * @return {*}
          */
         render: function () {
-            debugger;
             var options = this.choices;
             if (this.populateDefault) {
                 options.unshift({value: '', label: this.placeholder});
@@ -73,5 +71,5 @@ define([
         }
     });
 
-    return ChoiceOriginFolder;
+    return MultiSelectOriginFolder;
 });
