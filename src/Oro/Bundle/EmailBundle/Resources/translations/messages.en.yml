@@ -142,6 +142,7 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folder_type.label:        Folder type
         contact.label:            Contact
         date.label:               Date
         date_time.label:          Date/Time

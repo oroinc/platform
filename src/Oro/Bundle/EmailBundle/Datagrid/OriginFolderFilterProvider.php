@@ -50,9 +50,9 @@ class OriginFolderFilterProvider
             $folders = $origin->getFolders();
 
             if (count($folders)>0) {
-                $results[$origin->getUserLogin()]= [];
+                $results[(string)$origin]= [];
                 foreach ($folders as $folder) {
-                    $results[$origin->getUserLogin()][$folder->getId()] = $folder->getFullName();
+                    $results[(string)$origin][$folder->getId()] = $folder->getFullName();
                 }
             }
         }
