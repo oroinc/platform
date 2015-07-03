@@ -128,7 +128,7 @@ define(function (require) {
         },
 
         getLoopbackAnchors: function (elId) {
-            var preset, ind, presets = this.loopbackAnchorPreset;
+            var preset, presets = this.loopbackAnchorPreset;
             if (!(elId in this.loopback)) {
                 this.loopback[elId] = [];
             }
@@ -179,6 +179,10 @@ define(function (require) {
 
         recalculateConnections: function () {
             function process (ep, anchor) {
+                // don't manage Perimeter type anchors
+                if(anchor[0] === 'Perimeter') {
+                    return;
+                }
                 var i,
                     edge = getEdge(anchor),
                     key = ep.element.id + '_' + edge;
