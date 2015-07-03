@@ -32,9 +32,10 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     {
         $provider = $configManager->getProvider('activity');
 
-        return $provider->hasConfigById($configId)
-        && $provider->getConfigById($configId)->has('activities')
-        && in_array(self::ACTIVITY_CLASS, $provider->getConfigById($configId)->get('activities'));
+        return
+            $provider->hasConfigById($configId)
+            && $provider->getConfigById($configId)->has('activities')
+            && in_array(self::ACTIVITY_CLASS, $provider->getConfigById($configId)->get('activities'));
     }
 
     /**
