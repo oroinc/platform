@@ -151,10 +151,10 @@ define(function (require) {
         var selectedData,
             dataIds,
             config = this,
-            currentValue = [].concat(element.select2('val'));
+            currentValue = tools.ensureArray(element.select2('val'));
 
         selectedData = _.filter(
-            [].concat(element.data('selected-data')),
+            tools.ensureArray(element.data('selected-data')),
             function (item) {
                 return _.isObject(item);
             }
