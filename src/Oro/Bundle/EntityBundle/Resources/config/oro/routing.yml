@@ -12,3 +12,5 @@ oro_entity_api:
         _format:  json
     defaults:
         version:  latest
+    options:
+        group: dictionary_entity

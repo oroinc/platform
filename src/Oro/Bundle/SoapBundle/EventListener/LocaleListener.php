@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SoapBundle\EventListener;
 
+use Gedmo\Translatable\TranslatableListener;
+
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,15 +14,29 @@ class LocaleListener implements EventSubscriberInterface
     const API_PREFIX = '/api/rest/';
 
     /**
+     * @var TranslatableListener
+     */
+    protected $translatableListener;
+
+    /**
+     * @param TranslatableListener $translatableListener
+     */
+    public function __construct(TranslatableListener $translatableListener)
+    {
+        $this->translatableListener = $translatableListener;
+    }
+
+    /**
      * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
-        $locale = $request->query->get('locale');
+        $locale = str_replace('-', '_', $request->query->get('locale'));
         if ($locale && $this->isApiRequest($request)) {
-            $request->setLocale(str_replace('-', '_', $locale));
+            $request->setLocale($locale);
+            $this->translatableListener->setTranslatableLocale($locale);
         }
     }
 
