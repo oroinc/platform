@@ -7,21 +7,19 @@ define([
 
     var SelectCellRadioEditor;
 
+    /**
+     * @export  orodatagrid/js/datagrid/editor/select-cell-radio-editor
+     * @class   orodatagrid.datagrid.editor.SelectCellRadioEditor
+     * @extends Backgrid.SelectCellEditor
+     */
     SelectCellRadioEditor = Backgrid.SelectCellEditor.extend({
         /**
          * @inheritDoc
          */
-        tagName: "ul class='icons-ul'",
+        tagName: 'ul',
 
-        /**
-         * @inheritDoc
-         */
-        events: {
-            "change": "save",
-            "blur": "close",
-            "keydown": "close",
-            "click": "onClick"
-        },
+        /** @property */
+        className: 'icons-ul',
 
         /**
          * @inheritDoc
@@ -35,13 +33,6 @@ define([
             var model = this.model;
             var column = this.column;
             model.set(column.get("name"), this.formatter.toRaw(this.$el.find(':checked').val(), model));
-        },
-
-        /**
-         * @param {Object} event
-         */
-        onClick: function (event) {
-            event.stopPropagation();
         }
     });
 
