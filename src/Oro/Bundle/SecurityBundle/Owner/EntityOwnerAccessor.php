@@ -6,7 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
@@ -15,16 +15,16 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 class EntityOwnerAccessor
 {
     /**
-     * @var OwnershipMetadataProvider
+     * @var MetadataProviderInterface
      */
     protected $metadataProvider;
 
     /**
      * Constructor
      *
-     * @param OwnershipMetadataProvider $metadataProvider
+     * @param MetadataProviderInterface $metadataProvider
      */
-    public function __construct(OwnershipMetadataProvider $metadataProvider)
+    public function __construct(MetadataProviderInterface $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
     }
