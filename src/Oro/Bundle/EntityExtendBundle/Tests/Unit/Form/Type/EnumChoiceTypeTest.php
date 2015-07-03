@@ -85,10 +85,37 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $this->assertEquals(
             [
                 'empty_value' => $expectedEmptyValue,
-                'empty_data'  => $expectedEmptyData
+                'empty_data' => $expectedEmptyData
             ],
             $resolvedOptions
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage Either "class" or "enum_code" must option must be set.
+     */
+    public function testClassNormalizerOptionsException()
+    {
+        $resolver = $this->getOptionsResolver();
+        $this->type->setDefaultOptions($resolver);
+        $resolver->resolve([
+            'enum_code' => null,
+            'class' => null
+        ]);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"
+     */
+    public function testClassNormalizerUnexpectedEnumException()
+    {
+        $resolver = $this->getOptionsResolver();
+        $this->type->setDefaultOptions($resolver);
+        $resolver->resolve([
+            'enum_code' => 'unknown'
+        ]);
     }
 
     public function setDefaultOptionsProvider()
@@ -97,7 +124,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
             [false, false, 'oro.form.choose_value', null],
             [false, true, null, null],
             [true, false, null, null],
-            [true, true, null, null],
+            [true, true, null, null]
         ];
     }
 }
