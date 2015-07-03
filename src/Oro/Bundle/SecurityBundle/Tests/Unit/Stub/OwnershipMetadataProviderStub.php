@@ -16,8 +16,10 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
 
     /**
      * @param \PHPUnit_Framework_TestCase $testCase
+     *
+     * @param array $classes
      */
-    public function __construct(\PHPUnit_Framework_TestCase $testCase)
+    public function __construct(\PHPUnit_Framework_TestCase $testCase, array $classes = [])
     {
         $configProvider = $testCase->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -50,13 +52,15 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
             );
 
         parent::__construct(
-            [
-                'organization' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization',
-                'business_unit' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit',
-                'user' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User',
-            ]
+            array_merge(
+                [
+                    'organization' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization',
+                    'business_unit' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit',
+                    'user' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User',
+                ],
+                $classes
+            )
         );
-
         $this->setContainer($container);
     }
 
