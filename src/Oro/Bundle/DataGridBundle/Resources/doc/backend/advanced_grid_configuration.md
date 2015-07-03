@@ -103,6 +103,110 @@ datagrid:
 ```
 
 #### Problem:
+*Let's take previous problem, when we need to fill some form field dependent on grid state.
+For example "_grid should show users for group that currently editing and user should be able to select some parameter from dropwown for users in this group_"*
+#### Solution:
+For solving this problem we have to create form field that will contain changeset of edited user fields and process it on backend
+For example fields are:
+``` twig
+    form_widget(form.changeset, {'id': 'changeset'}),
+```
+
+Next step: modify query. We'll add additional field `enabled` that user will be able to change.
+``` yml
+datagrid:
+    acme-demo-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - u.id
+                    - u.username
+                    - CASE WHEN u.enabled = true THEN 'enabled' ELSE 'disabled' END as enabled
+                from:
+                    { table: AcmeDemoBundle:User, alias:u }
+            bind_parameters:
+                - groupId
+        options:
+            entityHint: user
+        properties:
+            id: ~
+        columns:
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                editable: true
+                choices:
+                   enabled: Active
+                   disabled: Inactive
+```
+
+Similarly Symfony2 ``choice Field Type`` approach editable cell may be rendered as one of several different HTML fields, depending on the ``expanded`` and ``multiple`` options.
+Currently supported ``select tag``, ``select tag (with multiple attribute)`` and ``radio buttons``.
+
+Example for radio buttons:
+
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        columns:
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                editable: true
+                expanded: true
+                multiple: false
+                choices:
+                   enabled: Active
+                   disabled: Inactive
+```
+By default ``expanded`` and ``multiple`` are ``false`` and their presence in config may be omitted.
+
+Last step: need to set "cellSelection" option, it will add behavior of selecting rows on frontend:
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # previous configuration
+        options:
+            cellSelection:
+                dataField: id
+                columnName:
+                    - enabled
+                selector: '#changeset'
+```
+
+#### Problem:
+*Let's take previous problem, but in additional we need to fill selector in addiction to enum values.*
+#### Solution:
+For solving this problem we have to use ``@oro_entity_extend.enum_value_provider->getEnumChoicesByCode('enum_code')``
+instead of choice array using
+```yml
+    choices:
+       enabled: Active
+       disabled: Inactive
+```
+
+Example:
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        columns:
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                editable: true
+                choices: @oro_entity_extend.enum_value_provider->getEnumChoicesByCode('user_status')
+```
+
+#### Problem:
 *I'm developing some extension for grid, how can I add my frontend builder (some class that should show my widget) ?*
 #### Solution:
 Any builders could be passed under gridconfig[options][requireJSModules] node. Your builder should have method `init`, it will be called when grid-builder finish building grid.
