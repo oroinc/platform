@@ -52,7 +52,7 @@ class VariablesProvider
 
     /**
      * Gets entity related variables available in a template
-     * Returned variables are sorted be name.
+     * Returned variables are sorted by name.
      *
      * @param string $entityClass The entity class name. If it is not specified the definitions for all
      *                            entities are returned.
