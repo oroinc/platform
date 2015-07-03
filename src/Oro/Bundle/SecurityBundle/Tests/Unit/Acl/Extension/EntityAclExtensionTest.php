@@ -104,7 +104,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         [
-                            'oro_security.ownership_tree_provider',
+                            'oro_security.ownership_tree_provider.chain',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             $treeProviderMock,
                         ],

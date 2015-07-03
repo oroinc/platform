@@ -14,7 +14,17 @@ interface OwnerTreeProviderInterface
      *
      * @return OwnerTree
      *
-     * @throws \Exception
+     * @throws \Exception If ACL tree cache not warmed
      */
     public function getTree();
+
+    /**
+     * Clear the owner tree cache
+     */
+    public function clear();
+
+    /**
+     * Warmup owner tree cache
+     */
+    public function warmUpCache();
 }

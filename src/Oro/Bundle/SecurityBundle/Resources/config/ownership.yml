@@ -1,7 +1,9 @@
 parameters:
     oro_security.entity.owners:
         organization: "OroOrganizationBundle:Organization"
-        business_unit: "OroOrganizationBundle:BusinessUnit"
+        business_unit: "OroOrganizationBundle:BusinessUnit"ДА там пожно потерятся
+[16:12:00] Roman Sergeevich: ладно давай я 10 мин пожебажу, если ничего не выйдет напишу
+
         user: "OroUserBundle:User"
 
     oro_security.owner.entity_owner_accessor.class:                       Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor
@@ -20,9 +22,8 @@ services:
 
     oro_security.owner.metadata_provider.chain:
         class: %oro_security.owner.metadata_provider.chain.class%
-        arguments:
-            - []
-            - @oro_security.owner.ownership_metadata_provider
+        calls:
+            - [setDefaultProvider, [@oro_security.owner.ownership_metadata_provider]]
 
     oro_security.owner.ownership_metadata_provider:
         class: %oro_security.owner.ownership_metadata_provider.class%

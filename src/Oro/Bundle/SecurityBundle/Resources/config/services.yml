@@ -52,6 +52,7 @@ parameters:
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
     oro_security.abstract_ownership_tree_provider.class:       Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider
+    oro_security.ownership_tree_provider.chain.class:          Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider
     oro_security.ownership_tree.cache.warmer.class:            Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
     oro_security.ownership_tree.cache.clearer.class:           Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
@@ -384,6 +385,11 @@ services:
         calls:
             - [setContainer, [@service_container]]
 
+    oro_security.ownership_tree_provider.chain:
+        class: %oro_security.ownership_tree_provider.chain.class%
+        calls:
+            - [setDefaultProvider, [@oro_security.ownership_tree_provider]]
+
     oro_security.ownership_tree_provider:
         public: false
         parent: oro_security.abstract_ownership_tree_provider
@@ -391,6 +397,8 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_security.ownership_tree_provider.cache
+        tags:
+            - { name: oro_security.ownership.tree_provider, alias: default }
 
     oro_security.link.ownership_tree_provider:
         tags:
@@ -406,7 +414,7 @@ services:
         public: false
         class: %oro_security.ownership_tree.cache.warmer.class%
         arguments:
-            - @oro_security.ownership_tree_provider
+            - @oro_security.ownership_tree_provider.chain
         tags:
             - { name: kernel.cache_warmer }
 
@@ -414,7 +422,7 @@ services:
         public: false
         class: %oro_security.ownership_tree.cache.clearer.class%
         arguments:
-            - @oro_security.ownership_tree_provider
+            - @oro_security.ownership_tree_provider.chain
         tags:
             - { name: kernel.cache_clearer }
 

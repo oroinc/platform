@@ -67,7 +67,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     public function getTreeProvider()
     {
         if (!$this->treeProvider) {
-            $this->treeProvider = $this->getContainer()->get('oro_security.ownership_tree_provider');
+            $this->treeProvider = $this->getContainer()->get('oro_security.ownership_tree_provider.chain');
         }
 
         return $this->treeProvider;

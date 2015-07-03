@@ -133,3 +133,9 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `oro_security.owner.ownership_metadata_provider.cache.clearer`
     * `oro_security.owner.ownership_config_subscriber`
     * `oro_security.owner.entity_owner_accessor`
+- Constructor was changed from implementation `public function __construct(OwnerTreeProvider $treeProvider)` to interface `public function __construct(OwnerTreeProviderInterface $treeProvider)`
+    * `Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer`
+    * `Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner`
+- Services rely on `oro_security.ownership_tree_provider.chain` instead of implementation `oro_security.ownership_tree_provider`
+    * `oro_security.ownership_tree.cache.cleaner`
+    * `oro_security.ownership_tree.cache.warmer`
