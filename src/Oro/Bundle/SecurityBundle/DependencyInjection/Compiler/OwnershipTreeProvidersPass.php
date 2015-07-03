@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class OwnershipTreeProvidersPass implements CompilerPassInterface
 {
     const TAG_NAME = 'oro_security.ownership.tree_provider';
-    const CHAIN_SERVICE_ID = 'oro_security.owner.metadata_provider.chain';
+    const CHAIN_SERVICE_ID = 'oro_security.ownership_tree_provider.chain';
 
     /**
      * {@inheritDoc}

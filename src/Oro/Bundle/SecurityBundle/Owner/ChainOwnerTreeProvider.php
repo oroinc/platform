@@ -66,14 +66,14 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
      */
     public function getTree()
     {
-        if ($this->defaultProvider) {
-            return $this->defaultProvider->getTree();
-        }
-
         foreach ($this->providers as $provider) {
             if ($provider->supports()) {
                 return $provider->getTree();
             }
+        }
+
+        if ($this->defaultProvider) {
+            return $this->defaultProvider->getTree();
         }
 
         throw new UnsupportedOwnerTreeProviderException('Supported provider not found in chain');
