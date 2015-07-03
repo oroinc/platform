@@ -2,15 +2,13 @@ define(function (require) {
     "use strict";
 
     function getEdge (params) {
-        var edge = '';
-        if(params[0] === 1) {
-            edge = 'right';
-        } else if(params[0] === 0) {
-            edge = 'left';
-        } else if(params[1] === 0) {
-            edge = 'top';
-        } else if(params[1] === 1) {
-            edge = 'bottom';
+        var x = params[0] - 0.5,
+            y = params[1] - 0.5,
+            edge = '';
+        if(Math.abs(y) > Math.abs(x)) {
+            edge = y > 0 ? 'bottom' : 'top';
+        } else {
+            edge = x > 0 ? 'right' : 'left'
         }
         return edge;
     }
@@ -38,6 +36,7 @@ define(function (require) {
     }
 
     var _ = require('underscore'),
+        $ = require('jquery'),
         Matrix = require('./jsplumb-manager/jpm-matrix'),
         HideStartRule = require('./jsplumb-manager/jpm-hide-start-rule'),
         CascadeRule = require('./jsplumb-manager/jpm-cascade-rule'),
@@ -66,6 +65,7 @@ define(function (require) {
             this.xIncrement = 200;
             this.yIncrement = 100;
             this.stepForNew = 10;
+            this._debounceRecalculateConnections = _.debounce(_.bind(this.recalculateConnections, this), 100);
         };
 
     _.extend(JsPlumbManager.prototype, {
@@ -177,13 +177,15 @@ define(function (require) {
             return collection;
         },
 
+        debounceRecalculateConnections: function () {
+            return this._debounceRecalculateConnections();
+        },
+
         recalculateConnections: function () {
             function process (ep, anchor) {
                 // don't manage Perimeter type anchors
-                if(anchor[0] === 'Perimeter') {
-                    return;
-                }
-                var i,
+                var i, adjusted,
+                    round = $('#' + ep.elementId).hasClass('start-step'),
                     edge = getEdge(anchor),
                     key = ep.element.id + '_' + edge;
                 if(key in that.anchors === false) {
@@ -195,9 +197,29 @@ define(function (require) {
                 } else {
                     anchor[1] = positions[i];
                 }
-
+                if (round) {
+                    adjusted = roundAdjust(edge, anchor[0], anchor[1]);
+                    anchor[0] = adjusted[0];
+                    anchor[1] = adjusted[1]
+                }
                 that.anchors[key].push(anchor);
                 ep.setAnchor(anchor);
+            }
+            function roundAdjust(edge, x, y) {
+                if(x * 2 % 1 === 0 && y * 2 % 1 === 0) {
+                    return [x, y];
+                }
+                var a, b, c = 0.5;
+                if(edge === 'top' || edge === 'bottom') {
+                    b = x - 0.5;
+                    a = Math.floor(Math.sqrt(c * c - b * b) * 1000) / 1000;
+                    y = 0.5 + a * (edge === 'bottom' ? 1 : -1);
+                } else {
+                    b = y - 0.5;
+                    a = Math.floor(Math.sqrt(c * c - b * b) * 1000) / 1000;
+                    x = 0.5 + a * (edge === 'right' ? 1 : -1);
+                }
+                return [x, y];
             }
             var that = this;
             that.loopback = {};

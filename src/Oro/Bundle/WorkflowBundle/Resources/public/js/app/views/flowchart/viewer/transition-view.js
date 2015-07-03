@@ -100,6 +100,7 @@ define(function (require) {
                 }
             }
             this.removeStaleConnections();
+            this.areaView.jsPlumbManager.debounceRecalculateConnections();
         },
 
         addStaleMark: function () {
@@ -161,12 +162,6 @@ define(function (require) {
                         }]
                     ]
                 }, this.defaultConnectionOptions);
-            if(startStep.get('_is_start')) {
-                connectionOptions.anchors[0] = ["Perimeter", {shape: "Circle"}];
-            }
-            if(endStep.get('_is_start')) {
-                connectionOptions.anchors[1] = ["Perimeter", {shape: "Circle"}];
-            }
 
             jsplumbConnection = this.areaView.jsPlumbInstance.connect(connectionOptions);
             jsplumbConnection.overlayView = overlayView;

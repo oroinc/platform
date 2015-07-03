@@ -67,10 +67,6 @@ define(function (require) {
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
         },
 
-        events: {
-            'mouseup': 'recalculateConnections'
-        },
-
         render: function () {
             // do nothing except connect()
             if (!this.isConnected) {
@@ -81,18 +77,20 @@ define(function (require) {
         },
 
         connect: function () {
-            var chartOptions = _.defaults({
+            var stepWithPosition,
+                chartOptions = _.defaults({
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
-            this.jsPlumbManager.organizeBlocks();
-            // wait a bit while flowchart renders
-            _.delay(_.bind(this.recalculateConnections, this), 100);
-        },
-
-        recalculateConnections: function () {
-            this.jsPlumbManager.recalculateConnections();
+            stepWithPosition = this.model.get('steps').find(function (step) {
+                return _.isArray(step.get('position'));
+            });
+            // if positions of step wasn't defined
+            if (_.isUndefined(stepWithPosition)) {
+                this.jsPlumbManager.organizeBlocks();
+            }
+            this.jsPlumbManager.debounceRecalculateConnections();
         }
     });
 
