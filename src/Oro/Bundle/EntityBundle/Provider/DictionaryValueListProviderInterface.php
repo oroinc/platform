@@ -9,6 +9,15 @@ use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 interface DictionaryValueListProviderInterface
 {
     /**
+     * Checks whether the provider supports a given entity
+     *
+     * @param string $className The FQCN of an entity
+     *
+     * @return bool TRUE if this provider supports the given entity; otherwise, FALSE
+     */
+    public function supports($className);
+
+    /**
      * Gets a query builder for getting dictionary item values for a given dictionary class
      *
      * @param string $className The FQCN of a dictionary entity
