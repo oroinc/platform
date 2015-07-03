@@ -1,0 +1,108 @@
+{% extends 'OroConfigBundle::configPage.html.twig' %}
+
+{% set pageTitle = 'oro.config.menu.system_configuration.label'|trans %}
+{% if form.vars.data.id is not null %}
+    {% set formAction = path(
+        'oro_email_mailbox_update',
+        { mailbox: form.vars.data.id }
+    )
+    %}
+{% else %}
+    {% set formAction = path('oro_email_mailbox_create') %}
+{% endif %}
+{% set routeName = 'oro_config_configuration_system' %}
+{% set routeParameters = {} %}
+
+{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
+{% import 'OroConfigBundle::macros.html.twig' as configUI %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
+
+{% block content %}
+    {% set saveButton    = UI.saveAndCloseButton('oro.config.actions.save_settings'|trans) %}
+    {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
+
+    <form
+            id="{{ form.vars.id }}"
+            name="{{ form.vars.name }}"
+            {{ form_enctype(form) }}
+            action="{{ formAction }}"
+            method="post"
+            data-collect="true"
+            >
+        {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
+        <div class="system-configuration-container left-panel-container">
+            <div class="placeholder">
+                <div class="scrollable-container">
+                    {{ configUI.renderTabs(data, activeGroup, activeSubGroup, routeName, routeParameters) }}
+                    <div class="system-configuration-content content form-container" id="configuration-options-block">
+                        <div class="pull-right">
+                            <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
+                        </div>
+                        {% set fromErrors = form_errors(form) %}
+                        {% if formErrors is defined and formErrors | length %}
+                            <div class="customer-info-actions container-fluid well-small alert-wrap">
+                                <div class="alert alert-error">
+                                    <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                                    {{ formErrors|raw }}
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% set accordionId = 'system-configuration-collapse' %}
+                        <div class="accordion">
+                            <div class="accordion-group">
+                                <div class="accordion-heading">
+                                    <div class="pull-right">
+                                        {{ configUI.renderCollapseExpandActions('#configuration-options-block') }}
+                                    </div>
+                                    <a href="#{{ accordionId }}" data-toggle="collapse" class="accordion-toggle">
+                                        {{ 'oro.email.system_configuration.mailbox_configuration.label'|trans }}
+                                    </a>
+                                </div>
+                                <div class="accordion-body in collapse" id="{{ accordionId }}" >
+                                    <div class="accordion-inner">
+                                        {{ form(form) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    {{ oro_form_js_validation(form) }}
+
+    <script type="text/javascript">
+        /* jshint browser:true, devel:true */
+        /* global require */
+        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/default', 'oroui/js/modal'],
+            function ($, __, Mediator, Messenger, FormDefault, Modal) {
+                'use strict';
+
+                $('#{{ form.vars.id }} :input[type=reset]').click(function (e) {
+                    var $form = $(this).closest('form'),
+                            $checkboxes = $form.find('.parent-scope-checkbox input'),
+                            confirm = new Modal({
+                                title: __('Confirmation'),
+                                okText: __('OK'),
+                                cancelText: __('Cancel'),
+                                content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
+                                className: 'modal modal-primary',
+                                okButtonClass: 'btn-primary btn-large'
+                            });
+
+                    confirm.on('ok', function () {
+                        $form.get(0).reset();
+                        $checkboxes.trigger('change');
+                    });
+                    confirm.open();
+                    e.preventDefault();
+                });
+
+                new FormDefault();
+            });
+    </script>
+    {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
+{% endblock content %}

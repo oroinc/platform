@@ -45,6 +45,10 @@ oro:
                         auto.label: Auto
                         manual.label: Manual
 
+            mailbox_configuration:
+                label: Mailboxes
+                add_mailbox.label: Add Mailbox
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
@@ -204,6 +208,26 @@ oro:
             owner.label:              Owner
             received_at.label:        Received At
             seen.label:               Seen
+        mailbox:
+            entity_label:             Mailbox
+            entity_plural_label:      Mailboxes
+            label.label:              Mailbox Label
+            general.label:            General
+            email.label:              Email
+            name.label:               Name
+            imap_origin.label:        IMAP Synchronization
+            imap_enabled.label:       Use IMAP Synchronization
+            processor:
+                label:                Email Processing
+                type.label:           Type
+            smtp_enabled.label:       Use SMTP
+            smtp_host.label:          Host
+            smtp_port.label:          Port
+            smtp_encryption.label:    SSL
+            smtp_username.label:      Username
+            smtp_password.label:      Password
+        mailbox_processor:
+            label:                    Do Nothing
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

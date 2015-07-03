@@ -1,0 +1,131 @@
+<?php
+
+namespace Oro\Bundle\EmailBundle\Form\Type;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider;
+
+class MailboxType extends AbstractType
+{
+    /** @var MailboxProcessorProvider */
+    private $processorProvider;
+
+    /**
+     * @param MailboxProcessorProvider $processorProvider
+     */
+    public function __construct(MailboxProcessorProvider $processorProvider)
+    {
+        $this->processorProvider = $processorProvider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults([
+            'data_class' => 'Oro\Bundle\EmailBundle\Entity\Mailbox'
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add('label', 'text', [
+            'required' => true,
+            'label'    => 'oro.email.mailbox.label.label',
+        ]);
+        $builder->add('email', 'email', [
+            'required' => true,
+            'label'    => 'oro.email.mailbox.email.label',
+        ]);
+        $builder->add('imapEnabled', 'checkbox', [
+            'label'    => 'oro.email.mailbox.imap_enabled.label',
+            'required' => false,
+        ]);
+        $builder->add('imapOrigin', 'oro_imap_configuration');
+        $builder->add('smtpEnabled', 'checkbox', [
+            'label'    => 'oro.email.mailbox.smtp_enabled.label',
+            'required' => false,
+        ]);
+        $builder->add('smtpHost', 'text', [
+            'label'    => 'oro.email.mailbox.smtp_host.label',
+            'required' => false,
+        ]);
+        $builder->add('smtpPort', 'integer', [
+            'label'    => 'oro.email.mailbox.smtp_port.label',
+            'required' => false,
+        ]);
+        $builder->add('smtpEncryption', 'choice', [
+            'label'       => 'oro.email.mailbox.smtp_encryption.label',
+            'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+            'empty_data'  => null,
+            'empty_value' => '',
+            'required'    => false
+        ]);
+        $builder->add('smtpUsername', 'text', [
+            'label'    => 'oro.email.mailbox.smtp_username.label',
+            'required' => false,
+        ]);
+        $builder->add('smtpPassword', 'password', [
+            'label'    => 'oro.email.mailbox.smtp_password.label',
+            'required' => false,
+        ]);
+        $builder->add('processorType', 'choice', [
+            'label'    => 'oro.email.mailbox.processor.type.label',
+            'choices'  => $this->processorProvider->getProcessorTypesChoiceList(),
+            'required' => true,
+            'mapped'   => false,
+        ]);
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'oro_email_mailbox';
+    }
+
+    /**
+     * PreSet event handler.
+     *
+     * @param FormEvent $event
+     */
+    public function preSet(FormEvent $event)
+    {
+        /** @var Mailbox $data */
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        if ($data->getProcessor() === null) {
+            return;
+        }
+
+        $processor = $data->getProcessor();
+        $processorType = $this->processorProvider->getProcessorTypes()[$processor->getType()];
+
+        $form->add('processor', $processorType->getSettingsFormType());
+    }
+
+    public function preSubmit(FormEvent $event)
+    {
+        $form = $event->getForm();
+        $data = $event->getData();
+
+        $processorType = $this->processorProvider->getProcessorTypes()[$data['processorType']];
+
+        $form->add('processor', $processorType->getSettingsFormType());
+    }
+}

@@ -16,6 +16,13 @@ oro_system_configuration:
             title: oro.email.system_configuration.attachment_configuration.label
             priority: 110
 
+        mailbox:
+            icon:  icon-envelope
+            title: oro.email.system_configuration.mailbox_configuration.label
+
+        mailboxes:
+            title: oro.email.system_configuration.mailbox_configuration.label
+
     fields:
         oro_email.signature:
             data_type: string
@@ -33,12 +40,25 @@ oro_system_configuration:
                     1: oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label
                     0: oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label
 
+        oro_email.mailbox_grid:
+            type: oro_email_mailbox_grid
+            ui_only: true
+            options:
+                label: false
+                required: false
+                resettable: false
+
     tree:
         system_configuration:
             platform:
                 children:
                     general_setup:
                         children:
+                            mailbox:
+                                children:
+                                    mailboxes:
+                                        children:
+                                            - oro_email.mailbox_grid
                             email_configuration:
                                 children:
                                     signature_configuration:
