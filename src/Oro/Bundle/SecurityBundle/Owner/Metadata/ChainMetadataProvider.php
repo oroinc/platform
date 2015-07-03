@@ -121,7 +121,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
     public function startProviderEmulation($providerAlias)
     {
         if (!$this->providers->containsKey($providerAlias)) {
-            throw new \InvalidArgumentException(sprintf('Provider with %s alias not registered', $providerAlias));
+            throw new \InvalidArgumentException(sprintf('Provider with "%s" alias not registered', $providerAlias));
         }
 
         $this->emulatedProvider = $this->providers->get($providerAlias);

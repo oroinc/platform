@@ -26,20 +26,29 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddProvider()
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider1 */
         $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider2 */
         $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         $chain = new ChainMetadataProvider();
-        $chain->addProvider($provider1);
+        $chain->addProvider('alias1', $provider1);
 
         $this->assertAttributeCount(1, 'providers', $chain);
         $this->assertAttributeContains($provider1, 'providers', $chain);
 
-        $chain->addProvider($provider2);
+        $chain->addProvider('alias2', $provider2);
 
         $this->assertAttributeCount(2, 'providers', $chain);
         $this->assertAttributeContains($provider1, 'providers', $chain);
         $this->assertAttributeContains($provider2, 'providers', $chain);
+
+        $chain->addProvider('alias2', $provider1);
+
+        $this->assertAttributeCount(2, 'providers', $chain);
+        $this->assertAttributeContains($provider1, 'providers', $chain);
+        $this->assertAttributeNotContains($provider2, 'providers', $chain);
     }
 
     public function testSupports()
@@ -47,12 +56,12 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $chain = new ChainMetadataProvider();
         $this->assertFalse($chain->supports());
 
-        $chain->addProvider($this->getMetadataProviderMock(false));
+        $chain->addProvider('alias1', $this->getMetadataProviderMock(false));
         $this->assertFalse($chain->supports());
 
         $chain = new ChainMetadataProvider();
-        $chain->addProvider($this->getMetadataProviderMock(false));
-        $chain->addProvider($this->getMetadataProviderMock(true));
+        $chain->addProvider('alias1', $this->getMetadataProviderMock(false));
+        $chain->addProvider('alias2', $this->getMetadataProviderMock(true));
         $this->assertTrue($chain->supports());
     }
 
@@ -72,8 +81,8 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $metadataFromMockProvider2 = ['label' => 'testLabel2'];
 
         $chain = new ChainMetadataProvider();
-        $chain->addProvider($this->getMetadataProviderMock(false, $metadataFromMockProvider1));
-        $chain->addProvider($this->getMetadataProviderMock(true, $metadataFromMockProvider2));
+        $chain->addProvider('alias1', $this->getMetadataProviderMock(false, $metadataFromMockProvider1));
+        $chain->addProvider('alias2', $this->getMetadataProviderMock(true, $metadataFromMockProvider2));
 
         $result = $chain->getMetadata('stdClass');
 
@@ -117,7 +126,7 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         $chain = new ChainMetadataProvider();
-        $chain->addProvider($provider);
+        $chain->addProvider('alias', $provider);
 
         $this->assertEquals($levelClass, $chain->$levelClassMethod($deep));
     }
@@ -139,7 +148,7 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->method($levelClassMethod);
 
         $chain = new ChainMetadataProvider();
-        $chain->addProvider($provider);
+        $chain->addProvider('alias', $provider);
 
         $this->assertEquals($levelClass, $chain->$levelClassMethod($deep));
     }
@@ -202,8 +211,104 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($accessLevel);
 
         $chain = new ChainMetadataProvider();
-        $chain->addProvider($provider);
+        $chain->addProvider('alias', $provider);
 
         $this->assertEquals($accessLevel, $chain->getMaxAccessLevel($accessLevel, $object));
+    }
+
+    public function testSupportedProvider()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider */
+        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider->expects($this->any())->method('supports')->willReturn(true);
+
+        $chain = new ChainMetadataProvider();
+        $chain->addProvider('alias', $provider);
+
+        $provider->expects($this->once())->method('getBasicLevelClass')->willReturn('\stdClass');
+        $provider->expects($this->once())->method('getSystemLevelClass')->willReturn('\stdClass');
+
+        $this->assertEquals('\stdClass', $chain->getBasicLevelClass());
+        $this->assertEquals('\stdClass', $chain->getSystemLevelClass());
+    }
+
+    public function testEmulatedProvider()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider */
+        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider->expects($this->any())->method('supports')->willReturn(true);
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $emulated */
+        $emulated = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        $chain = new ChainMetadataProvider();
+        $chain->addProvider('alias', $provider);
+        $chain->addProvider('emulated', $emulated);
+
+        $chain->startProviderEmulation('emulated');
+
+        $provider->expects($this->never())->method('getBasicLevelClass');
+        $emulated->expects($this->once())->method('getBasicLevelClass')->willReturn('\stdClass');
+        $this->assertEquals('\stdClass', $chain->getBasicLevelClass());
+
+        $chain->stopProviderEmulation();
+
+        $emulated->expects($this->never())->method('getSystemLevelClass');
+        $provider->expects($this->once())->method('getSystemLevelClass')->willReturn('\stdClass');
+        $this->assertEquals('\stdClass', $chain->getSystemLevelClass());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Provider with "alias" alias not registered
+     */
+    public function testEmulationNotSupported()
+    {
+        $chain = new ChainMetadataProvider();
+        $chain->startProviderEmulation('alias');
+    }
+
+    public function testClearCache()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider1 */
+        $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider2 */
+        $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $default */
+        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        $chain = new ChainMetadataProvider([], $default);
+        $chain->addProvider('alias1', $provider1);
+        $chain->addProvider('alias2', $provider2);
+
+        $provider1->expects($this->once())->method('clearCache');
+        $provider1->expects($this->once())->method('clearCache');
+        $default->expects($this->once())->method('clearCache');
+
+        $chain->clearCache();
+    }
+
+    public function testWarmUpCache()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider1 */
+        $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider2 */
+        $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $default */
+        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+
+        $chain = new ChainMetadataProvider([], $default);
+        $chain->addProvider('alias1', $provider1);
+        $chain->addProvider('alias2', $provider2);
+
+        $provider1->expects($this->once())->method('warmUpCache');
+        $provider1->expects($this->once())->method('warmUpCache');
+        $default->expects($this->once())->method('warmUpCache');
+
+        $chain->warmUpCache();
     }
 }

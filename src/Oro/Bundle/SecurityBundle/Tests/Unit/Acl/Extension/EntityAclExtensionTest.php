@@ -495,6 +495,59 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param OwnershipMetadata $metadata
+     * @param array $expected
+     *
+     * @dataProvider accessLevelProvider
+     */
+    public function testGetAccessLevelNamesForNonRoot(OwnershipMetadata $metadata, array $expected)
+    {
+        $object = new ObjectIdentity('entity', '\stdClass');
+
+        $this->metadataProvider->setMetadata('\stdClass', $metadata);
+
+        $this->assertEquals(
+            $expected,
+            $this->extension->getAccessLevelNames($object)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function accessLevelProvider()
+    {
+        return [
+            'without owner' => [new OwnershipMetadata(), [0 => 'NONE', 5 => 'SYSTEM']],
+            'basic level owned' => [
+                new OwnershipMetadata('USER', 'user', 'user_id'),
+                [
+                    0 => 'NONE',
+                    1 => 'BASIC',
+                    2 => 'LOCAL',
+                    3 => 'DEEP',
+                    4 => 'GLOBAL',
+                ],
+            ],
+            'local level owned' => [
+                new OwnershipMetadata('BUSINESS_UNIT', 'bu', 'bu_id'),
+                [
+                    0 => 'NONE',
+                    2 => 'LOCAL',
+                    3 => 'DEEP',
+                    4 => 'GLOBAL',
+                ],
+            ],
+            'global level owned' => [
+                new OwnershipMetadata('ORGANIZATION', 'org', 'org_id'),
+                [
+                    0 => 'NONE',
+                    4 => 'GLOBAL',
+                ],
+            ],
+        ];
+    }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
