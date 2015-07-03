@@ -34,15 +34,14 @@
         '&nbsp;<span style="width:10px;display:inline-block;text-align:left" class="dots">.</span>'
     %}
     <div class="btn-group">
-        <a type="button" class="btn sync-btn icons-holder-text no-hash" href="{{ path('oro_email_user_sync_emails') }}">
+        <a type="button" class="btn sync-btn icons-holder-text no-hash" href="javascript: void(0);">
             {{ actionSync|raw }}
         </a>
         <script type="text/javascript">
             require(['jquery', 'oroui/js/mediator', 'oroui/js/messenger'],
                 function($, mediator, messenger) {
-                    var buttonSyncSelector = 'a[type=button].sync-btn:enabled';
+                    var buttonSyncSelector = 'a[type=button].sync-btn';
                     var _sync = function (e) {
-                        e.preventDefault();
                         var button = $(e.currentTarget);
                         if (button.attr('disabled')) {
                             return;
@@ -62,13 +61,13 @@
                         $.ajax({
                             type: 'GET',
                             dataType: 'json',
-                            url: e.currentTarget.href,
+                            url: '{{ path('oro_email_user_sync_emails') }}',
                             beforeSend: function () {
                                 button.html('{{ actionProcessing|raw }}');
                                 button.attr('disabled', 'disabled');
                                 messenger.notificationFlashMessage(
                                     'info',
-                                    {{ 'Email sync started, please wait...'|trans|json_encode|raw }}
+                                    {{ 'oro.email.action.message.processing'|trans|json_encode|raw }}
                                 );
 
                                 loader = setInterval(function() { dotsLoader() }, 500);
@@ -82,7 +81,7 @@
 
                                 messenger.notificationFlashMessage(
                                     'success',
-                                    {{ 'Email sync completed.'|trans|json_encode|raw }}
+                                    {{ 'oro.email.action.message.success'|trans|json_encode|raw }}
                                 );
                             },
                             error: function () {
@@ -93,7 +92,7 @@
 
                                 messenger.notificationFlashMessage(
                                     'error',
-                                    {{ 'Email sync failed.'|trans|json_encode|raw }}
+                                    {{ 'oro.email.action.message.error'|trans|json_encode|raw }}
                                 );
 
                             }

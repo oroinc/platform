@@ -208,6 +208,10 @@ oro:
         action:
             sync: Sync emails
             processing: Processing
+            message:
+                success: Email sync completed.
+                error: Email sync failed.
+                processing: Email sync started, please wait...
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
