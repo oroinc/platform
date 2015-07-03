@@ -1,16 +1,53 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\Tests\Unit\Twig;
+namespace Oro\Bundle\DashboardBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\DashboardBundle\Twig\WidgetItemsExtension;
+use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
+use Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener;
+use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
-class WidgetItemsExtensionTest extends \PHPUnit_Framework_TestCase
+class WidgetItemsLoadDataListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $widgetItemsExtension;
+    private $widgetItemsLoadDataListener;
 
     public function setUp()
     {
-        $this->widgetItemsExtension = new WidgetItemsExtension();
+        $this->widgetItemsLoadDataListener = new WidgetItemsLoadDataListener();
+    }
+
+    public function testFilterItemsByItemsChoice()
+    {
+        $expectedItems = [
+            'revenue' => [
+                'label' => 'Revenue',
+            ],
+        ];
+
+        $items = [
+            'revenue' => [
+                'label' => 'Revenue',
+            ],
+            'orders_number' => [
+                'label' => 'Orders number',
+            ],
+        ];
+
+        $widgetConfig = [
+            'configuration' => [
+                'subWidgets' => [
+                    'type' => 'oro_type_widget_items_choice',
+                ],
+            ]
+        ];
+
+        $options = [
+            'subWidgets' => ['revenue']
+        ];
+
+        $event = new WidgetItemsLoadDataEvent($items, $widgetConfig, new WidgetOptionBag($options));
+        $this->widgetItemsLoadDataListener->filterItemsByItemsChoice($event);
+        $this->assertEquals($expectedItems, $event->getItems());
+        $this->assertEquals(array_keys($expectedItems), array_keys($event->getItems()));
     }
 
     /**
@@ -18,9 +55,16 @@ class WidgetItemsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterItems($items, $config, $expectedItems)
     {
-        $filteredItems = $this->widgetItemsExtension->filterItems($items, $config);
-        $this->assertEquals($expectedItems, $filteredItems);
-        $this->assertEquals(array_keys($expectedItems), array_keys($filteredItems));
+        $widgetConfig = [
+            'configuration' => [
+                'subWidgets' => [],
+            ]
+        ];
+
+        $event = new WidgetItemsLoadDataEvent($items, $widgetConfig, new WidgetOptionBag(['subWidgets' => $config]));
+        $this->widgetItemsLoadDataListener->filterItems($event);
+        $this->assertEquals($expectedItems, $event->getItems());
+        $this->assertEquals(array_keys($expectedItems), array_keys($event->getItems()));
     }
 
     public function filterItemsProvider()
