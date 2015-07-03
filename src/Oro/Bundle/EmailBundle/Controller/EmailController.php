@@ -298,14 +298,13 @@ class EmailController extends Controller
      * @Route("/user-sync-emails", name="oro_email_user_sync_emails")
      * @AclAncestor("oro_email_email_view")
      */
-    public function syncUserBox()
+    public function userEmailsSyncAction()
     {
-        $this->get('oro_email.email_synchronization_manager')
-            ->syncOrigins(
-                $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
-                    $this->get('oro_security.security_facade')->getLoggedUserId()
-                )
-            );
+        $this->get('oro_email.email_synchronization_manager')->syncOrigins(
+            $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
+                $this->get('oro_security.security_facade')->getLoggedUserId()
+            )
+        );
 
         return new JsonResponse([], Codes::HTTP_OK);
     }
