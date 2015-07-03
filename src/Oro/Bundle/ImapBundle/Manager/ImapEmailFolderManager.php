@@ -37,5 +37,4 @@ class ImapEmailFolderManager
     {
         return $this->connector->findFolders($parentFolder, $recursive);
     }
-
 }

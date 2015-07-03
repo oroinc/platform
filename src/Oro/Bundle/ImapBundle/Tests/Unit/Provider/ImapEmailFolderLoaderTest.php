@@ -26,6 +26,4 @@ class ImapEmailFolderLoaderTest extends \PHPUnit_Framework_TestCase
         $folders = $this->manager->getFolders(null, true);
         $this->assertNull($folders);
     }
-
 }
-

@@ -90,23 +90,27 @@ datagrid:
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
                 folder:
-#                { type: string, data_name: f.type, label: oro.email.folder_type.label }
                     label: oro.email.folder_type.label
                     type: choice
                     options:
                         field_options:
+                            multiple: true
                             choices:
-                                sent: '%oro_email.email_folder.model.class%::SENT'
-                                inbox: '%oro_email.email_folder.model.class%::INBOX'
+                                inbox: oro.email.folder_type.inbox
+                                sent: oro.email.folder_type.sent
+                                other: oro.email.folder_type.other
+                                drafts: oro.email.folder_type.drafts
+                                spam: oro.email.folder_type.spam
+                                trash: oro.email.folder_type.trash
                     data_name: f.type
                 folders:
-                    type:               multiselect-originfolder
-                    data_name:          f.id
+                    type: multiselect-originfolder
+                    data_name: f.id
                     label: oro.email.folders.label
                     options:
                         field_options:
-                            choices:    @oro_email.datagrid.origin_folder.provider->getListTypeChoices
-                            multiple:   true
+                            multiple: true
+                            choices: @oro_email.datagrid.origin_folder.provider->getListTypeChoices
                 is_new:
                     label: oro.email.status.label
                     type: choice
