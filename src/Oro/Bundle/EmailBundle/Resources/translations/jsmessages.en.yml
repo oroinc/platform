@@ -1,5 +1,9 @@
 oro:
     email:
+        menu:
+            mark_unread:
+                success.message: Message has been marked as unread
+                error.message: Error mark message as unread
         emailtemplate:
             load_failed: Error occured while loading template.
             variable_title: '{{ variable_label }}. Click to insert variable or drag it.'
@@ -25,6 +29,10 @@ oro:
             removed: The context has been removed
         send_email: Send email
         menu.shortcut_compose_email.label: Compose email
+        action:
+            success_mark_read: "Email has been market as read"
+            success_mark_unread: "Email has been market as unread"
+            error: Error has occurred
 "The email was sent": "The email was sent"
 "Preview": "Preview"
 "Yes, Proceed": "Yes, Proceed"

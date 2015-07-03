@@ -19,11 +19,13 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -32,6 +34,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
  * @package Oro\Bundle\EmailBundle\Controller
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailController extends Controller
 {
@@ -48,13 +51,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-
-        // TODO Should be refactored in CRM-2482
-        $em = $this->getDoctrine()->getManager();
-        $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
-        if ($emailUser) {
-            $this->getEmailManager()->setEmailUserSeen($emailUser);
-        }
+        $this->getEmailManager()->setSeenStatus($entity);
 
         return [
             'entity' => $entity,
@@ -72,6 +69,8 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
+        $this->getEmailManager()->setSeenStatus($entity, true);
+        
         return ['entity' => $entity];
     }
 
@@ -260,6 +259,7 @@ class EmailController extends Controller
      * @Template
      *
      * @param Request $request
+     *
      * @return array
      */
     public function emailsAction(Request $request)
@@ -321,8 +321,10 @@ class EmailController extends Controller
     /**
      * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
      * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
+     *
      * @param string $entityClass
      * @param string $activityId
+     *
      * @return array
      */
     public function contextGridAction($activityId, $entityClass = null)
@@ -334,6 +336,68 @@ class EmailController extends Controller
             'params' => ['activityId' => $activityId],
             'renderParams' => []
         ];
+    }
+
+    /**
+     * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_user_edit")
+     *
+     * @param EmailUser $emailUser
+     *
+     * @return JsonResponse
+     */
+    public function toggleSeenAction(EmailUser $emailUser)
+    {
+        if ($emailUser) {
+            $this->getEmailManager()->toggleEmailUserSeen($emailUser);
+        }
+    
+        return new JsonResponse(['successful' => (bool)$emailUser]);
+    }
+
+    /**
+     * @Route("/mark-seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
+     * @AclAncestor("oro_email_email_user_edit")
+     *
+     * @param Email $email
+     * @param string $status
+     *
+     * @return JsonResponse
+     */
+    public function markSeenAction(Email $email, $status)
+    {
+        if ($email) {
+            if ((bool)$status) {
+                $this->getEmailManager()->setSeenStatus($email, true);
+            } else {
+                $this->getEmailManager()->setUnseenStatus($email, true);
+            }
+        }
+
+        return new JsonResponse(['successful' => (bool)$email]);
+    }
+
+    /**
+     * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
+     *
+     * @param string $gridName
+     * @param string $actionName
+     *
+     * @return JsonResponse
+     */
+    public function markMassAction($gridName, $actionName)
+    {
+        /** @var MassActionDispatcher $massActionDispatcher */
+        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
+
+        $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $this->getRequest());
+
+        $data = [
+            'successful' => $response->isSuccessful(),
+            'message'    => $response->getMessage()
+        ];
+
+        return new JsonResponse(array_merge($data, $response->getOptions()));
     }
 
     /**
@@ -366,7 +430,7 @@ class EmailController extends Controller
         $responseData = [
             'entity' => $emailModel,
             'saved' => false,
-            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature'),
+            'appendSignature' => (bool)$this->get('oro_config.user')->get('oro_email.append_signature')
         ];
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;

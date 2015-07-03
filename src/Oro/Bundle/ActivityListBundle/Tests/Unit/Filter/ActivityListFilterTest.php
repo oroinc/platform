@@ -152,14 +152,7 @@ class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->activityManager->expects($this->once())
             ->method('getActivityAssociations')
-            ->will($this->returnValue([
-                [
-                    'className' => 'c1',
-                ],
-                [
-                    'className' => 'c2',
-                ],
-            ]));
+            ->will($this->returnValue([]));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
             ->disableOriginalConstructor()
