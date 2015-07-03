@@ -69,5 +69,4 @@ class EmailFolderManagerTest extends \PHPUnit_Framework_TestCase
 
         return $folder;
     }
-
 }

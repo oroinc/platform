@@ -4,6 +4,7 @@ oro:
             title:       Recent Emails
             inbox:       Inbox
             sent:        Sent
+            unread:      Unread Emails
             view_all:    View All
             description: This widget allows you to see most recent additions to your inbox and outbox
 
@@ -98,6 +99,8 @@ oro:
             compose: Compose
             shortcut_compose_email.label: Compose email
             shortcut_compose_email.description: Compose email
+            mark_read.label: Mark read
+            mark_unread.label: Mark unread
 
         datagrid:
             emailtemplate:
@@ -119,11 +122,18 @@ oro:
             emails:
                 action:
                     view: "View"
+                    mark_as_read: "Mark As Read"
+                    mark_as_unread: "Mark As Unread"
+                    enable_to_change_status: "Enable to change status"
 
             emailfolder:
                 view:
                     inbox: Inbox
                     sent: Sent Mail
+            filters:
+                new: Unread emails
+            mark:
+                success_message: "{0} No entities were marked|{1} One entity was marked|]1,Inf[ %count% entities were marked"
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -132,6 +142,14 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folder_type:
+            label:                Folder type
+            sent:                 Sent
+            inbox:                Inbox
+            other:                Other
+            spam:                 Spam
+            trash:                Trash
+            drafts:               Drafts
         contact.label:            Contact
         date.label:               Date
         date_time.label:          Date/Time
@@ -181,6 +199,10 @@ oro:
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
+        status:
+            label:                Status
+            unread.label:         Unread
+            read.label:           Read
 
         entity_config:
             email:

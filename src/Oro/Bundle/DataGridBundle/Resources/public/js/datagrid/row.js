@@ -34,6 +34,10 @@ define([
             hasSelectedText: false
         },
 
+        className: function () {
+            return this.model.get('row_class_name');
+        },
+
         /**
          * @inheritDoc
          */

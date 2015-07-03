@@ -110,11 +110,23 @@ class ImapConnector
         if (empty($searchString)) {
             $result = new ImapMessageIterator($this->imap);
         } else {
-            $ids    = $this->imap->search(array($searchString));
+            $ids    = $this->imap->search([$searchString]);
             $result = new ImapMessageIterator($this->imap, $ids);
         }
 
         return $result;
+    }
+
+    /**
+     * @param null $query
+     *
+     * @return mixed
+     */
+    public function findUIDs($query = null)
+    {
+        $this->ensureConnected();
+
+        return $this->imap->uidSearch([$query]);
     }
 
     /**
@@ -172,6 +184,24 @@ class ImapConnector
         $this->ensureConnected();
 
         return $this->imap->getUidValidity();
+    }
+
+    /**
+     * Set flags for massage in origin
+     *
+     * @param string $uid   - The UID of a message
+     * @param array  $flags - array of flags
+     *
+     * @return $this;
+     */
+    public function setFlags($uid, $flags)
+    {
+        $this->ensureConnected();
+
+        $id = $this->imap->getNumberByUniqueId($uid);
+        $this->imap->setFlags($id, $flags);
+
+        return $this;
     }
 
     /**

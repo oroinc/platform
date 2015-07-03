@@ -23,6 +23,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
     /** @var EntityVariablesProvider */
     protected $provider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $formatterManager;
+
     protected function setUp()
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
@@ -43,11 +46,16 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->formatterManager = $this->getMockBuilder('Oro\Bundle\UIBundle\Formatter\FormatterManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->provider = new EntityVariablesProvider(
             $translator,
             $this->emailConfigProvider,
             $this->entityConfigProvider,
-            $this->doctrine
+            $this->doctrine,
+            $this->formatterManager
         );
     }
 

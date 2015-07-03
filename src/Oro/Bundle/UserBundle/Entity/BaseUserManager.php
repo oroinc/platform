@@ -11,6 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
@@ -144,7 +145,7 @@ class BaseUserManager implements UserProviderInterface
     {
         foreach ($checkedFolders as $checkedFolder) {
             if ($checkedFolder['fullName'] === $fullName) {
-                if ($checkedFolder['syncEnabled']) {
+                if (isset($checkedFolder['syncEnabled']) && $checkedFolder['syncEnabled']) {
                     return true;
                 }
 
@@ -173,6 +174,15 @@ class BaseUserManager implements UserProviderInterface
                 if ($folder === null) {
                     continue;
                 }
+
+                if (!$folder->getId()) {
+                    $imapEmailFolder = new ImapEmailFolder();
+                    $imapEmailFolder->setFolder($folder);
+                    $imapEmailFolder->setUidValidity($uidValidity);
+
+                    $this->registry->getManager()->persist($imapEmailFolder);
+                }
+
                 $folders[] = $folder;
             }
 
@@ -216,7 +226,7 @@ class BaseUserManager implements UserProviderInterface
         }
         $em = $this->registry->getManager();
         $repo = $em->getRepository('OroEmailBundle:EmailFolder');
-        $folder = $repo->findOneBy(['fullName' => $fullName/*, 'origin' => $origin*/]);
+        $folder = $repo->findOneBy(['fullName' => $fullName, 'origin' => $origin]);
 
         if ($folder) {
             $this->processedFolders[] = $folder->getFullName();

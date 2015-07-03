@@ -2,12 +2,23 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+
+/**
+ * Class Imap
+ * @package Oro\Bundle\ImapBundle\Mail\Storage
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Imap extends \Zend\Mail\Storage\Imap
 {
-    const RFC822_HEADER = 'RFC822.HEADER';
-    const FLAGS         = 'FLAGS';
-    const UID           = 'UID';
-    const INTERNALDATE  = 'INTERNALDATE';
+    const BODY_HEADER      = 'BODY[HEADER]';
+    const BODY_PEEK_HEADER = 'BODY.PEEK[HEADER]';
+    const BODY_PEEK_TEXT   = 'BODY.PEEK[TEXT]';
+    const RFC822_HEADER    = 'RFC822.HEADER';
+    const FLAGS            = 'FLAGS';
+    const UID              = 'UID';
+    const INTERNALDATE     = 'INTERNALDATE';
 
     /**
      * Indicates whether IMAP server can store the same message in different folders
@@ -47,6 +58,8 @@ class Imap extends \Zend\Mail\Storage\Imap
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function __construct($params)
     {
@@ -56,11 +69,49 @@ class Imap extends \Zend\Mail\Storage\Imap
             $params = $params->protocol;
         }
 
-        parent::__construct($params);
+        if (is_array($params)) {
+            $params = (object) $params;
+        }
+
+        $this->has['flags'] = true;
+
+        if ($params instanceof ProtocolImap) {
+            $this->protocol = $params;
+            try {
+                $this->selectFolder('INBOX');
+            } catch (Exception\ExceptionInterface $e) {
+                throw new Exception\RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
+            }
+            $this->postInit();
+
+            return;
+        }
+
+        if (!isset($params->user)) {
+            throw new Exception\InvalidArgumentException('need at least user in params');
+        }
+
+        $host     = isset($params->host)     ? $params->host     : 'localhost';
+        $password = isset($params->password) ? $params->password : '';
+        $port     = isset($params->port)     ? $params->port     : null;
+        $ssl      = isset($params->ssl)      ? $params->ssl      : false;
+
+        $this->protocol = new ProtocolImap();
+        $this->protocol->connect($host, $port, $ssl);
+        if (!$this->protocol->login($params->user, $password)) {
+            throw new Exception\RuntimeException('cannot login, user or password wrong');
+        }
+        $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
+
+        $this->postInit();
+    }
+
+    protected function postInit()
+    {
         $this->messageClass = 'Oro\Bundle\ImapBundle\Mail\Storage\Message';
         $this->getMessageItems = array(
             self::FLAGS,
-            self::RFC822_HEADER,
+            self::BODY_PEEK_HEADER,
             self::UID,
             self::INTERNALDATE
         );
@@ -224,6 +275,35 @@ class Imap extends \Zend\Mail\Storage\Imap
     }
 
     /**
+     * Searches UIDS by the given criteria
+     *
+     * @param array $criteria
+     *
+     * @return mixed
+     */
+    public function uidSearch(array $criteria)
+    {
+        if (empty($criteria)) {
+            throw new \Zend\Mail\Storage\Exception\RuntimeException('The search criteria must not be empty.');
+        }
+
+        $response = $this->protocol->requestAndResponse('UID SEARCH', $criteria);
+        foreach ($response as $ids) {
+            if ($ids[0] === 'SEARCH') {
+                array_shift($ids);
+
+                return $ids;
+            }
+        }
+
+        if (!is_array($response)) {
+            throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot search messages.');
+        }
+
+        return $response;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function selectFolder($globalName)
@@ -267,7 +347,7 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     protected function createMessageObject($id, array $data)
     {
-        $header = $data[self::RFC822_HEADER];
+        $header = $data[self::BODY_HEADER];
 
         $flags = [];
         foreach ($data[self::FLAGS] as $flag) {
@@ -288,6 +368,16 @@ class Imap extends \Zend\Mail\Storage\Imap
         $this->setExtHeaders($headers, $data);
 
         return $message;
+    }
+
+    public function getRawContent($id, $part = null)
+    {
+        if ($part !== null) {
+            // TODO: implement
+            throw new Exception\RuntimeException('not implemented');
+        }
+
+        return $this->protocol->fetch(self::BODY_PEEK_TEXT, $id);
     }
 
     /**
