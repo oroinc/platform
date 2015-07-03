@@ -1,3 +1,9 @@
+placeholders:
+    scripts_before:
+        items:
+            email_filter_templates:
+                order: 5
+
 items:
     oro_send_email_button:
         template: OroEmailBundle:Email:activityButton.html.twig
@@ -5,3 +11,5 @@ items:
     oro_send_email_link:
         template: OroEmailBundle:Email:activityLink.html.twig
         acl: oro_email_email_create
+    email_filter_templates:
+        template: OroEmailBundle:Js:default_templates.js.twig
