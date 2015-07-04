@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  * @outputBuffering enabled
  * @dbIsolation
  */
-class EntityDictionaryControllerTest extends WebTestCase
+class DictionaryControllerTest extends WebTestCase
 {
     protected function setUp()
     {

@@ -10,6 +10,6 @@ oro_entity_alias_api:
     resource: "@OroEntityBundle/Controller/Api/Rest/EntityAliasController.php"
     type:     rest
 
-oro_entity_alias_api:
-    resource: "@OroEntityBundle/Controller/Api/Rest/EntityDictionaryController.php"
+oro_entity_dictionary_api:
+    resource: "@OroEntityBundle/Controller/Api/Rest/DictionaryController.php"
     type:     rest
