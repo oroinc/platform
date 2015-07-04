@@ -4,11 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractEnumType;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Fixtures\TestEntity;
@@ -35,7 +35,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         parent::setUp();
     }
 
-    public function doTestBuildForm(AbstractType $type)
+    public function doTestBuildForm(AbstractEnumType $type)
     {
         $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
 
@@ -46,7 +46,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->buildForm($builder, []);
     }
 
-    public function doTestPreSetDataForExistingEntity(AbstractType $type)
+    public function doTestPreSetDataForExistingEntity(AbstractEnumType $type)
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
@@ -69,7 +69,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    public function doTestPreSetDataForNullEntity(AbstractType $type)
+    public function doTestPreSetDataForNullEntity(AbstractEnumType $type)
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
@@ -90,7 +90,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    public function doTestPreSetDataForFormWithoutDataClass(AbstractType $type)
+    public function doTestPreSetDataForFormWithoutDataClass(AbstractEnumType $type)
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
@@ -110,7 +110,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    public function doTestPreSetDataForNewEntityKeepExistingValue(AbstractType $type)
+    public function doTestPreSetDataForNewEntityKeepExistingValue(AbstractEnumType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
 
@@ -122,7 +122,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $this->expectFormConfigWillReturnOptions(
             $formConfig,
             [
-                ['multiple', null, false],
+                ['multiple', null, false]
             ]
         );
 
@@ -153,7 +153,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    public function doTestPreSetDataForNewEntity(AbstractType $type)
+    public function doTestPreSetDataForNewEntity(AbstractEnumType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
 
@@ -165,7 +165,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $this->expectFormConfigWillReturnOptions(
             $parentFormConfig,
             [
-                ['data_class', null, 'TestEntity'],
+                ['data_class', null, 'TestEntity']
             ]
         );
 
@@ -180,7 +180,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             $formConfig,
             [
                 ['class', null, $enumValueClassName],
-                ['multiple', null, false],
+                ['multiple', null, false]
             ]
         );
 
@@ -195,7 +195,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    public function doTestPreSetDataForNewEntityWithMultiEnum(AbstractType $type)
+    public function doTestPreSetDataForNewEntityWithMultiEnum(AbstractEnumType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
 
@@ -205,7 +205,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             $formConfig,
             [
                 ['class', null, $enumValueClassName],
-                ['multiple', null, true],
+                ['multiple', null, true]
             ]
         );
 
@@ -215,7 +215,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $this->expectFormConfigWillReturnOptions(
             $parentFormConfig,
             [
-                ['data_class', null, 'TestEntity'],
+                ['data_class', null, 'TestEntity']
             ]
         );
 
@@ -244,7 +244,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     protected function doTestSetDefaultOptions(
-        AbstractType $type,
+        AbstractEnumType $type,
         OptionsResolver $resolver,
         $enumCode,
         $multiple = false,
@@ -252,6 +252,11 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         array $options = []
     ) {
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+
+        // AbstractEnumType require class to be instance of AbstractEnumValue
+        // This may be achieved with Stub. Stub namespace does not reflect Stub path. So we have to load it manually
+        $fileName = ExtendHelper::getShortClassName($enumValueClassName) . '.php';
+        require_once(realpath(__DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $fileName));
         $enumConfig         = new Config(new EntityConfigId('enum', $enumValueClassName));
         $enumConfig->set('multiple', $multiple);
         $enumConfigProvider = $this->getConfigProviderMock();
@@ -283,12 +288,14 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $this->assertEquals('name', $resolvedOptions['property']);
         $this->assertNotNull($resolvedOptions['query_builder']);
 
-        unset($resolvedOptions['multiple']);
-        unset($resolvedOptions['expanded']);
-        unset($resolvedOptions['enum_code']);
-        unset($resolvedOptions['class']);
-        unset($resolvedOptions['property']);
-        unset($resolvedOptions['query_builder']);
+        unset(
+            $resolvedOptions['multiple'],
+            $resolvedOptions['expanded'],
+            $resolvedOptions['enum_code'],
+            $resolvedOptions['class'],
+            $resolvedOptions['property'],
+            $resolvedOptions['query_builder']
+        );
 
         return $resolvedOptions;
     }
@@ -436,34 +443,14 @@ class AbstractEnumTypeTestCase extends TypeTestCase
      * @param string $enumValueClassName
      * @param array  $defaultValues
      */
-    protected function setExpectationsForLoadDefaultEnumValues($enumValueClassName, $defaultValues)
+    protected function setExpectationsForLoadDefaultEnumValues($enumValueClassName, array $defaultValues)
     {
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getResult'))
-            ->getMockForAbstractClass();
-        $query->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnValue($defaultValues));
-
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $qb->expects($this->once())
-            ->method('where')
-            ->with('e.default = true')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($query));
-
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $repo = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $repo->expects($this->once())
-            ->method('createQueryBuilder')
-            ->with('e')
-            ->will($this->returnValue($qb));
+            ->method('getDefaultValues')
+            ->will($this->returnValue($defaultValues));
 
         $this->doctrine->expects($this->once())
             ->method('getRepository')

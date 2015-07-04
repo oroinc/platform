@@ -99,7 +99,7 @@ datagrid:
                                 false: oro.email.status.unread.label
                                 true: oro.email.status.read.label
                     data_name: eu.seen
-        views_list : @oro_email.emailseen.datagrid_view_list
+        views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:
         extends: email-grid

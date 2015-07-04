@@ -59,7 +59,7 @@ define([
          * @param {Event} e
          */
         onClick: function (e) {
-            var exclude = 'a, .dropdown',
+            var exclude = 'a, .dropdown, .editable, .skip-row-click',
                 $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
             if ($target.is(exclude) || $target.parents(exclude).length) {
@@ -106,6 +106,9 @@ define([
             if (column.has('align')) {
                 cell.$el.removeClass('align-left align-center align-right');
                 cell.$el.addClass('align-' + column.get('align'));
+            }
+            if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
+                cell.$el.addClass('skip-row-click');
             }
             this._listenToCellEvents(cell);
             return cell;
