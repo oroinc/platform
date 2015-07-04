@@ -292,6 +292,16 @@ services:
         tags:
             - { name: routing.options_resolver }
 
+    oro_entity.api_doc_handler.dictionary:
+        class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityApiDocHandler
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_resolver
+            - @oro_entity_config.config_manager
+            - @translator
+        tags:
+            - { name: nelmio_api_doc.extractor.handler }
+
     oro_entity.manager.dictionary.api:
         class: %oro_entity.manager.dictionary.api.class%
         parent: oro_soap.manager.entity_manager.abstract

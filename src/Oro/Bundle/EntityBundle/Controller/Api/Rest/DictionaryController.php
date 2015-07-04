@@ -8,9 +8,9 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 
 /**
@@ -20,7 +20,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 class DictionaryController extends RestGetController
 {
     /**
-     * Returns the list of dictionary items for the specified entity.
+     * Get values of a dictionary entity.
      *
      * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
      *
@@ -46,7 +46,7 @@ class DictionaryController extends RestGetController
      * )
      *
      * @ApiDoc(
-     *      description="Returns the list of dictionary items for the specified entity",
+     *      description="Get values of a dictionary entity",
      *      resource=true
      * )
      *

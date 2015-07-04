@@ -12,5 +12,15 @@ oro_entity_api:
         _format:  json
     defaults:
         version:  latest
+
+oro_entity_dictionary_api:
+    resource: "@OroEntityBundle/Controller/Api/Rest/DictionaryController.php"
+    type:         rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest
     options:
         group: dictionary_entity
