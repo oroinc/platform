@@ -17,6 +17,9 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityAliasResolver;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityClassNameHelper;
+
     /** @var SortableRouteCollection */
     protected $routeCollection;
 
@@ -28,18 +31,21 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        $this->dictionaryProvider = $this
+        $this->dictionaryProvider    = $this
             ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+        $this->entityAliasResolver   = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->routeOptionsResolver = new DictionaryEntityRouteOptionsResolver(
             $this->dictionaryProvider,
-            $this->entityAliasResolver
+            $this->entityAliasResolver,
+            $this->entityClassNameHelper
         );
 
         $this->routeCollection         = new SortableRouteCollection();
@@ -99,10 +105,17 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
                     ['Test\Group', 'groups'],
                 ]
             );
+        $this->entityClassNameHelper->expects($this->any())
+            ->method('getUrlSafeClassName')
+            ->willReturnCallback(
+                function ($className) {
+                    return str_replace('\\', '_', $className);
+                }
+            );
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 
-        $this->assertEquals(['dictionary' => 'priorities|groups'], $route->getRequirements());
+        $this->assertEquals(['dictionary' => 'priorities|Test_Priority|groups|Test_Group'], $route->getRequirements());
 
         $this->routeCollection->sortByPriority();
         $this->assertEquals(
@@ -120,7 +133,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
         );
 
         $this->assertEquals(
-            'priorities|groups',
+            'priorities|Test_Priority|groups|Test_Group',
             $this->routeCollection->get('tested_route')->getRequirement('dictionary')
         );
         $this->assertEquals(
