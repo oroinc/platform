@@ -17,7 +17,7 @@ define([
      * @extends Backbone.Model
      */
     AbstractListener = Backbone.Model.extend({
-        /** @param {String} Column name of cells that will be listened for changing their values */
+        /** @param {String|Array} Column name of cells that will be listened for changing their values */
         columnName: 'id',
 
         /** @param {String} Model field that contains data */
@@ -84,6 +84,7 @@ define([
         /**
          * Process cell editing
          *
+         * @param {$.Event} e
          * @param {Backbone.Model} model
          * @protected
          */

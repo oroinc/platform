@@ -170,3 +170,26 @@
         }) }}
     {% endif %}
 {% endmacro %}
+
+{% macro addMarkUnreadButton(emailEntity) -%}
+    {% if resource_granted('oro_email_email_edit', emailEntity) %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {{ UI.clientButton({
+            'dataUrl': path(
+                'oro_email_mark_seen', {
+                    id: emailEntity.id,
+                    status: 0
+                }),
+            'dataAttributes': {
+                'page-component-module': 'oroemail/js/app/components/mark-unread-button',
+                'page-component-options': {
+                    'redirect': path('oro_email_user_emails'),
+                }|json_encode,
+            },
+            'aCss': 'no-hash',
+            'iCss': 'icon-minus hide-text',
+            'dataId': emailEntity.id,
+            'label' : 'oro.email.menu.mark_unread.label'|trans
+        }) }}
+    {% endif %}
+{% endmacro %}
