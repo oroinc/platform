@@ -66,7 +66,6 @@ datagrid:
             id: ~
         sorters:
             columns:
-                mailbox:  { data_name: folder.origin.mailboxName }
                 subject:  { data_name: e.subject }
                 sentAt:   { data_name: e.sentAt }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
