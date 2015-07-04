@@ -28,9 +28,10 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        $this->dictionaryProvider = $this->getMockBuilder(
-            'Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider'
-        )->disableOriginalConstructor()->getMock();
+        $this->dictionaryProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
             ->disableOriginalConstructor()
@@ -65,51 +66,53 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
 
     public function testResolve()
     {
-        $route = new Route('/{entity}/route', [], [], ['group' => DictionaryEntityRouteOptionsResolver::ROUTE_GROUP]);
+        $route = new Route(
+            '/{dictionary}/route',
+            [],
+            [],
+            ['group' => DictionaryEntityRouteOptionsResolver::ROUTE_GROUP]
+        );
 
         $this->routeCollection->add('first_route', new Route('/first_route'));
-        $this->routeCollection->add(
-            'override1',
-            new Route('/sources/route')
-        );
+        $this->routeCollection->add('override_before', new Route('/sources/route'));
         $this->routeCollection->add('some_route', new Route('/some_route'));
         $this->routeCollection->add('tested_route', $route);
-        $this->routeCollection->add(
-            'override2',
-            new Route('/statuses/route')
-        );
+        $this->routeCollection->add('override_after', new Route('/statuses/route'));
         $this->routeCollection->add('last_route', new Route('/last_route'));
 
         $this->dictionaryProvider->expects($this->once())
             ->method('getSupportedEntityClasses')
             ->willReturn([
-                    'Test\Status',
-                    'Test\Priority',
-                    'Test\Source'
-                ]);
+                'Test\Status',
+                'Test\Priority',
+                'Test\Source',
+                'Test\Group'
+            ]);
 
-        $this->entityAliasResolver->expects($this->exactly(3))
+        $this->entityAliasResolver->expects($this->exactly(4))
             ->method('getPluralAlias')
             ->willReturnMap(
                 [
                     ['Test\Status', 'statuses'],
                     ['Test\Priority', 'priorities'],
-                    ['Test\Source', 'sources']
+                    ['Test\Source', 'sources'],
+                    ['Test\Group', 'groups'],
                 ]
             );
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 
-        $this->assertEquals(['entity' => 'statuses|priorities|sources'], $route->getRequirements());
+        $this->assertEquals(['dictionary' => 'priorities|groups'], $route->getRequirements());
 
         $this->routeCollection->sortByPriority();
         $this->assertEquals(
             [
                 'first_route',
                 'some_route',
-                'override2',
-                'tested_route_auto_7',
-                'override1',
+                'override_after', // statuses
+                'tested_route_auto_7', // priorities
+                'override_before', // sources
+                'tested_route_auto_8', // groups
                 'tested_route',
                 'last_route'
             ],
@@ -117,12 +120,16 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
         );
 
         $this->assertEquals(
-            'statuses|priorities|sources',
-            $this->routeCollection->get('tested_route')->getRequirement('entity')
+            'priorities|groups',
+            $this->routeCollection->get('tested_route')->getRequirement('dictionary')
         );
         $this->assertEquals(
             'priorities',
-            $this->routeCollection->get('tested_route_auto_7')->getDefault('entity')
+            $this->routeCollection->get('tested_route_auto_7')->getDefault('dictionary')
+        );
+        $this->assertEquals(
+            'groups',
+            $this->routeCollection->get('tested_route_auto_8')->getDefault('dictionary')
         );
     }
 }
