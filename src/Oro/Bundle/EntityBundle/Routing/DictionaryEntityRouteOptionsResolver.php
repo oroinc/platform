@@ -12,9 +12,9 @@ use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 
 class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP        = 'dictionary_entity';
-    const ENTITY_ATTRIBUTE   = 'entity';
-    const ENTITY_PLACEHOLDER = '{entity}';
+    const ROUTE_GROUP = 'dictionary_entity';
+    const ENTITY_ATTRIBUTE = 'dictionary';
+    const ENTITY_PLACEHOLDER = '{dictionary}';
 
     /** @var ChainDictionaryValueListProvider */
     protected $dictionaryProvider;
@@ -53,7 +53,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
             );
 
             if (!empty($entities)) {
-                $this->adjustRoutes($route, $routes, $entities);
+                $entities = $this->adjustRoutes($route, $routes, $entities);
                 $route->setRequirement(self::ENTITY_ATTRIBUTE, implode('|', $entities));
             }
         }
@@ -63,9 +63,12 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
      * @param string[]                $entities
+     *
+     * @return string[] The list of entities handled by the default controller
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
+        $result    = [];
         $routeName = $routes->getName($route);
 
         foreach ($entities as $entity) {
@@ -84,7 +87,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                     true
                 );
             } else {
-                // add an additional strict route based on the base route and current activity
+                // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
                 $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $entity, $strictRoute->getPath()));
                 $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $entity);
@@ -94,8 +97,11 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                     $routeName,
                     true
                 );
+                $result[] = $entity;
             }
         }
+
+        return $result;
     }
 
     /**

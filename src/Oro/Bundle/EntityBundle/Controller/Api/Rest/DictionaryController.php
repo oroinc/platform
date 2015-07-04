@@ -22,9 +22,9 @@ class DictionaryController extends RestGetController
     /**
      * Returns the list of dictionary items for the specified entity.
      *
-     * @param string $entity The entity class name or alias.
+     * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
      *
-     * @Get("/{entity}", name="")
+     * @Get("/{dictionary}", name="")
      *
      * @QueryParam(
      *      name="page",
@@ -52,10 +52,10 @@ class DictionaryController extends RestGetController
      *
      * @return Response
      */
-    public function cgetAction($entity)
+    public function cgetAction($dictionary)
     {
         $manager = $this->getManager();
-        $manager->setClass($manager->resolveEntityClass($entity, true));
+        $manager->setClass($manager->resolveEntityClass($dictionary, true));
 
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
