@@ -38,8 +38,10 @@ class DictionaryApiEntityManager extends ApiEntityManager
     {
         $qb = $this->dictionaryProvider->getValueListQueryBuilder($this->class);
         if ($qb instanceof QueryBuilder) {
-            $qb->setMaxResults($limit);
-            $qb->setFirstResult($this->getOffset($page, $limit));
+            if ($limit >= 0) {
+                $qb->setMaxResults($limit);
+                $qb->setFirstResult($this->getOffset($page, $limit));
+            }
             if ($orderBy) {
                 $qb->orderBy($orderBy);
             }

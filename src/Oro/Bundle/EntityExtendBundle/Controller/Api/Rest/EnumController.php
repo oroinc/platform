@@ -26,6 +26,7 @@ class EnumController extends FOSRestController
      * Deprecated since 1.9. Use /api/rest/{version}/{dictionary}.{_format} instead.
      * For example /api/rest/latest/leadsources.json or /api/rest/latest/Extend_Entity_EV_Lead_Source.json.
      * Take into account that 'priority' field is replaced with 'order' field.
+     * Also by default only the first 10 items are returned. To get all items add '?limit=-1'.
      *
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *

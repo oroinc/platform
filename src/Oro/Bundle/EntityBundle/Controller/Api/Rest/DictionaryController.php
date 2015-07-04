@@ -36,7 +36,7 @@ class DictionaryController extends RestGetController
      *      name="limit",
      *      requirements="\d+",
      *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
+     *      description="Number of items per page. Defaults to 10. Set -1 to get all items."
      * )
      * @QueryParam(
      *      name="locale",
