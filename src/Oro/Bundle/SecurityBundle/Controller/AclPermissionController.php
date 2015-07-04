@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Controller;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -33,7 +34,10 @@ class AclPermissionController extends Controller
     public function aclAccessLevelsAction($oid)
     {
         if (strpos($oid, 'entity:') === 0) {
-            $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass(substr($oid, 7));
+            $entity = substr($oid, 7);
+            if ($entity !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+                $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass($entity);
+            }
         }
 
         $levels = $this
