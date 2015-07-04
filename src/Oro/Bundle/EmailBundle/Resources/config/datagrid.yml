@@ -5,7 +5,7 @@ datagrid:
             query:
                 select:
                     - partial eu.{id, email}
-                    - CASE WHEN eu.seen = 1 THEN 0 ELSE 1 END as is_new
+                    - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -99,7 +99,7 @@ datagrid:
                                 false: oro.email.status.unread.label
                                 true: oro.email.status.read.label
                     data_name: eu.seen
-        views_list : @oro_email.emailseen.datagrid_view_list
+        views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:
         extends: email-grid
@@ -169,7 +169,7 @@ datagrid:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
                     - a
-                    - CASE WHEN eu.seen = 1 THEN 0 ELSE 1 END as is_new
+                    - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
                 join:
@@ -265,7 +265,7 @@ datagrid:
             query:
                 where:
                     and:
-                        - eu.seen = 0
+                        - eu.seen = false
         columns:
             receivedAt:
                 type: twig

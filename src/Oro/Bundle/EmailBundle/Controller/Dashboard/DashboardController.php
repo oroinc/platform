@@ -37,7 +37,7 @@ class DashboardController extends Controller
             $unreadMailList = $this
                 ->get('doctrine')
                 ->getRepository('OroEmailBundle:EmailUser')
-                ->getEmailUserList($loggedUser, $currentOrganization, [], 0);
+                ->getEmailUserList($loggedUser, $currentOrganization, [], false);
 
             $params = array_merge(
                 [

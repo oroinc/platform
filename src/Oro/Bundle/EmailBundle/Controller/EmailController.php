@@ -339,7 +339,7 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/toggle_seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
+     * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
      *
      * @param EmailUser $emailUser
@@ -356,7 +356,7 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/mark_seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
+     * @Route("/mark-seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
      *
      * @param Email $email

@@ -1,9 +1,9 @@
 {% extends 'OroDashboardBundle:Dashboard:tabbedWidget.html.twig' %}
 {% import 'OroEmailBundle::macros.html.twig' as Email %}
 
-{% if unreadMailCount > 6 %}
+{% if unreadMailCount > 10 %}
     {% set unreadMailCount %}
-        <div class="email-mail-count-circle">6+</div>
+        <div class="email-mail-count-circle">10+</div>
     {% endset %}
 {% else %}
     {% set unreadMailCount %}
