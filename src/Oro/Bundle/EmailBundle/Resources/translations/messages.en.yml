@@ -9,6 +9,7 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        filter.inactive: inactive
         controller.emailtemplate.saved.message: "Template saved"
         form:
             choose_template:                     ""
