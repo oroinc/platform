@@ -4,8 +4,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
-
 interface DictionaryValueListProviderInterface
 {
     /**
@@ -22,8 +20,7 @@ interface DictionaryValueListProviderInterface
      *
      * @param string $className The FQCN of a dictionary entity
      *
-     * @return QueryBuilder|SqlQueryBuilder|null QueryBuilder or SqlQueryBuilder if the provider can get values
-     *                                           NULL if the provider cannot process the given entity
+     * @return QueryBuilder
      */
     public function getValueListQueryBuilder($className);
 
@@ -32,7 +29,7 @@ interface DictionaryValueListProviderInterface
      *
      * @param string $className The FQCN of a dictionary entity
      *
-     * @return array|null
+     * @return array
      */
     public function getSerializationConfig($className);
 

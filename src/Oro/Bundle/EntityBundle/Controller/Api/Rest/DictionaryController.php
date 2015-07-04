@@ -64,9 +64,7 @@ class DictionaryController extends RestGetController
     }
 
     /**
-     * Get entity manager
-     *
-     * @return DictionaryApiEntityManager
+     * {@inheritdoc}
      */
     public function getManager()
     {

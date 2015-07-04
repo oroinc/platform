@@ -4,8 +4,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
-
 class ChainDictionaryValueListProvider
 {
     /** @var array */
@@ -60,10 +58,7 @@ class ChainDictionaryValueListProvider
 
         foreach ($this->getProviders() as $provider) {
             if ($provider->supports($className)) {
-                $serializationConfig = $provider->getSerializationConfig($className);
-                if ($serializationConfig) {
-                    return $serializationConfig;
-                }
+                return $provider->getSerializationConfig($className);
             }
         }
 
@@ -75,8 +70,7 @@ class ChainDictionaryValueListProvider
      *
      * @param string $className The FQCN of a dictionary entity
      *
-     * @return QueryBuilder|SqlQueryBuilder|null QueryBuilder or SqlQueryBuilder if the given entity can be processed
-     *                                           NULL otherwise
+     * @return QueryBuilder|null
      */
     public function getValueListQueryBuilder($className)
     {
@@ -86,10 +80,7 @@ class ChainDictionaryValueListProvider
 
         foreach ($this->getProviders() as $provider) {
             if ($provider->supports($className)) {
-                $dictionaryItems = $provider->getValueListQueryBuilder($className);
-                if ($dictionaryItems) {
-                    return $dictionaryItems;
-                }
+                return $provider->getValueListQueryBuilder($className);
             }
         }
 
