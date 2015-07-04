@@ -79,8 +79,12 @@ class Imap extends \Zend\Mail\Storage\Imap
             $this->protocol = $params;
             try {
                 $this->selectFolder('INBOX');
-            } catch (Exception\ExceptionInterface $e) {
-                throw new Exception\RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
+            } catch (\Zend\Mail\Storage\Exception\ExceptionInterface $e) {
+                throw new \Zend\Mail\Storage\Exception\RuntimeException(
+                    'cannot select INBOX, is this a valid transport?',
+                    0,
+                    $e
+                );
             }
             $this->postInit();
 
@@ -88,7 +92,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         if (!isset($params->user)) {
-            throw new Exception\InvalidArgumentException('need at least user in params');
+            throw new \Zend\Mail\Storage\Exception\InvalidArgumentException('need at least user in params');
         }
 
         $host     = isset($params->host)     ? $params->host     : 'localhost';
@@ -99,7 +103,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         $this->protocol = new ProtocolImap();
         $this->protocol->connect($host, $port, $ssl);
         if (!$this->protocol->login($params->user, $password)) {
-            throw new Exception\RuntimeException('cannot login, user or password wrong');
+            throw new \Zend\Mail\Storage\Exception\RuntimeException('cannot login, user or password wrong');
         }
         $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
 
