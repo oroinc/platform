@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class DictionaryValueListProvider implements DictionaryValueListProviderInterface
 {
@@ -17,22 +16,16 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var AssociationTypeHelper */
-    protected $typeHelper;
-
     /**
-     * @param ConfigManager         $configManager
-     * @param ManagerRegistry       $doctrine
-     * @param AssociationTypeHelper $typeHelper
+     * @param ConfigManager   $configManager
+     * @param ManagerRegistry $doctrine
      */
     public function __construct(
         ConfigManager $configManager,
-        ManagerRegistry $doctrine,
-        AssociationTypeHelper $typeHelper
+        ManagerRegistry $doctrine
     ) {
         $this->configManager = $configManager;
         $this->doctrine      = $doctrine;
-        $this->typeHelper    = $typeHelper;
     }
 
     /**
@@ -40,7 +33,14 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
      */
     public function supports($className)
     {
-        return $this->typeHelper->isDictionary($className);
+        $groupingConfigProvider = $this->configManager->getProvider('grouping');
+        if (!$groupingConfigProvider->hasConfig($className)) {
+            return false;
+        }
+
+        $groups = $groupingConfigProvider->getConfig($className)->get('groups');
+
+        return !empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true);
     }
 
     /**
@@ -87,6 +87,16 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
      */
     public function getSupportedEntityClasses()
     {
-        return $this->typeHelper->getOwningSideEntities(GroupingScope::GROUP_DICTIONARY);
+        $result = [];
+
+        $groupingConfigProvider = $this->configManager->getProvider('grouping');
+        foreach ($groupingConfigProvider->getConfigs(null, true) as $config) {
+            $groups = $config->get('groups');
+            if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
+                $result[] = $config->getId()->getClassName();
+            }
+        }
+
+        return $result;
     }
 }
