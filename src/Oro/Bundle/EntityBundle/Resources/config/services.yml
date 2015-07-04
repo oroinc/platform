@@ -280,6 +280,7 @@ services:
 
     oro_entity.dictionary_value_list_provider:
         class: %oro_entity.dictionary_value_list_provider.class%
+        public: false
 
     oro_entity.routing.options_resolver.dictionary_entity:
         class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver
