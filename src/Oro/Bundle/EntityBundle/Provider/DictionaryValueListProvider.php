@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -74,6 +75,22 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
             }
 
             $fields[$fieldName] = null;
+        }
+        foreach ($metadata->getAssociationNames() as $fieldName) {
+            $extendFieldConfig = $extendConfigProvider->getConfig($className, $fieldName);
+            if ($extendFieldConfig->is('is_extend')) {
+                // skip extended fields
+                continue;
+            }
+
+            $mapping = $metadata->getAssociationMapping($fieldName);
+            if (($mapping['type'] & ClassMetadata::TO_ONE) && $mapping['isOwningSide']) {
+                $targetMetadata = $em->getClassMetadata($mapping['targetEntity']);
+                $idFieldNames   = $targetMetadata->getIdentifierFieldNames();
+                if (count($idFieldNames) === 1) {
+                    $fields[$fieldName] = ['fields' => $idFieldNames[0]];
+                }
+            }
         }
 
         return [

@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -172,22 +173,65 @@ class DictionaryValueListProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testGetSerializationConfig()
     {
-        $className = 'Test\Dictionary';
+        $className                = 'Test\Dictionary';
+        $manyToOneTargetClassName = 'Test\ManyToOne';
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->em->expects($this->once())
+
+        $manyToOneTargetMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->em->expects($this->exactly(2))
             ->method('getClassMetadata')
-            ->with($className)
-            ->willReturn($metadata);
+            ->willReturnMap(
+                [
+                    [$className, $metadata],
+                    [$manyToOneTargetClassName, $manyToOneTargetMetadata],
+                ]
+            );
+
         $metadata->expects($this->once())
             ->method('getFieldNames')
             ->willReturn(['id', 'name', 'default', 'extend_field']);
+        $metadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn(['manyToOne', 'manyToMany', 'extend_association']);
+        $metadata->expects($this->exactly(2))
+            ->method('getAssociationMapping')
+            ->willReturnMap(
+                [
+                    [
+                        'manyToOne',
+                        [
+                            'type'         => ClassMetadata::MANY_TO_ONE,
+                            'isOwningSide' => true,
+                            'targetEntity' => $manyToOneTargetClassName
+                        ]
+                    ],
+                    [
+                        'manyToMany',
+                        [
+                            'type'         => ClassMetadata::MANY_TO_MANY,
+                            'isOwningSide' => true,
+                            'targetEntity' => 'Test\ManyToMany'
+                        ]
+                    ],
+                ]
+            );
 
-        $this->extendConfigProvider->expects($this->exactly(4))
+        $manyToOneTargetMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->extendConfigProvider->expects($this->exactly(7))
             ->method('getConfig')
             ->willReturnMap(
                 [
@@ -211,6 +255,21 @@ class DictionaryValueListProviderTest extends \PHPUnit_Framework_TestCase
                         'extend_field',
                         $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
                     ],
+                    [
+                        $className,
+                        'manyToOne',
+                        $this->getEntityFieldConfig($className, 'manyToOne', [])
+                    ],
+                    [
+                        $className,
+                        'manyToMany',
+                        $this->getEntityFieldConfig($className, 'manyToMany', [])
+                    ],
+                    [
+                        $className,
+                        'extend_association',
+                        $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
+                    ]
                 ]
             );
 
@@ -218,9 +277,10 @@ class DictionaryValueListProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
-                    'id'      => null,
-                    'name'    => null,
-                    'default' => null
+                    'id'        => null,
+                    'name'      => null,
+                    'default'   => null,
+                    'manyToOne' => ['fields' => 'id']
                 ]
             ],
             $this->dictionaryValueListProvider->getSerializationConfig($className)
