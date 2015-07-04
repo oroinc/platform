@@ -9,6 +9,7 @@ use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface
 {
@@ -22,16 +23,22 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
+
     /**
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param EntityAliasResolver              $entityAliasResolver
+     * @param EntityClassNameHelper            $entityClassNameHelper
      */
     public function __construct(
         ChainDictionaryValueListProvider $dictionaryProvider,
-        EntityAliasResolver $entityAliasResolver
+        EntityAliasResolver $entityAliasResolver,
+        EntityClassNameHelper $entityClassNameHelper
     ) {
-        $this->dictionaryProvider  = $dictionaryProvider;
-        $this->entityAliasResolver = $entityAliasResolver;
+        $this->dictionaryProvider    = $dictionaryProvider;
+        $this->entityAliasResolver   = $entityAliasResolver;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
@@ -44,13 +51,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
         }
 
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
-            $entities = array_map(
-                function ($className) {
-                    // convert to entity alias
-                    return $this->entityAliasResolver->getPluralAlias($className);
-                },
-                $this->dictionaryProvider->getSupportedEntityClasses()
-            );
+            $entities = $this->dictionaryProvider->getSupportedEntityClasses();
 
             if (!empty($entities)) {
                 $entities = $this->adjustRoutes($route, $routes, $entities);
@@ -71,7 +72,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
         $result    = [];
         $routeName = $routes->getName($route);
 
-        foreach ($entities as $entity) {
+        foreach ($entities as $className) {
+            $entity = $this->entityAliasResolver->getPluralAlias($className);
+
             $existingRoute = $routes->getByPath(
                 str_replace(self::ENTITY_PLACEHOLDER, $entity, $route->getPath()),
                 $route->getMethods()
@@ -98,6 +101,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                     true
                 );
                 $result[] = $entity;
+                $result[] = $this->entityClassNameHelper->getUrlSafeClassName($className);
             }
         }
 
