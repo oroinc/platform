@@ -21,7 +21,7 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter
 class ActivitySearchController extends RestGetController
 {
     /**
-     * Searches entities associated with the specified type of an activity entity.
+     * Searches entities associated with the specified type of activity.
      *
      * @param string $activity The type of the activity entity.
      *
@@ -53,7 +53,7 @@ class ActivitySearchController extends RestGetController
      * )
      *
      * @ApiDoc(
-     *      description="Searches entities associated with the specified type of an activity entity",
+     *      description="Searches entities associated with the specified type of activity",
      *      resource=true
      * )
      *
