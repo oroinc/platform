@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityNameProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\ExclusionProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 
 class OroEntityBundle extends Bundle
 {
@@ -26,5 +27,6 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new ExclusionProviderPass());
         $container->addCompilerPass(new VirtualFieldProvidersCompilerPass());
         $container->addCompilerPass(new VirtualRelationProvidersCompilerPass());
+        $container->addCompilerPass(new DictionaryValueListProviderPass());
     }
 }
