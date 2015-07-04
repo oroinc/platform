@@ -35,6 +35,7 @@ parameters:
     oro_entity.entity_class_name_helper.class:               Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
     oro_entity.entity_name_resolver.class:                   Oro\Bundle\EntityBundle\Provider\EntityNameResolver
     oro_entity.entity_name_provider.default.class:           Oro\Bundle\EntityBundle\Provider\EntityNameProvider
+    oro_entity.dictionary_value_list_provider.default.class: Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider
 
     oro_entity.manager.dictionary.api.class:                 Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
 
@@ -267,6 +268,15 @@ services:
             - @doctrine
         tags:
             - { name: oro_entity.name_provider, priority: -100 }
+
+    oro_entity.dictionary_value_list_provider.default:
+        class: %oro_entity.dictionary_value_list_provider.default.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine
+        tags:
+            - { name: oro_entity.dictionary_value_list_provider, priority: -100 }
 
     oro_entity.dictionary_value_list_provider:
         class: %oro_entity.dictionary_value_list_provider.class%
