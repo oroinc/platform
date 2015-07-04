@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -12,6 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchAfter;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchBefore;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
