@@ -44,6 +44,9 @@ class ApiEntityManager
     /** @var EntitySerializer */
     protected $entitySerializer;
 
+    /** @var mixed */
+    private $serializationConfig = false;
+
     /**
      * Constructor
      *
@@ -257,7 +260,7 @@ class ApiEntityManager
      */
     public function serialize(QueryBuilder $qb)
     {
-        return $this->entitySerializer->serialize($qb, $this->getSerializationConfig());
+        return $this->entitySerializer->serialize($qb, $this->getCachedSerializationConfig());
     }
 
     /**
@@ -273,7 +276,7 @@ class ApiEntityManager
             ->where('e.id = :id')
             ->setParameter('id', $id);
 
-        $config = $this->getSerializationConfig();
+        $config = $this->getCachedSerializationConfig();
         $this->entitySerializer->prepareQuery($qb, $config);
         $entity = $qb->getQuery()->getResult();
         if (!$entity) {
@@ -306,7 +309,7 @@ class ApiEntityManager
      */
     public function isSerializerConfigured()
     {
-        return null !== $this->getSerializationConfig();
+        return null !== $this->getCachedSerializationConfig();
     }
 
     /**
@@ -317,6 +320,21 @@ class ApiEntityManager
     protected function getSerializationConfig()
     {
         return null;
+    }
+
+    /**
+     * Returns the configuration of the entity serializer is used for process GET requests
+     * This method uses a local cache to avoid building the config several times
+     *
+     * @return array|null
+     */
+    protected function getCachedSerializationConfig()
+    {
+        if (false === $this->serializationConfig) {
+            $this->serializationConfig = $this->getSerializationConfig();
+        }
+
+        return $this->serializationConfig;
     }
 
     /**
