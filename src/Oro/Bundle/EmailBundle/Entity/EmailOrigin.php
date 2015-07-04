@@ -13,7 +13,11 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * Email Origin
  *
- * @ORM\Table(name="oro_email_origin")
+ * @ORM\Table(name="oro_email_origin",
+ *      indexes={
+ *          @ORM\Index(name="IDX_mailbox_name", columns={"mailbox_name"})
+ *      }
+ * )
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
@@ -31,6 +35,13 @@ abstract class EmailOrigin
      * @JMS\Expose
      */
     protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="mailbox_name", type="string", length=64)
+     */
+    protected $mailboxName;
 
     /**
      * @var ArrayCollection
@@ -94,6 +105,7 @@ abstract class EmailOrigin
     {
         $this->folders   = new ArrayCollection();
         $this->syncCount = 0;
+        $this->setMailboxName($this->__toString());
     }
 
     /**
@@ -300,6 +312,28 @@ abstract class EmailOrigin
     public function setOwner($user)
     {
         $this->owner = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get mailbox name
+     */
+    public function getMailboxName()
+    {
+        return $this->mailboxName;
+    }
+
+    /**
+     * Set mailbox name
+     *
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setMailboxName($name)
+    {
+        $this->mailboxName = $name;
 
         return $this;
     }

@@ -151,6 +151,7 @@ oro:
             trash:                Trash
             drafts:               Drafts
         contact.label:            Contact
+        mailbox.label:            Mailbox
         date.label:               Date
         date_time.label:          Date/Time
         from_email_address.label: From

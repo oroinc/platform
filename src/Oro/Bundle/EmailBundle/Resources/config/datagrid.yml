@@ -4,7 +4,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial eu.{id, email}
+                    - partial eu.{id, email, folder}
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
@@ -34,6 +34,10 @@ datagrid:
                             alias: f
                 groupBy: eu.id, e.sentAt
         columns:
+            mailbox:
+                data_name: folder.origin.mailboxName
+                label: oro.email.mailbox.label
+                frontend_type: string
             contacts:
                 data_name: email.contacts
                 type: twig
@@ -62,6 +66,7 @@ datagrid:
             id: ~
         sorters:
             columns:
+                mailbox:  { data_name: folder.origin.mailboxName }
                 subject:  { data_name: e.subject }
                 sentAt:   { data_name: e.sentAt }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
@@ -82,7 +87,6 @@ datagrid:
                 where:
                     and:
                         - e.head = true
-                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::SENT')
         filters:
             columns:
                 subject: { type: string,   data_name: e.subject }

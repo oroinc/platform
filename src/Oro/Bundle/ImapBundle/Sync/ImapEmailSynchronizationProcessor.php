@@ -383,9 +383,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if ($count === self::DB_BATCH_SIZE) {
                 $this->saveEmails(
                     $batch,
-                    $imapFolder,
-                    $this->currentUser,
-                    $this->currentOrganization
+                    $imapFolder
                 );
                 $count = 0;
                 $batch = [];
@@ -394,9 +392,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($count > 0) {
             $this->saveEmails(
                 $batch,
-                $imapFolder,
-                $this->currentUser,
-                $this->currentOrganization
+                $imapFolder
             );
         }
 
@@ -510,7 +506,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 }
             }
         }
-
         $this->em->flush();
 
         $this->cleanUp();

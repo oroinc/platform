@@ -15,6 +15,7 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::addEmailFolderFields($schema);
+        self::addEmailOriginFields($schema);
     }
 
     /**
@@ -35,5 +36,18 @@ class OroEmailBundle implements Migration
             ['onDelete' => 'CASCADE', 'onUpdate' => null],
             'FK_EB940F1C421FFFC'
         );
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function addEmailOriginFields(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_origin');
+
+        $table->addColumn('mailbox_name', 'string', ['length' => 64, 'notnull' => false]);
+        $table->addIndex(['mailbox_name'], 'IDX_mailbox_name', []);
     }
 }
