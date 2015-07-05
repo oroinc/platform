@@ -195,19 +195,33 @@
 {% endblock %}
 
 {% block oro_email_email_folder_row %}
-    {{ form_widget(form.syncEnabled) }}<label style="margin-right: 5px">{{ value.name }}</label>
-    {{ form_widget(form.fullName) }}
-    {% if value.subFolders %}
-        <div style="margin-left: 20px">
-            {{ form_widget(form.subFolders) }}
+    {% if form.vars.value is not null %}
+        <div>
+            {{ form_widget(form.syncEnabled) }}<label style="margin-left: 5px">{{ form.vars.value.name }}</label>
+            {{ form_widget(form.fullName) }}
+            {{ form_widget(form.name) }}
+            {{ form_widget(form.type) }}
+            {% if form.vars.value.subFolders|length > 0 %}
+                <div style="margin-left: 20px">
+                    {{ form_widget(form.subFolders) }}
+                </div>
+            {% endif %}
         </div>
     {% endif %}
 {% endblock %}
 
+{% block oro_email_email_folder_tree_row %}
+    {% if form.vars.value is not null %}
+        {{ form_row(form) }}
+    {% endif %}
+{% endblock %}
+
 {% block oro_email_email_folder_tree_widget %}
-    <input id="check-all" type="checkbox" style="margin: 0"/><label style="margin-right: 5px">All</label>
-    <div id="folder-list" style="margin-left: 20px">
-        {{ form_rest(form) }}
+    <div style="margin-top: 5px">
+        <input id="check-all" type="checkbox" style="margin: 0"/><label style="margin-left: 5px">All</label>
+        <div id="folder-list" style="margin-left: 20px">
+            {{ form_rest(form) }}
+        </div>
     </div>
 
     <script type="text/javascript">

@@ -15,6 +15,7 @@ class EmailFolderType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => 'Oro\Bundle\EmailBundle\Entity\EmailFolder',
+            'nesting_level' => 3,
         ]);
     }
 
@@ -23,12 +24,20 @@ class EmailFolderType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('syncEnabled', 'checkbox')
-            ->add('fullName', 'hidden')
-            ->add('subFolders', 'collection', [
-                'type' => 'oro_email_email_folder',
-            ]);
+        if (--$options['nesting_level'] > 0) {
+            $builder
+                ->add('syncEnabled', 'checkbox')
+                ->add('fullName', 'hidden')
+                ->add('name', 'hidden')
+                ->add('type', 'hidden')
+                ->add('subFolders', 'collection', [
+                    'type' => 'oro_email_email_folder',
+                    'allow_add' => true,
+                    'options' => [
+                        'nesting_level' => $options['nesting_level'],
+                    ],
+                ]);
+        }
     }
 
     /**

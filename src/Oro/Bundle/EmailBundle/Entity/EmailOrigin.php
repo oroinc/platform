@@ -136,11 +136,21 @@ abstract class EmailOrigin
         return $this->folders;
     }
 
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
     public function addRootFolder(EmailFolder $folder)
     {
         return $this->addFolder($folder);
     }
 
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
     public function removeRootFolder(EmailFolder $folder)
     {
         if ($this->folders->contains($folder)) {
@@ -158,6 +168,7 @@ abstract class EmailOrigin
     public function getRootFolders()
     {
         return $this->folders->filter(function (EmailFolder $folder) {
+            // todo add outdatedAt condition
             return $folder->getParentFolder() === null;
         });
     }

@@ -602,17 +602,6 @@ services:
         calls:
             - [setLogger, [@logger]]
 
-    oro_email.email_folder_loader_selector:
-        public: false
-        class: %oro_email.email_folder_loader_selector.class%
-
-    oro_email.email.folder.manager:
-        class: %oro_email.email.folder.manager.class%
-        arguments:
-            - @oro_email.email_folder_loader_selector
-        calls:
-            - [setLogger, [@logger]]
-
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
         arguments:

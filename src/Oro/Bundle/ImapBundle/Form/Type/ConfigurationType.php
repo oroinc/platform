@@ -38,8 +38,6 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->addFolderTreeListener($builder);
-        // pre-populate password, imap origin change
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
 
@@ -75,27 +73,10 @@ class ConfigurationType extends AbstractType
                 'password',
                 array('label' => 'oro.imap.configuration.password.label', 'required' => true)
             )
-            ->add('check_connection', new CheckButtonType());
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addFolderTreeListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) {
-                /** @var ImapEmailOrigin $data */
-                $data = $event->getData();
-
-                if ($data !== null && !$data->getFolders()->isEmpty()) {
-                    $event->getForm()->add('rootFolders', 'oro_email_email_folder_tree', [
-                        'label' => $this->translator->trans('oro.email.folders.label'),
-                    ]);
-                }
-            }
-        );
+            ->add('check_connection', new CheckButtonType())
+            ->add('rootFolders', 'oro_email_email_folder_tree', [
+                'label' => $this->translator->trans('oro.email.folders.label'),
+            ]);
     }
 
     /**

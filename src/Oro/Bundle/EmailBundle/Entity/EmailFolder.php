@@ -242,7 +242,21 @@ class EmailFolder
      */
     public function getSubFolders()
     {
-        return $this->subFolders;
+        return $this->subFolders; // todo add outdatedAt filter
+    }
+
+    /**
+     * @param ArrayCollection $folders
+     *
+     * @return $this
+     */
+    public function setSubFolders($folders)
+    {
+        foreach ($folders as $folder) {
+            $this->addSubFolder($folder);
+        }
+
+        return $this;
     }
 
     /**
@@ -257,6 +271,20 @@ class EmailFolder
         $this->subFolders->add($folder);
 
         $folder->setParentFolder($this);
+
+        return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeSubFolder(EmailFolder $folder)
+    {
+        if ($this->subFolders->contains($folder)) {
+            $this->subFolders->remove($folder);
+        }
 
         return $this;
     }
@@ -305,6 +333,12 @@ class EmailFolder
     public function setOrigin(EmailOrigin $origin)
     {
         $this->origin = $origin;
+
+        if (!$this->subFolders->isEmpty()) {
+            foreach ($this->subFolders as $subFolder) {
+                $subFolder->setOrigin($origin);
+            }
+        }
 
         return $this;
     }

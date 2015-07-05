@@ -37,6 +37,8 @@ function ($, _, routing, __, mediator, messenger) {
 
                         return field;
                     });
+                    // clear folders data
+                    data = data.splice(0, 5);
                 }
 
                 url = routing.generate(routeName);
