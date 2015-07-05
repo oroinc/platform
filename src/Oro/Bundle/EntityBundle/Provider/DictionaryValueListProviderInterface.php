@@ -40,4 +40,3 @@ interface DictionaryValueListProviderInterface
      */
     public function getSupportedEntityClasses();
 }
-
