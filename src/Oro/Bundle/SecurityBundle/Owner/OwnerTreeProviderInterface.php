@@ -12,7 +12,7 @@ interface OwnerTreeProviderInterface
     /**
      * Get ACL tree
      *
-     * @return OwnerTree
+     * @return OwnerTreeInterface
      *
      * @throws \Exception If ACL tree cache not warmed
      */

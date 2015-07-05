@@ -21,7 +21,7 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
     private $container;
 
     /**
-     * @var OwnerTree
+     * @var OwnerTreeInterface
      */
     protected $tree;
 
@@ -31,14 +31,14 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
     abstract public function getCache();
 
     /**
-     * @return OwnerTree
+     * @return OwnerTreeInterface
      */
     abstract protected function getTreeData();
 
     /**
-     * @param OwnerTree $tree
+     * @param OwnerTreeInterface $tree
      */
-    abstract protected function fillTree(OwnerTree $tree);
+    abstract protected function fillTree(OwnerTreeInterface $tree);
 
     /**
      * @return MetadataProviderInterface
@@ -115,6 +115,8 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
 
     /**
      * Loads tree data and save them in cache
+     *
+     * @return OwnerTreeInterface
      */
     protected function loadTree()
     {

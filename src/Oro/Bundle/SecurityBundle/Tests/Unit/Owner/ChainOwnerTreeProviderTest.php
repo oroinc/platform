@@ -20,12 +20,10 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSupports()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $provider = $this->getProviderMock();
         $provider->expects($this->once())->method('supports')->willReturn(true);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $notSupported */
-        $notSupported = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $notSupported = $this->getProviderMock();
         $notSupported->expects($this->never())->method('supports');
 
         $this->provider->addProvider($provider);
@@ -36,8 +34,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testDoNotAddTwice()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $provider = $this->getProviderMock();
         $provider->expects($this->once())->method('supports')->willReturn(false);
 
         $this->provider->addProvider($provider);
@@ -48,12 +45,10 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsDefault()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $provider = $this->getProviderMock();
         $provider->expects($this->never())->method('supports');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $default */
-        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $default = $this->getProviderMock();
 
         $this->provider->addProvider($provider);
         $this->provider->setDefaultProvider($default);
@@ -63,13 +58,11 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTree()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $provider = $this->getProviderMock();
         $provider->expects($this->once())->method('supports')->willReturn(true);
         $provider->expects($this->once())->method('getTree')->willReturn(new OwnerTree());
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $default */
-        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $default = $this->getProviderMock();
 
         $this->provider->addProvider($provider);
         $this->provider->setDefaultProvider($default);
@@ -79,13 +72,11 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTreeDefault()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $provider = $this->getProviderMock();
         $provider->expects($this->once())->method('supports')->willReturn(false);
         $provider->expects($this->never())->method('getTree');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $default */
-        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $default = $this->getProviderMock();
         $default->expects($this->once())->method('getTree')->willReturn(new OwnerTree());
 
         $this->provider->addProvider($provider);
@@ -105,12 +96,10 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testClear()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $provider = $this->getProviderMock();
         $provider->expects($this->once())->method('clear');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $default */
-        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $default = $this->getProviderMock();
         $default->expects($this->once())->method('clear');
 
         $this->provider->addProvider($provider);
@@ -121,17 +110,23 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testWarmUpCache()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $provider = $this->getProviderMock();
         $provider->expects($this->once())->method('warmUpCache');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface $default */
-        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $default = $this->getProviderMock();
         $default->expects($this->once())->method('warmUpCache');
 
         $this->provider->addProvider($provider);
         $this->provider->setDefaultProvider($default);
 
         $this->provider->warmUpCache();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProviderInterface
+     */
+    protected function getProviderMock()
+    {
+        return $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
     }
 }

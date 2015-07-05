@@ -80,7 +80,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /**
      * {@inheritdoc}
      */
-    protected function fillTree(OwnerTree $tree)
+    protected function fillTree(OwnerTreeInterface $tree)
     {
         $userClass = $this->getOwnershipMetadataProvider()->getBasicLevelClass();
         $businessUnitClass = $this->getOwnershipMetadataProvider()->getLocalLevelClass();

@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -21,12 +24,12 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
     protected $treeProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|EntityManager
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider
      */
     protected $cache;
 
@@ -162,6 +165,8 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['test']));
 
         $this->treeProvider->warmUpCache();
+
+        /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
         $this->assertEquals(1, $tree->getBusinessUnitOrganizationId(1));
         $this->assertEquals([1], $tree->getUserOrganizationIds(1));
