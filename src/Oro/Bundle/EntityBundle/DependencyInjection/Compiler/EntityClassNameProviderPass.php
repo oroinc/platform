@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EntityClassNameProviderPass implements CompilerPassInterface
 {
-    const CHAIN_SERVICE = 'oro_entity.entity_class_name_helper';
+    const CHAIN_SERVICE = 'oro_entity.entity_class_name_provider';
     const PROVIDER_TAG_NAME = 'oro_entity.class_name_provider';
 
     /**

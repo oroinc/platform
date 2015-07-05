@@ -3,16 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Tools;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class EntityClassNameHelper implements EntityClassNameProviderInterface
+class EntityClassNameHelper
 {
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
-
-    /** @var EntityClassNameProviderInterface[] */
-    protected $providers = [];
 
     /**
      * @param EntityAliasResolver $entityAliasResolver
@@ -20,16 +16,6 @@ class EntityClassNameHelper implements EntityClassNameProviderInterface
     public function __construct(EntityAliasResolver $entityAliasResolver)
     {
         $this->entityAliasResolver = $entityAliasResolver;
-    }
-
-    /**
-     * Registers the given provider in the chain
-     *
-     * @param EntityClassNameProviderInterface $provider
-     */
-    public function addProvider(EntityClassNameProviderInterface $provider)
-    {
-        $this->providers[] = $provider;
     }
 
     /**
@@ -71,36 +57,6 @@ class EntityClassNameHelper implements EntityClassNameProviderInterface
     public function getUrlSafeClassName($className)
     {
         return str_replace('\\', '_', $className);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntityClassName($entityClass)
-    {
-        foreach ($this->providers as $provider) {
-            $name = $provider->getEntityClassName($entityClass);
-            if ($name) {
-                return $name;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntityClassPluralName($entityClass)
-    {
-        foreach ($this->providers as $provider) {
-            $name = $provider->getEntityClassPluralName($entityClass);
-            if ($name) {
-                return $name;
-            }
-        }
-
-        return null;
     }
 
     /**
