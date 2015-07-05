@@ -25,7 +25,7 @@ interface DictionaryValueListProviderInterface
     public function getValueListQueryBuilder($className);
 
     /**
-     * Returns the configuration of the entity serializer for a given dictionary class
+     * Gets the configuration of the entity serializer for a given dictionary class
      *
      * @param string $className The FQCN of a dictionary entity
      *
