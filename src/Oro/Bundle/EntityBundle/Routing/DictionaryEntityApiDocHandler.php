@@ -3,13 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Routing;
 
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
+use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class DictionaryEntityApiDocHandler implements HandlerInterface
 {
@@ -21,25 +20,19 @@ class DictionaryEntityApiDocHandler implements HandlerInterface
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var TranslatorInterface */
-    protected $translator;
+    /** @var EntityClassNameProviderInterface */
+    protected $entityClassNameProvider;
 
     /**
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
+     * @param EntityAliasResolver              $entityAliasResolver
+     * @param EntityClassNameProviderInterface $entityClassNameProvider
      */
     public function __construct(
         EntityAliasResolver $entityAliasResolver,
-        ConfigManager $configManager,
-        TranslatorInterface $translator
+        EntityClassNameProviderInterface $entityClassNameProvider
     ) {
-        $this->entityAliasResolver = $entityAliasResolver;
-        $this->configManager       = $configManager;
-        $this->translator          = $translator;
+        $this->entityAliasResolver     = $entityAliasResolver;
+        $this->entityClassNameProvider = $entityClassNameProvider;
     }
 
     /**
@@ -58,7 +51,7 @@ class DictionaryEntityApiDocHandler implements HandlerInterface
 
         $className = $this->entityAliasResolver->getClassByPluralAlias($pluralAlias);
 
-        $pluralName = $this->getEntityPluralName($className);
+        $pluralName = $this->entityClassNameProvider->getEntityClassPluralName($className);
         if ($pluralName) {
             $annotation->setDescription(
                 strtr(static::DESCRIPTION_TEMPLATE, ['{plural_name}' => $pluralName])
@@ -74,25 +67,5 @@ class DictionaryEntityApiDocHandler implements HandlerInterface
                 strtr(static::FALLBACK_DOCUMENTATION_TEMPLATE, ['{class}' => $className])
             );
         }
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return string|null
-     */
-    protected function getEntityPluralName($className)
-    {
-        $entityConfigProvider = $this->configManager->getProvider('entity');
-        if ($entityConfigProvider->hasConfig($className)) {
-            $entityConfig = $entityConfigProvider->getConfig($className);
-            $label        = $entityConfig->get('plural_label');
-            $translated   = $this->translator->trans($label, [], null, 'en');
-            if ($translated && $translated !== $label) {
-                return strtolower($translated);
-            }
-        }
-
-        return null;
     }
 }
