@@ -22,7 +22,7 @@ Login page: Login page
 "Business Unit": "Business Unit"
 "User": "User"
 "None": "None"
-"The username or email address \"%username%\" does not exist.": "The username or email address \"%username%\" does not exist."
+"There is no active user with username or email address \"%username%\".": "There is no active user with username or email address \"%username%\"."
 "Username or Email": "Username or Email"
 "Return to Login": "Return to Login"
 "Request": "Request"
