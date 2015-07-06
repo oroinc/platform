@@ -1,3 +1,8 @@
+/**
+ * This module is deprecated since platform version 1.8
+ *
+ * @deprecated
+ */
 require(['jquery', 'routing'],
     function($, routing) {
         'use strict';

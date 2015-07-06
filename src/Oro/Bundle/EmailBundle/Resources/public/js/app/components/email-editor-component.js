@@ -11,12 +11,12 @@ define(function(require) {
 
     EmailEditorComponent = BaseComponent.extend({
         /**
-         * margin of <div class="control-group">
+         * Height fix for body editor calculation
          */
-        CONTROL_GROUP_MARGIN: 10,
+        HEIGHT_FIX: 4,
 
         listen: {
-            'parentResize': 'onResize'
+            'parentResize': 'autosizeBodyEditor'
         },
 
         options: null,
@@ -35,6 +35,7 @@ define(function(require) {
             });
             this.view.render();
             this.view.renderPromise.done(_.bind(function() {
+                this.autosizeBodyEditor();
                 this._resolveDeferredInit();
                 this.listenTo(this.view.pageComponent('bodyEditor').view, 'resize', this.onResize, this);
             }, this));
@@ -59,12 +60,12 @@ define(function(require) {
             });
         },
 
-        onResize: function() {
+        autosizeBodyEditor: function() {
             var component = this.view.pageComponent('bodyEditor'),
                 outerHeight = this.view.$el.closest('.ui-widget-content').height(),
                 innerHeight = this.view.$el.height(),
                 editorHeight = component.view.getHeight(),
-                availableHeight = outerHeight - innerHeight + editorHeight - this.CONTROL_GROUP_MARGIN;
+                availableHeight = outerHeight - innerHeight + editorHeight - this.HEIGHT_FIX;
             component.view.setHeight(Math.max(availableHeight, this.options.minimalWysiwygEditorHeight));
         }
     });

@@ -49,16 +49,15 @@ define(function(require) {
         },
 
         onAddSignatureButtonClick: function() {
-            if (this.model.get('signature')) {
+            var tinyMCE,
+                signature = this.model.get('signature');
+            if (signature) {
                 if (this.pageComponent('bodyEditor').view.tinymceConnected) {
-                    var tinyMCE = this.pageComponent('bodyEditor').view.tinymceInstance;
-                    tinyMCE.execCommand('mceInsertContent', false, this.model.get('signature'));
+                    tinyMCE = this.pageComponent('bodyEditor').view.tinymceInstance;
+                    tinyMCE.execCommand('mceInsertContent', false, signature);
                 } else {
-                    this.domCache.body.focus();
-                    var caretPos = this.domCache.body.getCursorPosition();
-                    var body = this.domCache.body.val();
-                    this.domCache.body.val(body.substring(0, caretPos) +
-                        this.model.get('signature').replace(/(<([^>]+)>)/ig, '') + body.substring(caretPos));
+                    signature = signature.replace(/(<([^>]+)>)/ig, '');
+                    this.domCache.body.insertAtCursor(signature).focus();
                 }
             } else {
                 var url = routing.generate('oro_user_profile_update'),

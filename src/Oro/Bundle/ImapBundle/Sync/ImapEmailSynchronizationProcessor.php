@@ -81,7 +81,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             // register the current folder in the entity builder
             $this->emailEntityBuilder->setFolder($folder);
 
-            // build a search query
+            // build search query for emails sync
             $sqb = $this->manager->getSearchQueryBuilder();
             if ($origin->getSynchronizedAt() && $folder->getSynchronizedAt()) {
                 if ($folder->getType() === FolderType::SENT) {
@@ -93,12 +93,16 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             // sync emails using this search query
             $lastSynchronizedAt = $this->syncEmails($imapFolder, $sqb->get());
-
-            // update synchronization date for the current folder
             $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
 
-            $this->em->flush($folder);
+            $endDate = $folder->getSynchronizedAt();
+            $startDate = clone $endDate;
+            $startDate = $startDate->modify('-1 month');
 
+            // set seen flags from previously synchronized emails
+            $this->checkFlags($imapFolder, $startDate, $endDate);
+
+            $this->em->flush($folder);
             $this->cleanUp(true, $imapFolder->getFolder());
         }
 
@@ -106,6 +110,25 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
+    }
+
+    /**
+     * @param ImapEmailFolder $imapFolder
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     */
+    protected function checkFlags(ImapEmailfolder $imapFolder, $startDate, $endDate)
+    {
+        $uids = $this->manager->getUnseenEmailUIDs($startDate, $endDate);
+
+        $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
+
+        $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
+        $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
+
+        $emailUserRepository->setEmailUsersSeen($ids, false);
+        $emailUserRepository->setEmailUsersSeen($invertedIds, true);
     }
 
     /**

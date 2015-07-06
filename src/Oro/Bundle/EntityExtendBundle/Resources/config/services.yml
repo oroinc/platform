@@ -10,6 +10,7 @@ parameters:
     oro_entity_extend.entity_config_dumper.extension.enum.class:      Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\EnumEntityConfigDumperExtension
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
+    oro_entity_extend.extend.entity_proxy_generator.class:    Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator
     oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
     oro_entity_extend.validator.not_sql_keyword.class:        Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator
     oro_entity_extend.validator.unique_keys.class:            Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysValidator
@@ -41,6 +42,7 @@ parameters:
     oro_entity_extend.listener.search_entity_config_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
     oro_entity_extend.association_manager.class:              Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager
     oro_entity_extend.entity_alias_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
+    oro_entity_extend.enum_value_provider.class:               Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -48,6 +50,7 @@ services:
         class: %oro_entity_extend.entity.cache.warmer.class%
         arguments:
             - @oro_entity_extend.tools.dumper
+            - @oro_entity_config.config_manager
         tags:
             - { name: kernel.cache_warmer,  priority: 30 }
 
@@ -168,9 +171,15 @@ services:
         class: %oro_entity_extend.extend.entity_processor.class%
         arguments:
             - @oro_platform.maintenance
-            - @oro_entity_config.config_manager
             - @oro_entity_config.tools.command_executor
             - @logger
+            - @?profiler
+
+    oro_entity_extend.extend.entity_proxy_generator:
+        class: %oro_entity_extend.extend.entity_proxy_generator.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - %kernel.cache_dir%
 
     oro_entity_extend.extend.field_type_helper:
         class: %oro_entity_extend.extend.field_type_helper.class%
@@ -363,3 +372,8 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: oro_entity.alias_provider, priority: 90 }
+
+    oro_entity_extend.enum_value_provider:
+        class: %oro_entity_extend.enum_value_provider.class%
+        arguments:
+            - @oro_entity.doctrine_helper

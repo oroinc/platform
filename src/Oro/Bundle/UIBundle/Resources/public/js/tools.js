@@ -212,6 +212,15 @@ define(['jquery', 'underscore'], function($, _) {
             str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
             expression = new RegExp(str, flags);
             return expression;
+        },
+
+        /**
+         * Checks input values and if it isn't an array wraps it
+         *
+         * @returns {Array}
+         */
+        ensureArray: function (value) {
+            return _.isArray(value) ? value : [value];
         }
     };
 });

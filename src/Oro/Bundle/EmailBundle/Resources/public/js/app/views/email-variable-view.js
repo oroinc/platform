@@ -255,17 +255,18 @@ define(function(require) {
          *
          * @param {Event} e
          */
-        _handleVariableClick: function(e) {
+        _handleVariableClick: function (e) {
             var field = this.fields.filter(document.activeElement);
-            var value = $(e.currentTarget).html();
+            var variable = $(e.currentTarget).html();
 
+            e.preventDefault();
             if (!field.length && this.lastElement && this.lastElement.is(':visible')) {
                 field = this.lastElement;
             }
 
             if (field) {
-                field.val(field.val() + value);
-                mediator.trigger('email-variable-view:click-variable', field, value);
+                field.insertAtCursor(variable).focus();
+                mediator.trigger('email-variable-view:click-variable', field, variable);
             }
         },
 

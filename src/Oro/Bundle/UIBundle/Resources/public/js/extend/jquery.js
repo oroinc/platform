@@ -11,28 +11,16 @@ define(['jquery'], function($) {
     };
 
     $.fn.extend({
-        // http://stackoverflow.com/questions/4609405/set-focus-after-last-character-in-text-box
-        focusAndSetCaretAtEnd: function() {
-            if (!this.length)
-                return;
-            var elem = this[0], elemLen = elem.value.length;
-            // For IE Only
-            if (document.selection) {
-                // Set focus
-                $(elem).focus();
-                // Use IE Ranges
-                var oSel = document.selection.createRange();
-                // Reset position to 0 & then set at end
-                oSel.moveStart('character', -elemLen);
-                oSel.moveStart('character', elemLen);
-                oSel.moveEnd('character', 0);
-                oSel.select();
-            } else if (elem.selectionStart || elem.selectionStart == '0') {
-                // Firefox/Chrome
-                elem.selectionStart = elemLen;
-                elem.selectionEnd = elemLen;
-                $(elem).focus();
-            } // if
+        /**
+         * Sets cursor to end of input
+         */
+        setCursorToEnd: function(str) {
+            return this.each(function() {
+                var el = this;
+                if ('selectionStart' in el) {
+                    el.selectionEnd = el.selectionStart = el.value.length;
+                }
+            });
         },
 
         /**
@@ -43,7 +31,7 @@ define(['jquery'], function($) {
                 $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
             $autoFocus = $input.filter('[autofocus]');
-            ($autoFocus.length ? $autoFocus : $input).first().focus();
+            ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
         },
 
         focus: (function(orig) {
@@ -90,25 +78,26 @@ define(['jquery'], function($) {
         },
 
         /**
-         * Returns current cursor position in <textarea> or <input>
+         * Inserts string in <textarea> or <input> at the cursor position and sets cursor after inserted data
          *
          * @returns {number}
          */
-        getCursorPosition: function() {
-            var el = $(this).get(0);
-            var pos = 0;
-            if ('selectionStart' in el) {
-                pos = el.selectionStart;
-            } else if ('selection' in document) {
-                el.focus();
-                var Sel = document.selection.createRange();
-                var SelLength = document.selection.createRange().text.length;
-                Sel.moveStart('character', -el.value.length);
-                pos = Sel.text.length - SelLength;
-            }
-            return pos;
+        insertAtCursor: function(str) {
+            return this.each(function() {
+                var start,
+                    end,
+                    el = this,
+                    value = el.value;
+                if ('selectionStart' in el) {
+                    start = el.selectionStart;
+                    end = el.selectionEnd;
+                    el.value = value.substr(0, start) + str + value.substr(end);
+                    el.selectionEnd = el.selectionStart = start + str.length;
+                } else {
+                    el.value += str;
+                }
+            });
         }
-
     });
 
     return $;

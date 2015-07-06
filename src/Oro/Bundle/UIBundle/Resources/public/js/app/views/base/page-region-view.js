@@ -85,27 +85,6 @@ define([
          */
         getTemplateData: function() {
             return this.data;
-        },
-
-        /**
-         * Create flag of deferred initialization
-         *
-         * @protected
-         */
-        _deferredRender: function() {
-            this.deferredRender = $.Deferred();
-        },
-
-        /**
-         * Resolves deferred initialization
-         *
-         * @protected
-         */
-        _resolveDeferredRender: function() {
-            if (this.deferredRender) {
-                this.deferredRender.resolve(this);
-                delete this.deferredRender;
-            }
         }
     });
 
