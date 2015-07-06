@@ -58,6 +58,7 @@ config:
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/js/jquery-timepicker-l10n'
+            'base64': 'oroui/js/extend/base64'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/select2':
@@ -81,7 +82,8 @@ config:
         'oroui/js/app/components/base/component':
             'backbone': 'backbone'
             'chaplin': 'chaplin'
-
+        'oroui/js/extend/base64':
+            'base64': 'base64'
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
