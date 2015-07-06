@@ -473,7 +473,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     {
         if (null === $this->currentUser) {
             $user = $this->securityFacade->getLoggedUser();
-            if ($user instanceof User) {
+            if ($user && is_object($user) && $user instanceof User) {
                 $this->currentUser = $user;
             }
         }
