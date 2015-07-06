@@ -37,7 +37,7 @@ class FileExtension extends \Twig_Extension
     {
         $this->manager                  = $manager;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');
-        $this->doctrine = $doctrine;
+        $this->doctrine                 = $doctrine;
     }
 
     /**
@@ -61,7 +61,7 @@ class FileExtension extends \Twig_Extension
                 'oro_image_view',
                 [$this, 'getImageView'],
                 ['is_safe' => ['html'], 'needs_environment' => true]
-            ),
+            )
         ];
     }
 
@@ -81,6 +81,7 @@ class FileExtension extends \Twig_Extension
      * @param File   $attachment
      * @param string $type
      * @param bool   $absolute
+     *
      * @return string
      */
     public function getFileUrl(
@@ -97,6 +98,7 @@ class FileExtension extends \Twig_Extension
      * Get human readable file size
      *
      * @param integer $bytes
+     *
      * @return string
      */
     public function getFileSize($bytes)
@@ -110,6 +112,7 @@ class FileExtension extends \Twig_Extension
      * @param File $attachment
      * @param int  $width
      * @param int  $height
+     *
      * @return string
      */
     public function getResizedImageUrl(
@@ -124,6 +127,7 @@ class FileExtension extends \Twig_Extension
      * Get attachment icon class
      *
      * @param File $attachment
+     *
      * @return string
      */
     public function getAttachmentIcon(File $attachment)
@@ -138,6 +142,7 @@ class FileExtension extends \Twig_Extension
      * @param object            $parentEntity
      * @param string            $fieldName
      * @param File              $attachment
+     *
      * @return string
      */
     public function getFileView(
@@ -173,6 +178,7 @@ class FileExtension extends \Twig_Extension
      * @param mixed             $attachment
      * @param string|object     $entityClass
      * @param string            $fieldName
+     *
      * @return string
      */
     public function getImageView(
@@ -241,6 +247,7 @@ class FileExtension extends \Twig_Extension
     /**
      * @param File   $attachment
      * @param string $filterName
+     *
      * @return string
      */
     public function getFilteredImageUrl(File $attachment, $filterName)
