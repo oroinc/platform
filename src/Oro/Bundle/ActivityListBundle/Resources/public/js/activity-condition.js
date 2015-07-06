@@ -1,11 +1,12 @@
 define([
     'jquery',
     'underscore',
+    'base64',
     'orotranslation/js/translator',
     'oro/filter/choice-filter',
     'oro/filter/multiselect-filter',
     'oroquerydesigner/js/field-condition'
-], function($, _, __, ChoiceFilter, MultiSelectFilter) {
+], function($, _, base64, __, ChoiceFilter, MultiSelectFilter) {
     'use strict';
 
     $.widget('oroactivity.activityCondition', $.oroquerydesigner.fieldCondition, {
@@ -31,7 +32,7 @@ define([
                 $.oroquerydesigner.fieldCondition.prototype._create.apply(this, arguments);
                 this.element.data('value', data);
 
-                var data = $.extend(true, {
+                data = $.extend(true, {
                     criterion: {
                         data: {
                             filterType: 'hasActivity',
@@ -72,14 +73,14 @@ define([
                 }
 
                 this.$typeChoice.find('.filter-select, .filter-item').contents().filter(function() {
-                    return (this.nodeType == 3 && !/\S/.test(this.nodeValue));
+                    return (this.nodeType === 3 && !/\S/.test(this.nodeValue));
                 }).remove();
 
                 this.element.prepend(this.$activityChoice, '-&nbsp;', this.$typeChoice);
 
                 this.element.one('changed', _.bind(function() {
                     this.element.find('.select2-choice').contents().filter(function() {
-                        return (this.nodeType == 3 && !/\S/.test(this.nodeValue));
+                        return (this.nodeType === 3 && !/\S/.test(this.nodeValue));
                     }).remove();
                 }, this));
 
@@ -92,9 +93,9 @@ define([
                                 data: data.criterion.data.filter.data
                             }
                         });
-                        this._renderFilter(base64_decode(data.columnName));
+                        this._renderFilter(base64.decode(data.columnName));
                     }, this));
-                    this.selectField(base64_decode(data.columnName));
+                    this.selectField(base64.decode(data.columnName));
                 }
 
                 this.activityFilter.on('update', _.bind(this._onUpdate, this));
@@ -193,14 +194,14 @@ define([
             }
 
             var data = this.$fieldsLoader.data('fields');
-            data['$activity'] = {
+            data.$activity = {
                 fields: [],
                 fieldsIndex: {},
                 label: '',
                 name: '$activity',
                 plural_label: ''
             };
-            this._updateEntityWithActivityFields(data['$activity']);
+            this._updateEntityWithActivityFields(data.$activity);
 
             this.$fieldsLoader.data('fields', data);
             this.$fieldsLoader.data('activityFieldsUpdated', true);
@@ -221,8 +222,8 @@ define([
                     entity: entity
                 }
             ];
-            entity.fieldsIndex['$createdAt'] = fields[0];
-            entity.fieldsIndex['$updatedAt'] = fields[1];
+            entity.fieldsIndex.$createdAt = fields[0];
+            entity.fieldsIndex.$updatedAt = fields[1];
 
             entity.fields.push(fields[0], fields[1]);
         },
@@ -253,7 +254,7 @@ define([
 
             if (this.filter && !this.filter.isEmptyValue()) {
                 value = {
-                    columnName: base64_encode(this.element.find('input.select').select2('val')),
+                    columnName: base64.encode(this.element.find('input.select').select2('val')),
                     criterion: this._getFilterCriterion()
                 };
             } else {
