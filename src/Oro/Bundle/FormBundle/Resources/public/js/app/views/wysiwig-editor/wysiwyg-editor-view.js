@@ -9,8 +9,8 @@ define(function (require) {
         LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     WysiwygEditorView = BaseView.extend({
-        TINYMCE_UI_HEIGHT: 39,
-        TEXTAREA_UI_HEIGHT: 16,
+        TINYMCE_UI_HEIGHT: 15,
+        TEXTAREA_UI_HEIGHT: 22,
 
         autoRender: true,
         firstRender: true,
@@ -39,8 +39,6 @@ define(function (require) {
         },
 
         render: function () {
-            var loadingMaskContainer,
-                self = this;
             if (this.tinymceConnected) {
                 if (!this.tinymceInstance) {
                     throw new Error('Cannot disable tinyMCE before its instance is created');
@@ -57,58 +55,64 @@ define(function (require) {
                 this.tinymceConnected = false;
             }
             if (this.enabled) {
-                loadingMaskContainer = this.$el.parents('.ui-dialog');
-                if (!loadingMaskContainer.length) {
-                    loadingMaskContainer = this.$el.parent();
-                }
-                this.subview('loadingMask', new LoadingMask({
-                    container: loadingMaskContainer
-                }));
-                this.subview('loadingMask').show();
-                if (!this.firstRender) {
-                    if (this.htmlValue && this.$el.val() === this.strippedValue) {
-                        // if content is not modified, return html representation back
-                        this.$el.val(this.htmlValue);
-                    } else {
-                        this.$el.val(txtHtmlTransformer.text2html(this.$el.val()));
-                    }
-                }
-                this.renderDeferred = $.Deferred();
-                var options = this.options;
-                if ($(this.$el).prop('disabled')) {
-                    options.readonly = true;
-                }
-                this.$el.tinymce(_.extend({
-                    init_instance_callback: function (editor) {
-                        /**
-                         * fix of https://magecore.atlassian.net/browse/BAP-7130
-                         * "WYSWING editor does not work with IE"
-                         * Please check if it's still required after tinyMCE update
-                         */
-                        setTimeout(function () {
-                            var focusedElement = $(':focus');
-                            editor.focus();
-                            focusedElement.focus();
-                        }, 0);
-
-                        self.removeSubview('loadingMask');
-                        self.tinymceInstance = editor;
-                        _.defer(function () {
-                            /**
-                             * fixes jumping dialog on refresh page
-                             * (promise should be resolved in a separate process)
-                             */
-                            self.renderDeferred.resolve();
-                        });
-                    }
-                }, options));
-                this.tinymceConnected = true;
+                this.connectTinyMCE();
                 this.$el.attr('data-focusable', true);
             } else {
                 this.$el.removeAttr('data-focusable');
             }
             this.firstRender = false;
             this.trigger('resize');
+        },
+
+        connectTinyMCE: function () {
+            var loadingMaskContainer,
+                self = this;
+            loadingMaskContainer = this.$el.parents('.ui-dialog');
+            if (!loadingMaskContainer.length) {
+                loadingMaskContainer = this.$el.parent();
+            }
+            this.subview('loadingMask', new LoadingMask({
+                container: loadingMaskContainer
+            }));
+            this.subview('loadingMask').show();
+            if (!this.firstRender) {
+                if (this.htmlValue && this.$el.val() === this.strippedValue) {
+                    // if content is not modified, return html representation back
+                    this.$el.val(this.htmlValue);
+                } else {
+                    this.$el.val(txtHtmlTransformer.text2html(this.$el.val()));
+                }
+            }
+            this.renderDeferred = $.Deferred();
+            var options = this.options;
+            if ($(this.$el).prop('disabled')) {
+                options.readonly = true;
+            }
+            this.$el.tinymce(_.extend({
+                'init_instance_callback': function (editor) {
+                    /**
+                     * fix of https://magecore.atlassian.net/browse/BAP-7130
+                     * "WYSWING editor does not work with IE"
+                     * Please check if it's still required after tinyMCE update
+                     */
+                    setTimeout(function () {
+                        var focusedElement = $(':focus');
+                        editor.focus();
+                        focusedElement.focus();
+                    }, 0);
+
+                    self.removeSubview('loadingMask');
+                    self.tinymceInstance = editor;
+                    _.defer(function () {
+                        /**
+                         * fixes jumping dialog on refresh page
+                         * (promise should be resolved in a separate process)
+                         */
+                        self.renderDeferred.resolve();
+                    });
+                }
+            }, options));
+            this.tinymceConnected = true;
         },
 
         setEnabled: function (enabled) {
@@ -130,8 +134,10 @@ define(function (require) {
         },
 
         setHeight: function (newHeight) {
+            var currentToolbarHeight;
             if (this.tinymceConnected) {
-                this.$el.parent().find('iframe').height(newHeight - this.TINYMCE_UI_HEIGHT);
+                currentToolbarHeight = this.$el.parent().find('.mce-toolbar-grp').outerHeight();
+                this.$el.parent().find('iframe').height(newHeight - currentToolbarHeight - this.TINYMCE_UI_HEIGHT);
             } else {
                 this.$el.height(newHeight - this.TEXTAREA_UI_HEIGHT);
             }
