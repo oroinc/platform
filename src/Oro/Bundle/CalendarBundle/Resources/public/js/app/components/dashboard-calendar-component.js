@@ -1,10 +1,8 @@
-/*jslint nomen: true*/
-/*global define*/
 define(function(require) {
     'use strict';
-    var CalendarComponent = require('orocalendar/js/app/components/calendar-component'),
-        widgetManager = require('oroui/js/widget-manager'),
-        moment = require('moment');
+    var CalendarComponent = require('orocalendar/js/app/components/calendar-component');
+    var widgetManager = require('oroui/js/widget-manager');
+    var moment = require('moment');
 
     var DashboardCalendarComponent = CalendarComponent.extend({
         renderCalendar: function() {

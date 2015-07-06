@@ -1,6 +1,9 @@
-/*global define, alert*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/formatter/address'
-    ], function(_, Backbone, __, addressFormatter) {
+define([
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'orolocale/js/formatter/address'
+], function(_, Backbone, __, addressFormatter) {
     'use strict';
 
     var $ = Backbone.$;

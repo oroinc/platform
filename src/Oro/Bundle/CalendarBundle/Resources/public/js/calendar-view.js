@@ -1,30 +1,27 @@
-/*jslint nomen:true*/
-/*jshint devel:true*/
-/*global define, console*/
 define(function(require) {
     'use strict';
 
-    var CalendarView,
-        _               = require('underscore'),
-        $               = require('jquery'),
-        moment          = require('moment'),
-        __              = require('orotranslation/js/translator'),
-        tools           = require('oroui/js/tools'),
-        messenger       = require('oroui/js/messenger'),
-        mediator        = require('oroui/js/mediator'),
-        LoadingMask     = require('oroui/js/app/views/loading-mask-view'),
-        BaseView        = require('oroui/js/app/views/base/view'),
-        EventCollection = require('orocalendar/js/calendar/event/collection'),
-        EventModel      = require('orocalendar/js/calendar/event/model'),
-        EventView       = require('orocalendar/js/calendar/event/view'),
-        ConnectionView  = require('orocalendar/js/calendar/connection/view'),
-        eventDecorator  = require('orocalendar/js/calendar/event-decorator'),
-        ColorManager    = require('orocalendar/js/calendar/color-manager'),
-        colorUtil       = require('oroui/js/tools/color-util'),
-        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
-        localeSettings  = require('orolocale/js/locale-settings'),
-        PluginManager = require('oroui/js/app/plugins/plugin-manager'),
-        GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
+    var CalendarView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var moment = require('moment');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var messenger = require('oroui/js/messenger');
+    var mediator = require('oroui/js/mediator');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var EventCollection = require('orocalendar/js/calendar/event/collection');
+    var EventModel = require('orocalendar/js/calendar/event/model');
+    var EventView = require('orocalendar/js/calendar/event/view');
+    var ConnectionView  = require('orocalendar/js/calendar/connection/view');
+    var eventDecorator  = require('orocalendar/js/calendar/event-decorator');
+    var ColorManager  = require('orocalendar/js/calendar/color-manager');
+    var colorUtil = require('oroui/js/tools/color-util');
+    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    var localeSettings  = require('orolocale/js/locale-settings');
+    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
     require('jquery.fullcalendar');
 
     CalendarView = BaseView.extend({
@@ -168,9 +165,9 @@ define(function(require) {
         getEventView: function(eventModel) {
             if (!this.eventView) {
                 var connectionModel = this.getConnectionCollection().findWhere(
-                        {calendarUid: eventModel.get('calendarUid')}
-                    ),
-                    options = connectionModel.get('options') || {};
+                    {calendarUid: eventModel.get('calendarUid')}
+                );
+                var options = connectionModel.get('options') || {};
                 // create a view for event details
                 this.eventView = new EventView(_.extend({}, options, {
                     model: eventModel,
@@ -240,7 +237,8 @@ define(function(require) {
         },
 
         onEventAdded: function(eventModel) {
-            var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
+            var connectionModel = this.getConnectionCollection()
+                .findWhere({calendarUid: eventModel.get('calendarUid')});
 
             eventModel.set('editable', connectionModel.get('canEditEvent'), {silent: true});
             eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
@@ -257,9 +255,10 @@ define(function(require) {
         },
 
         onEventChanged: function(eventModel) {
-            var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
-                calendarElement = this.getCalendarElement(),
-                fcEvent;
+            var connectionModel = this.getConnectionCollection()
+                .findWhere({calendarUid: eventModel.get('calendarUid')});
+            var calendarElement = this.getCalendarElement();
+            var fcEvent;
 
             eventModel.set('editable', connectionModel.get('canEditEvent'));
             eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
@@ -297,8 +296,8 @@ define(function(require) {
                 return;
             }
 
-            var changes = connectionModel.changedAttributes(),
-                calendarUid = connectionModel.get('calendarUid');
+            var changes = connectionModel.changedAttributes();
+            var calendarUid = connectionModel.get('calendarUid');
             if (changes.visible && !this.eventsLoaded[calendarUid]) {
                 this.updateEvents();
             } else {
@@ -373,21 +372,21 @@ define(function(require) {
                 allDay: fcEvent.allDay,
                 start: fcEvent.start.clone(),
                 end: fcEvent.end ? fcEvent.end.clone() : null
-            }
+            };
         },
 
         onFcEventDrop: function(fcEvent, dateDiff, undo, jsEvent) {
-            var realDuration,
-                currentView = this.getCalendarElement().fullCalendar('getView'),
-                oldState = fcEvent._beforeDragState,
-                isDroppedOnDayGrid =
+            var realDuration;
+            var currentView = this.getCalendarElement().fullCalendar('getView');
+            var oldState = fcEvent._beforeDragState;
+            var isDroppedOnDayGrid =
                     fcEvent.start.time().as('ms') === 0 &&
                         (fcEvent.end === null || fcEvent.end.time().as('ms') === 0);
 
             // when on week view all-day event is dropped at 12AM to hour view
             // previous condition gives false positive result
             if (fcEvent.end === null && isDroppedOnDayGrid === true && fcEvent.start.time().as('ms') === 0) {
-                isDroppedOnDayGrid = !$(jsEvent.target).parents(".fc-time-grid-event").length;
+                isDroppedOnDayGrid = !$(jsEvent.target).parents('.fc-time-grid-event').length;
             }
 
             fcEvent.allDay = (currentView.name === 'month') ? oldState.allDay : isDroppedOnDayGrid;
@@ -417,7 +416,9 @@ define(function(require) {
         },
 
         saveFcEvent: function(fcEvent) {
-            var promises = [], eventModel, attrs;
+            var promises = [];
+            var eventModel;
+            var attrs;
             attrs = {
                 allDay: fcEvent.allDay,
                 start: fcEvent.start.clone().tz(this.options.timezone, true),
@@ -558,10 +559,10 @@ define(function(require) {
          */
         createViewModel: function(eventModel) {
             var fcEvent = _.pick(
-                    eventModel.attributes,
-                    ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
-                ),
-                colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
+                eventModel.attributes,
+                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
+            );
+            var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
 
             // set an event text and background colors the same as the owning calendar
             fcEvent.color = colors.backgroundColor;
@@ -623,15 +624,18 @@ define(function(require) {
             // init events container
             var eventsContainer = this.$el.find(this.options.eventsOptions.containerSelector);
             if (eventsContainer.length === 0) {
-                throw new Error("Cannot find container selector '" + this.options.eventsOptions.containerSelector + "' element.");
+                throw new Error('Cannot find container selector "' +
+                    this.options.eventsOptions.containerSelector + '" element.');
             }
             eventsContainer.empty();
             eventsContainer.append($(this.eventsTemplate()));
         },
 
-        initializeFullCalendar: function() {
-            var options, keys, self, scrollTime, fullCalendar,
-                calendarElement = this.getCalendarElement();
+        _prepareFullCalendarOptions: function() {
+            var options;
+            var keys;
+            var self;
+            var scrollTime;
             // prepare options for jQuery FullCalendar control
             options = { // prepare options for jQuery FullCalendar control
                 timezone: this.options.timezone,
@@ -665,8 +669,8 @@ define(function(require) {
             }
 
             if (!options.aspectRatio) {
-                options.contentHeight = "auto";
-                options.height = "auto";
+                options.contentHeight = 'auto';
+                options.height = 'auto';
             }
 
             if (this.options.scrollToCurrentTime) {
@@ -712,6 +716,12 @@ define(function(require) {
                 var event = this.collection.get(fcEvent.id);
                 eventDecorator.decorate(event, $el);
             }, this);
+        },
+
+        initializeFullCalendar: function() {
+            var fullCalendar;
+            var calendarElement = this.getCalendarElement();
+            var options = this._prepareFullCalendarOptions();
 
             // create jQuery FullCalendar control
             calendarElement.fullCalendar(options);
@@ -725,11 +735,12 @@ define(function(require) {
         },
 
         initializeConnectionsView: function() {
-            var connectionsContainer, connectionsTemplate;
+            var connectionsContainer;
+            var connectionsTemplate;
             // init connections container
             connectionsContainer = this.$el.find(this.options.connectionsOptions.containerSelector);
             if (connectionsContainer.length === 0) {
-                throw new Error("Cannot find '" + this.options.connectionsOptions.containerSelector + "' element.");
+                throw new Error('Cannot find "' + this.options.connectionsOptions.containerSelector + '" element.');
             }
             connectionsContainer.empty();
             connectionsTemplate = _.template($(this.options.connectionsOptions.containerTemplateSelector).html());
@@ -778,17 +789,22 @@ define(function(require) {
         },
 
         setTimeline: function() {
-            var todayElement, timeGrid, timelineElement, percentOfDay, curSeconds, timelineTop, dayCol,
-                calendarElement = this.getCalendarElement(),
-                currentView = calendarElement.fullCalendar('getView'),
-
-                // shown interval in calendar timezone
-                shownInterval = {
-                    start: currentView.intervalStart.clone().utc(),
-                    end: currentView.intervalEnd.clone().utc()
-                },
-                // current time in calendar timezone
-                now = moment.tz(this.options.timezone);
+            var todayElement;
+            var timeGrid;
+            var timelineElement;
+            var percentOfDay;
+            var curSeconds;
+            var timelineTop;
+            var dayCol;
+            var calendarElement = this.getCalendarElement();
+            var currentView = calendarElement.fullCalendar('getView');
+            // shown interval in calendar timezone
+            var shownInterval = {
+                start: currentView.intervalStart.clone().utc(),
+                end: currentView.intervalEnd.clone().utc()
+            };
+            // current time in calendar timezone
+            var now = moment.tz(this.options.timezone);
 
             if (currentView.name === 'month') {
                 // nothing to do
@@ -838,7 +854,7 @@ define(function(require) {
 
         getAvailableHeight: function() {
             var $fcView = this.getCalendarElement().find('.fc-view:first');
-            return mediator.execute('layout:getAvailableHeight', $fcView)
+            return mediator.execute('layout:getAvailableHeight', $fcView);
         },
 
         /**
@@ -850,10 +866,11 @@ define(function(require) {
                 // do nothing
                 return;
             }
-            var $fcView = this.getCalendarElement().find('.fc-view:first'),
-                $sidebar = $('.oro-page-sidebar'),
-                preferredLayout = mediator.execute('layout:getPreferredLayout', $fcView);
-            if (preferredLayout == 'fullscreen' && $sidebar.height() > mediator.execute('layout:getAvailableHeight', $sidebar)) {
+            var $fcView = this.getCalendarElement().find('.fc-view:first');
+            var $sidebar = $('.oro-page-sidebar');
+            var preferredLayout = mediator.execute('layout:getPreferredLayout', $fcView);
+            if (preferredLayout === 'fullscreen' &&
+                $sidebar.height() > mediator.execute('layout:getAvailableHeight', $sidebar)) {
                 preferredLayout = 'scroll';
             }
             this.setLayout(preferredLayout);
@@ -870,9 +887,9 @@ define(function(require) {
                 return;
             }
             this.layout = newLayout;
-            var $calendarEl = this.getCalendarElement(),
-                contentHeight = '',
-                height = '';
+            var $calendarEl = this.getCalendarElement();
+            var contentHeight = '';
+            var height = '';
             switch (newLayout) {
                 case 'fullscreen':
                     mediator.execute('layout:disablePageScroll', $calendarEl);

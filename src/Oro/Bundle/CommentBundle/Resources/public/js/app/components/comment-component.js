@@ -1,20 +1,18 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var CommentComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        mediator = require('oroui/js/mediator'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        CommentFromView = require('orocomment/js/app/views/comment-form-view'),
-        CommentsView = require('orocomment/js/app/views/comments-view'),
-        CommentCollection = require('orocomment/js/app/models/comment-collection'),
-        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
-        DialogWidget = require('oro/dialog-widget'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var CommentComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var CommentFromView = require('orocomment/js/app/views/comment-form-view');
+    var CommentsView = require('orocomment/js/app/views/comments-view');
+    var CommentCollection = require('orocomment/js/app/models/comment-collection');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var DialogWidget = require('oro/dialog-widget');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     CommentComponent = BaseComponent.extend({
 
@@ -56,8 +54,8 @@ define(function(require) {
         },
 
         createDialog: function(title, model) {
-            var dialogWidget, loadingMaskView;
-            dialogWidget = new DialogWidget({
+            var loadingMaskView;
+            var dialogWidget = new DialogWidget({
                 title: title,
                 el: $('<div><div class="comment-form-container"/></div>'),
                 stateEnabled: false,
@@ -86,15 +84,14 @@ define(function(require) {
         },
 
         onCommentAdd: function() {
-            var dialogWidget, model;
             if (!this.options.canCreate) {
                 return;
             }
 
-            model = this.collection.create();
+            var model = this.collection.create();
 
             // init dialog
-            dialogWidget = this.createDialog(__('oro.comment.dialog.add_comment.title'), model);
+            var dialogWidget = this.createDialog(__('oro.comment.dialog.add_comment.title'), model);
 
             model.once('sync', function() {
                 dialogWidget.remove();
@@ -152,11 +149,9 @@ define(function(require) {
         },
 
         onFormSubmit: function(formView) {
-            var model, options;
+            var model = formView.model;
 
-            model = formView.model;
-
-            options = formView.fetchAjaxOptions({
+            var options = formView.fetchAjaxOptions({
                 url: model.url()
             });
 

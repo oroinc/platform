@@ -1,5 +1,3 @@
-/*jslint nomen: true*/
-/*global define*/
 define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-view', 'oroui/js/tools/color-util'
     ], function($, _, BaseSimpleColorPickerView, colorUtil) {
     'use strict';

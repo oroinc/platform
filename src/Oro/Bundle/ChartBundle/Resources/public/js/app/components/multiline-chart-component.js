@@ -1,10 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var MultilineChartComponent,
-        Flotr = require('flotr2'),
-        dataFormatter = require('orochart/js/data_formatter'),
-        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var MultilineChartComponent;
+    var _ = require('underscore');
+    var Flotr = require('flotr2');
+    var dataFormatter = require('orochart/js/data_formatter');
+    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.MultilineChartComponent
@@ -31,10 +32,10 @@ define(function(require) {
             if (dataFormatter.isValueNumerical(xFormat)) {
                 var sort = function(rawData) {
                     rawData.sort(function(first, second) {
-                        if (first.label == null) {
+                        if (first.label === null || first.label === undefined) {
                             return -1;
                         }
-                        if (second.label == null) {
+                        if (second.label === null || second.label === undefined) {
                             return 1;
                         }
                         var firstLabel = dataFormatter.parseValue(first.label, xFormat);
@@ -57,9 +58,9 @@ define(function(require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[number]['label'] === null ?
+                        label = rawData[number].label === null ?
                             'N/A'
-                            : rawData[number]['label'];
+                            : rawData[number].label;
                     } else {
                         label = '';
                     }
@@ -71,9 +72,9 @@ define(function(require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[data]['value'] === null ?
+                        label = rawData[data].value === null ?
                             'N/A'
-                            : rawData[data]['value'];
+                            : rawData[data].value;
                     } else {
                         label = '';
                     }
@@ -85,9 +86,12 @@ define(function(require) {
                 var chartData = [];
 
                 for (var i in rawData) {
-                    var yValue = dataFormatter.parseValue(rawData[i]['value'], yFormat);
+                    if (!rawData.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    var yValue = dataFormatter.parseValue(rawData[i].value, yFormat);
                     yValue = yValue === null ? parseInt(i) : yValue;
-                    var xValue = dataFormatter.parseValue(rawData[i]['label'], xFormat);
+                    var xValue = dataFormatter.parseValue(rawData[i].label, xFormat);
                     xValue = xValue === null ? parseInt(i) : xValue;
 
                     var item = [xValue, yValue];

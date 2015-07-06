@@ -1,5 +1,3 @@
-/*jslint nomen: true*/
-/*global define*/
 define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
     ], function(_, BaseView) {
     'use strict';

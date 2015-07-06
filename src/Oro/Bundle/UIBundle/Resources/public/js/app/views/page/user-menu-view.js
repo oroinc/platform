@@ -1,4 +1,3 @@
-/*global define*/
 define([
     './../base/page-region-view'
 ], function(PageRegionView) {

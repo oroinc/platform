@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oroui/js/app/views/base/page-region-view'
 ], function(PageRegionView) {

@@ -1,4 +1,3 @@
-/*global define*/
 define(['../locale-settings', 'moment', 'orotranslation/js/translator'
     ], function(localeSettings, moment, __) {
     'use strict';

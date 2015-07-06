@@ -1,4 +1,3 @@
-/*global define*/
 define(['../locale-settings'
     ], function(localeSettings) {
     'use strict';

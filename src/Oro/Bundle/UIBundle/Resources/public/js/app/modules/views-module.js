@@ -1,4 +1,3 @@
-/*global require*/
 require([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page-view'

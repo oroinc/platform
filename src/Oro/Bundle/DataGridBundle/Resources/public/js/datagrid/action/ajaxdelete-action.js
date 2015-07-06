@@ -1,4 +1,3 @@
-/*global define*/
 define([
     './model-action',
     'oroui/js/delete-confirmation',

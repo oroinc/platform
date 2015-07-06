@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen: true*/
 define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
     ], function($, _, routing) {
     'use strict';

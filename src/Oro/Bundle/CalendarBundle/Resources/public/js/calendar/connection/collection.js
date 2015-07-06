@@ -1,6 +1,8 @@
-/*global define*/
-define(['backbone', 'routing', 'orocalendar/js/calendar/connection/model'
-    ], function(Backbone, routing, ConnectionModel) {
+define([
+    'backbone',
+    'routing',
+    'orocalendar/js/calendar/connection/model'
+], function(Backbone, routing, ConnectionModel) {
     'use strict';
 
     /**

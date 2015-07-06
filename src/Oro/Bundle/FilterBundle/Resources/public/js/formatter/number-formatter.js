@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', './abstract-formatter'
     ], function(_, AbstractFormatter) {
     'use strict';

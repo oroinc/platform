@@ -1,11 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var JobQueueView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var JobQueueView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     JobQueueView = BaseView.extend({
         events: {
@@ -47,17 +48,16 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         changeDemonState: function(e) {
-            var $link, $loader;
             e.preventDefault();
 
-            $link = this.$(e.currentTarget);
-            $loader = this.getActionElement('status').closest('div').find('img');
+            var $link = this.$(e.currentTarget);
+            var $loader = this.getActionElement('status').closest('div').find('img');
 
             $loader.show();
 
             $.getJSON($link.attr('href'), _.bind(function(data) {
                 if (data.error) {
-                    alert(data.message);
+                    mediator.execute('showErrorMessage', data.message, data);
                 } else {
                     $link.closest('div')
                             .find('span:first')
@@ -79,11 +79,10 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         toggleStateTrace: function(e) {
-            var $link, $traces;
             e.preventDefault();
 
-            $link = this.$(e.currentTarget);
-            $traces = $link.closest('.stack-trace').find('.traces');
+            var $link = this.$(e.currentTarget);
+            var $traces = $link.closest('.stack-trace').find('.traces');
 
             if ($link.next('.trace').length) {
                 $link.next('.trace').toggle();
@@ -99,8 +98,8 @@ define(function(require) {
          * Checks state of the daemon
          */
         checkStatus: function() {
-            var $statusLink = this.getActionElement('status'),
-                $loader = $statusLink.closest('div').find('img');
+            var $statusLink = this.getActionElement('status');
+            var $loader = $statusLink.closest('div').find('img');
             if (!$statusLink.length) {
                 return;
             }

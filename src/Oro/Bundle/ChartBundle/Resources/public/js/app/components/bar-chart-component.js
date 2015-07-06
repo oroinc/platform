@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var BarChartComponent,
-        Flotr = require('flotr2'),
-        numberFormatter = require('orolocale/js/formatter/number'),
-        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var BarChartComponent;
+    var Flotr = require('flotr2');
+    var numberFormatter = require('orolocale/js/formatter/number');
+    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.BarChartComponent
@@ -30,8 +30,11 @@ define(function(require) {
             var chartOptions;
 
             for (var i in data) {
-                chartData.push([xNumber++, parseInt(data[i]['value'])]);
-                xLabels.push(data[i]['label']);
+                if (!data.hasOwnProperty(i)) {
+                    continue;
+                }
+                chartData.push([xNumber++, parseInt(data[i].value)]);
+                xLabels.push(data[i].label);
             }
 
             chartOptions = {

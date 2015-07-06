@@ -1,5 +1,3 @@
-/*jslint nomen: true*/
-/*global define*/
 define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
     ], function(_, BaseSimpleColorPickerView) {
     'use strict';

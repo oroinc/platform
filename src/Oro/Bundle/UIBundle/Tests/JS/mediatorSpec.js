@@ -1,4 +1,3 @@
-/*global define, describe, it, expect*/
 define([
     'oroui/js/mediator',
     'backbone',

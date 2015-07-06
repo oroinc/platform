@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen:true, browser:true*/
 define(['jquery', 'jquery-ui'], function($) {
     'use strict';
 

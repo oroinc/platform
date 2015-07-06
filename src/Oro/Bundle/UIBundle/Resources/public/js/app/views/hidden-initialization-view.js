@@ -1,4 +1,3 @@
-/*global define*/
 /** @exports HiddenInitializationView */
 define(function(require) {
     'use strict';

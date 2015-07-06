@@ -1,5 +1,3 @@
-/*global define, require*/
-/*jslint nomen: true*/
 define([
     'jquery',
     'underscore',
@@ -16,7 +14,7 @@ define([
             filters: {},
             entitySelector: null,
             filterContainer: '<span class="active-filter">',
-            extensions: [],
+            extensions: []
         },
 
         _create: function() {

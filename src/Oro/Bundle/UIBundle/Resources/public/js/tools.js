@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define, require*/
 define(['jquery', 'underscore'], function($, _) {
     'use strict';
 

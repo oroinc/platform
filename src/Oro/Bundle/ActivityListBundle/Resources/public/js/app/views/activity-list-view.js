@@ -1,17 +1,15 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var ActivityListView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        routing = require('routing'),
-        mediator = require('oroui/js/mediator'),
-        DialogWidget = require('oro/dialog-widget'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var ActivityListView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var routing = require('routing');
+    var mediator = require('oroui/js/mediator');
+    var DialogWidget = require('oro/dialog-widget');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     ActivityListView = BaseCollectionView.extend({
         options: {
@@ -91,8 +89,8 @@ define(function(require) {
         },
 
         initItemView: function(model) {
-            var className = model.getRelatedActivityClass(),
-                configuration = this.options.configuration[className];
+            var className = model.getRelatedActivityClass();
+            var configuration = this.options.configuration[className];
             if (this.itemView) {
                 return new this.itemView({
                     autoRender: false,
@@ -151,7 +149,7 @@ define(function(require) {
             if (currentPage > 1) {
                 var nextPage = currentPage - 1;
                 this.collection.setPage(nextPage);
-                if (nextPage == 1) {
+                if (nextPage === 1) {
                     this._togglePrevious();
                 }
 
@@ -167,12 +165,12 @@ define(function(require) {
         },
 
         goto_page: function(e) {
-            var that = this.list,
-                currentPage = that.collection.getPage(),
-                maxPage = that.collection.pager.total,
-                nextPage = parseInt($(e.target).val());
+            var that = this.list;
+            var currentPage = that.collection.getPage();
+            var maxPage = that.collection.pager.total;
+            var nextPage = parseInt($(e.target).val());
 
-            if (_.isNaN(nextPage) || nextPage <= 0 || nextPage > maxPage || nextPage == currentPage) {
+            if (_.isNaN(nextPage) || nextPage <= 0 || nextPage > maxPage || nextPage === currentPage) {
                 $(e.target).val(currentPage);
                 return;
             }
@@ -180,10 +178,10 @@ define(function(require) {
             that._togglePrevious(true);
             that._toggleNext(true);
 
-            if (nextPage == 1) {
+            if (nextPage === 1) {
                 that._togglePrevious();
             }
-            if (nextPage == maxPage) {
+            if (nextPage === maxPage) {
                 that._toggleNext();
             }
 
@@ -197,7 +195,7 @@ define(function(require) {
             if (currentPage < this.collection.pager.total) {
                 var nextPage = currentPage + 1;
                 this.collection.setPage(nextPage);
-                if (nextPage == this.collection.pager.total) {
+                if (nextPage === this.collection.pager.total) {
                     this._toggleNext();
                 } else {
                     this._toggleNext(true);
@@ -265,7 +263,13 @@ define(function(require) {
         },
 
         renderAllItems: function() {
-            var result, i, view, model, oldViewState, contentLoadedPromises, deferredContentLoading;
+            var result;
+            var i;
+            var view;
+            var model;
+            var oldViewState;
+            var contentLoadedPromises;
+            var deferredContentLoading;
 
             result = ActivityListView.__super__.renderAllItems.apply(this, arguments);
 
@@ -337,12 +341,12 @@ define(function(require) {
             if (!this.itemEditDialog) {
                 var unescapeHTML = function unescapeHtml(unsafe) {
                     return unsafe
-                        .replace(/&nbsp;/g, " ")
-                        .replace(/&amp;/g, "&")
-                        .replace(/&lt;/g, "<")
-                        .replace(/&gt;/g, ">")
-                        .replace(/&quot;/g, "\"")
-                        .replace(/&#039;/g, "'");
+                        .replace(/&nbsp;/g, ' ')
+                        .replace(/&amp;/g, '&')
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&quot;/g, '\"')
+                        .replace(/&#039;/g, '\'');
                 };
 
                 this.itemEditDialog = new DialogWidget({

@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var PieChartComponent,
-        Flotr = require('flotr2'),
-        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var PieChartComponent;
+    var Flotr = require('flotr2');
+    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.PieChartComponent
@@ -71,7 +71,9 @@ define(function(require) {
             var chartData = [];
 
             for (var i in data) {
-                chartData.push({data: [[0, data[i]['fraction']]], label: data[i]['label']});
+                if (data.hasOwnProperty(i)) {
+                    chartData.push({data: [[0, data[i].fraction]], label: data[i].label});
+                }
             }
 
             Flotr.draw(

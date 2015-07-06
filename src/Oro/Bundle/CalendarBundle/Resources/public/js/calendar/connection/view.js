@@ -1,8 +1,13 @@
-/*jslint nomen:true*/
-/*global define, console*/
-define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model', 'oroui/js/tools'
-    ], function($, _, Backbone, __, messenger, ConnectionCollection, ConnectionModel, tools) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'oroui/js/messenger',
+    'orocalendar/js/calendar/connection/collection',
+    'orocalendar/js/calendar/connection/model',
+    'oroui/js/tools'
+], function($, _, Backbone, __, messenger, ConnectionCollection, ConnectionModel, tools) {
     'use strict';
 
     /**
@@ -26,7 +31,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             itemContainer: '.connection-container',
             item:          '.connection-item',
             lastItem:      '.connection-item:last',
-            findItemByCalendar: function(calendarUid) { return '.connection-item[data-calendar-uid="' + calendarUid + '"]'; },
+            findItemByCalendar: function(calendarUid) {
+                return '.connection-item[data-calendar-uid="' + calendarUid + '"]';
+            },
             newCalendarSelector: '#new_calendar',
             contextMenuTemplate: '#template-calendar-menu',
             visibilityButton: '.calendar-color'
@@ -83,8 +90,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         setItemVisibility: function($item, backgroundColor, skipActive) {
-            var $visibilityButton = $item.find(this.selectors.visibilityButton),
-                colors;
+            var $visibilityButton = $item.find(this.selectors.visibilityButton);
+            var colors;
             if (backgroundColor) {
                 if (skipActive !== true) {
                     $item.addClass('active');
@@ -108,13 +115,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         onModelAdded: function(model) {
-            var $el,
-                viewModel = model.toJSON();
+            var $el;
+            var viewModel = model.toJSON();
             // init text/background colors
             this.options.colorManager.applyColors(viewModel, _.bind(function() {
-                var $last = this.$el.find(this.selectors.lastItem),
-                    calendarAlias = $last.attr(this.attrs.calendarAlias);
-                return ['user', 'system', 'public'].indexOf(calendarAlias) !== -1 ? $last.attr(this.attrs.backgroundColor) : null;
+                var $last = this.$el.find(this.selectors.lastItem);
+                var calendarAlias = $last.attr(this.attrs.calendarAlias);
+                return ['user', 'system', 'public'].indexOf(calendarAlias) !== -1 ?
+                    $last.attr(this.attrs.backgroundColor) : null;
             }, this));
             this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.backgroundColor);
             model.set('backgroundColor', viewModel.backgroundColor);
@@ -128,8 +136,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             $el.on('click', '.context-menu-button', _.bind(function(e) {
                 e.stopPropagation();
 
-                var $currentTarget = $(e.currentTarget),
-                    $contextMenu = $currentTarget.closest(this.selectors.item).find('.context-menu');
+                var $currentTarget = $(e.currentTarget);
+                var $contextMenu = $currentTarget.closest(this.selectors.item).find('.context-menu');
                 if ($contextMenu.length) {
                     $contextMenu.remove();
                 } else {
@@ -192,19 +200,19 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         showContextMenu: function($button, model, posX, posY) {
-            var $container = $button.closest(this.selectors.item),
-                $contextMenu = $(this.contextMenuTemplate(model.toJSON())),
-                closeContextMenu = _.bind(function() {
+            var $container = $button.closest(this.selectors.item);
+            var $contextMenu = $(this.contextMenuTemplate(model.toJSON()));
+            var closeContextMenu = _.bind(function() {
                     $('.context-menu-button').css('display', '');
                     $contextMenu.remove();
                     $(document).off('.' + this.cid);
                     delete this._closeContextMenu;
-                }, this),
-                modules = _.uniq($contextMenu.find("li[data-module]").map(function() {
+                }, this);
+            var modules = _.uniq($contextMenu.find('li[data-module]').map(function() {
                     return $(this).data('module');
-                }).get()),
-                buttonHtml = $button.html(),
-                showLoadingTimeout;
+                }).get());
+            var buttonHtml = $button.html();
+            var showLoadingTimeout;
 
             this._closeContextMenu = closeContextMenu;
 
@@ -218,9 +226,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     clearTimeout(showLoadingTimeout);
                     $button.html(buttonHtml);
 
-                    _.each(modules, _.bind(function(moduleConstructor, moduleName) {
+                    _.each(modules, _.bind(function(ModuleConstructor, moduleName) {
                         $contextMenu.find('li[data-module="' + moduleName + '"]').each(_.bind(function(index, el) {
-                            var action = new moduleConstructor({
+                            var action = new ModuleConstructor({
                                     el: el,
                                     model: model,
                                     collection: this.options.collection,
@@ -241,7 +249,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     $container.find('.context-menu-button').css('display', 'block');
 
                     $(document).on('click.' + this.cid, _.bind(function(event) {
-                        if (!$(event.target).hasClass('context-menu') && !$(event.target).closest('.context-menu').length) {
+                        if (!$(event.target).hasClass('context-menu') &&
+                            !$(event.target).closest('.context-menu').length) {
                             closeContextMenu();
                         }
                     }, this));
@@ -252,10 +261,11 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         addModel: function(calendarId, calendarName, userId) {
-            var savingMsg, model,
-                calendarAlias = 'user',
-                calendarUid = calendarAlias + '_' + calendarId,
-                el = this.$el.find(this.selectors.findItemByCalendar(calendarUid));
+            var savingMsg;
+            var model;
+            var calendarAlias = 'user';
+            var calendarUid = calendarAlias + '_' + calendarId;
+            var el = this.$el.find(this.selectors.findItemByCalendar(calendarUid));
             if (el.length > 0) {
                 messenger.notificationFlashMessage('warning', __('This calendar already exists.'), {
                     namespace: 'calendar-ns'
@@ -308,8 +318,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         _showItem: function(model, visible) {
-            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
-                $connection = this.findItem(model);
+            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+            var $connection = this.findItem(model);
             this._removeVisibilityButtonEventListener($connection, model);
             this.setItemVisibility($connection, visible ? model.get('backgroundColor') : '');
             try {

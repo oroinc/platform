@@ -1,4 +1,3 @@
-/* global define */
 /** @exports WorkflowEditorComponent */
 define(function(require) {
     'use strict';

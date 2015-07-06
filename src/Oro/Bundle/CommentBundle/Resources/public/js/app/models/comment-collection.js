@@ -1,12 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var CommentCollection,
-        _ = require('underscore'),
-        LoadMoreCollection = require('oroui/js/app/models/load-more-collection'),
-        CommentModel = require('orocomment/js/app/models/comment-model');
+    var CommentCollection;
+    var LoadMoreCollection = require('oroui/js/app/models/load-more-collection');
+    var CommentModel = require('orocomment/js/app/models/comment-model');
 
     CommentCollection = LoadMoreCollection.extend({
         model: CommentModel,

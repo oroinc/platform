@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
     ], function($, _, __) {
     'use strict';

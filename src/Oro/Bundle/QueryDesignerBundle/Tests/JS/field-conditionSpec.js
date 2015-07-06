@@ -1,4 +1,3 @@
-/*global define, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
 define(function (require) {
     'use strict';
 

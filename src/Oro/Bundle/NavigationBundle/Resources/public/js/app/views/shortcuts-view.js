@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'routing', 'oroui/js/mediator', 'bootstrap'
     ], function($, _, __, BaseView, routing, mediator) {
     'use strict';

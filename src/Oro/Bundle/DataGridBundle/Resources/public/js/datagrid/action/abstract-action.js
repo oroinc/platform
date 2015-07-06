@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define, require*/
 define([
     'jquery',
     'underscore',
@@ -91,7 +89,7 @@ define([
          */
         initialize: function(options) {
             if (!options.datagrid) {
-                throw new TypeError("'datagrid' is required");
+                throw new TypeError('"datagrid" is required');
             }
             this.subviews = [];
             this.datagrid = options.datagrid;
@@ -237,9 +235,9 @@ define([
         },
 
         _showAjaxSuccessMessage: function(data) {
-            var defaultMessage = data.successful ? this.messages.success : this.messages.error,
-                type = data.successful ? 'success' : 'error',
-                message = data.message || __(defaultMessage);
+            var defaultMessage = data.successful ? this.messages.success : this.messages.error;
+            var type = data.successful ? 'success' : 'error';
+            var message = data.message || __(defaultMessage);
             if (message) {
                 mediator.execute('showFlashMessage', type, message);
             }

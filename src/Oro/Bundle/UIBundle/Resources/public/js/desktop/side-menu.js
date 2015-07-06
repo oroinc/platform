@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen: true*/
 define(['../side-menu', '../mediator', 'oroui/js/persistent-storage'], function($, mediator, persistentStorage) {
     'use strict';
 

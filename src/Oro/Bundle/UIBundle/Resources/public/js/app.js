@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define, requirejs*/
 define([
     'underscore',
     './app/application',

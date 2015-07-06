@@ -1,6 +1,3 @@
-/*jshint browser:true, nomen:true*/
-/*jslint browser:true, nomen:true*/
-/*global define*/
 define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($, __, Select2) {
     'use strict';
 
@@ -14,8 +11,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
      * @this AbstractSelect2
      */
     function populateCollapsibleResults(container, results, query) {
-        /*jshint validthis:true */
-        var populate, data, result, children,
+                var populate, data, result, children,
             opts = this.opts,
             id = opts.id,
             parent = container.parent(),

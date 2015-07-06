@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var FlowChartComponent,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        Flotr = require('flotr2'),
-        dataFormatter = require('orochart/js/data_formatter'),
-        PieChartComponent = require('orochart/js/app/components/pie-chart-component');
+    var FlowChartComponent;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Flotr = require('flotr2');
+    var dataFormatter = require('orochart/js/data_formatter');
+    var PieChartComponent = require('orochart/js/app/components/pie-chart-component');
     require('orochart/js/flotr2/funnel');
 
     var valueFormat = 'currency';
@@ -38,13 +38,12 @@ define(function(require) {
         _prepareData: function() {
             var date = this.date;
             _.each(this.data, function(item) {
-                var params, format;
-                params = {
+                var params = {
                     label: item.label,
                     date: date,
                     value: dataFormatter.formatValue(item.value, valueFormat)
                 };
-                format = 'oro.chart.flow_chart.label_fromatter.' + (item.isNozzle ? 'nozzle' : 'tick');
+                var format = 'oro.chart.flow_chart.label_fromatter.' + (item.isNozzle ? 'nozzle' : 'tick');
                 item.originalLabel = item.label;
                 item.label = __(format, params);
                 item.data = [item.value];
@@ -57,11 +56,11 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
-            var labelsWidth,
-                $chart = this.$chart,
-                $legend = this.$legend,
-                options = this.options,
-                hasPlaceForLabels = !this.$container.hasClass('wrapped-chart-legend');
+            var labelsWidth;
+            var $chart = this.$chart;
+            var $legend = this.$legend;
+            var options = this.options;
+            var hasPlaceForLabels = !this.$container.hasClass('wrapped-chart-legend');
 
             if (!$chart.get(0).clientWidth) {
                 return;

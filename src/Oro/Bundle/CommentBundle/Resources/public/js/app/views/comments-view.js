@@ -1,13 +1,12 @@
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var CommentsView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        CommentsHeaderView = require('./comments-header-view'),
-        CommentItemView = require('./comment-item-view'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
-        template = require('text!../../../templates/comment/comments-view.html');
+    var CommentsView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var CommentsHeaderView = require('./comments-header-view');
+    var CommentItemView = require('./comment-item-view');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var template = require('text!../../../templates/comment/comments-view.html');
 
     CommentsView = BaseView.extend({
         template: template,

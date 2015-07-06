@@ -1,5 +1,3 @@
-/*jslint nomen: true*/
-/*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view',
     'oroui/js/tools/color-util', 'jquery.simplecolorpicker', 'jquery.minicolors'
     ], function($, _, __, BaseView, colorUtil) {

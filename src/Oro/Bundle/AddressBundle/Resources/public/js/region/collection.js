@@ -1,6 +1,8 @@
-/*global define*/
-define(['backbone', 'routing', 'oroaddress/js/region/model'
-    ], function(Backbone, routing, RegionModel) {
+define([
+    'backbone',
+    'routing',
+    'oroaddress/js/region/model'
+], function(Backbone, routing, RegionModel) {
     'use strict';
 
     /**

@@ -1,4 +1,3 @@
-/*global define*/
 define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
     function(numberFormatter, dateTimeFormatter) {
         'use strict';

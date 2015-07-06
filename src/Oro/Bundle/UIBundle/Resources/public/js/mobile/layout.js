@@ -1,6 +1,3 @@
-/*jshint browser: true*/
-/*jslint browser: true*/
-/*global define*/
 define(function(require) {
     'use strict';
     var $ = require('jquery'),

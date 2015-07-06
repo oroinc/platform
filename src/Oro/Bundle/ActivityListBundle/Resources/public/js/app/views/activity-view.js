@@ -1,17 +1,15 @@
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var ActivityView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        routing = require('routing'),
-        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
-        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
-        CommentComponent = require('orocomment/js/app/components/comment-component');
-    
+    var ActivityView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var routing = require('routing');
+    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var CommentComponent = require('orocomment/js/app/components/comment-component');
+
     ActivityView = BaseView.extend({
         options: {
             configuration: {
@@ -155,8 +153,8 @@ define(function(require) {
         },
 
         _onCommentCountChange: function() {
-            var quantity = this.model.get('commentCount'),
-                $elem = this.$(this.options.commentsCountBlock);
+            var quantity = this.model.get('commentCount');
+            var $elem = this.$(this.options.commentsCountBlock);
             $elem.html(quantity);
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
         },

@@ -1,9 +1,11 @@
 define(function(require) {
     'use strict';
-    var GuestsPlugin,
-        _ = require('underscore'),
-        BasePlugin = require('oroui/js/app/plugins/base/plugin'),
-        GuestNotifierView = require('orocalendar/js/app/views/guest-notifier-view');
+
+    var GuestsPlugin;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var GuestNotifierView = require('orocalendar/js/app/views/guest-notifier-view');
 
     GuestsPlugin = BasePlugin.extend({
         enable: function() {
@@ -23,9 +25,9 @@ define(function(require) {
          * @returns {boolean}
          */
         hasParentEvent: function(eventModel) {
-            var result = false,
-                parentEventId = eventModel.get('parentEventId'),
-                alias = eventModel.get('calendarAlias');
+            var result = false;
+            var parentEventId = eventModel.get('parentEventId');
+            var alias = eventModel.get('calendarAlias');
             if (parentEventId) {
                 result = Boolean(this.main.getConnectionCollection().find(function(c) {
                     return c.get('calendarAlias') === alias &&
@@ -42,8 +44,8 @@ define(function(require) {
          * @returns {boolean}
          */
         hasLoadedGuestEvents: function(parentEventModel) {
-            var result = false,
-                guests = parentEventModel.get('invitedUsers');
+            var result = false;
+            var guests = parentEventModel.get('invitedUsers');
             guests = _.isNull(guests) ? [] : guests;
             if (parentEventModel.hasChanged('invitedUsers') && !_.isEmpty(parentEventModel.previous('invitedUsers'))) {
                 guests = _.union(guests, parentEventModel.previous('invitedUsers'));
@@ -86,7 +88,9 @@ define(function(require) {
          * @param eventModel
          */
         onEventChanged: function(eventModel) {
-            var guestEventModels, i, updatedAttrs;
+            var guestEventModels;
+            var i;
+            var updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
             if (this.hasLoadedGuestEvents(eventModel)) {
                 if (eventModel.hasChanged('invitedUsers')) {
@@ -95,7 +99,8 @@ define(function(require) {
                 }
                 // update linked events
                 guestEventModels = this.findGuestEventModels(eventModel);
-                updatedAttrs = _.pick(eventModel.changedAttributes(), ['start', 'end', 'allDay', 'title', 'description']);
+                updatedAttrs = _.pick(eventModel.changedAttributes(),
+                    ['start', 'end', 'allDay', 'title', 'description']);
                 for (i = 0; i < guestEventModels.length; i++) {
                     // fill with updated attributes in parent
                     guestEventModels[i].set(updatedAttrs);
@@ -109,7 +114,8 @@ define(function(require) {
          * @param eventModel
          */
         onEventDeleted: function(eventModel) {
-            var guestEventModels, i;
+            var guestEventModels;
+            var i;
             if (this.hasLoadedGuestEvents(eventModel)) {
                 // remove guests
                 guestEventModels = this.findGuestEventModels(eventModel);
@@ -130,8 +136,8 @@ define(function(require) {
          */
         onEventBeforeSave: function(eventModel, promises, attrs) {
             if (this.hasLoadedGuestEvents(eventModel)) {
-                var cleanUp,
-                    deferredConfirmation = $.Deferred();
+                var cleanUp;
+                var deferredConfirmation = $.Deferred();
                 promises.push(deferredConfirmation);
 
                 if (!this.modal) {

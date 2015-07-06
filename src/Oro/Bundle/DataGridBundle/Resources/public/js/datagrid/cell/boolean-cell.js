@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'backgrid',
     'orotranslation/js/translator'

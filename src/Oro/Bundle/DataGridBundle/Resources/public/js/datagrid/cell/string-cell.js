@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'backgrid',
     'orodatagrid/js/datagrid/formatter/cell-formatter'

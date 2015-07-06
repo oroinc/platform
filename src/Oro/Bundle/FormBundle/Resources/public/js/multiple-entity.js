@@ -1,5 +1,3 @@
-/* jshint devel:true */
-/*global define*/
 define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
     ], function(_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
     'use strict';

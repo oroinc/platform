@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
     ], function(_, __, Modal) {
     'use strict';

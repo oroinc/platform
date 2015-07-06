@@ -1,4 +1,3 @@
-/*global define*/
 define(['numeral', '../locale-settings', 'underscore'
     ], function(numeral, localeSettings, _) {
     'use strict';

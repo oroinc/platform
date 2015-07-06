@@ -1,5 +1,3 @@
-/*global define, require*/
-/*jslint nomen: true*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/map-filter-module-name',
     'oroentity/js/field-choice', 'jquery-ui'
     ], function($, _, __, mapFilterModuleName) {

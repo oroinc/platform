@@ -1,6 +1,8 @@
-/*global define*/
-define(['underscore', 'jquery', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
-], function(_, $, __, datetimeFormatter) {
+define([
+    'underscore',
+    'jquery',
+    'orotranslation/js/translator'
+], function(_, $, __) {
     'use strict';
 
     var defaultParam = {
@@ -29,11 +31,11 @@ define(['underscore', 'jquery', 'orotranslation/js/translator', 'orolocale/js/fo
             var firstDate = new Date(value);
             var secondDate = new Date(comparedValue);
 
-            return !(secondDate < firstDate);
+            return secondDate >= firstDate;
         },
         function(param, element) {
-            var value = String(this.elementValue(element)),
-                placeholders = {};
+            var value = String(this.elementValue(element));
+            var placeholders = {};
             param = _.extend({}, defaultParam, param);
             placeholders.field = value;
             return __(param.message, placeholders);

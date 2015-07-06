@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery', 'underscore', './view', 'json'
     ], function($, _, TagView) {
     'use strict';

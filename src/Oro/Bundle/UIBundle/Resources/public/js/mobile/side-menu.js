@@ -1,7 +1,3 @@
-/*jshint browser: true*/
-/*jslint browser: true*/
-/*global define*/
-/*jslint nomen: true*/
 define(['../side-menu', '../mediator'], function($, mediator) {
     'use strict';
 

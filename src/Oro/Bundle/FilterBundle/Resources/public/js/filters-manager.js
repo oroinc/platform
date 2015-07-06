@@ -1,6 +1,3 @@
-/*jshint devel:true, multistr:true*/
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',

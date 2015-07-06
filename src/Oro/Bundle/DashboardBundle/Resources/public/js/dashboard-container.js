@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/js/mediator',
     'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item', 'orodashboard/js/dashboard-util', 'orodashboard/js/widget/configuration-widget', 'jquery-ui'],
     function($, _, Backbone, routing, __, mediator, widgetManager, DashboardItemWidget, dashboardUtil, ConfigurationWidget) {

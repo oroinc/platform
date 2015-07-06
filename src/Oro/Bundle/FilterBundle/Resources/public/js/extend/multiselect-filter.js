@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint skip:start*/
 define([
     'jquery',
     'jquery-ui',

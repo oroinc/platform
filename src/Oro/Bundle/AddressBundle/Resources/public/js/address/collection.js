@@ -1,6 +1,8 @@
-/*global define*/
-define(['underscore', 'backbone', 'oroaddress/js/address/model'
-    ], function(_, Backbone, AddressModel) {
+define([
+    'underscore',
+    'backbone',
+    'oroaddress/js/address/model'
+], function(_, Backbone, AddressModel) {
     'use strict';
 
     /**

@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen:true*/
 define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap', 'cryptojs/sha256'],
 function($, _, tools) {
     'use strict';

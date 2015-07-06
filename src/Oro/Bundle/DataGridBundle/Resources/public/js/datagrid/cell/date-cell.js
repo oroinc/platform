@@ -1,4 +1,3 @@
-/*global define*/
 define([
     './datetime-cell'
 ], function(DateTimeCell) {

@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     './string-cell',
     'orodatagrid/js/datagrid/formatter/datetime-formatter'

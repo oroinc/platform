@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
     ], function(_, CellFormatter, formatter) {
     'use strict';

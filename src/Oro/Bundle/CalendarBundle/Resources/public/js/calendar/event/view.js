@@ -1,7 +1,12 @@
-/*jslint nomen:true*/
-/*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget',
-    'oroui/js/app/views/loading-mask-view', 'orocalendar/js/form-validation', 'oroui/js/delete-confirmation',
+define([
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'routing',
+    'oro/dialog-widget',
+    'oroui/js/app/views/loading-mask-view',
+    'orocalendar/js/form-validation',
+    'oroui/js/delete-confirmation',
     'oroform/js/formatter/field'
 ], function(_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
@@ -64,8 +69,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         render: function() {
-            var widgetOptions = this.options.widgetOptions || {},
-                defaultOptions = {
+            var widgetOptions = this.options.widgetOptions || {};
+            var defaultOptions = {
                     title: this.model.isNew() ? __('Add New Event') : __('View Event'),
                     stateEnabled: false,
                     incrementalPosition: false,
@@ -77,20 +82,20 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         close: _.bind(this.remove, this)
                     }),
                     submitHandler: _.bind(this.saveModel, this)
-                },
-                onDelete = _.bind(function(e) {
-                    var $el = $(e.currentTarget),
-                        deleteUrl = $el.data('url'),
-                        confirm = new DeleteConfirmation({
-                            content: $el.data('message')
-                        });
+                };
+            var onDelete = _.bind(function(e) {
+                    var $el = $(e.currentTarget);
+                    var deleteUrl = $el.data('url');
+                    var confirm = new DeleteConfirmation({
+                        content: $el.data('message')
+                    });
                     e.preventDefault();
                     confirm.on('ok', _.bind(function() {
                         this.deleteModel(deleteUrl);
                     }, this));
                     confirm.open();
-                }, this),
-                onEdit = _.bind(function(e) {
+                }, this);
+            var onEdit = _.bind(function(e) {
                     this.eventDialog.setTitle(__('Edit Event'));
                     this.eventDialog.setContent(this.getEventForm());
                     // subscribe to 'delete event' event
@@ -221,9 +226,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
             _.each(inputs, function(input) {
                 input = $(input);
-                var name = input.attr('name'),
-                    matches = [],
-                    match;
+                var name = input.attr('name');
+                var matches = [];
+                var match;
 
                 while ((match = fieldNameRegex.exec(name)) !== null) {
                     matches.push(match[1]);
@@ -235,7 +240,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         if (value === false || value === true) {
                             input.prop('checked', value);
                         } else {
-                            input.prop('checked', input.val() == value);
+                            input.prop('checked', input.val() === value);
                         }
                     } else {
                         input.val(value);
@@ -281,10 +286,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         getEventForm: function() {
-            var modelData = this.model.toJSON(),
-                templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData),
-                form = this.fillForm(this.template(templateData), modelData),
-                calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
+            var modelData = this.model.toJSON();
+            var templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData);
+            var form = this.fillForm(this.template(templateData), modelData);
+            var calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
 
             form.find(this.selectors.backgroundColor)
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
@@ -294,12 +299,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             this._toggleCalendarUidByInvitedUsers(form);
 
             form.find(this.selectors.calendarUid).on('change', _.bind(function(e) {
-                var $emptyColor = form.find('.empty-color'),
-                    $selector = $(e.currentTarget),
-                    tagName = $selector.prop('tagName').toUpperCase(),
-                    calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
-                    colors = this.options.colorManager.getCalendarColors(calendarUid),
-                    newCalendar = this.parseCalendarUid(calendarUid);
+                var $emptyColor = form.find('.empty-color');
+                var $selector = $(e.currentTarget);
+                var tagName = $selector.prop('tagName').toUpperCase();
+                var calendarUid = tagName === 'SELECT' || $selector.is(':checked') ?
+                    $selector.val() : this.model.get('calendarUid');
+                var colors = this.options.colorManager.getCalendarColors(calendarUid);
+                var newCalendar = this.parseCalendarUid(calendarUid);
                 $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
                 if (newCalendar.calendarAlias === 'user') {
                     this._showUserCalendarOnlyFields(form);
@@ -315,15 +321,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         getEventFormData: function() {
-            var fieldNameRegex = /\[(\w+)\]/g,
-                data = {},
-                formData = this.eventDialog.form.serializeArray();
+            var fieldNameRegex = /\[(\w+)\]/g;
+            var data = {};
+            var formData = this.eventDialog.form.serializeArray();
             formData = formData.concat(this.eventDialog.form.find('input[type=checkbox]:not(:checked)')
                 .map(function() {
-                    return {"name": this.name, "value": false};
+                    return {name: this.name, value: false};
                 }).get());
             _.each(formData, function(dataItem) {
-                var matches = [], match;
+                var matches = [];
+                var match;
                 while ((match = fieldNameRegex.exec(dataItem.name)) !== null) {
                     matches.push(match[1]);
                 }
@@ -382,7 +389,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
             if (form.find(this.selectors.invitedUsers).val()) {
                 $calendarUid.attr('disabled', 'disabled');
-                $calendarUid.parent().attr('title', __("The calendar cannot be changed because the event has guests"));
+                $calendarUid.parent().attr('title', __('The calendar cannot be changed because the event has guests'));
                 // fix select2 dynamic change disabled
                 if (!$calendarUid.parent().hasClass('disabled')) {
                     $calendarUid.parent().addClass('disabled');
@@ -404,7 +411,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         setValueByPath: function(obj, value, path) {
-            var parent = obj, i;
+            var parent = obj;
+            var i;
 
             for (i = 0; i < path.length - 1; i++) {
                 if (parent[path[i]] === undefined) {
@@ -417,10 +425,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         getValueByPath: function(obj, path) {
-            var current = obj, i;
+            var current = obj;
+            var i;
 
             for (i = 0; i < path.length; i++) {
-                if (current[path[i]] == undefined) {
+                if (current[path[i]] === undefined || current[path[i]] === null) {
                     return undefined;
                 }
                 current = current[path[i]];
@@ -430,12 +439,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         getEventFormTemplateData: function(isNew) {
-            var templateType = '',
-                calendars = [],
-                ownCalendar = null,
-                isOwnCalendar = function(item) {
-                    return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
-                };
+            var templateType = '';
+            var calendars = [];
+            var ownCalendar = null;
+            var isOwnCalendar = function(item) {
+                return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
+            };
 
             this.options.connections.each(function(item) {
                 var calendar;

@@ -1,4 +1,3 @@
-/*global define*/
 define(['backbone', 'routing', './constants'
     ], function(Backbone, routing, constants) {
     'use strict';

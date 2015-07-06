@@ -1,4 +1,3 @@
-/*global define*/
 define(function() {
     'use strict';
     var moduleNameTemplate = 'oro/datagrid/cell/{{type}}-cell',

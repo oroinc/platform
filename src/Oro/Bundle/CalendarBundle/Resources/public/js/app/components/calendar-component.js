@@ -1,13 +1,11 @@
-/*jslint nomen: true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        Calendar = require('orocalendar/js/calendar-view'),
-        EventCollection = require('orocalendar/js/calendar/event/collection'),
-        ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
+    var _ = require('underscore');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var Calendar = require('orocalendar/js/calendar-view');
+    var EventCollection = require('orocalendar/js/calendar/event/collection');
+    var ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
 
     /**
      * Creates calendar

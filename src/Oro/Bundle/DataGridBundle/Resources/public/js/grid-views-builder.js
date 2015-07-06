@@ -1,5 +1,3 @@
-/*jslint nomen:true */
-/*global define, require*/
 define(function(require) {
     'use strict';
 

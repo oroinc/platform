@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen: true*/
 define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _, mediator) {
     'use strict';
 

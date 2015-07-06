@@ -1,7 +1,10 @@
-/* jshint browser:true  */
-/*global define, google*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/locale-settings'
-    ], function(_, Backbone, __, localeSettings) {
+/*global google*/
+define([
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'orolocale/js/locale-settings'
+], function(_, Backbone, __, localeSettings) {
     'use strict';
 
     var $ = Backbone.$;
@@ -54,7 +57,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
         },
 
         _initMap: function(location) {
-            var weatherLayer, cloudLayer;
+            var weatherLayer;
+            var cloudLayer;
             this._initMapOptions();
             this.map = new google.maps.Map(
                 this.$mapContainer[0],
@@ -93,8 +97,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             }
 
             $.ajax({
-                url: window.location.protocol + "//www.google.com/jsapi",
-                dataType: "script",
+                url: window.location.protocol + '//www.google.com/jsapi',
+                dataType: 'script',
                 cache: true,
                 success: _.bind(function() {
                     google.load('maps', this.options.apiVersion, {

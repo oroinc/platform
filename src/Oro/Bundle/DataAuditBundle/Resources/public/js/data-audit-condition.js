@@ -1,5 +1,3 @@
-/*global define, require*/
-/*jslint nomen: true*/
 define([
     'jquery',
     'underscore',

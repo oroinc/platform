@@ -1,4 +1,3 @@
-/*global define*/
 define([
     'underscore',
     'backbone',
@@ -9,8 +8,8 @@ define([
 ], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation) {
     'use strict';
 
-    var DashboardItemWidget,
-        $ = Backbone.$;
+    var DashboardItemWidget;
+    var $ = Backbone.$;
 
     /**
      * @export  orodashboard/js/widget/dashboard-item
@@ -85,13 +84,15 @@ define([
                             '</span>' +
                             '<% if (showConfig) { %>' +
                                 '<span class="action-wrapper">' +
-                                    '<a class="configure-action" href="#" title="<%- _.__(\'oro.dashboard.widget.configure\') %>">' +
+                                    '<a class="configure-action" href="#" ' +
+                                        'title="<%- _.__(\'oro.dashboard.widget.configure\') %>">' +
                                         '<i class="icon-cog hide-text"></i>' +
                                     '</a>' +
                                 '</span>' +
                             '<% } %>' +
                             '<span class="action-wrapper">' +
-                                '<a class="remove-action" href="#" title="<%- _.__(\'oro.dashboard.widget.remove\') %>">' +
+                                '<a class="remove-action" href="#" ' +
+                                    'title="<%- _.__(\'oro.dashboard.widget.remove\') %>">' +
                                     '<i class="icon-trash hide-text"></i>' +
                                 '</a>' +
                             '</span>' +
@@ -226,7 +227,7 @@ define([
             this.state.expanded = true;
 
             var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
-            var $chart = this.$el.find(".chart");
+            var $chart = this.$el.find('.chart');
             collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
 
             this.widget.removeClass('collapsed');
@@ -239,7 +240,7 @@ define([
             }
 
             if ($chart.length > 0) {
-                $chart.trigger("update");
+                $chart.trigger('update');
             }
         },
 
@@ -264,11 +265,11 @@ define([
          * Trigger remove action
          */
         onRemoveFromDashboard: function() {
-            var that = this,
-                confirm = new DeleteConfirmation({
+            var that = this;
+            var confirm = new DeleteConfirmation({
                 content: __('oro.dashboard.widget.delete_confirmation')
             });
-            
+
             confirm.on('ok', function() {
                 that.trigger('removeFromDashboard', that.$el, that);
                 mediator.trigger('widget:dashboard:removeFromDashboard:' + that.getWid(), that.$el, that);

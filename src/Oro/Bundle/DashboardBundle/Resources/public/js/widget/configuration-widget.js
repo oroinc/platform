@@ -1,4 +1,3 @@
-/*global define*/
 define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
     function(__, routing, DialogWidget) {
     'use strict';

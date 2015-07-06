@@ -1,5 +1,3 @@
-/*jslint nomen:true */
-/*global define*/
 define(['underscore', '../content-manager'], function(_, ContentManager) {
     'use strict';
 

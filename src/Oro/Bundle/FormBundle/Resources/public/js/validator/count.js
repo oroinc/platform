@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', './number'
     ], function(_, numberValidator) {
     'use strict';

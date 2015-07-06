@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen: true*/
 define([
     'jquery',
     'jquery-ui'

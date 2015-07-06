@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define, console*/
 define(['oroui/js/app/views/base/view'
     ], function(BaseView) {
     'use strict';

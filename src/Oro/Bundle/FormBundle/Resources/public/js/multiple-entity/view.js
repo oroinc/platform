@@ -1,5 +1,3 @@
-/* jshint devel:true */
-/*global define*/
 define(['underscore', 'backbone', 'oro/dialog-widget'
     ], function(_, Backbone, DialogWidget) {
     'use strict';

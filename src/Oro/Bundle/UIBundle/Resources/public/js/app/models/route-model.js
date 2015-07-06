@@ -1,5 +1,3 @@
-/*jslint nomen:true, eqeq:true*/
-/*global define*/
 /** @lends RouteModel */
 define(function(require) {
     'use strict';

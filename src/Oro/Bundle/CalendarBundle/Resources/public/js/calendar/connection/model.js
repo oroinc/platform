@@ -1,7 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
-define(['underscore', 'backbone', 'routing'
-    ], function(_, Backbone, routing) {
+define([
+    'underscore',
+    'backbone',
+    'routing'
+], function(_, Backbone, routing) {
     'use strict';
 
     /**
@@ -50,7 +51,7 @@ define(['underscore', 'backbone', 'routing'
             var attrs;
 
             // Handle both `"key", value` and `{key: value}` -style arguments.
-            if (key == null || typeof key === 'object') {
+            if (key === null || key === undefined || typeof key === 'object') {
                 attrs = key;
                 options = val;
             } else {
@@ -62,7 +63,8 @@ define(['underscore', 'backbone', 'routing'
             options.data = JSON.stringify(
                 _.extend({}, _.omit(
                     this.toJSON(),
-                    ['calendarUid', 'calendarName', 'userId', 'removable', 'canAddEvent', 'canEditEvent', 'canDeleteEvent']
+                    ['calendarUid', 'calendarName', 'userId', 'removable',
+                        'canAddEvent', 'canEditEvent', 'canDeleteEvent']
                 ), attrs || {})
             );
 
@@ -74,9 +76,9 @@ define(['underscore', 'backbone', 'routing'
         },
 
         _updateCalendarUidAttribute: function() {
-            var calendarAlias = this.get('calendarAlias'),
-                calendarId = this.get('calendar'),
-                calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
+            var calendarAlias = this.get('calendarAlias');
+            var calendarId = this.get('calendar');
+            var calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
             this.set('calendarUid', calendarUid);
         }
     });

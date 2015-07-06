@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oroui/js/app/models/base/collection',
     './note-model'

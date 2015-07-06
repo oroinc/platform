@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../content-processor/dropdown-button'
     ], function($, mediator, __) {
     'use strict';

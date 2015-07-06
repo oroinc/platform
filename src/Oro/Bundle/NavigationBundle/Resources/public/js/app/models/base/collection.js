@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oroui/js/mediator',
     'oroui/js/app/models/base/collection'

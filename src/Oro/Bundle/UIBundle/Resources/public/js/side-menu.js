@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen: true*/
 define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, mediator) {
     'use strict';
 

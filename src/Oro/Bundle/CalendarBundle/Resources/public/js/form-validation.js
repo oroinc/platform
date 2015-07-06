@@ -1,6 +1,10 @@
-/* global define */
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'],
-function($, _, __, tools) {
+/*jshint devel:true*/
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/tools'
+], function($, _, __, tools) {
     'use strict';
 
     return {
@@ -66,7 +70,7 @@ function($, _, __, tools) {
         getFormFieldPrefix: function(container) {
             var formFieldPrefix = '';
             var form = null;
-            if (container.prop("tagName").toLowerCase() === 'form') {
+            if (container.prop('tagName').toLowerCase() === 'form') {
                 form = container;
             } else {
                 form = container.find('form');
@@ -88,8 +92,8 @@ function($, _, __, tools) {
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
          */
         removeFieldErrors: function(field) {
-            var $field     = $(field),
-                $container = $field.closest('.controls');
+            var $field     = $(field);
+            var $container = $field.closest('.controls');
 
             $container
                 .removeClass('validation-error')
@@ -104,8 +108,8 @@ function($, _, __, tools) {
          * @param errorMessages {string[]|string} The localized error string(s).
          */
         addFieldErrors: function(field, errorMessages) {
-            var $field     = $(field),
-                $container = $field.closest('div.controls');
+            var $field     = $(field);
+            var $container = $field.closest('div.controls');
 
             if (!$field.is(':visible')) {
                 $field = $container.children(':input');
@@ -182,5 +186,5 @@ function($, _, __, tools) {
             }
             container.find('.error>:input,:input.error').first().focus();
         }
-    }
+    };
 });

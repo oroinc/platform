@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number'
     ], function(_, __, numberFormatter) {
     'use strict';

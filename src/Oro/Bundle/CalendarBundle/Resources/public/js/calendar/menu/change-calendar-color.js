@@ -1,8 +1,12 @@
-/*jslint nomen:true*/
-/*global define, console*/
-define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'jquery.simplecolorpicker', 'jquery.minicolors'
-    ], function($, _, BaseView, __, messenger) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/app/views/base/view',
+    'orotranslation/js/translator',
+    'oroui/js/messenger',
+    'jquery.simplecolorpicker',
+    'jquery.minicolors'
+], function($, _, BaseView, __, messenger) {
     'use strict';
 
     /**
@@ -61,9 +65,9 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                     this.$customColor.css('color', this.colorManager.getContrastColor(hex));
                 }, this),
                 show: _.bind(function() {
-                    var color = this.customColor || this.model.get('backgroundColor'),
-                        $panel = this.$customColorParent.find('.minicolors-panel'),
-                        h;
+                    var color = this.customColor || this.model.get('backgroundColor');
+                    var $panel = this.$customColorParent.find('.minicolors-panel');
+                    var h;
                     $panel.css('top', 0);
                     h = $panel.outerHeight() + 39;
                     $panel.css('top', $(document).height() < $panel.offset().top + h ? -h : 0);
@@ -120,9 +124,9 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
 
         changeColor: function(color) {
             if (this.connectionsView._initActionSyncObject()) {
-                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
-                    $connection = this.connectionsView.findItem(this.model),
-                    saveAttributes = {backgroundColor: color};
+                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+                var $connection = this.connectionsView.findItem(this.model);
+                var saveAttributes = {backgroundColor: color};
                 if (!this.model.get('visible')) {
                     saveAttributes.visible = true;
                 }
@@ -141,14 +145,16 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                         error: _.bind(function(model, response) {
                             savingMsg.close();
                             this._showError(__('Sorry, the calendar updating was failed'), response.responseJSON || {});
-                            this.connectionsView.setItemVisibility($connection, this.model.get('visible') ? this.model.get('backgroundColor') : '');
+                            this.connectionsView.setItemVisibility($connection,
+                                this.model.get('visible') ? this.model.get('backgroundColor') : '');
                             this.connectionsView._actionSyncObject.reject();
                         }, this)
                     });
                 } catch (err) {
                     savingMsg.close();
                     this._showError(__('Sorry, unexpected error was occurred'), err);
-                    this.connectionsView.setItemVisibility($connection, this.model.get('visible') ? this.model.get('backgroundColor') : '');
+                    this.connectionsView.setItemVisibility($connection,
+                        this.model.get('visible') ? this.model.get('backgroundColor') : '');
                     this.connectionsView._actionSyncObject.reject();
                 }
             } else {

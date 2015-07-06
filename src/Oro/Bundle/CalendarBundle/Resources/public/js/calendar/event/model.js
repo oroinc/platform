@@ -1,7 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
-define(['underscore', 'backbone', 'routing', 'moment'
-    ], function(_, Backbone, routing, moment) {
+define([
+    'underscore',
+    'backbone',
+    'routing',
+    'moment'
+], function(_, Backbone, routing, moment) {
     'use strict';
 
     var EventModel;
@@ -17,7 +19,8 @@ define(['underscore', 'backbone', 'routing', 'moment'
         originalId: null, // original id received from a server
 
         defaults: {
-            id: null, // original id is copied to originalId property and this attribute is replaced with calendarUid + originalId
+            // original id is copied to originalId property and this attribute is replaced with calendarUid + originalId
+            id: null,
             title : null,
             description : null,
             start: null,
@@ -42,8 +45,8 @@ define(['underscore', 'backbone', 'routing', 'moment'
         },
 
         url: function() {
-            var url,
-                id = this.id;
+            var url;
+            var id = this.id;
 
             this.id = this.originalId;
             url = Backbone.Model.prototype.url.call(this, arguments);
@@ -53,10 +56,11 @@ define(['underscore', 'backbone', 'routing', 'moment'
         },
 
         save: function(key, val, options) {
-            var attrs, modelData;
+            var attrs;
+            var modelData;
 
             // Handle both `"key", value` and `{key: value}` -style arguments.
-            if (key == null || typeof key === 'object') {
+            if (key === null || key === undefined || typeof key === 'object') {
                 attrs = key || {};
                 options = val;
             } else {
@@ -81,9 +85,9 @@ define(['underscore', 'backbone', 'routing', 'moment'
         },
 
         _updateComputableAttributes: function() {
-            var calendarAlias = this.get('calendarAlias'),
-                calendarId = this.get('calendar'),
-                calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
+            var calendarAlias = this.get('calendarAlias');
+            var calendarId = this.get('calendar');
+            var calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
 
             this.set('calendarUid', calendarUid);
 
@@ -104,8 +108,8 @@ define(['underscore', 'backbone', 'routing', 'moment'
         },
 
         getInvitationStatus: function() {
-            var invitationStatus = this.get('invitationStatus'),
-                invitedUsers = this.get('invitedUsers');
+            var invitationStatus = this.get('invitationStatus');
+            var invitedUsers = this.get('invitedUsers');
             if (!invitationStatus && invitedUsers && invitedUsers.length) {
                 invitationStatus = 'accepted';
             }

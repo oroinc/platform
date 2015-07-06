@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     './abstract-action'
 ], function(AbstractAction) {

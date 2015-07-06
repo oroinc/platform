@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen: true*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger'
     ], function($, _, __, routing, messenger) {
     'use strict';

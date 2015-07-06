@@ -1,5 +1,3 @@
-/*jslint nomen: true*/
-/*global define*/
 define(['underscore', 'oroui/js/app/components/base/component', 'oroui/js/tools'
     ], function(_, BaseComponent, tools) {
     'use strict';

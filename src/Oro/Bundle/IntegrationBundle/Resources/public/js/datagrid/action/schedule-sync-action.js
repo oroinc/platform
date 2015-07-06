@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'orotranslation/js/translator',
     'oroui/js/messenger',

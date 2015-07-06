@@ -1,4 +1,3 @@
-/*global define*/
 define(
     ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore', 'oroui/js/mediator'],
     function($, sync, messenger, routing, _, mediator) {

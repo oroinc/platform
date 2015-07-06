@@ -1,4 +1,3 @@
-/* global define */
 define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'],
 function($, _, widgetManager, routing) {
     'use strict';

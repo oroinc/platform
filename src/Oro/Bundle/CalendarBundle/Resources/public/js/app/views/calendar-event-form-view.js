@@ -1,5 +1,3 @@
-/*jslint nomen: true*/
-/*global define*/
 define([
     'jquery',
     'oroui/js/mediator',
@@ -34,7 +32,8 @@ define([
         },
 
         handleLayoutInit: function() {
-            var opts, datepair;
+            var opts;
+            var datepair;
             opts = this.options;
             datepair = new DatepairView(opts);
             this.subview('datepair', datepair);

@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 /** @lends LoadMoreCollection */
 define(['./base/routing-collection'
 ], function(RoutingCollection) {

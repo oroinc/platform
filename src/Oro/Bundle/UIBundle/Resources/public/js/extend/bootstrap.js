@@ -1,4 +1,3 @@
-/*global define*/
 define([
     'jquery',
     'bootstrap'
@@ -32,8 +31,7 @@ define([
         this.removeData('globalHandlers');
     };
 
-    /*jslint ignore:start*/
-    $.fn.dropdown = function(option) {
+        $.fn.dropdown = function(option) {
         return this.each(function() {
             var $this = $(this) ,
                 data = $this.data('dropdown')
@@ -43,7 +41,6 @@ define([
     }
 
     $.fn.dropdown.Constructor = Dropdown
-    /*jslint ignore:end*/
 
     /**
      * fix endless loop

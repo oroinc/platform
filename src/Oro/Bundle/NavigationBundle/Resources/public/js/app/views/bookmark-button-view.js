@@ -1,5 +1,3 @@
-/*jslint browser:true, eqeq:true*/
-/*global define, window*/
 define([
     'oroui/js/mediator',
     'oroui/js/app/views/base/page-region-view'

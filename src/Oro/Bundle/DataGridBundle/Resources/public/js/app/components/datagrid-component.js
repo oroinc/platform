@@ -1,22 +1,20 @@
-/*jslint vars: true, nomen: true, browser: true*/
-/* jshint browser: true */
-/* global define */
 define(function(require) {
     'use strict';
 
-    var DataGridComponent, helpers,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        tools = require('oroui/js/tools'),
-        mediator = require('oroui/js/mediator'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        PageableCollection = require('orodatagrid/js/pageable-collection'),
-        Grid = require('orodatagrid/js/datagrid/grid'),
-        mapActionModuleName = require('orodatagrid/js/map-action-module-name'),
-        mapCellModuleName = require('orodatagrid/js/map-cell-module-name'),
-        gridContentManager = require('orodatagrid/js/content-manager'),
-        FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin'),
-        FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
+    var DataGridComponent;
+    var helpers;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var PageableCollection = require('orodatagrid/js/pageable-collection');
+    var Grid = require('orodatagrid/js/datagrid/grid');
+    var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
+    var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
+    var gridContentManager = require('orodatagrid/js/content-manager');
+    var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
+    var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
 
     helpers = {
         cellType: function(type) {
@@ -44,14 +42,13 @@ define(function(require) {
 
     DataGridComponent = BaseComponent.extend({
         initialize: function(options) {
-            var promises, self;
             if (!options.enableFilters) {
                 options.builders = _.reject(options.builders, function(module) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
             }
 
-            self = this;
+            var self = this;
             this._deferredInit();
             this.built = $.Deferred();
 
@@ -60,7 +57,7 @@ define(function(require) {
             this.processOptions(options);
             this.initDataGrid(options);
 
-            promises = [this.built.promise()];
+            var promises = [this.built.promise()];
 
             // run related builders
             _.each(options.builders, function(module) {
@@ -125,8 +122,8 @@ define(function(require) {
          * Collects required modules
          */
         collectModules: function() {
-            var modules = this.modules,
-                metadata = this.metadata;
+            var modules = this.modules;
+            var metadata = this.metadata;
             // cells
             _.each(metadata.columns, function(column) {
                 var type = column.type;
@@ -148,10 +145,11 @@ define(function(require) {
          * Build grid
          */
         build: function() {
-            var options, collectionOptions, collection, collectionName, grid;
+            var collectionOptions;
+            var grid;
 
-            collectionName = this.gridName;
-            collection = gridContentManager.get(collectionName);
+            var collectionName = this.gridName;
+            var collection = gridContentManager.get(collectionName);
             if (!collection) {
                 // otherwise, create collection from metadata
                 collectionOptions = this.combineCollectionOptions();
@@ -161,7 +159,7 @@ define(function(require) {
             }
 
             // create grid
-            options = this.combineGridOptions();
+            var options = this.combineGridOptions();
             mediator.trigger('datagrid_create_before', options, collection);
 
             this.$el.hide();
@@ -204,22 +202,22 @@ define(function(require) {
          * @returns {Object}
          */
         combineGridOptions: function() {
-            var columns,
-                rowActions = {},
-                massActions = {},
-                defaultOptions = {
-                    sortable: false
-                },
-                modules = this.modules,
-                metadata = this.metadata,
-                plugins = [];
+            var columns;
+            var rowActions = {};
+            var massActions = {};
+            var defaultOptions = {
+                sortable: false
+            };
+            var modules = this.modules;
+            var metadata = this.metadata;
+            var plugins = [];
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'],
-                    cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys))),
-                    extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type'))),
-                    cellType = modules[helpers.cellType(cell.type)];
+                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'];
+                var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
+                var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
+                var cellType = modules[helpers.cellType(cell.type)];
                 if (!_.isEmpty(extendOptions)) {
                     cellType = cellType.extend(extendOptions);
                 }

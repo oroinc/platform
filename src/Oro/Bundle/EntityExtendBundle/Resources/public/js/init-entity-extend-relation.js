@@ -1,5 +1,3 @@
-/* jshint browser:true */
-/* global require */
 require(['jquery', 'orotranslation/js/translator', 'routing'],
 function($, __, routing) {
     'use strict';

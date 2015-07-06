@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tools'
     ], function(_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
@@ -265,8 +263,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         // removing models that are no longer present, and merging models that
         // already exist in the collection, as necessary. Similar to **Model#set**,
         // the core operation for updating the data contained by the collection.
-        /* jshint ignore:start */
-        set: function(models, options) {
+                set: function(models, options) {
             options = _.defaults({}, options, {add: true, remove: true, merge: true});
             if (options.parse) models = this.parse(models, options);
             var singular = !_.isArray(models);
@@ -355,7 +352,6 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             // Return the added (or merged) model (or models).
             return singular ? models[0] : models;
         },
-        /* jshint ignore:end */
 
         /**
          * Updates and checks state

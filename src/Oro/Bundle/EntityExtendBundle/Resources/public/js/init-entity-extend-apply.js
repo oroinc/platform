@@ -1,6 +1,3 @@
-/*jshint browser:true*/
-/*jslint nomen:true, browser:true*/
-/*global require*/
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/mediator', 'routing'
     ], function($, _, __, Modal, mediator, routing) {
     'use strict';

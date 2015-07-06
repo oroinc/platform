@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/messenger', 'oroui/js/error'],
 function($, __, Modal, Messenger, Error) {
     'use strict';

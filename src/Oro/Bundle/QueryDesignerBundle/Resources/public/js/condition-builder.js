@@ -1,5 +1,3 @@
-/*global define, require*/
-/*jslint nomen: true*/
 define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
     'use strict';
 

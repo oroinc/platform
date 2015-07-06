@@ -1,5 +1,3 @@
-/*jslint nomen: true, vars: true*/
-/*global define, requirejs*/
 
 define(['jquery', 'underscore', 'backbone', '../constants',
     'text!./templates/widget-min-template.html',

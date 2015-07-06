@@ -1,5 +1,3 @@
-/* jshint devel:true */
-/* global define */
 define([
     'backbone',
     'underscore',

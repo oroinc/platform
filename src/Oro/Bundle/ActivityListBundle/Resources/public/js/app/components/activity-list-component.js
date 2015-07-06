@@ -1,22 +1,20 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var ActivityListComponent,
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        tools         = require('oroui/js/tools'),
-        mediator      = require('oroui/js/mediator'),
-        ActivityView       = require('../views/activity-view'),
-        ActivityListView   = require('../views/activity-list-view'),
-        ActivityModel      = require('../models/activity-list-model'),
-        ActivityCollection = require('../models/activity-list-collection'),
-        MultiSelectFilter  = require('oro/filter/multiselect-filter'),
-        DatetimeFilter     = require('oro/filter/datetime-filter'),
-        dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
+    var ActivityListComponent;
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools         = require('oroui/js/tools');
+    var mediator      = require('oroui/js/mediator');
+    var ActivityView       = require('../views/activity-view');
+    var ActivityListView   = require('../views/activity-list-view');
+    var ActivityModel      = require('../models/activity-list-model');
+    var ActivityCollection = require('../models/activity-list-collection');
+    var MultiSelectFilter  = require('oro/filter/multiselect-filter');
+    var DatetimeFilter     = require('oro/filter/datetime-filter');
+    var dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
 
     ActivityListComponent = BaseComponent.extend({
         defaults: {
@@ -64,7 +62,8 @@ define(function(require) {
         },
 
         processOptions: function() {
-            var defaults, activityListData;
+            var defaults;
+            var activityListData;
             defaults = $.extend(true, {}, this.defaults);
             _.defaults(this.options, defaults);
             _.defaults(this.options.activityListOptions, defaults.activityListOptions);
@@ -87,7 +86,8 @@ define(function(require) {
         },
 
         _init: function() {
-            var activityOptions, collection;
+            var activityOptions;
+            var collection;
             activityOptions = this.options.activityListOptions;
 
             // setup activity list collection
@@ -154,9 +154,10 @@ define(function(require) {
          * @param {ActivityModel} model
          */
         initComments: function(model) {
-            var itemView, commentOptions,
-                activityClass = model.getRelatedActivityClass(),
-                configuration = this.options.activityListOptions.configuration[activityClass];
+            var itemView;
+            var commentOptions;
+            var activityClass = model.getRelatedActivityClass();
+            var configuration = this.options.activityListOptions.configuration[activityClass];
 
             if (!configuration || !configuration.has_comments) {
                 // comments component is not configured for the activity
@@ -181,16 +182,21 @@ define(function(require) {
          * @param $el
          */
         renderFilters: function($el) {
-            var activityClass, activityOptions, activityTypeChoices, DateRangeFilterWithMeta;
+            var activityClass;
+            var activityOptions;
+            var DateRangeFilterWithMeta;
 
             /*
              * render "Activity Type" filter
              */
             // prepare choices
-            activityTypeChoices = {};
-            for (activityClass in this.options.activityListOptions.configuration) {
-                activityOptions = this.options.activityListOptions.configuration[activityClass];
-                activityTypeChoices[activityClass] = activityOptions.label;
+            var activityTypeChoices = {};
+            var configuration = this.options.activityListOptions.configuration;
+            for (activityClass in configuration) {
+                if (configuration.hasOwnProperty(activityClass)) {
+                    activityOptions = configuration[activityClass];
+                    activityTypeChoices[activityClass] = activityOptions.label;
+                }
             }
 
             // create and render

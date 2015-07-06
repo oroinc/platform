@@ -1,8 +1,11 @@
-/*jslint nomen: true*/
-/*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator',
-    'oroui/js/mediator', 'oroui/js/messenger', 'oroui/js/app/views/base/view'
-    ], function($, _, __, mediator, messenger, BaseView) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oroui/js/messenger',
+    'oroui/js/app/views/base/view'
+], function($, _, __, mediator, messenger, BaseView) {
     'use strict';
 
     var ChangeStatusView = BaseView.extend({

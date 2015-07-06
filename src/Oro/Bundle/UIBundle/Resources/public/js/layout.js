@@ -1,6 +1,3 @@
-/*global define, window*/
-/*jslint nomen: true*/
-/*jshint browser:true, devel:true*/
 define(function(require) {
     'use strict';
 

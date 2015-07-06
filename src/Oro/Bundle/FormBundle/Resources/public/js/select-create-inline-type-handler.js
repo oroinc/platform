@@ -1,4 +1,3 @@
-/* global define */
 define(['routing', 'oro/dialog-widget', 'oroui/js/widget-manager', 'orotranslation/js/translator', 'jquery.select2'],
 function(routing, DialogWidget, widgetManager, __) {
     'use strict';

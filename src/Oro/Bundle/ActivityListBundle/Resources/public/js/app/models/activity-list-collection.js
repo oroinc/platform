@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oroui/js/app/models/base/collection',
     './activity-list-model',
@@ -51,7 +49,9 @@ define([
         },
 
         reset: function(models, options) {
-            var i, newModel, oldModel;
+            var i;
+            var newModel;
+            var oldModel;
             if (options.parse) {
                 for (i = 0; i < models.data.length; i++) {
                     newModel = models.data[i];
@@ -87,7 +87,7 @@ define([
 
         setCount: function(count) {
             this.pager.count = count;
-            this.pager.total = count == 0 ? 1 : Math.ceil(count / this.pager.pagesize);
+            this.pager.total = count === 0 ? 1 : Math.ceil(count / this.pager.pagesize);
 
             this.count = count;
         },

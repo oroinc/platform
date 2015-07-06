@@ -1,4 +1,3 @@
-/*global define*/
 define([
     'oro/datagrid/action/ajaxdelete-action',
     'oroui/js/delete-confirmation',

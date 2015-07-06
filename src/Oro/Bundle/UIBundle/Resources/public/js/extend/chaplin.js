@@ -1,5 +1,3 @@
-/*jslint browser:true, nomen:true, white:true, eqeq:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',

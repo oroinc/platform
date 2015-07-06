@@ -1,5 +1,3 @@
-/*global define, require, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
-/*jslint browser: true, nomen: true*/
 define(function (require) {
     'use strict';
 

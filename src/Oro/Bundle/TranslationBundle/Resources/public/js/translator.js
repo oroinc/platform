@@ -1,5 +1,3 @@
-/* jshint devel:true */
-/* global define */
 define(['underscore', 'translator', 'module', 'json'],
 function(_, Translator, module) {
     "use strict";

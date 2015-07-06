@@ -1,12 +1,11 @@
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var CommentModel,
-        _ = require('underscore'),
-        Chaplin = require('chaplin'),
-        routing = require('routing'),
-        BaseModel = require('oroui/js/app/models/base/model');
+    var CommentModel;
+    var _ = require('underscore');
+    var Chaplin = require('chaplin');
+    var routing = require('routing');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     CommentModel = BaseModel.extend({
         route: 'oro_api_comment_get_item',
@@ -38,7 +37,8 @@ define(function(require) {
         },
 
         url: function() {
-            var url, parameters;
+            var url;
+            var parameters;
             if (this.isNew()) {
                 if (!this.get('relationClass') || !this.get('relationId')) {
                     throw 'Please specify relationClass and relationId';
@@ -59,8 +59,8 @@ define(function(require) {
         },
 
         removeAttachment: function() {
-            var model = this,
-                url = routing.generate(this.routeRemoveAttachment, {id: model.id});
+            var model = this;
+            var url = routing.generate(this.routeRemoveAttachment, {id: model.id});
             return $.ajax({
                 url: url,
                 type: 'POST',
@@ -91,8 +91,8 @@ define(function(require) {
         },
 
         getShortMessage: function() {
-            var shortMessage = this.getMessage(),
-                lineBreak = shortMessage.indexOf('<br />');
+            var shortMessage = this.getMessage();
+            var lineBreak = shortMessage.indexOf('<br />');
             if (lineBreak > 0) {
                 shortMessage = shortMessage.substr(0, shortMessage.indexOf('<br />'));
             }

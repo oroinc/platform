@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator', 'routing'],
     function(_, modal, mediator, __, routing) {
     'use strict';

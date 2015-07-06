@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
-    var WidgetConfigDatetimeRangeFilter,
-        DateFilter = require('oro/filter/date-filter'),
-        tools = require('oroui/js/tools');
+    var WidgetConfigDatetimeRangeFilter;
+    var DateFilter = require('oro/filter/date-filter');
+    var tools = require('oroui/js/tools');
 
     WidgetConfigDatetimeRangeFilter = DateFilter.extend({
         /**

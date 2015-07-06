@@ -1,4 +1,3 @@
-/*global define*/
 define([
     './model-action'
 ], function(ModelAction) {

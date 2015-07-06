@@ -1,4 +1,3 @@
-/*global define, require, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
 define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
     ], function (Wamp, Backbone, requirejsExposure) {
     'use strict';

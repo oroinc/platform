@@ -1,5 +1,3 @@
-/*jslint nomen:true, browser:true*/
-/*global define*/
 define([
     'underscore',
     './abstract-action'

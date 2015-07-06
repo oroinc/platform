@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
-    var FloatingHeaderPlugin,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BasePlugin = require('oroui/js/app/plugins/base/plugin'),
-        Backbone = require('backbone'),
-        mediator = require('oroui/js/mediator'),
-        layout = require('oroui/js/layout'),
-        tools = require('oroui/js/tools');
+    var FloatingHeaderPlugin;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var Backbone = require('backbone');
+    var mediator = require('oroui/js/mediator');
+    var layout = require('oroui/js/layout');
+    var tools = require('oroui/js/tools');
 
     FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
@@ -83,14 +83,14 @@ define(function(require) {
 
         fixHeaderCellWidth: function() {
             this.setupCache();
-            var headerCells = this.domCache.headerCells,
-                firstRowCells = this.domCache.firstRowCells,
-                totalWidth,
-                sumWidth,
-                widthDecrement = 0,
-                widths = [],
-                self = this,
-                scrollBarWidth = mediator.execute('layout:scrollbarWidth');
+            var headerCells = this.domCache.headerCells;
+            var firstRowCells = this.domCache.firstRowCells;
+            var totalWidth;
+            var sumWidth;
+            var widthDecrement = 0;
+            var widths = [];
+            var self = this;
+            var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             // remove style
             headerCells.attr('style', '');
             firstRowCells.attr('style', '');
@@ -112,9 +112,9 @@ define(function(require) {
             });
 
             // FF sometimes gives wrong values, need to check
-            sumWidth = _.reduce(widths, function(a, b) {return a + b});
+            sumWidth = _.reduce(widths, function(a, b) {return a + b;});
             if (sumWidth > totalWidth) {
-                widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001
+                widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001;
             }
 
             // add scroll bar width to last cell if scroll is visible
@@ -154,9 +154,9 @@ define(function(require) {
          */
         selectMode: function() {
             // get gridRect
-            var tableRect = this.domCache.gridContainer[0].getBoundingClientRect(),
-                visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]),
-                mode = 'default';
+            var tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
+            var visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]);
+            var mode = 'default';
             if (visibleRect.top !== tableRect.top || this.grid.layout === 'fullscreen') {
                 mode = 'fixed';
             }
@@ -174,7 +174,8 @@ define(function(require) {
          * Setups floating header mode
          */
         setFloatTheadMode: function(mode, visibleRect, tableRect) {
-            var theadRect, sizingThead;
+            var theadRect;
+            var sizingThead;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
                 visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]);
@@ -253,13 +254,13 @@ define(function(require) {
          * Enables other scroll functionality
          */
         enableOtherScroll: function() {
-            var self = this,
-                scrollContainer = this.domCache.gridScrollableContainer,
-                otherScroll = this.domCache.otherScroll,
-                otherScrollInner = this.domCache.otherScrollInner,
-                scrollBarWidth = mediator.execute('layout:scrollbarWidth'),
-                scrollStateModel = new Backbone.Model(),
-                heightDec;
+            var self = this;
+            var scrollContainer = this.domCache.gridScrollableContainer;
+            var otherScroll = this.domCache.otherScroll;
+            var otherScrollInner = this.domCache.otherScrollInner;
+            var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
+            var scrollStateModel = new Backbone.Model();
+            var heightDec;
 
             this.scrollStateModel = scrollStateModel;
 
@@ -355,7 +356,8 @@ define(function(require) {
          * Checks and performs required actions
          */
         checkLayout: function() {
-            var scrollContainerRect, scrollLeft;
+            var scrollContainerRect;
+            var scrollLeft;
             if (this.currentFloatTheadMode === 'default') {
                 if (this.grid.layout === 'fullscreen' &&
                         this.currentFloatTheadMode === 'default' &&
@@ -396,16 +398,15 @@ define(function(require) {
          * @returns {{top: number, left: Number, bottom: Number, right: Number}}
          */
         getVisibleRect: function(el) {
-            var current = el,
-                tableRect = current.getBoundingClientRect(),
-                midRect = tableRect,
-                borders,
-                resultRect = {
-                    top: midRect.top - this.headerHeight,
-                    left: midRect.left,
-                    bottom: midRect.bottom,
-                    right: midRect.right
-                };
+            var current = el;
+            var midRect = current.getBoundingClientRect();
+            var borders;
+            var resultRect = {
+                top: midRect.top - this.headerHeight,
+                left: midRect.left,
+                bottom: midRect.bottom,
+                right: midRect.right
+            };
             if (
                 (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
                 (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible

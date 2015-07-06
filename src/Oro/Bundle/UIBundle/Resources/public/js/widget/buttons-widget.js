@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
     ], function(_, Backbone, AbstractWidget) {
     'use strict';

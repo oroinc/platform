@@ -1,5 +1,9 @@
-define(['jquery', 'underscore', 'oroui/js/modal', 'oroworkflow/js/transition-executor'],
-function($, _, Modal, performTransition) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/modal',
+    'oroworkflow/js/transition-executor'
+], function($, _, Modal, performTransition) {
     'use strict';
 
     /**

@@ -1,6 +1,3 @@
-/*jshint browser: true*/
-/*jslint browser: true, nomen: true, vars: true*/
-/*global require*/
 
 require(['oroui/js/mediator'], function(mediator) {
     'use strict';

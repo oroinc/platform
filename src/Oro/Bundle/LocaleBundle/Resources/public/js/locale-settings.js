@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', 'orolocale/js/locale-settings/data'
     ], function(_, settings) {
     'use strict';

@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', 'jquery'],
     function(_, $) {
         'use strict';

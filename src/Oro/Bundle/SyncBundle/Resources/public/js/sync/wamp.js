@@ -1,5 +1,3 @@
-/* jshint browser:true */
-/*global define*/
 define(['jquery', 'underscore', 'backbone', 'autobahn'
     ], function($, _, Backbone, ab) {
     'use strict';

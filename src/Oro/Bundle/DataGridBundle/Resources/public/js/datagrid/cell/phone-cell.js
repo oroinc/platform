@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oro/datagrid/cell/html-cell',
     'orodatagrid/js/datagrid/formatter/phone-formatter'

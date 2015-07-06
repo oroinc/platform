@@ -1,7 +1,9 @@
-/*jslint nomen:true*/
-/*global define, console*/
-define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger'
-    ], function(_, BaseView, __, messenger) {
+define([
+    'underscore',
+    'oroui/js/app/views/base/view',
+    'orotranslation/js/translator',
+    'oroui/js/messenger'
+], function(_, BaseView, __, messenger) {
     'use strict';
 
     /**
@@ -15,8 +17,8 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
         },
 
         execute: function(model, actionSyncObject) {
-            var removingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...')),
-                $connection = this.connectionsView.findItem(model);
+            var removingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...'));
+            var $connection = this.connectionsView.findItem(model);
             try {
                 $connection.hide();
                 model.destroy({

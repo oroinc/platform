@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define */
 define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persistentStorage) {
     'use strict';
 

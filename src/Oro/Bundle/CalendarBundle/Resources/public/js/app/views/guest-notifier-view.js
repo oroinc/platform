@@ -1,7 +1,9 @@
-/*jslint nomen: true*/
-/*global define*/
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'oroui/js/modal'
-    ], function(_, __, BaseView, Modal) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/app/views/base/view',
+    'oroui/js/modal'
+], function(_, __, BaseView, Modal) {
     'use strict';
 
     var GuestNotifierView = BaseView.extend({

@@ -1,5 +1,3 @@
-/*jslint browser:true*/
-/*global define, FormData*/
 define(['jquery', 'jquery.form'], function($) {
     'use strict';
 

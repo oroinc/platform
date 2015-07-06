@@ -1,4 +1,3 @@
-/*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
     ], function(_, Backbone, __, TagCollection) {
     'use strict';

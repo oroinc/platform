@@ -1,6 +1,3 @@
-/*jshint browser:true*/
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/mediator',

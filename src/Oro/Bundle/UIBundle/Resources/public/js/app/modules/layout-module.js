@@ -1,4 +1,3 @@
-/*global require*/
 require([
     'oroui/js/mediator',
     'oroui/js/app/controllers/base/controller'

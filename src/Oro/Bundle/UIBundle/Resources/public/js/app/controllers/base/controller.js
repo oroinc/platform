@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define, require*/
 define([
     'jquery',
     'chaplin',

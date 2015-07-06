@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var CommentFormView,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        mediator = require('oroui/js/mediator'),
-        formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var CommentFormView;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options');
+    var BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
 
     function setValue($elem, value) {
@@ -47,8 +47,8 @@ define(function(require) {
         },
 
         bindData: function() {
-            var formView = this,
-                attrs = this.model.toJSON();
+            var formView = this;
+            var attrs = this.model.toJSON();
             _.each(attrs, function(value, name) {
                 var $elem = formView.$('[name="' + name + '"]');
                 if ($elem) {

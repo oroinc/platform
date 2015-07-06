@@ -1,4 +1,3 @@
-/*global define*/
 /** @lends RoutingCollection */
 define([
     'underscore',

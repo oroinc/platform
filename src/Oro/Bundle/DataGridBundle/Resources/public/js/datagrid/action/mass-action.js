@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/messenger',
@@ -33,10 +31,10 @@ define([
         initialize: function(options) {
             MassAction.__super__.initialize.apply(this, arguments);
 
-            var extended_options = {};
-            extended_options[this.datagrid.name] = this.datagrid.collection.urlParams || {};
+            var extendedOptions = {};
+            extendedOptions[this.datagrid.name] = this.datagrid.collection.urlParams || {};
 
-            _.extend(this.route_parameters, extended_options, {
+            _.extend(this.route_parameters, extendedOptions, {
                 gridName: this.datagrid.name,
                 actionName: this.name
             });

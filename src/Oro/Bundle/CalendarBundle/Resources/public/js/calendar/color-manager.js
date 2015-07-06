@@ -1,6 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
-define(['underscore', 'oroui/js/tools/color-util'], function(_, colorUtil) {
+define([
+    'underscore',
+    'oroui/js/tools/color-util'
+], function(_, colorUtil) {
     'use strict';
 
     /**
@@ -80,7 +81,9 @@ define(['underscore', 'oroui/js/tools/color-util'], function(_, colorUtil) {
         },
 
         _findNextColor: function(color) {
-            var i, j, unusedColors;
+            var i;
+            var j;
+            var unusedColors;
             if (_.isEmpty(color)) {
                 return this.defaultColor;
             }

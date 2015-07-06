@@ -1,4 +1,3 @@
-/*global define*/
 define([
     'oro/datagrid/action/model-action',
     'oroworkflow/js/activation-handler'

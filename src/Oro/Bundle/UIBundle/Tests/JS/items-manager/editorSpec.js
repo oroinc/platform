@@ -1,5 +1,3 @@
-/*global define, describe, it, expect, spyOn, beforeEach, afterEach*/
-/*jshint multistr: true*/
 define(function (require) {
     'use strict';
 

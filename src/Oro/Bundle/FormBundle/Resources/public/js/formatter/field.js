@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'
     ], function(_, __, numberFormatter, dateTimeFormatter) {
     'use strict';
