@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\SecurityBundle\Exception\NoSupportsMetadataProviderException;
+use Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException;
 
 class ChainMetadataProvider implements MetadataProviderInterface
 {
@@ -28,14 +28,9 @@ class ChainMetadataProvider implements MetadataProviderInterface
      */
     protected $emulatedProvider;
 
-    /**
-     * @param MetadataProviderInterface[] $providers
-     * @param MetadataProviderInterface $defaultProvider
-     */
-    public function __construct(array $providers = [], MetadataProviderInterface $defaultProvider = null)
+    public function __construct()
     {
-        $this->providers = new ArrayCollection($providers);
-        $this->defaultProvider = $defaultProvider;
+        $this->providers = new ArrayCollection();
     }
 
     /**
@@ -157,7 +152,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
             return $this->defaultProvider;
         }
 
-        throw new NoSupportsMetadataProviderException('Found no supports provider in chain');
+        throw new UnsupportedMetadataProviderException('Supported provider not found in chain');
     }
 
     /**
@@ -186,5 +181,13 @@ class ChainMetadataProvider implements MetadataProviderInterface
         if ($this->defaultProvider) {
             $this->defaultProvider->warmUpCache($className);
         }
+    }
+
+    /**
+     * @param MetadataProviderInterface $defaultProvider
+     */
+    public function setDefaultProvider($defaultProvider)
+    {
+        $this->defaultProvider = $defaultProvider;
     }
 }

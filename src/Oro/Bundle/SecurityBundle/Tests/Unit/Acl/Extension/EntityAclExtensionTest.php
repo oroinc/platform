@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
@@ -19,9 +22,9 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var EntityAclExtension */
@@ -104,7 +107,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         [
-                            'oro_security.ownership_tree_provider',
+                            'oro_security.ownership_tree_provider.chain',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             $treeProviderMock,
                         ],

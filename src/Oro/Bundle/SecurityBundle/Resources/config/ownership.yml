@@ -16,13 +16,12 @@ services:
     oro_security.owner.entity_owner_accessor:
         class: %oro_security.owner.entity_owner_accessor.class%
         arguments:
-            - @oro_security.owner.ownership_metadata_provider
+            - @oro_security.owner.metadata_provider.chain
 
     oro_security.owner.metadata_provider.chain:
         class: %oro_security.owner.metadata_provider.chain.class%
-        arguments:
-            - []
-            - @oro_security.owner.ownership_metadata_provider
+        calls:
+            - [setDefaultProvider, [@oro_security.owner.ownership_metadata_provider]]
 
     oro_security.owner.ownership_metadata_provider:
         class: %oro_security.owner.ownership_metadata_provider.class%

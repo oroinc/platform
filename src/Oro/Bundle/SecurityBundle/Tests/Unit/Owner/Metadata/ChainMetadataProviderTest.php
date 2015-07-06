@@ -15,15 +15,6 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeCount(0, 'providers', $chain);
     }
 
-    public function testPassProviderThroughConstructor()
-    {
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
-        $chain = new ChainMetadataProvider([$provider]);
-
-        $this->assertAttributeCount(1, 'providers', $chain);
-        $this->assertAttributeContains($provider, 'providers', $chain);
-    }
-
     public function testAddProvider()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider1 */
@@ -71,7 +62,8 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($chain->supports());
 
         $default = $this->getMetadataProviderMock(false);
-        $chain = new ChainMetadataProvider([], $default);
+        $chain = new ChainMetadataProvider();
+        $chain->setDefaultProvider($default);
         $this->assertTrue($chain->supports());
     }
 
@@ -95,7 +87,8 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $metadata = ['label' => 'testLabel1'];
 
         $default = $this->getMetadataProviderMock(true, $metadata);
-        $chain = new ChainMetadataProvider([], $default);
+        $chain = new ChainMetadataProvider();
+        $chain->setDefaultProvider($default);
 
         $result = $chain->getMetadata('stdClass');
 
@@ -138,8 +131,8 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
      * @param bool $deep
      * @param string $levelClass
      *
-     * @expectedException \Oro\Bundle\SecurityBundle\Exception\NoSupportsMetadataProviderException
-     * @expectedExceptionMessage Found no supports provider in chain
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException
+     * @expectedExceptionMessage Supported provider not found in chain
      */
     public function testGetLevelClassException($levelClassMethod, $deep = false, $levelClass = 'stdClass')
     {
@@ -279,7 +272,8 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $default */
         $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
-        $chain = new ChainMetadataProvider([], $default);
+        $chain = new ChainMetadataProvider();
+        $chain->setDefaultProvider($default);
         $chain->addProvider('alias1', $provider1);
         $chain->addProvider('alias2', $provider2);
 
@@ -301,7 +295,8 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $default */
         $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
-        $chain = new ChainMetadataProvider([], $default);
+        $chain = new ChainMetadataProvider();
+        $chain->setDefaultProvider($default);
         $chain->addProvider('alias1', $provider1);
         $chain->addProvider('alias2', $provider2);
 
