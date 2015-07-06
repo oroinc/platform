@@ -34,11 +34,13 @@ class WidgetController extends FOSRestController
     {
         /** @var WidgetRepository $widgetRepository */
         $widgetRepository = $this->getDoctrine()->getRepository('OroSidebarBundle:Widget');
-        $organization = $this->container->get('oro_security.security_facade')->getOrganization();
+        $items = $widgetRepository->getWidgets(
+            $this->getUser(),
+            $placement,
+            $this->container->get('security.context')->getToken()->getOrganizationContext()
+        );
 
-        if ($organization) {
-            $items = $widgetRepository->getWidgets($this->getUser(), $placement, $organization);
-        } else {
+        if (!$items) {
             $items = [];
         }
 
@@ -65,7 +67,9 @@ class WidgetController extends FOSRestController
         $entity->setPlacement($this->getRequest()->get('placement'));
         $entity->setState($this->getRequest()->get('state'));
         $entity->setUser($this->getUser());
-        $entity->setOrganization($this->container->get('oro_security.security_facade')->getOrganization());
+        $entity->setOrganization(
+            $this->container->get('security.context')->getToken()->getOrganizationContext()
+        );
 
         $manager = $this->getManager();
         $manager->persist($entity);
