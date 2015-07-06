@@ -39,7 +39,7 @@ class AclPrivilegeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_acl_privilege', $this->formType->getName());
+        $this->assertEquals(AclPrivilegeType::NAME, $this->formType->getName());
     }
 
     public function testSetDefaultOptions()

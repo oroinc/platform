@@ -24,7 +24,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -137,7 +137,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         $metadata = $this->getMetadata($dataClassName);
-        if (!$metadata || $metadata->isOrganizationOwned()) {
+        if (!$metadata || $metadata->isGlobalLevelOwned()) {
             return;
         }
 
@@ -146,10 +146,10 @@ class OwnerFormExtension extends AbstractTypeExtension
         $this->checkIsGranted('CREATE', 'entity:' . $dataClassName);
         $defaultOwner = null;
 
-        if ($metadata->isUserOwned() && $this->isAssignGranted) {
+        if ($metadata->isBasicLevelOwned() && $this->isAssignGranted) {
             $this->addUserOwnerField($builder, $dataClassName);
             $defaultOwner = $user;
-        } elseif ($metadata->isBusinessUnitOwned()) {
+        } elseif ($metadata->isLocalLevelOwned()) {
             $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
             if (!$this->checkIsBusinessUnitEntity($dataClassName)) {
                 $defaultOwner = $this->getCurrentBusinessUnit(
@@ -233,7 +233,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             $metadata = $this->getMetadata($form->getNormData());
             if ($metadata) {
                 $isCorrect = true;
-                if ($metadata->isUserOwned()) {
+                if ($metadata->isBasicLevelOwned()) {
                     $isCorrect = $this->businessUnitManager->canUserBeSetAsOwner(
                         $this->getCurrentUser(),
                         $newOwner,
@@ -241,7 +241,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                         $this->treeProvider,
                         $this->getOrganization()
                     );
-                } elseif ($metadata->isBusinessUnitOwned()) {
+                } elseif ($metadata->isLocalLevelOwned()) {
                     $isCorrect = in_array($newOwner->getId(), $this->getBusinessUnitIds());
                 }
 
@@ -283,9 +283,9 @@ class OwnerFormExtension extends AbstractTypeExtension
                     $form->remove($this->fieldName);
                 }
                 if ($this->isAssignGranted) {
-                    if ($metadata->isUserOwned()) {
+                    if ($metadata->isBasicLevelOwned()) {
                         $this->addUserOwnerField($form, $dataClassName, $permission, $owner, $entity->getId());
-                    } elseif ($metadata->isBusinessUnitOwned()) {
+                    } elseif ($metadata->isLocalLevelOwned()) {
                         $this->addBusinessUnitOwnerField($form, $this->getCurrentUser(), $dataClassName);
                     }
                 }
@@ -473,7 +473,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     {
         if (null === $this->currentUser) {
             $user = $this->securityFacade->getLoggedUser();
-            if ($user && !is_string($user)) {
+            if ($user && is_object($user) && $user instanceof User) {
                 $this->currentUser = $user;
             }
         }
@@ -520,7 +520,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      * Get metadata for entity
      *
      * @param object|string $entity
-     * @return bool|OwnershipMetadata
+     * @return bool|OwnershipMetadataInterface
      * @throws \LogicException
      */
     protected function getMetadata($entity)

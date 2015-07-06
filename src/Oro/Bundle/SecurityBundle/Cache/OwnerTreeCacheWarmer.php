@@ -4,25 +4,25 @@ namespace Oro\Bundle\SecurityBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 
 class OwnerTreeCacheWarmer implements CacheWarmerInterface
 {
     /**
-     * @var OwnerTreeProvider
+     * @var OwnerTreeProviderInterface
      */
     protected $treeProvider;
 
     /**
-     * @param OwnerTreeProvider $treeProvider
+     * @param OwnerTreeProviderInterface $treeProvider
      */
-    public function __construct(OwnerTreeProvider $treeProvider)
+    public function __construct(OwnerTreeProviderInterface $treeProvider)
     {
         $this->treeProvider = $treeProvider;
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function warmUp($cacheDir)
     {
@@ -30,7 +30,7 @@ class OwnerTreeCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function isOptional()
     {

@@ -3,6 +3,7 @@ parameters:
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.event_listener.update_schema_listener.class: Oro\Bundle\TestFrameworkBundle\EventListener\UpdateSchemaListener
     oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
+    oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
 
 services:
     oro_test.event_listener.update_schema_listener:
@@ -30,3 +31,11 @@ services:
         parent: oro_entity.entity_provider
         calls:
             - [setExclusionProvider, [@oro_test.provider.exclusion_provider]]
+
+    oro_test.test_activity_activity_list.provider:
+        class: %oro_test.test_activity_activity_list.provider.class%
+        arguments:
+           - @oro_entity.doctrine_helper
+           - @doctrine
+        tags:
+           - {name: oro_activity_list.provider}
