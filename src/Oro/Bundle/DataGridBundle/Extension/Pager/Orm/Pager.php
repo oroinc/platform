@@ -140,23 +140,26 @@ class Pager extends AbstractPager implements PagerInterface
         /** @var QueryBuilder $query */
         $query = $this->getQueryBuilder();
 
-        $query->setFirstResult(null);
-        $query->setMaxResults(null);
-
         if (count($this->getParameters()) > 0) {
             $query->setParameters($this->getParameters());
         }
+        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder(), true);
 
-        if (0 == $this->getPage() || 0 == $this->getMaxPerPage() || 0 == $this->getNbResults()) {
-            $this->setLastPage(0);
-        } else {
-            $offset = ($this->getPage() - 1) * $this->getMaxPerPage();
+        $query->setFirstResult(null);
+        $query->setMaxResults(null);
 
-            $this->setLastPage(ceil($this->getNbResults() / $this->getMaxPerPage()));
+        if (!$countQb->getDQLPart('groupBy')) {
+            $this->setPaginationData($countQb);
+            foreach ($countQb->getQuery()->getResult() as $data) {
+                $inArray[] = current($data);
+            }
+            if (isset($inArray)) {
+                $query->andWhere($query->expr()->in($this->countQueryBuilderOptimizer->getIdFieldFQN(), $inArray));
 
-            $query->setFirstResult($offset);
-            $query->setMaxResults($this->getMaxPerPage());
+                return;
+            }
         }
+        $this->setPaginationData($query);
     }
 
     /**
@@ -242,5 +245,22 @@ class Pager extends AbstractPager implements PagerInterface
         $results = $queryForRetrieve->getQuery()->execute();
 
         return $results[0];
+    }
+
+    /**
+     * @param QueryBuilder $query
+     */
+    protected function setPaginationData(QueryBuilder $query)
+    {
+        if (0 == $this->getPage() || 0 == $this->getMaxPerPage() || 0 == $this->getNbResults()) {
+            $this->setLastPage(0);
+        } else {
+            $offset = ($this->getPage() - 1) * $this->getMaxPerPage();
+
+            $this->setLastPage(ceil($this->getNbResults() / $this->getMaxPerPage()));
+
+            $query->setFirstResult($offset);
+            $query->setMaxResults($this->getMaxPerPage());
+        }
     }
 }
