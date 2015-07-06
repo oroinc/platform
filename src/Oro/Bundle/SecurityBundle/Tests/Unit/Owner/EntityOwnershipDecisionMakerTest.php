@@ -78,7 +78,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
                 $this->returnValueMap(
                     [
                         [
-                            'oro_security.ownership_tree_provider',
+                            'oro_security.ownership_tree_provider.chain',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             $treeProvider,
                         ],
