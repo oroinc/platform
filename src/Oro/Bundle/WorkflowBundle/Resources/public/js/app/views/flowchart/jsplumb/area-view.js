@@ -84,7 +84,8 @@ define(function (require) {
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
             stepWithPosition = this.model.get('steps').find(function (step) {
-                return _.isArray(step.get('position'));
+                var position = step.get('position');
+                return _.isArray(position) && position.length === 2;
             });
             // if positions of step wasn't defined
             if (_.isUndefined(stepWithPosition)) {

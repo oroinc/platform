@@ -34,14 +34,14 @@ define(function (require) {
             });
             this.listenTo(options.workflow.get('steps'), 'change add remove', onWorkflowChange);
             this.listenTo(options.workflow.get('transitions'), 'change add remove', onWorkflowChange);
-            this.listenTo(this.history, 'change:index', this.updateWorkflow);
+            this.listenTo(this.history, 'navigate', this.onHistoryNavigate);
         },
 
         onWorkflowChange: function () {
             this.history.pushState(this.workflow.getState());
         },
 
-        updateWorkflow: function () {
+        onHistoryNavigate: function () {
             var state = this.history.getCurrentState();
             this.workflow.setState(state);
         }

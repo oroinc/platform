@@ -34,6 +34,7 @@ define(function(require) {
             var index = this.get('index');
             if (index > 0) {
                 this.set('index', index - 1);
+                this.trigger('navigate');
                 return true;
             }
         },
@@ -41,6 +42,7 @@ define(function(require) {
             var index = this.get('index');
             if (index + 1 < this.get('states').length) {
                 this.set('index', index + 1);
+                this.trigger('navigate');
                 return true;
             }
         }
