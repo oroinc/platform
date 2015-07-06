@@ -157,8 +157,8 @@ class WorkflowController extends FOSRestController
             $workflowManager = $this->get('oro_workflow.manager');
 
             /**
-             * \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transit may produce a DB exception and bring transaction to
-             * the rollback-only state.
+             * \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transit may produce a DB exception
+             * and bring transaction to the rollback-only state.
              * App exits after that in production mode, so it's normal behaviour. But during functional tests
              * this breaks all tests in queue after this one.
              * So we should check transition availability to exclude exceptional situation.

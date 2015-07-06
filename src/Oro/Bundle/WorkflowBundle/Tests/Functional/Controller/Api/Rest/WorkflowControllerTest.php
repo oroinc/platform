@@ -215,8 +215,10 @@ class WorkflowControllerTest extends WebTestCase
         $assertSuccessResult = function (EntityManager $entityManager, $result, WorkflowAwareEntity $testEntity) {
             $this->assertArrayHasKey('workflowItem', $result);
             $this->assertEquals($result['workflowItem']['id'], $testEntity->getWorkflowItem()->getId());
-            $this->assertEquals($result['workflowItem']['workflow_name'],
-                $testEntity->getWorkflowItem()->getWorkflowName());
+            $this->assertEquals(
+                $result['workflowItem']['workflow_name'],
+                $testEntity->getWorkflowItem()->getWorkflowName()
+            );
             $this->assertEquals($result['workflowItem']['entity_id'], $testEntity->getId());
 
             // assert entity workflow step
