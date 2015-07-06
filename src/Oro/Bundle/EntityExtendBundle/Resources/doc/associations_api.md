@@ -3,6 +3,11 @@ Creating API to Manage Associations
 
 In this section we'll demonstrate how you can create an API for managing associations with the help of the [AssociationManager](../../Entity/Manager/AssociationManager.php).
 
+- [Introduction to Association Manager](#introduction-to-association-manager)
+- [Getting list of association targets](#getting-list-of-association-targets)
+- [Utilizing the improved routing mechanism](#utilizing-the-improved-routing-mechanism)
+- [Getting list of association for given targets](#getting-list-of-association-for-given-targets)
+
 Introduction to Association Manager
 ------------------------------------
 
