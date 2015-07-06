@@ -50,7 +50,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     }
 
     /**
-     * {@inheritdoc}
+     * @return OwnerTree
      */
     protected function getTreeData()
     {
@@ -63,6 +63,14 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     public function supports()
     {
         return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
+    }
+
+    /**
+     * @return OwnerTree
+     */
+    public function getTree()
+    {
+        return parent::getTree();
     }
 
     /**

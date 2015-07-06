@@ -140,3 +140,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - Services rely on `oro_security.ownership_tree_provider.chain` instead of implementation `oro_security.ownership_tree_provider`
     * `oro_security.ownership_tree.cache.cleaner`
     * `oro_security.ownership_tree.cache.warmer`
+
+####AddressBundle
+- `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber` marked deprecated. Use `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber` and `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber` instead.
