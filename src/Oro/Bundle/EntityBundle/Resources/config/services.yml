@@ -7,6 +7,7 @@ parameters:
     oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
     oro_entity.exclusion_provider.config.class:                    Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+    oro_entity.dictionary_value_list_provider.class:               Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
     oro_entity.exclusion_provider.dictionary.class:                Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
     oro_entity.virtual_relation_provider.config.class:             Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
     oro_entity.virtual_relation_provider.chain.class:              Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
@@ -34,6 +35,10 @@ parameters:
     oro_entity.entity_class_name_helper.class:               Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
     oro_entity.entity_name_resolver.class:                   Oro\Bundle\EntityBundle\Provider\EntityNameResolver
     oro_entity.entity_name_provider.default.class:           Oro\Bundle\EntityBundle\Provider\EntityNameProvider
+    oro_entity.entity_class_name_provider.default.class:     Oro\Bundle\EntityBundle\Provider\EntityClassNameProvider
+    oro_entity.dictionary_value_list_provider.default.class: Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider
+
+    oro_entity.manager.dictionary.api.class:                 Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
 
 services:
     oro_entity.listener.navigation_listener:
@@ -244,7 +249,7 @@ services:
         arguments:
             - @oro_entity.entity_alias_config_bag
         tags:
-            - { name: oro_entity.alias_provider, priority: 100 }
+            - { name: oro_entity.alias_provider, priority: -100 }
 
     oro_entity.entity_class_name_helper:
         class: %oro_entity.entity_class_name_helper.class%
@@ -263,4 +268,56 @@ services:
         arguments:
             - @doctrine
         tags:
-            - { name: oro_entity.name_provider, priority: 100 }
+            - { name: oro_entity.name_provider, priority: -100 }
+
+    oro_entity.entity_class_name_provider:
+        class: Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider
+        public: false
+
+    oro_entity.entity_class_name_provider.default:
+        class: %oro_entity.entity_class_name_provider.default.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            - @translator
+        tags:
+            - { name: oro_entity.class_name_provider, priority: -100 }
+
+    oro_entity.dictionary_value_list_provider.default:
+        class: %oro_entity.dictionary_value_list_provider.default.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine
+        tags:
+            - { name: oro_entity.dictionary_value_list_provider, priority: -100 }
+
+    oro_entity.dictionary_value_list_provider:
+        class: %oro_entity.dictionary_value_list_provider.class%
+        public: false
+
+    oro_entity.routing.options_resolver.dictionary_entity:
+        class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver
+        public: false
+        arguments:
+            - @oro_entity.dictionary_value_list_provider
+            - @oro_entity.entity_alias_resolver
+            - @oro_entity.entity_class_name_helper
+        tags:
+            - { name: routing.options_resolver }
+
+    oro_entity.api_doc_handler.dictionary:
+        class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityApiDocHandler
+        public: false
+        arguments:
+            - @oro_entity.entity_alias_resolver
+            - @oro_entity.entity_class_name_provider
+        tags:
+            - { name: nelmio_api_doc.extractor.handler }
+
+    oro_entity.manager.dictionary.api:
+        class: %oro_entity.manager.dictionary.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_entity.dictionary_value_list_provider
