@@ -2,22 +2,29 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var EntityAclExtension */
@@ -84,7 +91,59 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
-        $this->extension = TestHelper::get($this)->createEntityAclExtension($this->metadataProvider, $this->tree);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProviderMock */
+        $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $treeProviderMock->expects($this->any())
+            ->method('getTree')
+            ->will($this->returnValue($this->tree));
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [
+                            'oro_security.ownership_tree_provider.chain',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $treeProviderMock,
+                        ],
+                        [
+                            'oro_security.owner.metadata_provider.chain',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->metadataProvider,
+                        ],
+                        [
+                            'oro_security.acl.object_id_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new ObjectIdAccessor(),
+                        ],
+                        [
+                            'oro_security.owner.entity_owner_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new EntityOwnerAccessor($this->metadataProvider),
+                        ],
+                    ]
+                )
+            );
+
+        $decisionMaker = new EntityOwnershipDecisionMaker(
+            $treeProviderMock,
+            new ObjectIdAccessor(),
+            new EntityOwnerAccessor($this->metadataProvider),
+            $this->metadataProvider
+        );
+        $decisionMaker->setContainer($container);
+
+        $this->extension = TestHelper::get($this)->createEntityAclExtension(
+            $this->metadataProvider,
+            $this->tree,
+            new ObjectIdAccessor(),
+            $decisionMaker
+        );
     }
 
     private function buildTestTree()
@@ -439,6 +498,59 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param OwnershipMetadata $metadata
+     * @param array $expected
+     *
+     * @dataProvider accessLevelProvider
+     */
+    public function testGetAccessLevelNamesForNonRoot(OwnershipMetadata $metadata, array $expected)
+    {
+        $object = new ObjectIdentity('entity', '\stdClass');
+
+        $this->metadataProvider->setMetadata('\stdClass', $metadata);
+
+        $this->assertEquals(
+            $expected,
+            $this->extension->getAccessLevelNames($object)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function accessLevelProvider()
+    {
+        return [
+            'without owner' => [new OwnershipMetadata(), [0 => 'NONE', 5 => 'SYSTEM']],
+            'basic level owned' => [
+                new OwnershipMetadata('USER', 'user', 'user_id'),
+                [
+                    0 => 'NONE',
+                    1 => 'BASIC',
+                    2 => 'LOCAL',
+                    3 => 'DEEP',
+                    4 => 'GLOBAL',
+                ],
+            ],
+            'local level owned' => [
+                new OwnershipMetadata('BUSINESS_UNIT', 'bu', 'bu_id'),
+                [
+                    0 => 'NONE',
+                    2 => 'LOCAL',
+                    3 => 'DEEP',
+                    4 => 'GLOBAL',
+                ],
+            ],
+            'global level owned' => [
+                new OwnershipMetadata('ORGANIZATION', 'org', 'org_id'),
+                [
+                    0 => 'NONE',
+                    4 => 'GLOBAL',
+                ],
+            ],
+        ];
+    }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)

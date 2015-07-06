@@ -67,11 +67,11 @@ class SearchListener
         $metadata = $this->metadataProvider->getMetadata($className);
         if ($metadata) {
             $organizationField = null;
-            if ($metadata->getOrganizationFieldName()) {
-                $organizationField = $metadata->getOrganizationFieldName();
+            if ($metadata->getGlobalOwnerFieldName()) {
+                $organizationField = $metadata->getGlobalOwnerFieldName();
             }
 
-            if ($metadata->isOrganizationOwned()) {
+            if ($metadata->isGlobalLevelOwned()) {
                 $organizationField = $metadata->getOwnerFieldName();
             }
 

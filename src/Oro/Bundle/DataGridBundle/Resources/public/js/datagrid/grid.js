@@ -502,6 +502,16 @@ define(function (require) {
                     }
                 });
             });
+
+            this.listenTo(mediator, 'datagrid:restoreChangeset:' + this.name, function (dataField, changeset) {
+                this.collection.each(function (model) {
+                    if (changeset[model.get(dataField)]) {
+                        _.each(changeset[model.get(dataField)], function (value, columnName) {
+                            model.set(columnName, value);
+                        });
+                    }
+                });
+            });
         },
 
         /**

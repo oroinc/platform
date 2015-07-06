@@ -25,7 +25,7 @@ class EmailFolderViewList extends AbstractViewsList
                 [
                     'folder' => ['value' => FolderType::SENT]
                 ]
-            ),
+            )
         ];
     }
 }
