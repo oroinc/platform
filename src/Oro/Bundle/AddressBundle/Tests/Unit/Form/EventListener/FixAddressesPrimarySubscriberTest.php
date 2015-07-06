@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber;
-use Oro\Bundle\AddressBundle\Entity\AddressType;
+use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
+use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
 
 use Symfony\Component\Form\FormEvents;
 
-class FixAddressesPrimaryAndTypesSubscriberTest extends \PHPUnit_Framework_TestCase
+class FixAddressesPrimarySubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var FixAddressesPrimaryAndTypesSubscriber
+     * @var FixAddressesPrimarySubscriber
      */
     protected $subscriber;
 
     protected function setUp()
     {
-        $this->subscriber = new FixAddressesPrimaryAndTypesSubscriber('owner.addresses');
+        $this->subscriber = new FixAddressesPrimarySubscriber('owner.addresses');
     }
 
     public function testGetSubscribedEvents()
@@ -41,49 +41,46 @@ class FixAddressesPrimaryAndTypesSubscriberTest extends \PHPUnit_Framework_TestC
             ->disableOriginalConstructor()
             ->getMock();
 
-        $event->expects($this->exactly(2))
+        $event->expects($this->once())
             ->method('getData')
             ->will($this->returnValue($allAddresses[$formAddressKey]));
 
         $this->subscriber->postSubmit($event);
 
         foreach ($expectedAddressesData as $addressKey => $expectedData) {
+            /** @var AbstractTypedAddress $address */
             $address = $allAddresses[$addressKey];
             $this->assertEquals($expectedData['isPrimary'], $address->isPrimary());
-            $this->assertEquals($expectedData['typeNames'], $address->getTypeNames());
         }
     }
 
     public function postSubmitDataProvider()
     {
-        $billing = new AddressType('billing');
-        $shipping = new AddressType('shipping');
-
         return array(
-            'unset_primary_and_remove_type' => array(
+            'reset_other_primary' => array(
                 'allAddresses' => array(
-                    'foo' => $this->createAddress()->setPrimary(true)->addType($billing),
-                    'bar' => $this->createAddress()->addType($billing),
-                    'baz' => $this->createAddress()->setPrimary(true)->addType($shipping),
+                    'foo' => $this->createAddress()->setPrimary(true),
+                    'bar' => $this->createAddress(),
+                    'baz' => $this->createAddress()->setPrimary(true),
                 ),
                 'formAddressKey' => 'foo',
                 'expectedAddressesData' => array(
-                    'foo' => array('isPrimary' => true, 'typeNames' => array('billing')),
-                    'bar' => array('isPrimary' => false, 'typeNames' => array()),
-                    'baz' => array('isPrimary' => false, 'typeNames' => array('shipping'))
+                    'foo' => array('isPrimary' => true),
+                    'bar' => array('isPrimary' => false),
+                    'baz' => array('isPrimary' => false)
                 )
             ),
-            'nothing_to_do' => array(
+            'set_primary' => array(
                 'allAddresses' => array(
                     'foo' => $this->createAddress(),
-                    'bar' => $this->createAddress()->addType($billing),
-                    'baz' => $this->createAddress()->setPrimary(true)->addType($shipping),
+                    'bar' => $this->createAddress(),
+                    'baz' => $this->createAddress()->setPrimary(true),
                 ),
                 'formAddressKey' => 'foo',
                 'expectedAddressesData' => array(
-                    'foo' => array('isPrimary' => false, 'typeNames' => array()),
-                    'bar' => array('isPrimary' => false, 'typeNames' => array('billing')),
-                    'baz' => array('isPrimary' => true, 'typeNames' => array('shipping'))
+                    'foo' => array('isPrimary' => false),
+                    'bar' => array('isPrimary' => false),
+                    'baz' => array('isPrimary' => true)
                 )
             ),
         );
