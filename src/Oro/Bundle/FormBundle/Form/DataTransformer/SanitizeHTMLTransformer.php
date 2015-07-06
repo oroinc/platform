@@ -10,7 +10,7 @@ use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 class SanitizeHTMLTransformer implements DataTransformerInterface
 {
     const SUB_DIR = 'ezyang';
-    const MODE = 0775;
+    const MODE    = 0775;
 
     /**
      * @var string|null
@@ -29,7 +29,7 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     public function __construct($allowedElements = null, $cacheDir = null)
     {
         $this->allowedElements = $allowedElements;
-        $this->cacheDir = $cacheDir;
+        $this->cacheDir        = $cacheDir;
     }
 
     /**
@@ -58,6 +58,11 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
         $config = \HTMLPurifier_Config::createDefault();
         $this->fillAllowedElementsConfig($config);
         $this->fillCacheConfig($config);
+        // add inline data support
+        $config->set(
+            'URI.AllowedSchemes',
+            ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true]
+        );
         $purifier = new \HTMLPurifier($config);
 
         return $purifier->purify($value);

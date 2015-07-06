@@ -8,7 +8,6 @@ use CG\Generator\PhpClass;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent;
 use Oro\Bundle\TrackingBundle\Migration\Extension\VisitEventAssociationExtension;
 use Oro\Bundle\TrackingBundle\Tools\VisitEventAssociationGeneratorExtension;
 
@@ -49,13 +48,13 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
         return [
             [
                 [
-                    'class' => TrackingVisitEvent::ENTITY_NAME,
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
                     'relation' => 'test',
                     'relationData' => [
                         [
                             'field_id' => new FieldConfigId(
                                 'extend',
-                                TrackingVisitEvent::ENTITY_NAME,
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
                                 ExtendHelper::buildAssociationName(
                                     'Test\TargetEntity',
                                     VisitEventAssociationExtension::ASSOCIATION_KIND
@@ -70,13 +69,13 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
             ],
             [
                 [
-                    'class' => TrackingVisitEvent::ENTITY_NAME,
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
                     'relation' => 'test',
                     'relationData' => [
                         [
                             'field_id' => new FieldConfigId(
                                 'extend',
-                                TrackingVisitEvent::ENTITY_NAME,
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
                                 'testField',
                                 'manyToOne'
                             ),
@@ -88,13 +87,13 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
             ],
             [
                 [
-                    'class' => TrackingVisitEvent::ENTITY_NAME,
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
                     'relation' => 'test',
                     'relationData' => [
                         [
                             'field_id' => new FieldConfigId(
                                 'extend',
-                                TrackingVisitEvent::ENTITY_NAME,
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent',
                                 ExtendHelper::buildAssociationName(
                                     'Test\TargetEntity',
                                     VisitEventAssociationExtension::ASSOCIATION_KIND
@@ -108,7 +107,7 @@ class VisitEventAssociationGeneratorExtensionTest extends \PHPUnit_Framework_Tes
                 false
             ],
             [
-                ['class' => TrackingVisitEvent::ENTITY_NAME],
+                ['class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent'],
                 false
             ],
             [

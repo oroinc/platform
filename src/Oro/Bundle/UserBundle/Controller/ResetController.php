@@ -37,7 +37,7 @@ class ResetController extends Controller
         $username = $this->getRequest()->request->get('username');
         $user = $this->get('oro_user.manager')->findUserByUsernameOrEmail($username);
 
-        if (null === $user) {
+        if (null === $user || !$user->isEnabled()) {
             return $this->render('OroUserBundle:Reset:request.html.twig', array('invalid_username' => $username));
         }
 
