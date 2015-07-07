@@ -5,13 +5,14 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -33,8 +34,9 @@ use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
  */
 class AclHelper
 {
-    const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
-    const ORO_USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
+    const ORO_ACL_WALKER            = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
+    const ORO_ACL_OUTPUT_SQL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\SqlWalker';
+    const ORO_USER_CLASS            = 'Oro\Bundle\UserBundle\Entity\User';
 
     /**
      * @var OwnershipConditionDataBuilder
@@ -51,6 +53,9 @@ class AclHelper
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+
+    /** @var array */
+    protected $queryComponents = [];
 
     /**
      * @param OwnershipConditionDataBuilder $builder
@@ -113,6 +118,8 @@ class AclHelper
     public function apply($query, $permission = 'VIEW', $checkRelations = true)
     {
         $this->entityAliases = [];
+        $this->queryComponents = [];
+
         if ($query instanceof QueryBuilder) {
             $query = $query->getQuery();
         }
@@ -152,6 +159,11 @@ class AclHelper
                 }
                 $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $customHints);
                 $query->setHint(AclWalker::ORO_ACL_JOIN, $joinStorage);
+            }
+
+            if (!empty($this->queryComponents)) {
+                $query->setHint(SqlWalker::ORO_ACL_QUERY_COMPONENTS, $this->queryComponents);
+                $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, self::ORO_ACL_OUTPUT_SQL_WALKER);
             }
         }
 
@@ -490,10 +502,31 @@ class AclHelper
         $resultData = $this->builder->getAclShareData($entityName, $entityAlias, $permission);
 
         if (!empty($resultData)) {
-            list($join, $joinConditions, $whereConditions) = $resultData;
+            list($join, $joinConditions, $whereConditions, $queryComponents) = $resultData;
+            $this->addQueryComponents($queryComponents);
             return new AclJoinStatement($join, $whereConditions, $joinConditions);
         }
 
         return null;
+    }
+
+    /**
+     * Add query components which will add to query hints
+     *
+     * @param array $queryComponents
+     * @throws QueryException
+     */
+    protected function addQueryComponents(array $queryComponents)
+    {
+        $requiredKeys = array('metadata', 'parent', 'relation', 'map', 'nestingLevel', 'token');
+
+        foreach ($queryComponents as $dqlAlias => $queryComponent) {
+
+            if (array_diff($requiredKeys, array_keys($queryComponent))) {
+                throw QueryException::invalidQueryComponent($dqlAlias);
+            }
+
+            $this->queryComponents[$dqlAlias] = $queryComponent;
+        }
     }
 }

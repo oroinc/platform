@@ -17,6 +17,7 @@ use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\ComparisonExpression;
 use Doctrine\ORM\Query\AST\NullComparisonExpression;
+use Doctrine\ORM\Query\AST\ConditionalExpression;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclBiCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclNullCondition;
@@ -53,6 +54,7 @@ class AclWalker extends TreeWalkerAdapter
     {
         /** @var Query $query */
         $query = $this->_getQuery();
+        $this->whereShareCondition = null;
 
         if ($query->hasHint(self::ORO_ACL_JOIN)) {
             /** @var AclJoinStorage $joinStorage */
@@ -237,7 +239,7 @@ class AclWalker extends TreeWalkerAdapter
             }
         }
 
-        if (!empty($aclConditionalFactors)) {
+        if (!empty($aclConditionalFactors) && $this->whereShareCondition) {
             $aclConditionalFactors = $this->addShareFactor($aclConditionalFactors);
         }
 
@@ -473,7 +475,7 @@ class AclWalker extends TreeWalkerAdapter
                         $condition->getEntityAliasLeft(),
                         $condition->getEntityFieldLeft()
                     );
-                    $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+                    $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
                     $leftExpression = new ArithmeticExpression();
                     $leftExpression->simpleArithmeticExpression = $pathExpression;
                     $rightExpression = new ArithmeticExpression();
@@ -482,7 +484,7 @@ class AclWalker extends TreeWalkerAdapter
                         $condition->getEntityAliasRight(),
                         $condition->getEntityFieldRight()
                     );
-                    $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+                    $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
                     $rightExpression->simpleArithmeticExpression = $pathExpression;
                     $resultCondition      = new ConditionalPrimary();
                     $resultCondition->simpleConditionalExpression =
@@ -508,7 +510,6 @@ class AclWalker extends TreeWalkerAdapter
                     $conditionalFactors[] = $resultCondition;
                     break;
             }
-
         }
 
         $join = new Join(
@@ -544,12 +545,14 @@ class AclWalker extends TreeWalkerAdapter
             $this->whereShareCondition->getEntityAlias(),
             $this->whereShareCondition->getEntityField()
         );
-        $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+        $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
         $shareCondition = new NullComparisonExpression($pathExpression);
         $shareCondition->not = true;
+        $prShareCondition = new ConditionalPrimary();
+        $prShareCondition->simpleConditionalExpression = $shareCondition;
         $orgCondition = new ConditionalPrimary();
         $ownershipCondition = new ConditionalTerm($aclConditionalFactors);
-        $orgCondition->conditionalExpression = [$ownershipCondition, $shareCondition];
+        $orgCondition->conditionalExpression = new ConditionalExpression([$ownershipCondition, $prShareCondition]);
         return [$orgCondition];
     }
 }

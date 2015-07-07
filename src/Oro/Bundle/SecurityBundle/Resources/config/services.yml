@@ -386,6 +386,7 @@ services:
             - @oro_security.entity_security_metadata_provider
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.ownership_tree_provider.chain
+            - @doctrine
             - @?security.acl.voter.basic_permissions
 
     oro_security.abstract_ownership_tree_provider:

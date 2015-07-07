@@ -4,12 +4,16 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\PathExpression;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclBiCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclNullCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinClause;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
@@ -28,11 +32,11 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
  */
 class OwnershipConditionDataBuilder
 {
-    const ACL_ENTRIES_SCHEMA_NAME = 'Oro\Bundle\SecurityBundle\Entities\AclEntries';
-    const ACL_ENTRIES_ALIAS = 'acl_entries';
-    const ACL_ENTRIES_SHARE_RECORD = 'record_id';
-    const ACL_ENTRIES_CLASS_ID = 'class_id';
-    const ACL_ENTRIES_SECURITY_ID = 'security_identity_id';
+    const ACL_ENTRIES_SCHEMA_NAME = 'Oro\Bundle\SecurityBundle\Entity\AclEntry';
+    const ACL_ENTRIES_ALIAS = 'entries';
+    const ACL_ENTRIES_SHARE_RECORD = 'recordId';
+    const ACL_ENTRIES_CLASS_ID = 'class';
+    const ACL_ENTRIES_SECURITY_ID = 'securityIdentity';
 
     /** @var ServiceLink */
     protected $securityContextLink;
@@ -52,8 +56,16 @@ class OwnershipConditionDataBuilder
     /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
 
+    /** @var null|mixed */
+    protected $user = null;
+
     /** @var null|int|string */
     protected $userId = null;
+
+    /**
+     * @var ManagerRegistry
+     */
+    protected $registry;
 
     /**
      * @param ServiceLink                    $securityContextLink
@@ -61,6 +73,7 @@ class OwnershipConditionDataBuilder
      * @param EntitySecurityMetadataProvider $entityMetadataProvider
      * @param MetadataProviderInterface      $metadataProvider
      * @param OwnerTreeProviderInterface     $treeProvider
+     * @param ManagerRegistry                $registry
      * @param AclVoter                       $aclVoter
      */
     public function __construct(
@@ -69,6 +82,7 @@ class OwnershipConditionDataBuilder
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
+        ManagerRegistry $registry,
         AclVoter $aclVoter = null
     ) {
         $this->securityContextLink    = $securityContextLink;
@@ -77,6 +91,7 @@ class OwnershipConditionDataBuilder
         $this->entityMetadataProvider = $entityMetadataProvider;
         $this->metadataProvider       = $metadataProvider;
         $this->treeProvider           = $treeProvider;
+        $this->registry               = $registry;
     }
 
     /**
@@ -227,7 +242,10 @@ class OwnershipConditionDataBuilder
             return null;
         }
 
-        return $this->objectIdAccessor->getId($user);
+        $this->user = $user;
+        $this->userId = $this->objectIdAccessor->getId($user);
+
+        return $this->userId;
     }
 
     /**
@@ -411,8 +429,21 @@ class OwnershipConditionDataBuilder
      *
      * @return array
      */
-    public function getAclShareData($entityName, $entityAlias, $permission)
+    public function getAclShareData($entityName, $entityAlias, $permission = BasicPermissionMap::PERMISSION_VIEW)
     {
+        $aclClass = $this->registry->getRepository('OroSecurityBundle:AclClass')
+            ->findOneBy(['classType' => $entityName]);
+        $sid = UserSecurityIdentity::fromAccount($this->getUser());
+        $aclSId = $this->registry->getRepository('OroSecurityBundle:AclSecurityIdentity')
+            ->findOneBy([
+                'identifier' => $sid->getClass().'-'.$sid->getUsername(),
+                'username' => true,
+            ]);
+
+        if (!$aclClass || !$aclSId || $permission != BasicPermissionMap::PERMISSION_VIEW) {
+            return null;
+        }
+
         $joinClause = new AclJoinClause(
             self::ACL_ENTRIES_SCHEMA_NAME,
             self::ACL_ENTRIES_ALIAS,
@@ -420,20 +451,60 @@ class OwnershipConditionDataBuilder
             null,
             Join::JOIN_TYPE_LEFT
         );
+        //Add query components for OutputSqlWalker
+        $queryComponents[self::ACL_ENTRIES_ALIAS] = [
+            'metadata'     => $this->registry->getManagerForClass(self::ACL_ENTRIES_SCHEMA_NAME)->getClassMetadata(
+                self::ACL_ENTRIES_SCHEMA_NAME
+            ),
+            'parent'       => null,
+            'relation'     => null,
+            'map'          => null,
+            'nestingLevel' => null,
+            'token'        => null
+        ];
+
+
         $whereConditions[] = new AclNullCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_SHARE_RECORD, true);
+
         $joinConditions[] = new AclBiCondition(
             $entityAlias,
             'id',
             self::ACL_ENTRIES_ALIAS,
             self::ACL_ENTRIES_SHARE_RECORD
         );
-        //Stub, @TODO: AEIV-74
-        $sid = 9;
-        //Stub, @TODO: AEIV-74
-        $cid = 9;
-        $joinConditions[] = new AclCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_SECURITY_ID, $sid);
-        $joinConditions[] = new AclCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_CLASS_ID, $cid);
+        //@TODO: should add Organization Security Id and Business Unit Id
+        $joinConditions[] = new AclCondition(
+            self::ACL_ENTRIES_ALIAS,
+            self::ACL_ENTRIES_SECURITY_ID,
+            $aclSId->getId()
+        );
+        $joinConditions[] = new AclCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_CLASS_ID, $aclClass->getId());
 
-        return [$joinClause, $joinConditions, $whereConditions];
+        return [$joinClause, $joinConditions, $whereConditions, $queryComponents];
+    }
+
+    /**
+     * Gets the logged user
+     *
+     * @return null|mixed
+     */
+    public function getUser()
+    {
+        if ($this->user) {
+            return $this->user;
+        }
+
+        $token = $this->getSecurityContext()->getToken();
+        if (!$token) {
+            return null;
+        }
+        $user = $token->getUser();
+        if (!is_object($user) || !is_a($user, $this->metadataProvider->getUserClass())) {
+            return null;
+        }
+
+        $this->user = $user;
+
+        return $this->user;
     }
 }
