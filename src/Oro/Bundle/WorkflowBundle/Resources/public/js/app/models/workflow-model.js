@@ -31,6 +31,7 @@ define(function(require) {
             attributes: null
         },
 
+        observedAttributes: ['steps', 'transitions'],
         entityFieldUtil: null,
         entityFieldsInitialized: false,
 
@@ -58,6 +59,7 @@ define(function(require) {
             this.listenTo(transitions, 'add', this.setWorkflow);
             this.listenTo(steps, 'reset', this.setWorkflowToCollection);
             this.listenTo(transitions, 'reset', this.setWorkflowToCollection);
+            WorkflowModel.__super__.initialize.apply(this, arguments);
         },
 
         setWorkflow: function (item) {
@@ -222,18 +224,15 @@ define(function(require) {
         },
 
         getState: function () {
-            return new Backbone.Model({
+            return {
                 steps: this.get('steps').toJSON(),
                 transitions: this.get('transitions').toJSON()
-            })
+            };
         },
-        setState: function (state) {
-            WorkflowModel.__super__.setState.apply(this,arguments);
-            var steps = state.get('steps'),
-                transitions = state.get('transitions');
-            if (steps && transitions) {
-                this.get('steps').reset(steps);
-                this.get('transitions').reset(transitions);
+        setState: function (data) {
+            if (data.steps && data.transitions) {
+                this.get('steps').reset(data.steps);
+                this.get('transitions').reset(data.transitions);
             }
         }
     });

@@ -5,7 +5,7 @@ define(function (require) {
 
     var WorkflowEditorComponent,
         WorkflowViewerComponent = require('./workflow-viewer-component'),
-        WorkflowHistoryComponent = require('./workflow-history-component'),
+        WorkflowHistoryComponent = require('oroui/js/app/components/history-component'),
         FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
         mediator = require('oroui/js/mediator'),
         _ = require('underscore'),
@@ -40,7 +40,7 @@ define(function (require) {
                 model: this.model
             });
             this.historyManager = new WorkflowHistoryComponent({
-                workflow: this.model,
+                observedModel: this.model,
                 _sourceElement: $el.find('.workflow-history-container')
             });
             this.workflowManagementView.render();

@@ -1,11 +1,11 @@
 define(function (require) {
     'use strict';
 
-    var WorkflowHistoryView,
-        BaseView = require('oroui/js/app/views/base/view');
-    WorkflowHistoryView = BaseView.extend({
+    var HistoryView,
+        BaseView = require('./base/view');
+    HistoryView = BaseView.extend({
         autoRender: true,
-        template: require('tpl!oroworkflow/templates/workflow-history.html'),
+        template: require('tpl!oroui/templates/history.html'),
         events: {
             'click .undo-btn': 'onUndo',
             'click .redo-btn': 'onRedo'
@@ -24,5 +24,5 @@ define(function (require) {
         }
     });
 
-    return WorkflowHistoryView;
+    return HistoryView;
 });
