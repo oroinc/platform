@@ -47,10 +47,6 @@ class OwnerTypeExtension extends \Twig_Extension
         }
         $config = $this->configProvider->getConfig($ownerClassName);
 
-        if (!$config->has('owner_type')) {
-            return null;
-        }
-
         return $config->get('owner_type');
     }
 
