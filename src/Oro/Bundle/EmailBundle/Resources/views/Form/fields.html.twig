@@ -213,8 +213,7 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set email_origin = form_row(form.children.imapEnabled) ~
-        form_widget(form.children.imapOrigin)
+    {% set email_origin = form_row(form.children.imapEnabled)
     %}
     {% set smtp = form_row(form.children.smtpEnabled) ~
         form_row(form.children.smtpHost) ~
@@ -242,6 +241,20 @@
         <h5>{{ 'oro.email.mailbox.processor.label'|trans }}</h5>
         {{ processor|raw }}
     </fieldset>
+
+    <script type="text/javascript">
+        require(['oroemail/js/app/views/mailbox-update-view'], function(MailboxUpdateView) {
+            "use strict";
+
+            $(function() {
+                var options = {
+                    el: '#{{ form.vars.id }}'
+                };
+
+                new MailboxUpdateView(options);
+            });
+        });
+    </script>
 {% endblock %}
 
 {#

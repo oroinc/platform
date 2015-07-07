@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 
@@ -19,7 +20,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
  *      }
  * )
  */
-class Mailbox implements EmailOwnerInterface
+class Mailbox implements EmailHolderInterface
 {
 
     /**
@@ -56,19 +57,46 @@ class Mailbox implements EmailOwnerInterface
     protected $processor;
 
     /**
-     * @var EmailOrigin
-     *
-     * @ORM\OneToOne(targetEntity="EmailOrigin")
-     * @ORM\JoinColumn(name="imap_origin_id", referencedColumnName="id")
-     */
-    protected $imapOrigin;
-
-    /**
      * @var bool
      *
      * @ORM\Column(name="imap_enabled", type="boolean")
      */
     protected $imapEnabled;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="imap_host", type="string", length=255)
+     */
+    protected $imapHost;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="imap_port", type="integer")
+     */
+    protected $imapPort;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="imap_encryption", type="string", length=50)
+     */
+    protected $imapEncryption;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="imap_username", type="string", length=255)
+     */
+    protected $imapUsername;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="imap_password", type="string", length=255)
+     */
+    protected $imapPassword;
 
     /**
      * @var bool
@@ -114,23 +142,6 @@ class Mailbox implements EmailOwnerInterface
 
     public function __construct()
     {
-        $this->imapOrigin = new ImapEmailOrigin();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getClass()
-    {
-        return __CLASS__;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEmailFields()
-    {
-        return ['email'];
     }
 
     /**
@@ -139,22 +150,6 @@ class Mailbox implements EmailOwnerInterface
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFirstName()
-    {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLastName()
-    {
-        return $this->label;
     }
 
     /**
@@ -206,13 +201,23 @@ class Mailbox implements EmailOwnerInterface
     }
 
     /**
-     * @param mixed $processor
+     * @param MailboxProcessor $processor
      *
      * @return $this
      */
     public function setProcessor(MailboxProcessor $processor)
     {
         $this->processor = $processor;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearProcessor()
+    {
+        $this->processor = null;
 
         return $this;
     }
@@ -225,26 +230,6 @@ class Mailbox implements EmailOwnerInterface
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return EmailOrigin
-     */
-    public function getImapOrigin()
-    {
-        return $this->imapOrigin;
-    }
-
-    /**
-     * @param EmailOrigin $origin
-     *
-     * @return $this
-     */
-    public function setImapOrigin($origin)
-    {
-        $this->imapOrigin = $origin;
 
         return $this;
     }
@@ -385,6 +370,106 @@ class Mailbox implements EmailOwnerInterface
     public function setSmtpUsername($smtpUsername)
     {
         $this->smtpUsername = $smtpUsername;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImapEncryption()
+    {
+        return $this->imapEncryption;
+    }
+
+    /**
+     * @param string $imapEncryption
+     *
+     * @return $this
+     */
+    public function setImapEncryption($imapEncryption)
+    {
+        $this->imapEncryption = $imapEncryption;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImapHost()
+    {
+        return $this->imapHost;
+    }
+
+    /**
+     * @param string $imapHost
+     *
+     * @return $this
+     */
+    public function setImapHost($imapHost)
+    {
+        $this->imapHost = $imapHost;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImapPassword()
+    {
+        return $this->imapPassword;
+    }
+
+    /**
+     * @param string $imapPassword
+     *
+     * @return $this
+     */
+    public function setImapPassword($imapPassword)
+    {
+        $this->imapPassword = $imapPassword;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getImapPort()
+    {
+        return $this->imapPort;
+    }
+
+    /**
+     * @param int $imapPort
+     *
+     * @return $this
+     */
+    public function setImapPort($imapPort)
+    {
+        $this->imapPort = $imapPort;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImapUsername()
+    {
+        return $this->imapUsername;
+    }
+
+    /**
+     * @param string $imapUsername
+     *
+     * @return $this
+     */
+    public function setImapUsername($imapUsername)
+    {
+        $this->imapUsername = $imapUsername;
 
         return $this;
     }

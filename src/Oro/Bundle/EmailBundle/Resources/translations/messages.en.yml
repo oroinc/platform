@@ -219,7 +219,7 @@ oro:
             imap_enabled.label:       Use IMAP Synchronization
             processor:
                 label:                Email Processing
-                type.label:           Type
+                type.label:           Action
             smtp_enabled.label:       Use SMTP
             smtp_host.label:          Host
             smtp_port.label:          Port

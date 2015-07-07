@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 
 class MailboxConfigurationController extends Controller
 {
@@ -20,11 +21,27 @@ class MailboxConfigurationController extends Controller
      *      name="oro_email_mailbox_update"
      * )
      * @Template
+     *
      * @param $mailbox
      *
      * @return array
      */
     public function editAction($mailbox)
+    {
+        $mailboxRepository = $this->getDoctrine()->getRepository('OroEmailBundle:Mailbox');
+        $data = $mailboxRepository->find($mailbox);
+
+        return $this->update($data);
+    }
+
+    /**
+     * Prepares and handles data of Mailbox update/create form.
+     *
+     * @param $data
+     *
+     * @return array
+     */
+    private function update($data)
     {
         $provider = $this->get('oro_config.provider.system_configuration.form_provider');
 
@@ -33,19 +50,36 @@ class MailboxConfigurationController extends Controller
         $tree = $provider->getTree();
         $bc = $provider->getSubtree(self::ACTIVE_SUBGROUP)->toBlockConfig();
 
-        $mailboxRepository = $this->getDoctrine()->getRepository('OroEmailBundle:Mailbox');
-        $data = $mailboxRepository->find($mailbox);
-
         $form = $this->createForm('oro_email_mailbox', $data, [
             'block_config' => $bc,
         ]);
 
         $form->handleRequest($this->getRequest());
 
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($form->getData());
-            $em->flush();
+        if ($form->isSubmitted()) {
+            if ($this->getRequest()->get(MailboxType::RELOAD_MARKER, false)) {
+                $processorProvider = $this->get('oro_email.provider.mailbox_processor_provider');
+
+                $type = $form->get('processorType')->getViewData();
+                $data = $form->getData();
+
+                $processorEntity = $processorProvider->createConfigurationEntity($type);
+                $data->setProcessor($processorEntity);
+
+                $newForm = $this->createForm('oro_email_mailbox', $data, [
+                    'block_config' => $bc,
+                ]);
+
+                $form = $newForm;
+            } else {
+                if ($form->isValid()) {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($form->getData());
+                    $em->flush();
+                } else {
+                    var_dump($form->getErrors()); die;
+                }
+            }
         }
 
         return [
@@ -67,30 +101,8 @@ class MailboxConfigurationController extends Controller
      */
     public function createAction()
     {
-        $provider = $this->get('oro_config.provider.system_configuration.form_provider');
+        $data = new Mailbox();
 
-        list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
-
-        $tree = $provider->getTree();
-        $bc = $provider->getSubtree(self::ACTIVE_SUBGROUP)->toBlockConfig();
-
-        $form = $this->createForm('oro_email_mailbox', new Mailbox(), [
-            'block_config' => $bc,
-        ]);
-
-        $form->handleRequest($this->getRequest());
-
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($form->getData());
-            $em->flush();
-        }
-
-        return [
-            'data'           => $tree,
-            'form'           => $form->createView(),
-            'activeGroup'    => $activeGroup,
-            'activeSubGroup' => $activeSubGroup,
-        ];
+        return $this->update($data);
     }
 }

@@ -315,6 +315,9 @@ datagrid:
                     - m
                 from:
                     - { table: OroEmailBundle:Mailbox, alias: m }
+                join:
+                    left:
+                        - { join: m.processor, alias: processor }
         columns:
             email:
                 label: oro.email.mailbox.email.label
@@ -327,7 +330,10 @@ datagrid:
                 label: oro.email.mailbox.smtp_enabled.label
                 frontend_type: boolean
             processor:
+                type: translatable
+                data_name: processor.type
                 label: oro.email.mailbox.processor.label
+
         properties:
             id: ~
             update_link:

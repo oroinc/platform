@@ -76,4 +76,28 @@ class MailboxProcessorProvider
 
         return $choices;
     }
+
+    /**
+     * Creates an instance of configuration entity for provided processor type.
+     *
+     * @param MailboxProcessorInterface|string $type
+     *
+     * @return mixed
+     */
+    public function createConfigurationEntity($type)
+    {
+        if (!($type instanceof MailboxProcessorInterface)) {
+            $type = $this->processorTypes[$type];
+        }
+
+        $entityName = $type->getEntityFQCN();
+
+        if (!class_exists($entityName)) {
+            throw new \LogicException("Entity: {$entityName} does not exist.");
+        }
+
+        $instance = new $entityName();
+
+        return $instance;
+    }
 }

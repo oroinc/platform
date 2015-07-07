@@ -7,12 +7,16 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class MailboxType extends AbstractType
 {
+    const RELOAD_MARKER = '_reloadForm';
+
     /** @var MailboxProcessorProvider */
     private $processorProvider;
 
@@ -30,7 +34,8 @@ class MailboxType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\Bundle\EmailBundle\Entity\Mailbox'
+            'data_class' => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
+            'cascade_validation' => true,
         ]);
     }
 
@@ -42,16 +47,22 @@ class MailboxType extends AbstractType
         $builder->add('label', 'text', [
             'required' => true,
             'label'    => 'oro.email.mailbox.label.label',
+            'constraints' => [
+                new NotNull(),
+            ],
         ]);
         $builder->add('email', 'email', [
             'required' => true,
             'label'    => 'oro.email.mailbox.email.label',
+            'constraints' => [
+                new NotNull(),
+            ],
         ]);
         $builder->add('imapEnabled', 'checkbox', [
             'label'    => 'oro.email.mailbox.imap_enabled.label',
             'required' => false,
         ]);
-        $builder->add('imapOrigin', 'oro_imap_configuration');
+        //$builder->add('imapOrigin', 'oro_imap_configuration');
         $builder->add('smtpEnabled', 'checkbox', [
             'label'    => 'oro.email.mailbox.smtp_enabled.label',
             'required' => false,
@@ -84,6 +95,9 @@ class MailboxType extends AbstractType
             'choices'  => $this->processorProvider->getProcessorTypesChoiceList(),
             'required' => true,
             'mapped'   => false,
+            'constraints' => [
+                new NotNull(),
+            ],
         ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
@@ -109,23 +123,53 @@ class MailboxType extends AbstractType
         $data = $event->getData();
         $form = $event->getForm();
 
-        if ($data->getProcessor() === null) {
+        if ($data === null) {
             return;
         }
 
-        $processor = $data->getProcessor();
-        $processorType = $this->processorProvider->getProcessorTypes()[$processor->getType()];
+        $processorType = null;
+        if ($processorEntity = $data->getProcessor()) {
+            $processorType = $processorEntity->getType();
+        } else {
+            $choices = array_keys($form->get('processorType')->getConfig()->getOption('choices'));
+            $processorType = reset($choices);
+        }
+        FormUtils::replaceField($form, 'processorType', [
+            'data' => $processorType,
+        ]);
 
-        $form->add('processor', $processorType->getSettingsFormType());
+        $form->add(
+            'processor',
+            $this->processorProvider->getProcessorTypes()[$processorType]->getSettingsFormType(),
+            [
+                'required' => true,
+            ]
+        );
     }
 
+    /**
+     * PreSubmit event handler.
+     *
+     * @param FormEvent $event
+     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
 
-        $processorType = $this->processorProvider->getProcessorTypes()[$data['processorType']];
+        $processorType = $data['processorType'];
+        $originalProcessorType = $form->get('processorType')->getData();
 
-        $form->add('processor', $processorType->getSettingsFormType());
+        if ($processorType !== $originalProcessorType) {
+            $form->getViewData()->clearProcessor(null);
+        }
+
+        $form->add(
+            'processor',
+            $this->processorProvider->getProcessorTypes()[$processorType]->getSettingsFormType(),
+            [
+                'required' => true,
+            ]
+        );
     }
 }
