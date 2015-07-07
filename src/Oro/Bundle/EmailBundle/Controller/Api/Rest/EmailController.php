@@ -122,12 +122,12 @@ class EmailController extends RestController
     }
 
     /**
-     * Returns email context data.
+     * Get email context data.
      *
      * @param int $id The email id
      *
      * @ApiDoc(
-     *      description="Returns email context data",
+     *      description="Get email context data",
      *      resource=true
      * )
      *

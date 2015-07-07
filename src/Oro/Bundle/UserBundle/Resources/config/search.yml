@@ -43,3 +43,11 @@ Oro\Bundle\UserBundle\Entity\User:
             name:                   birthday
             target_type:            datetime
             target_fields:          [birthday]
+        -
+            name: emails
+            relation_type: one-to-many
+            relation_fields:
+                -
+                    name: email
+                    target_type: text
+                    target_fields: [email]

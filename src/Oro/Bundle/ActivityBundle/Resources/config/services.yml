@@ -112,6 +112,7 @@ services:
             - @oro_activity.form.activity_entity.api
             - @request
             - @doctrine.orm.entity_manager
+            - @oro_activity.manager
 
     oro_activity.form.activity_entity.api:
         class: Symfony\Component\Form\Form
