@@ -192,6 +192,17 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/reply/{id}", name="oro_email_email_reply_all", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_create")
+     * @Template("OroEmailBundle:Email:update.html.twig")
+     */
+    public function replyAllAction(Email $email)
+    {
+        $emailModel = $this->get('oro_email.email.model.builder')->createReplyAllEmailModel($email);
+        return $this->process($emailModel);
+    }
+
+    /**
      * @Route("/forward/{id}", name="oro_email_email_forward", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
