@@ -115,26 +115,21 @@ define(function (require) {
     });
 
     function initSelection(element, callback) {
-        var config = this;
 
-        var handleResults = function(data) {
+        function handleResults(data) {
             if (config.multiple === true) {
                 callback(data);
             } else {
                 callback(data.pop());
             }
-        };
+        }
 
-        var setSelect2ValueById = function(id) {
-            if (_.isArray(id)) {
-                id = id.join(config.separator);
-            }
-            var select2Obj = element.data('select2');
-            var select2AjaxOptions = select2Obj.opts.ajax;
-            var searchData = select2AjaxOptions.data(id, 1, true);
-            var url = (typeof select2AjaxOptions.url === 'function')
-                ? select2AjaxOptions.url.call(select2Obj, id, 1)
-                : select2AjaxOptions.url;
+        function setSelect2ValueById(id) {
+            var ids = _.isArray(id) ? id.join(config.separator) : id,
+                select2Obj = element.data('select2'),
+                ajaxOptions = select2Obj.opts.ajax,
+                searchData = ajaxOptions.data(ids, 1, true),
+                url = _.isFunction(ajaxOptions.url) ? ajaxOptions.url.call(select2Obj, ids, 1) : ajaxOptions.url;
 
             searchData.search_by_id = true;
             element.trigger('select2-data-request');
@@ -142,8 +137,8 @@ define(function (require) {
                 url: url,
                 data: searchData,
                 success: function(response) {
-                    if (typeof select2AjaxOptions.results == 'function') {
-                        response = select2AjaxOptions.results.call(select2Obj, response, 1);
+                    if (_.isFunction(ajaxOptions.results)) {
+                        response = ajaxOptions.results.call(select2Obj, response, 1);
                     }
                     if (typeof response.results != 'undefined') {
                         handleResults(response.results);
@@ -151,28 +146,22 @@ define(function (require) {
                     element.trigger('select2-data-loaded');
                 }
             });
-        };
-
-        var currentValue = element.select2('val');
-        if (!_.isArray(currentValue)) {
-            currentValue = [currentValue];
         }
 
-        var selectedData = element.data('selected-data');
-        if (!_.isArray(selectedData)) {
-            selectedData = [selectedData];
-        }
+        var selectedData,
+            dataIds,
+            config = this,
+            currentValue = tools.ensureArray(element.select2('val'));
 
-        // elementData must have name
-        var elementData = _.filter(
-            selectedData,
+        selectedData = _.filter(
+            tools.ensureArray(element.data('selected-data')),
             function (item) {
-                return item !== undefined && item.name !== undefined && item.name !== null;
+                return _.isObject(item);
             }
         );
 
-        if (elementData.length > 0) {
-            var dataIds = _.map(elementData, function(item) {
+        if (selectedData.length > 0) {
+            dataIds = _.map(selectedData, function (item) {
                 return item.id;
             });
 
@@ -180,13 +169,11 @@ define(function (require) {
             dataIds = _.compact(dataIds);
 
             if (dataIds.length === 0 || dataIds.sort().join(config.separator) === currentValue.sort().join(config.separator)) {
-                handleResults(elementData);
-            } else {
-                setSelect2ValueById(currentValue);
+                handleResults(selectedData);
+                return;
             }
-        } else {
-            setSelect2ValueById(currentValue);
         }
+        setSelect2ValueById(currentValue);
     }
     function highlightSelection(str, selection) {
         return str && selection && selection.term ?

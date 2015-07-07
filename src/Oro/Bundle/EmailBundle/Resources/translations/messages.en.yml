@@ -227,6 +227,14 @@ oro:
             received_at.label:        Received At
             seen.label:               Seen
 
+        action:
+            sync: Sync emails
+            processing: Processing
+            message:
+                success: Email sync completed.
+                error: Email sync failed.
+                processing: Email sync started, please wait...
+
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
 "Sent": "Sent"
