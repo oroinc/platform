@@ -1,10 +1,12 @@
-define(function(require) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'oroui/js/messenger'
+], function($, _, Backbone, __, messenger) {
     'use strict';
 
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var __ = require('orotranslation/js/translator');
-    var messenger = require('oroui/js/messenger');
     var service;
     var subscriptions = [];
 

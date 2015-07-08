@@ -1,38 +1,38 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var $ = require('jquery'),
-        markup = require('text!./Fixture/field-condition/markup.html'),
-        data = JSON.parse(require('text!./Fixture/field-condition/entities.json'));
+    var $ = require('jquery');
+    var markup = require('text!./Fixture/field-condition/markup.html');
+    var data = JSON.parse(require('text!./Fixture/field-condition/entities.json'));
     require('oroquerydesigner/js/field-condition');
 
-    describe('oroquerydesigner/js/field-condition', function () {
+    describe('oroquerydesigner/js/field-condition', function() {
         var $el = null;
 
-        beforeEach(function () {
+        beforeEach(function() {
             $el = $('<div>');
             $el.append($(markup));
             $('body').append($el);
-            $.each(data, function () {
+            $.each(data, function() {
                 var entity = this;
                 entity.fieldsIndex = {};
-                $.each(entity.fields, function () {
+                $.each(entity.fields, function() {
                     entity.fieldsIndex[this.name] = this;
                     this.entity = entity;
                 });
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $el.remove();
             $el = null;
         });
 
         function waitForFilter(cb) {
-            var timeout = 20,
-                tick = 1,
-                t = timeout,
-                html = $el.find('.active-filter').html();
+            var timeout = 20;
+            var tick = 1;
+            var t = timeout;
+            var html = $el.find('.active-filter').html();
             function wait() {
                 t -= tick;
                 var current = $el.find('.active-filter').html();
@@ -45,143 +45,145 @@ define(function (require) {
             setTimeout(wait, tick);
         }
 
-        it('is $ widget', function (done) {
-            expect(function () {
+        it('is $ widget', function(done) {
+            expect(function() {
                 $el.fieldCondition();
-                waitForFilter(function () {
+                waitForFilter(function() {
                     done();
                 });
             }).not.toThrow();
         });
 
-        it('renders empty filter', function (done) {
-            var $fieldsLoader = $('<input id="fields_loader"></input>');
+        it('renders empty filter', function(done) {
+            var $fieldsLoader = $('<input id="fields_loader"/>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
             $fieldsLoader.data('fields', data);
 
             $el.data('value', {
-                "columnName":"name"
+                columnName: 'name'
             });
             $el.fieldCondition({
-                "fieldChoice": {
-                    "fieldsLoaderSelector": "#fields_loader"
+                fieldChoice: {
+                    fieldsLoaderSelector: '#fields_loader'
                 }
             });
-            waitForFilter(function (timeout) {
+            waitForFilter(function(timeout) {
                 expect($el.find('.active-filter')).toContainHtml('<div></div>');
                 done();
             });
         });
 
-        it('renders none filter', function (done) {
-            var $fieldsLoader = $('<input id="fields_loader"></input>');
+        it('renders none filter', function(done) {
+            var $fieldsLoader = $('<input id="fields_loader"/>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
             $fieldsLoader.data('fields', data);
 
             $el.data('value', {
-                "columnName":"name",
-                "criterion": {
-                    "data": {
+                'columnName': 'name',
+                'criterion': {
+                    'data': {
                     }
                 }
             });
             $el.fieldCondition({
-                "fieldChoice": {
-                    "select2": {
-                        "placeholder": "Choose a field...",
-                        "formatSelectionTemplate": "<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>"
+                'fieldChoice': {
+                    'select2': {
+                        'placeholder': 'Choose a field...',
+                        'formatSelectionTemplate':
+                            '<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>'
                     },
-                    "fieldsLoaderSelector": "#fields_loader"
+                    'fieldsLoaderSelector': '#fields_loader'
                 },
-                "filters": []
+                'filters': []
             });
-            waitForFilter(function (timeout) {
+            waitForFilter(function(timeout) {
                 expect($el.find('.active-filter')).toContainHtml('<div></div>');
                 done();
             });
         });
 
-        it('renders choice filter', function (done) {
-            var $fieldsLoader = $('<input id="fields_loader"></input>');
+        it('renders choice filter', function(done) {
+            var $fieldsLoader = $('<input id="fields_loader" />');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
             $fieldsLoader.data('fields', data);
 
             $el.data('value', {
-                "columnName": "name",
-                "criterion": {
-                    "filter": "string",
-                    "data": {
-                        "value": "a",
-                        "type": "1"
+                'columnName': 'name',
+                'criterion': {
+                    'filter': 'string',
+                    'data': {
+                        'value': 'a',
+                        'type': '1'
                     }
                 }
             });
             $el.fieldCondition({
-                "fieldChoice": {
-                    "select2": {
-                        "placeholder": "Choose a field...",
-                        "formatSelectionTemplate": "<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>"
+                'fieldChoice': {
+                    'select2': {
+                        'placeholder': 'Choose a field...',
+                        'formatSelectionTemplate':
+                            '<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>'
                     },
-                    "fieldsLoaderSelector": "#fields_loader"
+                    'fieldsLoaderSelector': '#fields_loader'
                 },
-                "filters": [
+                'filters': [
                     {
-                        "name": "string",
-                        "label": "String",
-                        "choices": [
+                        'name': 'string',
+                        'label': 'String',
+                        'choices': [
                             {
-                                "data": 1,
-                                "value": "1",
-                                "label": "contains"
+                                'data': 1,
+                                'value': '1',
+                                'label': 'contains'
                             },
                             {
-                                "data": 2,
-                                "value": "2",
-                                "label": "does not contain"
+                                'data': 2,
+                                'value': '2',
+                                'label': 'does not contain'
                             },
                             {
-                                "data": 3,
-                                "value": "3",
-                                "label": "is equal to"
+                                'data': 3,
+                                'value': '3',
+                                'label': 'is equal to'
                             },
                             {
-                                "data": 4,
-                                "value": "4",
-                                "label": "starts with"
+                                'data': 4,
+                                'value': '4',
+                                'label': 'starts with'
                             },
                             {
-                                "data": 5,
-                                "value": "5",
-                                "label": "ends with"
+                                'data': 5,
+                                'value': '5',
+                                'label': 'ends with'
                             },
                             {
-                                "data": 6,
-                                "value": "6",
-                                "label": "is any of"
+                                'data': 6,
+                                'value': '6',
+                                'label': 'is any of'
                             },
                             {
-                                "data": 7,
-                                "value": "7",
-                                "label": "is not any of"
+                                'data': 7,
+                                'value': '7',
+                                'label': 'is not any of'
                             }
                         ],
-                        "applicable": [
+                        'applicable': [
                             {
-                                "type": "string"
+                                'type': 'string'
                             },
                             {
-                                "type": "text"
+                                'type': 'text'
                             }
                         ],
-                        "type": "string",
-                        "templateTheme": "embedded"
+                        'type': 'string',
+                        'templateTheme': 'embedded'
                     }
                 ]
             });
-            waitForFilter(function (timeout) {
+            waitForFilter(function(timeout) {
                 var $f = $el.find('.active-filter');
                 expect($f).toContainText('contains');
                 expect($f).toContainText('does not contain');
@@ -194,177 +196,178 @@ define(function (require) {
             });
         });
 
-        it('replaces filter', function (done) {
-            var $fieldsLoader = $('<input id="fields_loader"></input>');
+        it('replaces filter', function(done) {
+            var $fieldsLoader = $('<input id="fields_loader" />');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
             $fieldsLoader.data('fields', data);
 
             $el.data('value', {
-                "columnName": "name",
-                "criterion": {
-                    "filter": "string",
-                    "data": {
-                        "value": "a",
-                        "type": "1"
+                'columnName': 'name',
+                'criterion': {
+                    'filter': 'string',
+                    'data': {
+                        'value': 'a',
+                        'type': '1'
                     }
                 }
             });
             $el.fieldCondition({
-                "fieldChoice": {
-                    "select2": {
-                        "placeholder": "Choose a field...",
-                        "formatSelectionTemplate": "<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>"
+                'fieldChoice': {
+                    'select2': {
+                        'placeholder': 'Choose a field...',
+                        'formatSelectionTemplate':
+                            '<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>'
                     },
-                    "fieldsLoaderSelector": "#fields_loader"
+                    'fieldsLoaderSelector': '#fields_loader'
                 },
-                "filters": [
+                'filters': [
                     {
-                        "name": "string",
-                        "label": "String",
-                        "choices": [
+                        'name': 'string',
+                        'label': 'String',
+                        'choices': [
                             {
-                                "data": 1,
-                                "value": "1",
-                                "label": "contains"
+                                'data': 1,
+                                'value': '1',
+                                'label': 'contains'
                             },
                             {
-                                "data": 2,
-                                "value": "2",
-                                "label": "does not contain"
+                                'data': 2,
+                                'value': '2',
+                                'label': 'does not contain'
                             },
                             {
-                                "data": 3,
-                                "value": "3",
-                                "label": "is equal to"
+                                'data': 3,
+                                'value': '3',
+                                'label': 'is equal to'
                             },
                             {
-                                "data": 4,
-                                "value": "4",
-                                "label": "starts with"
+                                'data': 4,
+                                'value': '4',
+                                'label': 'starts with'
                             },
                             {
-                                "data": 5,
-                                "value": "5",
-                                "label": "ends with"
+                                'data': 5,
+                                'value': '5',
+                                'label': 'ends with'
                             },
                             {
-                                "data": 6,
-                                "value": "6",
-                                "label": "is any of"
+                                'data': 6,
+                                'value': '6',
+                                'label': 'is any of'
                             },
                             {
-                                "data": 7,
-                                "value": "7",
-                                "label": "is not any of"
+                                'data': 7,
+                                'value': '7',
+                                'label': 'is not any of'
                             }
                         ],
-                        "applicable": [
+                        'applicable': [
                             {
-                                "type": "string"
+                                'type': 'string'
                             },
                             {
-                                "type": "text"
+                                'type': 'text'
                             }
                         ],
-                        "type": "string",
-                        "templateTheme": "embedded"
+                        'type': 'string',
+                        'templateTheme': 'embedded'
                     },
                     {
-                        "name": "datetime",
-                        "label": "Datetime",
-                        "choices": [
+                        'name': 'datetime',
+                        'label': 'Datetime',
+                        'choices': [
                             {
-                                "data": 1,
-                                "value": "1",
-                                "label": "between"
+                                'data': 1,
+                                'value': '1',
+                                'label': 'between'
                             },
                             {
-                                "data": 2,
-                                "value": "2",
-                                "label": "not between"
+                                'data': 2,
+                                'value': '2',
+                                'label': 'not between'
                             },
                             {
-                                "data": 3,
-                                "value": "3",
-                                "label": "more than"
+                                'data': 3,
+                                'value': '3',
+                                'label': 'more than'
                             },
                             {
-                                "data": 4,
-                                "value": "4",
-                                "label": "less than"
+                                'data': 4,
+                                'value': '4',
+                                'label': 'less than'
                             }
                         ],
-                        "applicable": [
+                        'applicable': [
                             {
-                                "type": "datetime"
+                                'type': 'datetime'
                             }
                         ],
-                        "type": "datetime",
-                        "templateTheme": "embedded",
-                        "typeValues": {
-                            "between": 1,
-                            "notBetween": 2,
-                            "moreThan": 3,
-                            "lessThan": 4
+                        'type': 'datetime',
+                        'templateTheme': 'embedded',
+                        'typeValues': {
+                            'between': 1,
+                            'notBetween': 2,
+                            'moreThan': 3,
+                            'lessThan': 4
                         },
-                        "dateParts": {
-                            "value": "value",
-                            "dayofweek": "day of week",
-                            "week": "week",
-                            "day": "day",
-                            "month": "month",
-                            "quarter": "quarter",
-                            "dayofyear": "day of year",
-                            "year": "year"
+                        'dateParts': {
+                            'value': 'value',
+                            'dayofweek': 'day of week',
+                            'week': 'week',
+                            'day': 'day',
+                            'month': 'month',
+                            'quarter': 'quarter',
+                            'dayofyear': 'day of year',
+                            'year': 'year'
                         },
-                        "externalWidgetOptions":{
-                            "firstDay":0,
-                            "showDatevariables":true,
-                            "showTime":true,
-                            "showTimepicker":true,
-                            "dateVars":{
-                                "value":{
-                                    "1":"now",
-                                    "2":"today",
-                                    "3":"start of the week",
-                                    "4":"start of the month",
-                                    "5":"start of the quarter",
-                                    "6":"start of the year"
+                        'externalWidgetOptions': {
+                            'firstDay': 0,
+                            'showDatevariables': true,
+                            'showTime': true,
+                            'showTimepicker': true,
+                            'dateVars': {
+                                'value': {
+                                    '1': 'now',
+                                    '2': 'today',
+                                    '3': 'start of the week',
+                                    '4': 'start of the month',
+                                    '5': 'start of the quarter',
+                                    '6': 'start of the year'
                                 },
-                                "dayofweek":{
-                                    "10":"current day",
-                                    "15":"first day of quarter"
+                                'dayofweek': {
+                                    '10': 'current day',
+                                    '15': 'first day of quarter'
                                 },
-                                "week":{
-                                    "11":"current week"
+                                'week': {
+                                    '11': 'current week'
                                 },
-                                "day":{
-                                    "10":"current day",
-                                    "15":"first day of quarter"
+                                'day': {
+                                    '10': 'current day',
+                                    '15': 'first day of quarter'
                                 },
-                                "month":{
-                                    "12":"current month",
-                                    "16":"first month of quarter"
+                                'month': {
+                                    '12': 'current month',
+                                    '16': 'first month of quarter'
                                 },
-                                "quarter":{
-                                    "13":"current quarter"
+                                'quarter': {
+                                    '13': 'current quarter'
                                 },
-                                "dayofyear":{
-                                    "10":"current day",
-                                    "15":"first day of quarter"
+                                'dayofyear': {
+                                    '10': 'current day',
+                                    '15': 'first day of quarter'
                                 },
-                                "year":{
-                                    "14":"current year"
+                                'year': {
+                                    '14': 'current year'
                                 }
                             }
                         }
-                    },
+                    }
                 ]
             });
-            waitForFilter(function (timeout) {
+            waitForFilter(function(timeout) {
                 $el.fieldCondition('selectField', 'createdAt');
-                waitForFilter(function (timeout) {
+                waitForFilter(function(timeout) {
                     var $f = $el.find('.active-filter');
 
                     expect($f).toContainText('between');

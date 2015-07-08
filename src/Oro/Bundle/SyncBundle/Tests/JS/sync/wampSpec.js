@@ -1,12 +1,14 @@
 define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
-    ], function (Wamp, Backbone, requirejsExposure) {
+    ], function(Wamp, Backbone, requirejsExposure) {
     'use strict';
 
     var exposure = requirejsExposure.disclose('orosync/js/sync/wamp');
 
-    describe('orosync/js/sync/wamp', function () {
-        var ab, $, session;
-        beforeEach(function () {
+    describe('orosync/js/sync/wamp', function() {
+        var ab;
+        var $;
+        var session;
+        beforeEach(function() {
             ab = jasmine.createSpyObj('ab', ['debug', 'connect']);
             $ = jasmine.createSpy('$');
             $.on = jasmine.createSpy('$.on');
@@ -15,23 +17,24 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
             exposure.substitute('ab').by(ab);
             exposure.substitute('$').by($);
         });
-        afterEach(function () {
+        afterEach(function() {
             exposure.recover('ab');
             exposure.recover('$');
         });
-        describe('create instance', function () {
-            var wamp, options;
-            beforeEach(function () {
+        describe('create instance', function() {
+            var wamp;
+            var options;
+            beforeEach(function() {
                 options = {host: '127.0.0.1'};
             });
 
-            it('required options', function () {
-                expect(function () {
+            it('required options', function() {
+                expect(function() {
                     wamp = new Wamp();
                 }).toThrowError('host option is required');
             });
 
-            it('debug mode', function () {
+            it('debug mode', function() {
                 wamp = new Wamp(options);
                 expect(ab.debug).not.toHaveBeenCalled();
                 options.debug = true;
@@ -39,7 +42,7 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                 expect(ab.debug).toHaveBeenCalledWith(true, true, true);
             });
 
-            it('connection open', function () {
+            it('connection open', function() {
                 wamp = new Wamp(options);
                 expect(ab.connect).toHaveBeenCalledWith(
                     jasmine.any(String),
@@ -49,7 +52,7 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                 );
             });
 
-            it('connection re-open', function () {
+            it('connection re-open', function() {
                 wamp = new Wamp(options);
                 // connection established
                 wamp.session = session;
@@ -58,12 +61,12 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                 expect(ab.connect).not.toHaveBeenCalled();
             });
 
-            it('implements Backbone.Events', function () {
+            it('implements Backbone.Events', function() {
                 wamp = new Wamp(options);
                 expect(wamp).toEqual(jasmine.objectContaining(Backbone.Events));
             });
 
-            it('handle beforeunload event', function () {
+            it('handle beforeunload event', function() {
                 wamp = new Wamp(options);
                 wamp.session = session;
                 expect($).toHaveBeenCalledWith(window);
@@ -73,16 +76,17 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                 expect(session.close).toHaveBeenCalled();
             });
 
-            describe('connection callbacks', function () {
-                var onConnect, onHangup;
-                beforeEach(function () {
+            describe('connection callbacks', function() {
+                var onConnect;
+                var onHangup;
+                beforeEach(function() {
                     wamp = new Wamp(options);
                     spyOn(wamp, 'trigger').and.callThrough();
                     onConnect = ab.connect.calls.mostRecent().args[1];
                     onHangup = ab.connect.calls.mostRecent().args[2];
                 });
 
-                it('on connect with empty channels queue', function () {
+                it('on connect with empty channels queue', function() {
                     wamp.channels = {};
                     onConnect(session);
                     expect(wamp.session).toBe(session);
@@ -90,10 +94,10 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                     expect(session.subscribe).not.toHaveBeenCalled();
                 });
 
-                it('on connect with queid subscription', function () {
-                    var callback11 = function () {},
-                        callback12 = function () {},
-                        callback21 = function () {};
+                it('on connect with queid subscription', function() {
+                    var callback11 = function() {};
+                    var callback12 = function() {};
+                    var callback21 = function() {};
                     wamp.channels = {
                         '/some/channel/1': [callback11, callback12],
                         '/some/channel/2': [callback21]
@@ -108,14 +112,14 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                     expect(session.subscribe).not.toHaveBeenCalledWith('/some/channel/2', callback11);
                 });
 
-                it('on hangup peacefully', function () {
+                it('on hangup peacefully', function() {
                     wamp.session = session;
                     onHangup(0);
                     expect(wamp.session).toBeFalsy();
                     expect(wamp.trigger).not.toHaveBeenCalled();
                 });
 
-                it('on hangup with error code', function () {
+                it('on hangup with error code', function() {
                     wamp.session = session;
                     onHangup(1);
                     expect(wamp.session).toBeFalsy();
@@ -123,17 +127,17 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                 });
             });
 
-            describe('subscription handling', function () {
-                var wrappedCallback,
-                    originalCallback1 = function () {},
-                    originalCallback2 = function () {},
-                    channel = 'some/channel';
-                beforeEach(function () {
+            describe('subscription handling', function() {
+                var wrappedCallback;
+                var originalCallback1 = function() {};
+                var originalCallback2 = function() {};
+                var channel = 'some/channel';
+                beforeEach(function() {
                     wamp = new Wamp(options);
                     wamp.session = session;
                 });
 
-                it('subscribe', function () {
+                it('subscribe', function() {
                     wamp.subscribe(channel, originalCallback1);
                     expect(session.subscribe).toHaveBeenCalledWith(channel, jasmine.any(Function));
                     wrappedCallback = session.subscribe.calls.mostRecent().args[1];
@@ -149,14 +153,14 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                     expect(wamp.channels[channel]).toContain(wrappedCallback);
                 });
 
-                describe('unsubscribe', function () {
-                    beforeEach(function () {
+                describe('unsubscribe', function() {
+                    beforeEach(function() {
                         wamp.subscribe(channel, originalCallback1);
                         wamp.subscribe(channel, originalCallback2);
                         wrappedCallback = session.subscribe.calls.mostRecent().args[1];
                     });
 
-                    it('with two parameters', function () {
+                    it('with two parameters', function() {
                         expect(wamp.channels[channel].length).toEqual(2);
 
                         wamp.unsubscribe(channel, originalCallback1);
@@ -169,7 +173,7 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                         expect(wamp.channels[channel]).toBeUndefined();
                     });
 
-                    it('by channle', function () {
+                    it('by channle', function() {
                         expect(wamp.channels[channel].length).toEqual(2);
 
                         wamp.unsubscribe(channel);
