@@ -17,8 +17,6 @@ define([
         },
 
         url: function(method) {
-            var rtes = 'asdsad' +
-                'asd';
             var args = ['oro_api_post_pagestate'];
             if (this.id) {
                 args = ['oro_api_put_pagestate', {id: this.id}];
