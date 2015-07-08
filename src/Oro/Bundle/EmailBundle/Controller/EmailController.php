@@ -184,6 +184,9 @@ class EmailController extends Controller
      * @Route("/reply/{id}", name="oro_email_email_reply", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
+     *
+     * @param Email $email
+     * @return array
      */
     public function replyAction(Email $email)
     {
@@ -192,9 +195,12 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/reply/{id}", name="oro_email_email_reply_all", requirements={"id"="\d+"})
+     * @Route("/replyall/{id}", name="oro_email_email_reply_all", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
+     *
+     * @param Email $email
+     * @return array
      */
     public function replyAllAction(Email $email)
     {
