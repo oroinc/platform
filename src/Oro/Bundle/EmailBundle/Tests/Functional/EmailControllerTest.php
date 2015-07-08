@@ -167,4 +167,37 @@ class EmailControllerTest extends WebTestCase
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);
     }
+
+    public function testReply()
+    {
+        $id = $this->getReference('email_1')->getId();
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_email_email_reply', ['id' => $id, '_widgetContainer' => 'widget']),
+            [],
+            [],
+            $this->generateWsseAuthHeader()
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+        $content = $response->getContent();
+        $this->assertContains('Reply', $content);
+    }
+
+    public function testReplyAll()
+    {
+        $id = $this->getReference('email_1')->getId();
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_email_email_reply_all', ['id' => $id, '_widgetContainer' => 'widget']),
+            [],
+            [],
+            $this->generateWsseAuthHeader()
+        );
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+        $crawler = $this->client->getCrawler();
+        $this->assertEquals(1, $crawler->filter('div.widget-content input#oro_email_email[cc]')->count());
+    }
 }
