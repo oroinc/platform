@@ -5,7 +5,7 @@ define([
     'oroui/js/mediator',
     './map-filter-module-name',
     './collection-filters-manager'
-], function($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
+], function($, _, tools, mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
     var methods = {

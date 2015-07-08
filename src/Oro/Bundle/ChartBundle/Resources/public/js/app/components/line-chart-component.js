@@ -146,12 +146,12 @@ define(function(require) {
                     colors: options.settings.chartColors,
                     fontColor: options.settings.chartFontColor,
                     fontSize: options.settings.chartFontSize,
-                    lines : {
-                        show : connectDots
+                    lines: {
+                        show: connectDots
                     },
-                    mouse : {
-                        track : true,
-                        relative : true,
+                    mouse: {
+                        track: true,
+                        relative: true,
                         trackFormatter: function(pointData) {
                             return getXLabel(pointData.x) + ': ' + getYLabel(pointData.y);
                         }
@@ -172,9 +172,9 @@ define(function(require) {
                         },
                         title: options.data_schema.label.label
                     },
-                    HtmlText : false,
+                    HtmlText: false,
                     grid: {
-                        verticalLines : false
+                        verticalLines: false
                     }
                 }
             );

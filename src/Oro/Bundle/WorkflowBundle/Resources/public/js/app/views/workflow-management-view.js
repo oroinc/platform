@@ -89,7 +89,7 @@ define(function(require) {
                 'allowClear': true,
                 'query': getSteps,
                 'placeholder': __('Choose step...'),
-                'initSelection' : _.bind(function(element, callback) {
+                'initSelection': _.bind(function(element, callback) {
                     var startStep = this.model.getStepByName(element.val());
                     callback({
                         id: startStep.get('name'),

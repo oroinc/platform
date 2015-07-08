@@ -48,7 +48,7 @@ define(['underscore', 'backbone', 'oro/dialog-widget'
                 dialogOptions: {
                     'allowMinimize': true,
                     'width': 675,
-                    'autoResize':true
+                    'autoResize': true
                 }
             });
             widget.render();

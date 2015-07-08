@@ -56,7 +56,7 @@ define([
             $.ajax({
                 method: 'GET',
                 url: url,
-                success:function(r) {
+                success: function(r) {
                     self.collection.reset();
                     self.collection.add(r);
                     self.render();

@@ -21,8 +21,8 @@ define([
         defaults: {
             // original id is copied to originalId property and this attribute is replaced with calendarUid + originalId
             id: null,
-            title : null,
-            description : null,
+            title: null,
+            description: null,
             start: null,
             end: null,
             allDay: false,

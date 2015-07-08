@@ -92,7 +92,7 @@ define(function(require) {
                     grid: {
                         outlineWidth: 0
                     },
-                    legend : {
+                    legend: {
                         show: !hasPlaceForLabels,
                         container: $legend.get(0),
                         labelBoxWidth: 20,

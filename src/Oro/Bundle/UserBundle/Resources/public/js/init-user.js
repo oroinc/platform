@@ -51,7 +51,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
                     allowMinimize: true,
                     dblclick: 'maximize',
                     maximizedHeightDecreaseBy: 'minimize-bar',
-                    width : 1000,
+                    width: 1000,
                     title: $el.attr('title')
                 }
             }));
@@ -84,7 +84,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
 
         $(document).on('submit', '#create-status-form', function() {
             $.ajax({
-                type:'POST',
+                type: 'POST',
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
                 success: function() {

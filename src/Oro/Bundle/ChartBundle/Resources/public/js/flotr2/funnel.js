@@ -245,9 +245,9 @@ define([
             var distY = !$prev[0] ? options.marginY :
                 $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2;
             var style = {
-                    size : options.fontSize * 1.2,
-                    color : options.fontColor,
-                    weight : 1.5
+                    size: options.fontSize * 1.2,
+                    color: options.fontColor,
+                    weight: 1.5
                 };
             options.htmlText   = true;
             style.textAlign    = 'left';

@@ -8,11 +8,11 @@ define(['backbone'], function(Backbone) {
      */
     return Backbone.Model.extend({
         defaults: {
-            owner     : false,
-            notSaved  : false,
+            owner: false,
+            notSaved: false,
             moreOwners: false,
-            url       : '',
-            name      : ''
+            url: '',
+            name: ''
         }
     });
 });

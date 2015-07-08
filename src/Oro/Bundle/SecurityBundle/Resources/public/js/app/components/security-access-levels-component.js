@@ -8,22 +8,22 @@ define(function(require) {
     var $ = require('jquery');
 
     SecurityAccessLevelsComponent = BaseComponent.extend({
-        element : null,
+        element: null,
 
-        defaultOptions : {
-            accessLevelLinkSelector : '.access_level_value a',
-            selectDivSelector : '.access_level_value_choice',
-            linkDivSelector : 'access_level_value_link',
-            accessLevelRoute : 'oro_security_access_levels',
-            objectIdentityAttribute : 'data-identity',
-            selectorNameAttribute : 'data-selector-name',
-            selectorIdAttribute : 'data-selector-id',
-            valueAttribute : 'data-value'
+        defaultOptions: {
+            accessLevelLinkSelector: '.access_level_value a',
+            selectDivSelector: '.access_level_value_choice',
+            linkDivSelector: 'access_level_value_link',
+            accessLevelRoute: 'oro_security_access_levels',
+            objectIdentityAttribute: 'data-identity',
+            selectorNameAttribute: 'data-selector-name',
+            selectorIdAttribute: 'data-selector-id',
+            valueAttribute: 'data-value'
         },
 
-        options : {},
+        options: {},
 
-        selectTemplate : _.template(
+        selectTemplate: _.template(
             '<select name="<%= name %>" id="<%= id %>" class="<%= className %>">' +
                 '<% $.each(options, function (value, text) { %>' +
                     '<option value="<%= value %>"' +
@@ -51,11 +51,11 @@ define(function(require) {
                     url: routing.generate(self.options.accessLevelRoute, {oid: oid}),
                     success: function(data) {
                         var selector = $(self.selectTemplate({
-                            name : parentDiv.attr(self.options.selectorNameAttribute),
-                            id : parentDiv.attr(self.options.selectorIdAttribute),
-                            className : 'security-permission',
-                            options : _.omit(data, 'template_name'),
-                            selectedOption : parentDiv.attr(self.options.valueAttribute)
+                            name: parentDiv.attr(self.options.selectorNameAttribute),
+                            id: parentDiv.attr(self.options.selectorIdAttribute),
+                            className: 'security-permission',
+                            options: _.omit(data, 'template_name'),
+                            selectedOption: parentDiv.attr(self.options.valueAttribute)
                         }));
 
                         selectDiv.append(selector);

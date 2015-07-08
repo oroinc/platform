@@ -15,7 +15,7 @@ define(function(require) {
             id: '',
             name: ''
         },
-        url:function() {
+        url: function() {
             var param = {
                 activity: 'emails',
                 id: this.get('entityId'),

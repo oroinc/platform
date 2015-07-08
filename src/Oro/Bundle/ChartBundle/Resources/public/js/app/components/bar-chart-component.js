@@ -59,15 +59,15 @@ define(function(require) {
                     colors: settings.chartColors,
                     fontColor: settings.chartFontColor,
                     fontSize: settings.chartFontSize,
-                    bars : {
+                    bars: {
                         show: true,
                         horizontal: false,
                         shadowSize: 0,
                         barWidth: 0.5
                     },
-                    mouse : {
-                        track : true,
-                        relative : true,
+                    mouse: {
+                        track: true,
+                        relative: true,
                         trackFormatter: function(data) {
                             var yValue;
 
@@ -98,7 +98,7 @@ define(function(require) {
                         }
                     },
                     grid: {
-                        verticalLines : false
+                        verticalLines: false
                     }
                 }
             );

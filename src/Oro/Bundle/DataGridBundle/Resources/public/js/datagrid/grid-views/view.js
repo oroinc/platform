@@ -36,7 +36,7 @@ define([
         },
 
         /** @property */
-        template:null,
+        template: null,
 
         /** @property */
         titleTemplate: null,

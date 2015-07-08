@@ -85,26 +85,26 @@ define(function(require) {
                     fontSize: settings.chartFontSize,
                     shadowSize: 0,
                     HtmlText: true,
-                    xaxis : {
-                        showLabels : false
+                    xaxis: {
+                        showLabels: false
                     },
-                    yaxis : {
-                        showLabels : false
+                    yaxis: {
+                        showLabels: false
                     },
-                    grid : {
+                    grid: {
                         color: settings.chartFontColor,
-                        verticalLines : false,
-                        horizontalLines : false,
+                        verticalLines: false,
+                        horizontalLines: false,
                         outlineWidth: 0
                     },
-                    pie : {
-                        show : true,
-                        explode : 0,
+                    pie: {
+                        show: true,
+                        explode: 0,
                         sizeRatio: 0.8,
                         startAngle: Math.PI / 3.5
                     },
-                    mouse : {
-                        track : true,
+                    mouse: {
+                        track: true,
                         relative: true,
                         lineColor: settings.chartHighlightColor,
                         trackFormatter: function(obj) {
@@ -112,8 +112,8 @@ define(function(require) {
                                 '&nbsp;&nbsp;&nbsp;' + parseFloat(obj.fraction * 100).toFixed(2) + ' %';
                         }
                     },
-                    legend : {
-                        position : 'ne',
+                    legend: {
+                        position: 'ne',
                         container: $legend.get(0),
                         labelBoxWidth: 20,
                         labelBoxHeight: 13,

@@ -75,7 +75,7 @@ define([
         _getSelection: function() {
             var selection = {};
             this.collection.trigger('backgrid:getSelected', selection);
-            return _.defaults(selection, {inset : true, selected : []});
+            return _.defaults(selection, {inset: true, selected: []});
         },
 
         /**

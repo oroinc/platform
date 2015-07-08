@@ -8,15 +8,15 @@ define(function(require) {
     require('moment-timezone');
 
     moment.locale(locale, {
-        months : localeSettings.getCalendarMonthNames('wide', true),
-        monthsShort : localeSettings.getCalendarMonthNames('abbreviated', true),
-        weekdays : localeSettings.getCalendarDayOfWeekNames('wide', true),
-        weekdaysShort : localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
-        weekdaysMin : localeSettings.getCalendarDayOfWeekNames('short', true),
-        week : {
-            dow : localeSettings.getCalendarFirstDayOfWeek() - 1
+        months: localeSettings.getCalendarMonthNames('wide', true),
+        monthsShort: localeSettings.getCalendarMonthNames('abbreviated', true),
+        weekdays: localeSettings.getCalendarDayOfWeekNames('wide', true),
+        weekdaysShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
+        weekdaysMin: localeSettings.getCalendarDayOfWeekNames('short', true),
+        week: {
+            dow: localeSettings.getCalendarFirstDayOfWeek() - 1
         },
-        meridiem : function(hours, minutes, isLower) {
+        meridiem: function(hours, minutes, isLower) {
             if (hours > 11) {
                 return isLower ? __('pm') : __('PM');
             } else {

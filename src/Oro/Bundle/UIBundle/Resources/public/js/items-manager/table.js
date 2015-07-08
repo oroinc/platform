@@ -64,7 +64,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
 
             this.element.sortable({
                 cursor: 'move',
-                delay : 25,
+                delay: 25,
                 opacity: 0.7,
                 revert: 10,
                 axis: 'y',

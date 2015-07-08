@@ -25,7 +25,7 @@ define(function(require) {
             var items = typeof this.options.contextTargets === 'undefined' ? [] : this.options.contextTargets;
             this.contextsView = new EmailContextActivityView({
                 contextTargets: items,
-                entityId:this.options.entityId,
+                entityId: this.options.entityId,
                 el: this.options._sourceElement,
                 $container: $container,
                 inputName: this.options.inputName,

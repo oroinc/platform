@@ -41,7 +41,7 @@ define(function(require) {
             this.$el.val('');
 
             this.$el.typeahead({
-                source:_.bind(this.source, this),
+                source: _.bind(this.source, this),
                 matcher: function(item) {
                     return item.key.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
                 },

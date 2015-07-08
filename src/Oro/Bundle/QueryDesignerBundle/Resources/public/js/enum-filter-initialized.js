@@ -8,9 +8,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
                 'oro_api_get_dictionary_values',
                 {dictionary: className.replace(/\\/g, '_'), limit: -1}
             ),
-            success: function (data) {
+            success: function(data) {
                 data = _.sortBy(data, 'order');
-                var choices = _.map(data, function (item) {
+                var choices = _.map(data, function(item) {
                     return {value: item.id, label: item.name};
                 });
 

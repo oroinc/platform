@@ -45,7 +45,7 @@ define([
         ),
 
         /** @property */
-        launcherItemTemplate:_.template(
+        launcherItemTemplate: _.template(
             '<li class="launcher-item"></li>'
         ),
 
