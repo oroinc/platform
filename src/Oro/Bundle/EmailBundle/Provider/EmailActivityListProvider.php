@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -20,7 +21,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
+/**
+ * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
+ * we are trying to extract Organization from the current logged user.
+ *
+ * @todo Should be refactored in the BAP-8520
+ * @see EmailActivityListProvider::isApplicable
+ * @see EmailActivityListProvider::getOrganization
+ */
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
@@ -50,6 +60,9 @@ class EmailActivityListProvider implements
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
+    /** @var  SecurityContextInterface */
+    protected $securityContextLink;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
@@ -58,6 +71,7 @@ class EmailActivityListProvider implements
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
      * @param HtmlTagHelper       $htmlTagHelper
+     * @param ServiceLink         $securityContextLink
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -66,7 +80,8 @@ class EmailActivityListProvider implements
         Router $router,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
-        HtmlTagHelper $htmlTagHelper
+        HtmlTagHelper $htmlTagHelper,
+        ServiceLink $securityContextLink
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -75,6 +90,7 @@ class EmailActivityListProvider implements
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
         $this->htmlTagHelper        = $htmlTagHelper;
+        $this->securityContextLink  = $securityContextLink;
     }
 
     /**
@@ -167,7 +183,22 @@ class EmailActivityListProvider implements
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity Email */
-        return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
+        if ($activityEntity->getFromEmailAddress()->hasOwner() &&
+            $activityEntity->getFromEmailAddress()->getOwner()->getOrganization()
+        ) {
+            return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
+        }
+
+        /** @var SecurityContextInterface $securityContext */
+        $securityContext = $this->securityContextLink->getService();
+        if ($securityContext) {
+            $token = $securityContext->getToken();
+            if ($token instanceof OrganizationContextTokenInterface) {
+                return $token->getOrganizationContext();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -248,8 +279,9 @@ class EmailActivityListProvider implements
      */
     public function isApplicable($entity)
     {
-        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
-            && $entity->getFromEmailAddress()->hasOwner();
+        return
+            $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
+            && $this->getOrganization($entity);
     }
 
     /**
