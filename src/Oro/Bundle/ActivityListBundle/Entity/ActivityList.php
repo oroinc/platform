@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -160,6 +161,56 @@ class ActivityList extends ExtendActivityList
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     *
+     * @ORM\OneToMany(targetEntity="ActivityOwner", mappedBy="activity",
+     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    protected $activityOwners;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->activityOwners = new ArrayCollection();
+    }
+
+    /**
+     * @param ActivityOwner $activityOwner
+     *
+     * @return $this
+     */
+    public function addActivityOwner(ActivityOwner $activityOwner)
+    {
+        if (!$this->activityOwners->contains($activityOwner)) {
+            $this->activityOwners->add($activityOwner);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ActivityOwner $activityOwner
+     *
+     * @return $this
+     */
+    public function removeActivityOwner(ActivityOwner $activityOwner)
+    {
+        if ($this->activityOwners->contains($activityOwner)) {
+            $this->activityOwners->removeElement($activityOwner);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getActivityOwners()
+    {
+        return $this->activityOwners;
+    }
 
     /**
      * Get id
