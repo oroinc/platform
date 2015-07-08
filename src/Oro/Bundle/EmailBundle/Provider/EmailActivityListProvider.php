@@ -196,11 +196,9 @@ class EmailActivityListProvider implements
 
         /** @var SecurityContextInterface $securityContext */
         $securityContext = $this->securityContextLink->getService();
-        if ($securityContext) {
-            $token = $securityContext->getToken();
-            if ($token instanceof OrganizationContextTokenInterface) {
-                return $token->getOrganizationContext();
-            }
+        $token           = $securityContext->getToken();
+        if ($token instanceof OrganizationContextTokenInterface) {
+            return $token->getOrganizationContext();
         }
 
         return null;
