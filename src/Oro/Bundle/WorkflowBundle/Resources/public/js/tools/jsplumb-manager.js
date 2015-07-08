@@ -60,8 +60,8 @@ define(function (require) {
                 [[1, 0.5, 1, 0],[0.5, 0, 0, -1]],
                 [[0.5, 1, 0, 1],[0, 0.5, -1, 0]]
             ];
-            this.xPadding = 80;
-            this.yPadding = 15;
+            this.xPadding = 20;
+            this.yPadding = 8;
             this.xIncrement = 200;
             this.yIncrement = 100;
             this.stepForNew = 10;
@@ -113,7 +113,7 @@ define(function (require) {
 
         getPositionForNew: function () {
             var step = this.stepForNew,
-                val = step,
+                val = 0,
                 exist = [];
             this.workflow.get('steps').each(function (item) {
                 var pos = item.get('position');
