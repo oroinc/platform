@@ -29,7 +29,8 @@ define(function (require) {
                 router: null,
                 routingParams: {},
                 fieldsData: [],
-                confirmMessage: ''
+                confirmMessage: '',
+                loadEvent: 'fieldsLoaded'
             },
             filters: {
                 criteriaList: '',
@@ -54,24 +55,78 @@ define(function (require) {
         },
 
         initialize: function (options) {
-            this.processOptions(options);
-            this.$storage = $(this.options.valueSource);
+            require(options.extensions || [], _.bind(function () {
+                var extensions = arguments;
+                _.each(extensions, function (extension) {
+                    extension.load(this);
+                }, this);
 
-            this.initEntityFieldsUtil();
-            this.initFieldsLoader();
-            this.initGrouping();
-            this.initColumn();
-            this.configureFilters();
+                this.processOptions(options);
+                this.$storage = $(this.options.valueSource);
 
-            if (this.$entityChoice) {
-                this.trigger('fieldsLoaded',
-                    this.$entityChoice.val(), this.$entityChoice.fieldsLoader('getFieldsData'));
-            }
+                this.initEntityFieldsUtil();
+                this.$fieldsLoader = this.initFieldsLoader();
+                this.initGrouping();
+                this.initColumn();
+                this.configureFilters();
 
-            SegmentComponent.__super__.initialize.call(this, options);
+                this.initEntityChangeEvents();
 
-            this.form = this.$storage.parents('form');
-            this.form.submit(_.bind(this.onBeforeSubmit, this));
+                SegmentComponent.__super__.initialize.call(this, options);
+
+                this.form = this.$storage.parents('form');
+                this.form.submit(_.bind(this.onBeforeSubmit, this));
+            }, this));
+        },
+
+        initEntityChangeEvents: function () {
+            var confirm = new DeleteConfirmation({
+                title: __('Change Entity Confirmation'),
+                okText: __('Yes'),
+                content: __(this.options.fieldsLoader.confirmMessage)
+            });
+
+            var self = this;
+            this.$entityChoice.on('change', function (e, extraArgs) {
+                _.extend(e, extraArgs);
+
+                var data = self.load() || [];
+                var requiresConfirm = _.some(data, function (value) {
+                    return !_.isEmpty(value);
+                });
+
+                var ok = _.partial(_.bind(self._onEntityChangeConfirm, self), e, _.pick(e, 'val', 'removed'));
+
+                var cancel = function () {
+                    var oldVal = (e.removed && e.removed.id) || null;
+                    self.$entityChoice.val(oldVal).change();
+                };
+
+                if (requiresConfirm) {
+                    confirm.on('ok', ok);
+                    confirm.on('cancel', cancel);
+                    confirm.once('hidden', function () {
+                        confirm.off('ok');
+                        confirm.off('cancel');
+                    });
+                    confirm.open();
+                } else {
+                    ok();
+                }
+            });
+
+            this.once('dispose:before', function () {
+                confirm.dispose();
+            });
+
+            this.trigger(
+                this.options.fieldsLoader.loadEvent,
+                this.$fieldsLoader.val(),
+                this.$fieldsLoader.fieldsLoader('getFieldsData'));
+        },
+
+        _onEntityChangeConfirm: function (e, additionalOptions) {
+            this.$fieldsLoader.val(e.val).trigger('change', additionalOptions);
         },
 
         onBeforeSubmit: function (e) {
@@ -214,42 +269,41 @@ define(function (require) {
         /**
          * Initializes FieldsLoader on entityChoice element
          */
-        initFieldsLoader: function () {
-            var self, options, confirm, loadingMask, $entityChoice;
+        initFieldsLoader: function (loaderOptions) {
+            var self, options, loadingMask, $entityChoice;
 
             self = this;
-            options = this.options.fieldsLoader;
+            options = loaderOptions || this.options.fieldsLoader;
 
             loadingMask = new LoadingMask({
                 container: $(options.loadingMaskParent)
             });
 
-            confirm = new DeleteConfirmation({
-                title: __('Change Entity Confirmation'),
-                okText: __('Yes'),
-                content: __(options.confirmMessage)
-            });
+            this.$entityChoice = $(options.entityChoice);
 
-            $entityChoice = this.$entityChoice = $(options.entityChoice);
+            var entityChoiceCloneId = this.$entityChoice.attr('id') + options.router;
+            var $entityChoiceClone = $('<input>').attr({
+                'id': entityChoiceCloneId,
+                'class': 'hide',
+                'data-ftid': entityChoiceCloneId
+            });
+            this.$entityChoice.after($entityChoiceClone.prop('outerHTML'));
+            $entityChoice = $('#' + entityChoiceCloneId);
+            $entityChoice.val(this.$entityChoice.val());
+            $entityChoice.data('relatedChoice', this.$entityChoice);
+
             $entityChoice
                 .fieldsLoader({
                     router: options.router,
-                    routingParams: options.routingParams,
-                    confirm: confirm,
-                    requireConfirm: function () {
-                        var data = self.load();
-                        if (!data) {
-                            return false;
-                        }
-                        return _.some(data, function (value) {
-                            return !_.isEmpty(value);
-                        });
-                    }
+                    routingParams: options.routingParams
                 })
                 .on('fieldsloaderstart', _.bind(loadingMask.show, loadingMask))
                 .on('fieldsloadercomplete', _.bind(loadingMask.hide, loadingMask))
                 .on('fieldsloaderupdate', function (e, data) {
-                    self.trigger('fieldsLoaded', $(e.target).val(), data);
+                    if (!loaderOptions) {
+                        self.$entityChoice.trigger('fieldsloaderupdate', data);
+                    }
+                    self.trigger(options.loadEvent, $(e.target).val(), data);
                 })
                 .on('fieldsloadercomplete', function () {
                     var data = {};
@@ -257,15 +311,15 @@ define(function (require) {
                     self.save(data);
                 });
 
-            if (!_.isEmpty(options.fieldsData)) {
-                $entityChoice.fieldsLoader('setFieldsData', JSON.parse(options.fieldsData));
-            }
+            var fieldsData = !_.isEmpty(options.fieldsData) ? JSON.parse(options.fieldsData) : options.fieldsData;
+            $entityChoice.fieldsLoader('setFieldsData', fieldsData);
 
             this.once('dispose:before', function () {
                 loadingMask.dispose();
-                confirm.dispose();
                 delete this.$entityChoice;
             }, this);
+
+            return $entityChoice;
         },
 
         /**
@@ -485,7 +539,8 @@ define(function (require) {
 
         configureFilters: function () {
             var self, options, metadata,
-                $fieldCondition, $segmentCondition, $builder, $criteria;
+                $fieldCondition, $segmentCondition,
+                $builder, $criteria;
 
             self = this;
             options = this.options.filters;
