@@ -31,6 +31,8 @@ define(function(require) {
             attributes: null
         },
 
+        MAX_HISTORY_LENGTH: 50,
+
         observedAttributes: ['steps', 'transitions'],
         entityFieldUtil: null,
         entityFieldsInitialized: false,
