@@ -4,10 +4,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
 
     function loadEnumChoices(className, successCallback, errorCallback) {
         $.ajax({
-            url: routing.generate('oro_api_get_entity_extend_enum', {entityName: className.replace(/\\/g, '_')}),
-            success: function(data) {
-                data = _.sortBy(data, 'priority');
-                var choices = _.map(data, function(item) {
+            url: routing.generate(
+                'oro_api_get_dictionary_values',
+                {dictionary: className.replace(/\\/g, '_'), limit: -1}
+            ),
+            success: function (data) {
+                data = _.sortBy(data, 'order');
+                var choices = _.map(data, function (item) {
                     return {value: item.id, label: item.name};
                 });
 

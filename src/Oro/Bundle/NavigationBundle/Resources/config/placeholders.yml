@@ -41,17 +41,23 @@ placeholders:
 items:
    dot_menu_js:
         template: OroNavigationBundle:Js:dot.menu.js.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
    pinbar_js:
         template: OroNavigationBundle:Js:pinbar.js.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
    routing_requirejs_config:
         template: OroNavigationBundle:Js:requirejs.config.js.twig
    shortcuts:
         template: OroNavigationBundle:Shortcut:shortcuts.html.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
    application_menu:
         template: OroNavigationBundle:ApplicationMenu:applicationMenu.html.twig
    dots_menu:
         template: OroNavigationBundle:ApplicationMenu:dotsMenu.html.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
    pin_tabs_list:
         template: OroNavigationBundle:Menu:pin_tabs_list.html.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
    pin_button:
         template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()

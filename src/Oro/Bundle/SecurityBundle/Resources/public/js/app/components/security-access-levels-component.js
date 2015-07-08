@@ -10,7 +10,7 @@ define(function(require) {
     SecurityAccessLevelsComponent = BaseComponent.extend({
         element : null,
 
-        options : {
+        defaultOptions : {
             accessLevelLinkSelector : '.access_level_value a',
             selectDivSelector : '.access_level_value_choice',
             linkDivSelector : 'access_level_value_link',
@@ -20,6 +20,8 @@ define(function(require) {
             selectorIdAttribute : 'data-selector-id',
             valueAttribute : 'data-value'
         },
+
+        options : {},
 
         selectTemplate : _.template(
             '<select name="<%= name %>" id="<%= id %>" class="<%= className %>">' +
@@ -32,12 +34,12 @@ define(function(require) {
         ),
 
         initialize: function(options) {
-            _.extend(this.options, options);
+            this.options = _.extend({}, this.defaultOptions, options);
 
             this.element = options._sourceElement;
 
             var self = this;
-            this.element.on('click', self.options.accessLevelLinkSelector, function() {
+            this.element.on('click.' + this.cid, self.options.accessLevelLinkSelector, function() {
                 var link = $(this);
                 var parentDiv = link.parents('.access_level_value').first();
                 var selectDiv = parentDiv.find(self.options.selectDivSelector);
@@ -79,7 +81,7 @@ define(function(require) {
             }
 
             if (this.element) {
-                this.element.off();
+                this.element.off('.' + this.cid);
             }
 
             SecurityAccessLevelsComponent.__super__.dispose.call(this);

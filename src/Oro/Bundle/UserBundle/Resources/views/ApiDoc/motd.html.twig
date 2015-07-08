@@ -5,7 +5,7 @@
     $(function() {
         {% set user = get_current_user() %}
         var userName = {{ user ? user.username|json_encode|raw : 'null' }},
-            apiKey = {{ user.apiKeys|first ? (user.apiKeys|first).apiKey|json_encode|raw : 'null' }},
+            apiKey = {{ user and user.apiKeys|first ? (user.apiKeys|first).apiKey|json_encode|raw : 'null' }},
             wsseAllowed = userName && apiKey,
             serverTime = {{ 'now'|date('c', 'UTC')|json_encode|raw }},
             clientTime = new Date(),

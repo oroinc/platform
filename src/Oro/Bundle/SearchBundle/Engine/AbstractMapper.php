@@ -108,6 +108,8 @@ abstract class AbstractMapper
      * @param string $parentName
      * @param bool   $isArray
      *
+     * @deprecated since 1.8
+     *
      * @return array
      */
     protected function setRelatedFields(

@@ -3,12 +3,36 @@
 namespace Oro\Bundle\ActivityBundle\Form\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
 class ActivityEntityApiHandler extends ApiFormHandler
 {
+    /** @var ActivityManager */
+    protected $activityManager;
+
+    /**
+     * @param FormInterface   $form
+     * @param Request         $request
+     * @param ObjectManager   $entityManager
+     * @param ActivityManager $activityManager
+     */
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        ObjectManager $entityManager,
+        ActivityManager $activityManager
+    ) {
+        parent::__construct($form, $request, $entityManager);
+        $this->activityManager = $activityManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -27,12 +51,10 @@ class ActivityEntityApiHandler extends ApiFormHandler
     {
         /** @var ActivityInterface $activity */
         $activity = $entity['activity'];
-        /** @var object[] $relations */
+        /** @var ArrayCollection $relations */
         $relations = $entity['relations'];
 
-        foreach ($relations as $relatedEntity) {
-            $activity->addActivityTarget($relatedEntity);
-        }
+        $this->activityManager->addActivityTargets($activity, $relations->toArray());
 
         $this->entityManager->flush();
     }

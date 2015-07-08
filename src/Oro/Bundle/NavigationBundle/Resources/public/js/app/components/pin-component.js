@@ -83,9 +83,13 @@ define([
                     return !pinBar.isVisibleItem(item);
                 },
                 position: function() {
-                    return {
-                        left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
-                    };
+                    if (pinBar.el) {
+                        return {
+                            left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
+                        };
+                    } else {
+                        return null;
+                    }
                 }
             });
 
