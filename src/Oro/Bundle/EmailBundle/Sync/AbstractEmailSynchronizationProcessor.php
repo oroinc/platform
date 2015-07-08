@@ -83,7 +83,10 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected function isApplicableEmail(EmailHeader $email, $folderType, $userId = null, $organization = null)
     {
         if ($userId === null) {
-            return $this->isKnownSender($email) && $this->isKnownRecipient($email);
+            if ($this->isKnownRecipient($email)) {
+                return $this->isMailboxRecipient($email) || $this->isKnownSender($email);
+            }
+            return $this->isKnownSender($email);
         }
 
         if ($organization && !$this->checkOrganization($email, $folderType, $organization)) {
@@ -306,10 +309,10 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      */
     protected function initEnv(EmailOrigin $emailOrigin)
     {
-        $this->currentUser = $this->em->getReference(
+        $this->currentUser = $emailOrigin->getOwner() ? $this->em->getReference(
             'Oro\Bundle\UserBundle\Entity\User',
             $emailOrigin->getOwner()->getId()
-        );
+        ) : null;
         $this->currentOrganization = $this->em->getReference(
             'Oro\Bundle\OrganizationBundle\Entity\Organization',
             $emailOrigin->getOrganization()->getId()
@@ -375,5 +378,21 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             }
         }
         $this->dbBatchSaveTimestamp = time();
+    }
+
+    /**
+     * Checks if recipient is a system-wide mailbox.
+     *
+     * @param EmailHeader $email
+     *
+     * @return bool
+     */
+    private function isMailboxRecipient($email)
+    {
+        return $this->knownEmailAddressChecker->isAtLeastOneMailboxEmailAddress(
+            $email->getToRecipients(),
+            $email->getCcRecipients(),
+            $email->getBccRecipients()
+        );
     }
 }

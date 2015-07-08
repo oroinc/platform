@@ -323,12 +323,6 @@ datagrid:
                 label: oro.email.mailbox.email.label
             label:
                 label: oro.email.mailbox.label.label
-            imapEnabled:
-                label: oro.email.mailbox.imap_enabled.label
-                frontend_type: boolean
-            smtpEnabled:
-                label: oro.email.mailbox.smtp_enabled.label
-                frontend_type: boolean
             processor:
                 type: translatable
                 data_name: processor.type

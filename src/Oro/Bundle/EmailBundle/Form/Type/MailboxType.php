@@ -34,7 +34,7 @@ class MailboxType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
+            'data_class'         => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
             'cascade_validation' => true,
         ]);
     }
@@ -45,56 +45,32 @@ class MailboxType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('label', 'text', [
-            'required' => true,
-            'label'    => 'oro.email.mailbox.label.label',
+            'required'    => true,
+            'label'       => 'oro.email.mailbox.label.label',
             'constraints' => [
                 new NotNull(),
             ],
         ]);
         $builder->add('email', 'email', [
-            'required' => true,
-            'label'    => 'oro.email.mailbox.email.label',
+            'required'    => true,
+            'label'       => 'oro.email.mailbox.email.label',
             'constraints' => [
                 new NotNull(),
             ],
         ]);
-        $builder->add('imapEnabled', 'checkbox', [
-            'label'    => 'oro.email.mailbox.imap_enabled.label',
+        $builder->add('originEnable', 'checkbox', [
             'required' => false,
-        ]);
-        //$builder->add('imapOrigin', 'oro_imap_configuration');
-        $builder->add('smtpEnabled', 'checkbox', [
-            'label'    => 'oro.email.mailbox.smtp_enabled.label',
-            'required' => false,
-        ]);
-        $builder->add('smtpHost', 'text', [
-            'label'    => 'oro.email.mailbox.smtp_host.label',
-            'required' => false,
-        ]);
-        $builder->add('smtpPort', 'integer', [
-            'label'    => 'oro.email.mailbox.smtp_port.label',
-            'required' => false,
-        ]);
-        $builder->add('smtpEncryption', 'choice', [
-            'label'       => 'oro.email.mailbox.smtp_encryption.label',
-            'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-            'empty_data'  => null,
-            'empty_value' => '',
-            'required'    => false
-        ]);
-        $builder->add('smtpUsername', 'text', [
-            'label'    => 'oro.email.mailbox.smtp_username.label',
-            'required' => false,
-        ]);
-        $builder->add('smtpPassword', 'password', [
-            'label'    => 'oro.email.mailbox.smtp_password.label',
-            'required' => false,
-        ]);
-        $builder->add('processorType', 'choice', [
-            'label'    => 'oro.email.mailbox.processor.type.label',
-            'choices'  => $this->processorProvider->getProcessorTypesChoiceList(),
-            'required' => true,
+            'label'    => 'oro.email.mailbox.imap_enable.label',
+            'data'     => true,
             'mapped'   => false,
+        ]);
+        $builder->add('origin', 'oro_imap_configuration');
+        $builder->add('smtpSettings', 'oro_email_smtp');
+        $builder->add('processorType', 'choice', [
+            'label'       => 'oro.email.mailbox.processor.type.label',
+            'choices'     => $this->processorProvider->getProcessorTypesChoiceList(),
+            'required'    => true,
+            'mapped'      => false,
             'constraints' => [
                 new NotNull(),
             ],

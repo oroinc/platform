@@ -216,7 +216,7 @@ oro:
             email.label:              Email
             name.label:               Name
             imap_origin.label:        IMAP Synchronization
-            imap_enabled.label:       Use IMAP Synchronization
+            imap_enable.label:        Use IMAP Synchronization
             processor:
                 label:                Email Processing
                 type.label:           Action
@@ -226,6 +226,7 @@ oro:
             smtp_encryption.label:    SSL
             smtp_username.label:      Username
             smtp_password.label:      Password
+            action.create:            Add Mailbox
         mailbox_processor:
             label:                    Do Nothing
 

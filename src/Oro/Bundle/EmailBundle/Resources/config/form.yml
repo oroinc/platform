@@ -18,6 +18,7 @@ parameters:
     oro_email.form.type.email_link_to_scope.class:        Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
     oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
+    oro_email.form.type.smtp.class:                       Oro\Bundle\EmailBundle\Form\Type\SmtpType
     oro_email.form.type.mailbox_processor_manual.class:   Oro\Bundle\EmailBundle\Form\Type\ManualMailboxProcessorType
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
 
@@ -162,6 +163,12 @@ services:
         arguments: [@oro_email.provider.mailbox_processor_provider]
         tags:
             - { name: form.type, alias: oro_email_mailbox }
+
+    oro_email.form.type.smtp:
+        class: %oro_email.form.type.smtp.class%
+        tags:
+            - { name: form.type, alias: oro_email_smtp }
+
     oro_email.form.type.mailbox_processor_manual:
         class: %oro_email.form.type.mailbox_processor_manual.class%
         arguments: [@oro_email.provider.mailbox_processor_provider]

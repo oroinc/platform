@@ -197,34 +197,25 @@
 {% block oro_email_mailbox_grid_row %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <div class="form-row">
-        <div class="row">
-            <div class="pull-right">
-                <div class="btn-group">
-                    {{ UI.addButton({
-                    'path': path('oro_email_mailbox_create'),
-                    'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
-                    }) }}
-                </div>
+    <div class="row">
+        <div class="pull-right">
+            <div class="btn-group">
+                {{ UI.addButton({
+                'path': path('oro_email_mailbox_create'),
+                'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
+                }) }}
             </div>
         </div>
-        {{ dataGrid.renderGrid('base-mailboxes-grid') }}
     </div>
+    {{ dataGrid.renderGrid('base-mailboxes-grid') }}
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set email_origin = form_row(form.children.imapEnabled)
-    %}
-    {% set smtp = form_row(form.children.smtpEnabled) ~
-        form_row(form.children.smtpHost) ~
-        form_row(form.children.smtpPort) ~
-        form_row(form.children.smtpEncryption) ~
-        form_row(form.children.smtpUsername) ~
-        form_row(form.children.smtpPassword)
-    %}
+    {% set email_origin = form_row(form.children.originEnable) ~
+        form_widget(form.children.origin) %}
+    {% set smtp = form_widget(form.children.smtpSettings) %}
     {% set processor = form_row(form.children.processorType) ~
-        form_widget(form.children.processor)
-    %}
+    form_widget(form.children.processor) %}
     <fieldset class="form-horizontal form-horizontal-large">
         <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
         {{ form_widget(form) }}

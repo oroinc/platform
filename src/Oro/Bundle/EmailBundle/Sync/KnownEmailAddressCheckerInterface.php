@@ -31,4 +31,14 @@ interface KnownEmailAddressCheckerInterface
      * @param array $emails Each item can be a string or array of strings
      */
     public function preLoadEmailAddresses(array $emails);
+
+    /**
+     * Checks if at least one of given addresses belongs to a mailbox.
+     *
+     * @param mixed $_ Email address(es) to check
+     *                 Each parameter can be a string or array of strings
+     *
+     * @return bool
+     */
+    public function isAtLeastOneMailboxEmailAddress($_);
 }

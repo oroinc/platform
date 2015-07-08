@@ -174,6 +174,45 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isAtLeastOneMailboxEmailAddress($_)
+    {
+        $emailsToLoad = [];
+
+        $args = func_get_args();
+        unset($args[0]);
+        foreach ($args as $arg) {
+            if (empty($arg)) {
+                continue;
+            }
+            foreach ($this->normalizeEmailAddresses((array)$arg) as $email) {
+                if (empty($email)) {
+                    continue;
+                }
+                if (isset($this->emails[$email])) {
+                    if (isset($this->emails[$email]['mailbox'])) {
+                        return true;
+                    }
+                } elseif (!isset($emailsToLoad[$email])) {
+                    $emailsToLoad[$email] = $email;
+                }
+            }
+        }
+
+        if (!empty($emailsToLoad)) {
+            $this->loadKnownEmailAddresses($emailsToLoad);
+            foreach ($emailsToLoad as $email) {
+                if ($this->emails[$email]['known'] && isset($this->emails[$email]['mailbox'])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Loads the given emails into $this->emails
      *
      * @param string[] $emailsToLoad
@@ -212,15 +251,20 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
             ->setParameter('hasOwner', true)
             ->setParameter('emails', $emailsToLoad);
 
-        $select        = 'a.email';
-        $userIdField   = null;
-        $ownerIdFields = [];
+        $select         = 'a.email';
+        $userIdField    = null;
+        $mailboxIdField = null;
+        $ownerIdFields  = [];
         foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
             $ownerClass = $provider->getEmailOwnerClass();
             $isUser     = $ownerClass === 'Oro\Bundle\UserBundle\Entity\User';
+            $isMailbox  = $ownerClass === 'Oro\Bundle\EmailBundle\Entity\Mailbox';
             $field      = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
             if ($isUser) {
                 $userIdField = $field;
+            }
+            if ($isMailbox) {
+                $mailboxIdField = $field;
             }
             if (isset($this->exclusions[$ownerClass])) {
                 if ($isUser) {
@@ -248,10 +292,15 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
             $email  = strtolower($item['email']);
             $userId = $item[$userIdField];
+            $mailboxId = $item[$mailboxIdField];
 
             $result[$email] = $userId === null
                 ? ['known' => $known]
                 : ['known' => $known, 'user' => (int)$userId];
+
+            if ($mailboxId !== null) {
+                $result[$email]['mailbox'] = $mailboxId;
+            }
         }
 
         return $result;

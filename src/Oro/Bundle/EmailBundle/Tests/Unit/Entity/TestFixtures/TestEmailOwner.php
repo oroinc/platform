@@ -51,4 +51,13 @@ class TestEmailOwner implements EmailOwnerInterface
     {
         return $this->lastName;
     }
+
+    public function getName()
+    {
+        return sprintf(
+            '%s %s',
+            $this->getFirstName(),
+            $this->getLastName()
+        );
+    }
 }

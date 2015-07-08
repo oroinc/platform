@@ -1134,4 +1134,16 @@ class User extends ExtendUser implements
     {
         return $this->currentOrganization;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return sprintf(
+            '%s %s',
+            $this->getFirstName(),
+            $this->getLastName()
+        );
+    }
 }
