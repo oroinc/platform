@@ -66,7 +66,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var EmailAddress|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $fromCCEmailAddress;
+    protected $fromCcEmailAddress;
 
     /**
      * @var Factory|\PHPUnit_Framework_MockObject_MockObject
@@ -107,7 +107,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->setMethods(['getActivityTargetEntities', 'getFromEmailAddress', 'getId', 'getTo', 'getCC', 'getEmailBody'])
+            ->setMethods(['getActivityTargetEntities', 'getFromEmailAddress', 'getId', 'getTo', 'getCc', 'getEmailBody'])
             ->getMock();
 
         $this->email->expects($this->any())
@@ -349,7 +349,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateReplyAllEmailModel($getOwnerResult, $getUserResult, $getToCalls)
     {
         $this->fromEmailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
-        $this->fromCCEmailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $this->fromCcEmailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
 
         $this->fromEmailAddress->expects($this->once())
             ->method('getOwner')
@@ -387,16 +387,16 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getTo')
             ->willReturn($to);
 
-        $emailCCRecipient = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
-        $emailCCRecipient->expects($this->once())
+        $emailCcRecipient = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $emailCcRecipient->expects($this->once())
             ->method('getEmailAddress')
-            ->willReturn($this->fromCCEmailAddress);
+            ->willReturn($this->fromCcEmailAddress);
 
         $cc = new ArrayCollection();
-        $cc->add($emailCCRecipient);
+        $cc->add($emailCcRecipient);
 
         $this->email->expects($this->exactly($getToCalls))
-            ->method('getCC')
+            ->method('getCc')
             ->willReturn($cc);
 
         $this->helper->expects($this->once())

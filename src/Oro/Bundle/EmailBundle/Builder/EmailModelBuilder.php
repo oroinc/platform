@@ -163,17 +163,17 @@ class EmailModelBuilder
         $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
-        if ($fromAddress->getOwner() == $this->helper->getUser()) {
-            $toList = array();
-            foreach($parentEmailEntity->getTo() as $toRecipient){
+        if ($fromAddress->getOwner() === $this->helper->getUser()) {
+            $toList = [];
+            foreach($parentEmailEntity->getTo() as $toRecipient) {
                 $toList[] = $toRecipient->getEmailAddress()->getEmail();
             }
-            $ccList = array();
-            foreach($parentEmailEntity->getCc() as $ccRecipient){
+            $ccList = [];
+            foreach($parentEmailEntity->getCc() as $ccRecipient) {
                 $ccList[] = $ccRecipient->getEmailAddress()->getEmail();
             }
             $emailModel->setTo($toList);
-            $emailModel->setCC($ccList);
+            $emailModel->setCc($ccList);
             $emailModel->setFrom($fromAddress->getEmail());
         } else {
             $emailModel->setTo([$fromAddress->getEmail()]);
@@ -204,9 +204,8 @@ class EmailModelBuilder
         }
 
         foreach ($userEmails as $userEmail) {
-            if (in_array($userEmail->getEmail(), $toEmails)) {
+            if (in_array($userEmail->getEmail(), $toEmails, true)) {
                 $emailModel->setFrom($userEmail->getEmail());
-
                 break;
             }
         }
@@ -222,22 +221,21 @@ class EmailModelBuilder
         $toEmails = [];
         $ccEmails = [];
         $emailRecipients = $parentEmailEntity->getTo();
-        $emailCCRecipients = $parentEmailEntity->getCC();
+        $emailCcRecipients = $parentEmailEntity->getCc();
         /** @var EmailRecipient $emailRecipient */
         foreach ($emailRecipients as $emailRecipient) {
             $toEmails[] = $emailRecipient->getEmailAddress()->getEmail();
         }
 
-        /** @var EmailRecipient $emailCCRecipient */
-        foreach ($emailCCRecipients as $emailCCRecipient) {
-            $ccEmails[] = $emailCCRecipient->getEmailAddress()->getEmail();
+        /** @var EmailRecipient $emailCcRecipient */
+        foreach ($emailCcRecipients as $emailCcRecipient) {
+            $ccEmails[] = $emailCcRecipient->getEmailAddress()->getEmail();
         }
-        $emailModel->setCC($ccEmails);
+        $emailModel->setCc($ccEmails);
 
         foreach ($userEmails as $userEmail) {
-            if (in_array($userEmail->getEmail(), $toEmails)) {
+            if (in_array($userEmail->getEmail(), $toEmails, true)) {
                 $emailModel->setFrom($userEmail->getEmail());
-
                 break;
             }
         }
