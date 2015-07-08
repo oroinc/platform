@@ -64,6 +64,11 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
     protected $fromEmailAddress;
 
     /**
+     * @var EmailAddress|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fromCCEmailAddress;
+
+    /**
      * @var Factory|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $factory;
@@ -102,7 +107,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->setMethods(['getActivityTargetEntities', 'getFromEmailAddress', 'getId', 'getTo', 'getEmailBody'])
+            ->setMethods(['getActivityTargetEntities', 'getFromEmailAddress', 'getId', 'getTo', 'getCC', 'getEmailBody'])
             ->getMock();
 
         $this->email->expects($this->any())
@@ -331,6 +336,79 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($emailBody);
 
         $result = $this->emailModelBuilder->createForwardEmailModel($this->email);
+        $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
+    }
+
+    /**
+     * @param object $getOwnerResult
+     * @param object $getUserResult
+     * @param int    $getToCalls
+     *
+     * @dataProvider createReplyEmailModelProvider
+     */
+    public function testCreateReplyAllEmailModel($getOwnerResult, $getUserResult, $getToCalls)
+    {
+        $this->fromEmailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $this->fromCCEmailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+
+        $this->fromEmailAddress->expects($this->once())
+            ->method('getOwner')
+            ->willReturn($getOwnerResult);
+
+        $this->helper->expects($this->any())
+            ->method('getUser')
+            ->willReturn($getUserResult);
+
+        $getUserResult->expects($this->any())
+            ->method('getEmails')
+            ->willReturn([]);
+
+        $this->email->expects($this->once())
+            ->method('getFromEmailAddress')
+            ->willReturn($this->fromEmailAddress);
+
+        $this->email->expects($this->any())
+            ->method('getId');
+
+        $emailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $emailAddress->expects($this->exactly($getToCalls))
+            ->method('getEmail')
+            ->willReturn(null);
+
+        $emailRecipient = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $emailRecipient->expects($this->exactly($getToCalls))
+            ->method('getEmailAddress')
+            ->willReturn($emailAddress);
+
+        $to = new ArrayCollection();
+        $to->add($emailRecipient);
+
+        $this->email->expects($this->exactly($getToCalls))
+            ->method('getTo')
+            ->willReturn($to);
+
+        $emailCCRecipient = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $emailCCRecipient->expects($this->once())
+            ->method('getEmailAddress')
+            ->willReturn($this->fromCCEmailAddress);
+
+        $cc = new ArrayCollection();
+        $cc->add($emailCCRecipient);
+
+        $this->email->expects($this->exactly($getToCalls))
+            ->method('getCC')
+            ->willReturn($cc);
+
+        $this->helper->expects($this->once())
+            ->method('prependWith');
+
+        $this->helper->expects($this->once())
+            ->method('getEmailBody');
+        $this->activityListProvider->expects($this->once())
+            ->method('getTargetEntities')
+            ->willReturn([]);
+
+        $result = $this->emailModelBuilder->createReplyAllEmailModel($this->email);
         $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
     }
 }
