@@ -3,7 +3,7 @@ define([
     'backbone',
     'backgrid'
 ], function($, Backbone, Backgrid) {
-    "use strict";
+    'use strict';
 
     var SelectRowCell;
 
@@ -17,15 +17,15 @@ define([
     SelectRowCell = Backbone.View.extend({
 
         /** @property */
-        className: "select-row-cell",
+        className: 'select-row-cell',
 
         /** @property */
-        tagName: "td",
+        tagName: 'td',
 
         /** @property */
         events: {
-            "change :checkbox": "onChange",
-            "click": "enterEditMode"
+            'change :checkbox': 'onChange',
+            click: 'enterEditMode'
         },
 
         /**
@@ -42,8 +42,8 @@ define([
                 this.column = new Backgrid.Column(this.column);
             }
 
-            this.listenTo(this.model, "backgrid:select", function(model, checked) {
-                this.$checkbox.prop("checked", checked).change();
+            this.listenTo(this.model, 'backgrid:select', function(model, checked) {
+                this.$checkbox.prop('checked', checked).change();
             });
         },
 
@@ -64,7 +64,7 @@ define([
          */
         enterEditMode: function(e) {
             if (this.$checkbox[0] !== e.target) {
-                this.$checkbox.prop("checked", !this.$checkbox.prop("checked")).change();
+                this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).change();
             }
             e.stopPropagation();
         },
@@ -75,7 +75,7 @@ define([
          * checkbox's `checked` value.
          */
         onChange: function(e) {
-            this.model.trigger("backgrid:selected", this.model, $(e.target).prop("checked"));
+            this.model.trigger('backgrid:selected', this.model, $(e.target).prop('checked'));
         },
 
         /**

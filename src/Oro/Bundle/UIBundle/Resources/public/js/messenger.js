@@ -1,32 +1,32 @@
-define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap', 'cryptojs/sha256'],
-function($, _, tools) {
+define(['jquery', 'underscore', 'oroui/js/tools', 'cryptojs/sha256', 'bootstrap'],
+function($, _, tools, CryptoJS) {
     'use strict';
 
     var defaults = {
-            container: '',
-            delay: false,
-            template: $.noop,
-            insertMethod: 'appendTo'
-        },
-        queue = [],
-        notFlashTypes = ['error', 'danger', 'warning', 'alert'],
+        container: '',
+        delay: false,
+        template: $.noop,
+        insertMethod: 'appendTo'
+    };
+    var queue = [];
+    var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
 
-        /**
-         * Same arguments as for Oro.NotificationMessage
-         */
-        showMessage = function(type, message, options) {
-            var opt = _.extend({}, defaults, options || {}),
-                $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container),
-                delay = opt.delay || (opt.flash && 5000),
-                actions = {close: _.bind($el.alert, $el, 'close')};
-            if (opt.namespace) {
-                $el.attr('data-messenger-namespace', opt.namespace);
-            }
-            if (delay) {
-                _.delay(actions.close, delay);
-            }
-            return actions;
-        };
+    /**
+     * Same arguments as for Oro.NotificationMessage
+     */
+    function showMessage(type, message, options) {
+        var opt = _.extend({}, defaults, options || {});
+        var $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container);
+        var delay = opt.delay || (opt.flash && 5000);
+        var actions = {close: _.bind($el.alert, $el, 'close')};
+        if (opt.namespace) {
+            $el.attr('data-messenger-namespace', opt.namespace);
+        }
+        if (delay) {
+            _.delay(actions.close, delay);
+        }
+        return actions;
+    }
 
     /**
      * @export oroui/js/messenger
@@ -50,9 +50,9 @@ function($, _, tools) {
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationMessage:  function(type, message, options) {
-                var container = (options || {}).container ||  defaults.container,
-                    args = Array.prototype.slice.call(arguments),
-                    actions = {close: $.noop};
+                var container = (options || {}).container ||  defaults.container;
+                var args = Array.prototype.slice.call(arguments);
+                var actions = {close: $.noop};
                 if (container && $(container).length) {
                     actions = showMessage.apply(null, args);
                 } else {
@@ -79,7 +79,7 @@ function($, _, tools) {
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                var isFlash   = notFlashTypes.indexOf(type) == -1;
+                var isFlash   = notFlashTypes.indexOf(type) === -1;
                 var namespace = (options || {}).namespace;
 
                 if (!namespace) {
@@ -110,6 +110,7 @@ function($, _, tools) {
             showErrorMessage: function(message, err) {
                 var msg = message;
                 if (!_.isUndefined(err) && !_.isNull(err)) {
+                    /*jshint devel:true*/
                     if (!_.isUndefined(console)) {
                         console.error(_.isUndefined(err.stack) ? err : err.stack);
                     }

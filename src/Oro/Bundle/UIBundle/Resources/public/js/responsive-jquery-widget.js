@@ -1,10 +1,10 @@
 define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     'use strict';
 
-    var SERVICE_AREA = 60, // extra area for some kind of sidebars, etc.
-        SCREEN_SMALL = 1280 - SERVICE_AREA, //WXGA 16:9 1280x720
-        SCREEN_MEDIUM = 1360 - SERVICE_AREA, //HD ~16:9 1360x768
-        SCREEN_LARGE = 1600 - SERVICE_AREA; //HD+ 16:9 1600x900
+    var SERVICE_AREA = 60; // extra area for some kind of sidebars, etc.
+    var SCREEN_SMALL = 1280 - SERVICE_AREA; //WXGA 16:9 1280x720
+    var SCREEN_MEDIUM = 1360 - SERVICE_AREA; //HD ~16:9 1360x768
+    var SCREEN_LARGE = 1600 - SERVICE_AREA; //HD+ 16:9 1600x900
 
     /**
      * Widget makes layout responive
@@ -218,9 +218,8 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          * @protected
          */
         _updateClasses: function($target, classNames) {
-            var isChanged, addedClasses;
-            addedClasses = $target.data(this.options.addedClassesDataName) || [];
-            isChanged = !_.isEqual(addedClasses, classNames);
+            var addedClasses = $target.data(this.options.addedClassesDataName) || [];
+            var isChanged = !_.isEqual(addedClasses, classNames);
 
             if (isChanged) {
                 $target.removeClass(addedClasses.join(' '));

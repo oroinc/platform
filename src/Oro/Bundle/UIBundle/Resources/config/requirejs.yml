@@ -48,6 +48,22 @@ config:
         'oroui/lib/jquery.datepair-0.4.4/jquery.datepair':
             deps:
                 - 'oroui/lib/jquery.datepair-0.4.4/datepair'
+        'cryptojs/enc-base64':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
+        'cryptojs/hmac':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
+        'cryptojs/sha256':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
+        'cryptojs/pbkdf2':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
@@ -109,6 +125,11 @@ config:
         'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
+        'cryptojs/core': 'bundles/oroui/lib/cryptojs/core-min.js'
+        'cryptojs/enc-base64': 'bundles/oroui/lib/cryptojs/enc-base64-min.js'
+        'cryptojs/hmac': 'bundles/oroui/lib/cryptojs/hmac-min.js'
+        'cryptojs/sha256': 'bundles/oroui/lib/cryptojs/sha256-min.js'
+        'cryptojs/pbkdf2': 'bundles/oroui/lib/cryptojs/pbkdf2-min.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
@@ -175,4 +196,9 @@ build:
 #       therefore it's excluded
         'backbone-bootstrap-modal': 'empty:'
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'empty:'
-        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty'
+        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty:'
+        'cryptojs/core': 'empty:'
+        'cryptojs/enc-base64': 'empty:'
+        'cryptojs/hmac': 'empty:'
+        'cryptojs/sha256': 'empty:'
+        'cryptojs/pbkdf2': 'empty:'

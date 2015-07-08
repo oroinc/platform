@@ -39,9 +39,8 @@ define([
          * @param {Object} xhr
          */
         updateToolbar: function(xhr) {
-            var url, token;
-            token = xhr.getResponseHeader('x-debug-token');
-            url = routing.generate('_wdt', {token: token});
+            var token = xhr.getResponseHeader('x-debug-token');
+            var url = routing.generate('_wdt', {token: token});
             $.get(url, _.bind(this.render, this, token, url));
         },
 

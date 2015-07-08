@@ -23,8 +23,8 @@ define([
         },
 
         _showAjaxSuccessMessage: function(data) {
-            var defaultMessage = data.successful ? this.messages.success : this.messages.error,
-                message = data.message || __(defaultMessage);
+            var defaultMessage = data.successful ? this.messages.success : this.messages.error;
+            var message = data.message || __(defaultMessage);
 
             if (message) {
                 messenger.notificationFlashMessage(data.successful ? 'success' : 'error', message);

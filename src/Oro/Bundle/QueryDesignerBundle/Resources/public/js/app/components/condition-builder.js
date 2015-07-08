@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var $, _, defaults;
-    $ = require('oroquerydesigner/js/condition-builder');
-    _ = require('underscore');
-    defaults = {
+    var $ = require('oroquerydesigner/js/condition-builder');
+    var _ = require('underscore');
+    var defaults = {
         eriaListSelector: '',
         entityChoiceSelector: '',
         onFieldsUpdate: {
@@ -13,15 +12,13 @@ define(function(require) {
     };
 
     return function(options) {
-        var $conditions, $entityChoice, $criteriaList, $criteria, toggleCriteria;
-
         options = $.extend(true, {}, defaults, options);
-        $conditions = options._sourceElement;
-        $entityChoice = $(options.entityChoiceSelector);
-        $criteriaList = $(options.criteriaListSelector);
+        var $conditions = options._sourceElement;
+        var $entityChoice = $(options.entityChoiceSelector);
+        var $criteriaList = $(options.criteriaListSelector);
 
-        toggleCriteria = options.onFieldsUpdate.toggleCriteria;
-        $criteria = $criteriaList.find('[data-criteria]').filter(function() {
+        var toggleCriteria = options.onFieldsUpdate.toggleCriteria;
+        var $criteria = $criteriaList.find('[data-criteria]').filter(function() {
             return _.contains(toggleCriteria, $(this).data('criteria'));
         });
 

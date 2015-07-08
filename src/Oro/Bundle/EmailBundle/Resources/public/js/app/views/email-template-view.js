@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var EmailTemplateView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailTemplateView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @export oroemail/js/app/views/email-template-view

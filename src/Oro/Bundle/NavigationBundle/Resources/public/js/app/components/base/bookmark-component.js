@@ -22,11 +22,9 @@ define([
         },
 
         initialize: function(options) {
-            var data, extraOptions, $dataEl;
-
-            $dataEl = $(options.dataSource);
-            data = $dataEl.data('data');
-            extraOptions = $dataEl.data('options');
+            var $dataEl = $(options.dataSource);
+            var data = $dataEl.data('data');
+            var extraOptions = $dataEl.data('options');
             $dataEl.remove();
 
             // create own property _options (not spoil prototype)

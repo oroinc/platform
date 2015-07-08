@@ -49,11 +49,12 @@ define([
          * @param {Boolean} [options.liveUpdate] Update position of loading animation on window scroll and resize
          */
         initialize: function(options) {
-            var updateProxy,
-                options = options || {};
+            options = options || {};
 
             if (mediator.execute('retrieveOption', 'debug') && window.console) {
-                console.warn('Module "oroui/js/loading-mask" is deprecated, use "oroui/js/app/views/loading-mask-view" instead');
+                /*jshint devel:true*/
+                console.warn('Module "oroui/js/loading-mask" is deprecated, ' +
+                    'use "oroui/js/app/views/loading-mask-view" instead');
             }
 
             if (_.has(options, 'liveUpdate')) {
@@ -61,7 +62,7 @@ define([
             }
 
             if (this.liveUpdate) {
-                updateProxy = $.proxy(this.updatePos, this);
+                var updateProxy = $.proxy(this.updatePos, this);
                 $(window)
                     .on('resize.' + this.cid, updateProxy)
                     .on('scroll.' + this.cid, updateProxy);

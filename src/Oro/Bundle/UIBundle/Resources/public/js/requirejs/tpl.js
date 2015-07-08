@@ -17,6 +17,8 @@
  */
 define({
     load: function(name, parentRequire, onLoad) {
+        'use strict';
+
         parentRequire(['text!' + name, 'underscore'], function(text, _) {
             if (_) {
                 onLoad(_.template(text));

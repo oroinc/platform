@@ -21,10 +21,8 @@ define([
          * @protected
          */
         _createButtonView: function() {
-            var options, collection;
-
-            options = this._options.buttonOptions || {};
-            collection = this.collection;
+            var options = this._options.buttonOptions || {};
+            var collection = this.collection;
 
             _.extend(options, {
                 autoRender: true,
@@ -40,11 +38,9 @@ define([
          * @protected
          */
         _createTabView: function() {
-            var options, collection, TabItemView;
-
-            options = this._options.tabOptions || {};
-            collection = this.collection;
-            TabItemView = ItemView.extend({
+            var options = this._options.tabOptions || {};
+            var collection = this.collection;
+            var TabItemView = ItemView.extend({
                 template: this._options.tabItemTemplate
             });
 

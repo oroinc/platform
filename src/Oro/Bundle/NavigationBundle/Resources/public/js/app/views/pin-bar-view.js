@@ -14,7 +14,7 @@ define([
          * @returns {boolean}
          */
         isVisibleItem: function(model) {
-            var itemView = this.subview("itemView:" + model.cid);
+            var itemView = this.subview('itemView:' + model.cid);
             return this.isVisibleView(itemView);
         },
 

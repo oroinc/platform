@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var DateFilter,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        tools = require('oroui/js/tools'),
-        __ = require('orotranslation/js/translator'),
-        ChoiceFilter = require('./choice-filter'),
-        VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view'),
-        DateVariableHelper = require('orofilter/js/date-variable-helper'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        localeSettings = require('orolocale/js/locale-settings');
+    var DateFilter;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var __ = require('orotranslation/js/translator');
+    var ChoiceFilter = require('./choice-filter');
+    var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
+    var DateVariableHelper = require('orofilter/js/date-variable-helper');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var localeSettings = require('orolocale/js/locale-settings');
     require('orofilter/js/datevariables-widget');
 
     /**
@@ -124,7 +124,7 @@ define(function(require) {
             this.dateVariableHelper = new DateVariableHelper(this.dateWidgetOptions.dateVars);
 
             //parts rendered only if theme exist
-            this.hasPartsElement = (this.templateTheme != "");
+            this.hasPartsElement = (this.templateTheme !== '');
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -173,8 +173,8 @@ define(function(require) {
         },
 
         onChangeFilterType: function(e) {
-            var select = this.$el.find(e.currentTarget),
-                value = select.val();
+            var select = this.$el.find(e.currentTarget);
+            var value = select.val();
             this.changeFilterType(value);
         },
 
@@ -214,7 +214,7 @@ define(function(require) {
             var parts = [];
 
             // add date parts only if embed template used
-            if (this.templateTheme !== "") {
+            if (this.templateTheme !== '') {
                 parts.push(
                     datePartTemplate({
                         name: this.name + '_part',
@@ -258,11 +258,14 @@ define(function(require) {
          * @protected
          */
         _renderSubViews: function() {
-            var name, selector, pickerView, options,
-                value = this.criteriaValueSelectors.value;
+            var name;
+            var selector;
+            var pickerView;
+            var options;
+            var value = this.criteriaValueSelectors.value;
             for (name in value) {
                 if (!value.hasOwnProperty(name)) {
-                    return;
+                    continue;
                 }
                 selector = value[name];
                 options = this._getPickerConfigurationOptions({
@@ -302,13 +305,13 @@ define(function(require) {
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var hint = '',
-                option, start, end, type,
-                value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var hint = '';
+            var option;
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             if (value.value) {
-                start = value.value.start;
-                end   = value.value.end;
-                type  = value.type ? value.type.toString() : '';
+                var start = value.value.start;
+                var end   = value.value.end;
+                var type  = value.type ? value.type.toString() : '';
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():
@@ -327,7 +330,6 @@ define(function(require) {
                             hint += [__('after'), end].join(' ');
                         }
                         break;
-                    case this.typeValues.between.toString():
                     default:
                         if (start && end) {
                             option = this._getChoiceOption(this.typeValues.between);
@@ -447,7 +449,7 @@ define(function(require) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
                 var foundChoice = _.find(this[property], function(choice) {
-                    return (choice.value == value.type);
+                    return (choice.value === value.type);
                 });
                 selectedChoiceLabel = foundChoice.label;
             }

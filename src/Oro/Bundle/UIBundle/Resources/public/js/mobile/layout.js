@@ -1,9 +1,10 @@
 define(function(require) {
     'use strict';
-    var $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        pageHeader = require('oroui/js/mobile/page-header');
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
+    var pageHeader = require('oroui/js/mobile/page-header');
     require('oroui/js/mobile/side-menu');
 
     /**
@@ -24,10 +25,9 @@ define(function(require) {
      * @see http://stackoverflow.com/questions/14492613/ios-ipad-fixed-position-breaks-when-keyboard-is-opened
      */
     function fixStickyHeader() {
-        var $body, forceHeaderLayoutUpdate,
-            elementsWithKeyboardSelector = 'input[type=text], input[type=number], textarea, [content-editable]';
-        $body = $('body');
-        forceHeaderLayoutUpdate = _.debounce(function() {
+        var elementsWithKeyboardSelector = 'input[type=text], input[type=number], textarea, [content-editable]';
+        var $body = $('body');
+        var forceHeaderLayoutUpdate = _.debounce(function() {
             $(document).scrollTop($(document).scrollTop());
             mediator.trigger('layout:headerStateChange');
         }, 1);

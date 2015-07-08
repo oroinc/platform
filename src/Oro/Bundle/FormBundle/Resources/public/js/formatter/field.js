@@ -1,5 +1,6 @@
-define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'
-    ], function(_, __, numberFormatter, dateTimeFormatter) {
+define([
+    'underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'
+], function(_, __, numberFormatter, dateTimeFormatter) {
     'use strict';
 
     /**
@@ -95,5 +96,5 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
             return !val ? __('N/A') : '<i class="color hide-text" title="' +
                 val + '" style="background-color: ' + val + ';">' + val + '</i>';
         }
-    }
+    };
 });

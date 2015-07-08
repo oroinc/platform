@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var moment = require('moment'),
-        __ = require('orotranslation/js/translator'),
-        localeSettings = require('./locale-settings'),
-        locale = localeSettings.getLocale();
+    var moment = require('moment');
+    var __ = require('orotranslation/js/translator');
+    var localeSettings = require('./locale-settings');
+    var locale = localeSettings.getLocale();
     require('moment-timezone');
 
     moment.locale(locale, {

@@ -35,14 +35,13 @@ define([
         },
 
         build: function() {
-            var options, filtersList;
             if (!this.collection || !this.modules) {
                 return;
             }
 
-            options = methods.combineOptions.call(this);
+            var options = methods.combineOptions.call(this);
             options.collection = this.collection;
-            filtersList = new FiltersManager(options);
+            var filtersList = new FiltersManager(options);
             this.$el.prepend(filtersList.render().$el);
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
@@ -59,9 +58,9 @@ define([
          * @returns {Object}
          */
         combineOptions: function() {
-            var filters = {},
-                modules = this.modules,
-                collection = this.collection;
+            var filters = {};
+            var modules = this.modules;
+            var collection = this.collection;
             _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
                     // @TODO pass collection only for specific filters

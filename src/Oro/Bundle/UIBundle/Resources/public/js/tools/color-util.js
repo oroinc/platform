@@ -49,24 +49,17 @@ define([], function() {
          *                   If the given color is invalid or cannot be parsed, returns black.
          */
         getContrastColor: function(hex, blackPreference) {
-            var rgb = this.hex2rgb(hex),
-                white = {
-                    r: 255,
-                    g: 255,
-                    b: 255
-                },
-                black = {
-                    r: 0,
-                    g: 0,
-                    b: 0
-                };
+            var rgb = this.hex2rgb(hex);
+            var white = {r: 255, g: 255, b: 255};
+            var black = {r: 0, g: 0, b: 0};
             if (!blackPreference) {
                 blackPreference = 0.58;
             }
             if (!rgb) {
                 return '#000000';
             }
-            return (this.colorDifference(rgb, black) * blackPreference > this.colorDifference(rgb, white)) ? '#000000' : '#FFFFFF';
+            return (this.colorDifference(rgb, black) * blackPreference > this.colorDifference(rgb, white)) ?
+                '#000000' : '#FFFFFF';
         }
     };
 });

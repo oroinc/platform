@@ -12,9 +12,8 @@ define([
      * @constructor
      */
     function Dropdown(element) {
-        var $el, globalHandlers;
-        $el = $(element).on('click.dropdown.data-api', this.toggle);
-        globalHandlers = {
+        var $el = $(element).on('click.dropdown.data-api', this.toggle);
+        var globalHandlers = {
             'click.dropdown.data-api': function() {
                 $el.parent().removeClass('open');
             }
@@ -31,16 +30,20 @@ define([
         this.removeData('globalHandlers');
     };
 
-        $.fn.dropdown = function(option) {
+    $.fn.dropdown = function(option) {
         return this.each(function() {
-            var $this = $(this) ,
-                data = $this.data('dropdown')
-            if (!data) $this.data('dropdown', (data = new Dropdown(this)))
-            if (typeof option == 'string') data[option].call($this)
-        })
-    }
+            var $this = $(this);
+            var data = $this.data('dropdown');
+            if (!data) {
+                $this.data('dropdown', (data = new Dropdown(this)));
+            }
+            if (typeof option === 'string') {
+                data[option].call($this);
+            }
+        });
+    };
 
-    $.fn.dropdown.Constructor = Dropdown
+    $.fn.dropdown.Constructor = Dropdown;
 
     /**
      * fix endless loop
@@ -58,14 +61,14 @@ define([
                     $(document).on('focusin.modal', safeSetFocus);
                 }
             });
-    }
+    };
 
     /**
      * This customization allows to define own render function for Typeahead
      */
-    var Typeahead,
-        origTypeahead = $.fn.typeahead.Constructor,
-        origFnTypeahead = $.fn.typeahead;
+    var Typeahead;
+    var origTypeahead = $.fn.typeahead.Constructor;
+    var origFnTypeahead = $.fn.typeahead;
 
     Typeahead = function(element, options) {
         var opts = $.extend({}, $.fn.typeahead.defaults, options);
@@ -79,13 +82,13 @@ define([
 
     $.fn.typeahead = function(option) {
         return this.each(function() {
-            var $this = $(this) ,
-                data = $this.data('typeahead') ,
-                options = typeof option == 'object' && option;
+            var $this = $(this);
+            var data = $this.data('typeahead');
+            var options = typeof option === 'object' && option;
             if (!data) {
                 $this.data('typeahead', (data = new Typeahead(this, options)));
             }
-            if (typeof option == 'string') {
+            if (typeof option === 'string') {
                 data[option]();
             }
         });

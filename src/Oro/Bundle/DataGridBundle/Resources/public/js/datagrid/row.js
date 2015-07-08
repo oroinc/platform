@@ -5,8 +5,8 @@ define([
 ], function($, _, Backgrid) {
     'use strict';
 
-    var Row, document;
-    document = window.document;
+    var Row;
+    var document = window.document;
 
     /**
      * Grid row.
@@ -22,7 +22,7 @@ define([
 
         /** @property */
         events: {
-            "click": "onClick"
+            'click': 'onClick'
         },
 
         /** @property */
@@ -32,7 +32,7 @@ define([
             hasSelectedText: false
         },
 
-        className: function () {
+        className: function() {
             return this.model.get('row_class_name');
         },
 
@@ -57,8 +57,8 @@ define([
          * @param {Event} e
          */
         onClick: function(e) {
-            var exclude = 'a, .dropdown, .editable, .skip-row-click',
-                $target = this.$(e.target);
+            var exclude = 'a, .dropdown, .editable, .skip-row-click';
+            var $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
             if ($target.is(exclude) || $target.parents(exclude).length) {
                 return;
@@ -84,10 +84,10 @@ define([
          * @return {boolean}
          */
         _hasSelectedText: function() {
-            var text = "";
+            var text = '';
             if (_.isFunction(window.getSelection)) {
                 text = window.getSelection().toString();
-            } else if (!_.isUndefined(document.selection) && document.selection.type === "Text") {
+            } else if (!_.isUndefined(document.selection) && document.selection.type === 'Text') {
                 text = document.selection.createRange().text;
             }
             return !_.isEmpty(text);
@@ -97,7 +97,7 @@ define([
          * @inheritDoc
          */
         makeCell: function(column) {
-            var cell = new (column.get("cell"))({
+            var cell = new (column.get('cell'))({
                 column: column,
                 model: this.model
             });

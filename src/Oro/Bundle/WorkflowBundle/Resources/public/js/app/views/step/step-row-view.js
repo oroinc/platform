@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var StepRowView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        TransitionsShortListView = require('../transition/transition-list-short-view'),
-        StepModel = require('../../models/step-model');
+    var StepRowView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var TransitionsShortListView = require('../transition/transition-list-short-view');
+    var StepModel = require('../../models/step-model');
 
     StepRowView = BaseView.extend({
         tagName: 'tr',

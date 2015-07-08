@@ -64,8 +64,9 @@ define([
         },
 
         reset: function(model) {
-            var elementsMap, attrs,
-                self = this;
+            var elementsMap;
+            var attrs;
+            var self = this;
             this._hideErrors();
             this.validated = false;
             this.model = model;
@@ -89,7 +90,8 @@ define([
         },
 
         _onSaveItem: function(e) {
-            var attrs, model;
+            var attrs;
+            var model;
             e.preventDefault();
             if (!this._validate()) {
                 return;
@@ -122,8 +124,8 @@ define([
         },
 
         _validate: function(elem) {
-            var validator = this._getValidator(),
-                result = true;
+            var validator = this._getValidator();
+            var result = true;
             if (validator) {
                 this.element.removeAttr('data-validation-ignore');
                 if (elem) {
@@ -180,8 +182,8 @@ define([
         },
 
         _collectAttrs: function() {
-            var arrts = {},
-                self = this;
+            var arrts = {};
+            var self = this;
 
             $.each(this._elementsMap(), function(name, $elem) {
                 arrts[name] = self.options.getter($elem, name, $elem.val());
@@ -191,10 +193,10 @@ define([
         },
 
         _elementsMap: function() {
-            var mapped,
-                elementsMap = {},
-                $container = this.element,
-                pattern = this.options.namePattern;
+            var mapped;
+            var elementsMap = {};
+            var $container = this.element;
+            var pattern = this.options.namePattern;
 
             // collect elements using map
             $.each(this.options.mapping, function(attrName, elemName) {

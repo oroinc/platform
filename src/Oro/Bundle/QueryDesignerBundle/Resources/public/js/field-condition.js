@@ -67,9 +67,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _renderFilter: function(fieldId) {
-            var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
-                filterId = this._getApplicableFilterId(conditions),
-                filter = this.options.filters[filterId];
+            var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId);
+            var filterId = this._getApplicableFilterId(conditions);
+            var filter = this.options.filters[filterId];
 
             if (!filterId) {
                 filter = {
@@ -82,12 +82,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             }
 
             // @TODO temporary workaround. Will by fixed in BAP-8112
-            if (conditions.entity === 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account' && conditions.field === 'lifetimeValue') {
+            if (conditions.entity === 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account' &&
+                conditions.field === 'lifetimeValue') {
                 filterId = 'not_supported_lifetimeValue';
                 filter = {
                     type: 'none',
                     applicable: {},
-                    popupHint: '<span style="color: red">The filtering by the LifetimeValue is not supported yet.</span>'
+                    popupHint: '<span style="color: red">' +
+                        'The filtering by the LifetimeValue is not supported yet.</span>'
                 };
                 this._createFilter(filter, filterId);
                 return;
@@ -97,9 +99,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _getApplicableFilterId: function(conditions) {
-            var filterId = null,
-                matchedBy = null,
-                self = this;
+            var filterId = null;
+            var matchedBy = null;
+            var self = this;
 
             if (!_.isUndefined(conditions.filter)) {
                 // the criteria parameter represents a filter
@@ -135,7 +137,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             var hierarchy = this.options.hierarchy[criteria.entity];
             return _.find(applicable, function(item) {
                 return _.every(item, function(value, key) {
-                    if (key == 'entity' && hierarchy.length) {
+                    if (key === 'entity' && hierarchy.length) {
                         return _.indexOf(hierarchy, criteria[key]);
                     }
                     return criteria[key] === value;
@@ -145,8 +147,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
         _createFilter: function(filterOptions, fieldId) {
 
-            var moduleName = mapFilterModuleName(filterOptions.type),
-                requires = [moduleName];
+            var moduleName = mapFilterModuleName(filterOptions.type);
+            var requires = [moduleName];
 
             if (filterOptions.init_module) {
                 requires.push(filterOptions.init_module);
@@ -154,20 +156,21 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
             // show loading message, if loading takes more than 100ms
             var showLoadingTimeout = setTimeout(_.bind(function() {
-                this.$filterContainer.html("<span class=\"loading-indicator\">" + __("Loading...") + "</span>")
+                this.$filterContainer.html('<span class="loading-indicator">' + __('Loading...') + '</span>');
             }, this), 100);
 
             require(requires, _.bind(function(Filter, optionResolver) {
+                var fieldCondition = this;
                 function appendFilter() {
                     clearTimeout(showLoadingTimeout);
                     var filter = new (Filter.extend(filterOptions))();
-                    this._appendFilter(filter);
+                    fieldCondition._appendFilter(filter);
                 }
                 if (optionResolver) {
                     var promise = optionResolver(filterOptions, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
-                    promise.done(_.bind(appendFilter, this));
+                    promise.done(appendFilter);
                 } else {
-                    appendFilter.call(this);
+                    appendFilter();
                 }
             }, this));
         },

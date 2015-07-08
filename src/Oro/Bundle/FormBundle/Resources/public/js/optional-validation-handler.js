@@ -1,5 +1,6 @@
 define(['jquery'], function($) {
     'use strict';
+
     /**
      * @export  oroform/js/optional-validation-handler
      * @class   oroform.optionalValidationHandler
@@ -44,7 +45,7 @@ define(['jquery'], function($) {
          */
         isValueEmpty: function(value) {
             value = value ? $.trim(value) : '';
-            return value == '' || value == 0;
+            return !value;
         },
 
         /**
@@ -89,7 +90,7 @@ define(['jquery'], function($) {
             labels.addClass('required');
 
             groups.on('change', 'input', function() {
-                self.inputHandler($(this))
+                self.inputHandler($(this));
             });
             groups.on('change', 'select', function() {
                 self.selectHandler($(this));
@@ -102,5 +103,5 @@ define(['jquery'], function($) {
                 }
             });
         }
-    }
+    };
 });

@@ -1,7 +1,8 @@
 define(function(require) {
     'use strict';
-    var FlowchartViewerOverlayView = require('../viewer/transition-overlay-view'),
-        FlowChartEditorTransitionOverlayView;
+
+    var FlowchartViewerOverlayView = require('../viewer/transition-overlay-view');
+    var FlowChartEditorTransitionOverlayView;
 
     FlowChartEditorTransitionOverlayView = FlowchartViewerOverlayView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/editor/transition.html'),

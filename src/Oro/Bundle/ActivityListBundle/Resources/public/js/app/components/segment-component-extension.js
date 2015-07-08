@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'underscore',
+    'underscore'
 ], function($, _) {
+    'use strict';
 
     return {
         load: function(Segment) {

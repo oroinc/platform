@@ -1,10 +1,11 @@
 define(function(require) {
     'use strict';
-    var $ = require('jquery'),
-        _ = require('underscore'),
-        jsPlumb = require('jsplumb'),
-        FlowchartJsPlubmBaseView = require('./base-view'),
-        FlowchartJsPlubmAreaView;
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var jsPlumb = require('jsplumb');
+    var FlowchartJsPlubmBaseView = require('./base-view');
+    var FlowchartJsPlubmAreaView;
 
     FlowchartJsPlubmAreaView = FlowchartJsPlubmBaseView.extend({
 

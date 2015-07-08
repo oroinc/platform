@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var EmailTemplateEditorView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailTemplateEditorView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     EmailTemplateEditorView = BaseView.extend({
         options: {
@@ -34,14 +33,14 @@ define(function(require) {
         },
 
         afterLayoutInit: function() {
-            this.options.hasWysiwyg = this.$('textarea[name*="content"]:first').data('wysiwygEnabled') == true;
+            this.options.hasWysiwyg = this.$('textarea[name*="content"]:first').data('wysiwygEnabled') === true;
             if (this.options.hasWysiwyg) {
                 this.options.isWysiwygEnabled = this.$(this.options.typeSwitcher).filter(':checked').val() === 'html';
                 this.options.emailVariableView = this.pageComponent('email-template-variables');
 
                 this._onEditorBlur();
 
-                if (this.options.isWysiwygEnabled == false) {
+                if (this.options.isWysiwygEnabled === false) {
                     this._switchWysiwygEditor(false);
                 }
             }
@@ -50,7 +49,7 @@ define(function(require) {
         _onVariableClick: function(field, value) {
             var fieldId = field.data('id');
             if (this.options.isWysiwygEnabled && !_.isUndefined(fieldId)) {
-                this.getComponentManager().forEachComponent(function(component) {
+                this.forEachComponent(function(component) {
                     if (!_.isUndefined(component.view) &&
                         !_.isUndefined(component.view.tinymceConnected) &&
                         component.view.tinymceConnected === true &&
@@ -58,13 +57,13 @@ define(function(require) {
                     ) {
                         component.view.tinymceInstance.execCommand('mceInsertContent', false, value);
                     }
-                }, this);
+                });
             }
         },
 
         _onEditorBlur: function() {
             if (this.options.hasWysiwyg && this.options.isWysiwygEnabled) {
-                this.getComponentManager().forEachComponent(function(component) {
+                this.forEachComponent(function(component) {
                     if (!_.isUndefined(component.view) &&
                         !_.isUndefined(component.view.tinymceConnected) &&
                         component.view.tinymceConnected === true
@@ -79,7 +78,7 @@ define(function(require) {
                             )
                         );
                     }
-                }, this)
+                });
             }
         },
 
@@ -98,11 +97,11 @@ define(function(require) {
 
         _switchWysiwygEditor: function(enabled) {
             this.options.isWysiwygEnabled = enabled;
-            this.getComponentManager().forEachComponent(function(component) {
+            this.forEachComponent(function(component) {
                 if (!_.isUndefined(component.view) && !_.isUndefined(component.view.tinymceConnected)) {
                     component.view.setEnabled(enabled);
                 }
-            }, this);
+            });
 
         }
     });

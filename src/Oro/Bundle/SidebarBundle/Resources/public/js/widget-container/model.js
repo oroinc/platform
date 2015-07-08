@@ -1,5 +1,6 @@
-
-define(['backbone', '../constants'], function(Backbone, constants) {
+define([
+    'underscore', 'backbone', '../constants'
+], function(_, Backbone, constants) {
     'use strict';
 
     /**

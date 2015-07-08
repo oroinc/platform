@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var TransitionsShortListView,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        TransitionsShortRowView = require('./transition-row-short-view');
+    var TransitionsShortListView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var TransitionsShortRowView = require('./transition-row-short-view');
 
     TransitionsShortListView = BaseView.extend({
         tagName: 'ul',

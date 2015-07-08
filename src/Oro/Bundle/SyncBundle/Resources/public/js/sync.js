@@ -1,87 +1,91 @@
-define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger'
-    ], function($, _, Backbone, __, messenger) {
+define(function(require) {
     'use strict';
-    var service,
-        subscriptions = [],
 
-        /**
-         * Oro.Synchronizer - saves provided sync service internally and
-         * exists as base namespace for public methods
-         *
-         * @param {Object} serv service which provides backend synchronization
-         * @param {Function} serv.subscribe
-         * @param {Function} serv.unsubscribe
-         * @returns Oro.Synchronizer
-         *
-         * @var {Function} sync protected shortcut for Oro.Synchronizer
-         *
-         * @export orosync/js/sync
-         * @name   orosync.sync
-         */
-        sync = function(serv) {
-            if (!(_.isObject(serv) && _.isFunction(serv.subscribe) && _.isFunction(serv.unsubscribe))) {
-                throw new Error('Synchronization service does not fit requirements');
-            }
-            service = serv;
-            var onConnection = function() {
-                messenger.notificationFlashMessage('success', __('sync.connection.established'));
-            };
-            service.on('connection_lost', function(data) {
-                data = data || {};
-                var attempt = data.retries || 0;
-                if (attempt) {
-                    data.remain = data.maxretries - data.retries + 1;
-                }
-                messenger.notificationMessage('error',
-                    __('sync.connection.lost', data, attempt), {flash: Boolean(attempt)});
-                service.off(null, onConnection).once('connection_established', onConnection);
-            });
-            while (subscriptions.length) {
-                service.subscribe.apply(service, subscriptions.shift());
-            }
-            return sync;
-        },
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var __ = require('orotranslation/js/translator');
+    var messenger = require('oroui/js/messenger');
+    var service;
+    var subscriptions = [];
 
-        /**
-         * Subscribes provided model on update event
-         * @param {Backbone.Model} model
-         */
-        subscribeModel = function(model) {
-            if (model.id) {
-                // saves bound function in order to have same callback in unsubscribeModel call
-                model['[[SetCallback]]'] = (model['[[SetCallback]]'] || _.bind(model.set, model));
-                sync.subscribe(_.result(model, 'url'), model['[[SetCallback]]']);
-                model.on('remove', unsubscribeModel);
-            }
-        },
-
-        /**
-         * Removes subscription for a provided model
-         * @param {Backbone.Model} model
-         */
-        unsubscribeModel = function(model) {
-            if (model.id) {
-                var args = [_.result(model, 'url')];
-                if (_.isFunction(model['[[SetCallback]]'])) {
-                    args.push(model['[[SetCallback]]']);
-                }
-                sync.unsubscribe.apply(service, args);
-            }
-        },
-
-        events = {
-            add: subscribeModel,
-            error: function(collection) {
-                _.each(collection.models, unsubscribeModel);
-            },
-            reset: function(collection, options) {
-                _.each(options.previousModels, function(model) {
-                    model.urlRoot = collection.url;
-                    unsubscribeModel(model);
-                });
-                _.each(collection.models, subscribeModel);
-            }
+    /**
+     * Oro.Synchronizer - saves provided sync service internally and
+     * exists as base namespace for public methods
+     *
+     * @param {Object} serv service which provides backend synchronization
+     * @param {Function} serv.subscribe
+     * @param {Function} serv.unsubscribe
+     * @returns Oro.Synchronizer
+     *
+     * @var {Function} sync protected shortcut for Oro.Synchronizer
+     *
+     * @export orosync/js/sync
+     * @name   orosync.sync
+     */
+    function sync(serv) {
+        if (!(_.isObject(serv) && _.isFunction(serv.subscribe) && _.isFunction(serv.unsubscribe))) {
+            throw new Error('Synchronization service does not fit requirements');
+        }
+        service = serv;
+        var onConnection = function() {
+            messenger.notificationFlashMessage('success', __('sync.connection.established'));
         };
+        service.on('connection_lost', function(data) {
+            data = data || {};
+            var attempt = data.retries || 0;
+            if (attempt) {
+                data.remain = data.maxretries - data.retries + 1;
+            }
+            messenger.notificationMessage('error',
+                __('sync.connection.lost', data, attempt), {flash: Boolean(attempt)});
+            service.off(null, onConnection).once('connection_established', onConnection);
+        });
+        while (subscriptions.length) {
+            service.subscribe.apply(service, subscriptions.shift());
+        }
+        return sync;
+    }
+
+    /**
+     * Subscribes provided model on update event
+     * @param {Backbone.Model} model
+     */
+    function subscribeModel(model) {
+        if (model.id) {
+            // saves bound function in order to have same callback in unsubscribeModel call
+            model['[[SetCallback]]'] = (model['[[SetCallback]]'] || _.bind(model.set, model));
+            sync.subscribe(_.result(model, 'url'), model['[[SetCallback]]']);
+            model.on('remove', unsubscribeModel);
+        }
+    }
+
+    /**
+     * Removes subscription for a provided model
+     * @param {Backbone.Model} model
+     */
+    function unsubscribeModel(model) {
+        if (model.id) {
+            var args = [_.result(model, 'url')];
+            if (_.isFunction(model['[[SetCallback]]'])) {
+                args.push(model['[[SetCallback]]']);
+            }
+            sync.unsubscribe.apply(service, args);
+        }
+    }
+
+    var events = {
+        add: subscribeModel,
+        error: function(collection) {
+            _.each(collection.models, unsubscribeModel);
+        },
+        reset: function(collection, options) {
+            _.each(options.previousModels, function(model) {
+                model.urlRoot = collection.url;
+                unsubscribeModel(model);
+            });
+            _.each(collection.models, subscribeModel);
+        }
+    };
 
     /**
      * Establish connection with server and updates a provided object instantly
@@ -135,7 +139,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         if (service) {
             service.subscribe.apply(service, args);
         } else {
-            subscriptions.push(args)
+            subscriptions.push(args);
         }
     };
 
@@ -148,13 +152,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
      * @param {Function?} callback
      */
     sync.unsubscribe = function(channel, callback) {
-        var cleaner, args = _.toArray(arguments);
+        var cleaner;
+        var args = _.toArray(arguments);
         if (service) {
             service.unsubscribe.apply(service, args);
         } else {
             cleaner = !callback ?
-                function(args) { return channel === args[0] } :
-                function(args) { return channel === args[0] && callback === args[1] };
+                function(args) { return channel === args[0]; } :
+                function(args) { return channel === args[0] && callback === args[1]; };
             subscriptions = _.reject(subscriptions, cleaner);
         }
     };

@@ -15,8 +15,7 @@ define([
      * @class   oroworkflow.WorkflowDeleteHandler
      */
     return function() {
-        var element, confirmReset;
-        element = $(this);
+        var element = $(this);
         if (element.data('_in-progress')) {
             return;
         }
@@ -26,7 +25,7 @@ define([
             element.data('_in-progress', false);
         }
 
-        confirmReset = new Modal({
+        var confirmReset = new Modal({
             title:   __('Workflow reset'),
             content: __('Attention: This action will reset workflow data for this record.'),
             okText:  __('Yes, Reset')

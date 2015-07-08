@@ -1,5 +1,6 @@
 define(function(require) {
     'use strict';
+
     var FloatingHeaderPlugin;
     var $ = require('jquery');
     var _ = require('underscore');
@@ -426,7 +427,8 @@ define(function(require) {
                     if (resultRect.top < layout.MOBILE_HEADER_HEIGHT && current.id === 'top-page' &&
                         !this.domCache.body.hasClass('input-focused')) {
                         resultRect.top = layout.MOBILE_HEADER_HEIGHT;
-                    } else if (resultRect.top < layout.MOBILE_POPUP_HEADER_HEIGHT && current.className === 'widget-content') {
+                    } else if (resultRect.top < layout.MOBILE_POPUP_HEADER_HEIGHT &&
+                        current.className === 'widget-content') {
                         resultRect.top = layout.MOBILE_POPUP_HEADER_HEIGHT;
                     }
                 }

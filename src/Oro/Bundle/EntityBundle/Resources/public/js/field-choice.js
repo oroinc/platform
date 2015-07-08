@@ -43,28 +43,28 @@ define(function(require) {
         },
 
         _init: function() {
-            var instance, select2Options,
-                self = this;
+            var instance;
+            var select2Options;
+            var self = this;
 
             this._processSelect2Options();
             this.updateData(this.options.entity, this.options.data);
 
             select2Options = $.extend({
                 initSelection: function(element, callback) {
-                    var id, chain, opts, match;
                     instance = element.data('select2');
-                    opts = instance.opts;
-                    id = element.val();
-                    match = null;
-                    chain = self.util.pathToEntityChain(id, true);
+                    var opts = instance.opts;
+                    var id = element.val();
+                    var match = null;
+                    var chain = self.util.pathToEntityChain(id, true);
                     instance.pagePath = chain[chain.length - 1].basePath;
                     opts.query({
                         matcher: function(term, text, el) {
-                            var is_match = id === opts.id(el);
-                            if (is_match) {
+                            var isMatch = id === opts.id(el);
+                            if (isMatch) {
                                 match = el;
                             }
-                            return is_match;
+                            return isMatch;
                         },
                         callback: !$.isFunction(callback) ? $.noop : function() {
                             callback(match);
@@ -75,9 +75,8 @@ define(function(require) {
                     return result.id !== undefined ? result.id : result.pagePath;
                 },
                 data: function() {
-                    var pagePath, results;
-                    pagePath = (instance && instance.pagePath) || '';
-                    results = self._select2Data(pagePath);
+                    var pagePath = (instance && instance.pagePath) || '';
+                    var results = self._select2Data(pagePath);
                     return {
                         more: false,
                         pagePath: pagePath,
@@ -116,8 +115,8 @@ define(function(require) {
         },
 
         _processSelect2Options: function() {
-            var template,
-                options = this.options.select2;
+            var template;
+            var options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
@@ -182,10 +181,14 @@ define(function(require) {
          * @private
          */
         _select2Data: function(path) {
-            var fields = [], relations = [], results = [],
-                chain, entityName, entityFields,
-                entityData = this.options.data,
-                util = this.util;
+            var fields = [];
+            var relations = [];
+            var results = [];
+            var chain;
+            var entityName;
+            var entityFields;
+            var entityData = this.options.data;
+            var util = this.util;
             if ($.isEmptyObject(entityData)) {
                 return results;
             }
@@ -204,9 +207,9 @@ define(function(require) {
             }
 
             $.each(entityFields, function() {
-                var field = this, item, chainItem;
-                chainItem = {field: field};
-                item = {
+                var field = this;
+                var chainItem = {field: field};
+                var item = {
                     id: util.entityChainToPath(chain.concat(chainItem)),
                     text: field.label
                 };
@@ -223,14 +226,14 @@ define(function(require) {
 
             if (!_.isEmpty(fields)) {
                 results.push({
-                    text: __("oro.entity.field_choice.fields"),
+                    text: __('oro.entity.field_choice.fields'),
                     children: fields
                 });
             }
 
             if (!_.isEmpty(relations)) {
                 results.push({
-                    text: __("oro.entity.field_choice.relations"),
+                    text: __('oro.entity.field_choice.relations'),
                     children: relations
                 });
             }

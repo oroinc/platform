@@ -36,9 +36,9 @@ define(['../locale-settings', './name'
                 var value = '';
                 if ('name' === lowerCaseKey) {
                     value = nameFormatter.format(address, localeSettings.getCountryLocale(country));
-                } else if ('street' == lowerCaseKey) {
+                } else if ('street' === lowerCaseKey) {
                     value = address.street + ' ' + (address.street2 || '');
-                } else if ('street1' == lowerCaseKey) {
+                } else if ('street1' === lowerCaseKey) {
                     value = address.street;
                 } else {
                     value = address[lowerCaseKey];
@@ -51,8 +51,8 @@ define(['../locale-settings', './name'
 
             var addressLines = formatted
                 .replace(/ *(\\n)+/g, '\\n')
-                .split("\\n");
-            if (typeof newLine == 'function') {
+                .split('\\n');
+            if (typeof newLine === 'function') {
                 for (var i = 0; i < addressLines.length; i++) {
                     addressLines[i] = newLine(addressLines[i]);
                 }
@@ -73,5 +73,5 @@ define(['../locale-settings', './name'
             }
             return this.formats[country];
         }
-    }
+    };
 });

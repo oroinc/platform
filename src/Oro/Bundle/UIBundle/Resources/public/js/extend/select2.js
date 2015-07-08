@@ -11,15 +11,17 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
      * @this AbstractSelect2
      */
     function populateCollapsibleResults(container, results, query) {
-                var populate, data, result, children,
-            opts = this.opts,
-            id = opts.id,
-            parent = container.parent(),
-            selection = this.val();
+        // jshint -W040
+        var opts = this.opts;
+        var id = opts.id;
+        var parent = container.parent();
+        var selection = this.val();
 
-        populate = function(results, container, depth, parentStack) {
+        var populate = function(results, container, depth, parentStack) {
+            // jscs:disable
             var i, l, result, selectable, disabled, compound, node, label, innerContainer,
                 formatted, subId, parent, resultId;
+            // jscs:enable
             results = opts.sortResults(results, container, query);
             parent = container.parent();
 
@@ -92,9 +94,9 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
 
         parent.attr('id', parent.attr('id') || ('select2container_' + Date.now()));
         container.on('click.collapse.data-api', '[data-toggle=collapse]', function(e) {
-            var $this = $(this),
-                target = $this.attr('data-target'),
-                option = $(target).data('collapse') ? 'toggle' : $this.data();
+            var $this = $(this);
+            var target = $this.attr('data-target');
+            var option = $(target).data('collapse') ? 'toggle' : $this.data();
             $this[$(target).hasClass('in') ? 'addClass' : 'removeClass']('collapsed');
             $(target).collapse(option);
         });
@@ -103,11 +105,11 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
 
     // Override methods of AbstractSelect2 class
     (function(prototype) {
-        var select2DropBelowClassName = 'select2-drop-below',
-            positionDropdown = prototype.positionDropdown,
-            close = prototype.close,
-            prepareOpts = prototype.prepareOpts,
-            init = prototype.init;
+        var select2DropBelowClassName = 'select2-drop-below';
+        var positionDropdown = prototype.positionDropdown;
+        var close = prototype.close;
+        var prepareOpts = prototype.prepareOpts;
+        var init = prototype.init;
         prototype.prepareOpts = function(options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -126,10 +128,10 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
         };
 
         prototype.positionDropdown = function() {
-            var dialogIsBelow,
-                $container = this.container;
+            var $container = this.container;
             positionDropdown.apply(this, arguments);
-            dialogIsBelow = $container.hasClass('select2-dropdown-open') && !$container.hasClass('select2-drop-above');
+            var dialogIsBelow = $container.hasClass('select2-dropdown-open') &&
+                !$container.hasClass('select2-drop-above');
             $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
         };
 
@@ -152,14 +154,14 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
         };
 
         prototype.updateBreadcrumbs = function() {
-            var breadcrumbs = this.breadcrumbs,
-                opts = this.opts;
+            var breadcrumbs = this.breadcrumbs;
+            var opts = this.opts;
             breadcrumbs.empty();
             if ($.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
                 var items = opts.breadcrumbs(this.pagePath);
                 $.each(items, function(i, item) {
                     var $item = opts.formatBreadcrumbItem(item, {index: i, length: items.length});
-                    $item = $("<li class='select2-breadcrumb-item'>" + $item + "</li>");
+                    $item = $('<li class="select2-breadcrumb-item">' + $item + '</li>');
                     $item.data('select2-data', {pagePath: item.pagePath});
                     breadcrumbs.append($item);
                 });

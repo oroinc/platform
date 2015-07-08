@@ -21,10 +21,10 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
                     (param.max !== null && value > Number(param.max)));
         },
         function(param, element) {
-            var message,
-                placeholders = {},
-                value = this.elementValue(element),
-                normalizedValue = numberFormatter.unformat(value);
+            var message;
+            var placeholders = {};
+            var value = this.elementValue(element);
+            var normalizedValue = numberFormatter.unformat(value);
             param = _.extend({}, defaultParam, param);
             if (isNaN(normalizedValue)) {
                 message = param.invalidMessage;

@@ -4,10 +4,10 @@ define([
     'backgrid',
     '../actions-panel'
 ], function(_, Backbone, Backgrid, ActionsPanel) {
-    "use strict";
+    'use strict';
 
-    var $, ActionHeaderCell;
-    $ = Backbone.$;
+    var ActionHeaderCell;
+    var $ = Backbone.$;
 
     /**
      *
@@ -21,7 +21,7 @@ define([
         className: 'action-column',
 
         /** @property */
-        tagName: "th",
+        tagName: 'th',
 
         /** @property */
         template: '#template-datagrid-action-header-cell',
@@ -59,8 +59,8 @@ define([
         },
 
         createActionsPanel: function() {
-            var actions = [],
-                datagrid = this.column.get('datagrid');
+            var actions = [];
+            var datagrid = this.column.get('datagrid');
 
             _.each(this.column.get('massActions'), function(Action) {
                 var action = new Action({

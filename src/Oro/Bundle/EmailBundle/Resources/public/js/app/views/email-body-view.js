@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var EmailBodyView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailBodyView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     EmailBodyView = BaseView.extend({
         autoRender: true,
@@ -56,8 +56,8 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            var $content,
-                content = this.bodyContent;
+            var $content;
+            var content = this.bodyContent;
             try {
                 $content = $(content);
             } catch (e) {
@@ -105,8 +105,8 @@ define(function(require) {
          * @protected
          */
         _updateHeight: function() {
-            var $frame = this.$frame,
-                $el = this.$el;
+            var $frame = this.$frame;
+            var $el = this.$el;
             _.delay(function() {
                 $frame.height(0);
                 $frame.height($el[0].scrollHeight);

@@ -15,11 +15,11 @@ define([
      */
     PhoneCell = HtmlCell.extend({
         /** @property */
-        className: "phone-cell",
+        className: 'phone-cell',
 
         /** @property */
         events: {
-            "click": "stopPropagation"
+            click: 'stopPropagation'
         },
 
         /**

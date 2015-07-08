@@ -81,10 +81,12 @@ define(function() {
             /**
              * @inheritDoc
              */
+            // jshint -W001
             hasOwnProperty: function(sKey) {
                 return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\='))
                     .test(document.cookie);
             },
+            // jshint +W001
 
             /**
              * When invoked, will empty all keys out of the storage.

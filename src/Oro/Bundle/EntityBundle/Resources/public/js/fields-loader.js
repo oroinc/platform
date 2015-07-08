@@ -32,7 +32,8 @@ define([
 
         _onChange: function(e, extraArgs) {
             _.extend(e, extraArgs);
-            var oldVal, confirm = this.options.confirm;
+            var oldVal;
+            var confirm = this.options.confirm;
             if (confirm && this.options.requireConfirm()) {
                 // @todo support also other kind of inputs than select2
                 oldVal = (e.removed && e.removed.id) || null;
@@ -43,12 +44,12 @@ define([
         },
 
         loadFields: function() {
-            var routeName = this.options.router,
-                routeParams = this.options.routingParams;
+            var routeName = this.options.router;
+            var routeParams = this.options.routingParams;
 
             var additionalRequestParams = this.element.data('select2_query_additional_params');
             if (additionalRequestParams) {
-                routeParams = $.extend({}, routeParams, additionalRequestParams)
+                routeParams = $.extend({}, routeParams, additionalRequestParams);
             }
 
             $.ajax({
@@ -78,9 +79,9 @@ define([
             if (!oldVal) {
                 return;
             }
-            var $el = this.element,
-                load = $.proxy(this.loadFields, this),
-                revert = $.proxy(function() {
+            var $el = this.element;
+            var load = $.proxy(this.loadFields, this);
+            var revert = $.proxy(function() {
                     var $entityChoice = $el.data('relatedChoice');
                     if ($entityChoice && $entityChoice.val() !== oldVal) {
                         $entityChoice.val(oldVal).change();
@@ -104,8 +105,8 @@ define([
         },
 
         _onError: function(jqXHR) {
-            var err = jqXHR.responseJSON,
-                msg = __('Sorry, unexpected error was occurred');
+            var err = jqXHR.responseJSON;
+            var msg = __('Sorry, unexpected error was occurred');
             if (tools.debug) {
                 if (err.message) {
                     msg += ': ' + err.message;

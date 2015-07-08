@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailVariableView,
-        document = window.document,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailVariableView;
+    var document = window.document;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
+    var BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
     /**
@@ -109,12 +109,12 @@ define(function(require) {
          * @private
          */
         _renderEntityVariables: function() {
-            var $el = this._getSectionContent(this.sections.entity),
-                $tabEl = this._getSectionTab(this.sections.entity),
-                entityVars = this.model.getEntityVariables(),
-                entityLabel = this.model.getEntityLabel(),
-                path = this.model.getPath(),
-                pathLabels = this.model.getPathLabels();
+            var $el = this._getSectionContent(this.sections.entity);
+            var $tabEl = this._getSectionTab(this.sections.entity);
+            var entityVars = this.model.getEntityVariables();
+            var entityLabel = this.model.getEntityLabel();
+            var path = this.model.getPath();
+            var pathLabels = this.model.getPathLabels();
 
             // remove old content
             $el.empty();
@@ -186,8 +186,8 @@ define(function(require) {
          * @private
          */
         _getEntityVariablesHtml: function(variables, entityLabel, path, pathLabels) {
-            var fields = {},
-                relations = {};
+            var fields = {};
+            var relations = {};
             _.each(variables, function(variable, varName) {
                 if (_.has(variable, 'related_entity_name')) {
                     relations[varName] = variable;
@@ -255,7 +255,7 @@ define(function(require) {
          *
          * @param {Event} e
          */
-        _handleVariableClick: function (e) {
+        _handleVariableClick: function(e) {
             var field = this.fields.filter(document.activeElement);
             var variable = $(e.currentTarget).html();
 
@@ -278,8 +278,8 @@ define(function(require) {
          * @private
          */
         _handleReferenceClick: function(e) {
-            var $el = $(e.currentTarget),
-                path = $el.data('path');
+            var $el = $(e.currentTarget);
+            var path = $el.data('path');
 
             this.model.setPath(path);
         },

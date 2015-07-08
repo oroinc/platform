@@ -1,6 +1,7 @@
 define([
     './choice-filter'
 ], function(ChoiceFilter) {
+    'use strict';
 
     /**
      * @export  oro/filter/many-to-many-filter

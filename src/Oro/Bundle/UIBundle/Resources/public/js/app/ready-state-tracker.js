@@ -1,6 +1,6 @@
 define([
     'jquery'
-], function(jquery) {
+], function($) {
     'use strict';
 
     return {
@@ -15,7 +15,7 @@ define([
             this.getDeferred(name).resolve();
         },
         whenReady: function(name, cb, ctx) {
-            this.getDeferred(name).done(jQuery.proxy(cb, ctx || window));
+            this.getDeferred(name).done($.proxy(cb, ctx || window));
         }
     };
 });

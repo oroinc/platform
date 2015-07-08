@@ -29,7 +29,7 @@ define([
 
         /** @property */
         events: {
-            "click a": "onChangePage"
+            'click a': 'onChangePage'
         },
 
         /** @property */
@@ -56,15 +56,15 @@ define([
             options = options || {};
 
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
 
             this.collection = options.collection;
-            this.listenTo(this.collection, "add", this.render);
-            this.listenTo(this.collection, "remove", this.render);
-            this.listenTo(this.collection, "reset", this.render);
+            this.listenTo(this.collection, 'add', this.render);
+            this.listenTo(this.collection, 'remove', this.render);
+            this.listenTo(this.collection, 'reset', this.render);
 
-            this.hidden = options.hide == true;
+            this.hidden = options.hide === true;
 
             this.template = _.template($(options.template || this.template).html());
 
@@ -153,12 +153,12 @@ define([
             var windowEnd = windowStart + this.windowSize;
             windowEnd = windowEnd <= lastPage ? windowEnd : lastPage + 1;
 
-            if (collection.mode !== "infinite") {
+            if (collection.mode !== 'infinite') {
                 for (var i = windowStart; i < windowEnd; i++) {
                     handles.push({
                         label: i + 1,
-                        title: "No. " + (i + 1),
-                        className: currentPage === i ? "active" : undefined
+                        title: 'No. ' + (i + 1),
+                        className: currentPage === i ? 'active' : undefined
                     });
                 }
             }
@@ -169,7 +169,7 @@ define([
                 handles.unshift({
                     label: _.has(ffConfig.prev, 'label') ? ffConfig.prev.label : undefined,
                     wrapClass: _.has(ffConfig.prev, 'wrapClass') ? ffConfig.prev.wrapClass : undefined,
-                    className: collection.hasPrevious() ? undefined : "disabled"
+                    className: collection.hasPrevious() ? undefined : 'disabled'
                 });
             }
 
@@ -177,7 +177,7 @@ define([
                 handles.push({
                     label: _.has(ffConfig.next, 'label') ? ffConfig.next.label : undefined,
                     wrapClass: _.has(ffConfig.next, 'wrapClass') ? ffConfig.next.wrapClass : undefined,
-                    className: collection.hasNext() ? void 0 : "disabled"
+                    className: collection.hasNext() ? void 0 : 'disabled'
                 });
             }
 
@@ -193,7 +193,7 @@ define([
             var state = this.collection.state;
 
             // prevent render if data is not loaded yet
-            if (state.totalRecords == null) {
+            if (state.totalRecords === null) {
                 return this;
             }
 

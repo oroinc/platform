@@ -6,8 +6,8 @@ define([
 ], function(_, Backbone, __) {
     'use strict';
 
-    var Modal, $;
-    $ = Backbone.$;
+    var Modal;
+    var $ = Backbone.$;
 
     /**
      * Implementation of Bootstrap Modal
@@ -53,11 +53,13 @@ define([
          * @param {Function} [cb]     Optional callback that runs only when OK is pressed.
          */
         open: function(cb) {
-            if (!this.isRendered) this.render();
+            if (!this.isRendered) {
+                this.render();
+            }
             this.delegateEvents();
 
-            var self = this,
-                $el = this.$el;
+            var self = this;
+            var $el = this.$el;
 
             //Create it
             $el.modal(_.extend({
@@ -79,10 +81,10 @@ define([
             });
 
             //Adjust the modal and backdrop z-index; for dealing with multiple modals
-            var numModals = Backbone.BootstrapModal.count,
-                $backdrop = $('.modal-backdrop:eq(' + numModals + ')'),
-                backdropIndex = parseInt($backdrop.css('z-index'), 10),
-                elIndex = parseInt($backdrop.css('z-index'), 10) + 1;
+            var numModals = Backbone.BootstrapModal.count;
+            var $backdrop = $('.modal-backdrop:eq(' + numModals + ')');
+            var backdropIndex = parseInt($backdrop.css('z-index'), 10);
+            var elIndex = parseInt($backdrop.css('z-index'), 10) + 1;
 
             $backdrop.css('z-index', backdropIndex + numModals);
             this.$el.css('z-index', elIndex + numModals);
@@ -97,14 +99,17 @@ define([
                 });
 
                 $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function(e) {
+                    if (e.which !== 27) {
+                        return;
+                    }
                     if (self.options.handleClose) {
-                        e.which === 27 && self.trigger('close');
+                        self.trigger('close');
                     } else {
-                        e.which === 27 && self.trigger('cancel');
+                        self.trigger('cancel');
                     }
 
                     if (self.options.content && self.options.content.trigger) {
-                        e.which === 27 && self.options.content.trigger('shown', self);
+                        self.options.content.trigger('shown', self);
                     }
                 });
             }

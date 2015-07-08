@@ -9,6 +9,7 @@ define([
     'oroui/js/mediator'
 ], function(_, __, Chaplin, BaseModel, RouteModel, BaseCollection, mediator) {
     'use strict';
+
     /**
      * RoutingCollection is an abstraction of collection which uses Oro routing system.
      *
@@ -68,7 +69,8 @@ define([
         _route: null,
 
         /**
-         * State of the collection. Must contain both settings and server response parts such as totalItemsQuantity of items
+         * State of the collection. Must contain both settings and server response parts such as
+         * totalItemsQuantity of items
          * on server. Attributes will be available at the view as `<%= state.totalItemsQuantity %>`.
          *
          * The `stateChange` event is fired when state is changed.
@@ -181,9 +183,9 @@ define([
          * @protected
          */
         _mergeAllPropertyVersions: function(attrName) {
-            var attrVersion,
-                result = {},
-                attrVersions = Chaplin.utils.getAllPropertyVersions(this, attrName);
+            var attrVersion;
+            var result = {};
+            var attrVersions = Chaplin.utils.getAllPropertyVersions(this, attrName);
             for (var i = 0; i < attrVersions.length; i++) {
                 attrVersion = attrVersions[i];
                 if (_.isFunction(attrVersion)) {
@@ -191,7 +193,7 @@ define([
                 }
                 _.extend(result, attrVersion);
             }
-            return result
+            return result;
         },
 
         /**

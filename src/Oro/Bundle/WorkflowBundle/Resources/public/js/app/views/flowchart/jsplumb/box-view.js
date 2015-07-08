@@ -1,8 +1,9 @@
 define(function(require) {
     'use strict';
-    var FlowchartJsPlubmBaseView = require('./base-view'),
-        FlowchartJsPlubmAreaView = require('./area-view'),
-        FlowchartJsPlubmBoxView;
+
+    var FlowchartJsPlubmBaseView = require('./base-view');
+    var FlowchartJsPlubmAreaView = require('./area-view');
+    var FlowchartJsPlubmBoxView;
 
     FlowchartJsPlubmBoxView = FlowchartJsPlubmBaseView.extend({
         areaView: null,

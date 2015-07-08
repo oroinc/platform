@@ -44,9 +44,9 @@ define(['underscore', 'orotranslation/js/translator'
             return result === true;
         },
         function(param, element, value, placeholders) {
-            var result,
-                message,
-                number;
+            var result;
+            var message;
+            var number;
             param = _.extend({}, defaultParam, param);
             value = _.isUndefined(value) ? this.elementValue(element) : value;
             result = between(Number(value), param.min, param.max);

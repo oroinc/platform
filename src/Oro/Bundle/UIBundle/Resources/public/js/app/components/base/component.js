@@ -1,13 +1,13 @@
 define([
+    'jquery',
     'underscore',
     'backbone',
     'chaplin'
-], function(_, Backbone, Chaplin) {
+], function($, _, Backbone, Chaplin) {
     'use strict';
 
-    var BaseComponent, componentOptions;
-
-    componentOptions = ['model', 'collection', 'name'];
+    var BaseComponent;
+    var componentOptions = ['model', 'collection', 'name'];
 
     /**
      * Base component's constructor

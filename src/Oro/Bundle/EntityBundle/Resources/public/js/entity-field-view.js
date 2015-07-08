@@ -50,7 +50,7 @@ define(['underscore', 'backbone'
         },
 
         getFieldApplicableConditions: function(fieldId) {
-            if (_.isNull(fieldId) || fieldId == '') {
+            if (_.isNull(fieldId) || fieldId === '') {
                 return {};
             }
 

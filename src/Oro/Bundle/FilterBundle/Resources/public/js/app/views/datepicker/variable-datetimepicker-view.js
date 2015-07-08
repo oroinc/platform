@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var VariableDateTimePickerView,
-        _ = require('underscore'),
-        VariableDatePickerView = require('./variable-datepicker-view'),
-        dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin'),
-        moment = require('moment');
+    var VariableDateTimePickerView;
+    var _ = require('underscore');
+    var VariableDatePickerView = require('./variable-datepicker-view');
+    var dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
+    var moment = require('moment');
 
     VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
         /**
@@ -43,14 +43,13 @@ define(function(require) {
          * @param target
          */
         checkConsistency: function(target) {
-            var date, time, isVariable, isValidDate, isValidTime;
             dateTimePickerViewMixin.checkConsistency.apply(this, arguments);
 
-            date = this.$frontDateField.val();
-            time = this.$frontTimeField.val();
-            isVariable = this.dateVariableHelper.isDateVariable(date);
-            isValidDate = moment(date, this.getDateFormat(), true).isValid();
-            isValidTime = moment(time, this.getTimeFormat(), true).isValid();
+            var date = this.$frontDateField.val();
+            var time = this.$frontTimeField.val();
+            var isVariable = this.dateVariableHelper.isDateVariable(date);
+            var isValidDate = moment(date, this.getDateFormat(), true).isValid();
+            var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
             if (!target && !isVariable && (!isValidDate || !isValidTime)) {
                 this.$frontDateField.val('');

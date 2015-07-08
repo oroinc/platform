@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var EmailTreadView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        mediator = require('oroui/js/mediator'),
-        routing = require('routing'),
-        EmailItemView = require('./email-item-view'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailTreadView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var routing = require('routing');
+    var EmailItemView = require('./email-item-view');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     EmailTreadView = BaseView.extend({
         autoRender: true,
@@ -109,8 +109,9 @@ define(function(require) {
          * @returns {Promise}
          */
         loadEmails: function() {
-            var url, ids, promise;
-            ids = this.$(this.selectors.loadMore).addClass('process').data('emailsItems');
+            var url;
+            var promise;
+            var ids = this.$(this.selectors.loadMore).addClass('process').data('emailsItems');
             if (ids) {
                 url = routing.generate('oro_email_items_view', {ids: ids.join(',')});
                 promise = $.ajax(url)
@@ -188,14 +189,12 @@ define(function(require) {
          * Update toggle all action element
          */
         updateToggleAllAction: function() {
-            var hasMultipleEmails, hasHiddenEmails, $toggleAllAction, translationPrefix;
-
-            hasMultipleEmails = this.$(this.selectors.emailItem).length > 1;
-            hasHiddenEmails = this._hasHiddenEmails();
-            translationPrefix = 'oro.email.thread.' + (hasHiddenEmails ? 'expand_all' : 'collapse_all');
+            var hasMultipleEmails = this.$(this.selectors.emailItem).length > 1;
+            var hasHiddenEmails = this._hasHiddenEmails();
+            var translationPrefix = 'oro.email.thread.' + (hasHiddenEmails ? 'expand_all' : 'collapse_all');
 
             // update action element
-            $toggleAllAction = this.$actionPanel.find(this.selectors.toggleAll);
+            var $toggleAllAction = this.$actionPanel.find(this.selectors.toggleAll);
             $toggleAllAction.toggle(hasMultipleEmails);
             $toggleAllAction.text(__(translationPrefix + '.label'));
             $toggleAllAction.attr('title', __(translationPrefix + '.tooltip'));
@@ -208,9 +207,8 @@ define(function(require) {
          * @protected
          */
         _hasHiddenEmails: function() {
-            var hasCollapsedEmails, hasEmailsToLoad;
-            hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
-            hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
+            var hasCollapsedEmails = Boolean(this.$(this.selectors.emailItem).not('.in').length);
+            var hasEmailsToLoad = Boolean(this.$(this.selectors.loadMore).length);
             return hasCollapsedEmails || hasEmailsToLoad;
         },
 

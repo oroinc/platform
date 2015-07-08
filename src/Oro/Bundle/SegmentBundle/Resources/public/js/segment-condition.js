@@ -47,8 +47,8 @@ function($, _, SegmentFilter) {
         },
 
         _renderFilter: function(fieldId) {
-            var segmentId = fieldId.split('_')[1],
-                filterId = this._getSegmentFilterId();
+            var segmentId = fieldId.split('_')[1];
+            var filterId = this._getSegmentFilterId();
 
             var data = this.element.find('input.select').select2('data');
             if (_.has(data, 'id')) {

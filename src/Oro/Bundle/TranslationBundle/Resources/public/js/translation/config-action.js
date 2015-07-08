@@ -4,8 +4,10 @@ define([
     'routing',
     'orotranslation/js/translator',
     'oroui/js/mediator',
-    'oroui/js/messenger'],
-function(Backbone, _, routing, __, mediator, messenger) {
+    'oroui/js/messenger'
+], function(Backbone, _, routing, __, mediator, messenger) {
+    'use strict';
+
     var $ = Backbone.$;
 
     /**
@@ -29,7 +31,8 @@ function(Backbone, _, routing, __, mediator, messenger) {
 
         buttonsSelector: '.available-translation-widget-container .btn',
 
-        buttonTemplate: _.template('<button class="btn btn-mini" data-lang="<%= code %>" data-action="<%= action %>"><%= label %></button>'),
+        buttonTemplate: _.template('<button class="btn btn-mini" data-lang="<%= code %>" ' +
+            'data-action="<%= action %>"><%= label %></button>'),
 
         /**
          * Constructor
@@ -50,10 +53,9 @@ function(Backbone, _, routing, __, mediator, messenger) {
         clickHandler: function(e) {
             e.preventDefault();
 
-            var $el = $(e.currentTarget),
-                action = $el.data('action'),
-                code = $el.data('lang')
-            ;
+            var $el = $(e.currentTarget);
+            var action = $el.data('action');
+            var code = $el.data('lang');
 
             if (_.isUndefined(action)) {
                 throw new TypeError('Attribute "data-action" should be set for action button');
@@ -79,7 +81,7 @@ function(Backbone, _, routing, __, mediator, messenger) {
          * @param {Object} actionMediator
          */
         performAction: function(actionMediator) {
-            if (actionMediator.action == 'download' || actionMediator.action == 'update') {
+            if (actionMediator.action === 'download' || actionMediator.action === 'update') {
                 mediator.execute('showLoading');
 
                 var url = routing.generate(this.route, {code: actionMediator.code});
@@ -99,7 +101,7 @@ function(Backbone, _, routing, __, mediator, messenger) {
                             message  = _.isUndefined(response.message) ? __('unknown') : __(response.message);
                             message  = __('Could not download translations, error: ') + message;
                         } else {
-                            message = actionMediator.action == 'download' ?
+                            message = actionMediator.action === 'download' ?
                                 __('Download finished.')
                                 : __('Update finished.');
                         }
@@ -118,16 +120,16 @@ function(Backbone, _, routing, __, mediator, messenger) {
          * @param {Object} actionMediator
          */
         postAction: function(actionMediator) {
-            var $newButton,
-                action = actionMediator.action,
-                code = actionMediator.code,
-                value = this.$el.val(),
-                config = JSON.parse(value ? value : '{}');
+            var $newButton;
+            var action = actionMediator.action;
+            var code = actionMediator.code;
+            var value = this.$el.val();
+            var config = JSON.parse(value ? value : '{}');
 
-            if (action == 'download' || action == 'disable') {
+            if (action === 'download' || action === 'disable') {
                 $newButton = $(this.buttonTemplate({code: code, action: 'enable', label: __('Enable')}));
                 config[code] = this.options.STATUS_DOWNLOADED;
-            } else if (action == 'enable') {
+            } else if (action === 'enable') {
                 $newButton = $(this.buttonTemplate({code: code, action: 'disable', label: __('Disable')}));
                 config[code] = this.options.STATUS_ENABLED;
             }
@@ -137,7 +139,7 @@ function(Backbone, _, routing, __, mediator, messenger) {
 
             this.$el.val(JSON.stringify(config));
 
-            if (action == 'enable' || action == 'disable') {
+            if (action === 'enable' || action === 'disable') {
                 this.$el.parents('form').submit();
             }
         },
@@ -148,11 +150,12 @@ function(Backbone, _, routing, __, mediator, messenger) {
         markAsUpToDate: function(actionMediator) {
             var tableLine = actionMediator.el.parents('tr');
 
-            if (actionMediator.action == 'update') {
+            if (actionMediator.action === 'update') {
                 // remove update button
                 actionMediator.el.remove();
             }
-            tableLine.find('.translation-status').html($('<span class="status-up-to-date">' + __('Up to date') + '</span>'));
+            tableLine.find('.translation-status').html($('<span class="status-up-to-date">' +
+                __('Up to date') + '</span>'));
         }
     });
 });

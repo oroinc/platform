@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var LoadingMaskView,
-        BaseView = require('./base/view'),
-        template = require('text!../../../templates/loading-mask-view.html'),
-        _ = require('underscore');
+    var LoadingMaskView;
+    var BaseView = require('./base/view');
+    var template = require('text!../../../templates/loading-mask-view.html');
+    var _ = require('underscore');
 
     LoadingMaskView = BaseView.extend({
         autoRender: true,

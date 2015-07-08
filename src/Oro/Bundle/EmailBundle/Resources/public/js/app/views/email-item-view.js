@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var EmailItemView,
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailItemView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     EmailItemView = BaseView.extend({
         events: {
@@ -65,10 +64,8 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onEmailHeadClick: function(e) {
-            var $target,
-                exclude = 'a, .dropdown';
-
-            $target = this.$(e.target);
+            var exclude = 'a, .dropdown';
+            var $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
             if ($target.is(exclude) || $target.parents(exclude).length) {
                 return;
@@ -108,8 +105,8 @@ define(function(require) {
          * @returns {number}
          */
         fetchCommentsQuantity: function() {
-            var quantity = null,
-                commentsComponent = this.pageComponent('comments');
+            var quantity = null;
+            var commentsComponent = this.pageComponent('comments');
             if (commentsComponent) {
                 quantity = commentsComponent.collection.getState().totalItemsQuantity;
             }

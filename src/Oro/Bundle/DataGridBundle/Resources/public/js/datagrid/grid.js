@@ -1,25 +1,24 @@
 define(function(require) {
     'use strict';
 
-    var Grid,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        Backgrid = require('backgrid'),
-        __ = require('orotranslation/js/translator'),
-        mediator = require('oroui/js/mediator'),
-        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
-        GridHeader = require('./header'),
-        GridBody = require('./body'),
-        GridFooter = require('./footer'),
-        Toolbar = require('./toolbar'),
-        ActionColumn = require('./column/action-column'),
-        SelectRowCell = require('oro/datagrid/cell/select-row-cell'),
-        SelectAllHeaderCell = require('./header-cell/select-all-header-cell'),
-        RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action'),
-        ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
-        ExportAction = require('oro/datagrid/action/export-action'),
-        PluginManager = require('oroui/js/app/plugins/plugin-manager'),
-        tools = require('oroui/js/tools');
+    var Grid;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Backgrid = require('backgrid');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var GridHeader = require('./header');
+    var GridBody = require('./body');
+    var GridFooter = require('./footer');
+    var Toolbar = require('./toolbar');
+    var ActionColumn = require('./column/action-column');
+    var SelectRowCell = require('oro/datagrid/cell/select-row-cell');
+    var SelectAllHeaderCell = require('./header-cell/select-all-header-cell');
+    var RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action');
+    var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
+    var ExportAction = require('oro/datagrid/action/export-action');
+    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
 
     /**
      * Basic grid class.
@@ -119,7 +118,8 @@ define(function(require) {
          * @param {Array<oro.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
          * @param {Array<oro.datagrid.action.AbstractAction>} [options.massActions] Array of mass actions prototypes
          * @param {Boolean} [options.multiSelectRowEnabled] Option for enabling multi select row
-         * @param {oro.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
+         * @param {oro.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for
+         *  action that handles row click
          * @throws {TypeError} If mandatory options are undefined
          */
         initialize: function(options) {
@@ -245,8 +245,8 @@ define(function(require) {
         _createSelectRowColumn: function() {
             var coulmn;
             coulmn = new Backgrid.Column({
-                name:       "massAction",
-                label:      __("Selected Rows"),
+                name:       'massAction',
+                label:      __('Selected Rows'),
                 renderable: true,
                 sortable:   false,
                 editable:   false,
@@ -280,8 +280,8 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
-            var toolbarOptions, toolbar;
-            toolbarOptions = {
+            var toolbar;
+            var toolbarOptions = {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions()
@@ -464,12 +464,12 @@ define(function(require) {
          * @private
          */
         _runRowClickAction: function(row) {
-            var action, config;
+            var config;
             if (!this.rowClickAction) {
                 return;
             }
 
-            action = new this.rowClickAction({
+            var action = new this.rowClickAction({
                 datagrid: this,
                 model: row.model
             });
@@ -490,21 +490,22 @@ define(function(require) {
                 this.setAdditionalParameter(param, value);
             });
 
-            this.listenTo(mediator, 'datagrid:restoreState:' + this.name, function(columnName, dataField, included, excluded) {
-                this.collection.each(function(model) {
-                    if (_.indexOf(included, model.get(dataField)) !== -1) {
-                        model.set(columnName, true);
-                    }
-                    if (_.indexOf(excluded, model.get(dataField)) !== -1) {
-                        model.set(columnName, false);
-                    }
+            this.listenTo(mediator, 'datagrid:restoreState:' + this.name,
+                function(columnName, dataField, included, excluded) {
+                    this.collection.each(function(model) {
+                        if (_.indexOf(included, model.get(dataField)) !== -1) {
+                            model.set(columnName, true);
+                        }
+                        if (_.indexOf(excluded, model.get(dataField)) !== -1) {
+                            model.set(columnName, false);
+                        }
+                    });
                 });
-            });
 
-            this.listenTo(mediator, 'datagrid:restoreChangeset:' + this.name, function (dataField, changeset) {
-                this.collection.each(function (model) {
+            this.listenTo(mediator, 'datagrid:restoreChangeset:' + this.name, function(dataField, changeset) {
+                this.collection.each(function(model) {
                     if (changeset[model.get(dataField)]) {
-                        _.each(changeset[model.get(dataField)], function (value, columnName) {
+                        _.each(changeset[model.get(dataField)], function(value, columnName) {
                             model.set(columnName, value);
                         });
                     }
@@ -582,8 +583,10 @@ define(function(require) {
          * Define no data block.
          */
         _defineNoDataBlock: function() {
-            var placeholders = {entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()},
-                message = _.isEmpty(this.collection.state.filters) ?
+            var placeholders = {
+                entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
+            };
+            var message = _.isEmpty(this.collection.state.filters) ?
                         'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
             message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 

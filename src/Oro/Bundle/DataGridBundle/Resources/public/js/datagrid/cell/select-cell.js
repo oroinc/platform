@@ -20,7 +20,7 @@ define([
          */
         initialize: function(options) {
             if (this.expanded && !this.multiple) {
-                this.editor = SelectCellRadioEditor
+                this.editor = SelectCellRadioEditor;
             }
 
             if (this.choices) {
@@ -31,7 +31,7 @@ define([
             }
             SelectCell.__super__.initialize.apply(this, arguments);
 
-            this.listenTo(this.model, 'change:' + this.column.get('name'), function () {
+            this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
                 this.enterEditMode();
             });
         },
@@ -50,7 +50,7 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function () {
+        enterEditMode: function() {
             if (this.column.get('editable')) {
                 SelectCell.__super__.enterEditMode.apply(this, arguments);
 
@@ -62,7 +62,7 @@ define([
          * @inheritDoc
          */
         exitEditMode: function() {
-            this.$el.removeClass("error");
+            this.$el.removeClass('error');
             this.stopListening(this.currentEditor);
             delete this.currentEditor;
         }

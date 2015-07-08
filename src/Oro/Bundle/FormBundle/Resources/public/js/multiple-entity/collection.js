@@ -1,5 +1,6 @@
-define(['backbone', './model'
-    ], function(Backbone, EntityModel) {
+define([
+    'underscore', 'backbone', './model'
+], function(_, Backbone, EntityModel) {
     'use strict';
 
     /**

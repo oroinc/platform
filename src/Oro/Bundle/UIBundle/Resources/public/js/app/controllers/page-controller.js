@@ -8,14 +8,13 @@ define([
 ], function($, _, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
-    var document, location, history, console, utils, mediator, PageController;
-
-    document = window.document;
-    location = window.location;
-    history = window.history;
-    console = window.console;
-    utils = Chaplin.utils;
-    mediator = Chaplin.mediator;
+    var PageController;
+    var document = window.document;
+    var location = window.location;
+    var history = window.history;
+    var console = window.console;
+    var utils = Chaplin.utils;
+    var mediator = Chaplin.mediator;
 
     PageController = BaseController.extend({});
     _.extend(PageController.prototype, {
@@ -24,10 +23,9 @@ define([
          * @override
          */
         initialize: function() {
-            var page, isInAction;
             PageController.__super__.initialize.apply(this, arguments);
 
-            page = new PageModel();
+            var page = new PageModel();
             this.listenTo(page, 'request', this.onPageRequest);
             this.listenTo(page, 'sync', this.onPageLoaded);
             this.listenTo(page, 'invalid', this.onPageInvalid);
@@ -35,7 +33,7 @@ define([
             this.model = page;
 
             // application is in action till first 'page:afterChange' event
-            isInAction = true;
+            var isInAction = true;
 
             this.subscribeEvent('page:beforeChange', function() {
                 isInAction = true;
@@ -69,11 +67,11 @@ define([
          * @param {Object} options
          */
         index: function(params, route, options) {
-            var url, cacheItem, args;
+            var cacheItem;
 
-            url = this._combineRouteUrl(route);
+            var url = this._combineRouteUrl(route);
             this._setNavigationHandlers(url);
-            args = {// collect arguments to reuse in events of page_fetch state change
+            var args = {// collect arguments to reuse in events of page_fetch state change
                 params: params,
                 route: route,
                 options: options
@@ -121,10 +119,10 @@ define([
          * @private
          */
         _beforePageLoad: function(route, params, options) {
-            var oldRoute, newRoute, url, opts;
-
-            oldRoute = route.previous;
-            newRoute = _.extend(_.omit(route, ['previous']), {params: params});
+            var url;
+            var opts;
+            var oldRoute = route.previous;
+            var newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
 
             // if route has been changed during 'page:beforeChange' event,
@@ -163,13 +161,11 @@ define([
          * @param {Object} options
          */
         onPageLoaded: function(model, result, options) {
-            var pageData, actionArgs, jqXHR, self, updatePromises;
-
-            self = this;
-            updatePromises = [];
-            pageData = model.getAttributes();
-            actionArgs = options.actionArgs;
-            jqXHR = options.xhr;
+            var self = this;
+            var updatePromises = [];
+            var pageData = model.getAttributes();
+            var actionArgs = options.actionArgs;
+            var jqXHR = options.xhr;
 
             if (pageData.title) {
                 this.adjustTitle(pageData.title);
@@ -209,9 +205,8 @@ define([
          * @param {Object} options
          */
         onPageError: function(model, jqXHR, options) {
-            var rawData, data, payload;
-            rawData = jqXHR.responseText;
-            data = {};
+            var rawData = jqXHR.responseText;
+            var data = {};
 
             if (jqXHR.status === 200 && rawData.indexOf('http') === 0) {
                 data = {redirect: true, fullRedirect: true, location: rawData};
@@ -219,7 +214,7 @@ define([
                 return;
             }
 
-            payload = {stopPageProcessing: false};
+            var payload = {stopPageProcessing: false};
             this.publishEvent('page:beforeError', jqXHR, payload);
             if (payload.stopPageProcessing) {
                 history.back();
@@ -231,6 +226,7 @@ define([
                 model.set(data, options);
             } else {
                 if (mediator.execute('retrieveOption', 'debug')) {
+                    // jshint -W060
                     document.writeln(rawData);
                     if (console) {
                         console.error('Unexpected content format');
@@ -254,9 +250,12 @@ define([
          * @private
          */
         _processRedirect: function(pathDesc, params, options) {
-            var url, parser, pathname, query;
+            var url;
+            var parser;
+            var pathname;
+            var query;
             options = options || {};
-            if (typeof pathDesc === 'object' && pathDesc.url != null) {
+            if (typeof pathDesc === 'object' && pathDesc.url !== null && pathDesc.url !== void 0) {
                 options = params || {};
                 // fetch from URL only pathname and query
                 parser = document.createElement('a');
@@ -264,7 +263,7 @@ define([
                 pathname = parser.pathname;
                 query = parser.search.substr(1);
                 // IE removes starting slash
-                pathDesc.url = (pathname[0] == '/' ? '' : '/') + pathname + (query && ('?' + query));
+                pathDesc.url = (pathname[0] === '/' ? '' : '/') + pathname + (query && ('?' + query));
             }
             if (options.fullRedirect) {
                 query = utils.queryParams.parse(query);
@@ -313,14 +312,14 @@ define([
          * @returns {Object}
          */
         _parseRawData: function(rawData, prevPos) {
-            var jsonStartPos, additionalData, dataObj, data;
             if (_.isUndefined(prevPos)) {
                 prevPos = -1;
             }
             rawData = rawData.trim();
-            jsonStartPos = rawData.indexOf('{', prevPos + 1);
-            additionalData = '';
-            dataObj = null;
+            var jsonStartPos = rawData.indexOf('{', prevPos + 1);
+            var additionalData = '';
+            var dataObj = null;
+            var data;
             if (jsonStartPos > 0) {
                 additionalData = rawData.substr(0, jsonStartPos);
                 data = rawData.substr(jsonStartPos);

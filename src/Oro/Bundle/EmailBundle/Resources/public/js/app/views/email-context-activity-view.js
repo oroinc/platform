@@ -1,12 +1,13 @@
 define([
-        'jquery',
-        'orotranslation/js/translator',
-        'routing',
-        'oroui/js/messenger',
-        'oroui/js/app/views/base/view',
-        'oroui/js/mediator',
-        'oroemail/js/app/models/email-context-activity-collection'
-    ], function($, __, routing, messenger, BaseView, mediator, EmailContextActivityCollection) {
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'routing',
+    'oroui/js/messenger',
+    'oroui/js/app/views/base/view',
+    'oroui/js/mediator',
+    'oroemail/js/app/models/email-context-activity-collection'
+], function($, _, __, routing, messenger, BaseView, mediator, EmailContextActivityCollection) {
     'use strict';
 
     var EmailContextActivityView;
@@ -64,7 +65,7 @@ define([
         },
 
         render: function() {
-            if (this.collection.length == 0) {
+            if (this.collection.length === 0) {
                 this.$el.hide();
             } else {
                 this.$el.show();
@@ -93,8 +94,8 @@ define([
                             messenger.notificationFlashMessage('success', __('oro.email.contexts.removed'));
 
                             if (self.options.target &&
-                                model.get('targetClassName') == self.options.target.className &&
-                                model.get('targetId') == self.options.target.id) {
+                                model.get('targetClassName') === self.options.target.className &&
+                                model.get('targetId') === self.options.target.id) {
                                 mediator.trigger('widget_success:activity_list:item:update');
                             } else {
                                 mediator.trigger('widget:doRefresh:email-context-activity-list-widget');

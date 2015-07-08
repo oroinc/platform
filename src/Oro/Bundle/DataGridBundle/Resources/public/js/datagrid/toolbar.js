@@ -8,8 +8,8 @@ define([
 ], function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
     'use strict';
 
-    var $, Toolbar;
-    $ = Backbone.$;
+    var Toolbar;
+    var $ = Backbone.$;
 
     /**
      * Datagrid toolbar widget
@@ -46,7 +46,7 @@ define([
             options = options || {};
 
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
 
             this.collection = options.collection;

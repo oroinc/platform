@@ -59,14 +59,12 @@ define([
          * @private
          */
         getActionParameters: function() {
-            var selectionState, collection, idValues, params;
-            selectionState = this.datagrid.getSelectionState();
-            collection = this.datagrid.collection;
-            idValues = _.map(selectionState.selectedModels, function(model) {
+            var selectionState = this.datagrid.getSelectionState();
+            var collection = this.datagrid.collection;
+            var idValues = _.map(selectionState.selectedModels, function(model) {
                 return model.get(this.identifierFieldName);
             }, this);
-
-            params = {
+            var params = {
                 inset: selectionState.inset ? 1 : 0,
                 values: idValues.join(',')
             };

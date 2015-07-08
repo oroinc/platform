@@ -37,7 +37,7 @@ require(['jquery', 'routing'],
                         $.each(data, function(value, text) {
                             if (value !== 'template_name') {
                                 var option = $('<option>').attr('value', value).text(text);
-                                if (parentDiv.attr(valueAttribute) == value) {
+                                if (parentDiv.attr(valueAttribute) === value) {
                                     option.attr('selected', 'selected');
                                 }
                                 selector.append(option);

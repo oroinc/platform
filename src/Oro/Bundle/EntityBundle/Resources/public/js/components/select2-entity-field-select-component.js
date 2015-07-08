@@ -1,8 +1,10 @@
 define(function(require) {
     'use strict';
-    var Select2EntityFieldSelectComponent,
-        EntityFieldUtil = require('oroentity/js/entity-field-select-util'),
-        Select2EntityFieldComponent = require('oro/select2-entity-field-component');
+
+    var Select2EntityFieldSelectComponent;
+    var EntityFieldUtil = require('oroentity/js/entity-field-select-util');
+    var Select2EntityFieldComponent = require('oro/select2-entity-field-component');
+
     Select2EntityFieldSelectComponent = Select2EntityFieldComponent.extend({
         initialize: function(options) {
             this.util = new EntityFieldUtil(options._sourceElement);
@@ -17,7 +19,7 @@ define(function(require) {
                     more: false,
                     results: that.util._getData()
                 };
-            }
+            };
             return config;
         }
     });

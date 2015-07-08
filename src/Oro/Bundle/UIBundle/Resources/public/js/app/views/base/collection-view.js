@@ -44,7 +44,7 @@ define([
          * @returns {Chaplin.View}
          */
         getItemView: function(model) {
-            return this.subview("itemView:" + model.cid);
+            return this.subview('itemView:' + model.cid);
         },
 
         /**
@@ -56,10 +56,9 @@ define([
          * @override
          */
         initLoadingIndicator: function() {
-            var loading, loadingContainer;
-            loadingContainer = this._getLoadingContainer();
+            var loadingContainer = this._getLoadingContainer();
             if (loadingContainer) {
-                loading = new LoadingMaskView({
+                var loading = new LoadingMaskView({
                     container: loadingContainer
                 });
                 this.subview('loading', loading);

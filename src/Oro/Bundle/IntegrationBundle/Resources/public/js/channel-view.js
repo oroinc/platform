@@ -6,7 +6,7 @@ define([
     'oroui/js/mediator',
     'oroui/js/delete-confirmation'
 ], function($, Backbone, _, __, mediator, DeleteConfirmation) {
-    "use strict";
+    'use strict';
 
     /**
      * @export  orointegration/js/channel-view
@@ -100,12 +100,10 @@ define([
         processChange: function($el) {
             this.memoizeValue($el);
 
-            var $form = $(this.options.formSelector),
-                data = $form.serializeArray(),
-                url = $form.attr('action'),
-                fieldsSet = $el.is(this.options.typeSelector) ?
-                    this.fieldsSets.type
-                    : this.fieldsSets.transportType;
+            var $form = $(this.options.formSelector);
+            var data = $form.serializeArray();
+            var url = $form.attr('action');
+            var fieldsSet = $el.is(this.options.typeSelector) ? this.fieldsSets.type : this.fieldsSets.transportType;
 
             data = _.filter(data, function(field) {
                 return _.indexOf(fieldsSet, field.name) !== -1;
@@ -129,7 +127,7 @@ define([
             var fields = $(this.options.typeSelector).parents('form').find('input[type="text"]:not([name$="[name]"])');
 
             fields = fields.filter(function() {
-                return this.value != '';
+                return this.value !== '';
             });
 
             return !fields.length;

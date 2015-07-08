@@ -1,17 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var NotesComponent,
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        $ = require('jquery'),
-        _ = require('underscore'),
-        routing = require('routing'),
-        tools = require('oroui/js/tools'),
-        mediator = require('oroui/js/mediator'),
-        NoteView = require('../views/note-view'),
-        NotesView = require('../views/notes-view'),
-        NoteModel = require('../models/note-model'),
-        NotesCollection = require('../models/notes-collection');
+    var NotesComponent;
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var routing = require('routing');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+    var NoteView = require('../views/note-view');
+    var NotesView = require('../views/notes-view');
+    var NoteModel = require('../models/note-model');
+    var NotesCollection = require('../models/notes-collection');
     require('jquery');
 
     NotesComponent = BaseComponent.extend({
@@ -69,11 +69,10 @@ define(function(require) {
         },
 
         initView: function(options) {
-            var notesOptions, collection;
-            notesOptions = options.notesOptions;
+            var notesOptions = options.notesOptions;
 
             // setup notes collection
-            collection = new NotesCollection(options.notesData, {
+            var collection = new NotesCollection(options.notesData, {
                 model: notesOptions.itemModel
             });
             collection.baseUrl = notesOptions.urls.list;

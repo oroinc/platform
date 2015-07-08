@@ -1,7 +1,16 @@
-define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/js/mediator',
-    'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item', 'orodashboard/js/dashboard-util', 'orodashboard/js/widget/configuration-widget', 'jquery-ui'],
-    function($, _, Backbone, routing, __, mediator, widgetManager, DashboardItemWidget, dashboardUtil, ConfigurationWidget) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var routing = require('routing');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var widgetManager = require('oroui/js/widget-manager');
+    var DashboardItemWidget = require('orodashboard/js/widget/dashboard-item');
+    var dashboardUtil = require('orodashboard/js/dashboard-util');
+    var ConfigurationWidget = require('orodashboard/js/widget/configuration-widget');
+    require('jquery-ui');
 
     /**
      * @export orodashboard/js/dashboard-container
@@ -18,7 +27,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          */
         options: {
             widgetIds: [],
-            handle: ".dashboard-widget .sortable",
+            handle: '.dashboard-widget .sortable',
             columnsSelector: '.dashboard-column',
             emptyTextSelector: '> .empty-text',
             allowEdit: false,
@@ -265,7 +274,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             var result = true;
 
             _.each(this.widgets, function(widget) {
-                if (widget.state.layoutPosition[0] == columnIndex) {
+                if (widget.state.layoutPosition[0] === columnIndex) {
                     result = false;
                 }
             });

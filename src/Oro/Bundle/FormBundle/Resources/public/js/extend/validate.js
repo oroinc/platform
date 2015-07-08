@@ -1,3 +1,4 @@
+/*jshint devel:true*/
 define([
     'jquery',
     'underscore',
@@ -15,10 +16,10 @@ define([
      * @returns {Array.<Element>} sorted in order from form element to input element
      */
     function validationHolders(element) {
-        var $el = $(element),
-            form = $el.parents('form').first(),
-            // instance of validator
-            validator = $(form).data('validator');
+        var $el = $(element);
+        var form = $el.parents('form').first();
+        // instance of validator
+        var validator = $(form).data('validator');
         return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
             var $el = $(el);
             // is it current element or first in a group of elements
@@ -103,8 +104,8 @@ define([
      * @returns {jQuery}
      */
     $.validator.prototype.elementsOf = function(element) {
-        return $(element).find("input, select, textarea")
-            .not(":submit, :reset, :image, [disabled]")
+        return $(element).find('input, select, textarea')
+            .not(':submit, :reset, :image, [disabled]')
             .not(this.settings.ignore);
     };
 
@@ -135,7 +136,7 @@ define([
         if (this.settings.focusInvalid && $elem.is('.select2[type=hidden]')) {
             $elem.parent().find('input.select2-focusser')
                 .focus()
-                .trigger("focusin");
+                .trigger('focusin');
         } else {
             func.apply(this, _.rest(arguments));
         }
@@ -199,7 +200,7 @@ define([
             });
         })(errors);
 
-        this.showErrors(result)
+        this.showErrors(result);
     };
 
     /**
@@ -232,9 +233,9 @@ define([
         errorElement: 'span',
         errorClass: 'validation-failed',
         errorPlacement: function(label, $el) {
-            var $targetElem = getErrorTarget($el),
-                $errorHolder = $targetElem.parent(),
-                $sibling = $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
+            var $targetElem = getErrorTarget($el);
+            var $errorHolder = $targetElem.parent();
+            var $sibling = $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
             // we need this to remove server side error, because js does not know about it
             $sibling.next('.' + this.errorClass).remove();
             label.insertAfter($sibling);
@@ -253,7 +254,7 @@ define([
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
-        ignore: ":hidden:not([type=hidden])"
+        ignore: ':hidden:not([type=hidden])'
     });
 
     // general validation methods
@@ -284,8 +285,10 @@ define([
      * @type {Function}
      */
     $.validator.dataRules = _.wrap($.validator.dataRules, function(dataRules, element) {
-        var optionalGroup, ignoreGroup, validator,
-            rules = dataRules(element);
+        var optionalGroup;
+        var ignoreGroup;
+        var validator;
+        var rules = dataRules(element);
         if (!$.isEmptyObject(rules)) {
             optionalGroup = $(element).parents('[data-validation-optional-group]').get(0);
             ignoreGroup = $(element).parents('[data-validation-ignore]').get(0);
@@ -309,7 +312,7 @@ define([
 
     $.fn.validateDelegate = _.wrap($.fn.validateDelegate, function(validateDelegate, delegate, type, handler) {
         return validateDelegate.call(this, delegate, type, function() {
-            return this[0] && this[0].form && $.data(this[0].form, "validator") && handler.apply(this, arguments);
+            return this[0] && this[0].form && $.data(this[0].form, 'validator') && handler.apply(this, arguments);
         });
     });
 });

@@ -81,9 +81,9 @@ define(function(require) {
          * @param {String} id
          */
         validateSelect2: function(id) {
-            var self = this,
-                $element = $('#' + id),
-                childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
+            var self = this;
+            var $element = $('#' + id);
+            var childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
             $element.find(childSelector).each(function() {
                 var value = $(this).val();
                 if (value) {
@@ -99,9 +99,9 @@ define(function(require) {
          * @param {String} id
          */
         initSelect2: function(id) {
-            var self = this,
-                $element = $('#' + id),
-                childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
+            var self = this;
+            var $element = $('#' + id);
+            var childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
             $element.find(childSelector).each(function() {
                 var exclude = $(this).data('type-filter');
                 $(this).select2({
@@ -126,9 +126,8 @@ define(function(require) {
          * @param {Array} exclude
          */
         data: function(exclude) {
-            var data, util, optionsTemplate;
-            util = this.util;
-            data = {
+            var util = this.util;
+            var data = {
                 more: false,
                 results: []
             };
@@ -137,19 +136,19 @@ define(function(require) {
                 return data;
             }
 
-            optionsTemplate = this.optionsTemplate;
+            var optionsTemplate = this.optionsTemplate;
 
             $.each(this.items, function() {
-                var options, chain, entity, items;
-                options = this.func;
-                chain = util.pathToEntityChain(this.name).slice(1);
-                entity = chain[chain.length - 1];
-                items = data.results;
+                var options = this.func;
+                var chain = util.pathToEntityChain(this.name).slice(1);
+                var entity = chain[chain.length - 1];
+                var items = data.results;
                 if (!entity || !Util.filterFields([entity.field], exclude).length) {
                     return;
                 }
                 $.each(chain, function() {
-                    var item, id;
+                    var item;
+                    var id;
                     if (this.entity) {
                         item = _.findWhere(items, {path: this.path});
                         if (!item) {
@@ -182,5 +181,5 @@ define(function(require) {
 
             return data;
         }
-    }
+    };
 });

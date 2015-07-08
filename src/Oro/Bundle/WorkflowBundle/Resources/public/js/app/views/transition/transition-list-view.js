@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var TransitionsListView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        TransitionRowView = require('./transition-row-view');
+    var TransitionsListView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var TransitionRowView = require('./transition-row-view');
 
     TransitionsListView = BaseView.extend({
         options: {

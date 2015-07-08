@@ -46,8 +46,8 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
         },
 
         _processSelect2Options: function() {
-            var template,
-                options = this.options.select2;
+            var template;
+            var options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
@@ -87,7 +87,7 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
                 if (!$.isEmptyObject(data)) {
                     callback(data);
                 }
-            }
+            };
         },
 
         _bindFieldsLoader: function() {

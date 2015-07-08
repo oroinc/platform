@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var StepsListView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        StepRowView = require('./step-row-view');
+    var StepsListView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var StepRowView = require('./step-row-view');
 
     StepsListView = BaseView.extend({
         options: {

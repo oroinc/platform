@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var AttributeFormOptionListView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        AttributeFormOptionRowView = require('./attribute-form-option-row-view');
+    var AttributeFormOptionListView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var AttributeFormOptionRowView = require('./attribute-form-option-row-view');
 
     AttributeFormOptionListView = BaseView.extend({
         options: {
@@ -48,7 +48,7 @@ define(function(require) {
         },
 
         addItem: function(data) {
-            if (_.indexOf(this.getCollection(), data) == -1) {
+            if (_.indexOf(this.getCollection(), data) === -1) {
                 this.getCollection().push(data);
             }
             var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
@@ -85,7 +85,7 @@ define(function(require) {
                     var collection = this.getCollection();
                     var i = collection.length - 1;
                     while (i >= 0) {
-                        if (collection[i].attribute_name == data.attribute_name) {
+                        if (collection[i].attribute_name === data.attribute_name) {
                             if (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name)) {
                                 delete this.rowViewsByAttribute[data.attribute_name];
                             }

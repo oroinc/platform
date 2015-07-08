@@ -82,10 +82,9 @@ require([
         'oronavigation/js/app/views/page-state-view',
         'oronavigation/js/app/models/page-state-model'
     ], function($, PinComponent, Model, Collection, PageStateView, PageStateModel) {
-        var pinCollection, stateModel, template;
-
-        template = $('#template-list-pin-item').html();
-        pinCollection = new Collection([], {
+        var stateModel;
+        var template = $('#template-list-pin-item').html();
+        var pinCollection = new Collection([], {
             model: Model
         });
 

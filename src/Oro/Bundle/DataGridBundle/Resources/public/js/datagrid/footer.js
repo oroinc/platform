@@ -5,7 +5,7 @@ define([
     './footer/footer-row',
     './footer/footer-cell'
 ], function(_, Backbone, Backgrid, FooterRow, FooterCell) {
-    "use strict";
+    'use strict';
 
     var Footer;
 
@@ -18,7 +18,7 @@ define([
      */
     Footer = Backgrid.Footer.extend({
         /** @property */
-        tagName: "tfoot",
+        tagName: 'tfoot',
 
         /** @property */
         row: FooterRow,
@@ -39,10 +39,10 @@ define([
 
             this.rows = [];
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
             if (!options.columns) {
-                throw new TypeError("'columns' is required");
+                throw new TypeError('"columns" is required');
             }
 
             this.columns = options.columns;

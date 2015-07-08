@@ -2,24 +2,25 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowEditorComponent,
-        WorkflowViewerComponent = require('./workflow-viewer-component'),
-        FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
-        flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
-        mediator = require('oroui/js/mediator'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        messenger = require('oroui/js/messenger'),
-        tools = require('oroui/js/tools'),
-        routing = require('routing'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        WorkflowManagementView = require('../views/workflow-management-view'),
-        TransitionModel = require('../models/transition-model'),
-        TransitionEditFormView = require('../views/transition/transition-edit-view'),
-        StepEditView = require('../views/step/step-edit-view'),
-        StepModel = require('../models/step-model'),
-        workflowModelFactory = require('../../tools/workflow-model-factory'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var WorkflowEditorComponent;
+    var WorkflowViewerComponent = require('./workflow-viewer-component');
+    var FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view');
+    var flowchartTools = require('oroworkflow/js/tools/flowchart-tools');
+    var mediator = require('oroui/js/mediator');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var messenger = require('oroui/js/messenger');
+    var tools = require('oroui/js/tools');
+    var routing = require('routing');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var WorkflowManagementView = require('../views/workflow-management-view');
+    var TransitionModel = require('../models/transition-model');
+    var TransitionEditFormView = require('../views/transition/transition-edit-view');
+    var StepEditView = require('../views/step/step-edit-view');
+    var StepModel = require('../models/step-model');
+    var workflowModelFactory = require('../../tools/workflow-model-factory');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
      * Builds workflow editor UI.
@@ -253,9 +254,9 @@ define(function(require) {
                 'success': _.bind(function() {
                     mediator.execute('hideLoading');
 
-                    var redirectUrl = '',
-                        modelName = this.model.get('name'),
-                        saveAndClose = this.workflowManagementView.submitActor &&
+                    var redirectUrl = '';
+                    var modelName = this.model.get('name');
+                    var saveAndClose = this.workflowManagementView.submitActor &&
                             !$(this.workflowManagementView.submitActor).is('[data-action="save_and_stay"]');
                     if (saveAndClose) {
                         redirectUrl = routing.generate('oro_workflow_definition_view', {name: modelName});
@@ -272,6 +273,7 @@ define(function(require) {
                     mediator.execute('hideLoading');
                     var jsonResponse = response.responseJSON || {};
 
+                    /*jshint devel:true*/
                     if (tools.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
                         console.error(jsonResponse.error);
                     }

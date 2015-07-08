@@ -101,7 +101,7 @@ define([
          *
          * @property {String}
          */
-        nullLink: 'javascript:void(0);',
+        nullLink: '#',
 
         /**
          * Initialize.
@@ -312,7 +312,7 @@ define([
          * @protected
          */
         _getInputValue: function(input) {
-            var result = undefined;
+            var result;
             var $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
@@ -343,7 +343,7 @@ define([
                 case 'radio':
                     $input.each(function() {
                         var $input = $(this);
-                        if ($input.attr('value') == value) {
+                        if ($input.attr('value') === value) {
                             $input.attr('checked', true);
                             $input.click();
                         } else {
@@ -397,7 +397,7 @@ define([
          * @return {*}
          */
         _writeDOMValue: function(value) {
-            throw new Error("Method _writeDOMValue is abstract and must be implemented");
+            throw new Error('Method _writeDOMValue is abstract and must be implemented');
             //this._setInputValue(inputValueSelector, value.value);
             //return this
         },
@@ -409,7 +409,7 @@ define([
          * @protected
          */
         _readDOMValue: function() {
-            throw new Error("Method _readDOMValue is abstract and must be implemented");
+            throw new Error('Method _readDOMValue is abstract and must be implemented');
             //return { value: this._getInputValue(this.inputValueSelector) }
         },
 
@@ -435,7 +435,7 @@ define([
          * @private
          */
         _preventEnterProcessing: function(e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
                 e.preventDefault();
                 e.stopPropagation();
             }
@@ -460,8 +460,8 @@ define([
         },
 
         _getTemplate: function(selector) {
-            var theme = this.templateTheme,
-                src = theme && $(selector + '-' + theme).text() || $(selector).text();
+            var theme = this.templateTheme;
+            var src = theme && $(selector + '-' + theme).text() || $(selector).text();
 
             return _.template(src);
         }

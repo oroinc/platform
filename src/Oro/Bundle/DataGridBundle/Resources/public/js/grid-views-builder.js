@@ -1,15 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var gridViewsBuilder, gridGridViewsSelector,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
-
-    gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
-
-    gridViewsBuilder = {
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
+    var GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
+    var gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
+    var gridViewsBuilder = {
         /**
          * Runs grid views builder
          * Builder interface implementation
@@ -67,8 +64,8 @@ define(function(require) {
          * @returns {orodatagrid.datagrid.GridViewsView}
          */
         build: function(collection) {
-            var options, gridViews;
-            options = gridViewsBuilder.combineGridViewsOptions.call(this);
+            var gridViews;
+            var options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
                 var gridViewsOptions = _.extend({collection: collection}, options);
 
@@ -76,10 +73,10 @@ define(function(require) {
                     var $gridViews = $(gridGridViewsSelector);
                     gridViewsOptions.title = $gridViews.text();
 
-                    var gridViews = new GridViewsView(gridViewsOptions);
+                    gridViews = new GridViewsView(gridViewsOptions);
                     $gridViews.html(gridViews.render().$el);
                 } else {
-                    var gridViews = new GridViewsView(gridViewsOptions);
+                    gridViews = new GridViewsView(gridViewsOptions);
                     this.$gridEl.prepend(gridViews.render().$el);
                 }
             }

@@ -1,10 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var Select2View,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var Select2View;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
     require('jquery.select2');
+
     Select2View = BaseView.extend({
 
         /**

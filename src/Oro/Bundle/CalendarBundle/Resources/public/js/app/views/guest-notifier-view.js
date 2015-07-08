@@ -25,7 +25,7 @@ define([
             this.isModalShown = false;
 
             this.$form.parent().on('submit.' + this.cid, _.bind(function(e) {
-                if (!this.isModalShown && this.getFormState() != this.formInitialState) {
+                if (!this.isModalShown && this.getFormState() !== this.formInitialState) {
                     this.getConfirmDialog().open();
                     this.isModalShown = true;
                     e.preventDefault();
@@ -86,7 +86,7 @@ define([
             return new Modal({
                 title: __('Notify guests title'),
                 okText: __('Notify'),
-                cancelText: __("Don't notify"),
+                cancelText: __('Don\'t notify'),
                 content: __('Notify guests message'),
                 className: 'modal modal-primary',
                 okButtonClass: 'btn-primary btn-large',

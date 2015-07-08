@@ -120,7 +120,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         _disable: function(flag) {
             var $elem = this.element;
             if ($elem.data('select2')) {
-                $elem.select2("enable", !flag);
+                $elem.select2('enable', !flag);
             } else {
                 $elem.attr('disabled', flag);
             }
@@ -130,7 +130,8 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         _bindFieldChoice: function() {
-            var $fields, self = this;
+            var $fields;
+            var self = this;
             if (this.options.fieldChoiceSelector) {
                 $fields = $(this.options.fieldChoiceSelector);
                 $fields.change(function(e) {

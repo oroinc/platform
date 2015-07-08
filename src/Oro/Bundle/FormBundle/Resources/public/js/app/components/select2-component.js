@@ -1,12 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var Select2Component,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        tools = require('oroui/js/tools'),
-        Select2View = require('oroform/js/app/views/select2-view'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+    var Select2Component;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var Select2View = require('oroform/js/app/views/select2-view');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+
     Select2Component = BaseComponent.extend({
 
         url: '',
@@ -57,7 +58,7 @@ define(function(require) {
             // configure AJAX object if it exists
             if (config.ajax !== undefined) {
                 config.minimumInputLength = 0;
-                config.initSelection = _.result(config, 'initSelection') || _.bind(initSelection, config);
+                config.initSelection = _.result(config, 'initSelection') || _.partial(initSelection, config);
                 if (that.excluded) {
                     config.ajax.results = _.wrap(config.ajax.results, function(func, data, page) {
                         var response = func.call(this, data, page);
@@ -83,7 +84,7 @@ define(function(require) {
                         var inFirst = first.text.search(expression);
                         var inSecond = second.text.search(expression);
 
-                        if (inFirst == -1 || inSecond == -1) {
+                        if (inFirst === -1 || inSecond === -1) {
                             return inSecond - inFirst;
                         }
 
@@ -91,7 +92,7 @@ define(function(require) {
                     };
 
                     return results.sort(sortIteratorDelegate);
-                }
+                };
             }
             // set default values for other Select2 options
             if (config.formatResult === undefined) {
@@ -114,7 +115,7 @@ define(function(require) {
         }
     });
 
-    function initSelection(element, callback) {
+    function initSelection(config, element, callback) {
 
         function handleResults(data) {
             if (config.multiple === true) {
@@ -140,7 +141,7 @@ define(function(require) {
                     if (_.isFunction(ajaxOptions.results)) {
                         response = ajaxOptions.results.call(select2Obj, response, 1);
                     }
-                    if (typeof response.results != 'undefined') {
+                    if (typeof response.results !== 'undefined') {
                         handleResults(response.results);
                     }
                     element.trigger('select2-data-loaded');
@@ -148,10 +149,9 @@ define(function(require) {
             });
         }
 
-        var selectedData,
-            dataIds,
-            config = this,
-            currentValue = tools.ensureArray(element.select2('val'));
+        var selectedData;
+        var dataIds;
+        var currentValue = tools.ensureArray(element.select2('val'));
 
         selectedData = _.filter(
             tools.ensureArray(element.data('selected-data')),
@@ -161,14 +161,15 @@ define(function(require) {
         );
 
         if (selectedData.length > 0) {
-            dataIds = _.map(selectedData, function (item) {
+            dataIds = _.map(selectedData, function(item) {
                 return item.id;
             });
 
             // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
             dataIds = _.compact(dataIds);
 
-            if (dataIds.length === 0 || dataIds.sort().join(config.separator) === currentValue.sort().join(config.separator)) {
+            if (dataIds.length === 0 ||
+                dataIds.sort().join(config.separator) === currentValue.sort().join(config.separator)) {
                 handleResults(selectedData);
                 return;
             }
@@ -181,7 +182,8 @@ define(function(require) {
     }
 
     function getTitle(data, properties) {
-        var title = '', result;
+        var title = '';
+        var result;
         if (data) {
             if (properties === undefined) {
                 if (data.text !== undefined) {
@@ -208,8 +210,8 @@ define(function(require) {
             if ($.isEmptyObject(object)) {
                 return undefined;
             }
-            var result = '',
-                highlight = function(str) {
+            var result = '';
+            var highlight = function(str) {
                     return object.children ? str : highlightSelection(str, query);
                 };
             if (object._html !== undefined) {

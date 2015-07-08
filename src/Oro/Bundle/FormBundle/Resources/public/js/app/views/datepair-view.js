@@ -120,12 +120,12 @@ define([
 
         handleRangeError: function() {
             // resets 'start' and 'end' fields to default values on range error
-            var startDateInput = this.$('.' + this.options.startClass + '.' + this.options.dateClass),
-                endDateInput = this.$('.' + this.options.endClass + '.' + this.options.dateClass),
-                startTimeInput = this.$('.' + this.options.startClass + '.' + this.options.timeClass),
-                endTimeInput = this.$('.' + this.options.endClass + '.' + this.options.timeClass);
-            var startDate = this._parseDate($(startDateInput)),
-                startTime = this._parseTime($(startTimeInput));
+            var startDateInput = this.$('.' + this.options.startClass + '.' + this.options.dateClass);
+            var endDateInput = this.$('.' + this.options.endClass + '.' + this.options.dateClass);
+            var startTimeInput = this.$('.' + this.options.startClass + '.' + this.options.timeClass);
+            var endTimeInput = this.$('.' + this.options.endClass + '.' + this.options.timeClass);
+            var startDate = this._parseDate($(startDateInput));
+            var startTime = this._parseTime($(startTimeInput));
             var newDate = new Date(startDate.getTime() + this.options.defaultDateDelta * _ONE_DAY);
             var newTime = new Date(startTime.getTime() + this.options.defaultTimeDelta);
             this._updateDate($(endDateInput), newDate);

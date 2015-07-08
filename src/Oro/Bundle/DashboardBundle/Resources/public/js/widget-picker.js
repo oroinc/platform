@@ -1,5 +1,6 @@
-define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator', 'routing'],
-    function(_, modal, mediator, __, routing) {
+define([
+    'jquery', 'underscore', 'backbone', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator', 'routing'
+], function($, _, Backbone, modal, mediator, __, routing) {
     'use strict';
 
     /**
@@ -124,7 +125,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
                 widgetContainer.animate({backgroundColor: previous}, animateFinish);
             };
 
-            widgetContainer.animate({backgroundColor: "#F5F55B"}, 50, animateFinish);
+            widgetContainer.animate({backgroundColor: '#F5F55B'}, 50, animateFinish);
         },
 
         /**
@@ -134,7 +135,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         _onClickAddWidget: function(event) {
             event.preventDefault();
             var columnIndex = $(event.target).closest('.dashboard-column').index();
-            this.targetColumn = (columnIndex == -1) ? 0 : columnIndex;
+            this.targetColumn = (columnIndex === -1) ? 0 : columnIndex;
             this.dialog.open();
         }
     };

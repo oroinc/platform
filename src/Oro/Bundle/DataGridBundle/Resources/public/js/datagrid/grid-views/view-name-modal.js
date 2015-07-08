@@ -1,8 +1,9 @@
 define([
+    'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/modal'
-], function(_, __, Modal) {
+], function($, _, __, Modal) {
     'use strict';
 
     var ViewNameModal = Modal.extend({
@@ -38,7 +39,7 @@ define([
         setNameError: function(error) {
             this.$('.validation-failed').remove();
             if (error) {
-                var error = this.nameErrorTemplate({
+                error = this.nameErrorTemplate({
                     error: error
                 });
                 this.$('#gridViewName').after(error);

@@ -39,7 +39,7 @@ define(['underscore'
                     });
                     prevFieldName = _.last(pair);
                 }, this));
-            } else if (chain[0] != '') {
+            } else if (chain[0] !== '') {
                 result.push({
                     entity: this.findEntity(this.getEntityName()),
                     label: this._getFieldLabel(chain[0], data)
@@ -74,7 +74,7 @@ define(['underscore'
                         : this._getFieldData(fieldName, data);
                     data = this._getChildren(result);
                 }, this));
-            } else if (chain[0] != '') {
+            } else if (chain[0] !== '') {
                 result = this._getFieldData(chain[0], data);
             }
 
@@ -114,7 +114,7 @@ define(['underscore'
          */
         _getPair: function(item) {
             var pair = item.split('::');
-            if (_.size(pair) == 3) {
+            if (_.size(pair) === 3) {
                 pair = [
                     pair[0],
                     pair[1] + '::' + pair[2]
@@ -137,11 +137,11 @@ define(['underscore'
 
         _getFieldData: function(fieldName, data) {
             var fields = _.find(data, function(val) {
-                return _.isUndefined(val['name']);
+                return _.isUndefined(val.name);
             });
             if (_.isUndefined(fields)) {
                 fields = data;
-            } else if (!_.isUndefined(fields['children'])) {
+            } else if (!_.isUndefined(fields.children)) {
                 fields = fields.children;
             } else {
                 fields = [];
@@ -150,24 +150,22 @@ define(['underscore'
         },
 
         _getChildren: function(data) {
-            return _.isUndefined(data['children']) ?
-                []
-                : data.children;
+            return _.isUndefined(data.children) ? [] : data.children;
         },
 
         _filterData: function(data) {
             _.each(data, function(item, key) {
-                if (_.isUndefined(item['name'])) {
+                if (_.isUndefined(item.name)) {
                     // 'Fields' group
-                    if (!_.isUndefined(item['children'])) {
+                    if (!_.isUndefined(item.children)) {
                         this._filterData(item.children);
                         if (_.isEmpty(item.children)) {
                             delete data[key];
                         }
                     }
-                } else if (!_.isUndefined(item['relation_type'])) {
+                } else if (!_.isUndefined(item.relation_type)) {
                     // related field
-                    if (!_.isUndefined(item['children'])) {
+                    if (!_.isUndefined(item.children)) {
                         this._filterData(item.children);
                     }
                 } else {
@@ -194,7 +192,7 @@ define(['underscore'
                 var fieldId = (null !== parentFieldId) ?
                     parentFieldId + '+' + entityName + '::' + field.name
                     : field.name;
-                if (_.isUndefined(field['relation_type'])) {
+                if (_.isUndefined(field.relation_type)) {
                     if (_.isUndefined(this.exclude) ||
                         !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
                         result.push(_.extend({
@@ -203,12 +201,12 @@ define(['underscore'
                         }, _.omit(field, ['label'])));
                     }
                 } else {
-                    if (!_.isUndefined(field['related_entity_fields'])) {
+                    if (!_.isUndefined(field.related_entity_fields)) {
                         result.push(_.extend({
                             text: field.label,
                             children: this._convertData(
-                                field['related_entity_fields'],
-                                field['related_entity_name'],
+                                field.related_entity_fields,
+                                field.related_entity_name,
                                 fieldId
                             )
                         }, _.omit(field, ['label', 'related_entity_fields'])));

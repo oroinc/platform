@@ -43,7 +43,7 @@ function($, _, widgetManager, routing) {
             $(currentModeEl).val(mode);
 
             var entityCreateBlock = $viewContainer.find('.entity-create-block');
-            if (mode == 'create') {
+            if (mode === 'create') {
                 entityCreateBlock.removeAttr('data-validation-ignore');
             } else {
                 entityCreateBlock.attr('data-validation-ignore', true);
@@ -91,8 +91,8 @@ function($, _, widgetManager, routing) {
         });
 
         var drawViewWidget = function(viewWidget, routeParameters) {
-            widgetManager.getWidgetInstanceByAlias(viewWidget['widget_alias'], function(w) {
-                w.setUrl(routing.generate(viewWidget['route_name'], routeParameters));
+            widgetManager.getWidgetInstanceByAlias(viewWidget.widget_alias, function(w) {
+                w.setUrl(routing.generate(viewWidget.route_name, routeParameters));
                 w.render();
             });
         };
@@ -100,16 +100,18 @@ function($, _, widgetManager, routing) {
         var loadViewWidgets = function(model) {
             var getRouteParameters = function(map, model) {
                 var parameters = {};
-                for (var routeParamName in map) if (map.hasOwnProperty(routeParamName)) {
-                    parameters[routeParamName] = model.get(map[routeParamName]);
+                for (var routeParamName in map) {
+                    if (map.hasOwnProperty(routeParamName)) {
+                        parameters[routeParamName] = model.get(map[routeParamName]);
+                    }
                 }
                 return parameters;
             };
 
             var allRouteParameters = {};
             for (var i = 0; i < viewWidgets.length; i++) {
-                var routeParameters = getRouteParameters(viewWidgets[i]['grid_row_to_route'], model);
-                var widgetAlias = viewWidgets[i]['widget_alias'];
+                var routeParameters = getRouteParameters(viewWidgets[i].grid_row_to_route, model);
+                var widgetAlias = viewWidgets[i].widget_alias;
                 allRouteParameters[widgetAlias] = routeParameters;
                 drawViewWidget(viewWidgets[i], routeParameters);
             }
@@ -120,7 +122,7 @@ function($, _, widgetManager, routing) {
         widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
             widget.on('grid-row-select', function(data) {
                 var selectedId = data.model.get(gridModelId);
-                if (selectedId != $(existingEl).val()) {
+                if (selectedId !== $(existingEl).val()) {
                     $(existingEl).val(selectedId);
                     loadViewWidgets(data.model);
                 }
@@ -138,7 +140,7 @@ function($, _, widgetManager, routing) {
                 case 'view':
                     var allRouteParameters = getCurrentRouteParameters();
                     for (var i = 0; i < viewWidgets.length; i++) {
-                        var widgetAlias = viewWidgets[i]['widget_alias'];
+                        var widgetAlias = viewWidgets[i].widget_alias;
                         if (allRouteParameters[widgetAlias]) {
                             drawViewWidget(viewWidgets[i], allRouteParameters[widgetAlias]);
                         }
@@ -153,10 +155,10 @@ function($, _, widgetManager, routing) {
         // update mode
         var currentMode = getCurrentMode();
         var currentRouteParameters = getCurrentRouteParameters();
-        if (templateMode != currentMode ||
-            currentMode == 'view' && !_.isEqual(templateRouteParameters, currentRouteParameters)
+        if (templateMode !== currentMode ||
+            currentMode === 'view' && !_.isEqual(templateRouteParameters, currentRouteParameters)
         ) {
             setMode(currentMode);
         }
-    }
+    };
 });

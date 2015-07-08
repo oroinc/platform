@@ -1,24 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var _, $, defaults;
-    _ = require('underscore');
-    $ = require('oroentity/js/field-choice');
+    var _ = require('underscore');
+    var $ = require('oroentity/js/field-choice');
     require('oroquerydesigner/js/function-choice');
 
-    defaults = {
+    var defaults = {
         showItems: ['column', 'label', 'function', 'sorting', 'action']
     };
 
     return function(options) {
-        var $form, $fields, $functions, $label;
-
         options = $.extend({}, defaults, options);
 
-        $form = options._sourceElement;
-        $fields = $form.find('[data-purpose=column-selector]');
-        $functions = $form.find('[data-purpose=function-selector]');
-        $label = $form.find('[data-purpose=label]');
+        var $form = options._sourceElement;
+        var $fields = $form.find('[data-purpose=column-selector]');
+        var $functions = $form.find('[data-purpose=function-selector]');
+        var $label = $form.find('[data-purpose=label]');
 
         if (_.contains(options.showItems, 'function')) {
             $functions.functionChoice({

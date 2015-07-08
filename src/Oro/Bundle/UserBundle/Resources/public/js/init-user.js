@@ -23,12 +23,12 @@ function($, _, __, mediator, messenger, DialogWidget) {
         /**
          * Process role checkboxes after navigation request is completed
          */
-        mediator.on("page:afterChange", checkRoleInputs);
+        mediator.on('page:afterChange', checkRoleInputs);
 
         /**
          * Process flash messages stored in queue or storage
          */
-        mediator.on("page:afterChange", initFlashMessages);
+        mediator.on('page:afterChange', initFlashMessages);
 
         $(document).on('change', '#btn-enable input', function() {
             $('.status-enabled').toggleClass('hide');
@@ -37,8 +37,8 @@ function($, _, __, mediator, messenger, DialogWidget) {
 
         $(document).on('click', '#view-activity-btn', function(e) {
             e.stopImmediatePropagation();
-            var $el = $(this),
-                dialog = /** @var oro.DialogWidget */ $el.data('dialog');
+            var $el = $(this);
+            var dialog = /** @var oro.DialogWidget */ $el.data('dialog');
             if (dialog) {
                 // dialog already is opened
                 return false;
@@ -68,7 +68,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
     $(function() {
         var dialogBlock;
 
-        $(".update-status a").click(function() {
+        $('.update-status a').click(function() {
             $.get($(this).attr('href'), function(data) {
                 dialogBlock = $(data).dialog({
                     title: __('oro.user.update_status.label'),
@@ -88,7 +88,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
                 success: function() {
-                    dialogBlock.dialog("destroy");
+                    dialogBlock.dialog('destroy');
                 }
             });
 

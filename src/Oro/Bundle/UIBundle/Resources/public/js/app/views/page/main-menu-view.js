@@ -24,9 +24,8 @@ define([
         },
 
         render: function() {
-            var data, currentRoute;
-            data = this.getTemplateData();
-            currentRoute = this.getCurrentRoute(data);
+            var data = this.getTemplateData();
+            var currentRoute = this.getCurrentRoute(data);
 
             if (data) {
                 if (!_.isUndefined(data.mainMenu)) {
@@ -59,12 +58,9 @@ define([
          * Initialize route matcher callbacks.
          */
         initRouteMatches: function() {
-            var self, createRouteSearchCallback;
-
             this.routeMatchSearchers = [];
             this.routeMatchedMenuItemsCache = {};
-
-            createRouteSearchCallback = function(matchRule, $el) {
+            var createRouteSearchCallback = function(matchRule, $el) {
                 var matcherCallback;
                 if (matchRule.indexOf('*') > -1 || matchRule.indexOf('/') > -1) {
                     if (matchRule.indexOf('*') > -1) {
@@ -91,7 +87,7 @@ define([
                 return matcherCallback;
             };
 
-            self = this;
+            var self = this;
             this.$el
                 .find('[data-routes]')
                 .each(function(idx, el) {

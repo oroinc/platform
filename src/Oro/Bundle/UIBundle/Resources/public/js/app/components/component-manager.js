@@ -17,9 +17,9 @@ define([
         eventNamespace: '.component-manager',
 
         init: function() {
-            var promises,
-                elements = [],
-                modules = [];
+            var promises;
+            var elements = [];
+            var modules = [];
 
             this._analyseDom(elements, modules);
 
@@ -78,15 +78,13 @@ define([
             var el = this.$el[0];
 
             this.$el.find('[data-page-component-module]').each(function() {
-                var $elem, $separateLayout;
-
-                $elem = $(this);
+                var $elem = $(this);
 
                 // optimize load time - push components to preload queue
                 modules.push($elem.data('pageComponentModule'));
 
                 // find nearest marked container with separate layout
-                $separateLayout = $elem.closest('[data-layout="separate"]');
+                var $separateLayout = $elem.closest('[data-layout="separate"]');
 
                 // collects container elements from current layout
                 if (
@@ -106,13 +104,12 @@ define([
          * @protected
          */
         _readData: function($elem) {
-            var data, name;
-            data = {
+            var data = {
                 module: $elem.data('pageComponentModule'),
                 options: $elem.data('pageComponentOptions') || {}
             };
             data.options._sourceElement = $elem;
-            name = $elem.data('pageComponentName') || $elem.attr('data-ftid');
+            var name = $elem.data('pageComponentName') || $elem.attr('data-ftid');
             if (name) {
                 data.options.name = name;
             }
@@ -141,14 +138,13 @@ define([
          * @protected
          */
         _initComponent: function($elem) {
-            var data, initDeferred;
-            data = this._readData($elem);
+            var data = this._readData($elem);
             this._cleanupData($elem);
 
             // mark elem
             $elem.attr('data-bound-component', data.module);
 
-            initDeferred = $.Deferred();
+            var initDeferred = $.Deferred();
 
             require(
                 [data.module],
@@ -170,17 +166,16 @@ define([
          * @protected
          */
         _onComponentLoaded: function(initDeferred, options, Component) {
-            var component, name, $elem, message;
             if (this.disposed) {
                 initDeferred.resolve();
                 return;
             }
 
-            $elem = options._sourceElement;
-            name = options.name;
+            var $elem = options._sourceElement;
+            var name = options.name;
 
             if (name && this.components.hasOwnProperty(name)) {
-                message = 'Component with the name "' + name + '" is already registered in the layout';
+                var message = 'Component with the name "' + name + '" is already registered in the layout';
                 this._handleError(message, Error(message));
 
                 // prevent interface from blocking by loader
@@ -188,7 +183,7 @@ define([
                 return;
             }
 
-            component = new Component(options);
+            var component = new Component(options);
             if (component instanceof BaseComponent) {
                 this.add(name || component.cid, component, $elem[0]);
             }
@@ -197,8 +192,8 @@ define([
                 component.deferredInit
                     .always(_.bind(initDeferred.resolve, initDeferred))
                     .fail(_.bind(function(error) {
-                        var moduleName = $elem.attr('data-bound-component'),
-                            message = 'Initialization has failed for component "' + moduleName + '"';
+                        var moduleName = $elem.attr('data-bound-component');
+                        var message = 'Initialization has failed for component "' + moduleName + '"';
                         if (name) {
                             message += ' (name "' + name + '")';
                         }
@@ -233,6 +228,7 @@ define([
          * @protected
          */
         _handleError: function(message, error) {
+            /*jshint devel:true*/
             if (tools.debug) {
                 if (console && console.error) {
                     console.error(message);

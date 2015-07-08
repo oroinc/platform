@@ -1,6 +1,8 @@
 define(
     ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore', 'oroui/js/mediator'],
     function($, sync, messenger, routing, _, mediator) {
+        'use strict';
+
         /**
          * @export ororeminder/js/reminder-handler
          * @class ororeminder.ReminderHandler
@@ -84,7 +86,7 @@ define(
                         return;
                     }
                     this.reminders[uniqueId] = newReminder;
-                } else if (oldReminder.id != newId) {
+                } else if (oldReminder.id !== newId) {
                     oldReminder.duplicateIds = oldReminder.duplicateIds || [];
                     if (_.indexOf(oldReminder.duplicateIds, newId)) {
                         oldReminder.duplicateIds.push(newId);
@@ -158,11 +160,12 @@ define(
                 try {
                     message = '<i class="icon-bell"></i>';
                     var template = $('.reminder_templates[data-identifier="' + reminder.templateId + '"]').html();
-                    if ($.trim(template) == '') {
+                    if ($.trim(template) === '') {
                         template = $('.reminder_templates[data-identifier="default"]').html();
                     }
                     message += _.template(template)(reminder);
                 } catch (ex) {
+                    /*jshint devel:true*/
                     // Suppress possible exceptions during template processing
                     if (console && (typeof console.log === 'function')) {
                         console.log('Exception occurred when compiling reminder template', ex);

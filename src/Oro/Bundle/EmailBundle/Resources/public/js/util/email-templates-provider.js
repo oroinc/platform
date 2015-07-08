@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery'),
-        routing = require('routing'),
-        messenger = require('oroui/js/messenger'),
-        __ = require('orotranslation/js/translator');
+    var $ = require('jquery');
+    var routing = require('routing');
+    var messenger = require('oroui/js/messenger');
+    var __ = require('orotranslation/js/translator');
 
     return {
         create: function(templateId, relatedEntityId) {
@@ -23,5 +23,5 @@ define(function(require) {
                 }
             );
         }
-    }
+    };
 });

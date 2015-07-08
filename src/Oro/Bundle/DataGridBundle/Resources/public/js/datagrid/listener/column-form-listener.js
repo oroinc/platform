@@ -1,9 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'oroui/js/mediator',   
+    'oroui/js/mediator',
     './abstract-grid-change-listener'
-], function ($, _, mediator, AbstractGridChangeListener) {
+], function($, _, mediator, AbstractGridChangeListener) {
     'use strict';
 
     var ColumnFormListener;
@@ -39,11 +39,11 @@ define([
         /**
          * @inheritDoc
          */
-        setDatagridAndSubscribe: function () {
+        setDatagridAndSubscribe: function() {
             ColumnFormListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
 
             /** Restore include/exclude state from pagestate */
-            mediator.bind("pagestate_restored", function () {
+            mediator.bind('pagestate_restored', function() {
                 this._restoreState();
             }, this);
         },
@@ -51,7 +51,7 @@ define([
         /**
          * @inheritDoc
          */
-        _processValue: function (id, model) {
+        _processValue: function(id, model) {
             var original = this.get('original');
             var included = this.get('included');
             var excluded = this.get('excluded');
@@ -146,14 +146,15 @@ define([
             if (included || excluded) {
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_in', included);
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_not_in', excluded);
-                mediator.trigger('datagrid:restoreState:' + this.gridName, this.columnName, this.dataField, included, excluded);
+                mediator.trigger('datagrid:restoreState:' + this.gridName,
+                    this.columnName, this.dataField, included, excluded);
             }
         },
 
         /**
          * @inheritDoc
          */
-        _hasChanges: function () {
+        _hasChanges: function() {
             return !_.isEmpty(this.get('included')) || !_.isEmpty(this.get('excluded'));
         }
     });
@@ -170,21 +171,19 @@ define([
      * @param {Object} [options.metadata] configuration for the grid
      */
     ColumnFormListener.init = function(deferred, options) {
-        var gridOptions, gridInitialization;
-        gridOptions = options.metadata.options || {};
-        gridInitialization = options.gridPromise;
+        var gridOptions = options.metadata.options || {};
+        var gridInitialization = options.gridPromise;
 
         var gridListenerOptions = gridOptions.rowSelection || gridOptions.columnListener; // for BC
 
         if (gridListenerOptions) {
             gridInitialization.done(function(grid) {
-                var listener, listenerOptions;
-                listenerOptions = _.defaults({
+                var listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
                     gridName: grid.name
                 }, gridListenerOptions);
 
-                listener = new ColumnFormListener(listenerOptions);
+                var listener = new ColumnFormListener(listenerOptions);
                 deferred.resolve(listener);
             }).fail(function() {
                 deferred.reject();

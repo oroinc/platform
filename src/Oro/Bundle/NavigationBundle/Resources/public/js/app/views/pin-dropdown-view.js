@@ -1,13 +1,14 @@
 define([
+    'jquery',
     'underscore',
     'chaplin',
     'oroui/js/app/views/base/collection-view'
-], function(_, Chaplin, BaseCollectionView) {
+], function($, _, Chaplin, BaseCollectionView) {
     'use strict';
 
-    var DropdownCollectionView, utils;
+    var DropdownCollectionView;
+    var utils = Chaplin.utils;
 
-    utils = Chaplin.utils;
     DropdownCollectionView = BaseCollectionView.extend({
         listen: {
             'visibilityChange': 'updateVisibility',
@@ -59,9 +60,9 @@ define([
             var visibilityChanged;
 
             this.collection.each(function(model, index) {
-                var view, included, visibleItemsIndex;
-                view = this.subview("itemView:" + model.cid);
-                included = this.filterer(model, index);
+                var visibleItemsIndex;
+                var view = this.subview('itemView:' + model.cid);
+                var included = this.filterer(model, index);
                 this.filterCallback(view, included);
 
                 visibleItemsIndex = utils.indexOf(this.visibleItems, model);

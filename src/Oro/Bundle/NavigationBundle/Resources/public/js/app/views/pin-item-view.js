@@ -22,11 +22,11 @@ define([
         },
 
         outdatedContentHandler: function(event) {
-            var $el, self, url, refreshHandler, $noteEl;
-            self = this;
-            $el = this.$el;
-            url = this.model.get('url');
-            refreshHandler = function() {
+            var $noteEl;
+            var self = this;
+            var $el = this.$el;
+            var url = this.model.get('url');
+            var refreshHandler = function() {
                 if (self.checkCurrentUrl()) {
                     $noteEl = $el.find('.pin-status.outdated');
                     self.markNormal($noteEl);

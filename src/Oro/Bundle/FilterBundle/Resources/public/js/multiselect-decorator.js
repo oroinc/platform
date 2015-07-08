@@ -44,7 +44,7 @@ define([
          */
         initialize: function(options) {
             if (!options.element) {
-                throw new Error("Select element must be defined");
+                throw new Error('Select element must be defined');
             }
             this.element = options.element;
 
@@ -75,10 +75,10 @@ define([
          */
         dispose: function() {
             if (this.contextSearch && this.element.data('ech-multiselectfilter')) {
-                this.multiselectfilter("destroy");
+                this.multiselectfilter('destroy');
             }
             if (this.element.data('ech-multiselect')) {
-                this.multiselect("destroy");
+                this.multiselect('destroy');
             }
             this.element.hide();
             delete this.element;
@@ -124,9 +124,9 @@ define([
          * @return {Number}
          */
         getMinimumDropdownWidth: function() {
-            var elements, minimumWidth = 0;
+            var minimumWidth = 0;
             this.getWidget().find('.ui-multiselect-checkboxes').removeClass('fixed-li');
-            elements = this.getWidget().find('.ui-multiselect-checkboxes li');
+            var elements = this.getWidget().find('.ui-multiselect-checkboxes li');
             _.each(elements, function(element) {
                 var width = this._getTextWidth($(element).find('label'));
                 if (width > minimumWidth) {
@@ -145,12 +145,11 @@ define([
          * @protected
          */
         _getTextWidth: function(element) {
-            var html_org, html_calc, width;
-            html_org = element.html();
-            html_calc = '<span>' + html_org + '</span>';
-            element.html(html_calc);
-            width = element.outerWidth();
-            element.html(html_org);
+            var htmlOrg = element.html();
+            var htmlCalc = '<span>' + htmlOrg + '</span>';
+            element.html(htmlCalc);
+            var width = element.outerWidth();
+            element.html(htmlOrg);
             return width;
         },
 

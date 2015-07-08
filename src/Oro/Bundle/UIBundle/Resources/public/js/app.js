@@ -6,9 +6,7 @@ define([
 ].concat(requirejs.s.contexts._.config.appmodules), function(_, Application, routes, module) {
     'use strict';
 
-    var app, options;
-
-    options = _.extend(module.config(), {
+    var options = _.extend(module.config(), {
         // load routers
         routes: function(match) {
             var i;
@@ -22,7 +20,7 @@ define([
         }
     });
 
-    app = new Application(options);
+    var app = new Application(options);
 
     return app;
 });

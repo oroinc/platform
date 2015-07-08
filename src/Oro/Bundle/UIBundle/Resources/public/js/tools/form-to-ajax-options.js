@@ -8,10 +8,10 @@ define(['jquery', 'jquery.form'], function($) {
      * @returns {Array}
      */
     function serialize(data) {
-        var serialized, result, i, part;
-        serialized = $.param(data).split('&');
-        result = [];
-        for (i = 0; i < serialized.length; i += 1) {
+        var part;
+        var serialized = $.param(data).split('&');
+        var result = [];
+        for (var i = 0; i < serialized.length; i += 1) {
             // #252; undo param space replacement
             serialized[i] = serialized[i].replace(/\+/g, ' ');
             part = serialized[i].split('=');
@@ -30,15 +30,14 @@ define(['jquery', 'jquery.form'], function($) {
      * @returns {Object}
      */
     function fileUploadXhr(arrayData, extraData, options) {
-        var formData, data, i, beforeSend;
-        formData = new FormData();
+        var formData = new FormData();
 
-        for (i = 0; i < arrayData.length; i += 1) {
+        for (var i = 0; i < arrayData.length; i += 1) {
             formData.append(arrayData[i].name, arrayData[i].value);
         }
 
         if (extraData) {
-            data = serialize(extraData);
+            var data = serialize(extraData);
             for (i = 0; i < data.length; i += 1) {
                 if (data[i]) {
                     formData.append(data[i][0], data[i][1]);
@@ -46,7 +45,7 @@ define(['jquery', 'jquery.form'], function($) {
             }
         }
 
-        beforeSend = options.beforeSend;
+        var beforeSend = options.beforeSend;
         options = $.extend(true, {}, $.ajaxSettings, options, {
             contentType: false,
             processData: false,
@@ -71,13 +70,14 @@ define(['jquery', 'jquery.form'], function($) {
      * @returns {Object}
      */
     function formToAjaxOprions($form, options) {
-        var method, action, url,
-            arrayData, extraData, query, extraQuery;
+        var extraData;
+        var query;
+        var extraQuery;
 
-        action = $form.attr('action');
-        method = $form.attr('method');
+        var action = $form.attr('action');
+        var method = $form.attr('method');
 
-        url = (typeof action === 'string') ? $.trim(action) : '';
+        var url = (typeof action === 'string') ? $.trim(action) : '';
         url = url || window.location.href || '';
         if (url) {
             // clean url (don't include hash vaue)
@@ -89,7 +89,7 @@ define(['jquery', 'jquery.form'], function($) {
             type: method || 'GET'
         }, options || {});
 
-        arrayData = $form.formToArray();
+        var arrayData = $form.formToArray();
 
         if (options.data) {
             extraData = options.data;

@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var HiddenRedirectComponent,
-        $ = require('jquery'),
-        mediator = require('oroui/js/mediator'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+    var HiddenRedirectComponent;
+    var $ = require('jquery');
+    var mediator = require('oroui/js/mediator');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
      * @export oroui/js/app/components/hidden-redirect-component

@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var DatePickerTabsView,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var DatePickerTabsView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     DatePickerTabsView = BaseView.extend({
         autoRender: true,
@@ -24,10 +24,9 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            var data, template, html;
-            data = this.getTemplateData();
-            template = this.getTemplateFunction();
-            html = template(data);
+            var data = this.getTemplateData();
+            var template = this.getTemplateFunction();
+            var html = template(data);
             this.$el.html(html);
         },
 

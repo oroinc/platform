@@ -41,8 +41,8 @@ define([
                 this._initialSelection(value);
             }
             if (value.value !== '') {
-                var ids = this._getSelection(),
-                    scope;
+                var ids = this._getSelection();
+                var scope;
                 if (_.isArray(ids.selected)) {
                     scope = (ids.inset === Boolean(parseInt(value.value, 10)) ? 'in' : 'out');
                     value[scope] = ids.selected.join(',');
@@ -99,7 +99,7 @@ define([
                 _.partial(function(collection, id) {
                     var model = collection.get(id);
                     if (model instanceof Backbone.Model) {
-                        model.trigger("backgrid:select", model, checked);
+                        model.trigger('backgrid:select', model, checked);
                     }
                 }, this.collection)
             );

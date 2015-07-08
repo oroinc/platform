@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var TransitionEditView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        __ = require('orotranslation/js/translator'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        DialogWidget = require('oro/dialog-widget'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        AttributeFormOptionEditView = require('../attribute/attribute-form-option-edit-view'),
-        AttributeFormOptionListView = require('../attribute/attribute-form-option-list-view');
+    var TransitionEditView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var __ = require('orotranslation/js/translator');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var DialogWidget = require('oro/dialog-widget');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var AttributeFormOptionEditView = require('../attribute/attribute-form-option-edit-view');
+    var AttributeFormOptionListView = require('../attribute/attribute-form-option-list-view');
     require('jquery.validate');
 
     TransitionEditView = BaseView.extend({
@@ -118,7 +118,7 @@ define(function(require) {
             var result = '';
             var formOptions = this.model.get('frontend_options');
             if (formOptions && formOptions.hasOwnProperty(key)) {
-                result  = formOptions[key]
+                result  = formOptions[key];
             }
             return result;
         },

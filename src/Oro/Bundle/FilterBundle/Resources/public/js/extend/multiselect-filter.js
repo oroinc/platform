@@ -15,13 +15,18 @@ define([
             var elem = $(this.element);
 
             // get the multiselect instance
-            var instance = (this.instance = (elem.data('echMultiselect') || elem.data("multiselect") || elem.data("ech-multiselect")));
+            var instance = (this.instance =
+                (elem.data('echMultiselect') || elem.data('multiselect') || elem.data('ech-multiselect')));
 
             // store header; add filter class so the close/check all/uncheck all links can be positioned correctly
-            var header = (this.header = instance.menu.find('.ui-multiselect-header').addClass('ui-multiselect-hasfilter'));
+            this.header = instance.menu.find('.ui-multiselect-header').addClass('ui-multiselect-hasfilter');
 
             // wrapper elem
-            var wrapper = (this.wrapper = $('<div class="ui-multiselect-filter">' + (opts.label.length ? opts.label : '') + '<input placeholder="' + opts.placeholder + '" type="search"' + (/\d/.test(opts.width) ? 'style="width:' + opts.width + 'px"' : '') + ' /></div>').prependTo(this.header));
+            var wrapper = (this.wrapper =
+                $('<div class="ui-multiselect-filter">' + (opts.label.length ? opts.label : '') +
+                    '<input placeholder="' + opts.placeholder + '" type="search"' +
+                    (/\d/.test(opts.width) ? 'style="width:' + opts.width + 'px"' : '') +
+                    ' /></div>').prependTo(this.header));
 
             // reference to the actual inputs
             this.inputs = instance.menu.find('input[type="checkbox"], input[type="radio"]');

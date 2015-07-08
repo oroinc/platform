@@ -220,10 +220,10 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            var $container = $(this.limitCriteriaTo),
-                $criteria = this.$(this.criteriaSelector),
-                shift = $container.prop('clientWidth') + $container.offset().left -
-                    this.$el.offset().left - $criteria.outerWidth();
+            var $container = $(this.limitCriteriaTo);
+            var $criteria = this.$(this.criteriaSelector);
+            var shift = $container.prop('clientWidth') + $container.offset().left -
+                this.$el.offset().left - $criteria.outerWidth();
             $criteria.css('margin-left', shift < 0 ? shift : 0);
         },
 

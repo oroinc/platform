@@ -3,10 +3,7 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-
     var tools = require('oroui/js/tools');
-    var mediator = require('oroui/js/mediator');
-
     var scrollspy = {};
 
     scrollspy.init = function($container) {
@@ -36,15 +33,13 @@ define(function(require) {
      * @param {jQuery} container
      */
     scrollspy.makeUnique = function(container) {
-        var containerId, $scrollSpy;
-
-        $scrollSpy = container.find('[data-spy="scroll"]');
+        var $scrollSpy = container.find('[data-spy="scroll"]');
         if (!$scrollSpy.length) {
             // there's no scroll-spy elements
             return;
         }
 
-        containerId = container.attr('id');
+        var containerId = container.attr('id');
         if (!containerId) {
             // make sure container has id
             containerId = _.uniqueId('scrollspy');
@@ -52,22 +47,20 @@ define(function(require) {
         }
 
         $scrollSpy.each(function() {
-            var $spy, href, menuSelector, suffix;
-
-            suffix = _.uniqueId('-');
-            $spy = $(this);
-            href = $spy.attr('href');
+            var suffix = _.uniqueId('-');
+            var $spy = $(this);
+            var href = $spy.attr('href');
             if (href) {
                 href = href.replace(/.*(?=#[^\s]+$)/, ''); //strip for ie7
             }
-            menuSelector = $spy.data('target') || href || '';
+            var menuSelector = $spy.data('target') || href || '';
             // make target to be container related
             $spy.data('target', '#' + containerId + ' ' + menuSelector);
 
             container.find(menuSelector  + ' .nav li > a').each(function() {
-                var $link, $target, target;
-                $link = $(this);
-                target = $link.data('target') || $link.attr('href');
+                var $target;
+                var $link = $(this);
+                var target = $link.data('target') || $link.attr('href');
                 if (/^#\w/.test(target)) {
                     $target = container.find(target);
                 }
@@ -85,9 +78,9 @@ define(function(require) {
             $spy.removeAttr('data-spy').addClass('accordion');
 
             $spy.find('.scrollspy-title').each(function(i) {
-                var $header = $(this),
-                    targetSelector = '#' + $header.next().attr('id') + '+',
-                    $target = $(targetSelector);
+                var $header = $(this);
+                var targetSelector = '#' + $header.next().attr('id') + '+';
+                var $target = $(targetSelector);
                 $header
                     .removeClass('scrollspy-title')
                     .addClass('accordion-toggle')

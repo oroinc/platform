@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var DatetimeFilter,
-        _ = require('underscore'),
-        moment = require('moment'),
-        __ = require('orotranslation/js/translator'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view'),
-        DateFilter = require('./date-filter'),
-        tools = require('oroui/js/tools');
+    var DatetimeFilter;
+    var _ = require('underscore');
+    var moment = require('moment');
+    var __ = require('orotranslation/js/translator');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
+    var DateFilter = require('./date-filter');
+    var tools = require('oroui/js/tools');
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
@@ -61,7 +61,7 @@ define(function(require) {
          */
         _onClickOutsideCriteria: function(e) {
             if (this._justPickedTime) {
-                this._justPickedTime = false
+                this._justPickedTime = false;
             } else {
                 DatetimeFilter.__super__._onClickOutsideCriteria.apply(this, arguments);
             }
@@ -143,8 +143,8 @@ define(function(require) {
          */
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
-                var start = this.subview('start'),
-                    end = this.subview('end');
+                var start = this.subview('start');
+                var end = this.subview('end');
                 if (start && start.updateFront) {
                     start.updateFront();
                 }

@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var StepEditView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        __ = require('orotranslation/js/translator'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        DialogWidget = require('oro/dialog-widget'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        TransitionsListView = require('../transition/transition-list-view');
+    var StepEditView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var __ = require('orotranslation/js/translator');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var DialogWidget = require('oro/dialog-widget');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var TransitionsListView = require('../transition/transition-list-view');
 
     StepEditView = BaseView.extend({
         attributes: {

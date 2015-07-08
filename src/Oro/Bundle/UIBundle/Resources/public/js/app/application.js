@@ -80,11 +80,10 @@ define([
          * @returns {string}
          */
         combineFullUrl: function(path, query) {
-            var fullUrl, root, url;
             // root is always supposed to have trailing slash
-            root = this.options.root || '\/';
-            url = this.combineRouteUrl(path, query);
-            fullUrl = url[0] === '\/' ? root + url.slice(1) : root + url;
+            var root = this.options.root || '\/';
+            var url = this.combineRouteUrl(path, query);
+            var fullUrl = url[0] === '\/' ? root + url.slice(1) : root + url;
             return fullUrl;
         }
     });

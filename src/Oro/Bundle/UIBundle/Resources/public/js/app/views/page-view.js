@@ -28,13 +28,14 @@ define([
         },
 
         onSubmit: function(event) {
-            var $form, url, method, data, options;
+            var data;
+            var options;
 
             if (event.isDefaultPrevented()) {
                 return;
             }
 
-            $form = $(event.target);
+            var $form = $(event.target);
             if ($form.data('nohash') && !$form.data('sent')) {
                 $form.data('sent', true);
                 return;
@@ -46,8 +47,8 @@ define([
 
             $form.data('sent', true);
 
-            url = $form.attr('action');
-            method = $form.attr('method') || 'GET';
+            var url = $form.attr('action');
+            var method = $form.attr('method') || 'GET';
 
             if (url && method.toUpperCase() === 'GET') {
                 data = $form.serialize();

@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var layout, pageRenderedCbPool, document, console,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        scrollspy = require('oroui/js/scrollspy'),
-        mediator = require('oroui/js/mediator'),
-        tools = require('oroui/js/tools');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var scrollspy = require('oroui/js/scrollspy');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
     require('bootstrap');
     require('jquery-ui');
     require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
 
-    document = window.document;
-    console = window.console;
-    pageRenderedCbPool = [];
+    var document = window.document;
+    var console = window.console;
+    var pageRenderedCbPool = [];
 
-    layout = {
+    var layout = {
         /**
          * Default padding to keep when calculate available height for fullscreen layout
          */
@@ -233,9 +232,9 @@ define(function(require) {
          * @returns {number}
          */
         getAvailableHeight: function($mainEl) {
-            var $parents = $mainEl.parents(),
-                documentHeight = $(document).height(),
-                heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
+            var $parents = $mainEl.parents();
+            var documentHeight = $(document).height();
+            var heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
             $parents.each(function() {
                 heightDiff += this.scrollTop;
             });

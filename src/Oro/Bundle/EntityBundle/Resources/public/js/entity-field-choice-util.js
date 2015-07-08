@@ -1,6 +1,8 @@
-define(['underscore'
-    ], function(_) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
 
     // define a constructor
     var entityFieldUtil = function($el) {
@@ -21,7 +23,8 @@ define(['underscore'
 
         /** @property */
         optionTemplate: _.template(
-            '<option value="<%- name %>"<% _.each(_.omit(obj, ["name", "related_entity_fields"]), function (val, key) { %> data-<%- key %>="<%- val %>"<% }) %>>' +
+            '<option value="<%- name %>"<% _.each(_.omit(obj, ["name", "related_entity_fields"]), ' +
+                'function (val, key) { %> data-<%- key %>="<%- val %>"<% }) %>>' +
                 '<%- label %>' +
             '</option>'
         ),
@@ -32,7 +35,7 @@ define(['underscore'
 
         splitFieldId: function(fieldId) {
             var result = [];
-            if (fieldId != '') {
+            if (fieldId !== '') {
                 result.push({
                     entity: this.findEntity(this.getEntityName()),
                     label: this._getFieldLabel(fieldId)
@@ -53,7 +56,7 @@ define(['underscore'
                 this.$el.append(this.optionTemplate({name: '', label: emptyItem.text()}));
             }
             var content = this._buildSelectContent(fields);
-            if (content != '') {
+            if (content !== '') {
                 this.$el.append(content);
             }
             this.$el.val(this.$el.is('[multiple]') ? [] : '');
@@ -81,7 +84,7 @@ define(['underscore'
         },
 
         _getOptionElement: function(value) {
-            return this.$el.find('option[value="' + value.replace(/\\/g, "\\\\").replace(/:/g, "\\:") + '"]');
+            return this.$el.find('option[value="' + value.replace(/\\/g, '\\\\').replace(/:/g, '\\:') + '"]');
         },
 
         _getFieldApplicableConditions: function(field, entity) {
@@ -97,7 +100,7 @@ define(['underscore'
             var sFields = '';
             var sRelations = '';
             _.each(fields, _.bind(function(field) {
-                if (_.isUndefined(field['relation_type'])) {
+                if (_.isUndefined(field.relation_type)) {
                     if (_.isUndefined(this.exclude) ||
                         !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
                         sFields += this.optionTemplate(field);
@@ -107,11 +110,11 @@ define(['underscore'
                 }
             }, this));
 
-            if (sRelations == '') {
+            if (sRelations === '') {
                 return sFields;
             }
             var result = '';
-            if (sFields != '') {
+            if (sFields !== '') {
                 result += this.optGroupTemplate({
                     label: this.fieldsLabel,
                     options: sFields

@@ -147,10 +147,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             }, this));
             // stop propagation of some events to avoid showing a minicolors picker before a user clicks on a swatch
             // it is required because we need to set a picker position before show it
-            this.$picker.on('mousedown.' + this.cid + ' touchstart.' + this.cid + ' focus.' + this.cid, _.bind(function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }, this));
+            this.$picker.on('mousedown.' + this.cid + ' touchstart.' + this.cid + ' focus.' + this.cid,
+                _.bind(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, this));
         },
 
         /**
@@ -159,14 +160,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @private
          */
         _getPickerPos: function($swatch) {
-            var $panel = this.$picker.parent().find('.minicolors-panel'),
-                pos = $swatch.position(),
-                x = pos.left + $swatch.offsetParent().scrollLeft() + 5,
-                y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3,
-                w = $panel.outerWidth(),
-                h = $panel.outerHeight() + 39,
-                width = $swatch.offsetParent().width(),
-                height = $swatch.offsetParent().height();
+            var $panel = this.$picker.parent().find('.minicolors-panel');
+            var pos = $swatch.position();
+            var x = pos.left + $swatch.offsetParent().scrollLeft() + 5;
+            var y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3;
+            var w = $panel.outerWidth();
+            var h = $panel.outerHeight() + 39;
+            var width = $swatch.offsetParent().width();
+            var height = $swatch.offsetParent().height();
             if (x > width - w) {
                 x -= w;
             }

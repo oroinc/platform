@@ -83,7 +83,7 @@ define([
          * Trigger change event
          */
         sync: function() {
-            if (this.target.val() == '' && this.$el.val() != '') {
+            if (this.target.val() === '' && this.$el.val() !== '') {
                 this.$el.trigger('change');
             }
         },

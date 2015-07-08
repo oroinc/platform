@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
-    var FlowchartViewerStepView = require('../viewer/step-view'),
-        mediator = require('oroui/js/mediator'),
-        FlowchartEditorStepView;
+
+    var FlowchartViewerStepView = require('../viewer/step-view');
+    var FlowchartEditorStepView;
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/editor/step.html'),

@@ -31,7 +31,7 @@ define(['jquery', 'underscore'], function($, _) {
                 if (path.length > 1) {
                     var dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
-                        root[dir] = path[0] == '' ? [] : {};
+                        root[dir] = path[0] === '' ? [] : {};
                     }
                     setValue(root[dir], path, value);
                 } else {
@@ -93,9 +93,11 @@ define(['jquery', 'underscore'], function($, _) {
         invertKeys: function(object, keys) {
             var result = _.extend({}, object);
             for (var key in keys) {
-                var mirrorKey, baseKey;
-                baseKey = key;
-                mirrorKey = keys[key];
+                if (!keys.hasOwnProperty(key)) {
+                    continue;
+                }
+                var baseKey = key;
+                var mirrorKey = keys[key];
 
                 if (baseKey in result) {
                     result[mirrorKey] = result[baseKey];
@@ -116,20 +118,23 @@ define(['jquery', 'underscore'], function($, _) {
             if (!_.isObject(value1)) {
                 if (_.isNumber(value1) || _.isNumber(value2)) {
                     var toNumber = function(v) {
-                        if (_.isString(v) && v == '') {
+                        if (_.isString(v) && v === '') {
                             return NaN;
                         }
                         return Number(v);
                     };
-                    return (toNumber(value1) == toNumber(value2));
+                    return (toNumber(value1) === toNumber(value2));
                 }
-                return ((value1 || '') == (value2 || ''));
+                return ((value1 || '') === (value2 || ''));
             } else if (_.isObject(value1)) {
                 var valueKeys = _.keys(value1);
 
                 if (_.isObject(value2)) {
                     valueKeys = _.unique(valueKeys.concat(_.keys(value2)));
                     for (var index in valueKeys) {
+                        if (!valueKeys.hasOwnProperty(index)) {
+                            continue;
+                        }
                         var key = valueKeys[index];
                         if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
                             return false;
@@ -139,6 +144,7 @@ define(['jquery', 'underscore'], function($, _) {
                 }
                 return false;
             } else {
+                // jshint -W116
                 return value1 == value2;
             }
         },
@@ -171,7 +177,8 @@ define(['jquery', 'underscore'], function($, _) {
          * @param {Object=} context
          */
         loadModules: function(modules, callback, context) {
-            var requirements, onLoadHandler;
+            var requirements;
+            var onLoadHandler;
             if (_.isObject(modules)) {
                 // if modules is an object of {formal_name: module_name}
                 requirements = _.values(modules);
@@ -187,7 +194,7 @@ define(['jquery', 'underscore'], function($, _) {
                 requirements = !_.isArray(modules) ? [modules] : modules;
                 onLoadHandler = function() {
                     callback.apply(context || null, arguments);
-                }
+                };
             }
             // loads requirements and execute onLoadHandler handler
             require(requirements, onLoadHandler);
@@ -209,7 +216,7 @@ define(['jquery', 'underscore'], function($, _) {
          */
         safeRegExp: function(str, flags) {
             var expression;
-            str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             expression = new RegExp(str, flags);
             return expression;
         },
@@ -219,7 +226,7 @@ define(['jquery', 'underscore'], function($, _) {
          *
          * @returns {Array}
          */
-        ensureArray: function (value) {
+        ensureArray: function(value) {
             return _.isArray(value) ? value : [value];
         }
     };

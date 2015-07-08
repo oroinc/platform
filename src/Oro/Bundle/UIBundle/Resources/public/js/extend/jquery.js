@@ -27,10 +27,9 @@ define(['jquery'], function($) {
          * Sets focus on first form field
          */
         focusFirstInput: function() {
-            var $autoFocus,
-                $input = this.find(':input:visible, [data-focusable]')
+            var $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
-            $autoFocus = $input.filter('[autofocus]');
+            var $autoFocus = $input.filter('[autofocus]');
             ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
         },
 
@@ -84,10 +83,10 @@ define(['jquery'], function($) {
          */
         insertAtCursor: function(str) {
             return this.each(function() {
-                var start,
-                    end,
-                    el = this,
-                    value = el.value;
+                var start;
+                var end;
+                var el = this;
+                var value = el.value;
                 if ('selectionStart' in el) {
                     start = el.selectionStart;
                     end = el.selectionEnd;

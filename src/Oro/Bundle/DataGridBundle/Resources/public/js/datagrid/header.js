@@ -4,7 +4,7 @@ define([
     'backgrid',
     './header-cell/header-cell'
 ], function(_, Backbone, Backgrid, HeaderCell) {
-    "use strict";
+    'use strict';
 
     var Header;
 
@@ -17,7 +17,7 @@ define([
      */
     Header = Backgrid.Header.extend({
         /** @property */
-        tagName: "thead",
+        tagName: 'thead',
 
         /** @property */
         row: Backgrid.HeaderRow,
@@ -30,10 +30,10 @@ define([
          */
         initialize: function(options) {
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
             if (!options.columns) {
-                throw new TypeError("'columns' is required");
+                throw new TypeError('"columns" is required');
             }
 
             this.columns = options.columns;

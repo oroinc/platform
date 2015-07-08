@@ -5,7 +5,7 @@ define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
     function getFormatter(style) {
         var functionName = 'format' + style.charAt(0).toUpperCase() + style.slice(1);
         if (!_.isFunction(formatter[functionName])) {
-            throw new Error("Formatter doesn't support '" + style + "' number style");
+            throw new Error('Formatter doesn\'t support "' + style + '" number style');
         }
         return formatter[functionName];
     }
@@ -46,7 +46,7 @@ define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
         toRaw: function(formattedData) {
             var rawData = null;
             if (formattedData !== null && formattedData !== '') {
-                rawData = formatter.unformat(formattedData)
+                rawData = formatter.unformat(formattedData);
             }
             return rawData;
         }

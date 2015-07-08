@@ -9,8 +9,9 @@ define([
     'oroui/js/delete-confirmation'
 ], function(Backbone, _, __, GridViewsCollection, GridViewModel, ViewNameModal, mediator, DeleteConfirmation) {
     'use strict';
-    var $, GridViewsView;
-    $ = Backbone.$;
+
+    var GridViewsView;
+    var $ = Backbone.$;
 
     /**
      * Datagrid views widget
@@ -24,14 +25,14 @@ define([
 
         /** @property */
         events: {
-            "click .views-group a": "onChange",
-            "click a.save": "onSave",
-            "click a.save_as": "onSaveAs",
-            "click a.share": "onShare",
-            "click a.unshare": "onUnshare",
-            "click a.delete": "onDelete",
-            "click a.rename": "onRename",
-            "click a.discard_changes": "onDiscardChanges"
+            'click .views-group a': 'onChange',
+            'click a.save': 'onSave',
+            'click a.save_as': 'onSaveAs',
+            'click a.share': 'onShare',
+            'click a.unshare': 'onUnshare',
+            'click a.delete': 'onDelete',
+            'click a.rename': 'onRename',
+            'click a.discard_changes': 'onDiscardChanges'
         },
 
         /** @property */
@@ -83,7 +84,7 @@ define([
             options = options || {};
 
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
 
             this.template = _.template($('#template-datagrid-grid-view').html());
@@ -108,17 +109,7 @@ define([
 
             this.gridName = options.gridName;
             this.collection = options.collection;
-            this.enabled = options.enable != false;
-
-            this.listenTo(this.collection, "updateState", function(collection) {
-                if (!collection.state.gridView) {
-                    collection.state.gridView = '__all__';
-                }
-            });
-            this.listenTo(this.collection, "updateState", this.render);
-            this.listenTo(this.collection, "beforeFetch", this.render);
-            this.listenTo(this.collection, "reset", this._onCollectionReset);
-            this.listenTo(this.collection, "reset", this.render);
+            this.enabled = options.enable !== false;
 
             options.views = options.views || [];
             _.each(options.views, function(view) {
@@ -137,6 +128,35 @@ define([
             this.viewDirty = !this._isCurrentStateSynchronized();
             this.prevState = this._getCurrentState();
 
+            this._bindEventListeners();
+            this._updateTitle();
+
+            GridViewsView.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            this.viewsCollection.dispose();
+            delete this.viewsCollection;
+            GridViewsView.__super__.dispose.call(this);
+        },
+
+        _bindEventListeners: function() {
+            this.listenTo(this.collection, 'updateState', function(collection) {
+                if (!collection.state.gridView) {
+                    collection.state.gridView = '__all__';
+                }
+            });
+            this.listenTo(this.collection, 'updateState', this.render);
+            this.listenTo(this.collection, 'beforeFetch', this.render);
+            this.listenTo(this.collection, 'reset', this._onCollectionReset);
+            this.listenTo(this.collection, 'reset', this.render);
+
             this.listenTo(this.viewsCollection, 'add', this._onModelAdd);
             this.listenTo(this.viewsCollection, 'remove', this._onModelRemove);
             this.listenTo(this.viewsCollection, 'change', this._onModelChange, this);
@@ -153,22 +173,6 @@ define([
                 this.viewDirty = !this._isCurrentStateSynchronized();
                 this.render();
             }, this);
-
-            this._updateTitle();
-
-            GridViewsView.__super__.initialize.call(this, options);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            this.viewsCollection.dispose();
-            delete this.viewsCollection;
-            GridViewsView.__super__.dispose.call(this);
         },
 
         /**
@@ -381,10 +385,10 @@ define([
          */
         _onModelRemove: function(model) {
             this.choices = _.reject(this.choices, function(item) {
-                return item.value == this.collection.state.gridView;
+                return item.value === this.collection.state.gridView;
             }, this);
 
-            if (model.id == this.collection.state.gridView) {
+            if (model.id === this.collection.state.gridView) {
                 this.collection.state.gridView = '__all__';
                 this.viewDirty = !this._isCurrentStateSynchronized();
             }
@@ -421,8 +425,8 @@ define([
          * @returns {*}
          */
         changeView: function(gridView) {
-            var view, viewState;
-            view = this.viewsCollection.get(gridView);
+            var viewState;
+            var view = this.viewsCollection.get(gridView);
 
             if (view) {
                 viewState = _.extend({}, this.collection.initialState, view.toGridState());
@@ -579,7 +583,7 @@ define([
          */
         _getView: function(name) {
             var currentViews =  _.filter(this.choices, function(item) {
-                return item.value == name;
+                return item.value === name;
             }, this);
 
             return _.first(currentViews);
@@ -649,7 +653,7 @@ define([
             }
 
             var title = currentView.label;
-            if (currentView.value == '__all__') {
+            if (currentView.value === '__all__') {
                 title = __('oro.datagrid.gridView.all');
             }
 

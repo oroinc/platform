@@ -116,7 +116,7 @@ define([
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value == value.type);
+                    return (choice.value === value.type);
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
@@ -155,14 +155,15 @@ define([
         },
 
         _updateValueField: function() {
-            var leftWidth, rightWidth, type, isEmptyType,
-                valueFrame = this.$('.value-field-frame');
+            var type;
+            var isEmptyType;
+            var valueFrame = this.$('.value-field-frame');
             if (!valueFrame.length) {
                 return;
             }
             // update left and right margins of value field frame
-            leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
-            rightWidth = this.$('.filter-update').outerWidth();
+            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
+            var rightWidth = this.$('.filter-update').outerWidth();
             valueFrame.css('margin-left', leftWidth);
             valueFrame.css('margin-right', rightWidth);
             // update class of criteria dropdown
@@ -246,9 +247,9 @@ define([
             var menu = this.$('.choice-filter .dropdown-menu');
             menu.find('li a').each(function() {
                 var item = $(this);
-                if (item.data('value') == oldValue.type && item.parent().hasClass('active')) {
+                if (item.data('value') === oldValue.type && item.parent().hasClass('active')) {
                     item.parent().removeClass('active');
-                } else if (item.data('value') == newValue.type && !item.parent().hasClass('active')) {
+                } else if (item.data('value') === newValue.type && !item.parent().hasClass('active')) {
                     item.parent().addClass('active');
                     menu.parent().find('button').html(item.html() + '<span class="caret"></span>');
                 }

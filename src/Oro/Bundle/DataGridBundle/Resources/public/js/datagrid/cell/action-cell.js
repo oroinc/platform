@@ -17,7 +17,7 @@ define([
     ActionCell = Backgrid.Cell.extend({
 
         /** @property */
-        className: "action-cell",
+        className: 'action-cell',
 
         /** @property {Array} */
         actions: undefined,
@@ -101,10 +101,9 @@ define([
          * @return {Array}
          */
         createActions: function() {
-            var result, actions, config;
-            result = [];
-            actions = this.column.get('actions');
-            config = this.model.get('action_configuration');
+            var result = [];
+            var actions = this.column.get('actions');
+            var config = this.model.get('action_configuration');
 
             _.each(actions, function(action, name) {
                 // filter available actions for current row
@@ -138,9 +137,8 @@ define([
             var result = [];
 
             _.each(this.actions, function(action) {
-                var options, launcher;
-                options = {};
-                launcher = action.createLauncher(options);
+                var options = {};
+                var launcher = action.createLauncher(options);
                 result.push(launcher);
             }, this);
 
@@ -151,7 +149,8 @@ define([
          * Render cell with actions
          */
         render: function() {
-            var launchers, $listsContainer;
+            var launchers;
+            var $listsContainer;
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.launchers)) {
                 this.$el.empty();
@@ -188,10 +187,9 @@ define([
          * @return {jQuery} Rendered element wrapped with jQuery
          */
         renderLaunchersList: function(launchers, params) {
-            var result, $launchersList;
             params = params || {};
-            result = $(this.launchersListTemplate(params));
-            $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
+            var result = $(this.launchersListTemplate(params));
+            var $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
             _.each(launchers, function(launcher) {
                 $launchersList.append(this.renderLauncherItem(launcher));
             }, this);
@@ -207,10 +205,9 @@ define([
          * @return {jQuery} Rendered element wrapped with jQuery
          */
         renderLauncherItem: function(launcher, params) {
-            var result, $launcherItem;
             params = params || {};
-            result = $(this.launcherItemTemplate(params));
-            $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
+            var result = $(this.launcherItemTemplate(params));
+            var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);
             return result;
         },

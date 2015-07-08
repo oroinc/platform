@@ -43,7 +43,7 @@ define([
          * @inheritDoc
          */
         enterEditMode: function(e) {
-            if (this.column.get("editable")) {
+            if (this.column.get('editable')) {
                 e.stopPropagation();
             }
             return NumberCell.__super__.enterEditMode.apply(this, arguments);

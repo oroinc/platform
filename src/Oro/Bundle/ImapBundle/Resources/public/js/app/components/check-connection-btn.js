@@ -2,10 +2,8 @@ define(['jquery', 'underscore', 'routing', 'orotranslation/js/translator', 'orou
 function($, _, routing, __, mediator, messenger) {
     'use strict';
 
-    var routeName, prefix;
-
-    routeName = 'oro_imap_connection_check';
-    prefix = 'oro_imap_configuration';
+    var routeName = 'oro_imap_connection_check';
+    var prefix = 'oro_imap_configuration';
 
     /**
      * Initialize component
@@ -15,13 +13,13 @@ function($, _, routing, __, mediator, messenger) {
      */
     return function(options) {
         if (options.elementNamePrototype) {
-            var $form, $el, elementNamePrototype, isNestedForm, url;
+            var url;
 
-            $el = $(options._sourceElement);
-            $form = $el.closest('form');
+            var $el = $(options._sourceElement);
+            var $form = $el.closest('form');
 
-            isNestedForm = options.elementNamePrototype.indexOf('[') !== -1;
-            elementNamePrototype = isNestedForm ? options.elementNamePrototype.replace(/(.+)\[\w+]$/, '$1') : '';
+            var isNestedForm = options.elementNamePrototype.indexOf('[') !== -1;
+            var elementNamePrototype = isNestedForm ? options.elementNamePrototype.replace(/(.+)\[\w+]$/, '$1') : '';
 
             $el.click(function() {
                 var data = $form.serializeArray();
@@ -41,8 +39,8 @@ function($, _, routing, __, mediator, messenger) {
 
                 url = routing.generate(routeName);
                 if (options.id !== null) {
-                    var extraQuery = 'id=' + options.id,
-                        delimiter = url.indexOf('?') === -1 ? '?' : '&';
+                    var extraQuery = 'id=' + options.id;
+                    var delimiter = url.indexOf('?') === -1 ? '?' : '&';
 
                     url += (delimiter + extraQuery);
                 }
@@ -67,5 +65,5 @@ function($, _, routing, __, mediator, messenger) {
             // unable to initialize
             $(options._sourceElement).remove();
         }
-    }
+    };
 });

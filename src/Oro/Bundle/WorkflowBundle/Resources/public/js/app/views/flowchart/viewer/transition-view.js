@@ -1,8 +1,9 @@
 define(function(require) {
     'use strict';
-    var _ = require('underscore'),
-        FlowchartJsPlubmBaseView = require('../jsplumb/base-view'),
-        FlowchartViewerTransitionView;
+
+    var _ = require('underscore');
+    var FlowchartJsPlubmBaseView = require('../jsplumb/base-view');
+    var FlowchartViewerTransitionView;
 
     FlowchartViewerTransitionView = FlowchartJsPlubmBaseView.extend({
         /**
@@ -79,8 +80,8 @@ define(function(require) {
         },
 
         findConnectionByStartStep: function(startStep) {
-            var i, connection;
-            for (i = 0; i < this.connections.length; i++) {
+            var connection;
+            for (var i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
                 if (connection.startStep === startStep) {
                     return connection;
@@ -89,11 +90,12 @@ define(function(require) {
         },
 
         updateStepTransitions: function() {
-            var i, startStep, connection,
-                startSteps = this.model.getStartingSteps(),
-                endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
+            var connection;
+            var startStep;
+            var startSteps = this.model.getStartingSteps();
+            var endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
             this.addStaleMark();
-            for (i = 0; i < startSteps.length; i++) {
+            for (var i = 0; i < startSteps.length; i++) {
                 startStep = startSteps[i];
                 connection = this.findConnectionByStartStep(startStep);
                 if (connection && connection.endStep === endStep) {
@@ -106,16 +108,16 @@ define(function(require) {
         },
 
         addStaleMark: function() {
-            var i, connection;
-            for (i = 0; i < this.connections.length; i++) {
+            var connection;
+            for (var i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
                 connection.stale = true;
             }
         },
 
         removeStaleConnections: function() {
-            var i, connection;
-            for (i = 0; i < this.connections.length; i++) {
+            var connection;
+            for (var i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
                 if (connection.stale) {
                     this.areaView.jsPlumbInstance.detach(connection.jsplumbConnection);
@@ -129,12 +131,12 @@ define(function(require) {
         },
 
         createConnection: function(startStep, endStep) {
-            var jsplumbConnection,
-                overlayView,
-                transitionModel = this.model,
-                areaView = this.areaView,
-                endEl = this.findElByStep(endStep),
-                startEl = this.findElByStep(startStep);
+            var jsplumbConnection;
+            var overlayView;
+            var transitionModel = this.model;
+            var areaView = this.areaView;
+            var endEl = this.findElByStep(endStep);
+            var startEl = this.findElByStep(startStep);
 
             jsplumbConnection = this.areaView.jsPlumbInstance.connect(_.extend(
                 {},

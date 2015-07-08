@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var VariableDatePickerView,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        TabsView = require('oroui/js/app/views/tabs-view'),
-        DateVariableHelper = require('orofilter/js/date-variable-helper'),
-        DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
+    var VariableDatePickerView;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var TabsView = require('oroui/js/app/views/tabs-view');
+    var DateVariableHelper = require('orofilter/js/date-variable-helper');
+    var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     require('orofilter/js/datevariables-widget');
 
     VariableDatePickerView = DatePickerView.extend({

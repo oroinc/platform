@@ -1,9 +1,9 @@
 define(['../side-menu', '../mediator', 'oroui/js/persistent-storage'], function($, mediator, persistentStorage) {
     'use strict';
 
-    var STATE_STORAGE_KEY = 'main-menu-state',
-        MAXIMIZED_STATE = 'maximized',
-        MINIMIZED_STATE = 'minimized';
+    var STATE_STORAGE_KEY = 'main-menu-state';
+    var MAXIMIZED_STATE = 'maximized';
+    var MINIMIZED_STATE = 'minimized';
 
     $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
         /**

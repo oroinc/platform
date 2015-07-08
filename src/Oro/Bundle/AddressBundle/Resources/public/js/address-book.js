@@ -180,7 +180,7 @@ define([
                 });
                 this.addressEditDialog.render();
                 mediator.on(
-                    "page:request",
+                    'page:request',
                     _.bind(function() {
                         if (this.addressEditDialog) {
                             this.addressEditDialog.remove();

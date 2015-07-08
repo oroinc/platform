@@ -46,12 +46,11 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            var view, model, widgets;
             this.options = _.defaults(options || {}, this.options);
 
-            view = this;
-            model = view.model;
-            widgets = this.getWidgets();
+            var view = this;
+            var model = view.model;
+            var widgets = this.getWidgets();
 
             view.iconViews = {};
             view.hoverViews = {};
@@ -310,10 +309,11 @@ define(function(require) {
                 return;
             }
 
-            var widgetView, state = widget.get('state');
-            if (state == constants.WIDGET_MAXIMIZED) {
+            var widgetView;
+            var state = widget.get('state');
+            if (state === constants.WIDGET_MAXIMIZED) {
                 widgetView = this.widgetViews[cid];
-            } else if (state == constants.WIDGET_MAXIMIZED_HOVER) {
+            } else if (state === constants.WIDGET_MAXIMIZED_HOVER) {
                 widgetView = this.hoverViews[cid];
             }
 

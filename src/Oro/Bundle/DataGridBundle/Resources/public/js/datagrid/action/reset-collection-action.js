@@ -27,7 +27,7 @@ define([
             var opts = options || {};
 
             if (!opts.datagrid) {
-                throw new TypeError("'datagrid' is required");
+                throw new TypeError('"datagrid" is required');
             }
             this.collection = opts.datagrid.collection;
 

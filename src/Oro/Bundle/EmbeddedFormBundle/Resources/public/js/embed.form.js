@@ -1,6 +1,8 @@
-var ORO = {
-    EmbedForm: function(options) {
+/*jshint -W098*/
+var ORO = (function(ORO) {
+    'use strict';
 
+    ORO.EmbedForm = function(options) {
         var formContainer = document.getElementById(options.container);
         var iframe = document.createElement('iframe');
         iframe.src = options.iframe.src;
@@ -9,5 +11,7 @@ var ORO = {
         iframe.frameBorder = options.iframe.frameBorder;
 
         formContainer.appendChild(iframe);
-    }
-};
+    };
+
+    return ORO;
+})(ORO || {});

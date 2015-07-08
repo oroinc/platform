@@ -1,8 +1,9 @@
 define(function(require) {
     'use strict';
-    var FlowchartJsPlubmOverlayView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        FlowchartJsPlubmAreaView = require('./area-view');
+
+    var FlowchartJsPlubmOverlayView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var FlowchartJsPlubmAreaView = require('./area-view');
 
     FlowchartJsPlubmOverlayView = BaseView.extend({
         listen: {

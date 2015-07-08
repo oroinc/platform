@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var CommentModel;
+    var $ = require('jquery');
     var _ = require('underscore');
     var Chaplin = require('chaplin');
     var routing = require('routing');

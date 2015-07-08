@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var EmailVariableModel,
-        _ = require('underscore'),
-        BaseModel = require('oroui/js/app/models/base/model')
+    var EmailVariableModel;
+    var _ = require('underscore');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export oroemail/js/app/models/email-variable-model

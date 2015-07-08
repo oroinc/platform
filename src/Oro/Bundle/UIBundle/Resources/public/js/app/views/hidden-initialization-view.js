@@ -2,9 +2,10 @@
 define(function(require) {
     'use strict';
 
-    var HiddenInitializationView,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var HiddenInitializationView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+
     /**
      * View allows hide part of DOM tree till all page components will be initialized
      *

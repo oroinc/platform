@@ -15,9 +15,9 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
          * @inheritDoc
          */
         _processOptions: function(options) {
-            var selectedVal = this.$el.val(),
-                selectedIndex = null,
-                customIndex = null;
+            var selectedVal = this.$el.val();
+            var selectedIndex = null;
+            var customIndex = null;
 
             SimpleColorPickerView.__super__._processOptions.call(this, options);
 

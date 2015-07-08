@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var JqueryWidgetComponent,
-        _ = require('underscore'),
-        tools = require('oroui/js/tools'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+    var JqueryWidgetComponent;
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
      * Initializes jquery widget on _sourceElement
@@ -15,10 +15,8 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var $elem, widgetOptions;
-
-            widgetOptions = _.omit(options, ['_sourceElement', 'widgetModule', 'widgetName']);
-            $elem = options._sourceElement;
+            var widgetOptions = _.omit(options, ['_sourceElement', 'widgetModule', 'widgetName']);
+            var $elem = options._sourceElement;
 
             this._deferredInit();
 

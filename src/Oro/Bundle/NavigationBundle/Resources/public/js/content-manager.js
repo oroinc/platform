@@ -21,48 +21,48 @@ define([
      * @name   oronavigation.contentManager
      * @type {Object}
      */
-    var contentManager,
+    var contentManager;
 
-        /**
-         * Hash object with relation page URL -> its content
-         * @type {Object.<string, Object>}
-         */
-        pagesCache = {},
+    /**
+     * Hash object with relation page URL -> its content
+     * @type {Object.<string, Object>}
+     */
+    var pagesCache = {};
 
-        /**
-         * Information about current page (URL and tags for current page)
-         * @type {Object}
-         * {
-         *    tags: {Array},
-         *    path: {string},
-         *    query: {string},
-         *    page: {Object.<string, *>}, // object with page content
-         *    state: {Object.<string, *>} // each page component can cache own state
-         * }
-         */
-        current = {
-            // collect tags and state, even if the page is not initialized
-            tags: [],
-            state: {}
-        },
+    /**
+     * Information about current page (URL and tags for current page)
+     * @type {Object}
+     * {
+     *    tags: {Array},
+     *    path: {string},
+     *    query: {string},
+     *    page: {Object.<string, *>}, // object with page content
+     *    state: {Object.<string, *>} // each page component can cache own state
+     * }
+     */
+    var current = {
+        // collect tags and state, even if the page is not initialized
+        tags: [],
+        state: {}
+    };
 
-        /**
-         * User ID needed to check whenever update person is the same user
-         * @type {String}
-         */
-        currentUser = null,
+    /**
+     * User ID needed to check whenever update person is the same user
+     * @type {String}
+     */
+    var currentUser = null;
 
-        /**
-         * Notifier object
-         * @type {{close: function()}}
-         */
-        notifier,
+    /**
+     * Notifier object
+     * @type {{close: function()}}
+     */
+    var notifier;
 
-        /**
-         * Pages that has been out dated
-         * @type {Array}
-         */
-        outdatedPageHandlers = {};
+    /**
+     * Pages that has been out dated
+     * @type {Object}
+     */
+    var outdatedPageHandlers = {};
 
     /**
      * On URL changes clean up tags collection and set a new URL as current
@@ -88,7 +88,7 @@ define([
         });
 
         // there's no previous page, then collected tags and state belong to current page
-        if (current.path == null) {
+        if (current.path === null || current.path === void 0) {
             _.extend(item.state, current.state);
             item.tags = current.tags;
         }
@@ -104,14 +104,14 @@ define([
      * @param {string} path
      */
     function defaultCallback(path) {
-        var page = contentManager.get(path),
-            title = page ? '<b>' + page.titleShort + '</b>' : 'the';
+        var page = contentManager.get(path);
+        var title = page ? '<b>' + page.titleShort + '</b>' : 'the';
         if (notifier) {
             notifier.close();
         }
         notifier = messenger.notificationMessage(
             'warning',
-            __("navigation.message.content.outdated", {title: title})
+            __('navigation.message.content.outdated', {title: title})
         );
     }
 
@@ -160,11 +160,10 @@ define([
         pages = [current].concat(_.values(pagesCache));
 
         _.each(pages, function(page) {
-            var handler, items, path, callbacks;
-
-            callbacks = [];
-            items = page.tags;
-            path = page.path;
+            var handler;
+            var callbacks = [];
+            var items = page.tags;
+            var path = page.path;
 
             // collect callbacks for outdated contents
             _.each(items, function(options) {
@@ -199,9 +198,8 @@ define([
 
     // handles page request
     mediator.on('page:request', function(args) {
-        var path, query;
-        path = args.route.path != null ? args.route.path : current.path;
-        query = args.route.query != null ? args.route.query : current.query;
+        var path = args.route.path !== null && args.route.path !== void 0  ? args.route.path : current.path;
+        var query = args.route.query !== null && args.route.query !== void 0 ? args.route.query : current.query;
         changeUrl(path, query);
         if (notifier) {
             notifier.close();
@@ -342,12 +340,11 @@ define([
          * @param {Object} options
          */
         changeUrl: function(url, options) {
-            var route, _ref;
             options = options || {};
-            _ref = url.split('?');
+            var _ref = url.split('?');
             current.path = _ref[0];
             current.query = _ref[1] || '';
-            route = _.pick(current, ['path', 'query']);
+            var route = _.pick(current, ['path', 'query']);
             mediator.execute('changeRoute', route, options);
         },
 
@@ -358,10 +355,10 @@ define([
          * @param {string} value
          */
         changeUrlParam: function(param, value) {
-            var route, query;
-
-            query = Chaplin.utils.queryParams.parse(current.query);
-            if (query[param] === value || (query[param] == null && value == null)) {
+            var route;
+            var query = Chaplin.utils.queryParams.parse(current.query);
+            if (query[param] === value || (
+                (query[param] === null || query[param] === void 0) && (value === null || query[param] === void 0))) {
                 // there's nothing to change in query, skip query update and redirect
                 return;
             }
@@ -400,7 +397,7 @@ define([
         checkState: function(key, hash) {
             var query;
             query = Chaplin.utils.queryParams.parse(current.query);
-            return query[key] == hash;
+            return query[key] === hash;
         },
 
         /**
@@ -412,7 +409,7 @@ define([
          * @returns {boolean}
          */
         compareUrl: function(url, refPath) {
-            if (refPath == null) {
+            if (refPath === null || refPath === void 0) {
                 refPath = current.path;
             }
 

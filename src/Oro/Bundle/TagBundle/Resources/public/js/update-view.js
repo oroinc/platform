@@ -42,15 +42,15 @@ define(['jquery', 'underscore', './view', 'json'
             this.options = _.defaults(options, this.options);
 
             if (!options.autocompleteFieldId) {
-                throw new TypeError("'autocompleteFieldId' is required");
+                throw new TypeError('"autocompleteFieldId" is required');
             }
 
             if (!options.fieldId) {
-                throw new TypeError("'fieldId' is required");
+                throw new TypeError('"fieldId" is required');
             }
 
             if (!options.ownFieldId) {
-                throw new TypeError("'ownFieldId' is required");
+                throw new TypeError('"ownFieldId" is required');
             }
 
             this.$tagOverlayId = $(this.options.tagOverlayId);
@@ -121,8 +121,8 @@ define(['jquery', 'underscore', './view', 'json'
             e.preventDefault();
             e.stopImmediatePropagation();
 
-            var $el = $(e.currentTarget).parents('li'),
-                id = $($el).data('id');
+            var $el = $(e.currentTarget).parents('li');
+            var id = $($el).data('id');
             if (!_.isUndefined(id)) {
                 this.getCollection().removeItem(id, this.options.filter);
             }

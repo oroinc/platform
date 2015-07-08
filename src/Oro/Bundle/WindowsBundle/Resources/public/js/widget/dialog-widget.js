@@ -1,17 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var DialogWidget,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        tools = require('oroui/js/tools'),
-        error = require('oroui/js/error'),
-        messenger = require('oroui/js/messenger'),
-        mediator = require('oroui/js/mediator'),
-        layout = require('oroui/js/layout'),
-        AbstractWidget = require('oroui/js/widget/abstract-widget'),
-        StateModel = require('orowindows/js/dialog/state/model');
+    var DialogWidget;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var error = require('oroui/js/error');
+    var messenger = require('oroui/js/messenger');
+    var mediator = require('oroui/js/mediator');
+    var layout = require('oroui/js/layout');
+    var AbstractWidget = require('oroui/js/widget/abstract-widget');
+    var StateModel = require('orowindows/js/dialog/state/model');
     require('jquery.dialog.extended');
 
     /**
@@ -304,7 +304,12 @@ define(function(require) {
             var scrollableContent = content.find('.scrollable-container');
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                this.widget.on('dialogresize.adjust-height-events dialogmaximize.adjust-height-events dialogrestore.adjust-height-events', _.bind(this._fixScrollableHeight, this));
+                var events = [
+                    'dialogresize.adjust-height-events',
+                    'dialogmaximize.adjust-height-events',
+                    'dialogrestore.adjust-height-events'
+                ];
+                this.widget.on(events.join(''), _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
         },
@@ -413,23 +418,23 @@ define(function(require) {
 
         onResizeStart: function(event) {
             this.$el.css({overflow: 'hidden'});
-            this.getComponentManager().forEachComponent(function(component) {
+            this.forEachComponent(function(component) {
                 component.trigger('parentResizeStart', event, this);
-            }, this);
+            });
         },
 
         onResize: function(event) {
-            this.getComponentManager().forEachComponent(function(component) {
+            this.forEachComponent(function(component) {
                 component.trigger('parentResize', event, this);
-            }, this);
+            });
         },
 
         onResizeStop: function(event) {
             this.$el.css({overflow: ''});
             this._fixBorderShifting();
-            this.getComponentManager().forEachComponent(function(component) {
+            this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
-            }, this);
+            });
         }
     });
 

@@ -20,18 +20,18 @@ define(['jquery', 'jquery-ui'], function($) {
         },
 
         _create: function() {
-            var $elems, $main, $more,
-                $group = $(this.options.groupContainer);
+            var $more;
+            var $group = $(this.options.groupContainer);
 
             // replaces button's separators
             this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
 
-            $elems = this._collectButtons();
+            var $elems = this._collectButtons();
             if ($elems.length <= 1) {
                 return;
             }
 
-            $main = this._mainButtons($elems);
+            var $main = this._mainButtons($elems);
             if (this.options.useMainButtonsClone) {
                 $main = $main.clone(true);
             }

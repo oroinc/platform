@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'underscore',
+    'underscore'
 ], function($, _) {
+    'use strict';
 
     return {
         load: function(segment) {
@@ -13,7 +14,7 @@ define([
                         routingParams: {},
                         fieldsData: [],
                         loadEvent: 'auditFieldsLoaded'
-                    },
+                    }
                 }
             });
 
@@ -53,11 +54,11 @@ define([
                 return originalInitEntityChangeEvents.apply(this, arguments);
             };
 
-            var original_onEntityChangeConfirm = segment._onEntityChangeConfirm;
+            var originalOnEntityChangeConfirm = segment._onEntityChangeConfirm;
             segment._onEntityChangeConfirm = function(e, additionalOptions) {
                 this.$auditFieldsLoader.val(e.val).trigger('change', additionalOptions);
 
-                return original_onEntityChangeConfirm.apply(this, arguments);
+                return originalOnEntityChangeConfirm.apply(this, arguments);
             };
         }
     };

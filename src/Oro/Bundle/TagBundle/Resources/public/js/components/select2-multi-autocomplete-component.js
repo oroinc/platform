@@ -1,10 +1,11 @@
 define(function(require) {
     'use strict';
-    var Select2MultiAutocompleteComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+
+    var Select2MultiAutocompleteComponent;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+
     Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
         oroTagCreateGranted: false,
         initialize: function(options) {
@@ -20,7 +21,7 @@ define(function(require) {
                 var match = _.find(data, function(item) {
                         return item.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
                     });
-                if (typeof match == 'undefined' && that.oroTagCreateGranted) {
+                if (typeof match === 'undefined' && that.oroTagCreateGranted) {
                     return {
                         id: term,
                         name: term

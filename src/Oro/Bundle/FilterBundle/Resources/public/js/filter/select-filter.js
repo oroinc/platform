@@ -264,7 +264,7 @@ define([
         _getCriteriaHint: function() {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var choice = _.find(this.choices, function(c) {
-                return (c.value == value.value);
+                return (c.value === value.value);
             });
             return !_.isUndefined(choice) ? choice.label : this.placeholder;
         },
@@ -278,9 +278,9 @@ define([
             if (!this.cachedMinimumWidth) {
                 this.cachedMinimumWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             }
-            var widget = this.selectWidget.getWidget(),
-                filterWidth = this.$(this.containerSelector).width(),
-                requiredWidth = Math.max(filterWidth + 24, this.cachedMinimumWidth);
+            var widget = this.selectWidget.getWidget();
+            var filterWidth = this.$(this.containerSelector).width();
+            var requiredWidth = Math.max(filterWidth + 24, this.cachedMinimumWidth);
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
             widget.find('input[type="search"]').width(requiredWidth - 30);
         },

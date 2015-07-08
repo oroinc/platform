@@ -39,5 +39,5 @@ define([
     });
 
     // replace original ech.multiselect widget to make ech.multiselectfilter work
-    $.widget("ech.multiselect", $.orofilter.multiselect, {});
+    $.widget('ech.multiselect', $.orofilter.multiselect, {});
 });

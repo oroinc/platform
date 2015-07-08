@@ -32,9 +32,9 @@ function($, __, Modal, Messenger, Error) {
                     Error.handle({}, xhr, {enforce: true});
                     element.trigger('activation_error', [xhr, textStatus, error]);
                 }
-            })
+            });
         });
 
         confirmActivation.open();
-    }
+    };
 });

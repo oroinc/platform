@@ -73,5 +73,5 @@ define(['../locale-settings'
 
             return this.formatCache[locale];
         }
-    }
+    };
 });

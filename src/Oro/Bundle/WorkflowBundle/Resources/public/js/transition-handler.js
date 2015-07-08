@@ -75,5 +75,5 @@ define([
                 performTransition(element);
             }
         }
-    }
+    };
 });

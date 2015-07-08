@@ -2,8 +2,9 @@ define([
     'underscore',
     'backbone',
     'orotranslation/js/translator',
+    'oroui/js/mediator',
     'orolocale/js/formatter/address'
-], function(_, Backbone, __, addressFormatter) {
+], function(_, Backbone, __, mediator, addressFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -28,7 +29,7 @@ define([
 
         initialize: function() {
             this.$el.attr('id', 'address-book-' + this.model.id);
-            this.template = _.template($("#template-addressbook-item").html());
+            this.template = _.template($('#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:active', this.toggleActive);
         },
@@ -51,7 +52,7 @@ define([
 
         close: function() {
             if (this.model.get('primary')) {
-                alert(__('Primary address can not be removed'));
+                mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
                 this.model.destroy({wait: true});
             }
@@ -75,7 +76,7 @@ define([
                 postal_code: data.postalCode,
                 region: data.region || data.regionText,
                 region_code: data.regionCode
-            }, null, "\n");
+            }, null, '\n');
             this.$el.append(this.template(data));
             if (this.model.get('primary')) {
                 this.activate();

@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var StepModel,
-        _ = require('underscore'),
-        TransitionCollection = require('./transition-collection'),
-        BaseModel = require('oroui/js/app/models/base/model');
+    var StepModel;
+    var _ = require('underscore');
+    var TransitionCollection = require('./transition-collection');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     StepModel = BaseModel.extend({
         defaults: {

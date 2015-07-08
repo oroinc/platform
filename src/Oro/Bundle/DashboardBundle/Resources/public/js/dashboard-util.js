@@ -1,7 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var mediator = require('oroui/js/mediator')
+    var $ = require('jquery');
+
     return {
         onDashboardRemove: function(dashboardId) {
             $('[data-menu="' + dashboardId + '"]').remove();

@@ -14,7 +14,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
             },
             conditionsGroup: {
                 items: '>.condition[data-criteria]',
-                cursorAt: "10 10",
+                cursorAt: '10 10',
                 cancel: 'a, input, .btn, select'
             },
             criteriaList: {
@@ -107,8 +107,8 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
         },
 
         _initConditionBuilder: function() {
-            var $root = this.element,
-                sortableConnectWith = this.options.sortable.connectWith;
+            var $root = this.element;
+            var sortableConnectWith = this.options.sortable.connectWith;
             if (!$root.is(sortableConnectWith)) {
                 $root = $root.find(sortableConnectWith);
                 if (!$root.length) {
@@ -137,10 +137,10 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
             this._on($group, {
                 // handle condition-item value change
                 'changed >[data-criteria]>[data-value]:not(.operator)': function(e) {
-                    var $content = $(e.currentTarget),
-                        $condition = $content.parent(),
-                        criteria = $condition.data('criteria'),
-                        hasValue = !$.isEmptyObject($content.data('value'));
+                    var $content = $(e.currentTarget);
+                    var $condition = $content.parent();
+                    var criteria = $condition.data('criteria');
+                    var hasValue = !$.isEmptyObject($content.data('value'));
                     // update validation checkbox if condition 'has/has not' value
                     $condition.find('>input[name^=condition_item_]').prop('checked', hasValue);
                     // if it's value of condition with not default criteria, mixin it's name into value
@@ -161,8 +161,8 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
 
         _onCriteriaGrab: function(e, ui) {
             // create clone element just to remember place of item
-            var $origin = ui.item,
-                $clone = $origin.clone();
+            var $origin = ui.item;
+            var $clone = $origin.clone();
             $origin.data('clone', $clone);
             $clone.data('origin', $origin).removeAttr('style').insertAfter($origin);
             ui.helper.addClass(this.options.helperClass);
@@ -170,8 +170,8 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
 
         _onCriteriaDrop: function(e, ui) {
             // put item back instead of it's clone
-            var $origin = ui.item,
-                $clone = $origin.data('clone');
+            var $origin = ui.item;
+            var $clone = $origin.data('clone');
             $clone.removeData('origin').replaceWith($origin.removeData('clone'));
         },
 
@@ -181,7 +181,12 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
         },
 
         _createCondition: function(criteria, value) {
-            var $content, $condition, $criteria, $validationInput, widgetOptions, widgetName;
+            var $content;
+            var  $condition;
+            var  $criteria;
+            var  $validationInput;
+            var  widgetOptions;
+            var  widgetName;
             if (!criteria) {
                 // if criteria is not passed, define it from value
                 criteria = $.isArray(value) ? 'conditions-group' : (value.criteria || 'condition-item');
@@ -214,8 +219,9 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
         },
 
         _createConditionContent: function(html, value) {
-            var operation, self = this,
-                $content = $(html);
+            var operation;
+            var self = this;
+            var $content = $(html);
             if ($.isArray(value)) {
                 // build sub-conditions, if value is array
                 operation = null;
@@ -239,8 +245,9 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
         },
 
         _createValidationInput: function(criteria, value) {
-            var $input, validation = this.options.validation,
-                rule = validation[criteria] || validation['condition-item'];
+            var $input;
+            var validation = this.options.validation;
+            var rule = validation[criteria] || validation['condition-item'];
             if (rule) {
                 $input = $('<input class="select2-focusser select2-offscreen" type="checkbox"/>')
                     .prop('checked', !$.isEmptyObject(value))
@@ -271,14 +278,14 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
         },
 
         _updateOperators: function() {
-            var self = this,
-                options = this.options.conditionsGroup,
-                $conditions = this.element.find(options.connectWith + options.items);
+            var self = this;
+            var options = this.options.conditionsGroup;
+            var $conditions = this.element.find(options.connectWith + options.items);
             // remove operators for first items in groups
             $conditions.filter(':first-child')
                 .find('>.operator').each(function() {
-                    var $operator = $(this),
-                        $condition = $operator.parent();
+                    var $operator = $(this);
+                    var $condition = $operator.parent();
                     $operator.remove();
                     $condition.trigger('changed');
                 });
@@ -309,8 +316,8 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
         },
 
         _onConditionClose: function(e) {
-            var $condition = $(e.target).parent(),
-                $group = $condition.parent();
+            var $condition = $(e.target).parent();
+            var $group = $condition.parent();
             e.preventDefault();
             $condition.remove();
             this._updateOperators();

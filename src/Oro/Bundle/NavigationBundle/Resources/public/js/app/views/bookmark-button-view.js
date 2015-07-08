@@ -4,9 +4,8 @@ define([
 ], function(mediator, PageRegionView) {
     'use strict';
 
-    var BookmarkButtonView, document;
-
-    document = window.document;
+    var BookmarkButtonView;
+    var document = window.document;
 
     BookmarkButtonView = PageRegionView.extend({
         pageItems: ['navigationElements', 'titleShort', 'titleSerialized'],
@@ -38,11 +37,12 @@ define([
         },
 
         render: function() {
-            var data, titleSerialized, titleShort;
+            var titleSerialized;
+            var titleShort;
 
             this.updateState();
 
-            data = this.getTemplateData();
+            var data = this.getTemplateData();
             if (!data || !data.navigationElements) {
                 // no data, it is initial auto render, skip rendering
                 return this;
@@ -69,12 +69,13 @@ define([
         updateState: function() {
             var model;
             model = this.collection.getCurrentModel();
-            this.$el.toggleClass('gold-icon', model != null);
+            this.$el.toggleClass('gold-icon', model !== null || model !== undefined);
         },
 
         onToggle: function() {
-            var model, attrs, Model;
-            model = this.collection.getCurrentModel();
+            var attrs;
+            var Model;
+            var model = this.collection.getCurrentModel();
             if (model) {
                 this.collection.trigger('toRemove', model);
             } else {
@@ -86,15 +87,13 @@ define([
         },
 
         getItemAttrs: function() {
-            var attrs, title;
-            title = this.$el.data('title');
-            attrs = {
+            var title = this.$el.data('title');
+            return {
                 url: mediator.execute('currentUrl'),
-                'title_rendered': document.title,
-                'title_rendered_short': this.$el.data('title-rendered-short') || document.title,
+                title_rendered: document.title,
+                title_rendered_short: this.$el.data('title-rendered-short') || document.title,
                 title: title ? JSON.stringify(title) : '{"template": "' + document.title + '"}'
             };
-            return attrs;
         }
     });
 

@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var EmailEditorView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        $ = require('jquery'),
-        routing = require('routing'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        mediator = require('oroui/js/mediator'),
-        ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
+    var EmailEditorView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
+    var routing = require('routing');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
     require('jquery.select2');
 
     EmailEditorView = BaseView.extend({
@@ -49,8 +49,10 @@ define(function(require) {
         },
 
         onAddSignatureButtonClick: function() {
-            var tinyMCE,
-                signature = this.model.get('signature');
+            var tinyMCE;
+            var url;
+            var message;
+            var signature = this.model.get('signature');
             if (signature) {
                 if (this.pageComponent('bodyEditor').view.tinymceConnected) {
                     tinyMCE = this.pageComponent('bodyEditor').view.tinymceInstance;
@@ -60,9 +62,9 @@ define(function(require) {
                     this.domCache.body.insertAtCursor(signature).focus();
                 }
             } else {
-                var url = routing.generate('oro_user_profile_update'),
-                    message = this.model.get('isSignatureEditable') ?
-                        __('oro.email.thread.no_signature', {url: url}) :
+                url = routing.generate('oro_user_profile_update');
+                message = this.model.get('isSignatureEditable') ?
+                    __('oro.email.thread.no_signature', {url: url}) :
                         __('oro.email.thread.no_signature_no_permission');
                 mediator.execute('showFlashMessage', 'info', message);
             }
@@ -130,8 +132,8 @@ define(function(require) {
         },
 
         showField: function(fieldName) {
-            var field = fieldName.toLowerCase(),
-                $field = this.$('[data-ftid=oro_email_email_' + field + ']');
+            var field = fieldName.toLowerCase();
+            var $field = this.$('[data-ftid=oro_email_email_' + field + ']');
             $field.parents('.control-group.taggable-field').show();
             $field.parents('.controls').find('input.select2-input')
                 .unbind('focusout')
@@ -152,8 +154,8 @@ define(function(require) {
         },
 
         hideField: function(fieldName) {
-            var field = fieldName.toLowerCase(),
-                $field = this.$('[data-ftid=oro_email_email_' + field + ']');
+            var field = fieldName.toLowerCase();
+            var $field = this.$('[data-ftid=oro_email_email_' + field + ']');
             $field.parents('.control-group.taggable-field').hide();
 
             if (this.$('span.show' + fieldName).length > 0) {
@@ -169,11 +171,11 @@ define(function(require) {
         },
 
         addForgedAsterisk: function() {
-            var labelTab = this.$('.forged-required').find('label'),
-                emTag = labelTab.find('em');
+            var labelTab = this.$('.forged-required').find('label');
+            var emTag = labelTab.find('em');
 
             if (emTag.length <= 0) {
-                labelTab.append('<em>*</em>')
+                labelTab.append('<em>*</em>');
             } else {
                 emTag.html('*');
             }

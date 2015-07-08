@@ -1,20 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowModel,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        BaseModel = require('oroui/js/app/models/base/model'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        StepCollection = require('./step-collection'),
-        TransitionCollection = require('./transition-collection'),
-        TransitionDefinitionCollection = require('./transition-definition-collection'),
-        AttributeCollection = require('./attribute-collection'),
-        StepModel = require('./step-model'),
-        TransitionModel = require('./transition-model'),
-        TransitionDefinitionModel = require('./transition-definition-model'),
-        AttributeModel = require('./attribute-model'),
-        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+    var WorkflowModel;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var BaseModel = require('oroui/js/app/models/base/model');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var StepCollection = require('./step-collection');
+    var TransitionCollection = require('./transition-collection');
+    var TransitionDefinitionCollection = require('./transition-definition-collection');
+    var AttributeCollection = require('./attribute-collection');
+    var StepModel = require('./step-model');
+    var TransitionModel = require('./transition-model');
+    var TransitionDefinitionModel = require('./transition-definition-model');
+    var AttributeModel = require('./attribute-model');
+    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
     WorkflowModel = BaseModel.extend({
         defaults: {
@@ -119,7 +119,7 @@ define(function(require) {
                 cloned.position = [
                     cloned.position[0] + this.positionIncrementPx,
                     cloned.position[1] + this.positionIncrementPx
-                ]
+                ];
             }
 
             var clonedModel = new StepModel(cloned);
@@ -148,7 +148,7 @@ define(function(require) {
         getFieldIdByPropertyPath: function(propertyPath) {
             var pathData = propertyPath.split('.');
 
-            if (pathData.length > 1 && pathData[0] == this.get('entity_attribute')) {
+            if (pathData.length > 1 && pathData[0] === this.get('entity_attribute')) {
                 pathData.splice(0, 1);
                 return this.entityFieldUtil.getPathByPropertyPath(pathData);
             } else {

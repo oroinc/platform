@@ -15,9 +15,8 @@ define([
      */
     BaseView = Chaplin.View.extend({
         getTemplateFunction: function() {
-            var template, templateFunc;
-            template = this.template;
-            templateFunc = null;
+            var template = this.template;
+            var templateFunc = null;
 
             if (typeof template === 'string') {
                 templateFunc = _.template(template);
@@ -46,8 +45,8 @@ define([
          * @override
          */
         _ensureElement: function() {
-            var $el, el;
-            el = this.el;
+            var $el;
+            var el = this.el;
 
             if (el && typeof el === 'string' && el.substr(0, 7) === 'region:') {
                 $el = this._findRegionElem(el.substr(7));
@@ -68,12 +67,12 @@ define([
          * @private
          */
         _findRegionElem: function(name) {
-            var $el, region, instance;
-            region = Chaplin.mediator.execute('region:find', name);
-            if (region != null) {
-                instance = region.instance;
-                if (instance.container != null) {
-                    $el = instance.region != null ? $(instance.container).find(region.selector) : instance.container;
+            var $el;
+            var region = Chaplin.mediator.execute('region:find', name);
+            if (region) {
+                var instance = region.instance;
+                if (instance.container) {
+                    $el = instance.region ? $(instance.container).find(region.selector) : instance.container;
                 } else {
                     $el = instance.$(region.selector);
                 }
@@ -86,7 +85,7 @@ define([
          *
          * @protected
          */
-        _deferredRender: function () {
+        _deferredRender: function() {
             this.deferredRender = $.Deferred();
         },
 
@@ -95,7 +94,7 @@ define([
          *
          * @protected
          */
-        _resolveDeferredRender: function () {
+        _resolveDeferredRender: function() {
             if (this.deferredRender) {
                 this.deferredRender.resolve(this);
                 delete this.deferredRender;

@@ -1,4 +1,7 @@
+/*jshint -W098*/
 function Loader(element) {
+    'use strict';
+
     var clickedElement = null;
     var loadingElement = element;
 
@@ -14,9 +17,10 @@ function Loader(element) {
             loadingElement.show();
         },
         displayOriginalElement: function() {
-            clickedElement && clickedElement.show();
+            if (clickedElement) {
+                clickedElement.show();
+            }
             loadingElement.hide();
         }
-
-    }
+    };
 }

@@ -15,6 +15,7 @@ define([
     'oroui/lib/bootstrap/js/bootstrap-typeahead'
 ], function($) {
     'use strict';
+
     /**
      * Dev Bootstrap build,
      * to use it switch bootstrap module in requirejs.yml

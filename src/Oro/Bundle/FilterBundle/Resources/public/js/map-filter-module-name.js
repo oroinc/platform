@@ -1,7 +1,8 @@
 define(function() {
     'use strict';
-    var moduleNameTemplate = 'oro/filter/{{type}}-filter',
-        types = {
+
+    var moduleNameTemplate = 'oro/filter/{{type}}-filter';
+    var types = {
             string:      'choice',
             choice:      'select',
             single_choice: 'select',

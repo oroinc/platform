@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore'),
-        Backbone = require('backbone'),
-
-        iconTemplate = require('text!./templates/icon-template.html'),
-        constants    = require('../constants');
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var iconTemplate = require('text!./templates/icon-template.html');
+    var constants    = require('../constants');
 
     /**
      * @export  orosidebar/js/widget-container/icon-view
@@ -26,8 +25,8 @@ define(function(require) {
         },
 
         render: function() {
-            var view  = this,
-                model = view.model;
+            var view  = this;
+            var model = view.model;
 
             view.$el.html(view.template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);

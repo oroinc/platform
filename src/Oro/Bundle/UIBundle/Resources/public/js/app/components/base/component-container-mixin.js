@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var componentContainerMixin,
-        ComponentManager = require('oroui/js/app/components/component-manager');
+    var componentContainerMixin;
+    var ComponentManager = require('oroui/js/app/components/component-manager');
 
     componentContainerMixin = {
         /**
@@ -17,7 +17,7 @@ define(function(require) {
          *
          * @returns {ComponentManager}
          */
-        getComponentManager: function() {
+        _getComponentManager: function() {
             if (!this.componentManager) {
                 this.componentManager = new ComponentManager(this.getLayoutElement());
             }
@@ -41,9 +41,9 @@ define(function(require) {
                 if (!el) {
                     throw Error('The element related to the component is required');
                 }
-                return this.getComponentManager().add(name, component, el);
+                return this._getComponentManager().add(name, component, el);
             } else {
-                return this.getComponentManager().get(name);
+                return this._getComponentManager().get(name);
             }
         },
 
@@ -51,14 +51,24 @@ define(function(require) {
          * @param {string} name component name to remove
          */
         removePageComponent: function(name) {
-            this.getComponentManager().remove(name);
+            this._getComponentManager().remove(name);
+        },
+
+        /**
+         * Applies callback function to all component
+         *
+         * @param {Function} callback
+         * @param {Object?} context
+         */
+        forEachComponent: function(callback, context) {
+            this._getComponentManager().forEachComponent(callback, context || this);
         },
 
         /**
          * Initializes all linked page components
          */
         initPageComponents: function() {
-            return this.getComponentManager().init();
+            return this._getComponentManager().init();
         },
 
         /**
@@ -69,7 +79,7 @@ define(function(require) {
                 return;
             }
             if (this.componentManager) {
-                this.getComponentManager().dispose();
+                this._getComponentManager().dispose();
                 delete this.componentManager;
             }
         }

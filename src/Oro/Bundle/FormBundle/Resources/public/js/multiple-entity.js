@@ -150,7 +150,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         addEntity: function(item) {
-            if (item.get('id') == this.$defaultEl.val()) {
+            if (item.get('id') === this.$defaultEl.val()) {
                 item.set('isDefault', true);
             }
             var entityView = new EntityView({
@@ -166,9 +166,9 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         addEntities: function(e) {
             if (!this.selectorDialog) {
                 var url = this._getSelectionWidgetUrl();
-                var route_additional_params = $(e.target).data('route_additional_params');
-                if (route_additional_params) {
-                    url = url + (url.indexOf('?') == -1 ? '?' : '&') + $.param(route_additional_params);
+                var routeAdditionalParams = $(e.target).data('route_additional_params');
+                if (routeAdditionalParams) {
+                    url = url + (url.indexOf('?') === -1 ? '?' : '&') + $.param(routeAdditionalParams);
                 }
 
                 this.selectorDialog = new DialogWidget({
@@ -191,11 +191,11 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
 
         _getSelectionWidgetUrl: function() {
             var url = this.options.selectionUrl ||
-                routing.generate(this.options.selectionRouteName, this.options.selectionRouteParams),
-                separator = url.indexOf('?') > -1 ? '&' : '?',
-                added = this.$addedEl.val(),
-                removed = this.$removedEl.val(),
-                defaultEl = this.$defaultEl.val();
+                routing.generate(this.options.selectionRouteName, this.options.selectionRouteParams);
+            var separator = url.indexOf('?') > -1 ? '&' : '?';
+            var added = this.$addedEl.val();
+            var removed = this.$removedEl.val();
+            var defaultEl = this.$defaultEl.val();
 
             return url + separator +
                 'added=' + (added || '') +
@@ -236,7 +236,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
                 var model = this.getCollection().get(removed[i]);
                 if (model) {
                     model.set('id', null);
-                    model.destroy()
+                    model.destroy();
                 }
             }
 

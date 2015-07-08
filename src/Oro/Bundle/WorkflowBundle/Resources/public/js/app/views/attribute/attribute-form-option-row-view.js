@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var AttributeFormOptionRowView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        __ = require('orotranslation/js/translator'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        Confirmation = require('oroui/js/delete-confirmation');
+    var AttributeFormOptionRowView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var __ = require('orotranslation/js/translator');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var Confirmation = require('oroui/js/delete-confirmation');
 
     AttributeFormOptionRowView = BaseView.extend({
         tagName: 'tr',

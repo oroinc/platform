@@ -8,9 +8,9 @@ define(['underscore'], function(_) {
         },
 
         trunc: function(str, maxLength, useWordBoundary) {
-            var lastSpace, toLong = str.length > maxLength;
+            var toLong = str.length > maxLength;
             str = toLong ? str.substr(0, maxLength - 1) : str;
-            lastSpace = str.lastIndexOf(' ');
+            var lastSpace = str.lastIndexOf(' ');
             str = useWordBoundary && toLong && lastSpace > 0 ? str.substr(0, lastSpace) : str;
             return toLong ? str + '&hellip;' : str;
         }

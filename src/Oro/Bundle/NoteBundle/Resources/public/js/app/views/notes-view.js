@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var NotesView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/app/views/loading-mask-view'),
-        DialogWidget = require('oro/dialog-widget'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var NotesView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var DialogWidget = require('oro/dialog-widget');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     NotesView = BaseCollectionView.extend({
         options: {
@@ -86,9 +86,9 @@ define(function(require) {
         },
 
         toggleSorting: function(e) {
-            var $el = $(e.currentTarget),
-                titleAlt = $el.data('title-alt'),
-                iconAlt = $el.data('icon-alt');
+            var $el = $(e.currentTarget);
+            var titleAlt = $el.data('title-alt');
+            var iconAlt = $el.data('icon-alt');
             $el.data('title-alt', $el.attr('title'));
             $el.attr('title', titleAlt);
             $el.data('icon-alt', $el.find('i').attr('class').replace(/ hide-text/, ''));
@@ -125,11 +125,11 @@ define(function(require) {
         },
 
         _addItem: function(e) {
-            var url = this._getUrl('createItem'),
-                routeAdditionalParams = $(e).data('route_additional_params') || {};
+            var url = this._getUrl('createItem');
+            var routeAdditionalParams = $(e).data('route_additional_params') || {};
 
             if (!_.isEmpty(routeAdditionalParams)) {
-                url += (url.indexOf('?') == -1 ? '?' : '&') + $.param(routeAdditionalParams);
+                url += (url.indexOf('?') === -1 ? '?' : '&') + $.param(routeAdditionalParams);
             }
 
             this._openItemEditForm(this._getMessage('addDialogTitle'), url);
@@ -210,10 +210,10 @@ define(function(require) {
                 });
                 this.itemEditDialog.render();
                 this.itemEditDialog.on('formSave', _.bind(function(response) {
-                    var model, insertPosition;
                     this.itemEditDialog.remove();
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
-                    model = this.collection.get(response.id);
+                    var insertPosition;
+                    var model = this.collection.get(response.id);
                     if (model) {
                         model.set(response);
                     } else {

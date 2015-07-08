@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var EmailContextComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        routing = require('routing'),
-        widgetManager = require('oroui/js/widget-manager'),
-        messenger = require('oroui/js/messenger'),
-        mediator = require('oroui/js/mediator'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        EmailContextView = require('oroemail/js/app/views/email-context-view');
+    var EmailContextComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var routing = require('routing');
+    var widgetManager = require('oroui/js/widget-manager');
+    var messenger = require('oroui/js/messenger');
+    var mediator = require('oroui/js/mediator');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var EmailContextView = require('oroemail/js/app/views/email-context-view');
 
     /**
      * @exports EmailContextComponent
@@ -43,8 +43,8 @@ define(function(require) {
          * @protected
          */
         _bindGridEvent: function() {
-            var self = this,
-                gridWidgetName = this.options.gridWidgetName;
+            var self = this;
+            var gridWidgetName = this.options.gridWidgetName;
             if (!gridWidgetName) {
                 return;
             }
@@ -61,9 +61,9 @@ define(function(require) {
          * @param {} data
          */
         onRowSelect: function(gridWidget, data) {
-            var id = data.model.get('id'),
-                dialogWidgetName = this.options.dialogWidgetName,
-                contextTargetClass = this.contextView.currentTargetClass();
+            var id = data.model.get('id');
+            var dialogWidgetName = this.options.dialogWidgetName;
+            var contextTargetClass = this.contextView.currentTargetClass();
 
             gridWidget._showLoading();
             $.ajax({

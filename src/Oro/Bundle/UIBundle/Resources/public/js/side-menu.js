@@ -46,24 +46,20 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
          * @private
          */
         _convertToAccordion: function() {
-            var $groups, $root, self;
-
-            $root = this.element.find(this.options.rootElement).first();
+            var $root = this.element.find(this.options.rootElement).first();
             $root.attr('id', this._getGroupId(0)).addClass('accordion');
-            $groups = $root.find('.dropdown');
+            var $groups = $root.find('.dropdown');
 
             $root.find('.dropdown-menu').removeClass('dropdown-menu').addClass('accordion-body collapse');
             $groups.removeClass('dropdown').addClass('accordion-group');
 
-            self = this;
+            var self = this;
             $groups.add($root).each(function(i) {
-                var $group, $header, $target, targetId;
+                var $group = $(this);
+                var $header = $group.find('a[href=#]>span').first();
+                var $target = $group.find('.accordion-body').first();
 
-                $group = $(this);
-                $header = $group.find('a[href=#]>span').first();
-                $target = $group.find('.accordion-body').first();
-
-                targetId = self._getGroupId(i + 1);
+                var targetId = self._getGroupId(i + 1);
                 $target.attr('id', targetId);
 
                 $header.addClass('accordion-toggle')

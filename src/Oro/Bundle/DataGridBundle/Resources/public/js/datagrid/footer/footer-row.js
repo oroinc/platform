@@ -3,7 +3,7 @@ define([
     'backgrid',
     './footer-cell'
 ], function(_, Backgrid, FooterCell) {
-    "use strict";
+    'use strict';
 
     var FooterRow;
 
@@ -18,7 +18,7 @@ define([
         /** @property */
         footerCell: FooterCell,
 
-        requiredOptions: ["columns", "collection", "footerCell"],
+        requiredOptions: ['columns', 'collection', 'footerCell'],
 
         initialize: function(options) {
             this.options = options || {};
@@ -41,7 +41,7 @@ define([
         },
 
         makeCell: function(column, options) {
-            var FooterCell = column.get("footerCell") || options.footerCell || this.footerCell;
+            var FooterCell = column.get('footerCell') || options.footerCell || this.footerCell;
             return new FooterCell({
                 column: column,
                 collection: this.collection,

@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var WysiwygEditorView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        _ = require('underscore'),
-        $ = require('tinymce/jquery.tinymce.min'),
-        txtHtmlTransformer = require('./txt-html-transformer'),
-        LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var WysiwygEditorView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var _ = require('underscore');
+    var $ = require('tinymce/jquery.tinymce.min');
+    var txtHtmlTransformer = require('./txt-html-transformer');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 15,
@@ -65,8 +65,8 @@ define(function(require) {
         },
 
         connectTinyMCE: function() {
-            var loadingMaskContainer,
-                self = this;
+            var loadingMaskContainer;
+            var self = this;
             loadingMaskContainer = this.$el.parents('.ui-dialog');
             if (!loadingMaskContainer.length) {
                 loadingMaskContainer = this.$el.parent();
@@ -89,13 +89,13 @@ define(function(require) {
                 options.readonly = true;
             }
             this.$el.tinymce(_.extend({
-                'init_instance_callback': function (editor) {
+                'init_instance_callback': function(editor) {
                     /**
                      * fix of https://magecore.atlassian.net/browse/BAP-7130
                      * "WYSWING editor does not work with IE"
                      * Please check if it's still required after tinyMCE update
                      */
-                    setTimeout(function () {
+                    setTimeout(function() {
                         var focusedElement = $(':focus');
                         editor.focus();
                         focusedElement.focus();
@@ -103,7 +103,7 @@ define(function(require) {
 
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
-                    _.defer(function () {
+                    _.defer(function() {
                         /**
                          * fixes jumping dialog on refresh page
                          * (promise should be resolved in a separate process)

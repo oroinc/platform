@@ -1,7 +1,8 @@
 define(function(require) {
     'use strict';
-    var BaseView = require('oroui/js/app/views/base/view'),
-        FlowchartJsPlubmBaseView;
+
+    var BaseView = require('oroui/js/app/views/base/view');
+    var FlowchartJsPlubmBaseView;
 
     FlowchartJsPlubmBaseView = BaseView.extend({
         id: function() {

@@ -14,8 +14,16 @@ define(['underscore', './abstract-formatter'
         options = options ? _.clone(options) : {};
         _.extend(this, this.defaults, options);
 
+        if (this.percent && (typeof this.percent !== 'number' || isNaN(this.percent))) {
+            throw new TypeError('percent must be a number');
+        }
+
+        if (typeof this.decimals !== 'number' || isNaN(this.decimals)) {
+            throw new TypeError('decimals must be a number');
+        }
+
         if (this.decimals < 0 || this.decimals > 20) {
-            throw new RangeError("decimals must be between 0 and 20");
+            throw new RangeError('decimals must be between 0 and 20');
         }
     };
 
@@ -55,13 +63,15 @@ define(['underscore', './abstract-formatter'
          * @return {string}
          */
         fromRaw: function(number) {
-            if (isNaN(number) || number === null) return '';
+            if (isNaN(number) || number === null) {
+                return '';
+            }
 
-            number = number.toFixed(~~this.decimals);
+            number = number.toFixed(this.decimals);
 
             var parts = number.split('.');
             var integerPart = parts[0];
-            var isPercentValueTrim = parts[1] && parts[1] == this.EMPTY_DECIMAL && ~~this.percent;
+            var isPercentValueTrim = parts[1] && parts[1] === this.EMPTY_DECIMAL && this.percent;
             var decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
 
             return integerPart.replace(this.HUMANIZED_NUM_RE, '$1' + this.orderSeparator) + decimalPart;
@@ -78,15 +88,16 @@ define(['underscore', './abstract-formatter'
          */
         toRaw: function(formattedData) {
             var rawData = '';
+            var i;
 
             var thousands = formattedData.trim().split(this.orderSeparator);
-            for (var i = 0; i < thousands.length; i++) {
+            for (i = 0; i < thousands.length; i++) {
                 rawData += thousands[i];
             }
 
             var decimalParts = rawData.split(this.decimalSeparator);
             rawData = '';
-            for (var i = 0; i < decimalParts.length; i++) {
+            for (i = 0; i < decimalParts.length; i++) {
                 rawData = rawData + decimalParts[i] + '.';
             }
 
@@ -94,8 +105,10 @@ define(['underscore', './abstract-formatter'
                 rawData = rawData.slice(0, rawData.length - 1);
             }
 
-            var result = (rawData * 1).toFixed(~~this.decimals) * 1;
-            if (_.isNumber(result) && !_.isNaN(result)) return result;
+            var result = (rawData * 1).toFixed(this.decimals) * 1;
+            if (_.isNumber(result) && !_.isNaN(result)) {
+                return result;
+            }
         }
     });
 

@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var CommentFormView;
+    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');

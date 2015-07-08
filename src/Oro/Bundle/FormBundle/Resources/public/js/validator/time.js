@@ -15,8 +15,8 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/da
             return this.optional(element) || element.type === 'time' || datetimeFormatter.isTimeValid(String(value));
         },
         function(param, element) {
-            var value = String(this.elementValue(element)),
-                placeholders = {};
+            var value = String(this.elementValue(element));
+            var placeholders = {};
             param = _.extend({}, defaultParam, param);
             placeholders.value = value;
             return __(param.message, placeholders);

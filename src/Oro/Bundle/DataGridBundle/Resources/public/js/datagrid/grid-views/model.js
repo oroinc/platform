@@ -24,8 +24,8 @@ define([
 
         /** @property */
         directions: {
-            "ASC": "-1",
-            "DESC": "1"
+            ASC: '-1',
+            DESC: '1'
         },
 
         /**

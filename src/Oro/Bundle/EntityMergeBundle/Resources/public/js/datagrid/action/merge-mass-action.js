@@ -33,12 +33,13 @@ define([
          * @param {object} options Additional param options needed to stop action
          */
         onPreExecute: function(event, options) {
-            var selectionState, isInset, length, totalRecords, validationMessage, maxLength;
+            var totalRecords;
+            var validationMessage;
 
-            maxLength = this.max_element_count;
-            selectionState = this.datagrid.getSelectionState();
-            isInset = selectionState.inset;
-            length = Object.keys(selectionState.selectedModels).length;
+            var maxLength = this.max_element_count;
+            var selectionState = this.datagrid.getSelectionState();
+            var isInset = selectionState.inset;
+            var length = Object.keys(selectionState.selectedModels).length;
 
             if (!isInset) {
                 totalRecords = this.datagrid.collection.state.totalRecords;
@@ -47,13 +48,16 @@ define([
 
             if (length > maxLength) {
                 options.doExecute = false;
-                validationMessage = __('oro.entity_merge.mass_action.validation.maximum_records_error', {number: maxLength});
+                validationMessage = __('oro.entity_merge.mass_action.validation.maximum_records_error',
+                    {number: maxLength});
                 messenger.notificationFlashMessage('error', validationMessage);
             }
 
             if (length < 2) {
                 options.doExecute = false;
-                messenger.notificationFlashMessage('error', __('oro.entity_merge.mass_action.validation.minimum_records_error', {number: maxLength}));
+                validationMessage = __('oro.entity_merge.mass_action.validation.minimum_records_error',
+                    {number: maxLength});
+                messenger.notificationFlashMessage('error', validationMessage);
             }
         }
     });

@@ -31,10 +31,10 @@ define(function(require) {
      * @augment BaseModel
      * @exports RouteModel
      */
-    var RouteModel,
-        _ = require('underscore'),
-        routing = require('routing'),
-        BaseModel = require('./base/model');
+    var RouteModel;
+    var _ = require('underscore');
+    var routing = require('routing');
+    var BaseModel = require('./base/model');
 
     RouteModel = BaseModel.extend(/** @exports RouteModel.prototype */{
         /**
@@ -67,15 +67,14 @@ define(function(require) {
          * @returns {Array.<string>}
          */
         getAcceptableParameters: function() {
-            var route, variableTokens, routeParameters;
             if (!this.get('routeName')) {
                 throw new Error('routeName must be specified');
             }
-            route = routing.getRoute(this.get('routeName'));
-            variableTokens = _.filter(route.tokens, function(tokenPart) {
+            var route = routing.getRoute(this.get('routeName'));
+            var variableTokens = _.filter(route.tokens, function(tokenPart) {
                 return tokenPart[0] === 'variable';
             });
-            routeParameters = _.map(variableTokens, function(tokenPart) {
+            var routeParameters = _.map(variableTokens, function(tokenPart) {
                 return tokenPart[3];
             });
             routeParameters.push.apply(routeParameters, this.get('routeQueryParameterNames'));
@@ -89,8 +88,8 @@ define(function(require) {
          * @returns {string} route url
          */
         getUrl: function(parameters) {
-            var routeParameters = _.extend(this.toJSON(), parameters),
-                acceptableParameters = this.getAcceptableParameters();
+            var routeParameters = _.extend(this.toJSON(), parameters);
+            var acceptableParameters = this.getAcceptableParameters();
             return routing.generate(this.get('routeName'), _.pick(routeParameters, acceptableParameters));
         }
     });

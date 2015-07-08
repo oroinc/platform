@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore'),
-        Backbone = require('backbone');
+    var _ = require('underscore');
+    var Backbone = require('backbone');
 
     function BasePlugin(main, manager, options) {
         this.main = main;

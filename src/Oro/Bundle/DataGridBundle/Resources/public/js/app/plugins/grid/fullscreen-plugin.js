@@ -1,5 +1,6 @@
 define(function(require) {
     'use strict';
+
     var FullScreenPlugin;
     var $ = require('jquery');
     var _ = require('underscore');

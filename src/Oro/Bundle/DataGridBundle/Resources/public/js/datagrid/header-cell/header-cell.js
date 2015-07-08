@@ -2,7 +2,7 @@ define([
     'underscore',
     'backgrid'
 ], function(_, Backgrid) {
-    "use strict";
+    'use strict';
 
     var HeaderCell;
 
@@ -33,7 +33,8 @@ define([
         /**
          * Initialize.
          *
-         * Add listening "reset" event of collection to able catch situation when header cell should update it's sort state.
+         * Add listening "reset" event of collection to able catch situation when
+         * header cell should update it's sort state.
          */
         initialize: function() {
             this.allowNoSorting = this.collection.multipleSorting;
@@ -67,11 +68,10 @@ define([
          * @private
          */
         _initCellDirection: function(collection) {
-            var state, direction, columnName;
             if (collection === this.collection) {
-                state = collection.state;
-                direction = null;
-                columnName = this.column.get('name');
+                var state = collection.state;
+                var direction = null;
+                var columnName = this.column.get('name');
                 if (this.column.get('sortable') && _.has(state.sorters, columnName)) {
                     if (1 === parseInt(state.sorters[columnName], 10)) {
                         direction = 'descending';
@@ -94,8 +94,8 @@ define([
             this.$el.empty();
 
             this.$el.append(this.template({
-                label: this.column.get("label"),
-                sortable: this.column.get("sortable")
+                label: this.column.get('label'),
+                sortable: this.column.get('sortable')
             }));
 
             if (this.column.has('width')) {
@@ -124,30 +124,30 @@ define([
 
             var column = this.column;
             var collection = this.collection;
-            var event = "backgrid:sort";
+            var event = 'backgrid:sort';
 
             var cycleSort = _.bind(function(header, col) {
-                if (column.get("direction") === "ascending") {
-                    collection.trigger(event, col, "descending");
-                } else if (this.allowNoSorting && column.get("direction") === "descending") {
+                if (column.get('direction') === 'ascending') {
+                    collection.trigger(event, col, 'descending');
+                } else if (this.allowNoSorting && column.get('direction') === 'descending') {
                     collection.trigger(event, col, null);
                 } else {
-                    collection.trigger(event, col, "ascending");
+                    collection.trigger(event, col, 'ascending');
                 }
             }, this);
 
             var toggleSort = function(header, col) {
-                if (column.get("direction") === "ascending") {
-                    collection.trigger(event, col, "descending");
+                if (column.get('direction') === 'ascending') {
+                    collection.trigger(event, col, 'descending');
                 } else {
-                    collection.trigger(event, col, "ascending");
+                    collection.trigger(event, col, 'ascending');
                 }
             };
 
             var sortable = Backgrid.callByNeed(column.sortable(), column, this.collection);
             if (sortable) {
-                var sortType = column.get("sortType");
-                if (sortType === "toggle") {
+                var sortType = column.get('sortType');
+                if (sortType === 'toggle') {
                     toggleSort(this, column);
                 } else {
                     cycleSort(this, column);

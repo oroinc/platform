@@ -3,10 +3,10 @@ define([
     'backgrid',
     'backbone'
 ], function(_, Backgrid, Backbone) {
-    "use strict";
+    'use strict';
 
-    var $, SelectAllHeaderCell;
-    $ = Backbone.$;
+    var SelectAllHeaderCell;
+    var $ = Backbone.$;
 
     /**
      * Contains mass-selection logic
@@ -22,10 +22,10 @@ define([
      */
     SelectAllHeaderCell = Backbone.View.extend({
         /** @property */
-        className: "select-all-header-cell",
+        className: 'select-all-header-cell',
 
         /** @property */
-        tagName: "th",
+        tagName: 'th',
 
         events: {
             'click': 'onClick'
@@ -189,7 +189,7 @@ define([
          */
         _markSelected: function(selected) {
             this.collection.each(function(model) {
-                model.trigger("backgrid:select", model, selected);
+                model.trigger('backgrid:select', model, selected);
             });
         },
 

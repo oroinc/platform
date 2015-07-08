@@ -41,7 +41,7 @@ define([
          * @returns {XMLHttpRequest}
          */
         save: function(key, value, options) {
-            if (key == null || typeof key === 'object') {
+            if (key === null || key === void 0 || typeof key === 'object') {
                 options = value;
             }
             options = this._extendOptions(options);
@@ -78,7 +78,7 @@ define([
             _.extend(options, {
                 accepts: {
                     // @TODO refactor server side action point to accept 'application/json'
-                    "json": "*/*"
+                    json: '*/*'
                 }
             });
 

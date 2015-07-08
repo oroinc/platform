@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var EmailEditorComponent,
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        _ = require('underscore'),
-        EmailEditorView = require('../views/email-editor-view'),
-        emailTemplatesProvider = require('../../util/email-templates-provider'),
-        EmailEditorModel = require('../models/email-editor-model'),
-        EmailModel = require('../models/email-model');
+    var EmailEditorComponent;
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var _ = require('underscore');
+    var EmailEditorView = require('../views/email-editor-view');
+    var emailTemplatesProvider = require('../../util/email-templates-provider');
+    var EmailEditorModel = require('../models/email-editor-model');
+    var EmailModel = require('../models/email-model');
 
     EmailEditorComponent = BaseComponent.extend({
         /**
@@ -61,11 +61,11 @@ define(function(require) {
         },
 
         autosizeBodyEditor: function() {
-            var component = this.view.pageComponent('bodyEditor'),
-                outerHeight = this.view.$el.closest('.ui-widget-content').height(),
-                innerHeight = this.view.$el.height(),
-                editorHeight = component.view.getHeight(),
-                availableHeight = outerHeight - innerHeight + editorHeight - this.HEIGHT_FIX;
+            var component = this.view.pageComponent('bodyEditor');
+            var outerHeight = this.view.$el.closest('.ui-widget-content').height();
+            var innerHeight = this.view.$el.height();
+            var editorHeight = component.view.getHeight();
+            var availableHeight = outerHeight - innerHeight + editorHeight - this.HEIGHT_FIX;
             component.view.setHeight(Math.max(availableHeight, this.options.minimalWysiwygEditorHeight));
         }
     });

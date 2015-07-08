@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var EmailVariableComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        EmailVariableView = require('oroemail/js/app/views/email-variable-view'),
-        EmailVariableModel = require('oroemail/js/app/models/email-variable-model'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+    var EmailVariableComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var EmailVariableView = require('oroemail/js/app/views/email-variable-view');
+    var EmailVariableModel = require('oroemail/js/app/models/email-variable-model');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     EmailVariableComponent = BaseComponent.extend({
         /**
@@ -39,10 +39,10 @@ define(function(require) {
         },
 
         onEntityChange: function(e) {
-            var view = this.view,
-                $el = $(e.currentTarget),
-                entityName = $el.val(),
-                entityLabel = $el.find(':selected').data('label');
+            var view = this.view;
+            var $el = $(e.currentTarget);
+            var entityName = $el.val();
+            var entityLabel = $el.find(':selected').data('label');
 
             if (!this.view.isEmpty()) {
                 if (this.confirm) {

@@ -82,9 +82,8 @@ define([
          * @protected
          */
         _onCollectionReset: function(collection) {
-            var hasRecords, hasFiltersState;
-            hasRecords = collection.state.totalRecords > 0;
-            hasFiltersState = !_.isEmpty(collection.state.filters);
+            var hasRecords = collection.state.totalRecords > 0;
+            var hasFiltersState = !_.isEmpty(collection.state.filters);
             if (hasRecords || hasFiltersState) {
                 this.$el.show();
             } else {
@@ -124,12 +123,12 @@ define([
          * @return {*}
          */
         _applyState: function(state) {
-            var toEnable  = [],
-                toDisable = [];
+            var toEnable  = [];
+            var toDisable = [];
 
             _.each(this.filters, function(filter, name) {
-                var shortName = '__' + name,
-                    filterState;
+                var shortName = '__' + name;
+                var filterState;
                 if (_.has(state, name)) {
                     filterState = state[name];
                     if (!_.isObject(filterState)) {

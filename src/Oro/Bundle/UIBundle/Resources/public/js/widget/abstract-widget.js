@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var AbstractWidget,
-        document = window.document,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/app/views/loading-mask-view'),
-        __ = require('orotranslation/js/translator');
+    var AbstractWidget;
+    var document = window.document;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var mediator = require('oroui/js/mediator');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var __ = require('orotranslation/js/translator');
     require('jquery.form');
 
     /**
@@ -62,14 +62,14 @@ define(function(require) {
          * @param {string} title
          */
         setTitle: function(title) {
-            console.warn('Implement setTitle');
+            throw new Error('Implement setTitle');
         },
 
         /**
          * Get actions container element
          */
         getActionsElement: function() {
-            console.warn('Implement getActionsElement');
+            throw new Error('Implement getActionsElement');
         },
 
         /**
@@ -227,9 +227,11 @@ define(function(require) {
          * @private
          */
         _getUniqueIdentifier: function() {
-                        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0,
-                    v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                // jshint -W016
+                var r = Math.random() * 16 | 0;
+                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                // jshint +W016
                 return v.toString(16);
             });
         },
@@ -240,12 +242,12 @@ define(function(require) {
          * @private
          */
         _initSectionActions: function() {
-            var widget = this,
-                sections = this.widget.find('[data-section]');
+            var widget = this;
+            var sections = this.widget.find('[data-section]');
             sections.each(function(i, sectionEl) {
-                var $sectionEl = $(sectionEl),
-                    sectionName = $sectionEl.attr('data-section'),
-                    actions = $sectionEl.find('[action-name], [data-action-name]');
+                var $sectionEl = $(sectionEl);
+                var sectionName = $sectionEl.attr('data-section');
+                var actions = $sectionEl.find('[action-name], [data-action-name]');
                 if ($sectionEl.attr('action-name') || $sectionEl.attr('data-action-name')) {
                     actions.push($sectionEl);
                 }
@@ -253,8 +255,8 @@ define(function(require) {
                     widget.actions[sectionName] = {};
                 }
                 actions.each(function(i, actionEl) {
-                    var $actionEl = $(actionEl),
-                        actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
+                    var $actionEl = $(actionEl);
+                    var actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
                     widget.actions[sectionName][actionName] = $actionEl;
                     widget.trigger('widget:add:action:' + sectionName + ':' + actionName, $actionEl);
                 });
@@ -451,13 +453,13 @@ define(function(require) {
          * @param {string} section section name
          */
         removeAction: function(key, section) {
-            var self = this,
-                remove = function(actions, key) {
-                    if (_.isElement(self.actions[key])) {
-                        self.actions[key].remove();
-                    }
-                    delete self.actions[key];
-                };
+            var self = this;
+            function remove(actions, key) {
+                if (_.isElement(self.actions[key])) {
+                    self.actions[key].remove();
+                }
+                delete self.actions[key];
+            }
             if (this.hasAction(key, section)) {
                 if (section !== undefined) {
                     remove(this.actions[section], key);

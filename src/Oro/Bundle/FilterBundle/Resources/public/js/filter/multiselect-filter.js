@@ -7,7 +7,7 @@ define([
     'use strict';
 
     // @const
-    var FILTER_EMPTY_VALUE = "";
+    var FILTER_EMPTY_VALUE = '';
 
     var MultiSelectFilter;
 
@@ -70,10 +70,11 @@ define([
          */
         _setDropdownWidth: function() {
             if (!this.cachedMinimumWidth) {
-                this.cachedMinimumWidth = Math.max(this.minimumDropdownWidth, this.selectWidget.getMinimumDropdownWidth()) + 24;
+                this.cachedMinimumWidth = Math.max(this.minimumDropdownWidth,
+                    this.selectWidget.getMinimumDropdownWidth()) + 24;
             }
-            var widget = this.selectWidget.getWidget(),
-                requiredWidth = this.cachedMinimumWidth;
+            var widget = this.selectWidget.getWidget();
+            var requiredWidth = this.cachedMinimumWidth;
             // fix width
             widget.width(requiredWidth).css({
                 minWidth: requiredWidth,
@@ -92,7 +93,7 @@ define([
             var normValue;
             normValue = this._normalizeValue(tools.deepClone(value));
             // prevent uncheck 'Any' value
-            if (value.value == null && tools.isEqualsLoosely(this.value, normValue)) {
+            if ((value.value === null || value.value === undefined) && tools.isEqualsLoosely(this.value, normValue)) {
                 this._updateDOMValue();
                 this._onValueUpdated(normValue, this.value);
             }
@@ -104,7 +105,7 @@ define([
          */
         _normalizeValue: function(value) {
             // means that all checkboxes are unchecked
-            if (value.value == null) {
+            if (value.value === null || value.value === undefined) {
                 value.value = [FILTER_EMPTY_VALUE];
                 return value;
             }
@@ -114,13 +115,13 @@ define([
                 // need to uncheck it in new value
                 if (value.value.length > 1) {
                     var indexOfEmptyOption = value.value.indexOf(FILTER_EMPTY_VALUE);
-                    if (indexOfEmptyOption != -1) {
+                    if (indexOfEmptyOption !== -1) {
                         value.value.splice(indexOfEmptyOption, 1);
                     }
                 }
             } else {
                 // if we just selected "EMPTY" option
-                if (!value.value || value.value.indexOf(FILTER_EMPTY_VALUE) != -1) {
+                if (!value.value || value.value.indexOf(FILTER_EMPTY_VALUE) !== -1) {
                     // clear other choices
                     value.value = [FILTER_EMPTY_VALUE];
                 }

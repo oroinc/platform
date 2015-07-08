@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var moment = require('moment-timezone'),
-        origTz = moment.fn.tz;
+    var moment = require('moment-timezone');
+    var origTz = moment.fn.tz;
 
     /**
      * Getter/Setter for moment's timezone

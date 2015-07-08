@@ -46,7 +46,7 @@ define([
         className: undefined,
 
         /** @property {String} */
-        link: 'javascript:void(0);',
+        link: '#',
 
         /** @property {Array} */
         links: undefined,
@@ -122,11 +122,11 @@ define([
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
-            var opts, linkSelector;
-            opts = options || {};
+            var linkSelector;
+            var opts = options || {};
 
             if (!opts.action) {
-                throw new TypeError("'action' is required");
+                throw new TypeError('"action" is required');
             }
 
             if (opts.template) {
@@ -196,11 +196,10 @@ define([
          * @return {*}
          */
         render: function() {
-            var $el, label;
             this.$el.empty();
 
-            label = this.label || this.action.label;
-            $el = $(this.template({
+            var label = this.label || this.action.label;
+            var $el = $(this.template({
                 label: this.label || this.action.label,
                 icon: this.icon,
                 title: this.title || label,
@@ -226,7 +225,8 @@ define([
          * @return {Boolean}
          */
         onClick: function(e) {
-            var $link, key;
+            var $link;
+            var key;
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }

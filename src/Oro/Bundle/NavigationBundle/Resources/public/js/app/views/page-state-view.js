@@ -7,7 +7,7 @@ define([
     'oroui/js/modal',
     'oroui/js/app/views/base/view',
     'base64'
-], function($, _, routing, __, mediator, Modal, BaseView) {
+], function($, _, routing, __, mediator, Modal, BaseView, base64) {
     'use strict';
 
     var PageStateView;
@@ -71,13 +71,14 @@ define([
          * @param {Array} queue
          */
         beforePageRefresh: function(queue) {
-            var deferred, confirmModal, self,
-                preservedState;
+            var deferred;
+            var confirmModal;
+            var self;
             if (!this.model.get('data')) {
                 // data is not set, nothing to compare with
                 return;
             }
-            preservedState = JSON.parse(this.model.get('data'));
+            var preservedState = JSON.parse(this.model.get('data'));
             if (this._isStateChanged(preservedState)) {
                 self = this;
                 confirmModal = this.subview('confirmModal');
@@ -104,13 +105,14 @@ define([
          * (excludes cancel action)
          */
         beforePageChange: function(e) {
-            var action = $(e.target).data('action'),
-                href = $(e.target).attr('href');
+            var action = $(e.target).data('action');
+            var href = $(e.target).attr('href');
             if (
                 action !== 'cancel' &&
                     !this._isStateTraceRequired() &&
                     this._isStateChanged() &&
                     !mediator.execute('compareUrl', href) && // link to same page
+                    // jshint -W107
                     href.substr(0, 11) !== 'javascript:' // javascript code link
             ) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
@@ -212,10 +214,8 @@ define([
          * @protected
          */
         _loadState: function(options) {
-            var url, self;
-            self = this;
-
-            url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
+            var self = this;
+            var url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
             $.get(url).done(function(data) {
                 var attributes;
                 attributes = {
@@ -295,14 +295,12 @@ define([
          * @protected
          */
         _collectState: function() {
-            var pageId, data;
-
-            pageId = this._combinePageId();
+            var pageId = this._combinePageId();
             if (!pageId) {
                 return;
             }
 
-            data = JSON.stringify(this._collectFormsData());
+            var data = JSON.stringify(this._collectFormsData());
 
             if (data === this.model.get('data')) {
                 return;
@@ -334,9 +332,9 @@ define([
                 // collect select2 selected data
                 items = $(el).find('.select2[type=hidden], .select2[type=select]');
                 _.each(items, function(item) {
-                    var $item, itemData, selectedData;
-                    $item = $(item);
-                    itemData = {name: item.name, value: $item.val()};
+                    var selectedData;
+                    var $item = $(item);
+                    var itemData = {name: item.name, value: $item.val()};
 
                     if ($item.data('select2')) {
                         // select2 is already initialized
@@ -406,7 +404,7 @@ define([
         _combinePageId: function() {
             var route;
             route = this._parseCurrentURL();
-            return base64_encode(route.path);
+            return base64.encode(route.path);
         },
 
         /**
@@ -415,9 +413,8 @@ define([
          * @protected
          */
         _parseCurrentURL: function() {
-            var route, _ref;
-            route = mediator.execute('currentUrl');
-            _ref = route.split('?');
+            var route = mediator.execute('currentUrl');
+            var _ref = route.split('?');
             route = {
                 path: _ref[0],
                 query: _ref[1] || ''
@@ -455,9 +452,8 @@ define([
          * @protected
          */
         _isDifferentFromInitialState: function(state) {
-            var isSame,
-                initialState = this._initialState;
-            isSame = initialState && _.every(initialState, function(form, i) {
+            var initialState = this._initialState;
+            var isSame = initialState && _.every(initialState, function(form, i) {
                 return _.isArray(state[i]) && _.every(form, function(field, j) {
                     return _.isObject(state[i][j]) &&
                         state[i][j].name === field.name && state[i][j].value === field.value;

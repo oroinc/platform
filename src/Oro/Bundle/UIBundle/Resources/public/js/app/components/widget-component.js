@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var WidgetComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        mediator = require('oroui/js/mediator'),
-        tools = require('oroui/js/tools'),
-        mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
+    var WidgetComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
 
     /**
      * @export oroui/js/app/components/widget-component
@@ -70,9 +70,8 @@ define(function(require) {
          * @protected
          */
         _bindOpenEvent: function() {
-            var eventName, handler;
-            eventName = this.options.createOnEvent;
-            handler = _.bind(function(e) {
+            var eventName = this.options.createOnEvent;
+            var handler = _.bind(function(e) {
                 e.preventDefault();
                 this.openWidget();
             }, this);
@@ -105,9 +104,9 @@ define(function(require) {
          * @protected
          */
         _openWidget: function() {
-            var widget,
-                Widget = this.widget,
-                options = $.extend(true, {}, this.options.options);
+            var widget;
+            var Widget = this.widget;
+            var options = $.extend(true, {}, this.options.options);
 
             if (!this.options.multiple && this.opened) {
                 // single instance is already opened
@@ -145,10 +144,10 @@ define(function(require) {
          * @protected
          */
         _bindEnvironmentEvent: function(widget) {
-            var reloadEvent = this.options['reload-event'],
-                reloadGridName = this.options['reload-grid-name'],
-                refreshWidgetAlias = this.options['refresh-widget-alias'],
-                reloadWidgetAlias = this.options['reload-widget-alias'];
+            var reloadEvent = this.options['reload-event'];
+            var reloadGridName = this.options['reload-grid-name'];
+            var refreshWidgetAlias = this.options['refresh-widget-alias'];
+            var reloadWidgetAlias = this.options['reload-widget-alias'];
 
             reloadEvent = reloadEvent || 'widget_success:' + (widget.getAlias() || widget.getWid());
 

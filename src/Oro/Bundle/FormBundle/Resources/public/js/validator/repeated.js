@@ -14,11 +14,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
         'Repeated',
         function(value, element, params) {
             // validator should be added to repeated field (second one)
-            var attr = element.hasAttribute('data-ftid') ? 'data-ftid' : 'id',
-                id = element.getAttribute(attr),
-                secondName = params.second_name || '',
-                firstId = id.slice(0, -secondName.length) + (params.first_name || ''),
-                firstElement = document.querySelector('[' + attr + '="' + firstId + '"]');
+            var attr = element.hasAttribute('data-ftid') ? 'data-ftid' : 'id';
+            var id = element.getAttribute(attr);
+            var secondName = params.second_name || '';
+            var firstId = id.slice(0, -secondName.length) + (params.first_name || '');
+            var firstElement = document.querySelector('[' + attr + '="' + firstId + '"]');
             return firstElement && (this.optional(firstElement) || value === this.elementValue(firstElement));
         },
         function(param) {

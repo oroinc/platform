@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var BaseComponent = require('oroui/js/app/components/base/component'),
-        EmailContextActivityView = require('oroemail/js/app/views/email-context-activity-view');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var EmailContextActivityView = require('oroemail/js/app/views/email-context-activity-view');
 
     /**
      * @exports EmailContextActivityComponent
@@ -22,7 +22,7 @@ define(function(require) {
 
         initView: function() {
             var $container = this.options._sourceElement.find('#' + this.options.container);
-            var items = typeof this.options.contextTargets == 'undefined' ? [] : this.options.contextTargets;
+            var items = typeof this.options.contextTargets === 'undefined' ? [] : this.options.contextTargets;
             this.contextsView = new EmailContextActivityView({
                 contextTargets: items,
                 entityId:this.options.entityId,

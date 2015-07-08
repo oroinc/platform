@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var TransitionModel,
-        _ = require('underscore'),
-        BaseModel = require('oroui/js/app/models/base/model');
+    var TransitionModel;
+    var _ = require('underscore');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     TransitionModel = BaseModel.extend({
         defaults: {

@@ -1,8 +1,9 @@
 define([
+    'jquery',
     'orotranslation/js/translator',
     'oro/datagrid/action/model-action',
     'oroui/js/app/components/widget-component'
-], function(__, ModelAction, WidgetComponent) {
+], function($, __, ModelAction, WidgetComponent) {
     'use strict';
 
     var DialogAction;

@@ -30,10 +30,8 @@ define([
          * @protected
          */
         _createButtonView: function() {
-            var options, collection;
-
-            options = this._options.buttonOptions || {};
-            collection = this.collection;
+            var options = this._options.buttonOptions || {};
+            var collection = this.collection;
 
             _.extend(options, {
                 autoRender: true,
@@ -49,11 +47,9 @@ define([
          * @protected
          */
         _createBarView: function() {
-            var options, collection, BarItemView;
-
-            options = this._options.barOptions || {};
-            collection = this.collection;
-            BarItemView = ItemView.extend({
+            var options = this._options.barOptions || {};
+            var collection = this.collection;
+            var BarItemView = ItemView.extend({
                 template: this._options.barItemTemplate
             });
 
@@ -72,12 +68,10 @@ define([
          * @protected
          */
         _createDropdownView: function() {
-            var options, collection, pinBar, DropdownItemView;
-
-            options = this._options.dropdownOptions || {};
-            collection = this.collection;
-            pinBar = this.pinBar;
-            DropdownItemView = ItemView.extend({
+            var options = this._options.dropdownOptions || {};
+            var collection = this.collection;
+            var pinBar = this.pinBar;
+            var DropdownItemView = ItemView.extend({
                 template: this._options.dropdownItemTemplate
             });
 
@@ -122,8 +116,8 @@ define([
         },
 
         onPageStateChange: function() {
-            var model, url;
-            model = this.collection.getCurrentModel();
+            var url;
+            var model = this.collection.getCurrentModel();
             if (model) {
                 url = mediator.execute('currentUrl');
                 if (model.get('url') !== url) {

@@ -8,7 +8,14 @@ define([
     _.extend(Backbone.View.prototype, componentContainerMixin);
     Backbone.View.prototype.disposed = false;
     Backbone.View.prototype.dispose = function() {
-        var prop, properties, subview, _i, _j, _len, _len1, _ref;
+        var prop;
+        var properties;
+        var subview;
+        var _i;
+        var _j;
+        var _len;
+        var _len1;
+        var _ref;
         if (this.disposed) {
             return;
         }
@@ -36,7 +43,7 @@ define([
         }
 
         this.disposed = true;
-        return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+        return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
     Backbone.View.prototype.eventNamespace = function() {
         return '.delegateEvents' + this.cid;
@@ -53,7 +60,10 @@ define([
 
     Backbone.Model.prototype.disposed = false;
     Backbone.Model.prototype.dispose = function() {
-        var prop, properties, _i, _len;
+        var prop;
+        var properties;
+        var _i;
+        var _len;
         if (this.disposed) {
             return;
         }
@@ -61,18 +71,22 @@ define([
         Backbone.mediator.unsubscribe(null, null, this);
         this.stopListening();
         this.off();
-        properties = ['collection', 'attributes', 'changed', '_escapedAttributes', '_previousAttributes', '_silent', '_pending', '_callbacks'];
+        properties = ['collection', 'attributes', 'changed', '_escapedAttributes', '_previousAttributes',
+            '_silent', '_pending', '_callbacks'];
         for (_i = 0, _len = properties.length; _i < _len; _i++) {
             prop = properties[_i];
             delete this[prop];
         }
         this.disposed = true;
-        return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+        return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
 
     Backbone.Collection.prototype.disposed = false;
     Backbone.Collection.prototype.dispose = function() {
-        var prop, properties, _i, _len;
+        var prop;
+        var properties;
+        var _i;
+        var _len;
         if (this.disposed) {
             return;
         }
@@ -89,7 +103,7 @@ define([
             delete this[prop];
         }
         this.disposed = true;
-        return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+        return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
 
     return Backbone;

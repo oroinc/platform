@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var dateTimePickerViewMixin,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        moment = require('moment'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        localeSettings  = require('orolocale/js/locale-settings');
+    var dateTimePickerViewMixin;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var moment = require('moment');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var localeSettings  = require('orolocale/js/locale-settings');
     require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
     /**
@@ -111,8 +111,8 @@ define(function(require) {
             var widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
             this.$frontTimeField.on('showTimepicker', function() {
-                var $el = $(this),
-                    needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+                var $el = $(this);
+                var needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
                 $el.parent().toggleClass('datetimepicker-dialog-is-below', needClass);
             });
             this.$frontTimeField.on('hideTimepicker', function() {
@@ -162,12 +162,10 @@ define(function(require) {
          * @param {HTMLElement} target
          */
         checkConsistency: function(target) {
-            var date, time, isValidDate, isValidTime;
-
-            date = this.$frontDateField.val();
-            time = this.$frontTimeField.val();
-            isValidDate = moment(date, this.getDateFormat(), true).isValid();
-            isValidTime = moment(time, this.getTimeFormat(), true).isValid();
+            var date = this.$frontDateField.val();
+            var time = this.$frontTimeField.val();
+            var isValidDate = moment(date, this.getDateFormat(), true).isValid();
+            var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
             // just changed the date
             if (this.$frontDateField.is(target) && isValidDate && !time) {
@@ -195,8 +193,8 @@ define(function(require) {
          * @returns {string}
          */
         getFrontendFormattedTime: function() {
-            var value = '',
-                momentInstance = this.getOriginalMoment();
+            var value = '';
+            var momentInstance = this.getOriginalMoment();
             if (momentInstance) {
                 value = momentInstance.tz(this.timezone).format(this.getTimeFormat());
             }
@@ -209,12 +207,11 @@ define(function(require) {
          * @returns {moment}
          */
         getFrontendMoment: function() {
-            var value, date, time, format, momentInstance;
-            date = this.$frontDateField.val();
-            time = this.$frontTimeField.val();
-            value = date + this.getSeparatorFormat() + time;
-            format = this.getDateTimeFormat();
-            momentInstance = moment.utc(value, format, true);
+            var date = this.$frontDateField.val();
+            var time = this.$frontTimeField.val();
+            var value = date + this.getSeparatorFormat() + time;
+            var format = this.getDateTimeFormat();
+            var momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance.tz(this.timezone, true);
             }
@@ -226,9 +223,9 @@ define(function(require) {
          * @returns {string}
          */
         getBackendFormattedValue: function() {
-            var value = '',
-                momentInstance = this.getFrontendMoment(),
-                format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
+            var value = '';
+            var momentInstance = this.getFrontendMoment();
+            var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
                 value = momentInstance.utc().format(format);
             }
@@ -241,8 +238,8 @@ define(function(require) {
          * @returns {string}
          */
         getFrontendFormattedDate: function() {
-            var value = '',
-                momentInstance = this.getOriginalMoment();
+            var value = '';
+            var momentInstance = this.getOriginalMoment();
             if (momentInstance) {
                 value = momentInstance.tz(this.timezone).format(this.getDateFormat());
             }
@@ -273,10 +270,9 @@ define(function(require) {
          * @returns {string}
          */
         getDateTimeFormat: function() {
-            var dateFormat, timeFormat, separatorFormat;
-            dateFormat = this.getDateFormat();
-            timeFormat = this.getTimeFormat();
-            separatorFormat = this.getSeparatorFormat();
+            var dateFormat = this.getDateFormat();
+            var timeFormat = this.getTimeFormat();
+            var separatorFormat = this.getSeparatorFormat();
             return dateFormat + separatorFormat + timeFormat;
         }
     };

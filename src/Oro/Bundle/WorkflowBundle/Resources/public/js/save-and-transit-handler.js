@@ -41,7 +41,8 @@ define([
                     });
                     transitionsWidget.on('renderComplete', function(el) {
                         // Try to execute required transition
-                        var transition = el.find('#transition-' + saveBtn.data('workflow') + '-' + saveBtn.data('transition'));
+                        var transition = el.find('#transition-' + saveBtn.data('workflow') +
+                            '-' + saveBtn.data('transition'));
                         if (transition.length) {
                             transition.on('transitionHandlerInitialized', function() {
                                 transition.data('executor').call();

@@ -25,7 +25,8 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
          * @param {Object} data
          */
         handleExportResponse: function(data) {
-            var message, messageType;
+            var message;
+            var messageType;
             if (data.success) {
                 if (data.readsCount > 0) {
                     message = __(
@@ -52,5 +53,5 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
             }
             messenger.notificationMessage(messageType, message);
         }
-    }
+    };
 });

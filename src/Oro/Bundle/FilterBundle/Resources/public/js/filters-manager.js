@@ -10,8 +10,8 @@ define([
 ], function($, _, Backbone, mediator, tools, __, MultiselectDecorator, filterWrapper) {
     'use strict';
 
-    var FiltersManager,
-        DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
+    var FiltersManager;
+    var DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
 
     /**
      * Defines parent element for dropdown-menu by toggle element
@@ -21,10 +21,10 @@ define([
      * @returns {*|jQuery|HTMLElement}
      */
     function getDropdownMenuParent($toggle) {
-        var $parent,
-            selector = $toggle.attr('data-target');
+        var $parent;
+        var selector = $toggle.attr('data-target');
         if (!selector) {
-            selector = $toggle.attr('href')
+            selector = $toggle.attr('href');
             selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
         }
         $parent = selector && $(selector);

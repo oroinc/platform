@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowManagementView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        __ = require('orotranslation/js/translator'),
-        Confirmation = require('oroui/js/delete-confirmation'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        StepsListView = require('./step/step-list-view');
+    var WorkflowManagementView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var __ = require('orotranslation/js/translator');
+    var Confirmation = require('oroui/js/delete-confirmation');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var StepsListView = require('./step/step-list-view');
     require('oroentity/js/fields-loader');
 
     /**
@@ -64,8 +64,8 @@ define(function(require) {
         },
 
         initStartStepSelector: function() {
-            var select2Options,
-                getSteps = _.bind(function(query) {
+            var select2Options;
+            var getSteps = _.bind(function(query) {
                 var steps = [];
                 _.each(this.model.get('steps').models, function(step) {
                     // starting point is not allowed to be a start step

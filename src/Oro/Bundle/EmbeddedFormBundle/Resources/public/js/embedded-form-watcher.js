@@ -6,6 +6,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/delete-confirmation'
 ], function($, Backbone, routing, mediator, __, DeleteConfirmation) {
+    'use strict';
 
     var $formTypeField;
     var $cssField;
@@ -56,7 +57,7 @@ define([
 
             mediator.execute('showLoading');
             var url = routing.generate('oro_embedded_form_default_data', {'formType': formType});
-            var css = $.get(url)
+            $.get(url)
                 .done(function(data, code, response) {
                     $cssField.val(data.css);
                     $successMessageField.val(data.successMessage);

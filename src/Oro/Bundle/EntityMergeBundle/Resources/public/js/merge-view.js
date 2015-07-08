@@ -1,10 +1,6 @@
-define(['jquery'],
+define(['jquery'],  function($) {
+    'use strict';
 
-    /**
-     * @param {jquery} $
-     * @return mergeView
-     */
-    function($) {
     /**
      * @typedef mergeView
      * @function entitySelectAllHandler
@@ -42,7 +38,7 @@ define(['jquery'],
             var entityKey = $this.val();
             $('.merge-entity-representative[data-entity-field-name="' + fieldName + '"]').each(function(index, item) {
                 var $this = $(item);
-                if ($this.data('entity-key') != entityKey) {
+                if ($this.data('entity-key') !== entityKey) {
                     $this.addClass('entity-merge-not-selected');
                 } else {
                     $this.removeClass('entity-merge-not-selected');

@@ -1,9 +1,9 @@
-define([
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/mediator'
-], function(_, __, mediator) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
 
     function Util(entity, data) {
         this.init(entity, data);
@@ -21,7 +21,8 @@ define([
         fields = _.filter(fields, function(item) {
             var result;
             result = !_.some(exclude, function(rule) {
-                var result, cut;
+                var result;
+                var cut;
                 // exclude can be a property name
                 if (_.isString(rule)) {
                     result = _.intersection(
@@ -42,9 +43,8 @@ define([
     };
 
     Util.errorHandler = (function() {
-        var message, handler;
-        message = __('oro.entity.not_exist');
-        handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
+        var message = __('oro.entity.not_exist');
+        var handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
         return _.throttle(handler, 100, {trailing: false});
     }());
 
@@ -85,14 +85,14 @@ define([
          * @returns {Array.<Object>}
          */
         pathToEntityChain: function(path, trim) {
-            var chain, data, self = this;
-            data = this.data;
+            var self = this;
+            var data = this.data;
 
             if (!data[this.entity]) {
                 return [];
             }
 
-            chain = [{
+            var chain = [{
                 entity: data[this.entity],
                 path: '',
                 basePath: ''
@@ -104,7 +104,9 @@ define([
 
             try {
                 _.each(path.split('+'), function(item, i) {
-                    var fieldName, entityName, pos;
+                    var fieldName;
+                    var entityName;
+                    var pos;
 
                     if (i === 0) {
                         // first item is always just a field name
@@ -209,15 +211,14 @@ define([
          * @returns {Object}
          */
         getApplicableConditions: function(fieldId) {
-            var chain, result, entity;
-            result = {};
+            var result = {};
 
             if (!fieldId) {
                 return result;
             }
 
-            chain = this.pathToEntityChain(fieldId);
-            entity = chain[chain.length - 1];
+            var chain = this.pathToEntityChain(fieldId);
+            var entity = chain[chain.length - 1];
 
             if (entity) {
                 result = {
@@ -278,17 +279,16 @@ define([
          * @returns {string}
          */
         getPathByPropertyPath: function(pathData) {
-            var entityData, fieldIdParts;
+            var fieldIdParts;
             if (!_.isArray(pathData)) {
                 pathData = pathData.split('.');
             }
 
-            entityData = this.data[this.entity];
+            var entityData = this.data[this.entity];
             try {
                 fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function(fieldName) {
-                    var fieldPartId, fieldsData;
-                    fieldPartId = fieldName;
-                    fieldsData = null;
+                    var fieldPartId = fieldName;
+                    var fieldsData = null;
                     if (entityData.hasOwnProperty('fieldsIndex')) {
                         fieldsData = entityData.fieldsIndex;
                     } else if (

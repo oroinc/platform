@@ -1,7 +1,9 @@
 /** @lends LoadMoreCollection */
-define(['./base/routing-collection'
-], function(RoutingCollection) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var RoutingCollection = require('./base/routing-collection');
 
     /**
      * Collection with "load more" functionality support. Any add/remove actions will be considered like already done
@@ -42,7 +44,7 @@ define(['./base/routing-collection'
          */
         parse: function(response) {
             this._state.set('totalItemsQuantity', response.count || 0);
-            return LoadMoreCollection.__super__.parse.apply(this, arguments);;
+            return LoadMoreCollection.__super__.parse.apply(this, arguments);
         },
 
         /**
@@ -97,6 +99,6 @@ define(['./base/routing-collection'
             });
         }
     });
-    
+
     return LoadMoreCollection;
 });

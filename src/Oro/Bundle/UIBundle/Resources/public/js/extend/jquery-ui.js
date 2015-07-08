@@ -16,8 +16,8 @@ define(['jquery', 'jquery-ui'], function($) {
          * @private
          */
         function getEvents(uuid) {
-            var events = ['scroll', 'resize'],
-                ns = 'datepicker-' + uuid;
+            var events = ['scroll', 'resize'];
+            var ns = 'datepicker-' + uuid;
 
             events = $.map(events, function(eventName) {
                 return eventName + '.' + ns;
@@ -30,10 +30,15 @@ define(['jquery', 'jquery-ui'], function($) {
          * Process position update for datepicker element
          */
         function updatePos() {
-            var pos, isFixed, offset, inst, dialogIsBelow,
-                input = this, $input = $(this);
+            var pos;
+            var isFixed;
+            var offset;
+            var dialogIsBelow;
+            // jshint -W040
+            var input = this;
+            var $input = $(this);
 
-            inst = $.datepicker._getInst(input);
+            var inst = $.datepicker._getInst(input);
 
             if (!$.datepicker._pos) { // position below input
                 pos = $.datepicker._findPos(input);
@@ -42,13 +47,13 @@ define(['jquery', 'jquery-ui'], function($) {
 
             isFixed = false;
             $input.parents().each(function() {
-                isFixed |= $(this).css("position") === "fixed";
+                isFixed = isFixed || $(this).css('position') === 'fixed';
                 return !isFixed;
             });
 
             offset = {left: pos[0], top: pos[1]};
             offset = $.datepicker._checkOffset(inst, offset, isFixed);
-            inst.dpDiv.css({left: offset.left + "px", top: offset.top + "px"});
+            inst.dpDiv.css({left: offset.left + 'px', top: offset.top + 'px'});
 
             dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
 
@@ -59,9 +64,9 @@ define(['jquery', 'jquery-ui'], function($) {
 
         }
 
-        var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
-            _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker,
-            dateDialogClassName = 'ui-datepicker-dialog-is-below';
+        var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker;
+        var _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
+        var dateDialogClassName = 'ui-datepicker-dialog-is-below';
 
         /**
          * Bind update position method after datepicker is opened
@@ -71,12 +76,10 @@ define(['jquery', 'jquery-ui'], function($) {
          * @private
          */
         $.datepicker.constructor.prototype._showDatepicker = function(elem) {
-            var events, input;
-
             _showDatepicker.apply(this, arguments);
 
-            input = elem.target || elem;
-            events = getEvents(input.id);
+            var input = elem.target || elem;
+            var events = getEvents(input.id);
 
             $(input).removeClass(dateDialogClassName).parents().add(window).each(function() {
                 $(this).on(events, $.proxy(updatePos, input));
@@ -100,7 +103,7 @@ define(['jquery', 'jquery-ui'], function($) {
          * @private
          */
         $.datepicker.constructor.prototype._hideDatepicker = function(elem) {
-            var events, input = elem;
+            var input = elem;
 
             if (!elem) {
                 if (!$.datepicker._curInst) {
@@ -108,7 +111,7 @@ define(['jquery', 'jquery-ui'], function($) {
                 }
                 input = $.datepicker._curInst.input.get(0);
             }
-            events = getEvents(input.id);
+            var events = getEvents(input.id);
 
             $(input).parents().add(window).each(function() {
                 $(this).off(events);

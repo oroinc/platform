@@ -20,7 +20,7 @@ define([
 
         /** @property */
         events: {
-            "click a": "onChangePageSize"
+            'click a': 'onChangePageSize'
         },
 
         /** @property */
@@ -43,7 +43,7 @@ define([
             options = options || {};
 
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
 
             if (options.items) {
@@ -52,12 +52,12 @@ define([
 
             this.template = _.template($(options.template || this.template).html());
             this.collection = options.collection;
-            this.listenTo(this.collection, "add", this.render);
-            this.listenTo(this.collection, "remove", this.render);
-            this.listenTo(this.collection, "reset", this.render);
+            this.listenTo(this.collection, 'add', this.render);
+            this.listenTo(this.collection, 'remove', this.render);
+            this.listenTo(this.collection, 'reset', this.render);
 
-            this.enabled = options.enable != false;
-            this.hidden = options.hide == true;
+            this.enabled = options.enable !== false;
+            this.hidden = options.hide === true;
 
             PageSize.__super__.initialize.call(this, options);
         },
@@ -111,12 +111,14 @@ define([
                 this.items,
                 _.bind(
                     function(item) {
-                        return item.size === undefined ? this.collection.state.pageSize == item : this.collection.state.pageSize == item.size;
+                        return item.size === undefined ?
+                            this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
                     },
                     this
                 )
             );
-            currentSizeLabel = currentSizeLabel[0].label == undefined ? currentSizeLabel[0] : currentSizeLabel[0].label;
+            currentSizeLabel = _.isUndefined(currentSizeLabel[0].label) ?
+                currentSizeLabel[0] : currentSizeLabel[0].label;
 
             this.$el.append($(this.template({
                 disabled: !this.enabled || !this.collection.state.totalRecords,

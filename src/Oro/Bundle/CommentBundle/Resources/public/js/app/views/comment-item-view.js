@@ -1,10 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var CommentItemView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        template = require('text!../../../templates/comment/comment-item-view.html'),
-        dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    var CommentItemView;
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var template = require('text!../../../templates/comment/comment-item-view.html');
+    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
     CommentItemView = BaseView.extend({
         template: template,

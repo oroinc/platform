@@ -1,7 +1,8 @@
 define(['jquery'], function($) {
     'use strict';
 
-    var $mask, onHide;
+    var $mask;
+    var onHide;
 
     function createMask() {
         $mask = $('<div></div>');

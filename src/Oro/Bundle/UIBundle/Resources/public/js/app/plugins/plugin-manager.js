@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
     var BasePlugin = require('./base/plugin');
 
     function PluginManager(main) {
@@ -24,8 +25,8 @@ define(function(require) {
          * @returns {Object}
          */
         getInstance: function(Constructor) {
-            var i, instance;
-            for (i = 0; i < this._pluginList.length; i++) {
+            var instance;
+            for (var i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
                 if (instance instanceof Constructor) {
                     return instance;
@@ -127,8 +128,8 @@ define(function(require) {
          * Disables all connected plugins
          */
         disableAll: function() {
-            var instance, i;
-            for (i = 0; i < this._pluginList.length; i++) {
+            var instance;
+            for (var i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
                 if (instance.enabled) {
                     instance.disable();
@@ -137,8 +138,8 @@ define(function(require) {
         },
 
         dispose: function() {
-            var instance, i;
-            for (i = 0; i < this._pluginList.length; i++) {
+            var instance;
+            for (var i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
                 if (instance.enabled) {
                     instance.disable();

@@ -1,5 +1,6 @@
 define(function(require) {
     'use strict';
+
     var _ = require('underscore');
 
     /**
@@ -87,7 +88,7 @@ define(function(require) {
         formatDisplayValue: function(value) {
             for (var i in this.index) {
                 if (this.index.hasOwnProperty(i)) {
-                    value = value.replace(new RegExp('\{+' + i + '\}+', 'gi'), this.index[i]);
+                    value = value.replace(new RegExp('\\{+' + i + '\\}+', 'gi'), this.index[i]);
                 }
             }
             return value;
