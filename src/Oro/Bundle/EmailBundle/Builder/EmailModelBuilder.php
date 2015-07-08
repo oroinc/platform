@@ -134,7 +134,7 @@ class EmailModelBuilder
         $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
-        if ($fromAddress->getOwner() == $this->helper->getUser()) {
+        if ($fromAddress->getOwner() === $this->helper->getUser()) {
             $emailModel->setTo([$parentEmailEntity->getTo()->first()->getEmailAddress()->getEmail()]);
             $emailModel->setFrom($fromAddress->getEmail());
         } else {
