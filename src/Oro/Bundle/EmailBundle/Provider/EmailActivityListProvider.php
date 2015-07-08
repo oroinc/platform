@@ -60,7 +60,7 @@ class EmailActivityListProvider implements
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /** @var  SecurityContextInterface */
+    /** @var  ServiceLink */
     protected $securityContextLink;
 
     /**
@@ -71,7 +71,6 @@ class EmailActivityListProvider implements
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
      * @param HtmlTagHelper       $htmlTagHelper
-     * @param ServiceLink         $securityContextLink
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -80,8 +79,7 @@ class EmailActivityListProvider implements
         Router $router,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
-        HtmlTagHelper $htmlTagHelper,
-        ServiceLink $securityContextLink
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -90,7 +88,14 @@ class EmailActivityListProvider implements
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
         $this->htmlTagHelper        = $htmlTagHelper;
-        $this->securityContextLink  = $securityContextLink;
+    }
+
+    /**
+     * @param ServiceLink $securityContextLink
+     */
+    public function setSecurityContextLink(ServiceLink $securityContextLink)
+    {
+        $this->securityContextLink = $securityContextLink;
     }
 
     /**
