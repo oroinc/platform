@@ -223,8 +223,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      *                           Both should be applied to 'user' relation.
      *                           ['user_id' => 'user', 'user_name' => 'user']
      *
-     * @return array
-     * @throws \Exception
+     * @return Criteria
      */
     protected function getFilterCriteria($parameters, $normalisers = [], $fieldMap = [])
     {
@@ -251,8 +250,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      *                           Both should be applied to 'user' relation.
      *                           ['user_id' => 'user', 'user_name' => 'user']
      *
-     * @return array
-     * @throws \Exception
+     * @return Criteria
      */
     protected function buildFilterCriteria($filters, $normalisers = [], $fieldMap = [])
     {

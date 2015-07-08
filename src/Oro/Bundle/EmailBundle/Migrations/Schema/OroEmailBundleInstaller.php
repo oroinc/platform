@@ -15,6 +15,8 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_8\OroEmailBundle as OroEmailBund
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_9\OroEmailBundle as OroEmailBundle19;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\OroEmailBundle as OroEmailBundle112_1;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\RemoveOldSchema as OroEmailBundle112_2;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_13\OroEmailBundle as OroEmailBundle113;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_14\OroEmailBundle as OroEmailBundle114;
 
 class OroEmailBundleInstaller implements Installation
 {
@@ -23,7 +25,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_12';
+        return 'v1_14';
     }
 
     /**
@@ -67,5 +69,9 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle112_1::changeEmailToEmailBodyRelation($schema);
         OroEmailBundle112_1::splitEmailEntity($schema);
         OroEmailBundle112_2::removeOldSchema($schema);
+
+        OroEmailBundle113::addColumnMultiMessageId($schema);
+
+        OroEmailBundle114::addEmbeddedContentIdField($schema);
     }
 }

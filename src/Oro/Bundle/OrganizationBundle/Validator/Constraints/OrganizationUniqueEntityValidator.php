@@ -40,7 +40,7 @@ class OrganizationUniqueEntityValidator extends UniqueEntityValidator
     public function validate($entity, Constraint $constraint)
     {
         $className = $this->doctrineHelper->getEntityClass($entity);
-        $organizationField = $this->metadataProvider->getMetadata($className)->getOrganizationFieldName();
+        $organizationField = $this->metadataProvider->getMetadata($className)->getGlobalOwnerFieldName();
         if ($organizationField) {
             $constraint->fields = array_merge(
                 (array) $constraint->fields,

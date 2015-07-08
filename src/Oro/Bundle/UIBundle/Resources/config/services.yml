@@ -19,6 +19,10 @@ parameters:
 
     oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
 
+    ## Formatters
+    oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
+    oro_ui.twig.extension.formatter.class:                 Oro\Bundle\UIBundle\Twig\FormatExtension
+
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
@@ -99,3 +103,14 @@ services:
         arguments:
             - @oro_form.provider.html_tag_provider
             - %kernel.cache_dir%
+
+    ## Formatters
+    oro_ui.formatter:
+        class: %oro_ui.formatter.class%
+
+    oro_ui.twig.extension.formatter:
+        class: %oro_ui.twig.extension.formatter.class%
+        arguments:
+            - @oro_ui.formatter
+        tags:
+            - { name: twig.extension }

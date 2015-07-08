@@ -7,6 +7,9 @@ namespace Oro\Bundle\CacheBundle\Provider;
  * can be synchronized by resetting a namespace version.
  *
  * This trait can be used in a cache implementation bases on \Doctrine\Common\Cache\CacheProvider
+ *
+ * @method string getNamespace
+ * @method string setNamespace($namespace)
  */
 trait NamespaceVersionSyncTrait
 {

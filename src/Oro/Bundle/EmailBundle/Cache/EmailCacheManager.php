@@ -14,6 +14,7 @@ use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
+use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 
 class EmailCacheManager implements LoggerAwareInterface
 {
@@ -40,9 +41,9 @@ class EmailCacheManager implements LoggerAwareInterface
         EntityManager $em,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->selector          = $selector;
-        $this->em                = $em;
-        $this->eventDispatcher   = $eventDispatcher;
+        $this->selector = $selector;
+        $this->em = $em;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -55,38 +56,37 @@ class EmailCacheManager implements LoggerAwareInterface
      */
     public function ensureEmailBodyCached(Email $email)
     {
-        if ($email->getEmailBody() !== null) {
-            // The email body is already cached
-            return;
+        if ($email->getEmailBody() === null) {
+            // body loader can load email from any folder
+            $folder = $email->getEmailUsers()->first()->getFolder();
+            $origin = $folder->getOrigin();
+            $loader = $this->selector->select($origin);
+
+            try {
+                $emailBody = $loader->loadEmailBody($folder, $email, $this->em);
+            } catch (LoadEmailBodyException $loadEx) {
+                $this->logger->notice(
+                    sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
+                    ['exception' => $loadEx]
+                );
+                throw $loadEx;
+            } catch (\Exception $ex) {
+                $this->logger->warning(
+                    sprintf('Load email body failed. Email id: %d. Error: %s.', $email->getId(), $ex->getMessage()),
+                    ['exception' => $ex]
+                );
+                throw new LoadEmailBodyFailedException($email, $ex);
+            }
+
+            $email->setEmailBody($emailBody);
+
+            $this->em->persist($email);
+            $this->em->flush();
+
+            $event = new EmailBodyAdded($email);
+            $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
         }
 
-        // body loader can load email from any folder
-        $folder = $email->getEmailUsers()->first()->getFolder();
-        $origin = $folder->getOrigin();
-        $loader = $this->selector->select($origin);
-
-        try {
-            $emailBody = $loader->loadEmailBody($folder, $email, $this->em);
-        } catch (LoadEmailBodyException $loadEx) {
-            $this->logger->notice(
-                sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
-                ['exception' => $loadEx]
-            );
-            throw $loadEx;
-        } catch (\Exception $ex) {
-            $this->logger->warning(
-                sprintf('Load email body failed. Email id: %d. Error: %s.', $email->getId(), $ex->getMessage()),
-                ['exception' => $ex]
-            );
-            throw new LoadEmailBodyFailedException($email, $ex);
-        }
-
-        $email->setEmailBody($emailBody);
-
-        $this->em->persist($email);
-        $this->em->flush();
-
-        $event = new EmailBodyAdded($email);
-        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+        $this->eventDispatcher->dispatch(EmailBodyLoaded::NAME, new EmailBodyLoaded($email));
     }
 }

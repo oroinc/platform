@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -11,7 +12,22 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class Configuration implements ConfigurationInterface
 {
-    const DEFAULT_ENGINE = 'orm';
+    const DEFAULT_ENGINE                 = 'orm';
+    const RELATION_FIELDS_NODE_MAX_LEVEL = 4;
+
+    protected $targetTypes   = array(
+        Query::TYPE_TEXT,
+        Query::TYPE_DECIMAL,
+        Query::TYPE_INTEGER,
+        Query::TYPE_DATETIME
+    );
+
+    protected $relationTypes = array(
+        Indexer::RELATION_ONE_TO_ONE,
+        Indexer::RELATION_ONE_TO_MANY,
+        Indexer::RELATION_MANY_TO_ONE,
+        Indexer::RELATION_MANY_TO_MANY
+    );
 
     /**
      * Bundle configuration structure
@@ -23,19 +39,6 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_search');
-
-        $targetTypes   = array(
-            Query::TYPE_TEXT,
-            Query::TYPE_DECIMAL,
-            Query::TYPE_INTEGER,
-            Query::TYPE_DATETIME
-        );
-        $relationTypes = array(
-            Indexer::RELATION_ONE_TO_ONE,
-            Indexer::RELATION_ONE_TO_MANY,
-            Indexer::RELATION_MANY_TO_ONE,
-            Indexer::RELATION_MANY_TO_MANY
-        );
 
         $rootNode
             ->children()
@@ -90,28 +93,17 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('name')->end()
                                 ->enumNode('target_type')
-                                    ->values($targetTypes)
+                                    ->values($this->targetTypes)
                                 ->end()
                                 ->arrayNode('target_fields')
                                     ->prototype('scalar')->end()
                                 ->end()
                                 ->scalarNode('getter')->end()
                                 ->enumNode('relation_type')
-                                    ->values($relationTypes)
+                                    ->values($this->relationTypes)
                                 ->end()
                                 ->scalarNode('relation_class')->end()
-                                ->arrayNode('relation_fields')
-                                    ->prototype('array')
-                                    ->children()
-                                        ->scalarNode('name')->end()
-                                        ->enumNode('target_type')
-                                            ->values($targetTypes)
-                                        ->end()
-                                        ->arrayNode('target_fields')
-                                            ->prototype('scalar')->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
+                                ->append($this->getRelationFieldsNodeDefinition())
                             ->end()
                         ->end()
                     ->end()
@@ -119,5 +111,39 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         return $treeBuilder;
+    }
+
+    protected function getRelationFieldsNodeDefinition($level = 1)
+    {
+        $nodeBuilder = new NodeBuilder();
+        $relationFieldsNode = $nodeBuilder->arrayNode('relation_fields');
+
+        if ($level < self::RELATION_FIELDS_NODE_MAX_LEVEL) {
+            $relationFieldsNode
+                ->prototype('array')
+                    ->children()
+                        ->scalarNode('name')->end()
+                        ->enumNode('target_type')
+                            ->values($this->targetTypes)
+                        ->end()
+                        ->arrayNode('target_fields')
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->enumNode('relation_type')
+                            ->values($this->relationTypes)
+                        ->end()
+                        ->append($this->getRelationFieldsNodeDefinition($level + 1))
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($value) {
+                            return (!empty($value['relation_type']) && empty($value['relation_fields']))
+                                || (!empty($value['relation_fields']) && empty($value['relation_type']));
+                        })
+                        ->thenInvalid('Both or none of relation_type and relation_fields should be specified for field')
+                    ->end()
+                ->end();
+        }
+
+        return $relationFieldsNode;
     }
 }

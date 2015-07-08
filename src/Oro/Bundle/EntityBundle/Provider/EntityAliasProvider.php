@@ -88,7 +88,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface
     }
 
     /**
-     * Returns a string which is used to build entity aliases for entities from 3-td party bundles
+     * Returns a string which is used to build entity aliases for entities from 3-rd party bundles
      *
      * @param string $entityClass
      *

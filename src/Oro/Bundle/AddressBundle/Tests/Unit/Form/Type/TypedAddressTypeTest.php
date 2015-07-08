@@ -38,7 +38,16 @@ class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
                 ->method('addEventSubscriber')
                 ->with(
                     $this->isInstanceOf(
-                        'Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber'
+                        'Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber'
+                    )
+                )
+                ->will($this->returnSelf());
+
+            $builder->expects($this->at($at++))
+                ->method('addEventSubscriber')
+                ->with(
+                    $this->isInstanceOf(
+                        'Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber'
                     )
                 )
                 ->will($this->returnSelf());
