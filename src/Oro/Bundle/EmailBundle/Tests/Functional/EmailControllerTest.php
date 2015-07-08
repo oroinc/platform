@@ -171,14 +171,8 @@ class EmailControllerTest extends WebTestCase
     public function testReply()
     {
         $id = $this->getReference('email_1')->getId();
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_email_email_reply', ['id' => $id, '_widgetContainer' => 'widget']),
-            [],
-            [],
-            $this->generateWsseAuthHeader()
-        );
-
+        $url = $this->getUrl('oro_email_email_reply', ['id' => $id, '_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
         $response = $this->client->getResponse();
         $this->assertResponseStatusCodeEquals($response, 200);
         $content = $response->getContent();
@@ -188,13 +182,8 @@ class EmailControllerTest extends WebTestCase
     public function testReplyAll()
     {
         $id = $this->getReference('email_1')->getId();
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_email_email_reply_all', ['id' => $id, '_widgetContainer' => 'widget']),
-            [],
-            [],
-            $this->generateWsseAuthHeader()
-        );
+        $url = $this->getUrl('oro_email_email_reply_all', ['id' => $id, '_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
         $response = $this->client->getResponse();
         $this->assertResponseStatusCodeEquals($response, 200);
         $crawler = $this->client->getCrawler();
