@@ -15,11 +15,7 @@ class OwnerTreeListener
      *
      * @var array
      */
-    protected $securityClasses = [
-        'Oro\Bundle\UserBundle\Entity\User',
-        'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
-        'Oro\Bundle\OrganizationBundle\Entity\Organization',
-    ];
+    protected $securityClasses = [];
 
     /**
      * @var ServiceLink
@@ -39,22 +35,26 @@ class OwnerTreeListener
         $this->treeProviderLink = $treeProviderLink;
     }
 
+    public function addSupportedClass($class)
+    {
+        if (!in_array($class, $this->securityClasses, true)) {
+            $this->securityClasses[] = $class;
+        }
+    }
+
     /**
      * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
+        if (!$this->securityClasses) {
+            return;
+        }
+
         $uow = $args->getEntityManager()->getUnitOfWork();
-        $this->needWarmup = false;
-        if ($this->checkEntities($uow->getScheduledEntityInsertions())) {
-            $this->needWarmup = true;
-        }
-        if (!$this->needWarmup && $this->checkEntities($uow->getScheduledEntityUpdates())) {
-            $this->needWarmup = true;
-        }
-        if (!$this->needWarmup && $this->checkEntities($uow->getScheduledEntityDeletions())) {
-            $this->needWarmup = true;
-        }
+        $this->needWarmup = $this->checkEntities($uow->getScheduledEntityInsertions())
+            || $this->checkEntities($uow->getScheduledEntityUpdates())
+            || $this->checkEntities($uow->getScheduledEntityDeletions());
 
         if ($this->needWarmup) {
             $this->getTreeProvider()->clear();
@@ -68,7 +68,7 @@ class OwnerTreeListener
     protected function checkEntities(array $entities)
     {
         foreach ($entities as $entity) {
-            if (in_array(ClassUtils::getClass($entity), $this->securityClasses)) {
+            if (in_array(ClassUtils::getClass($entity), $this->securityClasses, true)) {
                 return true;
             }
         }

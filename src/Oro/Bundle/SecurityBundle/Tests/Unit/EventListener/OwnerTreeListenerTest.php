@@ -4,16 +4,18 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener;
 
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-
 class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider provider
+     *
+     * @param string $supportedClass
+     * @param array $inserts
+     * @param array $updates
+     * @param array $deletions
+     * @param bool $isExpectedCache
      */
-    public function testOnFlush($inserts, $updates, $deletions, $isExpectedCache)
+    public function testOnFlush($supportedClass, array $inserts, array $updates, array $deletions, $isExpectedCache)
     {
         $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
@@ -57,6 +59,7 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
         }
 
         $treeListener = new OwnerTreeListener($serviceLink);
+        $treeListener->addSupportedClass($supportedClass);
         $treeListener->onFlush($args);
     }
 
@@ -66,42 +69,53 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
     public function provider()
     {
         return [
-            [
-                [new User()],
-                [],
+           'supported insert' => [
+               'stdClass',
+               [new \stdClass()],
+               [new \DateTime()],
+               [new \DateTime()],
+               true
+           ],
+            'supported update' => [
+                'stdClass',
+                [new \DateTime()],
+                [new \stdClass()],
+                [new \DateTime()],
+                true
+            ],
+            'supported delete' => [
+                'stdClass',
+                [new \DateTime()],
+                [new \DateTime()],
                 [new \stdClass()],
                 true
             ],
-            [
-                [new User()],
-                [new BusinessUnit()],
-                [new \stdClass()],
-                true
-            ],
-            [
-                [],
-                [new User()],
-                [],
-                true
-            ],
-            [
-                [],
-                [new \stdClass()],
-                [new Organization()],
-                true
-            ],
-            [
-                [new \stdClass()],
-                [],
-                [],
-                false
-            ],
-            [
-                [],
-                [],
-                [],
+            'unsupported class' => [
+                'stdClass',
+                [new \DateTime()],
+                [new \DateTime()],
+                [new \DateTime()],
                 false
             ]
         ];
+    }
+
+    public function testOnFlushNoEntities()
+    {
+        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $serviceLink->expects($this->never())
+            ->method($this->anything());
+
+        $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $args->expects($this->never())
+            ->method($this->anything());
+
+        $treeListener = new OwnerTreeListener($serviceLink);
+        $treeListener->onFlush($args);
     }
 }

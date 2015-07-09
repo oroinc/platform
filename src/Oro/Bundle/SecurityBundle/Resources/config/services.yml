@@ -430,6 +430,10 @@ services:
         class: %oro_security.ownership_tree_subscriber.class%
         arguments:
             - @oro_security.link.ownership_tree_provider
+        calls:
+            - ['addSupportedClass', [%oro_user.entity.class%]]
+            - ['addSupportedClass', [%oro_organization.business_unit.entity.class%]]
+            - ['addSupportedClass', [%oro_organization.organization.entity.class%]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
