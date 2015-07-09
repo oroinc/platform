@@ -129,8 +129,8 @@ class EmailApiHandler extends ApiFormHandler
         $email = $model->getEntity();
 
         // Subject
-        if ($model->getSubject()) {
-            $this->processString($email, 'Subject', $model->getSubject());
+        if ($model->getSubject() || !$email->getId()) {
+            $this->processString($email, 'Subject', (string)$model->getSubject());
         }
         // From
         if ($model->getFrom()) {
@@ -149,8 +149,8 @@ class EmailApiHandler extends ApiFormHandler
             $this->processRecipients($email, EmailRecipient::BCC, $model->getBcc());
         }
         // Body
-        if ($model->getBody()) {
-            $this->processBody($email, $model->getBody(), $model->getBodyType());
+        if ($model->getBody()  || !$email->getId()) {
+            $this->processBody($email, (string)$model->getBody(), $model->getBodyType());
         } elseif ($model->getBodyType()) {
             $this->processBodyType($email, $model->getBodyType());
         }
