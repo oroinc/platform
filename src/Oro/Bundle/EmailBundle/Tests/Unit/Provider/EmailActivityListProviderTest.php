@@ -15,11 +15,17 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
     protected $emailActivityListProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacadeLink;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineRegistryLink;
 
     protected function setUp()
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacadeLink = $this
@@ -42,33 +48,22 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $htmlTagHelper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(['get', 'getToken', 'getOrganizationContext'])
+        $this->doctrineRegistryLink = $this->getMockBuilder(
+            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
+        )
             ->disableOriginalConstructor()
             ->getMock();
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->willReturn($container);
-        $container
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($container);
-        $container
-            ->expects($this->once())
-            ->method('getOrganizationContext')
-            ->willReturn($container);
 
         $this->emailActivityListProvider = new EmailActivityListProvider(
-            $doctrineHelper,
-            $this->securityFacadeLink,
+            $this->doctrineHelper,
+            $this->doctrineRegistryLink,
             $entityNameResolver,
             $router,
             $configManager,
             $emailThreadProvider,
-            $htmlTagHelper,
-            $container
+            $htmlTagHelper
         );
+        $this->emailActivityListProvider->setSecurityContextLink($this->securityFacadeLink);
     }
 
     public function testGetActivityOwners()
@@ -83,22 +78,39 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $owners = [$emailUser];
 
         $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
+            ->setMethods(['getFromEmailAddress', 'hasOwner', 'getOwner', 'getOrganization'])
             ->disableOriginalConstructor()
             ->getMock();
+        $emailMock->expects($this->exactly(3))
+            ->method('getFromEmailAddress')
+            ->willReturn($emailMock);
+        $emailMock->expects($this->once())
+            ->method('hasOwner')
+            ->willReturn(true);
+        $emailMock->expects($this->exactly(2))
+            ->method('getOwner')
+            ->willReturn($emailMock);
+        $emailMock->expects($this->exactly(2))
+            ->method('getOrganization')
+            ->willReturn($organization);
+
         $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->securityFacadeLink
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineRegistryLink
             ->expects($this->once())
             ->method('getService')
-            ->willReturn($this->securityFacadeLink);
-        $this->securityFacadeLink
-            ->expects($this->once())
+            ->willReturn($em);
+        $em->expects($this->once())
             ->method('getRepository')
-            ->willReturn($this->securityFacadeLink);
-        $this->securityFacadeLink
-            ->expects($this->once())
+            ->willReturn($repository);
+        $repository->expects($this->once())
             ->method('findBy')
             ->willReturn($owners);
 
@@ -106,7 +118,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $activityOwnerArray);
         $owner = $activityOwnerArray[0];
-        $this->assertEquals('Org', $owner->getOrganization()->getName());
-        $this->assertEquals('test', $owner->getUser()->getUsername());
+        $this->assertEquals($organization->getName(), $owner->getOrganization()->getName());
+        $this->assertEquals($user->getUsername(), $owner->getUser()->getUsername());
     }
 }
