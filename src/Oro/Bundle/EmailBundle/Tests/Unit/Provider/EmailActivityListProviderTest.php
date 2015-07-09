@@ -15,11 +15,17 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
     protected $emailActivityListProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacadeLink;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineRegistryLink;
 
     protected function setUp()
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacadeLink = $this
@@ -42,33 +48,39 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $htmlTagHelper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(['get', 'getToken', 'getOrganizationContext'])
+        $this->doctrineRegistryLink = $this->getMockBuilder(
+            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
+        )
             ->disableOriginalConstructor()
             ->getMock();
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->willReturn($container);
-        $container
+
+        $securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+            ->setMethods(['getOrganizationContext', 'getToken'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityContext
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn($container);
-        $container
+            ->willReturn($securityContext);
+        $securityContext
             ->expects($this->once())
             ->method('getOrganizationContext')
-            ->willReturn($container);
+            ->willReturn($securityContext);
+        $this->securityFacadeLink
+            ->expects($this->once())
+            ->method('getService')
+            ->willReturn($securityContext);
 
         $this->emailActivityListProvider = new EmailActivityListProvider(
-            $doctrineHelper,
-            $this->securityFacadeLink,
+            $this->doctrineHelper,
+            $this->doctrineRegistryLink,
             $entityNameResolver,
             $router,
             $configManager,
             $emailThreadProvider,
-            $htmlTagHelper,
-            $container
+            $htmlTagHelper
         );
+        $this->emailActivityListProvider->setSecurityContextLink($this->securityFacadeLink);
     }
 
     public function testGetActivityOwners()
@@ -88,16 +100,21 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->securityFacadeLink
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineRegistryLink
             ->expects($this->once())
             ->method('getService')
-            ->willReturn($this->securityFacadeLink);
-        $this->securityFacadeLink
+            ->willReturn($em);
+        $em
             ->expects($this->once())
             ->method('getRepository')
-            ->willReturn($this->securityFacadeLink);
-        $this->securityFacadeLink
+            ->willReturn($repository);
+        $repository
             ->expects($this->once())
             ->method('findBy')
             ->willReturn($owners);
