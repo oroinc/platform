@@ -72,7 +72,6 @@ class EmailActivityListProvider implements
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
      * @param HtmlTagHelper       $htmlTagHelper
-     * @param ContainerInterface  $container
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -81,8 +80,7 @@ class EmailActivityListProvider implements
         Router $router,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
-        HtmlTagHelper $htmlTagHelper,
-        ContainerInterface $container
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -91,7 +89,6 @@ class EmailActivityListProvider implements
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
         $this->htmlTagHelper        = $htmlTagHelper;
-        $this->container            = $container;
     }
 
     /**
@@ -338,7 +335,7 @@ class EmailActivityListProvider implements
      */
     public function getActivityOwners(Email $entity, ActivityList $activity)
     {
-        $organization = $this->container->get('security.context')->getToken()->getOrganizationContext();
+        $organization = $this->securityContextLink->getService()->getToken()->getOrganizationContext();
         $activityArray = [];
         $owners = $this->doctrineRegistryLink->getService()
             ->getRepository('OroEmailBundle:EmailUser')
