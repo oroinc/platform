@@ -5,8 +5,10 @@ define(function(require) {
         Backbone = require('backbone');
 
     HistoryStateModel = Backbone.Model.extend({
-        defaults: {
-            data: {}
+        defaults: function () {
+            return {
+                data: {}
+            };
         }
     });
 

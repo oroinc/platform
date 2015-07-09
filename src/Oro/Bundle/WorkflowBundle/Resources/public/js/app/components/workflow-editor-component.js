@@ -5,7 +5,7 @@ define(function (require) {
 
     var WorkflowEditorComponent,
         WorkflowViewerComponent = require('./workflow-viewer-component'),
-        WorkflowHistoryComponent = require('oroui/js/app/components/history-component'),
+        HistoryNavigationComponent = require('oroui/js/app/components/history-navigation-component'),
         FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
         mediator = require('oroui/js/mediator'),
         _ = require('underscore'),
@@ -39,7 +39,7 @@ define(function (require) {
                 stepsEl: '.workflow-definition-steps-list-container',
                 model: this.model
             });
-            this.historyManager = new WorkflowHistoryComponent({
+            this.historyManager = new HistoryNavigationComponent({
                 observedModel: this.model,
                 _sourceElement: $el.find('.workflow-history-container')
             });
