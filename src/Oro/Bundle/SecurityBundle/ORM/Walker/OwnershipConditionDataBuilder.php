@@ -423,6 +423,8 @@ class OwnershipConditionDataBuilder
     }
 
     /**
+     * Get ACL sql conditions and join statements to check shared records
+     *
      * @param string $entityName
      * @param string $entityAlias
      * @param string $permission
@@ -462,7 +464,6 @@ class OwnershipConditionDataBuilder
             'nestingLevel' => null,
             'token'        => null
         ];
-
 
         $whereConditions[] = new AclNullCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_SHARE_RECORD, true);
 
