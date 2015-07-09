@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormView;
+
 use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
 
 class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
@@ -16,7 +18,7 @@ class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_acl_collection', $this->formType->getName());
+        $this->assertEquals(PrivilegeCollectionType::NAME, $this->formType->getName());
     }
 
     public function testGetParent()
@@ -26,19 +28,29 @@ class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildView()
     {
-        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $view = new FormView();
         $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $privileges_config = array('permissions' => array('VIEW', 'CREATE'));
+        $privilegesConfig = array('permissions' => array('VIEW', 'CREATE'));
         $options = array(
             'options' => array(
-                'privileges_config' => $privileges_config
-            )
+                'privileges_config' => $privilegesConfig
+            ),
+            'page_component_module' => 'component_name',
+            'page_component_options' => ['component' => 'options'],
         );
+
+        $expectedVars = [
+            'privileges_config' => $privilegesConfig,
+            'page_component_module' => $options['page_component_module'],
+            'page_component_options' => $options['page_component_options'],
+        ];
+
         $this->formType->buildView($view, $form, $options);
-        $this->assertAttributeContains($privileges_config, 'vars', $view);
+        foreach ($expectedVars as $key => $value) {
+            $this->assertArrayHasKey($key, $view->vars);
+            $this->assertEquals($value, $view->vars[$key]);
+        }
     }
 }

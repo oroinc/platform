@@ -245,4 +245,4 @@ services:
             - @oro_locale.formatter.name.link
             - @oro_locale.dql.formatter.name.link
         tags:
-            - { name: oro_entity.name_provider, priority: 90 }
+            - { name: oro_entity.name_provider, priority: -90 }

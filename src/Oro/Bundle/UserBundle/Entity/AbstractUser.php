@@ -649,8 +649,6 @@ abstract class AbstractUser implements
 
     /**
      * {@inheritdoc}
-     *
-     * @return AbstractUser
      */
     public function setOrganization(OrganizationInterface $organization = null)
     {

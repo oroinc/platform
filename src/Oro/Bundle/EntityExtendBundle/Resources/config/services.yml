@@ -41,8 +41,10 @@ parameters:
     oro_entity_extend.listener.before_map_object_search_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener
     oro_entity_extend.listener.search_entity_config_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
     oro_entity_extend.association_manager.class:              Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager
-    oro_entity_extend.entity_alias_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
-    oro_entity_extend.enum_value_provider.class:               Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider
+    oro_entity_extend.entity_alias_provider.class:            Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
+    oro_entity_extend.entity_class_name_provider.enum.class:  Oro\Bundle\EntityExtendBundle\Provider\EnumEntityClassNameProvider
+    oro_entity_extend.enum_value_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider
+    oro_entity_extend.dictionary_value_list_provider.enum.class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -371,9 +373,27 @@ services:
             - @oro_entity.entity_alias_config_bag
             - @oro_entity_config.config_manager
         tags:
-            - { name: oro_entity.alias_provider, priority: 90 }
+            - { name: oro_entity.alias_provider, priority: -90 }
+
+    oro_entity_extend.entity_class_name_provider.enum:
+        class: %oro_entity_extend.entity_class_name_provider.enum.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            - @translator
+        tags:
+            - { name: oro_entity.class_name_provider, priority: -110 }
 
     oro_entity_extend.enum_value_provider:
         class: %oro_entity_extend.enum_value_provider.class%
         arguments:
             - @oro_entity.doctrine_helper
+
+    oro_entity_extend.dictionary_value_list_provider.enum:
+        class: %oro_entity_extend.dictionary_value_list_provider.enum.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine
+        tags:
+            - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
