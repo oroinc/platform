@@ -335,11 +335,16 @@ class EmailActivityListProvider implements
      */
     public function getActivityOwners(Email $entity, ActivityList $activity)
     {
-        $organization = $this->securityContextLink->getService()->getToken()->getOrganizationContext();
+        $filter = ['email' => $entity];
+        $organization = $this->getOrganization($entity);
+        if ($organization) {
+            $filter['organization'] = $organization;
+        }
+
         $activityArray = [];
         $owners = $this->doctrineRegistryLink->getService()
             ->getRepository('OroEmailBundle:EmailUser')
-            ->findBy(['email' => $entity, 'organization' => $organization]);
+            ->findBy($filter);
 
         if ($owners) {
             foreach ($owners as $owner) {

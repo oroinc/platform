@@ -54,23 +54,6 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->setMethods(['getOrganizationContext', 'getToken'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityContext
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($securityContext);
-        $securityContext
-            ->expects($this->once())
-            ->method('getOrganizationContext')
-            ->willReturn($securityContext);
-        $this->securityFacadeLink
-            ->expects($this->once())
-            ->method('getService')
-            ->willReturn($securityContext);
-
         $this->emailActivityListProvider = new EmailActivityListProvider(
             $this->doctrineHelper,
             $this->doctrineRegistryLink,
@@ -95,8 +78,22 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $owners = [$emailUser];
 
         $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
+            ->setMethods(['getFromEmailAddress', 'hasOwner', 'getOwner', 'getOrganization'])
             ->disableOriginalConstructor()
             ->getMock();
+        $emailMock->expects($this->exactly(3))
+            ->method('getFromEmailAddress')
+            ->willReturn($emailMock);
+        $emailMock->expects($this->once())
+            ->method('hasOwner')
+            ->willReturn(true);
+        $emailMock->expects($this->exactly(2))
+            ->method('getOwner')
+            ->willReturn($emailMock);
+        $emailMock->expects($this->exactly(2))
+            ->method('getOrganization')
+            ->willReturn($organization);
+
         $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
             ->disableOriginalConstructor()
             ->getMock();
