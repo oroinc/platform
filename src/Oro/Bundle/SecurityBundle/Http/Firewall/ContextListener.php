@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
+use Doctrine\ORM\NoResultException;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
@@ -35,9 +37,13 @@ class ContextListener
     {
         $token = $this->context->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
-            $token->setOrganizationContext(
-                $this->manager->getOrganizationById($token->getOrganizationContext()->getId())
-            );
+            try {
+                $token->setOrganizationContext(
+                    $this->manager->getOrganizationById($token->getOrganizationContext()->getId())
+                );
+            } catch (NoResultException $e) {
+                $token->setAuthenticated(false);
+            }
         }
     }
 }
