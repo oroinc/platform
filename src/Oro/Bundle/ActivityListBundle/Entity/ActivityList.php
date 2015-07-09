@@ -179,7 +179,7 @@ class ActivityList extends ExtendActivityList
     /**
      * @param ActivityOwner $activityOwner
      *
-     * @return $this
+     * @return self
      */
     public function addActivityOwner(ActivityOwner $activityOwner)
     {
@@ -193,7 +193,7 @@ class ActivityList extends ExtendActivityList
     /**
      * @param ActivityOwner $activityOwner
      *
-     * @return $this
+     * @return self
      */
     public function removeActivityOwner(ActivityOwner $activityOwner)
     {

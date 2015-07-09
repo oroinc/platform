@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
 /**
  * @ORM\Table(name="oro_activity_owner")
@@ -91,7 +90,7 @@ class ActivityOwner
      *
      * @param ActivityList $activity
      *
-     * @return $this
+     * @return self
      */
     public function setActivity(ActivityList $activity = null)
     {
@@ -103,7 +102,7 @@ class ActivityOwner
     /**
      * @param User $user
      *
-     * @return $this
+     * @return self
      */
     public function setUser(User $user = null)
     {
