@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
@@ -77,7 +75,7 @@ class Role extends ExtendRole
      */
     public function __construct($role = '')
     {
-        parent::__construct();
+        parent::__construct($role);
 
         $this->role  =
         $this->label = $role;
