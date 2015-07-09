@@ -128,4 +128,14 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     {
         return $entity->getActivityTargetEntities();
     }
+
+    /**
+     * @param $entity
+     * @param $activity
+     * @return array
+     */
+    public function getActivityOwners($entity, $activity)
+    {
+        return [];
+    }
 }
