@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\UserBundle\Model\ExtendRole;
 
 /**
  * Role Entity
@@ -33,7 +34,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class Role extends AbstractRole
+class Role extends ExtendRole
 {
     const PREFIX_ROLE = 'ROLE_';
 
@@ -73,7 +74,9 @@ class Role extends AbstractRole
      */
     public function __construct($role = '')
     {
-        $this->role =
+        parent::__construct();
+
+        $this->role  =
         $this->label = $role;
     }
 
