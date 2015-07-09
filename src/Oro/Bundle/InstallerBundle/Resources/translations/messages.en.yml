@@ -31,8 +31,21 @@ form:
             locale:       Locale
         websocket:
             header:       Websocket connection
-            host:         Host
-            port:         Port
+            bind:
+                address:          Service bind address
+                port:             Service bind port
+                address.tooltip:  The host IP the socket server will bind to
+                port.tooltip:     The port the socket server will listen on
+            frontend:
+                host:             WS Frontend host
+                port:             WS Frontend port
+                host.tooltip:     Websocket host the browser will connect to
+                port.tooltip:     Websocket port the browser will connect to
+            backend:
+                host:             WS Backend host
+                port:             WS Backend port
+                host.tooltip:     Websocket host the application server will connect to
+                port.tooltip:     Websocket port the application server will connect to
     setup:
         email:             Email
         organization_name: Organization name

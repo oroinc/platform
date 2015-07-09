@@ -89,4 +89,20 @@ class ExtendClassLoadingUtils
 
         return [];
     }
+
+    /**
+     * Checks if directory exists and attempts to create it if it doesn't exist.
+     *
+     * @param string $dir
+     *
+     * @throws \RuntimeException if directory creation failed
+     */
+    public static function ensureDirExists($dir)
+    {
+        if (!is_dir($dir)) {
+            if (false === @mkdir($dir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $dir));
+            }
+        }
+    }
 }

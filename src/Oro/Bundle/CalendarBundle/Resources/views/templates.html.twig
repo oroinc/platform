@@ -51,7 +51,7 @@
     %}
     <div class="widget-content">
         <div class="alert alert-error" style="display: none;"></div>
-        <form id="{{ form.vars.name }}" action="#">
+        <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="#">
             {% set options = {
                 'view':'orocalendar/js/app/views/calendar-event-form-view',
                 'nativeMode': isMobileVersion()

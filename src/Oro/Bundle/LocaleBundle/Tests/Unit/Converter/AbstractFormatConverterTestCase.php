@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 
@@ -19,6 +21,11 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
      * @var LocaleSettings
      */
     protected $formatter;
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
 
     /**
      * @var array
@@ -45,6 +52,9 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
         array(\IntlDateFormatter::NONE,   null,                       self::LOCALE_RU, "H:mm"),
     );
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     */
     protected function setUp()
     {
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
@@ -55,6 +65,27 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
         $this->formatter->expects($this->any())
             ->method('getPattern')
             ->will($this->returnValueMap($this->localFormatMap));
+
+        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator->method('trans')
+            ->will(
+                $this->returnCallback(
+                    function ($one, $two, $tree, $locale) {
+                        if ($locale == self::LOCALE_EN) {
+                            return 'MMM d';
+                        }
+
+                        if ($locale == self::LOCALE_RU) {
+                            return 'd.MMM';
+                        }
+
+                        return '';
+                    }
+                )
+            );
 
         $this->converter = $this->createFormatConverter();
     }
@@ -118,4 +149,19 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCa
      * @return array
      */
     abstract public function getDateTimeFormatDataProvider();
+
+    /**
+     * @param string $expected
+     * @param string $locale
+     * @dataProvider getDateFormatDayProvider
+     */
+    public function testGetDayFormat($expected, $locale)
+    {
+        $this->assertEquals($expected, $this->converter->getDayFormat($locale));
+    }
+
+    /**
+     * @return array
+     */
+    abstract public function getDateFormatDayProvider();
 }

@@ -15,7 +15,8 @@ class StepHandler extends AbstractHandler
         'order',
         'is_final',
         'entity_acl',
-        'allowed_transitions'
+        'allowed_transitions',
+        'position'
     );
 
     /**

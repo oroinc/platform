@@ -190,7 +190,6 @@ class EmailActivityManager
      */
     protected function addContextsToThread(EntityManager $em, Email $email, $contexts)
     {
-
         $thread = $email->getThread();
         if ($thread) {
             $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
@@ -214,7 +213,8 @@ class EmailActivityManager
     protected function changeContexts(EntityManager $em, Email $email, $contexts)
     {
         $oldContexts = $this->emailActivityListProvider->getTargetEntities($email);
-        foreach ($oldContexts as $context) {
+        $removeContexts = array_diff($oldContexts, $contexts);
+        foreach ($removeContexts as $context) {
             $this->removeActivityTarget($email, $context);
         }
         foreach ($contexts as $context) {

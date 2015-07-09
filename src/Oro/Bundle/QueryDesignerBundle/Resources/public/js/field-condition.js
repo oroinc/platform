@@ -73,6 +73,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 filterId = this._getApplicableFilterId(conditions),
                 filter = this.options.filters[filterId];
 
+            if (!filterId) {
+                filter = {
+                    type: 'none',
+                    applicable: {},
+                    popupHint: '<span style="color: red">This filter is not supported.</span>'
+                };
+                this._createFilter(filter, 'none');
+                return;
+            }
+
             // @TODO temporary workaround. Will by fixed in BAP-8112
             if (conditions.entity === 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account' && conditions.field === 'lifetimeValue') {
                 filterId = 'not_supported_lifetimeValue';
@@ -182,7 +192,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         _onUpdate: function () {
             var value;
 
-            if (!this.filter.isEmptyValue()) {
+            if (this.filter && !this.filter.isEmptyValue()) {
                 value = {
                     columnName: this.element.find('input.select').select2('val'),
                     criterion: this._getFilterCriterion()

@@ -56,6 +56,18 @@ define([
         updateSelectorEmptyClass: 'filter-update-empty',
 
         /**
+         * @property {String}
+         */
+        caret: '<span class="caret"></span>',
+
+        initialize: function (options) {
+            var opts = _.pick(options || {}, 'caret');
+            _.extend(this, opts);
+
+            EmptyFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
          * Set raw value to filter
          *
          * @param value
@@ -86,13 +98,30 @@ define([
             var type = $(e.currentTarget).attr('data-value');
             var choiceName = $(e.currentTarget).html();
 
-            this.$(this.criteriaValueSelectors.type).val(type).trigger('change');
-            choiceName += '<span class="caret"></span>';
+            var criteriaValues = this.$(this.criteriaValueSelectors.type).val(type);
+            this.fixSelects();
+            criteriaValues.trigger('change');
+            choiceName += this.caret;
             parentDiv.find('.dropdown-toggle').html(choiceName);
 
             this._handleEmptyFilter(type);
 
             e.preventDefault();
+        },
+
+        /**
+         * Without this $select.val() or select.selectedValue returns wrong value
+         * (tested with select.ui-datepicker-month)
+         */
+        fixSelects: function () {
+            this.$('select').each(function () {
+                var $select = $(this);
+                if ($select.val()) {
+                    return true;
+                }
+
+                $select.val($select.find('option[selected]').val());
+            });
         },
 
         /**

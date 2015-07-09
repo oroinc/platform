@@ -5,3 +5,11 @@ oro_email_api:
 oro_email_emailtemplate_api:
     resource: Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController
     type: rest
+
+oro_email_activity_api:
+    resource: Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivityController
+    type:     rest
+
+oro_email_activity_search_api:
+    resource: Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivitySearchController
+    type:     rest

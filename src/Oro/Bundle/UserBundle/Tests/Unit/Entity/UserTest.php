@@ -1,42 +1,33 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Entity;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserApi;
-use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\Group;
-use Oro\Bundle\UserBundle\Entity\Status;
-use Oro\Bundle\UserBundle\Entity\Email;
-
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends AbstractUserTest
 {
-    public function testUsername()
+    /**
+     * @return User
+     */
+    public function getUser()
     {
-        $user = new User;
-        $name = 'Tony';
-
-        $this->assertNull($user->getUsername());
-
-        $user->setUsername($name);
-
-        $this->assertEquals($name, $user->getUsername());
-        $this->assertEquals($name, $user);
+        return new User();
     }
 
     public function testEmail()
     {
-        $user = new User;
+        $user = $this->getUser();
         $mail = 'tony@mail.org';
 
         $this->assertNull($user->getEmail());
@@ -46,137 +37,11 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($mail, $user->getEmail());
     }
 
-    public function testIsPasswordRequestNonExpired()
-    {
-        $user      = new User;
-        $requested = new \DateTime('-10 seconds');
-
-        $user->setPasswordRequestedAt($requested);
-
-        $this->assertSame($requested, $user->getPasswordRequestedAt());
-        $this->assertTrue($user->isPasswordRequestNonExpired(15));
-        $this->assertFalse($user->isPasswordRequestNonExpired(5));
-    }
-
-    public function testIsPasswordRequestAtCleared()
-    {
-        $user = new User;
-        $requested = new \DateTime('-10 seconds');
-
-        $user->setPasswordRequestedAt($requested);
-        $user->setPasswordRequestedAt(null);
-
-        $this->assertFalse($user->isPasswordRequestNonExpired(15));
-        $this->assertFalse($user->isPasswordRequestNonExpired(5));
-    }
-
-    public function testConfirmationToken()
-    {
-        $user  = new User;
-        $token = $user->generateToken();
-
-        $this->assertNotEmpty($token);
-
-        $user->setConfirmationToken($token);
-
-        $this->assertEquals($token, $user->getConfirmationToken());
-    }
-
-    public function testSetRolesWithArrayArgument()
-    {
-        $roles = array(new Role(User::ROLE_DEFAULT));
-        $user = new User;
-        $this->assertEmpty($user->getRoles());
-        $user->setRoles($roles);
-        $this->assertEquals($roles, $user->getRoles());
-    }
-
-    public function testSetRolesWithCollectionArgument()
-    {
-        $roles = new ArrayCollection(array(new Role(User::ROLE_DEFAULT)));
-        $user = new User;
-        $this->assertEmpty($user->getRoles());
-        $user->setRoles($roles);
-        $this->assertEquals($roles->toArray(), $user->getRoles());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $roles must be an instance of Doctrine\Common\Collections\Collection or an array
-     */
-    public function testSetRolesThrowsInvalidArgumentException()
-    {
-        $user = new User;
-        $user->setRoles('roles');
-    }
-
-    public function testHasRoleWithStringArgument()
-    {
-        $user = new User;
-        $role = new Role(User::ROLE_DEFAULT);
-
-        $this->assertFalse($user->hasRole(User::ROLE_DEFAULT));
-        $user->addRole($role);
-        $this->assertTrue($user->hasRole(User::ROLE_DEFAULT));
-    }
-
-    public function testHasRoleWithObjectArgument()
-    {
-        $user = new User;
-        $role = new Role(User::ROLE_DEFAULT);
-
-        $this->assertFalse($user->hasRole($role));
-        $user->addRole($role);
-        $this->assertTrue($user->hasRole($role));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string
-     */
-    public function testHasRoleThrowsInvalidArgumentException()
-    {
-        $user = new User;
-        $user->hasRole(new \stdClass());
-    }
-
-    public function testRemoveRoleWithStringArgument()
-    {
-        $user = new User;
-        $role = new Role(User::ROLE_DEFAULT);
-        $user->addRole($role);
-
-        $this->assertTrue($user->hasRole($role));
-        $user->removeRole(User::ROLE_DEFAULT);
-        $this->assertFalse($user->hasRole($role));
-    }
-
-    public function testRemoveRoleWithObjectArgument()
-    {
-        $user = new User;
-        $role = new Role(User::ROLE_DEFAULT);
-        $user->addRole($role);
-
-        $this->assertTrue($user->hasRole($role));
-        $user->removeRole($role);
-        $this->assertFalse($user->hasRole($role));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string
-     */
-    public function testRemoveRoleThrowsInvalidArgumentException()
-    {
-        $user = new User;
-        $user->removeRole(new \stdClass());
-    }
-
     public function testSetRolesCollection()
     {
-        $user = new User;
+        $user = $this->getUser();
         $role = new Role(User::ROLE_DEFAULT);
-        $roles = new ArrayCollection(array($role));
+        $roles = new ArrayCollection([$role]);
         $user->setRolesCollection($roles);
         $this->assertSame($roles, $user->getRolesCollection());
     }
@@ -187,14 +52,14 @@ class UserTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetRolesCollectionThrowsException()
     {
-        $user = new User();
-        $user->setRolesCollection(array());
+        $user = $this->getUser();
+        $user->setRolesCollection([]);
     }
 
     public function testGroups()
     {
-        $user  = new User;
-        $role  = new Role('ROLE_FOO');
+        $user = $this->getUser();
+        $role = new Role('ROLE_FOO');
         $group = new Group('Users');
 
         $group->addRole($role);
@@ -213,64 +78,17 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($user->hasRole($role));
     }
 
-    public function testIsEnabled()
-    {
-        $user = new User;
-
-        $this->assertTrue($user->isEnabled());
-        $this->assertTrue($user->isAccountNonExpired());
-        $this->assertTrue($user->isAccountNonLocked());
-
-        $user->setEnabled(false);
-
-        $this->assertFalse($user->isEnabled());
-        $this->assertFalse($user->isAccountNonLocked());
-    }
-
-    public function testSerializing()
-    {
-        $user  = new User;
-        $clone = clone $user;
-        $data  = $user->serialize();
-
-        $this->assertNotEmpty($data);
-
-        $user->setPassword('new-pass')
-             ->setConfirmationToken('token')
-             ->setUsername('new-name');
-
-        $user->unserialize($data);
-
-        $this->assertEquals($clone, $user);
-    }
-
-    public function testPassword()
-    {
-        $user = new User;
-        $pass = 'anotherPassword';
-
-        $user->setPassword($pass);
-        $user->setPlainPassword($pass);
-
-        $this->assertEquals($pass, $user->getPassword());
-        $this->assertEquals($pass, $user->getPlainPassword());
-
-        $user->eraseCredentials();
-
-        $this->assertNull($user->getPlainPassword());
-    }
-
     public function testCallbacks()
     {
-        $user = new User;
+        $user = $this->getUser();
         $user->beforeSave();
         $this->assertInstanceOf('\DateTime', $user->getCreatedAt());
     }
 
     public function testStatuses()
     {
-        $user  = new User;
-        $status  = new Status();
+        $user = $this->getUser();
+        $status = new Status();
 
         $this->assertNotContains($status, $user->getStatuses());
         $this->assertNull($user->getCurrentStatus());
@@ -292,8 +110,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testEmails()
     {
-        $user  = new User;
-        $email  = new Email();
+        $user = $this->getUser();
+        $email = new Email();
 
         $this->assertNotContains($email, $user->getEmails());
 
@@ -308,9 +126,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testNames()
     {
-        $user  = new User();
+        $user = $this->getUser();
         $first = 'James';
-        $last  = 'Bond';
+        $last = 'Bond';
 
         $user->setFirstName($first);
         $user->setLastName($last);
@@ -318,54 +136,14 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testDates()
     {
-        $user = new User;
-        $now  = new \DateTime('-1 year');
+        $user = $this->getUser();
+        $now = new \DateTime('-1 year');
 
         $user->setBirthday($now);
         $user->setLastLogin($now);
 
         $this->assertEquals($now, $user->getBirthday());
         $this->assertEquals($now, $user->getLastLogin());
-    }
-
-    public function testUnserialize()
-    {
-        $user = new User();
-        $serialized = array(
-            'password',
-            'salt',
-            'username',
-            true,
-            'confirmation_token',
-            10
-        );
-        $user->unserialize(serialize($serialized));
-
-        $this->assertEquals($serialized[0], $user->getPassword());
-        $this->assertEquals($serialized[1], $user->getSalt());
-        $this->assertEquals($serialized[2], $user->getUsername());
-        $this->assertEquals($serialized[3], $user->isEnabled());
-        $this->assertEquals($serialized[4], $user->getConfirmationToken());
-        $this->assertEquals($serialized[5], $user->getId());
-    }
-
-    public function testIsCredentialsNonExpired()
-    {
-        $user = new User();
-        $this->assertTrue($user->isCredentialsNonExpired());
-    }
-
-    /**
-     * @dataProvider provider
-     * @param string $property
-     * @param mixed  $value
-     */
-    public function testSettersAndGetters($property, $value)
-    {
-        $obj = new User();
-
-        call_user_func_array(array($obj, 'set' . ucfirst($property)), array($value));
-        $this->assertEquals($value, call_user_func_array(array($obj, 'get' . ucfirst($property)), array()));
     }
 
     /**
@@ -375,24 +153,26 @@ class UserTest extends \PHPUnit_Framework_TestCase
      */
     public function provider()
     {
-        return array(
-            array('username', 'test'),
-            array('email', 'test'),
-            array('nameprefix', 'test'),
-            array('firstname', 'test'),
-            array('middlename', 'test'),
-            array('lastname', 'test'),
-            array('namesuffix', 'test'),
-            array('birthday', new \DateTime()),
-            array('password', 'test'),
-            array('plainPassword', 'test'),
-            array('confirmationToken', 'test'),
-            array('passwordRequestedAt', new \DateTime()),
-            array('lastLogin', new \DateTime()),
-            array('loginCount', 11),
-            array('createdAt', new \DateTime()),
-            array('updatedAt', new \DateTime()),
-        );
+        return [
+            ['username', 'test'],
+            ['email', 'test'],
+            ['nameprefix', 'test'],
+            ['firstname', 'test'],
+            ['middlename', 'test'],
+            ['lastname', 'test'],
+            ['namesuffix', 'test'],
+            ['birthday', new \DateTime()],
+            ['password', 'test'],
+            ['plainPassword', 'test'],
+            ['confirmationToken', 'test'],
+            ['passwordRequestedAt', new \DateTime()],
+            ['passwordChangedAt', new \DateTime()],
+            ['lastLogin', new \DateTime()],
+            ['loginCount', 11],
+            ['createdAt', new \DateTime()],
+            ['updatedAt', new \DateTime()],
+            ['salt', md5('user')],
+        ];
     }
 
     public function testPreUpdateUnChanged()
@@ -402,10 +182,11 @@ class UserTest extends \PHPUnit_Framework_TestCase
             'loginCount' => null
         ];
 
-        $user = new User();
+        $user = $this->getUser();
         $updatedAt = new \DateTime('2015-01-01');
         $user->setUpdatedAt($updatedAt);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -421,10 +202,11 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $changeSet = ['lastname' => null];
 
-        $user = new User();
+        $user = $this->getUser();
         $updatedAt = new \DateTime('2015-01-01');
         $user->setUpdatedAt($updatedAt);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -438,10 +220,10 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testBusinessUnit()
     {
-        $user  = new User;
+        $user = $this->getUser();
         $businessUnit = new BusinessUnit();
 
-        $user->setBusinessUnits(new ArrayCollection(array($businessUnit)));
+        $user->setBusinessUnits(new ArrayCollection([$businessUnit]));
 
         $this->assertContains($businessUnit, $user->getBusinessUnits());
 
@@ -456,7 +238,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testOwners()
     {
-        $entity = new User();
+        $entity = $this->getUser();
         $businessUnit = new BusinessUnit();
 
         $this->assertEmpty($entity->getOwner());
@@ -466,23 +248,16 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($businessUnit, $entity->getOwner());
     }
 
-    public function testOrganization()
-    {
-        $entity         = new User();
-        $organization   = new Organization();
-
-        $this->assertNull($entity->getOrganization());
-        $entity->setOrganization($organization);
-        $this->assertSame($organization, $entity->getOrganization());
-    }
-
     public function testImapConfiguration()
     {
-        $entity = new User();
+        $entity = $this->getUser();
         $imapConfiguration = $this->getMock('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin');
         $imapConfiguration->expects($this->once())
             ->method('setIsActive')
             ->with(false);
+        $imapConfiguration->expects($this->exactly(2))
+            ->method('isActive')
+            ->willReturn(true);
 
         $this->assertCount(0, $entity->getEmailOrigins());
         $this->assertNull($entity->getImapConfiguration());
@@ -498,7 +273,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testEmailOrigins()
     {
-        $entity = new User();
+        $entity = $this->getUser();
         $origin1 = new InternalEmailOrigin();
         $origin2 = new InternalEmailOrigin();
 
@@ -517,8 +292,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetApiKey()
     {
-        /** @var User $entity */
-        $entity = new User();
+        $entity = $this->getUser();
 
         $this->assertEmpty($entity->getApiKeys(), 'Should return some key, even if is not present');
 
@@ -549,27 +323,65 @@ class UserTest extends \PHPUnit_Framework_TestCase
             new ArrayCollection([$apiKey1, $apiKey2]),
             $entity->getApiKeys()
         );
+
+        $entity->removeApiKey($apiKey2);
+        $this->assertEquals(
+            new ArrayCollection([$apiKey1]),
+            $entity->getApiKeys()
+        );
     }
 
-    public function testOrganizations()
+    public function testGetClass()
     {
-        $user  = new User;
-        $disabledOrganization = new Organization();
-        $organization = new Organization();
-        $organization->setEnabled(true);
+        $user = $this->getUser();
+        $this->assertInstanceOf($user->getClass(), $user);
+    }
 
-        $user->setOrganizations(new ArrayCollection(array($organization)));
-        $this->assertContains($organization, $user->getOrganizations());
+    public function testGetEmailFields()
+    {
+        $user = $this->getUser();
+        $this->assertInternalType('array', $user->getEmailFields());
+        $this->assertEquals(['email'], $user->getEmailFields());
+    }
 
-        $user->removeOrganization($organization);
-        $this->assertNotContains($organization, $user->getOrganizations());
+    public function testGetTaggableId()
+    {
+        $id = 2;
+        $user = $this->getUser();
+        $user->setId($id);
+        $this->assertEquals($id, $user->getId());
+        $this->assertEquals($id, $user->getTaggableId());
+    }
 
-        $user->addOrganization($organization);
-        $this->assertContains($organization, $user->getOrganizations());
+    public function testTags()
+    {
+        $user = $this->getUser();
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getTags());
 
-        $user->addOrganization($disabledOrganization);
-        $result = $user->getOrganizations(true);
-        $this->assertTrue($result->count() == 1);
-        $this->assertSame($result->first(), $organization);
+        // should return same collection
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getTags());
+
+        $tags = ['tag1', 'tag2'];
+        $user->setTags($tags);
+        $this->assertEquals($tags, $user->getTags());
+
+        // should return same collection
+        $this->assertEquals($tags, $user->getTags());
+
+        $newTags = ['tag2', 'tag3'];
+        $user->setTags($newTags);
+        $this->assertEquals($newTags, $user->getTags());
+
+        // should return same collection
+        $this->assertEquals($newTags, $user->getTags());
+    }
+
+    public function testGetNotificationEmails()
+    {
+        $user = $this->getUser();
+        $email = 'user@example.com';
+        $user->setEmail($email);
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getNotificationEmails());
+        $this->assertEquals([$email], $user->getNotificationEmails()->toArray());
     }
 }

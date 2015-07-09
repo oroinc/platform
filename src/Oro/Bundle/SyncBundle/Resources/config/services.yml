@@ -8,8 +8,8 @@ services:
     oro_wamp.publisher:
         class:                            %oro_wamp.publisher.class%
         arguments:
-            - %websocket_host%
-            - %websocket_port%
+            - %websocket_backend_host%
+            - %websocket_backend_port%
 
     oro_wamp.db_ping:
         class:                            %oro_wamp.db_ping.class%

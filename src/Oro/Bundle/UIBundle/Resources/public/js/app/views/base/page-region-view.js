@@ -37,6 +37,7 @@ define([
         onPageUpdate: function (pageData, actionArgs, jqXHR, promises) {
             this.data = _.pick(pageData, this.pageItems);
             this.actionArgs = actionArgs;
+            this.disposePageComponents();
             this.render();
             this.data = null;
             this.actionArgs = null;
@@ -72,7 +73,7 @@ define([
             // starts deferred initialization
             this._deferredRender();
             // initialize components in view's markup
-            mediator.execute('layout:init', this.$el, this)
+            this.initLayout()
                 .done(_.bind(this._resolveDeferredRender, this));
 
             return this;
@@ -86,27 +87,6 @@ define([
          */
         getTemplateData: function () {
             return this.data;
-        },
-
-        /**
-         * Create flag of deferred initialization
-         *
-         * @protected
-         */
-        _deferredRender: function () {
-            this.deferredRender = $.Deferred();
-        },
-
-        /**
-         * Resolves deferred initialization
-         *
-         * @protected
-         */
-        _resolveDeferredRender: function () {
-            if (this.deferredRender) {
-                this.deferredRender.resolve(this);
-                delete this.deferredRender;
-            }
         }
     });
 

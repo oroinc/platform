@@ -94,17 +94,17 @@
     padding-right: 60px;
   }
 }
-#cc-bcc-holder {
+.cc-bcc-holder {
   position: absolute;
   top: 5px;
   right: 0;
-}
-#showCc, #showBcc {
-  cursor:pointer;
-  padding: 0 5px;
-}
-#showCc:hover, #showBcc:hover {
-  text-decoration: underline;
+  .showCc, .showBcc {
+    cursor:pointer;
+    padding: 0 5px;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 .activity-list-widget {
   .email-info, .email-load-more {
@@ -474,11 +474,11 @@ a.attachment .icon .icon-link {
   }
 }
 
-#context-items-dropdown {
+.context-items-dropdown {
   top: 35px;
   left: 15px;
 }
-#email-context-current-block {
+.email-context-current-block {
   cursor: pointer;
   background-color:#FFFFFF;
   border: none;
@@ -486,7 +486,7 @@ a.attachment .icon .icon-link {
   margin: 10px 10px 15px 10px;
   box-shadow: none;
 }
-#email-context-current-item {
+.email-context-current-item {
   font-size: 18px;
   font-weight: bold;
   color: #666666;
@@ -500,7 +500,7 @@ a.attachment .icon .icon-link {
   overflow: auto;
 }
 
-.email-body-actions #attach-file {
+.email-body-actions .attach-file {
   font-weight: normal !important;
 }
 
@@ -546,4 +546,29 @@ a.attachment .icon .icon-link {
 
 .attachment-list-popup .attachment-list-row span {
   padding-top: 1px;
+}
+
+.template-editor .mce-tinymce {
+  width: 542px;
+}
+
+.email-row-is-readed {
+  background-color: #f5f5f5;
+}
+
+.email-mail-count-circle {
+  display: inline;
+  background-color: orange;
+  color: white;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  padding: 2px 2px 2px 3px;
+  font-size: 12px;
+}
+
+a.sync-btn span.dots {
+  width: 10px;
+  display: inline-block;
+  text-align: left;
 }

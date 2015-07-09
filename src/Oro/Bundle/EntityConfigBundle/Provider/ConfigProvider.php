@@ -5,8 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Provider;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\PersistentCollection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -38,16 +36,15 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * Constructor.
      *
-     * @param ConfigManager      $configManager
-     * @param ContainerInterface $container
-     * @param string             $scope
-     * @param array              $config
+     * @param ConfigManager $configManager
+     * @param string        $scope
+     * @param array         $config
      */
-    public function __construct(ConfigManager $configManager, ContainerInterface $container, $scope, array $config)
+    public function __construct(ConfigManager $configManager, $scope, array $config)
     {
         $this->scope                   = $scope;
         $this->configManager           = $configManager;
-        $this->propertyConfigContainer = new PropertyConfigContainer($config, $container);
+        $this->propertyConfigContainer = new PropertyConfigContainer($config);
     }
 
     /**

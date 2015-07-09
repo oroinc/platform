@@ -2,8 +2,9 @@
 
 namespace Oro\Component\Layout\Util;
 
-use Oro\Component\Layout\BlockView;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+
+use Oro\Component\Layout\BlockView;
 
 class BlockUtils
 {

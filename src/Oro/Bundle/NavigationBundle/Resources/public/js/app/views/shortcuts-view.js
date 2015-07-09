@@ -162,8 +162,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             }
         },
 
+        getLayoutElement: function () {
+            return this.$el.closest('.shortcuts');
+        },
+
         render: function() {
-            mediator.execute('layout:init', this.$el.closest('.shortcuts'), this);
+            this.initLayout();
             return this;
         }
     });

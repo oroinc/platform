@@ -46,6 +46,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             format: {
                 datetime: {
                     moment: {
+                        day: 'MM-DD',
                         date: 'YYYY-MM-DD',
                         time: 'HH:mms',
                         datetime: 'YYYY-MM-DD HH:mm',
@@ -208,6 +209,13 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                 return this.settings.currency_data[currencyCode].symbol
             }
             return currencyCode;
+        },
+
+        /**
+         * @return {string} name of system tynezone
+         */
+        getTimeZone: function () {
+            return this.settings.timezone;
         },
 
         getTimeZoneOffset: function() {

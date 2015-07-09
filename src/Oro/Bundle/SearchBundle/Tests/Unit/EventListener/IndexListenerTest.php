@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\SearchBundle\EventListener\IndexListener;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class IndexListenerTest extends \PHPUnit_Framework_TestCase
@@ -24,9 +25,9 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $entitiesMapping = array(
-        'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product' => array(),
-    );
+    protected $entitiesMapping = [
+        'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product' => [],
+    ];
 
     protected function setUp()
     {
@@ -54,21 +55,21 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $unitOfWork->expects($this->once())->method('getScheduledEntityInsertions')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 'inserted' => $insertedEntity,
                 'not_supported' => $notSupportedEntity,
-            )));
+            ]));
         $unitOfWork->expects($this->once())->method('getScheduledEntityUpdates')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 'inserted' => $insertedEntity,
                 'updated' => $updatedEntity,
                 'not_supported' => $notSupportedEntity,
-            )));
+            ]));
         $unitOfWork->expects($this->once())->method('getScheduledEntityDeletions')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 'deleted' => $deletedEntity,
                 'not_supported' => $notSupportedEntity,
-            )));
+            ]));
 
         $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($deletedEntity)
             ->will($this->returnValue($entityClass));
@@ -85,12 +86,12 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onFlush(new OnFlushEventArgs($entityManager));
 
         $this->assertAttributeEquals(
-            array('inserted' => $insertedEntity, 'updated' => $updatedEntity),
+            ['inserted' => $insertedEntity, 'updated' => $updatedEntity],
             'savedEntities',
             $listener
         );
         $this->assertAttributeEquals(
-            array('deleted' => $deletedEntityReference),
+            ['deleted' => $deletedEntityReference],
             'deletedEntities',
             $listener
         );
@@ -112,9 +113,9 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     public function testPostFlush($realTime)
     {
         $insertedEntity = $this->createTestEntity('inserted');
-        $insertedEntities = array('inserted' => $insertedEntity);
+        $insertedEntities = ['inserted' => $insertedEntity];
         $deletedEntity = $this->createTestEntity('deleted');
-        $deletedEntities = array('deleted' => $deletedEntity);
+        $deletedEntities = ['deleted' => $deletedEntity];
 
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
@@ -122,7 +123,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $unitOfWork->expects($this->once())->method('getScheduledEntityInsertions')
             ->will($this->returnValue($insertedEntities));
         $unitOfWork->expects($this->once())->method('getScheduledEntityUpdates')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
         $unitOfWork->expects($this->once())->method('getScheduledEntityDeletions')
             ->will($this->returnValue($deletedEntities));
 
@@ -146,16 +147,16 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnClear()
     {
         $insertedEntity = $this->createTestEntity('inserted');
-        $insertedEntities = array('inserted' => $insertedEntity);
+        $insertedEntities = ['inserted' => $insertedEntity];
         $deletedEntity = $this->createTestEntity('deleted');
-        $deletedEntities = array('deleted' => $deletedEntity);
+        $deletedEntities = ['deleted' => $deletedEntity];
 
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()->getMock();
         $unitOfWork->expects($this->once())->method('getScheduledEntityInsertions')
             ->will($this->returnValue($insertedEntities));
         $unitOfWork->expects($this->once())->method('getScheduledEntityUpdates')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
         $unitOfWork->expects($this->once())->method('getScheduledEntityDeletions')
             ->will($this->returnValue($deletedEntities));
 
@@ -178,10 +179,10 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function postFlushDataProvider()
     {
-        return array(
-            'realtime' => array(true),
-            'queued'   => array(false),
-        );
+        return [
+            'realtime' => [true],
+            'queued'   => [false],
+        ];
     }
 
     public function testSetRealTimeUpdate()
@@ -198,7 +199,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     public function testSetEntitiesConfig()
     {
         $listener = $this->createListener();
-        $config = array('key' => 'value');
+        $config = ['key' => 'value'];
 
         $this->assertAttributeEquals($this->entitiesMapping, 'entitiesConfig', $listener);
         $listener->setEntitiesConfig($config);
@@ -214,6 +215,12 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new IndexListener($this->doctrineHelper, $this->searchEngine);
         $listener->setRealTimeUpdate($realTime);
         $listener->setEntitiesConfig($this->entitiesMapping);
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
+        $mapperProvider = new SearchMappingProvider($eventDispatcher);
+        $mapperProvider->setMappingConfig($this->entitiesMapping);
+        $listener->setMappingProvider($mapperProvider);
 
         return $listener;
     }

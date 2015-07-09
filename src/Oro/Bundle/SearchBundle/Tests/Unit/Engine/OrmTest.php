@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class OrmTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,12 @@ class OrmTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->registry        = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->mapper          = new ObjectMapper($this->eventDispatcher, $config);
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
+        $mapperProvider = new SearchMappingProvider($eventDispatcher);
+        $mapperProvider->setMappingConfig($config);
+        $this->mapper->setMappingProvider($mapperProvider);
         $this->doctrineHelper  = new DoctrineHelper($this->registry);
     }
 

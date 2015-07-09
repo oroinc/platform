@@ -20,7 +20,8 @@
         "oro/user-bundle": "@dev",
         "oro/ui-bundle": "@dev",
         "oro/security-bundle": "@dev",
-        "oro/config-expression": "dev-master"
+        "oro/config-expression": "dev-master",
+        "oro/jsplumb": "~1.7"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\WorkflowBundle": "" }

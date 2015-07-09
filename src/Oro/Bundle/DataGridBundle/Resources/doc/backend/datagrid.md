@@ -6,6 +6,7 @@ Table of content
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Advanced grid configuration](./advanced_grid_configuration.md)
+- [Editable data grid cells](./editable_grid_cells.md)
 - [Implementation](#implementation)
 - [Extendability](#extendability)
 
