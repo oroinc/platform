@@ -89,7 +89,9 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->activityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
+        $this->activityListProvider = $this->getMockBuilder(
+            'Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -107,7 +109,9 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->setMethods(['getActivityTargetEntities', 'getFromEmailAddress', 'getId', 'getTo', 'getCc', 'getEmailBody'])
+            ->setMethods(
+                ['getActivityTargetEntities', 'getFromEmailAddress', 'getId', 'getTo', 'getCc', 'getEmailBody']
+            )
             ->getMock();
 
         $this->email->expects($this->any())

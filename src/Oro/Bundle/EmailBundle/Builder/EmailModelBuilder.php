@@ -165,11 +165,11 @@ class EmailModelBuilder
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
         if ($fromAddress->getOwner() === $this->helper->getUser()) {
             $toList = [];
-            foreach($parentEmailEntity->getTo() as $toRecipient) {
+            foreach ($parentEmailEntity->getTo() as $toRecipient) {
                 $toList[] = $toRecipient->getEmailAddress()->getEmail();
             }
             $ccList = [];
-            foreach($parentEmailEntity->getCc() as $ccRecipient) {
+            foreach ($parentEmailEntity->getCc() as $ccRecipient) {
                 $ccList[] = $ccRecipient->getEmailAddress()->getEmail();
             }
             $emailModel->setTo($toList);
