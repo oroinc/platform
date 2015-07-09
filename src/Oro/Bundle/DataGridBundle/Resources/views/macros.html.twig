@@ -9,6 +9,9 @@
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
     {% set datagrid = oro_datagrid_build(name, params) %}
     {% if datagrid %}
+        {% if app.request.get('_wid') %}
+            {% set renderParams = {'enableViews': false}|merge(renderParams) %}
+        {% endif %}
         {% set metaData = oro_datagrid_metadata(datagrid, params) %}
         {% if renderParams.routerEnabled is defined %}
             {% set metadataOptions = metaData.options is defined ? metaData.options : {} %}
