@@ -69,7 +69,7 @@ define([
         updateState: function() {
             var model;
             model = this.collection.getCurrentModel();
-            this.$el.toggleClass('gold-icon', model !== null || model !== undefined);
+            this.$el.toggleClass('gold-icon', Boolean(model));
         },
 
         onToggle: function() {
