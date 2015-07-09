@@ -32,16 +32,16 @@ services:
             - []
 
     oro_config.scope.user:
-        class:                        %oro_config.user.class%
+        class: %oro_config.user.class%
         arguments:
             - @doctrine.orm.entity_manager
         calls:
-            - [setSecurity, ["@security.context"]]
+            - [setContainer, ["@service_container"]]
         tags:
             - { name: oro_config.scope, scope: user, priority: 255 }
 
     oro_config.scope.global:
-        class:                        %oro_config.global.class%
+        class: %oro_config.global.class%
         arguments:
             - @doctrine.orm.entity_manager
         tags:

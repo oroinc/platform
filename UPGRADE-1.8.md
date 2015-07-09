@@ -40,6 +40,7 @@ UPGRADE FROM 1.7 to 1.8
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
 - IMPORTANT: if you use the service method links in your `entity_config.yml` they should be replaced with the direct service method call. For example `my_service_method_link` should be replaced with `@my_service->method`.
 - Removed the method `initConfig` of the class `Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer`.
+- `Oro\Bundle\ConfigBundle\Config\UserScopeManager` is no longer depends on `security.context`. It is retreived from `service.container` directly inside
 
 ####ImportExportBundle
  - `Oro\Bundle\ImportExportBundle\Context\ContextInterface` added $incrementBy integer parameter for methods: incrementReadCount, incrementAddCount, incrementUpdateCount, incrementReplaceCount, incrementDeleteCount, incrementErrorEntriesCount
@@ -55,6 +56,7 @@ UPGRADE FROM 1.7 to 1.8
  - `Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension` by default adds unique suffix to id attribute of each form type
  - `Oro\Bundle\FormBundle\Model\UpdateHandler` triggers events that can be used to modify data and interrupt processing, also this handler has new constructor argument used to inject EventDispatcher
  - `Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType` removed support for `extra_config` and `extra_modules` options, use `component` option instead (the value reflects what js-module will be used as Select2Component)
+ - `Oro\Bundle\FormBundle\Form\Type\EnumFilterType` second constructor argument was changed from instance of `Doctrine\Common\Persistence\ManagerRegistry` to `Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider` 
 
 ####SyncBundle
 Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. Instead the following websocket configuration is used:
@@ -90,3 +92,58 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\UserBundle\Mailer\Processor` is now based on `Oro\Bundle\UserBundle\Mailer\BaseProcessor`
 - `Oro\Bundle\UserBundle\Mailer\Processor` - first argument `$user` of `sendChangePasswordEmail`, `sendResetPasswordEmail` and `sendResetPasswordAsAdminEmail` methods must implement `Oro\Bundle\UserBundle\Entity\UserInterface`
 - First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly
+- `Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler` is now accepts Manager Registry instead of Entity Manager, added method `setManagerRegistry`, method `setEntityManager` marked as deprecated 
+
+####SecurityBundle
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata` usage
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata`
+    * `isOrganizationOwned` deprecated, use `isGlobalLevelOwned` instead
+    * `isBusinessUnitOwned` deprecated, use `isLocalLevelOwned` instead
+    * `isUserOwned` deprecated, use `isBasicLevelOwned` instead
+    * `getOrganizationColumnName` deprecated, use `getGlobalOwnerColumnName` instead
+    * `getOrganizationFieldName` deprecated, use `getGlobalOwnerFieldName` instead
+- `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder` method signature changed to use `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` instead of `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata`
+    * `protected function buildConstraintIfAccessIsGranted($targetEntityClassName, $accessLevel, OwnershipMetadataInterface $metadata)`
+    * `protected function getOrganizationId(OwnershipMetadataInterface $metadata = null)` 
+    * `protected function getCondition($idOrIds, OwnershipMetadataInterface $metadata, $columnName = null, $ignoreOwner = false)`
+    * `protected function getColumnName(OwnershipMetadataInterface $metadata, $columnName = null)`
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` usage
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` - chain for ownership metadata providers which implements new `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider`
+    * is based on `Oro\Bundle\SecurityBundle\Owner\Metadata\AbstractMetadataProvider` and implements `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+    * added public method `setSecurityFacade(SecurityFacade $securityFacade)`
+    * `getOrganizationClass` deprecated, use `getGlobalLevelClass` instead
+    * `getBusinessUnitClass` deprecated, use `getLocalLevelClass` instead
+    * `getUserClass` deprecated, use `getBasicLevelClass` instead
+- `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` added into `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` chain using tag `oro_security.owner.metadata_provider`
+- `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    * fourth constructor argument `$metadataProvider` now must implement `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`
+    * `fixMaxAccessLevel` deprecated, use `MetadataProviderInterface::getMaxAccessLevel` instead
+- Class methods and constructors deprecated, please inject `@service_container` and appropriate methods instead
+    * `Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener` defined using `oro_security.listener.console_context_listener` service
+    * `Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker` defined using `oro_security.owner.decision_maker` service
+    * `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider` defined using `oro_security.owner.ownership_metadata_provider` service
+- ACL parameter `group_name` is now used to separate permissions in application scopes 
+- Constructor was changed from implementation `public function __construct(OwnershipMetadataProvider $provider)` to interface `public function __construct(MetadataProviderInterface $provider)`
+    * `Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheClearer` 
+    * `Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheWarmer`
+    * `Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigSubscriber`
+    * `Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor`
+    * `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder`
+- Services rely on `oro_security.owner.metadata_provider.chain` instead of implementation `oro_security.owner.ownership_metadata_provider`
+    * `oro_security.owner.ownership_metadata_provider.cache.warmer`
+    * `oro_security.owner.ownership_metadata_provider.cache.clearer`
+    * `oro_security.owner.ownership_config_subscriber`
+    * `oro_security.owner.entity_owner_accessor`
+    * `oro_security.orm.ownership_sql_walker_builder`
+- Constructor was changed from implementation `public function __construct(OwnerTreeProvider $treeProvider)` to interface `public function __construct(OwnerTreeProviderInterface $treeProvider)`
+    * `Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer`
+    * `Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner`
+    * `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder`
+- Services rely on `oro_security.ownership_tree_provider.chain` instead of implementation `oro_security.ownership_tree_provider`
+    * `oro_security.ownership_tree.cache.cleaner`
+    * `oro_security.ownership_tree.cache.warmer`
+    * `oro_security.orm.ownership_sql_walker_builder`
+
+####AddressBundle
+- `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber` marked deprecated. Use `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber` and `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber` instead.

@@ -41,6 +41,10 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'value' => 'anyvalue',
                 'type'  => 'scalar',
             ),
+            'emptystring' => array(
+                'value' => '',
+                'type'  => 'scalar',
+            ),
         ),
     );
 
@@ -247,5 +251,37 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             'anyvalue',
             $this->manager->get($parameterName)
         );
+    }
+
+    public function testGetEmptyValueSettings()
+    {
+        $parameterName = 'oro_test.emptystring';
+
+        $this->userScopeManager->expects($this->once())
+            ->method('getSettingValue')
+            ->willReturn(['value' => '']);
+
+        $this->globalScopeManager->expects($this->never())
+            ->method('getSettingValue');
+        $this->globalScopeManager->expects($this->never())
+            ->method('getScopedEntityName');
+
+        $this->assertEquals(['value' => null], $this->manager->get($parameterName));
+    }
+
+    public function testGetEmptyValueSettingsFalse()
+    {
+        $parameterName = 'oro_test.emptystring';
+
+        $this->userScopeManager->expects($this->once())
+            ->method('getSettingValue')
+            ->willReturn(['value' => false]);
+
+        $this->globalScopeManager->expects($this->never())
+            ->method('getSettingValue');
+        $this->globalScopeManager->expects($this->never())
+            ->method('getScopedEntityName');
+
+        $this->assertEquals(['value' => null], $this->manager->get($parameterName, null));
     }
 }

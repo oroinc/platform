@@ -34,9 +34,7 @@ class ContentProcessor
             return $this->extractContent($part);
         }
 
-        $content = $this->getMultipartContentRecursively($part, 'text/html');
-
-        return $content ? $this->replaceEmbeddedContent($content, $part) : null;
+        return $this->getMultipartContentRecursively($part, 'text/html');
     }
 
     /**
@@ -56,7 +54,7 @@ class ContentProcessor
                 }
 
                 $contentTypeHeader = $this->getPartContentType($part);
-                if ($contentTypeHeader->getType() === $format) {
+                if (strtolower($contentTypeHeader->getType()) === $format) {
                     return $this->extractContent($part);
                 }
             }
@@ -93,11 +91,9 @@ class ContentProcessor
             $contentType = 'text/plain';
             $encoding    = 'ASCII';
         }
-
+        $contentTransferEncoding = 'BINARY';
         if ($part->getHeaders()->has('Content-Transfer-Encoding')) {
             $contentTransferEncoding = $part->getHeader('Content-Transfer-Encoding')->getFieldValue();
-        } else {
-            $contentTransferEncoding = 'BINARY';
         }
 
         return new Content($part->getContent(), $contentType, $contentTransferEncoding, $encoding);
@@ -113,49 +109,5 @@ class ContentProcessor
     protected function getPartContentType(PartInterface $part)
     {
         return $part->getHeaders()->has('Content-Type') ? $part->getHeader('Content-Type') : null;
-    }
-
-    /**
-     * Trying to find links on embedded content, extract it and replace respectively.
-     * Returns new instance of Content if there was any replacement or same instance otherwise
-     *
-     * @param Content       $content
-     * @param PartInterface $multipart
-     *
-     * @return Content
-     */
-    protected function replaceEmbeddedContent(Content $content, PartInterface $multipart)
-    {
-        $contentReplacements = $this->loadContents($multipart);
-        if ($contentReplacements) {
-            $replacedContent = strtr($content->getContent(), $contentReplacements);
-
-            return new Content(
-                $replacedContent,
-                $content->getContentType(),
-                $content->getContentTransferEncoding(),
-                $content->getEncoding()
-            );
-        }
-
-        return $content;
-    }
-
-    /**
-     * @param PartInterface $multipart
-     *
-     * @return array
-     */
-    protected function loadContents(PartInterface $multipart)
-    {
-        /** @var ContentIdExtractorInterface[] $contentExtractors */
-        $contentExtractors = [new ImageExtractor()];
-
-        $contents = [];
-        foreach ($contentExtractors as $contentExtractor) {
-            $contents = array_merge($contents, $contentExtractor->extract($multipart));
-        }
-
-        return $contents;
     }
 }

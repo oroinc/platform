@@ -983,7 +983,9 @@ class User extends ExtendUser implements
             function ($item) {
                 return
                     $item instanceof ImapEmailOrigin
-                    && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
+                    && (!$this->getCurrentOrganization()
+                        || $item->getOrganization() === $this->getCurrentOrganization())
+                    && $item->isActive();
             }
         );
 
