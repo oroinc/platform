@@ -3,9 +3,12 @@
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Common\Collections\Criteria;
 
+use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
@@ -19,6 +22,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class ActivityListManager
 {
@@ -46,6 +50,9 @@ class ActivityListManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /**
      * @param Registry                  $doctrine
      * @param SecurityFacade            $securityFacade
@@ -66,7 +73,8 @@ class ActivityListManager
         ActivityListChainProvider $provider,
         ActivityListFilterHelper $activityListFilterHelper,
         CommentApiManager $commentManager,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        AclHelper $aclHelper
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
@@ -77,6 +85,7 @@ class ActivityListManager
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->commentManager           = $commentManager;
         $this->doctrineHelper           = $doctrineHelper;
+        $this->aclHelper                = $aclHelper;
     }
 
     /**
@@ -101,6 +110,8 @@ class ActivityListManager
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
 
+        $qb=  $this->addAclCriteria($qb);
+
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
         $pager->setPage($page);
@@ -113,6 +124,26 @@ class ActivityListManager
         ];
 
         return $this->getEntityViewModels($pager->getResults(), $targetEntityData);
+    }
+
+    protected function addAclCriteria(QueryBuilder $qb)
+    {
+        $supportedActivities = $this->chainProvider->getSupportedActivities();
+        $activityClass= 'Oro\Bundle\EmailBundle\Entity\EmailUser';
+
+        $newCriteria = new Criteria();
+        foreach ($supportedActivities as $supportedActivity) {
+            if ($supportedActivity === 'Oro\Bundle\EmailBundle\Entity\Email') {
+                $supportedActivity = $activityClass;
+            }
+            $criteria = new Criteria();
+            $criteria = $this->aclHelper->applyAclToCriteria($supportedActivity, $criteria, 'VIEW');
+            $criteria->andWhere(Criteria::expr()->eq('relatedActivityClass', quotemeta($supportedActivity)));
+            $newCriteria->orWhere(Criteria::expr()->orX($criteria->getWhereExpression()));
+        }
+
+        $qb->addCriteria($newCriteria);
+        return $qb;
     }
 
     /**
