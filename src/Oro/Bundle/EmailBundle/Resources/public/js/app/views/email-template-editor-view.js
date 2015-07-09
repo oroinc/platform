@@ -33,7 +33,7 @@ define(function(require) {
         },
 
         afterLayoutInit: function() {
-            this.options.hasWysiwyg = this.$('textarea[name*="content"]:first').data('wysiwygEnabled') === true;
+            this.options.hasWysiwyg = this.$('textarea[name*="content"]:first').data('wysiwygEnabled') === 1;
             if (this.options.hasWysiwyg) {
                 this.options.isWysiwygEnabled = this.$(this.options.typeSwitcher).filter(':checked').val() === 'html';
                 this.options.emailVariableView = this.pageComponent('email-template-variables');
