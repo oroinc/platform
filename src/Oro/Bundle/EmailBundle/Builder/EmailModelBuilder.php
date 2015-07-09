@@ -25,6 +25,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailModelBuilder
 {
@@ -190,6 +191,28 @@ class EmailModelBuilder
     }
 
     /**
+     * @param EmailEntity $parentEmailEntity
+     *
+     * @return EmailModel
+     */
+    public function createForwardEmailModel(EmailEntity $parentEmailEntity)
+    {
+        $emailModel = $this->factory->getEmail();
+        $emailModel->setMailType(EmailModel::MAIL_TYPE_FORWARD);
+        $emailModel->setParentEmailId($parentEmailEntity->getId());
+
+        $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
+        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
+        $emailModel->setBodyFooter($body);
+        // link attachments of forwarded email to current email instance
+        if ($this->request->isMethod('GET')) {
+            $this->applyAttachments($emailModel, $parentEmailEntity);
+        }
+
+        return $this->createEmailModel($emailModel);
+    }
+
+    /**
      * @param EmailModel  $emailModel
      * @param EmailEntity $parentEmailEntity
      */
@@ -239,28 +262,6 @@ class EmailModelBuilder
                 break;
             }
         }
-    }
-
-    /**
-     * @param EmailEntity $parentEmailEntity
-     *
-     * @return EmailModel
-     */
-    public function createForwardEmailModel(EmailEntity $parentEmailEntity)
-    {
-        $emailModel = $this->factory->getEmail();
-        $emailModel->setMailType(EmailModel::MAIL_TYPE_FORWARD);
-        $emailModel->setParentEmailId($parentEmailEntity->getId());
-
-        $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
-        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
-        $emailModel->setBodyFooter($body);
-        // link attachments of forwarded email to current email instance
-        if ($this->request->isMethod('GET')) {
-            $this->applyAttachments($emailModel, $parentEmailEntity);
-        }
-
-        return $this->createEmailModel($emailModel);
     }
 
     /**
