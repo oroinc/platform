@@ -70,6 +70,14 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     /**
      * {@inheritdoc}
      */
+    public function getDescription($entity)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getData(ActivityList $activityListEntity)
     {
         return [];

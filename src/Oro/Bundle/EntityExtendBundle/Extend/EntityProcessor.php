@@ -34,10 +34,14 @@ class EntityProcessor
 
     /**
      * @var array
+     *
+     * Disable sync caches for doctrine related commands
+     * because in other case entity classes and Doctrine metadata do not match each other
+     * and as result DoctrineDataCollector raises an exception
      */
     protected $commands = [
-        'oro:entity-extend:update-config' => [],
-        'oro:entity-extend:update-schema' => [],
+        'oro:entity-extend:update-config' => ['--disable-cache-sync' => true],
+        'oro:entity-extend:update-schema' => ['--disable-cache-sync' => true]
     ];
 
     /**

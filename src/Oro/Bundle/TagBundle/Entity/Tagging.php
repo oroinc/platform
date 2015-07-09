@@ -5,6 +5,7 @@ namespace Oro\Bundle\TagBundle\Entity;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\TagBundle\Model\ExtendTagging;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -40,7 +41,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class Tagging
+class Tagging extends ExtendTagging
 {
     /**
      * @var integer $id
@@ -101,6 +102,8 @@ class Tagging
      */
     public function __construct(Tag $tag = null, Taggable $resource = null)
     {
+        parent::__construct();
+
         if ($tag != null) {
             $this->setTag($tag);
         }

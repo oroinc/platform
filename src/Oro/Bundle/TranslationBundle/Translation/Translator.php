@@ -128,7 +128,8 @@ class Translator extends BaseTranslator
             && isset($this->dynamicResources[$locale])
             && !empty($this->dynamicResources[$locale])
         ) {
-            $catalogueFile = $this->options['cache_dir'] . '/catalogue.' . $locale . '.php';
+            $catalogueFile = $this->options['cache_dir']
+                . '/catalogue.' . $locale . '.' . sha1(serialize($this->getFallbackLocales())) . '.php';
             if (is_file($catalogueFile)) {
                 $time = filemtime($catalogueFile);
                 /** @var DynamicResourceInterface $dynamicResource */

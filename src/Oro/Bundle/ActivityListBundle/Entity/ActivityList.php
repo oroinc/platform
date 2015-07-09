@@ -92,6 +92,14 @@ class ActivityList extends ExtendActivityList
     protected $subject;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="text", nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     */
+    protected $description;
+
+    /**
      * @var bool
      *
      * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
@@ -213,6 +221,30 @@ class ActivityList extends ExtendActivityList
     public function setSubject($subject)
     {
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * Get a description of the related record
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set a description of the related record
+     *
+     * @param string $description
+     *
+     * @return self
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }
