@@ -35,6 +35,9 @@ class OwnerTreeListener
         $this->treeProviderLink = $treeProviderLink;
     }
 
+    /**
+     * @param string $class
+     */
     public function addSupportedClass($class)
     {
         if (!in_array($class, $this->securityClasses, true)) {

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\Event\OnFlushEventArgs;
+
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener;
 
 class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
@@ -20,12 +23,14 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
         $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject $serviceLink */
         $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
         $serviceLink->expects($this->any())
             ->method('getService')
             ->will($this->returnValue($treeProvider));
+        /** @var OnFlushEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
         $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -102,16 +107,17 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnFlushNoEntities()
     {
+        /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject $serviceLink */
         $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
         $serviceLink->expects($this->never())
             ->method($this->anything());
 
+        /** @var OnFlushEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
         $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
-
         $args->expects($this->never())
             ->method($this->anything());
 
