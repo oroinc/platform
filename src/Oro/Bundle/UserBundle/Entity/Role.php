@@ -74,7 +74,7 @@ class Role extends ExtendRole
      */
     public function __construct($role = '')
     {
-        parent::__construct();
+        parent::__construct($role);
 
         $this->role  =
         $this->label = $role;
