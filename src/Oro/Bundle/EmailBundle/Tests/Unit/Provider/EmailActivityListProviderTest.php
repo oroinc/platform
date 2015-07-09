@@ -110,12 +110,10 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getService')
             ->willReturn($em);
-        $em
-            ->expects($this->once())
+        $em->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('findBy')
             ->willReturn($owners);
 
@@ -123,7 +121,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $activityOwnerArray);
         $owner = $activityOwnerArray[0];
-        $this->assertEquals('Org', $owner->getOrganization()->getName());
-        $this->assertEquals('test', $owner->getUser()->getUsername());
+        $this->assertEquals($organization->getName(), $owner->getOrganization()->getName());
+        $this->assertEquals($user->getUsername(), $owner->getUser()->getUsername());
     }
 }
