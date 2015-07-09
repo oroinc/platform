@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
 use Doctrine\ORM\NoResultException;
+
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
